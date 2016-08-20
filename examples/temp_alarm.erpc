@@ -1,0 +1,70 @@
+program TempAlarm
+
+type SensorAddress = uint8
+
+struct SensorReadResult
+{
+    SensorAddress address
+    float temp
+}
+
+struct AlarmInfo
+{
+    float temp
+    bool enabled
+}
+
+struct SensorInfo
+{
+    SensorAddress address
+    float readInterval //!< Seconds, default 1s.
+    AlarmInfo highAlarm
+    AlarmInfo lowAlarm
+}
+
+enum AlarmType
+{
+    kHighAlarm,
+    kLowAlarm,
+    kBothAlarms, //!< Only used for enable/disable.
+}
+
+type SensorInfoList = list<SensorInfo>
+type SavedState = binary
+
+//! Calls from Linux to M4.
+interface Temp
+{
+    add_sensor(SensorAddress address) -> bool
+    remove_sensor(SensorAddress address) -> bool
+
+    set_interval(SensorAddress address, float interval) -> bool
+
+    set_alarm(SensorAddress address, AlarmType alarmType, float alarmTemp) -> bool
+    enable_alarm(SensorAddress address, AlarmType alarmType) -> bool
+    disable_alarm(SensorAddress address, AlarmType alarmType) -> bool
+
+    get_one_sensor(SensorAddress address) -> SensorInfo
+    get_all_sensors_a(out SensorInfoList infos @length(count), out uint32 count) -> bool
+    get_all_sensors_b() -> SensorInfoList
+
+    save_settings() -> SavedState
+    load_settings(SavedState savedState) -> bool
+
+    //! Reads one sensor synchronously.
+    read_one_sensor(SensorAddress address) -> float
+
+    //! Sends read_results() asynchronously.
+    read_sensors(list<SensorAddress> addresses @length(count), uint32 count) -> bool
+}
+
+//! Asynchronous events from M4 to Linux.
+interface TempAsync
+{
+    //! Void return so we can verify the message was received.
+    alarm_fired(SensorAddress addr, float temp) -> void
+
+    //! Oneway since it's less important than an alarm.
+    oneway read_results(list<SensorReadResult> results @length(count), uint32 count)
+}
+

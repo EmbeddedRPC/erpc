@@ -1,0 +1,29 @@
+---
+name: i32
+desc: Test of int32 params and return
+idl: |
+  interface xyz {
+    add(int32 a, int32 b) -> int32
+  }
+test.h:
+  - int32_t add(int32_t a, int32_t b);
+test_client.cpp:
+  - int32_t add(int32_t a, int32_t b)
+  - out->write(a)
+  - out->write(b)
+  - int32_t result
+  - in->read(&result)
+  - return result
+
+---
+name: py
+desc: Python example
+idl: |
+  interface xyz {
+    oneway quit()
+  }
+lang: py
+test/interface.py:
+  - def quit(self)
+
+

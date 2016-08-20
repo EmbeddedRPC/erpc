@@ -1,0 +1,321 @@
+/*! Bluetooth UUID type - values chosen to correspond with the ATT UUID format */
+enum bleUuidType_t {
+    gBleUuidType16_c    = 0x01,    /*!< 16-bit standard UUID */
+    gBleUuidType128_c   = 0x02,    /*!< 128-bit UUID */
+    gBleUuidType32_c    = 0x03     /*!< 32-bit UUID - not available as ATT UUID format */
+}
+
+//union bleUuid_t {
+//    uint16_t    uuid16;         /*!< For gBleUuidType16_c. */
+//    uint32_t    uuid32;         /*!< For gBleUuidType32_c. */
+//    uint8_t     uuid128[16];    /*!< For gBleUuidType128_c. */
+//}
+
+struct bleUuid_t {
+    uint8[16] uuid128
+}
+
+enum gattCharacteristicPropertiesBitFields_t {
+    gGattCharPropNone_c                   = 0,        /*!< No Properties selected. */
+    gGattCharPropBroadcast_c              = BIT0,     /*!< Characteristic can be broadcast. */
+    gGattCharPropRead_c                   = BIT1,     /*!< Characteristic can be read. */
+    gGattCharPropWriteWithoutRsp_c        = BIT2,     /*!< Characteristic can be written without response. */
+    gGattCharPropWrite_c                  = BIT3,     /*!< Characteristic can be written with response. */
+    gGattCharPropNotify_c                 = BIT4,     /*!< Characteristic can be notified. */
+    gGattCharPropIndicate_c               = BIT5,     /*!< Characteristic can be indicated. */
+    gGattCharPropAuthSignedWrites_c       = BIT6,     /*!< Characteristic can be written with signed data. */
+    gGattCharPropExtendedProperties_c     = BIT7      /*!< Extended Characteristic properties. */
+}
+
+enum gattAttributePermissionsBitFields_t {
+    gPermissionNone_c                         = 0,        /*!< No permissions selected. */
+
+    /* Reading Permissions */
+    gPermissionFlagReadable_c                 = BIT0,     /*!< Attribute can be read. */
+    /* if gPermissionFlagReadable_c == 1 */
+    gPermissionFlagReadWithEncryption_c       = BIT1,     /*!< Attribute may be read only if link is encrypted. */
+    gPermissionFlagReadWithAuthentication_c   = BIT2,     /*!< Attribute may be read only by authenticated peers. */
+    gPermissionFlagReadWithAuthorization_c    = BIT3,     /*!< Attribute may be read only by authorized peers. */
+    /* endif */
+
+    /* Writing Permissions */
+    gPermissionFlagWritable_c                 = BIT4,     /*!< Attribute can be written. */
+    /* if gPermissionFlagWritable_c == 1 */
+    gPermissionFlagWriteWithEncryption_c      = BIT5,     /*!< Attribute may be written only if link is encrypted. */
+    gPermissionFlagWriteWithAuthentication_c  = BIT6,     /*!< Attribute may be written only by authenticated peers. */
+    gPermissionFlagWriteWithAuthorization_c   = BIT7,     /*!< Attribute may be written only by authorized peers. */
+    /* endif */
+
+}
+
+/*! GATT Server Event type enumeration */
+//enum gattServerEventType_t {
+//    gEvtMtuChanged_c,                       /*!< ATT_MTU was changed after the MTU exchange. */
+//    gEvtHandleValueConfirmation_c,          /*!< Received a Handle Value Confirmation from the Client. */
+//    gEvtAttributeWritten_c,                 /*!< An attribute registered with GattServer_RegisterHandlesForWriteNotifications was written.
+//                                                 After receiving this event, application must call GattServer_SendAttributeWrittenStatus.
+//                                                 Application must write the Attribute in the Database if it considers necessary. */
+//    gEvtCharacteristicCccdWritten_c,        /*!< A CCCD was written. Application should save the CCCD value with Gap_SaveCccd. */
+//    gEvtAttributeWrittenWithoutResponse_c,  /*!< An attribute registered with GattServer_RegisterHandlesForWriteNotifications was written without response (with ATT Write Command).
+//                                                 Application must write the Attribute Value in the Database if it considers necessary. */
+//    gEvtError_c,                            /*!< An error appeared during a Server-initiated procedure. */
+//    gEvtLongCharacteristicWritten_c,        /*!< A long characteristic was written. */
+//    gEvtAttributeRead_c,                    /*!< An attribute registered with GattServer_RegisterHandlesForReadNotifications is being read.
+//                                                 After receiving this event, application must call GattServer_SendAttributeReadStatus. */
+//}
+enum gattServerEventType_t {
+   gEvtMtuChanged_c,
+   gEvtHandleValueConfirmation_c,
+   gEvtAttributeWritten_c,
+   gEvtCharacteristicCccdWritten_c,
+   gEvtAttributeWrittenWithoutResponse_c,
+   gEvtError_c,
+   gEvtLongCharacteristicWritten_c,
+   gEvtAttributeRead_c,
+}
+
+/*! GATT Server MTU Changed Event structure */
+struct gattServerMtuChangedEvent_t {
+    uint16 newMtu;    /*!< Value of the agreed ATT_MTU for this connection. */
+}
+
+/*! GATT Server Attribute Written Event structure */
+struct gattServerAttributeWrittenEvent_t {
+    uint16    handle;         /*!< Handle of the attribute. */
+    uint16    cValueLength;   /*!< Length of the attribute value array. */
+//    uint8_t*    aValue;         /*!< Attribute value array attempted to be written. */
+    list<uint8>    aValue @length(cValueLength);         /*!< Attribute value array attempted to be written. */
+}
+
+/*! GATT Server Long Characteristic Written Event structure */
+struct gattServerLongCharacteristicWrittenEvent_t {
+    uint16    handle;         /*!< Handle of the Characteristic Value. */
+    uint16    cValueLength;   /*!< Length of the value written. */
+//    uint8_t*    aValue;         /*!< Pointer to the attribute value in the database. */
+    list<uint8>    aValue @length(cValueLength);         /*!< Pointer to the attribute value in the database. */
+}
+
+/*! Flags for the value of the Client Characteristic Configuration Descriptor. */
+enum gattCccdFlags_t {
+    gCccdEmpty_c        = 0x0000,   /*!< Nothing is enabled. */
+    gCccdNotification_c = BIT0,     /*!< Enables notifications. */
+    gCccdIndication_c   = BIT1      /*!< Enabled indications. */
+}
+
+/*! GATT Server CCCD Written Event structure */
+struct gattServerCccdWrittenEvent_t {
+    uint16            handle;       /*!< Handle of the CCCD attribute. */
+    gattCccdFlags_t   newCccd;      /*!< New value of the CCCD. */
+}
+
+/*! GATT Server Attribute Read Event structure */
+struct gattServerAttributeReadEvent_t {
+    uint16       handle;         /*!< Handle of the attribute. */
+}
+
+/*! Server-initiated procedure type enumeration */
+enum gattServerProcedureType_t {
+    gSendAttributeWrittenStatus_c,      /*!< Procedure initiated by GattServer_SendAttributeWrittenStatus. */
+    gSendAttributeReadStatus_c,         /*!< Procedure initiated by GattServer_SendAttributeReadStatus. */
+    gSendNotification_c,                /*!< Procedure initiated by GattServer_SendNotification. */
+    gSendIndication_c                   /*!< Procedure initiated by GattServer_SendIndication. */
+}
+
+/*! Server-initiated procedure error structure */
+struct gattServerProcedureError_t {
+    gattServerProcedureType_t   procedureType;  /*!< Procedure that generated error. */
+    bleResult_t                 error;          /*!< Error generated. */
+}
+
+/*! GATT Server Event structure: type + data. */
+struct gattServerEvent_t {
+    gattServerEventType_t eventType;    /*!< Event type. */
+    union (eventType) {
+        case gEvtMtuChanged_c:
+            gattServerMtuChangedEvent_t                 mtuChangedEvent;        /*!< For event type gEvtMtuChanged_c: the new value of the ATT_MTU. */
+        case gEvtAttributeWritten_c, gEvtAttributeWrittenWithoutResponse_c:
+            gattServerAttributeWrittenEvent_t           attributeWrittenEvent;  /*!< For event types gEvtAttributeWritten_c, gEvtAttributeWrittenWithoutResponse_c: handle and value of the attempted write. */
+        case gEvtCharacteristicCccdWritten_c:
+            gattServerCccdWrittenEvent_t                charCccdWrittenEvent;   /*!< For event type gEvtCharacteristicCccdWritten_c: handle and value of the CCCD. */
+        case gEvtError_c:
+            gattServerProcedureError_t                  procedureError;         /*!< For event type gEvtError_c: error that terminated a Server-initiated procedure. */
+        case gEvtLongCharacteristicWritten_c:
+            gattServerLongCharacteristicWrittenEvent_t  longCharWrittenEvent;   /*!< For event type gEvtLongCharacteristicWritten_c: handle and value. */
+        case gEvtAttributeRead_c:
+            gattServerAttributeReadEvent_t              attributeReadEvent;     /*!< For event types gEvtAttributeRead_c: handle of the attempted read. */
+    } eventData;                            /*!< Event data : selected according to event type. */
+}
+
+type gattServerCallback_t = uint32
+
+
+@group("ble_api")
+interface gatt_server {
+
+    _GattServer_RegisterCallback(
+//        gattServerCallback_t callback
+    ) -> bleResult_t
+
+    _GattServer_RegisterHandlesForWriteNotifications(
+        uint8     handleCount,
+        /*uint16_t ptr*/ list<uint16>   aAttributeHandles @length(handleCount)
+    ) -> bleResult_t
+
+    GattServer_SendAttributeWrittenStatus(
+        deviceId_t      deviceId,
+        uint16          attributeHandle,
+        uint8           status
+    ) -> bleResult_t
+
+    _GattServer_RegisterHandlesForReadNotifications(
+        uint8       handleCount,
+        /*uint16 ptr*/ list<uint16>     aAttributeHandles @length(handleCount)
+    ) -> bleResult_t
+
+    GattServer_SendAttributeReadStatus(
+        deviceId_t      deviceId,
+        uint16          attributeHandle,
+        uint8           status
+    ) -> bleResult_t
+
+    GattServer_SendNotification(
+        deviceId_t              deviceId,
+        uint16                  handle
+    ) -> bleResult_t
+
+    GattServer_SendIndication(
+        deviceId_t              deviceId,
+        uint16                  handle
+    ) -> bleResult_t
+
+    GattServer_SendInstantValueNotification(
+        deviceId_t              deviceId,
+        uint16                  handle,
+        uint16                  valueLength,
+        /*uint8_t ptr*/ list<uint8>  aValue @length(valueLength)
+    ) -> bleResult_t
+
+    GattServer_SendInstantValueIndication(
+        deviceId_t              deviceId,
+        uint16                  handle,
+        uint16                  valueLength,
+        /*uint8_t ptr*/ list<uint8>  aValue @length(valueLength)
+    ) -> bleResult_t
+
+}
+
+@group("ble_api")
+@py_interface_name_strip_prefix("_GattDb_")
+interface gatt_db {
+
+    _GattDb_WriteAttribute(
+            uint16    handle,
+            uint16    valueLength,
+            list<uint8>    aValue @length(valueLength)
+        ) -> bleResult_t
+
+    _GattDb_ReadAttribute(
+            uint16       handle,
+            uint16       maxBytes,
+            out list<uint8> /*uint8 ptr*/    aOutValue @length(pOutValueLength),
+            out uint16   pOutValueLength
+        ) -> bleResult_t
+
+    _GattDb_FindServiceHandle(
+            uint16          startHandle,
+            bleUuidType_t   serviceUuidType,
+            bleUuid_t       pServiceUuid,
+            out uint16      pOutServiceHandle
+        ) -> bleResult_t
+
+    _GattDb_FindCharValueHandleInService(
+            uint16          serviceHandle,
+            bleUuidType_t   characteristicUuidType,
+            bleUuid_t       pCharacteristicUuid,
+            out uint16      pOutCharValueHandle
+        ) -> bleResult_t
+
+    GattDb_FindCccdHandleForCharValueHandle(
+            uint16          charValueHandle,
+            out uint16      pOutCccdHandle
+        ) -> bleResult_t
+
+    _GattDb_FindDescriptorHandleForCharValueHandle(
+            uint16          charValueHandle,
+            bleUuidType_t   descriptorUuidType,
+            bleUuid_t       pDescriptorUuid,
+            out uint16      pOutDescriptorHandle
+        ) -> bleResult_t
+
+}
+
+@group("ble_api")
+interface gatt_dynamic_db {
+
+    GattDbDynamic_AllocateAttributes(
+            uint16 cNumAttributes
+        ) -> bleResult_t
+
+    GattDbDynamic_AllocateAttributeValues(
+            uint32 cNumBytes
+        ) -> bleResult_t
+
+    GattDbDynamic_ReleaseDatabase() -> bleResult_t
+
+    GattDbDynamic_AddPrimaryServiceDeclaration(
+            bleUuidType_t   serviceUuidType,
+            bleUuid_t       pServiceUuid
+        ) -> bleResult_t
+
+    GattDbDynamic_AddSecondaryServiceDeclaration(
+            bleUuidType_t   serviceUuidType,
+            bleUuid_t       pServiceUuid
+        ) -> bleResult_t
+
+    GattDbDynamic_AddIncludeDeclaration(
+            uint16          includedServiceHandle,
+            uint16          endGroupHandle,
+            bleUuidType_t   serviceUuidType,
+            bleUuid_t       pServiceUuid
+        ) -> bleResult_t
+
+    _GattDbDynamic_AddCharacteristicDeclarationAndValue(
+            bleUuidType_t                               characteristicUuidType,
+            bleUuid_t                                   pCharacteristicUuid,
+            gattCharacteristicPropertiesBitFields_t     characteristicProperties,
+            uint16                                      maxValueLength,
+            uint16                                      initialValueLength,
+            list<uint8>                                 aInitialValue @length(initialValueLength),
+            gattAttributePermissionsBitFields_t         valueAccessPermissions
+        ) -> bleResult_t
+
+    _GattDbDynamic_AddCharacteristicDescriptor(
+            bleUuidType_t                               descriptorUuidType,
+            bleUuid_t                                   pDescriptorUuid,
+            uint16                                      descriptorValueLength,
+            list<uint8>                                 aInitialValue @length(initialValueLength),
+            gattAttributePermissionsBitFields_t         descriptorAccessPermissions
+        ) -> bleResult_t
+
+    GattDbDynamic_AddCccd() -> bleResult_t
+
+    GattDbDynamic_AddCharacteristicDeclarationWithUniqueValue(
+            bleUuidType_t                               characteristicUuidType,
+            bleUuid_t                                   pCharacteristicUuid,
+            gattCharacteristicPropertiesBitFields_t     characteristicProperties,
+            gattAttributePermissionsBitFields_t         valueAccessPermissions
+        ) -> bleResult_t
+
+}
+
+@group("ble_callbacks")
+interface gatt_server_cb {
+
+    oneway gattServerCallback(
+            deviceId_t deviceId,
+            gattServerEvent_t  pServerEvent
+        )
+
+
+}
+

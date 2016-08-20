@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice, this list
+ *   of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+@include("myAlloc.h")
+program test_arrays;
+enum enumColor{red, green, blue}
+enum numbers {one = 1, two, three, four}
+
+struct C
+{
+    int32 m
+    int32 n
+}
+
+struct AllTypes
+{
+    int32 number
+    string text
+    C c
+    enumColor color
+    list<int32> list_numbers
+    list<string> list_text
+    int32[5] array_numbers
+    string[5] array_text
+}
+
+enum myEnum {a, b, c}
+
+const int32 c_x = 5
+
+type arr1 = int32[c_x * b + 2 + two]
+type arr2 = int32[c_x + 5 * 3 + 4 / two]
+
+type ArrayIntType = int32[12]
+type Array2IntType = int32[12][10]
+
+type ArrayStringType = string[12]
+type Array2StringType = string[3][5]
+
+type ArrayEnumType = enumColor[3]
+type Array2EnumType = enumColor[3][3]
+
+type ArrayStructType = C[3]
+type Array2StructType = C[3][3]
+
+type ArrayListType = list<int32>[2]
+type Array2ListType = list<int32>[2][2]
+
+
+interface PointersService {
+    sendReceivedInt32(int32[12] arrayNumbers) -> int32[12]
+    sendReceived2Int32(int32[12][10] arrayNumbers) -> int32[12][10]
+
+    sendReceivedString(string[12] arrayStrings ) -> string[12]
+    sendReceived2String(string[3][5] arrayStrings ) -> string[3][5]
+
+    sendReceivedEnum(enumColor[3] arrayEnums) -> enumColor[3]
+    sendReceived2Enum(enumColor[3][3] arrayEnums) -> enumColor[3][3]
+
+    sendReceivedList(list<int32>[2] arrayLists) -> list<int32>[2]
+    sendReceived2List(list<int32>[2][2] arrayLists @retain) -> list<int32>[2][2]
+
+    sendReceivedInt32Type(ArrayIntType arrayNumbers) -> ArrayIntType
+    sendReceived2Int32Type(Array2IntType arrayNumbers) -> Array2IntType
+
+    sendReceivedStringType(ArrayStringType arrayStrings ) -> ArrayStringType
+    sendReceived2StringType(Array2StringType arrayStrings ) -> Array2StringType
+
+    sendReceivedEnumType(ArrayEnumType arrayEnums) -> ArrayEnumType
+    sendReceived2EnumType(Array2EnumType arrayEnums) -> Array2EnumType
+
+    sendReceivedStructType(ArrayStructType arrayStructs) -> ArrayStructType
+    sendReceived2StructType(Array2StructType arrayStructs) -> Array2StructType
+
+    sendReceivedListType(ArrayListType arrayLists) -> ArrayListType
+    sendReceived2ListType(Array2ListType arrayLists) -> Array2ListType
+
+    sendReceiveStruct(AllTypes[2] arrayStructs) -> AllTypes[2]
+    sendReceive2Struct(AllTypes[1][1] arrayStructs) -> AllTypes[1][1]
+
+    test_array_allDirection(int32[5] a, in int32[5] b, out int32[5] c, out byref int32[5] d, inout int32[5] e) -> void
+}
+
+interface TestSecondInterfaceService {
+    oneway testFunction()
+}

@@ -1,0 +1,69 @@
+---
+name: enum const expression
+desc:
+params:
+  name:
+    - ""
+    - numbers
+idl: |
+  enum {name} {
+    one = 1,
+    two,
+    three
+  }
+
+  const int32 a = 2
+  const int32 b = a * two + three -1
+
+test.h:
+  # named enums get a typedef
+  - if: name
+    then:
+      - re: ^typedef enum {name}
+    else:
+      - re: ^enum
+  - one = 1
+  - two = 2
+  - three = 3
+  - if: name
+    then:
+      - '} {name}'
+  - const int32_t a;
+  - const int32_t b;
+
+test_client.cpp:
+  - const int32_t a = 2;
+  - const int32_t b = 6;
+
+test_server.cpp:
+  - const int32_t a = 2;
+  - const int32_t b = 6;
+
+---
+name: py enum const expression
+desc:
+params:
+  name:
+    - ""
+    - "E"
+idl: |
+  enum {name} {
+    one =1,
+    two,
+    three
+  }
+
+  const int32 a = 2
+  const int32 b = a * two + three -1
+lang: py
+test/common.py:
+  - a = 2
+  - b = 6
+  - if: name
+    then:
+      - class E
+    else:
+      - not: class E
+  - one = 1
+  - two = 2
+  - three = 3

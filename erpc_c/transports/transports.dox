@@ -1,0 +1,85 @@
+/*!
+@defgroup transports Transport Layers
+@brief Transport layer classes.
+*/
+
+/*!
+@defgroup dspi_master_transport DSPI Master
+@ingroup transports
+@brief Kinetis SDK DSPI master driver transport.
+*/
+
+/*!
+@defgroup dspi_slave_transport DSPI Slave
+@ingroup transports
+@brief Kinetis SDK DSPI slave driver transport.
+*/
+
+/*!
+@defgroup spi_master_transport SPI Master
+@ingroup transports
+@brief Kinetis SDK SPI master driver transport.
+*/
+
+/*!
+@defgroup spi_slave_transport SPI Slave
+@ingroup transports
+@brief Kinetis SDK SPI slave driver transport.
+*/
+
+/*!
+@defgroup itbp_transport Inter-thread
+@ingroup transports
+@brief Simple inter-thread communications transport.
+*/
+
+/*!
+@defgroup lpuart_transport LPUART
+@ingroup transports
+@brief Kinetis SDK LPUART driver transport.
+*/
+
+/*!
+@defgroup uart_transport UART
+@ingroup transports
+@brief Kinetis SDK UART driver transport.
+*/
+
+/*!
+@defgroup serial_transport Serial port
+@ingroup transports
+@brief POSIX and Win32 serial port transport.
+*/
+
+/*!
+@defgroup rpmsg_lite_rtos_transport RPMsg-Lite RTOS
+@ingroup transports
+@brief RPMsg-Lite transport using RTOS API.
+*/
+
+/*!
+@defgroup rpmsg_lite_transport RPMsg-Lite
+@ingroup transports
+@brief RPMsg-Lite transport.
+*/
+
+/*!
+@defgroup rpmsg_rtos_transport RPMsg RTOS
+@ingroup transports
+@brief OpenAMP RPMsg RTOS layer transport.
+*/
+
+/*!
+@defgroup rpmsg_transport RPMsg
+@ingroup transports
+@brief OpenAMP RPMsg transport.
+*/
+
+/*!
+@defgroup tcp_transport TCP/IP
+@ingroup transports
+@brief Simple TCP/IP transport.
+*/
+
+
+

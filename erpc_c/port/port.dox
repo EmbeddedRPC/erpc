@@ -1,0 +1,26 @@
+/*!
+@defgroup port Porting
+@brief Porting layer
+*/
+
+/*!
+@defgroup port_mem Memory
+@brief Memory allocation
+@ingroup port
+*/
+
+/*!
+@defgroup port_threads Threads
+@brief Threading model
+@ingroup port
+*/
+
+/*!
+@defgroup port_serial Serial
+@brief Serial port
+@ingroup port
+*/
+
+
+
+

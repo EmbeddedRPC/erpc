@@ -1,0 +1,8 @@
+---
+name: basic struct
+desc:
+idl: |
+  struct A {
+  }
+test.h:
+ - typedef struct A A;

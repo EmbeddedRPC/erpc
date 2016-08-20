@@ -1,0 +1,30 @@
+---
+name: extern c empty
+desc: do the extern "C" blocks get produced for empty input
+idl: ""
+test.h:
+  - |
+    #if defined(__cplusplus)
+    extern "C" {
+    #endif
+  - |
+    #if defined(__cplusplus)
+    }
+    #endif
+
+---
+name: extern c
+desc: do the extern "C" blocks get produced for non-empty input
+idl: |
+  interface Foo {
+    foofn() -> void
+  }
+test.h:
+  - |
+    #if defined(__cplusplus)
+    extern "C" {
+    #endif
+  - |
+    #if defined(__cplusplus)
+    }
+    #endif

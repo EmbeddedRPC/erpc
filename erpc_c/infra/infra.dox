@@ -1,0 +1,38 @@
+/*!
+@defgroup infra Infrastructure
+@brief C++ core
+*/
+
+/*!
+@defgroup infra_transport Transports
+@brief Superclasses for building transports.
+@ingroup infra
+*/
+
+/*!
+@defgroup infra_utility Utilities
+@brief Utility code used by the infrastructure.
+@ingroup infra
+*/
+
+/*!
+@defgroup infra_server Server
+@brief Server classes.
+@ingroup infra
+*/
+
+/*!
+@defgroup infra_client Client
+@brief Client classes
+@ingroup infra
+*/
+
+/*!
+@defgroup infra_codec Serialization
+@brief Classes used for message serialization.
+@ingroup infra
+*/
+
+
+
+

@@ -1,0 +1,100 @@
+---
+name: non nullable scalar field
+desc: tests that non-nullable fields checked against None
+params:
+  type:
+    - [bool, b]
+    - [int8, i]
+    - [int16, i]
+    - [int32, i]
+    - [uint8, u]
+    - [uint16, u]
+    - [uint32, u]
+    - [float, f]
+    - [double, d]
+idl: |
+  struct S {
+    {type[0]} {type[1]}
+  }
+lang: py
+test/common.py:
+  - class S
+  - def _write
+  - if self.{type[1]} is None
+  - raise ValueError
+
+---
+name: non nullable array struct field
+desc: tests that non-nullable array fields checked against None
+params:
+  type:
+    - bool
+    - int8
+    - int16
+    - int32
+    - uint8
+    - uint16
+    - uint32
+    - float
+    - double
+  count:
+    - 1
+    - 2
+    - 4
+    - 8
+idl: |
+  struct S {
+    {type}[{count}] a
+  }
+lang: py
+test/common.py:
+  - class S
+  - def _write
+  - if self.a is None
+  - raise ValueError
+
+---
+name: non nullable string struct field
+desc: tests that non-nullable string fields checked against None
+idl: |
+  struct S {
+    string s
+  }
+lang: py
+test/common.py:
+  - class S
+  - def _write
+  - if self.s is None
+  - raise ValueError
+
+---
+name: non nullable enum struct field
+desc: tests that non-nullable enum fields checked against None
+idl: |
+  enum E { A=1, B=2 }
+  struct S {
+    E e
+  }
+lang: py
+test/common.py:
+  - class S
+  - def _write
+  - if self.e is None
+  - raise ValueError
+
+---
+name: non nullable struct field
+desc: tests that non-nullable struct fields checked against None
+idl: |
+  struct X {
+    int32 x
+  }
+  struct S {
+    X x
+  }
+lang: py
+test/common.py:
+  - class S
+  - def _write
+  - if self.x is None
+  - raise ValueError

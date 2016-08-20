@@ -1,0 +1,6 @@
+*.o
+*.d
+cpptempl_test
+tags
+html
+

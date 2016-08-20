@@ -1,0 +1,7 @@
+erpc_test
+.eggs
+dist
+build
+*.egg-info
+
+

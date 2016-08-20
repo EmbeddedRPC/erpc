@@ -1,0 +1,150 @@
+---
+name: basic enum
+desc:
+params:
+  name:
+    - ""
+    - E
+idl: |
+  enum {name} {
+  }
+
+---
+name: basic enum
+desc:
+params:
+  name:
+    - ""
+    - E
+idl: |
+  enum {name} {
+    A,
+    B,
+    C
+  }
+test.h:
+  # named enums get a typedef
+  - if: name
+    then:
+      - re: ^typedef enum {name}
+    else:
+      - re: ^enum
+  - A = 0
+  - B = 1
+  - C = 2
+  - if: name
+    then:
+      - '} {name}'
+
+---
+name: enum incr value
+desc:
+params:
+  name:
+    - ""
+    - E
+idl: |
+  enum {name} {
+    A = 10,
+    B,
+    C
+  }
+test.h:
+  # named enums get a typedef
+  - if: name
+    then:
+      - re: ^typedef enum {name}
+    else:
+      - re: ^enum
+  - A = 10
+  - B = 11
+  - C = 12
+  - if: name
+    then:
+      - '} {name}'
+
+---
+name: enum all values
+desc: tests enum with all enumerators having a value, both in and out of order
+params:
+  name:
+    - ""
+    - E
+  c_val:
+    - 10
+    - 40
+idl: |
+  enum {name} {
+    A = 20,
+    B = 30,
+    C = {c_val}
+  }
+test.h:
+  # named enums get a typedef
+  - if: name
+    then:
+      - re: ^typedef enum {name}
+    else:
+      - re: ^enum
+  - A = 20
+  - B = 30
+  - C = {c_val}
+  - if: name
+    then:
+      - '} {name}'
+
+---
+name: single enum
+desc:
+params:
+  name:
+    - ""
+    - "E"
+  opt_comma:
+    - ""
+    - ","
+  a_val:
+    - ""
+    - " = 10"
+idl: |
+  enum {name} {
+    A{a_val}{opt_comma}
+  }
+test.h:
+  # named enums get a typedef
+  - if: name
+    then:
+      - re: ^typedef enum {name}
+    else:
+      - re: ^enum
+  - A{a_val}
+  - if: name
+    then:
+      - '} {name}'
+
+---
+name: py basic enum
+desc:
+params:
+  name:
+    - ""
+    - "E"
+idl: |
+  enum {name} {
+    A,
+    B,
+    C
+  }
+lang: py
+test/common.py:
+  - if: name
+    then:
+      - class E
+    else:
+      - not: class E
+  - A = 0
+  - B = 1
+  - C = 2
+
+
+

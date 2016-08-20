@@ -1,0 +1,174 @@
+
+{############################### encodeValue ###############################}
+{% def encodeValue(info, name, codec, indent, depth) %}
+{#--------------- struct ---------------#}
+{% if info.type == "struct" %}
+{$name}._write({$codec}){%>%}
+{#--------------- union ---------------#}
+{% elif info.type == "union" %}
+{# unions are always within structs, so we have self available #}
+{%  set isFirst = true %}
+{%  set hasNonVoidCase = false %}
+{%  set defaultCase = false %}
+{%  for c in info.cases %}
+{%   if c.name == "default" %}
+{%    set defaultCase = c %}
+{%   elif not c.isVoid %}
+{%    set hasNonVoidCase = true %}
+{% if not isFirst %}{$indent}{% endif %}{$"if" if isFirst else "elif"} self.{$info.discriminatorName} == {$c.value}:
+{%    for cm in c.members %}
+{%     if cm.isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        {$codec}.write_null_flag(True)
+{$indent}    else:
+{$indent}        {$codec}.write_null_flag(False)
+{$indent}    {$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     else -- isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        raise ValueError("{$name}.{$cm.name} is None")
+{$indent}    {$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%    set isFirst = false %}
+{%   endif -- default case/not void %}
+{%  endfor -- union cases %}
+{%  if defaultCase %}
+{%   if not isFirst %}
+{$indent}else: # default case
+{%   endif %}
+{%   if defaultCase.isVoid && not isFirst %}
+{$indent}    pass
+{%   else %}
+{%    for cm in defaultCase.members %}
+{%     if cm.isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        {$codec}.write_null_flag(True)
+{$indent}    else:
+{$indent}        {$codec}.write_null_flag(False)
+{$indent}    {% if not isFirst %}    {% endif %}{$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     else -- isNullable %}
+{$indent}{% if not isFirst %}    {% endif %}{$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%   endif -- defaultCase.isVoid %}
+{%  elif hasNonVoidCase %}
+{$indent}else:
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr(self.{$info.discriminatorName}))
+{%  endif -- defaultCase/hasNonVoidCase %}
+{#--------------- enum ---------------#}
+{% elif info.type == "enum" %}
+{$codec}.write_uint32({$name}){%>%}
+{#--------------- string ---------------#}
+{% elif info.type == "string" %}
+{$codec}.write_string({$name}){%>%}
+{#--------------- binary ---------------#}
+{% elif info.type == "binary" %}
+{$codec}.write_binary({$name}){%>%}
+{#--------------- list, array ---------------#}
+{% elif info.type == "list" || info.type == "array" %}
+{%  if info.type == "list" %}
+{$codec}.start_write_list(len({$name}))
+{%  endif %}
+{%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
+{$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}
+{%  if info.type == "list" %}
+{$indent}{$codec}.end_write_list()
+{%  endif %}
+{#--------------- else ---------------#}
+{% else %}
+{$codec}.write_{$info.type}({$name}){%>%}
+{% endif %}
+{% enddef %}
+
+{############################### decodeValue ###############################}
+{% def decodeValue(info, name, commonPrefix, codec, indent, depth) %}
+{#--------------- struct ---------------#}
+{% if info.type == "struct" %}
+{$name} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
+{#--------------- union ---------------#}
+{% elif info.type == "union" %}
+{# unions are always within structs, so we have self available #}
+{$name} = {$name}_union()
+{%  set isFirst = true %}
+{%  set hasNonVoidCase = false %}
+{%  set defaultCase = false %}
+{%  for c in info.cases %}
+{%   if c.name == "default" %}
+{%    set defaultCase = c %}
+{%   elif not c.isVoid %}
+{%    set hasNonVoidCase = true %}
+{$indent}{$"if" if isFirst else "elif"} self.{$info.discriminatorName} == {$c.value}:
+{%    for cm in c.members %}
+{%     if cm.isNullable %}
+{$indent}    if not {$codec}.read_null_flag()
+{$indent}        {$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    else:
+{$indent}        {$name}.{$cm.name} = None
+{%     else -- isNullable %}
+{$indent}    {$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%  set isFirst = false %}
+{%   endif -- default/not void %}
+{%  endfor -- union cases %}
+{%  if defaultCase %}
+{%   if not isFirst %}
+{$indent}else: # default case
+{%   endif %}
+{%   if defaultCase.isVoid && not isFirst %}
+{$indent}    pass
+{%   else %}
+{%    for cm in defaultCase.members %}
+{%     if cm.isNullable %}
+{$indent}    if not {$codec}.read_null_flag()
+{$indent}    {% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    else:
+{$indent}        {$name}.{$cm.name} = None
+{%     else -- isNullable %}
+{$indent}{% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%   endif -- defaultCase.isVoid %}
+{%  elif hasNonVoidCase %}
+{$indent}else:
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr(self.{$info.discriminatorName}))
+{%  endif -- default/hasNonVoidCase %}
+{#--------------- enum ---------------#}
+{% elif info.type == "enum" %}
+{$name} = {$codec}.read_uint32(){%>%}
+{#--------------- string ---------------#}
+{% elif info.type == "string" %}
+{$name} = {$codec}.read_string(){%>%}
+{#--------------- binary ---------------#}
+{% elif info.type == "binary" %}
+{$name} = {$codec}.read_binary(){%>%}
+{#--------------- list, array ---------------#}
+{% elif info.type == "list" || info.type == "array" %}
+{%   if info.type == "list" %}
+_n{$depth} = {$codec}.start_read_list()
+{%   endif %}
+{%   if info.type == "list" %}{$indent}{%   endif %}{$name} = []
+{$indent}for _i{$depth} in range({% if info.type == "list" %}_n{$depth}{% else %}{$info.elementCount}{% endif %}):
+{$indent}    {$decodeValue(info.elementType, "_v" & depth, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    {$name}.append(_v{$depth})
+{%   if info.type == "list" %}
+{$indent}{$codec}.end_read_list()
+{%   endif %}
+{#--------------- else ---------------#}
+{% else %}
+{$name} = {$codec}.read_{$info.type}(){%>%}
+{% endif %}
+{% enddef %}
+
+{############################### prettyTypeName ###############################}
+{% def prettyTypeName(name, info) %}
+{% if info.type == "list" %}
+list<{$prettyTypeName("", info.elementType)}>{%>%}
+{% elif info.type == "array" %}
+{$prettyTypeName("", info.elementType)}[{$info.elementCount}]
+{% elif info.type == "union" %}
+{$name}_union{%>%}
+{% else %}
+{$info.name}{%>%}
+{% endif %}
+{% enddef %}

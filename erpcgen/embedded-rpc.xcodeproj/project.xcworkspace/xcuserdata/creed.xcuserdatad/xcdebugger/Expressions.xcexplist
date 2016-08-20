@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "erpc::BasicCodec::write(int):basic_serialization.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "erpc::BufferedTransport::write(void const*, unsigned int):buffered_transport.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "test_encode():erpc_test.cpp">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

@@ -1,0 +1,11 @@
+program erpc_test
+
+interface Arithmetic {
+    add(float a, float b) -> float
+    sub(float a, float b) -> float
+}
+
+interface Server {
+    oneway quit()
+}
+

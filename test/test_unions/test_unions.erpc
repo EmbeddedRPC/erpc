@@ -1,0 +1,147 @@
+/*
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice, this list
+ *   of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+@include("myAlloc.h")
+@outputDir("erpc_outputs")
+@separateInterfaceOutput(true)
+program test_unions;
+
+enum caseValues { bar, baz }
+enum fruit { apple, orange, banana, coconut, grape, papaya, kiwi }
+const int32 returnVal = 10;
+
+type floatList = list<float>
+
+
+struct foobar
+{
+    float a
+    binary rawString
+}
+
+struct foo
+{
+    int32 discriminator
+    union(discriminator)
+    {
+        case apple:
+            foobar myFoobar
+        case banana:
+        case papaya:
+            int32 x;
+            float y;
+        case orange:
+            list<int32> a
+        case coconut:
+            uint32 cx;
+            list<int32> cc @length(cx)
+        case returnVal:
+            int32 ret
+        default:
+            bool c
+            int32 blah
+    } bing
+}
+
+struct InnerList {
+    list<int32> myList
+}
+
+const uint8 gcBleDeviceAddressSize_c = 6
+
+type bleDeviceAddress_t = uint8[gcBleDeviceAddressSize_c]
+
+type bool_t = uint8
+
+enum bleResult_t { gBleStatusBase_c, gBleSuccess_c,  gBleOsError_c }
+
+enum gapGenericEventType_t
+{
+    gInternalError_c,
+    gWhiteListSizeReady_c,
+    gRandomAddressReady_c,
+    gPublicAddressRead_c,
+    gAdvertisingSetupFailed_c,
+    gAdvTxPowerLevelRead_c,
+    gPrivateResolvableAddressVerified_c
+    gTestCaseReturn_c
+}
+
+enum gapInternalErrorSource_t
+{
+    gHciCommandStatus_c,
+    gCheckPrivateResolvableAddress_c,
+    gVerifySignature_c,
+    gConnect_c
+}
+
+struct gapInternalError_t
+{
+    bleResult_t errorCode
+    gapInternalErrorSource_t errorSource
+    uint16 hciCommandOpcode
+}
+
+struct gapGenericEvent_t
+{
+    gapGenericEventType_t eventType;
+    union(eventType)
+    {
+        case gInternalError_c:
+            gapInternalError_t internalError /*!<comment test*/
+        case gWhiteListSizeReady_c:
+            uint8 whiteListSize; /*!<another comment test */
+        case gRandomAddressReady_c, gPublicAddressRead_c:
+            bleDeviceAddress_t aAddress /*!< testing more comments */
+        case gAdvertisingSetupFailed_c:
+            bleResult_t setupFailError;
+        case gAdvTxPowerLevelRead_c:
+            int8 advTxPowerLevel_dBm
+        case gPrivateResolvableAddressVerified_c:
+            bool_t verified;
+        case gTestCaseReturn_c:
+            int32 returnCode;
+        default:
+            int8 defaultValue
+    } eventData
+}
+
+struct Foop {
+    gapGenericEventType_t eventType;
+    union(eventType){
+       default:
+          void
+    } value
+}
+
+interface ArithmeticService {
+    testGenericCallback(gapGenericEvent_t event) -> gapGenericEvent_t
+    sendMyFoo(foo f @retain) -> foo
+    testInnerList(InnerList il) -> InnerList
+}

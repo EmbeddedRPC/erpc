@@ -1,0 +1,92 @@
+<!-- This file is maintained by component support author -->
+<metadata>
+  <components>
+    <component name="middleware.multicore.erpc" provides="middleware.multicore" version="2.0.0">
+      <source path="./">
+        <files mask=".cproject"/>
+        <files mask=".project"/>
+        <files mask="*.meta"/>
+        <files mask="Makefile"/>
+        <files mask="readme.txt"/>
+      </source>
+      <source path="./erpc_c">
+        <files mask="readme.txt"/>
+      </source>
+      <source path="./erpc_c/config">
+        <files mask="erpc_config.h"/>
+      </source>
+      <source path="./erpc_c/infra">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+      </source>
+      <source path="./erpc_c/port">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+      </source>
+      <source path="./erpc_c/setup">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+      </source>
+      <source path="./erpc_c/transports">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+      </source>
+      <source path="./erpc_python">
+        <files mask="setup.py"/>
+        <files mask="readme.txt"/>
+      </source>
+      <source path="./erpc_python/erpc">
+        <files mask="*.py"/>
+      </source>
+      <source path="./erpcgen">
+        <files mask="Makefile"/>
+        <files mask="readme.txt"/>
+      </source>
+      <source path="./erpcgen/bin">
+        <files mask="txt_to_c.py"/>
+      </source>
+      <source path="./erpcgen/embedded-rpc.xcodeproj">
+        <files mask="project.pbxproj"/>
+      </source>
+      <source path="./erpcgen/embedded-rpc.xcodeproj/project.xcworkspace">
+        <files mask="contents.xcworkspacedata"/>
+      </source>
+      <source path="./erpcgen/src">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+        <files mask="*.l"/>
+        <files mask="*.y"/>
+      </source>
+      <source path="./erpcgen/src/cpptemplate">
+        <files mask="cpptempl.h"/>
+        <files mask="cpptempl.cpp"/>
+        <files mask="README.rst"/>
+        <files mask="LICENSE.txt"/>
+      </source>
+      <source path="./erpcgen/src/templates">
+        <files mask="*.template"/>
+      </source>
+      <source path="./erpcgen/src/types">
+        <files mask="*.h"/>
+        <files mask="*.cpp"/>
+      </source>
+      <source path="./erpcgen/VisualStudio_v12">
+        <files mask="erpcgen.sdf"/>
+        <files mask="erpcgen.sln"/>
+        <files mask="erpcgen.vcxproj"/>
+        <files mask="erpcgen.v12.suo"/>
+        <files mask="erpcgen.vcxproj.filters"/>
+        <files mask="erpcgen.vcxproj.user"/>
+        <files mask="readme_erpcgen.txt"/>
+        <files mask="stdafx.cpp"/>
+        <files mask="stdafx.h"/>
+        <files mask="stdbool.h"/>
+        <files mask="targetver.h"/>
+      </source>
+      <source path="./mk">
+        <files mask="*.mk"/>
+      </source>
+    </component>
+  </components>
+</metadata>
+

@@ -1,0 +1,8 @@
+@include("myAlloc.h")
+@outputDir("unit_test_common")
+program unit_test_common;
+@id(0)
+interface Common {
+    oneway quit()
+    getServerAllocated() -> int32
+}

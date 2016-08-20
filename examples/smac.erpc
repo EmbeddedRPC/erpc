@@ -1,0 +1,158 @@
+program smac
+
+
+enum smacErrors_t
+{
+  gErrorNoError_c = 0,
+  gErrorBusy_c,
+  gErrorChannelBusy_c,
+  gErrorNoAck_c,
+  gErrorOutOfRange_c,
+  gErrorNoResourcesAvailable_c,
+  gErrorNoValidCondition_c,
+  gErrorCorrupted_c,
+  gErrorMaxError_c
+}
+
+enum smacMessageDefs_t
+{
+  gMcpsDataCnf_c,
+  gMcpsDataInd_c,
+  gMlmeCcaCnf_c,
+  gMlmeEdCnf_c,
+  gMlmeSetReq_c,
+  gMlmeSetCnf_c,
+  gMlmeTimeoutInd_c,
+  gMlme_UnexpectedRadioResetInd_c
+}
+
+enum rxStatus_t
+{
+  rxInitStatus,
+  rxProcessingReceptionStatus_c,
+  rxSuccessStatus_c,
+  rxTimeOutStatus_c,
+  rxAbortedStatus_c,
+  rxMaxStatus_c
+}
+
+type smacTime_t = uint64
+
+struct smacHeader_t
+{
+  uint16 frameControl;
+  uint8 seqNo;
+  uint16 panId;
+  uint16 destAddr;
+  uint16 srcAddr;
+}
+
+struct txPacket_t
+{
+  uint8 u8DataLength;
+  smacHeader_t smacHeader;
+  binary smacPdu @length(u8DataLength);
+}
+
+struct txContextConfig_t
+{
+  bool ccaBeforeTx;
+  bool autoAck;
+  uint8 retryCountCCAFail;
+  uint8 retryCountAckFail;
+}
+
+struct rxPacket_t
+{
+  uint8 u8MaxDataLength;
+  rxStatus_t rxStatus;
+  uint8 u8DataLength;
+  smacHeader_t smacHeader;
+  binary smacPdu @length(u8DataLength);
+}
+
+
+interface SMAC {
+
+    InitSmac() -> void
+
+    MCPSDataRequest(txPacket_t txPacket) -> smacErrors_t
+
+    MLMEConfigureTxContext(txContextConfig_t txConfig) -> smacErrors_t
+
+    MLMERXEnableRequest(rxPacket_t rxPacket, smacTime_t stTimeout) -> smacErrors_t
+    MLMERXDisableRequest() -> smacErrors_t
+
+    MLMESetChannelRequest(channels_t newChannel) -> smacErrors_t
+    MLMEGetChannelRequest() -> channels_t
+
+    MLMEPAOutputAdjust(uint8 u8PaValue) -> smacErrors_t
+
+    MLMELinkQuality() -> uint8
+    MLMEScanRequest(channels_t u8ChannelToScan) -> smacErrors_t
+    MLMECcaRequest() -> smacErrors_t
+
+    MLMETXDisableRequest() -> void
+
+    SMACSetShortSrcAddress(uint16 nwShortAddress) -> smacErrors_t
+    SMACSetPanID(uint16 nwShortPanID) -> smacErrors_t
+
+    SMAC_SetIVKey(uint8[16] KEY, uint8[16] IV) -> void
+
+}
+
+type instanceId_t = uint32
+
+struct smacDataCnf_t
+{
+  smacErrors_t status;
+}
+
+struct smacDataInd_t
+{
+  uint8 u8LastRxRssi;
+  rxPacket_t pRxPacket;
+}
+
+struct smacCcaCnf_t
+{
+  smacErrors_t status;
+}
+
+struct smacEdCnf_t
+{
+  smacErrors_t status;
+  uint8 energyLevel;
+  uint8 energyLeveldB;
+  channels_t scannedChannel;
+}
+
+struct smacToAppMlmeMessage_t
+{
+  smacMessageDefs_t msgType;
+  uint8 appInstanceId;
+  union (msgType) {
+    smacCcaCnf_t ccaCnf;
+    smacEdCnf_t edCnf;
+  } msgData;
+}
+
+struct smacToAppDataMessage_t
+{
+  smacMessageDefs_t msgType;
+  uint8 appInstanceId;
+  union (msgType) {
+    smacDataCnf_t dataCnf;
+    smacDataInd_t dataInd;
+  } msgData;
+}
+
+
+interface SMACCallbacks {
+
+    SMAC_APP_MCPS_SapHandler(smacToAppDataMessage_t msg, instanceId_t instanceId) -> smacErrors_t
+
+    SMAC_APP_MLME_SapHandler(smacToAppMlmeMessage_t msg, instanceId_t instanceId) -> smacErrors_t
+
+}
+

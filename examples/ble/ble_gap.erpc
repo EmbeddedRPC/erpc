@@ -1,0 +1,671 @@
+
+/*! Advertising Type */
+//@external
+enum bleAdvertisingType_t {
+    gAdvConnectableUndirected_c                 = 0x00,     /*!< Answers to both connect and scan requests. */
+    gAdvDirectedHighDutyCycle_c                 = 0x01,     /*!< Answers only to connect requests; smaller advertising interval for quicker connection. */
+    gAdvScannable_c                             = 0x02,     /*!< Answers only to scan requests. */
+    gAdvNonConnectable_c                        = 0x03,     /*!< Does not answer to connect nor scan requests. */
+    gAdvDirectedLowDutyCycle_c                  = 0x04      /*!< Answers only to connect requests; larger advertising interval. */
+}
+
+/*! Advertising Channel Map flags - setting a bit activates advertising on the respective channel. */
+//@external
+enum gapAdvertisingChannelMapFlags_t {
+    gAdvChanMapFlag37_c        = BIT0,   /*!< Bit for channel 37. */
+    gAdvChanMapFlag38_c        = BIT1,   /*!< Bit for channel 38. */
+    gAdvChanMapFlag39_c        = BIT2    /*!< Bit for channel 39. */
+}
+
+/*! Advertising Filter Policy flags */
+enum gapAdvertisingFilterPolicyFlags_t {
+    gProcessAll_c                   = 0x00,     /*!< Default value: process all connect and scan requests. */
+    gProcessScanWhiteListFlag_c     = BIT0,     /*!< If this bit is set, process scan requests only from devices in White List. */
+    gProcessConnWhiteListFlag_c     = BIT1      /*!< If this bit is set, process connect requests only from devices in White List. */
+}
+
+/*! Advertising Parameters; for defaults see gGapDefaultAdvertisingParameters_d. */
+//@external
+struct gapAdvertisingParameters_t {
+    uint16                            minInterval;            /*!< Minimum desired advertising interval. Default: 1.28 s. */
+    uint16                            maxInterval;            /*!< Maximum desired advertising interval. Default: 1.28 s. */
+    bleAdvertisingType_t                advertisingType;        /*!< Advertising type. Default: connectable undirected. */
+    bleAddressType_t                    ownAddressType;         /*!< Indicates whether the advertising address will be the public address (BD_ADDR) or the random address (set by Gap_SetRandomAddress). Default: public address. */
+    bleAddressType_t                    directedAddressType;    /*!< Address type of the target initiator; only used if advertisingType is equal to gAdvDirectedHighDutyCycle_c or gAdvDirectedLowDutyCycle_c. */
+    bleDeviceAddress_t                  directedAddress;        /*!< Address of the target initiator; same as above. */
+    gapAdvertisingChannelMapFlags_t     channelMap;             /*!< Bit mask indicating which of the three advertising channels will be used. Default: all three. */
+    gapAdvertisingFilterPolicyFlags_t   filterPolicy;           /*!< Indicates whether the connect and scan requests are filtered using the White List. Default: does not use White List (process all). */
+}
+
+enum gapGenericEventType_t {
+    gInitializationComplete_c,                  /*!< Initial setup started by Ble_HostInitialize is complete. */
+    gInternalError_c,                           /*!< An internal error occurred. */
+    gAdvertisingSetupFailed_c,                  /*!< Error during advertising setup. */
+    gAdvertisingParametersSetupComplete_c,      /*!< Advertising parameters have been successfully set. Response to Gap_SetAdvertisingParameters. */
+    gAdvertisingDataSetupComplete_c,            /*!< Advertising and/or scan response data has been successfully set. Response to Gap_SetAdvertisingData. */
+    gWhiteListSizeRead_c,                       /*!< Contains the White List size. Response to Gap_ReadWhiteListSize. */
+    gDeviceAddedToWhiteList_c,                  /*!< Device has been added to White List. Response to Gap_AddDeviceToWhiteList. */
+    gDeviceRemovedFromWhiteList_c,              /*!< Device has been removed from the White List. Response to Gap_RemoveDeviceFromWhiteList. */
+    gWhiteListCleared_c,                        /*!< White List has been cleared. Response to Gap_ClearWhiteList. */
+    gRandomAddressReady_c,                      /*!< A random device address has been created. Response to Gap_CreateRandomDeviceAddress. */
+    gCreateConnectionCanceled_c,                /*!< Connection initiation was successfully cancelled. Response to Gap_CancelInitiatingConnection. */
+    gPublicAddressRead_c,                       /*!< Contains the public device address. Response to Gap_ReadPublicDeviceAddress. */
+    gAdvTxPowerLevelRead_c,                     /*!< Contains the TX power on the advertising channel. Response to Gap_ReadAdvertisingTxPowerLevel. */
+    gPrivateResolvableAddressVerified_c,        /*!< Contains the result of PRA verification. Response to Gap_VerifyPrivateResolvableAddress. */
+    gRandomAddressSet_c                         /*!< Random address has been set into the Controller. Response to Gap_SetRandomAddress. */
+}
+
+/*! Internal Error Source - the command that triggered the error */
+enum gapInternalErrorSource_t {
+    gHciCommandStatus_c,
+    gCheckPrivateResolvableAddress_c,
+    gVerifySignature_c,
+    gAddNewConnection_c,
+    gResetController_c,
+    gSetEventMask_c,
+    gReadLeBufferSize_c,
+    gSetLeEventMask_c,
+    gReadDeviceAddress_c,
+    gReadLocalSupportedFeatures_c,
+    gReadWhiteListSize_c,
+    gClearWhiteList_c,
+    gAddDeviceToWhiteList_c,
+    gRemoveDeviceFromWhiteList_c,
+    gCancelCreateConnection_c,
+    gReadRadioPower_c,
+    gSetRandomAddress_c,
+    gCreateRandomAddress_c,
+    gEncryptLink_c,
+    gProvideLongTermKey_c,
+    gDenyLongTermKey_c,
+    gConnect_c,
+    gDisconnect_c,
+    gTerminatePairing_c,
+    gSendSlaveSecurityRequest_c,
+    gEnterPasskey_c,
+    gProvideOob_c,
+    gSendSmpKeys_c
+}
+
+/*! Internal Error Event Data */
+struct gapInternalError_t {
+    bleResult_t                 errorCode;          /*!< Host Stack error code. */
+    gapInternalErrorSource_t    errorSource;        /*!< The command that generated the error; useful when it is not obvious from the error code. */
+    uint16                    hciCommandOpcode;   /*!< Only for errorSource = gHciCommandStatus_c; the HCI Command that received an error status. */
+}
+
+/*! Generic Event Structure = type + data */
+struct gapGenericEvent_t {
+    gapGenericEventType_t  eventType;       /*!< Event type. */
+    union (eventType) {
+        case gInternalError_c:
+            gapInternalError_t      internalError;          /*!< Data for the gInternalError_c event. The error that has occurred and the command that triggered it. */
+        case gWhiteListSizeRead_c:
+            uint8                 whiteListSize;          /*!< Data for the gWhiteListSizeReady_c event. The size of the White List. */
+        case gRandomAddressReady_c, gPublicAddressRead_c:
+            bleDeviceAddress_t      aAddress;               /*!< Data for the gRandomAddressReady_c, gPublicAddressRead_c events. Contains the requested device address. */
+        case gAdvertisingSetupFailed_c:
+            bleResult_t             setupFailError;         /*!< Data for the gAdvertisingSetupFailed_c event. The error that occurred during the advertising setup. */
+        case gAdvTxPowerLevelRead_c:
+            int8                  advTxPowerLevel_dBm;    /*!< Data for the gAdvTxPowerLevelRead_c event. Value in dBm. */
+        case gPrivateResolvableAddressVerified_c:
+            bool                  verified;               /*!< Data for the gPrivateResolvableAddressVerified_c event. TRUE if the PRA was resolved with the given IRK. */
+        default:
+            void
+    } eventData;                            /*!< Event data, selected according to event type. */
+}
+
+
+/*! AD Type values as defined by Bluetooth SIG used when defining gapAdStructure_t structures for advertising or scan response data. */
+enum gapAdType_t {
+    gAdFlags_c                               = 0x01,    /*!< Defined by the Bluetooth SIG. */
+    gAdIncomplete16bitServiceList_c          = 0x02,    /*!< Defined by the Bluetooth SIG. */
+    gAdComplete16bitServiceList_c            = 0x03,    /*!< Defined by the Bluetooth SIG. */
+    gAdIncomplete32bitServiceList_c          = 0x04,    /*!< Defined by the Bluetooth SIG. */
+    gAdComplete32bitServiceList_c            = 0x05,    /*!< Defined by the Bluetooth SIG. */
+    gAdIncomplete128bitServiceList_c         = 0x06,    /*!< Defined by the Bluetooth SIG. */
+    gAdComplete128bitServiceList_c           = 0x07,    /*!< Defined by the Bluetooth SIG. */
+    gAdShortenedLocalName_c                  = 0x08,    /*!< Defined by the Bluetooth SIG. */
+    gAdCompleteLocalName_c                   = 0x09,    /*!< Defined by the Bluetooth SIG. */
+    gAdTxPowerLevel_c                        = 0x0A,    /*!< Defined by the Bluetooth SIG. */
+    gAdClassOfDevice_c                       = 0x0D,    /*!< Defined by the Bluetooth SIG. */
+    gAdSimplePairingHashC192_c               = 0x0E,    /*!< Defined by the Bluetooth SIG. */
+    gAdSimplePairingRandomizerR192_c         = 0x0F,    /*!< Defined by the Bluetooth SIG. */
+    gAdSecurityManagerTkValue_c              = 0x10,    /*!< Defined by the Bluetooth SIG. */
+    gAdSecurityManagerOobFlags_c             = 0x11,    /*!< Defined by the Bluetooth SIG. */
+    gAdSlaveConnectionIntervalRange_c        = 0x12,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceSolicitationList16bit_c        = 0x14,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceSolicitationList32bit_c        = 0x1F,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceSolicitationList128bit_c       = 0x15,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceData16bit_c                    = 0x16,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceData32bit_c                    = 0x20,    /*!< Defined by the Bluetooth SIG. */
+    gAdServiceData128bit_c                   = 0x21,    /*!< Defined by the Bluetooth SIG. */
+    gAdPublicTargetAddress_c                 = 0x17,    /*!< Defined by the Bluetooth SIG. */
+    gAdRandomTargetAddress_c                 = 0x18,    /*!< Defined by the Bluetooth SIG. */
+    gAdAppearance_c                          = 0x19,    /*!< Defined by the Bluetooth SIG. */
+    gAdAdvertisingInterval_c                 = 0x1A,    /*!< Defined by the Bluetooth SIG. */
+    gAdLeDeviceAddress_c                     = 0x1B,    /*!< Defined by the Bluetooth SIG. */
+    gAdLeRole_c                              = 0x1C,    /*!< Defined by the Bluetooth SIG. */
+    gAdSimplePairingHashC256_c               = 0x1D,    /*!< Defined by the Bluetooth SIG. */
+    gAdSimplePairingRandomizerR256_c         = 0x1E,    /*!< Defined by the Bluetooth SIG. */
+    gAd3dInformationData_c                   = 0x3D,    /*!< Defined by the Bluetooth SIG. */
+    gAdManufacturerSpecificData_c            = 0xFF     /*!< Defined by the Bluetooth SIG. */
+}
+
+/*! Values of the AD Flags advertising data structure. */
+enum gapAdTypeFlags_t {
+    gNone_c                                     = 0x00,     /*!< No information. */
+    gLeLimitedDiscoverableMode_c                = BIT0,     /*!< This device is in Limited Discoverable mode. */
+    gLeGeneralDiscoverableMode_c                = BIT1,     /*!< This device is in General Discoverable mode. */
+    gBrEdrNotSupported_c                        = BIT2,     /*!< This device supports only Bluetooth Low Energy; no support for Classic Bluetooth. */
+    gSimultaneousLeBrEdrCapableController_c     = BIT3,     /*!< This device's Controller also supports Classic Bluetooth. */
+    gSimultaneousLeBrEdrCapableHost_c           = BIT4,     /*!< This device's Host also supports Classic Bluetooth. */
+}
+
+/*! Definition of an AD Structure as contained in Advertising and Scan Response packets. An Advertising or Scan Response packet contains several AD Structures. */
+struct gapAdStructure_t {
+    uint8         length;     /*!< Total length of the [adType + aData] fields. Equal to 1 + lengthOf(aData). */
+    gapAdType_t     adType;     /*!< AD Type of this AD Structure. */
+    list<uint8>        aData @length(length);      /*!< Data contained in this AD Structure; length of this array is equal to (gapAdStructure_t.length - 1). */
+}
+
+/*! Advertising Data structure : a list of several gapAdStructure_t structures. */
+struct gapAdvertisingData_t {
+   uint8             cNumAdStructures;   /*!< Number of AD Structures. */
+   list<gapAdStructure_t>   aAdStructures @length(cNumAdStructures);      /*!< Array of AD Structures. */
+}
+
+type gapScanResponseData_t = gapAdvertisingData_t;
+
+/*! Advertising event type enumeration, as contained in the gapAdvertisingEvent_t. */
+enum gapAdvertisingEventType_t {
+   gAdvertisingStateChanged_c,     /*!< Event received when advertising has been successfully enabled or disabled. */
+   gAdvertisingCommandFailed_c,    /*!< Event received when advertising could not be enabled or disabled. Reason contained in gapAdvertisingEvent_t.eventData.failReason. */
+}
+
+/*! Advertising event structure: type + data. */
+struct gapAdvertisingEvent_t {
+   gapAdvertisingEventType_t eventType;    /*!< Event type. */
+   union (eventType) {
+       case gAdvertisingCommandFailed_c:
+           bleResult_t  failReason;    /*!< Event data for gAdvertisingCommandFailed_c event type: reason of failure to enable or disable advertising. */
+       default:
+           void
+   } eventData;                            /*!< Event data, to be interpreted according to gapAdvertisingEvent_t.eventType. */
+}
+
+/*! Connection event type enumeration, as contained in the gapConnectionEvent_t. */
+enum gapConnectionEventType_t {
+    gConnEvtConnected_c,                    /*!< A connection has been established. Data in gapConnectionEvent_t.eventData.connectedEvent. */
+    gConnEvtPairingRequest_c,               /*!< A pairing request has been received from the peer Master. Data in gapConnectionEvent_t.eventData.pairingEvent. */
+    gConnEvtSlaveSecurityRequest_c,         /*!< A Slave Security Request has been received from the peer Slave. Data in gapConnectionEvent_t.eventData.slaveSecurityRequestEvent. */
+    gConnEvtPairingResponse_c,              /*!< A pairing response has been received from the peer Slave. Data in gapConnectionEvent_t.eventData.pairingEvent. */
+    gConnEvtAuthenticationRejected_c,       /*!< A link encryption or pairing request has been rejected by the peer Slave. Data in gapConnectionEvent_t.eventData.authenticationRejectedEvent. */
+    gConnEvtPasskeyRequest_c,               /*!< Peer Slave has requested a passkey (maximum 6 digit PIN) for the pairing procedure. Master should respond with Gap_EnterPasskey. Slave will not receive this event! Slave's application must call Gap_SetLocalPasskey before any connection. */
+    gConnEvtOobRequest_c,                   /*!< Out-of-Band data must be provided for the pairing procedure. Master or Slave should respond with Gap_ProvideOob. */
+    gConnEvtPasskeyDisplay_c,               /*!< The pairing procedure requires this Slave to display the passkey for the Master's user. */
+    gConnEvtKeyExchangeRequest_c,           /*!< The pairing procedure requires the SMP keys to be distributed to the peer. Data in gapConnectionEvent_t.eventData.keyExchangeRequestEvent. */
+    gConnEvtKeysReceived_c,                 /*!< SMP keys distributed by the peer during pairing have been received. Data in gapConnectionEvent_t.eventData.keysReceivedEvent. */
+    gConnEvtLongTermKeyRequest_c,           /*!< The bonded peer Master has requested link encryption and the LTK must be provided. Slave should respond with Gap_ProvideLongTermKey. Data in gapConnectionEvent_t.eventData.longTermKeyRequestEvent. */
+    gConnEvtEncryptionChanged_c,            /*!< Link's encryption state has changed, e.g., during pairing or after a reconnection with a bonded peer. Data in gapConnectionEvent_t.eventData.encryptionChangedEvent. */
+    gConnEvtPairingComplete_c,              /*!< Pairing procedure is complete, either successfully or with failure. Data in gapConnectionEvent_t.eventData.pairingCompleteEvent. */
+    gConnEvtDisconnected_c,                 /*!< A connection has been terminated. Data in gapConnectionEvent_t.eventData.disconnectedEvent. */
+    gConnEvtRssiRead_c,                     /*!< RSSI for an active connection has been read. Data in gapConnectionEvent_t.eventData.rssi_dBm. */
+    gConnEvtTxPowerLevelRead_c,             /*!< TX power level for an active connection has been read. Data in gapConnectionEvent_t.eventData.txPowerLevel_dBm. */
+    gConnEvtPowerReadFailure_c,             /*!< Power reading could not be performed. Data in gapConnectionEvent_t.eventData.failReason. */
+    gConnEvtParameterUpdateRequest_c,       /*!< A connection parameter update request has been received. Data in gapConnectionEvent_t.eventData.connectionUpdateRequest. */
+    gConnEvtParameterUpdateComplete_c       /*!< The connection has new parameters. Data in gapConnectionEvent_t.eventData.connectionUpdateComplete. */
+}
+
+/*! Connection parameters as received in the gConnEvtConnected_c connection event. */
+struct gapConnectionParameters_t {
+    uint16                    connInterval;           /*!< Interval between connection events. */
+    uint16                    connLatency;            /*!< Number of consecutive connection events the Slave may ignore. */
+    uint16                    supervisionTimeout;     /*!< The maximum time interval between consecutive over-the-air packets; if this timer expires, the connection is dropped. */
+    bleMasterClockAccuracy_t    masterClockAccuracy;    /*!< Accuracy of master's clock, allowing for frame detection optimizations. */
+}
+
+/*! Event data structure for the gConnEvtConnected_c event. */
+struct gapConnectedEvent_t {
+    gapConnectionParameters_t   connParameters;         /*!< Connection parameters established by the Controller. */
+    bleAddressType_t            peerAddressType;        /*!< Connected device's address type. */
+    bleDeviceAddress_t          peerAddress;            /*!< Connected device's address. */
+}
+
+/*! LE Security Mode */
+enum gapSecurityMode_t {
+    gSecurityMode_1_c = 0x10,   /*!< Mode 1 - Encryption required (except for Level 1). */
+    gSecurityMode_2_c = 0x20    /*!< Mode 2 - Data Signing required. */
+}
+
+/*! LE Security Level */
+enum gapSecurityLevel_t {
+    gSecurityLevel_NoSecurity_c =           0x00,  /*!< No security (combined only with Mode 1). */
+    gSecurityLevel_NoMitmProtection_c =     0x01,  /*!< Unauthenticated (no MITM protection). */
+    gSecurityLevel_WithMitmProtection_c =   0x02   /*!< Authenticated (MITM protection by PIN or OOB). */
+}
+
+/*! Security Mode-and-Level definitions */
+enum gapSecurityModeAndLevel_t {
+    gSecurityMode_1_Level_1_c = gSecurityMode_1_c | gSecurityLevel_NoSecurity_c,          /*!< Mode 1 Level 1 - No Security. */
+    gSecurityMode_1_Level_2_c = gSecurityMode_1_c | gSecurityLevel_NoMitmProtection_c,    /*!< Mode 1 Level 2 - Encryption without authentication. */
+    gSecurityMode_1_Level_3_c = gSecurityMode_1_c | gSecurityLevel_WithMitmProtection_c,  /*!< Mode 1 Level 3 - Encryption with authentication. */
+    gSecurityMode_2_Level_1_c = gSecurityMode_2_c | gSecurityLevel_NoMitmProtection_c,    /*!< Mode 2 Level 1 - Data Signing without authentication. */
+    gSecurityMode_2_Level_2_c = gSecurityMode_2_c | gSecurityLevel_WithMitmProtection_c   /*!< Mode 2 Level 2 - Data Signing with authentication. */
+}
+
+/*! I/O Capabilities as defined by the SMP */
+enum gapIoCapabilities_t {
+    gIoDisplayOnly_c        = 0x00,     /*!< May display a PIN, no input. */
+    gIoDisplayYesNo_c       = 0x01,     /*!< May display a PIN and has a binary input (e.g., YES and NO buttons). */
+    gIoKeyboardOnly_c       = 0x02,     /*!< Has keyboard input, no display. */
+    gIoNone_c               = 0x03,     /*!< No input and no display. */
+    gIoKeyboardDisplay_c    = 0x04      /*!< Has keyboard input and display. */
+}
+
+/*! Flags indicating the Keys to be exchanged by the SMP during the key exchange phase of pairing. */
+enum gapSmpKeyFlags_t {
+    gNoKeys_c   = 0x00,     /*!< No key can be distributed. */
+    gLtk_c      = BIT0,     /*!< Long Term Key. */
+    gIrk_c      = BIT1,     /*!< Identity Resolving Key. */
+    gCsrk_c     = BIT2      /*!< Connection Signature Resolving Key. */
+}
+
+/*! Pairing parameters structure for the Gap_Pair() API */
+struct gapPairingParameters_t {
+    bool                      withBonding;            /*!< TRUE if this device is able to and wants to bond after pairing, FALSE otherwise. */
+    gapSecurityModeAndLevel_t   securityModeAndLevel;   /*!< The desired security mode-level. */
+    uint8                     maxEncryptionKeySize;   /*!< Maximum LTK size supported by the device. */
+    gapIoCapabilities_t         localIoCapabilities;    /*!< I/O capabilities used to determine the pairing method. */
+    bool                      oobAvailable;           /*!< TRUE if this device has Out-of-Band data that can be used for authenticated pairing. FALSE otherwise. */
+    gapSmpKeyFlags_t            centralKeys;            /*!< Indicates the SMP keys to be distributed by the Central. */
+    gapSmpKeyFlags_t            peripheralKeys;         /*!< Indicates the SMP keys to be distributed by the Peripheral. */
+}
+
+/*! Reason for rejecting the pairing request. These values are
+ * equal to the corresponding reasons from SMP. */
+enum gapAuthenticationRejectReason_t {
+    gLinkEncryptionFailed_c         = 0xF0,     /*!< Link could not be encrypted. This reason may not be used by Gap_RejectPairing! */
+    gOobNotAvailable_c              = 0x02,     /*!< This device does not have the required OOB for authenticated pairing. */
+    gIncompatibleIoCapabilities_c   = 0x03,     /*!< The combination of I/O capabilities does not allow pairing with the desired level of security. */
+    gPairingNotSupported_c          = 0x05,     /*!< This device does not support pairing. */
+    gLowEncryptionKeySize_c         = 0x06,     /*!< The peer's encryption key size is too low for this device's required security level. */
+    gRepeatedAttempts_c             = 0x09,     /*!< This device is the target of repeated unsuccessful pairing attempts and does not allow further pairing attempts at the moment.  */
+    gUnspecifiedReason_c            = 0x08      /*!< The host has rejected the pairing for an unknown reason. */
+}
+
+/*! Event data structure for the gConnEvtAuthenticationRejected_c event. */
+struct gapAuthenticationRejectedEvent_t {
+    gapAuthenticationRejectReason_t rejectReason;   /*!< Slave's reason for rejecting the authentication. */
+}
+
+/*! Parameters of a Slave Security Request. */
+struct gapSlaveSecurityRequestParameters_t {
+    bool                      bondAfterPairing;       /*!< TRUE if the Slave supports bonding. */
+    bool                      authenticationRequired; /*!< TRUE if the Slave requires authentication for MITM protection. */
+}
+
+/*! Event data structure for the gConnEvtKeyExchangeRequest_c event. */
+struct gapKeyExchangeRequestEvent_t {
+    gapSmpKeyFlags_t    requestedKeys;      /*!< Mask identifying the keys being requested. */
+    uint8             requestedLtkSize;   /*!< Requested size of the encryption key. */
+}
+
+/*! Structure containing the SMP information exchanged during pairing. */
+struct gapSmpKeys_t {
+   uint8     cLtkSize;   /*!< Encryption Key Size. If aLtk is NULL, this is ignored. */
+   /*uint8_t ptr */ list<uint8>    aLtk @nullable @length(cLtkSize);       /*!< Long Term (Encryption) Key. NULL if LTK is not distributed, else size is given by cLtkSize.*/
+
+   /*uint8_t ptr */ binary    aIrk @nullable;       /*!< Identity Resolving Key. NULL if aIrk is not distributed. */
+   /*uint8_t ptr */ binary    aCsrk @nullable;      /*!< Connection Signature Resolving Key. NULL if aCsrk is not distributed. */
+
+   uint8     cRandSize;  /*!< Size of RAND; usually equal to gcMaxRandSize_d. If aLtk is NULL, this is ignored. */
+   /*uint8_t ptr */ list<uint8> aRand @nullable @length(cRandSize);      /*!< RAND value used to identify the LTK. If aLtk is NULL, this is ignored. */
+   uint16    ediv;       /*!< EDIV value used to identify the LTK. If aLtk is NULL, this is ignored. */
+
+   bleAddressType_t    addressType; /*!< Public or Random address. If aAddress is NULL, this is ignored. */
+   /*uint8_t ptr */ binary   aAddress @nullable;    /*!< Device Address. NULL if address is not distributed. If aIrk is NULL, this is ignored. */
+}
+
+/*! Event data structure for the gConnEvtKeysReceived_c event. */
+struct gapKeysReceivedEvent_t {
+    // TODO how is the size of this list determined?
+   /* gapSmpKeys_t ptr */ list<gapSmpKeys_t> pKeys;   /*!< The SMP keys distributed by the peer. */
+}
+
+/*! Event data structure for the gConnEvtPairingComplete_c event. */
+struct gapPairingCompleteEvent_t {
+   bool    pairingSuccessful;    /*!< TRUE if pairing succeeded, FALSE otherwise. */
+   union (pairingSuccessful) {
+       case true:
+           bool      withBonding;        /*!< If pairingSuccessful is TRUE, this indicates whether the devices bonded. */
+       case false:
+           bleResult_t failReason;         /*!< If pairingSuccessful is FALSE, this contains the reason of failure. */
+   } pairingCompleteData;          /*!< Information of completion, selected upon the value of gapPairingCompleteEvent_t.pairingSuccessful. */
+}
+
+/*! Event data structure for the gConnEvtLongTermKeyRequest_c event. */
+struct gapLongTermKeyRequestEvent_t {
+    uint16 ediv;                          /*!< The Encryption Diversifier, as defined by the SMP. */
+    uint8[gcSmpMaxRandSize_c]  aRand;    /*!< The Random number, as defined by the SMP.  */
+    uint8  randSize;                      /*!< Usually equal to gcMaxRandSize_d. */
+}
+
+/*! Event data structure for the gConnEvtEncryptionChanged_c event. */
+struct gapEncryptionChangedEvent_t {
+    bool    newEncryptionState;   /*!< TRUE if link has been encrypted, FALSE if encryption was paused or removed. */
+}
+
+/*! Disconnection reason alias - reasons are contained in HCI error codes. */
+type gapDisconnectionReason_t = bleResult_t;
+
+/*! Event data structure for the gConnEvtDisconnected_c event. */
+struct gapDisconnectedEvent_t {
+    gapDisconnectionReason_t    reason;     /*!< Reason for disconnection. */
+}
+
+/*! Event data structure for the gConnEvtParameterUpdateRequest_c event. */
+struct gapConnParamsUpdateReq_t {
+    uint16    intervalMin;        /*!< Minimum interval between connection events. */
+    uint16    intervalMax;        /*!< Maximum interval between connection events. */
+    uint16    slaveLatency;       /*!< Number of consecutive connection events the Slave may ignore. */
+    uint16    timeoutMultiplier;  /*!< The maximum time interval between consecutive over-the-air packets; if this timer expires, the connection is dropped. */
+}
+
+/*! Event data structure for the gConnEvtParameterUpdateComplete_c event. */
+struct gapConnParamsUpdateComplete_t {
+   bleResult_t status;
+   uint16    connInterval;       /*!< Interval between connection events. */
+   uint16    connLatency;        /*!< Number of consecutive connection events the Slave may ignore. */
+   uint16    supervisionTimeout; /*!< The maximum time interval between consecutive over-the-air packets; if this timer expires, the connection is dropped. */
+}
+
+/*! Connection event structure: type + data. */
+struct gapConnectionEvent_t {
+   gapConnectionEventType_t eventType;  /*!< Event type */
+   union (eventType) {
+       case gConnEvtConnected_c:
+           gapConnectedEvent_t                 connectedEvent;                 /*!< Data for gConnEvtConnected_c: information about the connection parameters. */
+       case gConnEvtPairingRequest_c, gConnEvtPairingResponse_c:
+           gapPairingParameters_t              pairingEvent;                   /*!< Data for gConnEvtPairingRequest_c, gConnEvtPairingResponse_c: pairing parameters. */
+       case gConnEvtAuthenticationRejected_c:
+           gapAuthenticationRejectedEvent_t    authenticationRejectedEvent;    /*!< Data for gConnEvtAuthenticationRejected_c: reason for rejection. */
+       case gConnEvtSlaveSecurityRequest_c:
+           gapSlaveSecurityRequestParameters_t slaveSecurityRequestEvent;      /*!< Data for gConnEvtSlaveSecurityRequest_c: Slave's security requirements. */
+       case gConnEvtKeyExchangeRequest_c:
+           gapKeyExchangeRequestEvent_t        keyExchangeRequestEvent;        /*!< Data for gConnEvtKeyExchangeRequest_c: mask indicating the keys that were requested by the peer. */
+       case gConnEvtKeysReceived_c:
+           gapKeysReceivedEvent_t              keysReceivedEvent;              /*!< Data for gConnEvtKeysReceived_c: the keys received from the peer. */
+       case gConnEvtPairingComplete_c:
+           gapPairingCompleteEvent_t           pairingCompleteEvent;           /*!< Data for gConnEvtPairingComplete_c: fail reason or (if successful) bonding state. */
+       case gConnEvtLongTermKeyRequest_c:
+           gapLongTermKeyRequestEvent_t        longTermKeyRequestEvent;        /*!< Data for gConnEvtLongTermKeyRequest_c: encryption diversifier and random number. */
+       case gConnEvtEncryptionChanged_c:
+           gapEncryptionChangedEvent_t         encryptionChangedEvent;         /*!< Data for gConnEvtEncryptionChanged_c: new encryption state. */
+       case gConnEvtDisconnected_c:
+           gapDisconnectedEvent_t              disconnectedEvent;              /*!< Data for gConnEvtDisconnected_c: reason for disconnection. */
+       case gConnEvtRssiRead_c:
+           int8                              rssi_dBm;                       /*!< Data for gConnEvtRssiRead_c: value of the RSSI in dBm. */
+       case gConnEvtTxPowerLevelRead_c:
+           int8                              txPowerLevel_dBm;               /*!< Data for gConnEvtTxPowerLevelRead_c: value of the TX power. */
+       case gConnEvtPowerReadFailure_c:
+           bleResult_t                         failReason;                     /*!< Data for gConnEvtPowerReadFailure_c: reason for power reading failure. */
+       case gConnEvtPasskeyRequest_c:
+           uint32                            passkeyForDisplay;
+       case gConnEvtParameterUpdateRequest_c:
+           gapConnParamsUpdateReq_t            connectionUpdateRequest;        /*!< Data for gConnEvtParameterUpdateRequest_c: connection parameters update. */
+       case gConnEvtParameterUpdateComplete_c:
+           gapConnParamsUpdateComplete_t       connectionUpdateComplete;       /*!< Data for gConnEvtParameterUpdateComplete_c: connection parameters update. */
+       default:
+           void
+   } eventData;                        /*!< Event data, to be interpreted according to gapConnectionEvent_t.eventType. */
+}
+
+/*! Security Requirements structure for a Device, a Service or a Characteristic */
+struct gapSecurityRequirements_t {
+    gapSecurityModeAndLevel_t   securityModeLevel;          /*!< Security mode and level. */
+    bool                        authorization;              /*!< Authorization required. */
+    uint16                      minimumEncryptionKeySize;   /*!< Minimum encryption key (LTK) size. */
+}
+
+/*! Service Security Requirements */
+struct gapServiceSecurityRequirements_t {
+    uint16                      serviceHandle;  /*!< Handle of the Service declaration in the GATT Database. */
+    gapSecurityRequirements_t   requirements;   /*!< Requirements for all attributes in this service. */
+}
+
+struct gapDeviceSecurityRequirements_t {
+    byref gapSecurityRequirements_t          pMasterSecurityRequirements;    /*!< Security requirements added to all services. */
+    uint8                             cNumServices;                   /*!< Number of service-specific requirements; must be less than or equal to gcMaxServiceSpecificSecurityRequirements_d. */
+    list<gapServiceSecurityRequirements_t>   aServiceSecurityRequirements @length(cNumService);   /*!< Array of service-specific requirements. */
+}
+
+enum gattDbAccessType_t {
+    gAccessRead_c,      /*< Attempting to read the attribute. */
+    gAccessWrite_c,     /*< Attempting to write the attribute. */
+    gAccessNotify_c     /*< Attempting to notify the attribute. */
+}
+
+enum gapRadioPowerLevelReadType_t {
+    gTxPowerCurrentLevelInConnection_c = gReadCurrentTxPowerLevel_c,        /*!< Reading the instantaneous TX power level in a connection. */
+    gTxPowerMaximumLevelInConnection_c = gReadMaximumTxPowerLevel_c,        /*!< Reading the maximum TX power level achieved during a connection. */
+    gTxPowerLevelForAdvertising_c,                                          /*!< Reading the TX power on the advertising channels. */
+    gRssi_c                                                                 /*!< Reading the Received Signal Strength Indication in a connection. */
+}
+
+type gapAdvertisingCallback_t = uint32
+type gapConnectionCallback_t = uint32
+
+@group("ble_api")
+interface gap {
+
+    Gap_SetAdvertisingParameters(
+            gapAdvertisingParameters_t pAdvertisingParameters
+        ) -> bleResult_t
+
+    _Gap_SetAdvertisingData(
+            gapAdvertisingData_t         pAdvertisingData,
+            gapScanResponseData_t        pScanResponseData
+        ) -> bleResult_t
+
+    _Gap_StartAdvertising(
+//            gapAdvertisingCallback_t    advertisingCallback,
+//            gapConnectionCallback_t     connectionCallback
+        ) -> bleResult_t
+
+    Gap_StopAdvertising() -> bleResult_t
+
+    Gap_ReadPublicDeviceAddress() -> bleResult_t
+
+    Gap_CheckNotificationStatus(
+            deviceId_t  deviceId,
+            uint16    handle,
+            out bool     pOutIsActive
+        ) -> bleResult_t
+
+    Gap_CheckIndicationStatus(
+            deviceId_t  deviceId,
+            uint16    handle,
+            out bool     pOutIsActive
+        ) -> bleResult_t
+
+    Gap_Disconnect(
+            deviceId_t deviceId
+        ) -> bleResult_t
+
+    //
+    // Security APIs
+    //
+
+    Gap_RegisterDeviceSecurityRequirements(
+            gapDeviceSecurityRequirements_t pSecurity
+        ) -> bleResult_t
+
+    Gap_Authorize(
+            deviceId_t          deviceId,
+            uint16            handle,
+            gattDbAccessType_t  access
+        ) -> bleResult_t
+
+    Gap_SaveCccd(
+            deviceId_t      deviceId,
+            uint16        handle,
+            gattCccdFlags_t cccd
+        ) -> bleResult_t
+
+    Gap_GetBondedStaticAddresses(
+            out list<bleDeviceAddress_t>  aOutDeviceAddresses @max_length(maxDevice) @length(pOutActualCount),
+            uint8             maxDevices,
+            out uint8            pOutActualCount
+        ) -> bleResult_t
+
+    Gap_SendSlaveSecurityRequest(
+            deviceId_t                  deviceId,
+            bool                        bondAfterPairing,
+            gapSecurityModeAndLevel_t   securityModeLevel
+        ) -> bleResult_t
+
+    Gap_AcceptPairingRequest(
+            deviceId_t                  deviceId,
+            gapPairingParameters_t      pPairingParameters
+        ) -> bleResult_t
+
+    Gap_RejectPairing(
+            deviceId_t                      deviceId,
+            gapAuthenticationRejectReason_t reason
+        ) -> bleResult_t
+
+    Gap_EnterPasskey(
+            deviceId_t  deviceId,
+            uint32      passkey
+        ) -> bleResult_t
+
+    Gap_ProvideOob(
+            deviceId_t      deviceId,
+            uint8[gcSmpOobSize_c]           aOob
+        ) -> bleResult_t
+
+    Gap_SendSmpKeys(
+            deviceId_t      deviceId,
+            gapSmpKeys_t    pKeys
+        ) -> bleResult_t
+
+    Gap_RejectKeyExchangeRequest(
+            deviceId_t deviceId
+        ) -> bleResult_t
+
+    Gap_ProvideLongTermKey(
+            deviceId_t  deviceId,
+            list<uint8>    aLtk @length(ltkSize),
+            uint8     ltkSize
+        ) -> bleResult_t
+
+    Gap_DenyLongTermKey(
+            deviceId_t deviceId
+        ) -> bleResult_t
+
+    Gap_LoadEncryptionInformation(
+            deviceId_t   deviceId,
+            out list<uint8>     aOutLtk @length(pOutLtkSize),
+            out uint8     pOutLtkSize
+        ) -> bleResult_t
+
+    Gap_SetLocalPasskey(
+            uint32 passkey
+        ) -> bleResult_t
+
+    Gap_CheckIfBonded(
+            deviceId_t  deviceId,
+            out bool     pOutIsBonded
+        ) -> bleResult_t
+
+    Gap_ReadWhiteListSize() -> bleResult_t
+
+    Gap_ClearWhiteList() -> bleResult_t
+
+    Gap_AddDeviceToWhiteList(
+            bleAddressType_t    addressType,
+            bleDeviceAddress_t  address
+        ) -> bleResult_t
+
+    Gap_RemoveDeviceFromWhiteList(
+            bleAddressType_t    addressType,
+            bleDeviceAddress_t  address
+        ) -> bleResult_t
+
+    Gap_CreateRandomDeviceAddress(
+            binary aIrk @nullable,
+            uint8[3] aRandomPart
+        ) -> bleResult_t
+
+    Gap_SaveDeviceName(
+            deviceId_t  deviceId,
+            string    aName @length(cNameSize),
+            uint8     cNameSize
+        ) -> bleResult_t
+
+    Gap_GetBondedDevicesCount(
+            out uint8    pOutBondedDevicesCount
+        ) -> bleResult_t
+
+    Gap_GetBondedDeviceName(
+            uint8     nvmIndex,
+            out string    aOutName @stringLength(maxNameSize),
+            uint8     maxNameSize
+        ) -> bleResult_t
+
+    Gap_RemoveBond(
+            uint8 nvmIndex
+        ) -> bleResult_t
+
+    Gap_RemoveAllBonds() -> bleResult_t
+
+    Gap_ReadRadioPowerLevel(
+            gapRadioPowerLevelReadType_t    txReadType,
+            deviceId_t                      deviceId
+        ) -> bleResult_t
+
+    Gap_VerifyPrivateResolvableAddress(
+            uint8             nvmIndex,
+            bleDeviceAddress_t  aAddress
+        ) -> bleResult_t
+
+    Gap_SetRandomAddress(
+            bleDeviceAddress_t aAddress
+        ) -> bleResult_t
+
+    Gap_SetDefaultPairingParameters(
+            gapPairingParameters_t pPairingParameters
+        ) -> bleResult_t
+
+    Gap_UpdateConnectionParameters(
+            deviceId_t  deviceId,
+            uint16    intervalMin,
+            uint16    intervalMax,
+            uint16    slaveLatency,
+            uint16    timeoutMultiplier,
+            uint16    minCeLength,
+            uint16    maxCeLength
+        ) -> bleResult_t
+
+    Gap_EnableUpdateConnectionParameters(
+            deviceId_t  deviceId,
+            bool        enable
+        ) -> bleResult_t
+
+}
+
+@group("ble_callbacks")
+interface gap_cb {
+
+    oneway gapGenericCallback(gapGenericEvent_t pGenericEvent)
+
+    oneway gapAdvertisingCallback(gapAdvertisingEvent_t pAdvertisingEvent)
+
+    oneway gapConnectionCallback(
+            deviceId_t              deviceId,
+            gapConnectionEvent_t   pConnectionEvent
+        )
+
+}
+

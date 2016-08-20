@@ -1,0 +1,155 @@
+---
+name: error checks c allowed
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+idl: |
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f() -> {type[0]}
+    }
+test_client.cpp:
+  - if (out == NULL)
+  - if (!err)
+  - '{'
+  - '}'
+  - if (in == NULL)
+  - g_client->releaseRequest(request);
+  - if (err)
+  - '{'
+  - return {type[1]};
+  - '}'
+
+---
+name: error checks c not allowed
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+idl: |
+    @no_infra_errors
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f() -> {type[0]}
+    }
+test_client.cpp:
+  - not: if (out == NULL)
+  - not: if (!err)
+  - not: if (in == NULL)
+  - not: if (err)
+  - not: return {type[1]};
+
+---
+name: error checks c infra allowed
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+idl: |
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f() -> {type[0]}
+    }
+test_client.cpp:
+  - not: if (out == NULL)
+  - if (!err)
+  - not: if (in == NULL)
+  - if (err)
+  - return {type[1]};
+
+---
+name: error checks c alloc allowed
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+idl: |
+    @no_infra_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f() -> {type[0]}
+    }
+test_client.cpp:
+  - if (out == NULL)
+  - not: if (!err)
+  - if (in == NULL)
+  - if (err)
+  - return {type[1]};

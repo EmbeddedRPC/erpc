@@ -1,0 +1,74 @@
+---
+name: in param struct
+desc:
+params:
+  type:
+    - [bool, bool]
+    - [int8, int8_t]
+    - [int16, int16_t]
+    - [int32, int32_t]
+    - [uint8, uint8_t]
+    - [uint16, uint16_t]
+    - [uint32, uint32_t]
+    - [float, float]
+    - [double, double]
+idl: |
+  struct Vector {
+    {type[0]}[3] v
+  }
+  interface foo {
+    bar(Vector v @nullable) -> void
+  }
+test.h:
+  - '{type[1]} v[3]'
+  - void bar(const Vector * v);
+test_client.cpp:
+  - re: void bar\(const Vector \* v\)
+  - if (v == NULL)
+  - writeNullFlag(true)
+  - "{"
+  - writeNullFlag(false)
+  - write_Vector_struct
+  - "}"
+test_server.cpp:
+  - ::bar_shim
+  - bool isNull
+  - readNullFlag
+  - if (!isNull)
+  - read_Vector_struct
+  - else
+  - v = NULL
+  - endReadMessage
+
+---
+name: struct field
+desc:
+idl: |
+  struct pair {
+    string a
+    list<bool> b @nullable
+  }
+  interface foo {
+    bar(pair s) -> void
+  }
+test_client.cpp:
+  - int32_t write_pair_struct
+  - if (data->b.elements == NULL)
+  - writeNullFlag(true)
+  - '{'
+  - writeNullFlag(false)
+  - write_list_0_t_struct
+  - '}'
+  - void bar(const pair * s)
+  - write_pair_struct
+test_server.cpp:
+  - int32_t read_pair_struct
+  - bool isNull
+  - readNullFlag
+  - if (!isNull)
+  - read_list_0_t_struct
+  - else
+  - data->b.elements = NULL
+  - data->b.elementsCount = 0
+  - endReadStruct
+

@@ -1,0 +1,25 @@
+/*!
+@defgroup setup Setup API
+@brief C language setup functions.
+*/
+
+/*!
+@defgroup server_setup Server Setup
+@ingroup setup
+@brief Server side setup and control functions.
+*/
+
+/*!
+@defgroup client_setup Client Setup
+@ingroup setup
+@brief Client side setup functions.
+*/
+
+/*!
+@defgroup transport_setup Transport Setup
+@ingroup setup
+@brief Transport layer initialization.
+*/
+
+
+

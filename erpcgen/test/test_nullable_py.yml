@@ -1,0 +1,88 @@
+---
+name: in param struct
+desc:
+idl: |
+ struct Vector {
+   float[3] v
+ }
+ interface foo {
+   bar(Vector v @nullable) -> void
+ }
+lang: py
+test/client.py:
+  - if v is None
+  - write_null_flag(True
+  - else
+  - write_null_flag(False
+  - v._write
+test/server.py:
+  - def _handle_
+  - 'if not inCodec.read_null_flag():'
+  - Vector()._read
+  - else
+  - v = None
+
+---
+name: out param struct
+desc:
+idl: |
+ struct Vector {
+   float[3] v
+ }
+ interface foo {
+   bar(out Vector v @nullable) -> void
+ }
+lang: py
+test/client.py:
+  - assert type(v) is erpc.Reference
+  - read_null_flag
+  - Vector()._read
+  - else
+  - v.value = None
+test/server.py:
+  - v = erpc.Reference
+  - re: if v.value is None
+  - write_null_flag(True
+  - else
+  - write_null_flag(False
+  - v.value._write
+
+---
+name: struct field
+desc:
+params:
+  type:
+    - string
+    - list<bool>
+idl: |
+ struct pair {
+   {type} b @nullable
+ }
+ interface foo {
+   bar(pair s) -> void
+ }
+lang: py
+test/common.py:
+  - _read
+  - read_null_flag
+  - if: type=="list<bool>"
+    then:
+      - start_read_list
+      - re: read_[a-z]+
+      - end_read_list
+    else:
+      - read_string
+  - else
+  - self.b = None
+  - _write
+  - if self.b is None
+  - write_null_flag(True
+  - else
+  - write_null_flag(False
+  - if: type=="list<bool>"
+    then:
+      - start_write_list
+      - write_bool
+      - end_write_list
+    else:
+      - write_string
