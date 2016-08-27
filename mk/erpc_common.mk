@@ -14,10 +14,9 @@
 #-------------------------------------------------------------------------------
 
 this_makefile := $(firstword $(MAKEFILE_LIST))
-PROJ_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../../)
+ERPC_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../)
 
-include $(PROJ_ROOT)/erpc/mk/common.mk
-include $(PROJ_ROOT)/erpc/mk/paths.mk
-# ERPC_ROOT is set in /erpc/mk/paths.mk
+include $(ERPC_ROOT)/mk/common.mk
+include $(ERPC_ROOT)/mk/paths.mk
 include $(ERPC_ROOT)/mk/flags.mk
 

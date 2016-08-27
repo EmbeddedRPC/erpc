@@ -93,7 +93,7 @@ protected:
     {
         if ((m_head + 1) % m_capacity != m_tail)
         {
-            memcpy((void *)((uint32_t)m_data + m_head * m_elementSize), element, m_elementSize);
+            memcpy((void *)((uintptr_t)m_data + m_head * m_elementSize), element, m_elementSize);
             m_head = (m_head + 1) % m_capacity;
             return true;
         }
@@ -110,7 +110,7 @@ protected:
         void *element = NULL;
         if (m_tail != m_head)
         {
-            element = (void *)((uint32_t)m_data + m_tail * m_elementSize);
+            element = (void *)((uintptr_t)m_data + m_tail * m_elementSize);
             m_tail = (m_tail + 1) % m_capacity;
         }
         return element;

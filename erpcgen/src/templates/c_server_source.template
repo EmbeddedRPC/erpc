@@ -6,13 +6,17 @@
 
 {% if generateInfraErrorChecks %}
 {%   set infraErrIndents = "    " %}
+{%   set infraErrVar = "err = " %}
 {% else %}
 {%   set infraErrIndents = "" %}
+{%   set infraErrVar = "" %}
 {% endif %}
 {% if generateAllocErrorChecks %}
 {%   set allocErrIndents = "    " %}
+{%   set allocErrVar = "err = " %}
 {% else %}
 {%   set allocErrIndents = "" %}
+{%   set allocErrVar = "" %}
 {% endif %}
 {% if generateInfraErrorChecks or generateAllocErrorChecks %}
 {%   set errVar = "err = " %}
@@ -75,12 +79,12 @@ status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * in, Codec * out, uin
     // startReadMessage() was already called before this shim was invoked.
 {%   if fn.isSendValue %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->startReadStruct();
+{$infraErrIndents}    {$infraErrVar}in->startReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%    for param in fn.parametersTo2Core %}
 {%     if param.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->readNullFlag(&isNull);
+{$infraErrIndents}    {$infraErrVar}in->readNullFlag(&isNull);
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
 {%      if param.allocateToServer %}
@@ -98,11 +102,11 @@ status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * in, Codec * out, uin
 {%     endif -- isNullable %}
 {%    endfor -- parametersTo2Core %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->endReadStruct();
+{$infraErrIndents}    {$infraErrVar}in->endReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif -- isSendValue %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->endReadMessage();
+{$infraErrIndents}    {$infraErrVar}in->endReadMessage();
 {$> addInfraErrorChecksEnd("    ") }
 {%   for param in fn.parametersTo1Core %}
 {%    if param.mallocServerOut != "" %}
@@ -119,18 +123,18 @@ status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * in, Codec * out, uin
 
     // Build response message.
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}out->startWriteMessage(kReplyMessage, k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, sequence);
+{$infraErrIndents}    {$infraErrVar}out->startWriteMessage(kReplyMessage, k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, sequence);
 {$> addInfraErrorChecksEnd("    ") }
 {%    for param in fn.parametersTo1Core %}
 {%     if param.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$param.coderCall.name} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(true);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(true);
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(false);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(false);
 {$addIndent(infraErrIndents &"        ", addInfraErrorChecks(param.coderCall, "encode"))}
 {$> addInfraErrorChecksEnd("    ") }
 {%     else -- isNullable %}
@@ -145,7 +149,7 @@ status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * in, Codec * out, uin
 {$addIndent("    ", addInfraErrorChecks(fn.returnValue.coderCall, "encode"))}
 {%    endif -- notVoid %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}out->endWriteMessage();
+{$infraErrIndents}    {$infraErrVar}out->endWriteMessage();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif -- isReturnValue %}
 {%   if fn.isReturnValue %}

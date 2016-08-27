@@ -30,7 +30,12 @@ TCP_SERVER_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(SERVER_NAME)/$(DEBUG_OR_
 
 
 .PHONY: all
-all: test_client test_server
+all: test_lib test_client test_server
+
+.PHONY: test_lib
+test_lib:
+	@$(call printmessage,build,Building, test_lib,gray,,,\n)
+	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test_lib.mk
 
 # Unit Test Targets
 .PHONY: test-tcp

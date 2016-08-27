@@ -83,7 +83,7 @@ status_t TransportArbitrator::receive(MessageBuffer *message)
         // If this message is an invocation, return it to the calling server.
         if (msgType == kInvocationMessage || msgType == kOnewayMessage)
         {
-            return kStatus_Success;
+            return kErpcStatus_Success;
         }
 
         // Just ignore messages we don't know what to do with.
@@ -102,7 +102,7 @@ status_t TransportArbitrator::receive(MessageBuffer *message)
                 client->m_request->getInCodec()->getBuffer()->swap(message);
 
                 // Wake up the client receive thread.
-               client->m_sem.put()
+                client->m_sem.put();
                 break;
             }
         }
@@ -139,7 +139,7 @@ status_t TransportArbitrator::clientReceive(client_token_t token)
 
     removePendingClient(info);
 
-    return kStatus_Success;
+    return kErpcStatus_Success;
 }
 
 TransportArbitrator::PendingClientInfo *TransportArbitrator::addPendingClient()
@@ -206,7 +206,7 @@ void TransportArbitrator::removePendingClient(PendingClientInfo *info)
 
 void TransportArbitrator::freeClientList(PendingClientInfo *list)
 {
-    PendingClientInfo *info = listist;
+    PendingClientInfo *info = list;
     while (info)
     {
         PendingClientInfo *temp = info;

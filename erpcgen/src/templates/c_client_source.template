@@ -6,13 +6,17 @@
 
 {% if generateInfraErrorChecks %}
 {%   set infraErrIndents = "    " %}
+{%   set infraErrVar = "err = " %}
 {% else %}
 {%   set infraErrIndents = "" %}
+{%   set infraErrVar = "" %}
 {% endif %}
 {% if generateAllocErrorChecks %}
 {%   set allocErrIndents = "    " %}
+{%   set allocErrVar = "err = " %}
 {% else %}
 {%   set allocErrIndents = "" %}
+{%   set allocErrVar = "" %}
 {% endif %}
 {% if generateInfraErrorChecks or generateAllocErrorChecks %}
 {%   set errVar = "err = " %}
@@ -52,11 +56,11 @@ extern ClientManager *g_client;
 {% if generateAllocErrorChecks %}
     if (out == NULL)
     {
-        {$errVar}kErpcStatus_MemoryError;
+        {$allocErrVar}kErpcStatus_MemoryError;
     }
 {%  endif %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}out->startWriteMessage({% if not fn.isReturnValue %}kOnewayMessage{%else%}kInvocationMessage{%endif%}, k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, request.getSequence());
+{$infraErrIndents}    {$infraErrVar}out->startWriteMessage({% if not fn.isReturnValue %}kOnewayMessage{%else%}kInvocationMessage{%endif%}, k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, request.getSequence());
 {$> addInfraErrorChecksEnd("    ") }
 {%   if fn.isSendValue %}
 {%    for param in fn.parametersTo2Core %}
@@ -64,11 +68,11 @@ extern ClientManager *g_client;
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$param.coderCall.name} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(true);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(true);
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(false);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(false);
 {$addIndent(infraErrIndents & "         ", addInfraErrorChecks(param.coderCall, "encode"))}{$loop.addNewLineIfNotLast}
 {$infraErrIndents}    }
 {$> addInfraErrorChecksEnd("    ") }
@@ -79,12 +83,12 @@ extern ClientManager *g_client;
 {%   endif -- isSendValue %}
 
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}out->endWriteMessage();
+{$infraErrIndents}    {$infraErrVar}out->endWriteMessage();
 {$> addInfraErrorChecksEnd("    ") }
 
     // Send message to server
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}g_client->performRequest(request);
+{$infraErrIndents}    {$infraErrVar}g_client->performRequest(request);
 {$> addInfraErrorChecksEnd("    ") }
 {%   if fn.isReturnValue %}
 
@@ -97,13 +101,13 @@ extern ClientManager *g_client;
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}    if (in == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}kErpcStatus_MemoryError;
+{$infraErrIndents}        {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}    }
 {%    endif %}
 {$> addInfraErrorChecksEnd("    ") }
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    // Decode reply. startReadMessage has already been called for us by performRequest.
-{$infraErrIndents}    {$errVar}in->startReadStruct();
+{$infraErrIndents}    {$infraErrVar}in->startReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%    if fn.needNullVariableOnClient %}
     bool isNull;
@@ -111,7 +115,7 @@ extern ClientManager *g_client;
 {%    for param in fn.parametersTo1Core %}
 {%     if param.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->readNullFlag(&isNull);
+{$infraErrIndents}    {$infraErrVar}in->readNullFlag(&isNull);
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
 {$> addIndent((infraErrIndents & "        ", param.mallocClient)}
@@ -137,10 +141,10 @@ extern ClientManager *g_client;
 {$addIndent("    ", addInfraErrorChecks(fn.returnValue.coderCall, "decode"))}
 {%    endif -- isNotVoid %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->endReadStruct();
+{$infraErrIndents}    {$infraErrVar}in->endReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->endReadMessage();
+{$infraErrIndents}    {$infraErrVar}in->endReadMessage();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif -- isReturnValue %}
 

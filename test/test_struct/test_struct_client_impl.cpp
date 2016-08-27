@@ -61,7 +61,7 @@ TEST(test_struct, ReturnStruct1)
 
 TEST(test_struct, SendIntSizes)
 {
-    F f = { 0xFF, 0xFFFF, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
+    F f = { (int8_t)0xFF, (int16_t)0xFFFF, (int32_t)0xFFFFFFFF, (int64_t)0xFFFFFFFFFFFFFFFF };
     EXPECT_TRUE(0 == sendManyInts(&f));
 }
 

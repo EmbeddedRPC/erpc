@@ -34,6 +34,14 @@ LDFLAGS += -L/usr/local/lib
 INCLUDES += /usr/local/opt/flex/include
 endif
 
+# Need to pass the -U option to GNU ar to turn off deterministic mode, or
+# we'll get a warning.
+ifneq "$(is_darwin)" "1"
+ARFLAGS = -rcsU
+else
+ARFLAGS = -rcs
+endif
+
 ifeq "$(build)" "debug"
 DEBUG_OR_RELEASE := Debug
 CFLAGS += -g3 -O0 -DDEBUG

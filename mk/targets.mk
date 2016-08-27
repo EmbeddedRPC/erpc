@@ -110,6 +110,9 @@ $(OBJS_ROOT)/%.o: $(ERPC_ROOT)/%.s
 # Build the target
 #------------------------------------------------------------------------
 
+# Only link if an APP_NAME is provided.
+ifneq "$(APP_NAME)" ""
+
 # Wrap the link objects in start/end group so that ld re-checks each
 # file for dependencies.  Otherwise linking static libs can be a pain
 # since order matters.
@@ -120,6 +123,8 @@ $(MAKE_TARGET): $(OBJECTS_ALL)
           $(LIBRARIES) \
           -o $@
 	@echo "Output binary:" ; echo "  $(APP_NAME)"
+
+endif
 
 #-------------------------------------------------------------------------------
 # Clean

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -60,7 +60,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:/boost_1_57_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <BrowseInformation>true</BrowseInformation>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -71,7 +71,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\boost_1_57_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\boost_1_61_0\lib32-msvc-12.0;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bison>
       <OutputFile>$(ProjectDir)\%(Filename).tab.cpp</OutputFile>
@@ -125,7 +125,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_RELEASE;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:/boost_1_57_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -137,7 +137,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\boost_1_57_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\boost_1_61_0\lib32-msvc-12.0;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template

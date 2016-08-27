@@ -38,6 +38,7 @@ extern "C" {
 #include "app_core1.h"
 #if RPMSG
 #include "rpmsg_lite.h"
+#include "mcmgr.h"
 #endif
 }
 #endif
@@ -55,9 +56,11 @@ int MyAlloc::allocated_ = 0;
 int main(int argc, const char *argv[])
 {
 #if RPMSG
-// MU_Init(MU0_B);
-/* Initialize GIC */
-// env_init();
+    // MU_Init(MU0_B);
+    /* Initialize GIC */
+    // env_init();
+    /* Initialize MCMGR before calling its API */
+    MCMGR_Init();
 #endif
 
     erpc_transport_t transport;

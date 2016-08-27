@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -14,7 +14,6 @@
 #-------------------------------------------------------------------------------
 
 # Parallel building can sometimes fail on certain systems.
-.NOTPARALLEL:
 
 include ../../mk/erpc_common.mk
 -include $(TEST_ROOT)/$(TEST_NAME)/variables.mk
@@ -23,50 +22,24 @@ include ../../mk/erpc_common.mk
 # setup variables
 # ----------------------------------------------
 
+# client or server
 ifeq "$(TYPE)" "CLIENT"
 APP_TYPE=client
 INCLUDES +=  $(ERPC_ROOT)/test/common/gtest
-SOURCES +=  $(ERPC_ROOT)/test/common/gtest/gtest.cpp \
-            $(ERPC_ROOT)/erpc_c/infra/client_manager.cpp
-
-#Added client setup file
-#ifeq "$(TRANSPORT)" "serial"
-#SOURCES += $(ERPC_ROOT)/erpc_c/setup/client_setup_serial.cpp
-#else ifeq "$(TRANSPORT)" "tcp"
-#do nothing - we currently do not have a setup file for tcp
-#endif
-
 else
 APP_TYPE=server
-SOURCES += $(ERPC_ROOT)/erpc_c/infra/server.cpp \
-            $(ERPC_ROOT)/erpc_c/infra/simple_server.cpp
+endif
 
-#Added server setup file
-#SOURCES += $(ERPC_ROOT)/src/erpc/server/server_setup_common.cpp
-#ifeq "$(TRANSPORT)" "serial"
-#SOURCES += $(ERPC_ROOT)/src/erpc/server/server_setup_serial.cpp
-#else ifeq "$(TRANSPORT)" "tcp"
-#do nothing - we currently do not have a setup file for tcp
-#endif
-
-endif # client or server
-
+# transport
 ifeq "$(TRANSPORT)" "tcp"
 CXXFLAGS += -DTRANSPORT_TCP
-SOURCES += $(ERPC_ROOT)/erpc_c/infra/framed_transport.cpp \
-            $(ERPC_ROOT)/erpc_c/transports/tcp_transport.cpp \
-            $(ERPC_ROOT)/erpc_c/port/erpc_threading_pthreads.cpp
 else ifeq "$(TRANSPORT)" "serial"
 CXXFLAGS += -DSERIAL
-SOURCES += $(ERPC_ROOT)/erpc_c/infra/framed_transport.cpp \
-            $(ERPC_ROOT)/erpc_c/transports/serial_transport.cpp \
-            $(ERPC_ROOT)/erpc_c/port/erpc_threading_pthreads.cpp \
-            $(ERPC_ROOT)/erpc_c/port/serial.cpp
-endif # transport
+endif
 
 APP_NAME ?= $(TEST_NAME)_$(APP_TYPE)_$(TRANSPORT)_test
 ERPC_OUT_DIR ?= $(RPC_OBJS_ROOT)/erpc_outputs
-UNIT_OUT_DIR ?= $(RPC_OBJS_ROOT)/unit_test_common
+UNIT_OUT_DIR = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/
 ERPC_NAME ?= $(TEST_NAME)
 
 TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/gcc/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
@@ -79,7 +52,7 @@ UT_COMMON_SRC = $(ERPC_ROOT)/test/common
 # Include path. Add the include paths like this:
 # INCLUDES += ./include/
 #-----------------------------------------------
-INCLUDES += $(TARGET_OUTPUT_ROOT)\
+INCLUDES += $(TARGET_OUTPUT_ROOT) \
             $(ERPC_OUT_DIR) \
             $(UNIT_OUT_DIR) \
             $(UT_COMMON_SRC) \
@@ -98,40 +71,30 @@ IDL_FILE = $(CUR_DIR).erpc
 
 SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
-            $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp \
-            $(ERPC_ROOT)/erpcgen/src/format_string.cpp \
-            $(ERPC_ROOT)/erpcgen/src/Logging.cpp \
-            $(ERPC_ROOT)/erpc_c/infra/basic_codec.cpp \
-            $(ERPC_ROOT)/erpc_c/infra/message_buffer.cpp \
-            $(ERPC_ROOT)/erpc_c/port/erpc_port_stdlib.cpp \
-            $(UT_COMMON_SRC)/addOne.cpp \
-            $(UNIT_OUT_DIR)/unit_test_common_$(APP_TYPE).cpp
+            $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
 ifeq "$(is_linux)" "1"
 LIBRARIES += -lpthread -lrt
 endif
 
+# Add libtest.a to build.
+LIBRARIES += -ltest
+LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+
 .PHONY: all
-all: $(UNIT_OUT_DIR)/unit_test_common_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp  $(UNIT_OUT_DIR)/unit_test_common/$(APP_TYPE).py $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
+all: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
 
 include $(ERPC_ROOT)/mk/targets.mk
 
-# Run erpcgen on common code for C.
-$(UNIT_OUT_DIR)/unit_test_common_$(APP_TYPE).cpp: $(UT_COMMON_SRC)/unit_test_common.erpc
-	@$(call printmessage,orange,Running erpcgen-common C, $(subst $(UT_COMMON_SRC)/,,$<))
-	$(at)$(ERPCGEN) -gc -o $(RPC_OBJS_ROOT)/ $(UT_COMMON_SRC)/unit_test_common.erpc
-
-# Run erpcgen on common code for Python.
-$(UNIT_OUT_DIR)/unit_test_common/$(APP_TYPE).py: $(UT_COMMON_SRC)/unit_test_common.erpc
-	@$(call printmessage,orange,Running erpcgen-common Py, $(subst $(UT_COMMON_SRC)/,,$<))
-	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(UT_COMMON_SRC)/unit_test_common.erpc
+# Define dependency.
+$(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp
 
 # Run erpcgen for C.
-$(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp: $(IDL_FILE) # $(UNIT_OUT_DIR)/unit_test_common_$(APP_TYPE).cpp
-	@$(call printmessage,orange,Running erpcgen-ut C, $(subst $(ERPC_ROOT)/,,$<))
+$(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp: $(IDL_FILE)
+	@$(call printmessage,orange,Running erpcgen-c $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gc -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
 
 # Run erpcgen for Python.
 $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
-	@$(call printmessage,orange,Running erpcgen-ut Py, $(subst $(ERPC_ROOT)/,,$<))
+	@$(call printmessage,orange,Running erpcgen-py $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)

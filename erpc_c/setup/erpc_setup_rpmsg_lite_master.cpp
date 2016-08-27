@@ -58,9 +58,11 @@ static ManuallyConstructed<RPMsgTransport> s_transport;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr)
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
+                                                       unsigned long dst_addr,
+                                                       int rpmsg_link_id)
 {
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE);
+    s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

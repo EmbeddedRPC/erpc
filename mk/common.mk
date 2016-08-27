@@ -40,10 +40,6 @@ MAKETHREADS :=
 # instances of make.
 this_makefile := $(firstword $(MAKEFILE_LIST))
 
-# The rest of the paths are defined in a separate makefile for easy access.
-# ERPC_ROOT is set in /erpc/mk/paths.mk
-#include $(ERPC_ROOT)/mk/paths.mk
-
 #-------------------------------------------------------------------------------
 # Utility
 #-------------------------------------------------------------------------------
@@ -58,7 +54,6 @@ space := $(empty) $(empty)
 
 # Get the OS name. Known values are "Linux", "CYGWIN_NT-5.1", and "Darwin".
 os_name := $(shell uname -s)
-#os_name := $(shell gcc -dumpmachine)
 
 # Set to 1 if running on Darwin.
 is_darwin := $(and $(findstring Darwin,$(os_name)),1)
@@ -67,10 +62,10 @@ is_darwin := $(and $(findstring Darwin,$(os_name)),1)
 is_cygwin := $(and $(findstring CYGWIN,$(os_name)),1)
 
 # Set to 1 if running on mingw.
-#is_mingw := $(and $(findstring MINGW,$(os_name)),1)
 ifeq "$(os_name)" ""
 is_mingw := 1
 os_name = MINGW
+MAKE := mingw32-make
 else
 is_mingw := 0
 endif
@@ -81,27 +76,12 @@ is_redhat := $(shell if [ -f /etc/redhat-release ]; then echo 1 ; fi)
 # Set to 1 if running on Linux.
 is_linux := $(and $(findstring Linux,$(os_name)),1)
 
-# Disable parallel builds for cygwin since they hang.
-#ifeq "$(is_cygwin)" "1"
-#.NOTPARALLEL:
-#endif
-
-#ifeq "$(is_mingw)" "1"
-#.NOTPARALLEL:
-#endif
-
 #-------------------------------------------------------------------------------
 # Logging options
 #-------------------------------------------------------------------------------
 
 # Enable color output by default.
 BUILD_SDK_COLOR ?= 1
-
-# MAKE
-#MAKE := make
-ifeq "$(is_mingw)" "1"
-MAKE := mingw32-make
-endif
 
 # Normally, commands in recipes are prefixed with '@' so the command itself
 # is not echoed by make. But if VERBOSE is defined (set to anything non-empty),

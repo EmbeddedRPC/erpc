@@ -19,7 +19,6 @@
 
 CUR_DIR := $(notdir $(CURDIR))
 
-ERPC_ROOT := $(PROJ_ROOT)/erpc
 OUTPUT_ROOT := $(ERPC_ROOT)
 TEST_ROOT :=  $(ERPC_ROOT)/test
 
@@ -33,6 +32,17 @@ TARGET_OUTPUT_ROOT = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/$(APP_NAME)
 MAKE_TARGET = $(TARGET_OUTPUT_ROOT)/$(APP_NAME)
 
 OBJS_ROOT = $(TARGET_OUTPUT_ROOT)/obj
+
+#-----------------------------------------------
+# install paths
+# ----------------------------------------------
+
+# Default install location.
+PREFIX ?= /usr/local
+
+BIN_INSTALL_DIR = $(PREFIX)/bin
+LIB_INSTALL_DIR = $(PREFIX)/lib
+INC_INSTALL_DIR = $(PREFIX)/include/erpc
 
 #-----------------------------------------------
 # tool paths

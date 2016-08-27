@@ -82,26 +82,30 @@ public:
      *
      * @param[in] src_addr Source address.
      * @param[in] dst_addr Destination address.
-     * @param[in] role Device role number.
-     * @param[in] base_address RPMsg base address in the shared memory
-     * @param[in] length RPMsg shared memory region length
+     * @param[in] base_address RPMsg base address in the shared memory.
+     * @param[in] length RPMsg shared memory region length.
+     * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_Fail When rpmsg init function wasn't executed successfully.
      */
-    virtual status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length);
+    virtual status_t init(
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id);
 
     /*!
      * @brief This function call RPMsg rtos init function - as RPMsg remote
      *
-     * @param[in] dev_id Device id number.
-     * @param[in] role Device role number.
-     * @param[in] base_address RPMsg base address in the shared memory
+     * @param[in] src_addr Source address.
+     * @param[in] dst_addr Destination address.
+     * @param[in] base_address RPMsg base address in the shared memory.
+     * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
+     * @param[in] ready_cb Callback called after RPMsg init is done and the core is ready.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_Fail When rpmsg init function wasn't executed successfully.
      */
-    virtual status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address);
+    virtual status_t init(
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
 
     /*!
      * @brief Store incoming message to message buffer.

@@ -31,8 +31,6 @@
 #include <cstdio>
 #include <string>
 #include <termios.h>
-
-#include "Logging.h"
 #include "serial_transport.h"
 #include "message_buffer.h"
 #include "serial.h"

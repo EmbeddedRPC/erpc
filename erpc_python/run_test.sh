@@ -7,7 +7,7 @@ make erpcgen
 popd
 
 # Generate code
-../Debug/Darwin/erpcgen/erpcgen -gpy ../test/arithmetic.erpc
+../Debug/*/erpcgen/erpcgen -gpy ../test/arithmetic.erpc
 echo "Generated code"
 
 # Run server

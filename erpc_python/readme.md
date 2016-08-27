@@ -7,12 +7,17 @@ The Python implementation of eRPC is fully compatible with the C/C++ implementat
 protocol level. Also, the classes mirror those in the C++ infrastructure.
 
 
-Contents:
+## Contents
 
-    erpc - Python package for eRPC infrastructure.
+`erpc` - Python package for eRPC infrastructure.
 
-    setup.py - setuptools setup script that installs the erpc package.
+`setup.py` - setuptools setup script that installs the erpc package.
 
+`test.py` - Example Python client and server in one file. The server is selected by passing `-s` on the command line, the client is selected with `-c`.
+
+`run_test.sh` - Script to generate the Python shim code and run test.py as both server and client. It ensures that erpcgen is built.
+
+## Installation
 
 To install the eRPC Python infrastructure, run the setup.py script like this:
 

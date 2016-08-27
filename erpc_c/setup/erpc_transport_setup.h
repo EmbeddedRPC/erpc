@@ -100,22 +100,28 @@ erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRat
 /*!
  * @brief Create an RPMsg-Lite transport.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr);
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
+                                                       unsigned long dst_addr,
+                                                       int rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite transport.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr, unsigned long dst_addr);
+erpc_transport_t erpc_transport_rpmsg_lite_remote_init(
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void));
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr, unsigned long dst_addr);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr,
+                                                            unsigned long dst_addr,
+                                                            int rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void));
 
 //@}
 

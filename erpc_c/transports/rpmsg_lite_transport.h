@@ -83,28 +83,32 @@ public:
      *
      * Call init() for RPMsg. Create buffers for receiving messages.
      *
-     * @param[in] dev_id RPMsg remote device for which driver is to be initialized.
-     *
-     * @param[in] base_address RPMsg base address in the shared memory
-     *
-     * @param[in] length RPMsg shared memory region length
+     * @param[in] src_addr Source address.
+     * @param[in] dst_addr Destination address.
+     * @param[in] base_address RPMsg base address in the shared memory.
+     * @param[in] length RPMsg shared memory region length.
+     * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
      *
      * @return kErpcStatus_Success when initialization was successful, else kErpcStatus_Fail.
      */
-    virtual status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length);
+    virtual status_t init(
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id);
 
     /*!
      * @brief Initialization of RPMsgTransport layer - as RPMsg remote
      *
      * Call init() for RPMsg. Create buffers for receiving messages.
      *
-     * @param[in] dev_id RPMsg remote device for which driver is to be initialized.
-     *
-     * @param[in] base_address RPMsg base address in the shared memory
+     * @param[in] src_addr Source address.
+     * @param[in] dst_addr Destination address.
+     * @param[in] base_address RPMsg base address in the shared memory.
+     * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
+     * @param[in] ready_cb Callback called after RPMsg init is done and the core is ready.
      *
      * @return kErpcStatus_Success when initialization was successful, else kErpcStatus_Fail.
      */
-    virtual status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address);
+    virtual status_t init(
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
 
     /*!
      * @brief Set message to first received message.

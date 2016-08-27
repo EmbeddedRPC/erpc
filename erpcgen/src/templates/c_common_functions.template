@@ -60,7 +60,7 @@ static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data)
 {%   for mem in st.members %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ")}
-{$infraErrIndents}    {$errVar}in->readNullFlag(&isNull);
+{$infraErrIndents}    {$infraErrVar}in->readNullFlag(&isNull);
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
 {$addIndent(infraErrIndents & "        ", addInfraErrorChecks(mem.coderCall, "decode"))}{$loop.addNewLineIfNotLast}
@@ -77,7 +77,7 @@ static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data)
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}in->endReadStruct();
+{$infraErrIndents}    {$infraErrVar}in->endReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
 {% if errVar != ""  %}
@@ -109,11 +109,11 @@ static int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * dat
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$mem.coderCall.name}{$mem.structElements} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(true);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(true);
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}out->writeNullFlag(false);
+{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(false);
 {$addIndent(infraErrIndents & "        ", addInfraErrorChecks(mem.coderCall, "encode"))}{$loop.addNewLineIfNotLast}
 {$infraErrIndents}    }
 {$> addInfraErrorChecksEnd("    ") }
@@ -123,7 +123,7 @@ static int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * dat
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$errVar}out->endWriteStruct();
+{$infraErrIndents}    {$infraErrVar}out->endWriteStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
 {% if errVar != ""  %}

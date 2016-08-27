@@ -31,6 +31,7 @@
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
 #include "erpc_transport_setup.h"
+#include "erpc_common.h"
 #include <stdint.h>
 #include <stdbool.h>
 

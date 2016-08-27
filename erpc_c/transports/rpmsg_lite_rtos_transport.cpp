@@ -28,7 +28,6 @@
  */
 
 #include "rpmsg_lite_rtos_transport.h"
-#include "mcmgr.h"
 #include <cassert>
 
 #if !(__embedded_cplusplus)
@@ -59,14 +58,12 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport()
     s_initialized = 0;
 }
 
-status_t RPMsgRTOSTransport::init(unsigned long src_addr,
-                                  unsigned long dst_addr,
-                                  void *base_address,
-                                  unsigned long length)
+status_t RPMsgRTOSTransport::init(
+    unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id)
 {
     if (!s_initialized)
     {
-        s_rpmsg = rpmsg_lite_master_init(base_address, length, RL_PLATFORM_LPC5411x_M0_CORE_ID, RL_NO_FLAGS);
+        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS);
         s_initialized = 1;
     }
 
@@ -77,14 +74,18 @@ status_t RPMsgRTOSTransport::init(unsigned long src_addr,
     return kErpcStatus_Success;
 }
 
-status_t RPMsgRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address)
+status_t RPMsgRTOSTransport::init(
+    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
 {
     if (!s_initialized)
     {
-        s_rpmsg = rpmsg_lite_remote_init(base_address, RL_PLATFORM_LPC5411x_M4_CORE_ID, RL_NO_FLAGS);
+        s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS);
 
         /* Signal the other core we are ready */
-        MCMGR_SignalReady(kMCMGR_Core1);
+        if (ready_cb != NULL)
+        {
+            ready_cb();
+        }
 
         while (!rpmsg_lite_is_link_up(s_rpmsg))
         {

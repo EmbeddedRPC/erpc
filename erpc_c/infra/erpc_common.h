@@ -85,7 +85,9 @@ enum _erpc_status
 };
 
 /*! @brief Type used for all status and error return values. */
+#ifndef _FSL_COMMON_H_
 typedef int32_t status_t;
+#endif
 
 /*! @} */
 

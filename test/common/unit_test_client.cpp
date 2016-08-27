@@ -83,6 +83,10 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 
 int MyAlloc::allocated_ = 0;
 
+#if RPMSG
+extern char rpmsg_lite_base[];
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +126,8 @@ int main(int argc, char **argv)
     /* start the second core */
     // MU_BootCoreB(MU0_A, kMU_CoreBootFromImem);
     /* Boot source for Core 1 */
-    MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS);
+    // MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS);
+    MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
     /* Wait for remote side to come up. This delay is arbitrary and may
        need adjustment for different configuration of remote systems */

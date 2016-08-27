@@ -29,10 +29,12 @@ idl: |
     }
 test_client.cpp:
   - if (out == NULL)
+  - err = out
   - if (!err)
   - '{'
   - '}'
   - if (in == NULL)
+  - err = in
   - g_client->releaseRequest(request);
   - if (err)
   - '{'
@@ -72,9 +74,11 @@ idl: |
         f() -> {type[0]}
     }
 test_client.cpp:
+  - not: err = out
   - not: if (out == NULL)
   - not: if (!err)
   - not: if (in == NULL)
+  - not: err = in
   - not: if (err)
   - not: return {type[1]};
 
@@ -111,8 +115,10 @@ idl: |
     }
 test_client.cpp:
   - not: if (out == NULL)
+  - err = out
   - if (!err)
   - not: if (in == NULL)
+  - err = in
   - if (err)
   - return {type[1]};
 
@@ -149,7 +155,189 @@ idl: |
     }
 test_client.cpp:
   - if (out == NULL)
+  - not: err = out
   - not: if (!err)
   - if (in == NULL)
+  - not: err = in
   - if (err)
   - return {type[1]};
+
+---
+name: error checks c allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+  dir:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({dir} {type[0]} variable @max_length(10)) -> void
+    }
+test_client.cpp:
+  - if (out == NULL)
+  - err = out
+  - if (!err)
+  - '{'
+  - '}'
+  - if (in == NULL)
+  - err = in
+  - g_client->releaseRequest(request);
+  - if (err)
+  - '{'
+  - not: return {type[1]};
+  - '}'
+
+---
+name: error checks c not allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+  direction:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    @no_infra_errors
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({direction} {type[0]} variable @max_length(10)) -> void
+    }
+test_client.cpp:
+  - not: err = out
+  - not: if (out == NULL)
+  - not: if (!err)
+  - not: if (in == NULL)
+  - not: err = in
+  - not: if (err)
+  - not: return {type[1]};
+
+---
+name: error checks c infra allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+  direction:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({direction} {type[0]} variable @max_length(10)) -> void
+    }
+test_client.cpp:
+  - not: if (out == NULL)
+  - err = out
+  - if (!err)
+  - not: if (in == NULL)
+  - err = in
+  - if (err)
+  - not: return {type[1]};
+
+---
+name: error checks c alloc allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false"]
+    - [int8, "-1"]
+    - [int16, "-1"]
+    - [int32, "-1"]
+    - [int64, "-1"]
+    - [uint8, "0xFF"]
+    - [uint16, "0xFFFF"]
+    - [uint32, "0xFFFFFFFF"]
+    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [float, "-1"]
+    - [double, "-1"]
+    - [string, "NULL"]
+    - [A, "NULL"]
+    - [B, "(B) -1"]
+  direction:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    @no_infra_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({direction} {type[0]} variable @max_length(10)) -> void
+    }
+test_client.cpp:
+  - if (out == NULL)
+  - not: err = out
+  - not: if (!err)
+  - if (in == NULL)
+  - not: err = in
+  - if (err)
+  - not: return {type[1]};

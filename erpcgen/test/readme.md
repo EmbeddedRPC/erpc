@@ -5,6 +5,9 @@ This file documents the parser and output test system for erpcgen.
 
 This test system is built on py.test using its extensive plugin hooks. To run the tests, just run
 py.test in either the `erpc/erpgen/` or `erpc/erpcgen/test/` directory.
+Because of py.test are trying run all tests in all subfolders, is safer to run py.test with parameter
+source directory (from erpcgen directory run: "pytest test"). This prevent on windows to execute
+boost test in boost folder.
 
 
 Setup

@@ -2,14 +2,14 @@
 {% if info.builtinType == "kStringType" %}
 uint32_t {$info.stringLocalName}_len;
 char * {$info.stringLocalName}_local;
-{$errVar}in->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
+{$infraErrVar}in->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {$> addInfraErrorChecksBegin("") }
 {%  if source == "client" && not info.withoutAlloc %}
 {$infraErrIndents}{$info.name} = (char *) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}if ({$info.name} == NULL)
 {$infraErrIndents}{
-{$infraErrIndents}    {$errVar}kErpcStatus_MemoryError;
+{$infraErrIndents}    {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}}
 {$infraErrIndents}else
 {$infraErrIndents}{
@@ -19,7 +19,7 @@ char * {$info.stringLocalName}_local;
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}if ({$info.name} == NULL)
 {$infraErrIndents}{
-{$infraErrIndents}    {$errVar}kErpcStatus_MemoryError;
+{$infraErrIndents}    {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}}
 {$infraErrIndents}else
 {$infraErrIndents}{
@@ -39,16 +39,16 @@ char * {$info.stringLocalName}_local;
 {$> addInfraErrorChecksEnd("") }
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
-{$errVar}in->read({$info.name});
+{$infraErrVar}in->read({$info.name});
 {%  else %}
-{$errVar}in->read(&{$info.name});
+{$infraErrVar}in->read(&{$info.name});
 {%  endif -- pointerScalarTypes %}
 {% endif -- builtinType %}
 {% enddef ------------------------------- BuiltinType %}
 
 {% def decodeBinaryType(info) --------------- BinaryType %}
 uint8_t * {$info.sizeTemp};
-{$errVar}in->readBinary(&{$info.size}, &{$info.sizeTemp});
+{$infraErrVar}in->readBinary(&{$info.size}, &{$info.sizeTemp});
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}if ({$info.size} > 0)
 {$infraErrIndents}{
@@ -57,7 +57,7 @@ uint8_t * {$info.sizeTemp};
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}    if ({$info.name} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}kErpcStatus_MemoryError;
+{$infraErrIndents}        {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
@@ -78,7 +78,7 @@ uint8_t * {$info.sizeTemp};
 {% enddef ------------------------------- BinaryType %}
 
 {% def decodeEnumType(info) ---------------- EnumType %}
-{$errVar}in->read(&enum_tmp_local);
+{$infraErrVar}in->read(&enum_tmp_local);
 {$> addInfraErrorChecksBegin("") }
 {% if source == "client" && info.pointerScalarTypes %}
 {$infraErrIndents}*{$info.name} = static_cast<{$info.enumName}>(enum_tmp_local);
@@ -95,7 +95,7 @@ uint8_t * {$info.sizeTemp};
 {%  if info.hasLengthVariable %}
 uint32_t {$info.sizeTemp};
 {%  endif %}
-{$errVar}in->startReadList(&{$info.sizeTemp});
+{$infraErrVar}in->startReadList(&{$info.sizeTemp});
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}if ({$info.sizeTemp} > 0)
 {$infraErrIndents}{
@@ -104,7 +104,7 @@ uint32_t {$info.sizeTemp};
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}    if ({$info.name} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$errVar}kErpcStatus_MemoryError;
+{$infraErrIndents}        {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
@@ -123,7 +123,7 @@ uint32_t {$info.sizeTemp};
 {$infraErrIndents}}
 {$> addInfraErrorChecksEnd("") }
 {$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}{$errVar}in->endReadList();
+{$infraErrIndents}{$infraErrVar}in->endReadList();
 {$> addInfraErrorChecksEnd("") }
 {% endif %}
 {% enddef ------------------------------------- ListType %}
@@ -144,9 +144,9 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp};
 
 {% def decodeStructType(info) --------------- StructType %}
 {% if info.inDataContainer %}
-{$errVar}read_{$info.typeName}_struct(in, &({$info.name}));
+{$infraErrVar}read_{$info.typeName}_struct(in, &({$info.name}));
 {% else -- not inDataContainer %}
-{$errVar}read_{$info.typeName}_struct(in, {$info.name});
+{$infraErrVar}read_{$info.typeName}_struct(in, {$info.name});
 {% endif -- inDataContainer %}
 {% enddef -------------------------- StructType %}
 
@@ -176,32 +176,32 @@ switch ({$info.dataLiteral}->{$info.discriminatorName})
 {% if info.builtinType == "kStringType" %}
 if ({$info.name})
 {
-    {$errVar}out->writeString(strlen({$info.name}), {$info.name});
+    {$infraErrVar}out->writeString(strlen({$info.name}), {$info.name});
 }
 {% if generateInfraErrorChecks %}
 else
 {
-    {$errVar}kErpcStatus_Fail;
+    {$infraErrVar}kErpcStatus_Fail;
 }
 {% endif %}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
-{$errVar}out->write(*{$info.name});
+{$infraErrVar}out->write(*{$info.name});
 {%  else %}
-{$errVar}out->write({$info.name});
+{$infraErrVar}out->write({$info.name});
 {%  endif -- pointerScalarTypes %}
 {% endif -- builtinType %}
 {% enddef --------------------------------------- BuiltinType %}
 
 {% def encodeBinaryType(info) -----------------  %}
-{$errVar}out->writeBinary({$info.size}, {$info.name});
+{$infraErrVar}out->writeBinary({$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
 
 {% def encodeEnumType(info) ---------------------%}
 {% if source == "client" && info.pointerScalarTypes %}
-{$errVar}out->write(static_cast<int32_t>(*{$info.name}));
+{$infraErrVar}out->write(static_cast<int32_t>(*{$info.name}));
 {% else %}
-{$errVar}out->write(static_cast<int32_t>({$info.name}));
+{$infraErrVar}out->write(static_cast<int32_t>({$info.name}));
 {% endif -- pointerScalarTypes %}
 {% enddef --------------------------------------- Enum %}
 
@@ -211,15 +211,15 @@ else
 {% else %}
 if ({$info.size} > 0 && {$info.name})
 {
-    {$errVar}out->startWriteList({$info.size});
+    {$infraErrVar}out->startWriteList({$info.size});
 {$addIndent("    ", encodeArrayType(info))}
 }
 else
 {
-    {$errVar}out->startWriteList(0);
+    {$infraErrVar}out->startWriteList(0);
 }
 {$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}out->endWriteList();
+{$infraErrIndents}{$infraErrVar}out->endWriteList();
 {$> addInfraErrorChecksEnd("") }
 {% endif %}
 {% enddef ------------------------------------ ListType %}
@@ -240,9 +240,9 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{
 
 {% def encodeStructType(info) -------------------%}
 {% if info.inDataContainer %}
-{$errVar}write_{$info.typeName}_struct(out, &({$info.name}));
+{$infraErrVar}write_{$info.typeName}_struct(out, &({$info.name}));
 {% else -- not inDataContainer %}
-{$errVar}write_{$info.typeName}_struct(out, {$info.name});
+{$infraErrVar}write_{$info.typeName}_struct(out, {$info.name});
 {% endif -- inDataContainer %}
 {% enddef --------------------------------------- StructType %}
 

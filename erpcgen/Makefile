@@ -143,5 +143,11 @@ $(OBJS_ROOT)/%.c: $(ERPC_ROOT)/%.template
 	@$(call printmessage,orange,Converting, $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(mkdirc) -p $(dir $@) && $(PYTHON) $(ERPC_ROOT)/$(PYTH_SCRIPT) -o $@ $<
 
+.PHONY: install
+install: $(MAKE_TARGET)
+	@$(call printmessage,c,Installing, erpcgen in $(BIN_INSTALL_DIR))
+	$(at)mkdir -p $(BIN_INSTALL_DIR)
+	$(at)install $(MAKE_TARGET) $(BIN_INSTALL_DIR)
+
 clean::
 	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c

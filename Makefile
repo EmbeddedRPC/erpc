@@ -31,11 +31,21 @@ TESTDIR = test
 SUBDIRS = erpcgen $(TESTDIR)
 
 # Default target.
-.DEFAULT_GOAL := erpcgen
+.PHONY: default
+default: erpcgen erpc
+
+.PHONY: erpc
+erpc:
+	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c
+
+.PHONY: install
+install: erpc erpc_c erpcgen
+	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c install
+	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcgen install
 
 #make all target
 .PHONY: all
-all: $(SUBDIRS)
+all: erpc $(SUBDIRS)
 
 # Unit Test Targets
 .PHONY: test-tcp
@@ -65,3 +75,5 @@ include $(ERPC_ROOT)/mk/subdirs.mk
 .PHONY: os_name
 os_name:
 	@echo $(os_name)
+
+

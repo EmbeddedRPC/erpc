@@ -29,7 +29,6 @@
 
 #include "manually_constructed.h"
 #include "rpmsg_lite_rtos_transport.h"
-#include "mcmgr.h"
 
 using namespace erpc;
 
@@ -43,15 +42,10 @@ static ManuallyConstructed<RPMsgRTOSTransport> s_transport;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr)
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void))
 {
-    uint32_t startupData;
-
-    /* Get the startup data */
-    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
-
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, reinterpret_cast<void *>(startupData));
+    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready_cb);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }
-

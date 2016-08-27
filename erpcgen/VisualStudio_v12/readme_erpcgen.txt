@@ -19,21 +19,18 @@ Requirements
 
 3. boost [http://boost.org]
 
-    Direct link to the boost 1.57 release downloads:
-        [https://sourceforge.net/projects/boost/files/boost/1.57.0/]
+    Direct link to the boost 1.61 release downloads:
+        [https://sourceforge.net/projects/boost/files/boost-binaries/1.61.0/]
 
-    Extract and install boost 1.57 into C:\boost_1_57_0\.
+    Install binary for your version of visual studio (x86 architecture)
+    into current directory (for Visual Studio 2013: boost_1_61_0-msvc-12.0-32.exe):
+        erpc\erpcgen\VisualStudio_v12\
 
-    Run these commands in the boost install directory to build boost using Visual Studio 2013:
-        1.  bootstrap.bat
-        2.  for x86 (32-bit):
-                b2 --toolset=msvc-12.0 --build-type=complete stage
-            for x64 (64-bit):
-                b2 --toolset=msvc-12.0 --build-type=complete architecture=x86 address-model=64 stage
+        whole path has to be:
+        erpc\erpcgen\VisualStudio_v12\boost_1_61_0\
 
-        For release build, extend second command with:
-            runtime-link=static runtime-debugging=off variant=release
-
+    For different version of Visual Studio boost library you need update project:
+        in Properties\Linker\General update Additional Library Directories
 
 Build output
 ------------

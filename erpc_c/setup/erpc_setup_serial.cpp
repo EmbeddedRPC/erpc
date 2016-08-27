@@ -29,6 +29,7 @@
 
 #include "manually_constructed.h"
 #include "serial_transport.h"
+#include "erpc_transport_setup.h"
 
 using namespace erpc;
 
