@@ -27,13 +27,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "erpc_client_setup.h"
-#include "client_manager.h"
-#include "manually_constructed.h"
-#include "basic_codec.h"
-#include "message_buffer.h"
-#include "erpc_config_internal.h"
-#include "erpc_setup.h"
+#ifndef _EMBEDDED_RPC_SETUP_H_
+#define _EMBEDDED_RPC_SETUP_H_
 #include <new>
 #include <assert.h>
 
@@ -44,51 +39,27 @@ using namespace std;
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Classes
+// CLASS
 ////////////////////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
-
-// global client variables
-static ManuallyConstructed<ClientManager> s_client;
-ClientManager *g_client;
-
-static ManuallyConstructed<BasicMessageBufferFactory> s_msgFactory;
-static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-
-////////////////////////////////////////////////////////////////////////////////
-// Code
-////////////////////////////////////////////////////////////////////////////////
-
-void erpc_client_init(erpc_transport_t transport)
+class BasicMessageBufferFactory : public MessageBufferFactory
 {
-    // Init factories.
-    s_msgFactory.construct();
-    s_codecFactory.construct();
-
-    // Init client manager with the provided transport.
-    s_client.construct();
-    s_client->setTransport(reinterpret_cast<Transport *>(transport));
-    s_client->setMessageBufferFactory(s_msgFactory);
-    s_client->setCodecFactory(s_codecFactory);
-    g_client = s_client;
-}
-
-void erpc_client_set_error_handler(client_error_handler_t error_handler)
-{
-    if (g_client)
+public:
+    virtual MessageBuffer create()
     {
-        g_client->setErrorHandler(error_handler);
+        uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
+        return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
     }
-}
 
-void erpc_client_deinit()
-{
-    s_client.destroy();
-    s_msgFactory.destroy();
-    s_codecFactory.destroy();
-}
+    virtual void dispose(MessageBuffer *buf)
+    {
+        assert(buf);
+        if (*buf)
+        {
+            delete[] buf->get();
+        }
+    }
+};
+
+/*! @} */
+
+#endif // _EMBEDDED_RPC__CLIENT_SETUP_H_
