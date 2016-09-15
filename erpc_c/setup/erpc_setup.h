@@ -31,6 +31,8 @@
 #define _EMBEDDED_RPC_SETUP_H_
 #include <new>
 #include <assert.h>
+#include "erpc_config_internal.h"
+#include "message_buffer.h"
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -62,4 +64,4 @@ public:
 
 /*! @} */
 
-#endif // _EMBEDDED_RPC__CLIENT_SETUP_H_
+#endif
