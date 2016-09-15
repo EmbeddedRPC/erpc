@@ -64,4 +64,4 @@ public:
 
 /*! @} */
 
-#endif
+#endif //_EMBEDDED_RPC_SETUP_H_
