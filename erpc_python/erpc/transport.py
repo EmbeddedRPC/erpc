@@ -29,6 +29,8 @@
 
 import struct
 import serial
+from rpmsg.sysfs import RpmsgEndpoint
+import time
 import socket
 import threading
 from .crc16 import crc16
@@ -104,6 +106,26 @@ class SerialTransport(FramedTransport):
 
 class ConnectionClosed(Exception):
     pass
+
+class RpmsgTransport(Transport):
+    def __init__(self):
+        self.ept = RpmsgEndpoint(
+            RpmsgEndpoint.rpmsg_openamp_channel,
+            RpmsgEndpoint.LOCAL_DEFAULT_ADDRESS,
+            RpmsgEndpoint.Types.DATAGRAM)
+
+    def send(self, message):
+        self.ept.send(message, RpmsgEndpoint.REMOTE_DEFAULT_ADDRESS)
+
+    def receive(self):
+        while True:
+            ret = self.ept.recv(2048)
+            if len(ret[1]) != 0:
+                return ret[1]
+            else:
+                time.sleep(0.001)
+        return ret[1] 
+
 
 class TCPTransport(FramedTransport):
     def __init__(self, host, port, isServer):
