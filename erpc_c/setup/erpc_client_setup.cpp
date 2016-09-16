@@ -31,8 +31,6 @@
 #include "client_manager.h"
 #include "manually_constructed.h"
 #include "basic_codec.h"
-#include "message_buffer.h"
-#include "erpc_config_internal.h"
 #include "erpc_setup.h"
 #include <new>
 #include <assert.h>
