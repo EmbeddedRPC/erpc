@@ -99,7 +99,7 @@ status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
     while (!s_isTransferCompleted)
     {
     }
-    GPIO_SetPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    
     return status;
 }
 
@@ -119,6 +119,6 @@ status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
     while (!s_isTransferCompleted)
     {
     }
-    GPIO_SetPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    
     return status;
 }
