@@ -29,6 +29,7 @@
 
 #ifndef _EMBEDDED_RPC_SETUP_H_
 #define _EMBEDDED_RPC_SETUP_H_
+
 #include <new>
 #include <assert.h>
 #include "erpc_config_internal.h"
@@ -41,7 +42,7 @@ using namespace std;
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
-// CLASS
+// Classes
 ////////////////////////////////////////////////////////////////////////////////
 class BasicMessageBufferFactory : public MessageBufferFactory
 {

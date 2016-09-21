@@ -68,7 +68,7 @@ protected:
     SPI_Type *m_spiBaseAddr; /*!< Base address of DSPI peripheral used in this transport layer */
     uint32_t m_baudRate;       /*!< Baud rate of DSPI peripheral used in this transport layer */
     uint32_t m_srcClock_Hz;    /*!< Source clock of DSPI peripheral used in this transport layer */
-    bool m_binited;           /*!< the SPI peripheral init status flag */
+    bool m_isInited;           /*!< the SPI peripheral init status flag */
 
 private:
     /*!
