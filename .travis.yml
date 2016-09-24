@@ -1,0 +1,18 @@
+language: cpp
+sudo: required
+compiler:
+- gcc
+- clang
+os:
+- linux
+- osx
+before_install:
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install bison flex libboost-dev libboost-filesystem-dev libboost-system-dev python ; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install bison flex boost; fi
+install:
+- pip install pytest pyyaml
+script:
+- make all
+- pushd erpcgen/test ; py.test ; popd
+- python test/run_unit_tests.py
