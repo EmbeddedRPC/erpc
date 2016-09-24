@@ -26,7 +26,7 @@ Client side usage:
 void example_client(void) {
     // Initialize client running over UART.
     erpc_client_init(
-        erpc_transport_uart_init(UART0, 115200, get_uart_clock()));
+        erpc_transport_cmsis_uart_init(UART0_NonBlocking_Driver);
 
     // Now we can call the remote function to turn on the green LED.
     set_led(kGreen, true);
@@ -43,7 +43,7 @@ void set_led(LEDName whichLed, bool onOrOff) {
 void example_server(void) {
     // Initialize server running over UART.
     erpc_server_init(
-        erpc_transport_uart_init(UART0, 115200, get_uart_clock()));
+        erpc_transport_uart_init(UART0_NonBlocking_Driver);
 
     // Add the IO service.
     erpc_add_service_to_server(create_IO_service());
@@ -57,12 +57,12 @@ A number of transports are supported, and new transport classes are easy to writ
 
 Supported transports:
 
-* NXP Kinetis UART and LPUART
+* CMSIS UART
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
 * [OpenAMP RPMsg](https://github.com/OpenAMP/open-amp)
-* NXP RPMsg-Lite
+* [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 
@@ -151,7 +151,7 @@ List of top level Makefile targets:
 - `all`: build all of the above
 - `install`: install liberpc.a, erpcgen, and include files
 
-### Installing Python
+### Installing for Python
 
 To install the Python infrastructure for eRPC, first change to the `erpc_python/` directory. Then run the setup.py script like this:
 
