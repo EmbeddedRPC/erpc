@@ -74,6 +74,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
@@ -88,6 +89,7 @@ SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_source.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_coders.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_defines.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
@@ -95,6 +97,7 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
@@ -115,15 +118,29 @@ ifeq "$(is_mingw)" "1"
         LIBRARIES += -lboost_system-mgw48-mt-d-1_57 -lboost_filesystem-mgw48-mt-d-1_57
     endif
 else
-ifeq "$(is_linux)" "1"
-    LIBRARIES += -lpthread -lrt
-endif
-    LIBRARIES += -lboost_system -lboost_filesystem
+    ifeq "$(is_linux)" "1"
+        LIBRARIES += -lpthread -lrt
+    endif
+
+    static_libs := NO
+    ifneq "$(build)" "debug"
+        ifeq "$(is_darwin)" "1"
+            static_libs := $(BOOST_ROOT)/lib/libboost_system.a $(BOOST_ROOT)/lib/libboost_filesystem.a
+        endif
+    endif
+    ifneq "$(static_libs)" "NO"
+        LIBRARIES += $(static_libs)
+    else
+        LIBRARIES += -lboost_system -lboost_filesystem
+    endif
 endif
 
 # Release should be alwas static. Customers don't need install things.
 ifneq "$(build)" "debug"
-	LIBRARIES += -static
+    # Except Darwin. Darwin has static libs defined above.
+    ifeq "$(is_darwin)" ""
+        LIBRARIES += -static
+    endif
 endif
 
 # Run flex

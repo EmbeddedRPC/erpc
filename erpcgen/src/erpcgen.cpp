@@ -33,10 +33,7 @@
 #include <vector>
 #include "options.h"
 #include "Logging.h"
-#include "AstNode.h"
 #include "ErpcLexer.h"
-#include "AstWalker.h"
-#include "erpcgen_parser.tab.hpp"
 #include "InterfaceDefinition.h"
 #include "CGenerator.h"
 #include "PythonGenerator.h"

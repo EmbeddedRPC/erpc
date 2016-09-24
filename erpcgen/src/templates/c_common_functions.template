@@ -21,7 +21,7 @@ const {$c.typeAndName} = {$c.value};
 {%  for st in structs %}
 
 //! @brief Function to read struct {$st.name}
-static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data);
+static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data);
 {%  endfor -- structs %}
 {% endif %}
 {% enddef -- structDeserialHeader %}
@@ -33,7 +33,7 @@ static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data);
 
 //! @brief Function to write struct {$st.name}
 {#int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * data{% if st.isNeedIfDealloc %}, bool needDealloc{% endif %});#}
-static int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * data);
+static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * data);
 {%  endfor -- structs %}
 {% endif %}
 {% enddef  -- structSerialHeader %}
@@ -44,7 +44,7 @@ static int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * dat
 {%  for st in structs %}
 
 // Read struct {$st.name} function implementation
-static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data)
+static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 {
 {%   if st.hasNullableMember %}
     bool isNull;
@@ -53,31 +53,31 @@ static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data)
 {%    if st.needEnumTmp %}
     int32_t enum_tmp_local;
 {%    endif %}
-    {% if errVar != ""  %}status_t {$errVar}{% endif %}in->startReadStruct();
+    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}codec->startReadStruct();
 {%   else %}
-    {% if errVar != ""  %}status_t {$errVar}{% endif %}kErpcStatus_Success;
+    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}kErpcStatus_Success;
 {%   endif %}
 {%   for mem in st.members %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ")}
-{$infraErrIndents}    {$infraErrVar}in->readNullFlag(&isNull);
+{$infraErrIndents}    {$infraErrVar}codec->readNullFlag(&isNull);
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
-{$addIndent(infraErrIndents & "        ", addInfraErrorChecks(mem.coderCall, "decode"))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks(infraErrIndents & "        ", mem.coderCall.decode(mem.coderCall))}
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}     {
 {$infraErrIndents}        {$mem.coderCall.name}{$mem.structElements} = NULL;
 {$infraErrIndents}        {$mem.coderCall.name}{$mem.structElementsCount} = 0;
 {$infraErrIndents}    }
-{$> addInfraErrorChecksEnd("    ") }
+{$> addInfraErrorChecksEnd("    ") }{$loop.addNewLineIfNotLast}
 {%    else -- notNullable %}
-{$addIndent("    ", addInfraErrorChecks(mem.coderCall, "decode"))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks("    ", mem.coderCall.decode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$infraErrVar}in->endReadStruct();
+{$infraErrIndents}    {$infraErrVar}codec->endReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
 {% if errVar != ""  %}
@@ -97,33 +97,33 @@ static int32_t read_{$st.name}_struct(erpc::Codec * in, {$st.name} * data)
 
 // Write struct {$st.name} function implementation
 {#int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * data{% if st.isNeedIfDealloc %}, bool needDealloc{% endif %})#}
-static int32_t write_{$st.name}_struct(erpc::Codec * out, const {$st.name} * data)
+static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * data)
 {
 {%   if st.genStructWrapperF %}
-    {% if errVar != ""  %}status_t {$errVar}{% endif %}out->startWriteStruct();
+    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}codec->startWriteStruct();
 {%   else %}
-    {% if errVar != ""  %}status_t {$errVar}{% endif %}kErpcStatus_Success;
+    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}kErpcStatus_Success;
 {%   endif %}
 {%   for mem in st.members %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$mem.coderCall.name}{$mem.structElements} == NULL)
 {$infraErrIndents}    {
-{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(true);
+{$infraErrIndents}        {$infraErrVar}codec->writeNullFlag(true);
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
-{$infraErrIndents}        {$infraErrVar}out->writeNullFlag(false);
-{$addIndent(infraErrIndents & "        ", addInfraErrorChecks(mem.coderCall, "encode"))}{$loop.addNewLineIfNotLast}
+{$infraErrIndents}        {$infraErrVar}codec->writeNullFlag(false);
+{$addInfraErrorChecks(infraErrIndents & "        ", mem.coderCall.encode(mem.coderCall))}
 {$infraErrIndents}    }
-{$> addInfraErrorChecksEnd("    ") }
+{$> addInfraErrorChecksEnd("    ") }{$loop.addNewLineIfNotLast}
 {%    else -- notNullable %}
-{$addIndent("    ", addInfraErrorChecks(mem.coderCall, "encode"))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks("    ", mem.coderCall.encode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
 {$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$infraErrVar}out->endWriteStruct();
+{$infraErrIndents}    {$infraErrVar}codec->endWriteStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
 {% if errVar != ""  %}
@@ -227,10 +227,32 @@ switch ({$info.dataLiteral}->{$info.discriminatorName})
 {% enddef ------------------------------- freeUnion %}
 
 {# ---------------- addInfraErrorChecks---------------- #}
-{% def addInfraErrorChecks(info, coderType) %}
+{#{% def addInfraErrorChecks(info, coderType) %}
 {$> addInfraErrorChecksBegin("")}
 {% if coderType == "encode" %}{$addIndent(infraErrIndents, info.encode(info))}{% else %}{$addIndent(infraErrIndents, info.decode(info))}{% endif%}
 {$> addInfraErrorChecksEnd("")}
+{% enddef ------------------------------- addInfraErrorChecks %}#}
+
+{% def addInfraErrorChecks(indent, code) %}
+{% if generateInfraErrorChecks %}
+{$ indent}if (!err)
+{$ indent}{
+{$addIndent(indent & "    ", code)}
+{$ indent}}
+{% else %}
+{$addIndent(indent, code)}
+{% endif %}
+{% enddef ------------------------------- addInfraErrorChecks %}
+
+{% def addErrorChecks(indent, code) %}
+{% if generateInfraErrorChecks or generateAllocErrorChecks %}
+{$ indent}if (!err)
+{$ indent}{
+{$addIndent(indent & "    ", code)}
+{$ indent}}
+{% else %}
+{$addIndent(indent, code)}
+{% endif %}
 {% enddef ------------------------------- addInfraErrorChecks %}
 
 {# ---------------- addInfraErrorChecksBegin---------------- #}

@@ -367,12 +367,19 @@ const_def       :    annotation_doxygen_ml_list_opt[list_opt] "const" simple_dat
  */
 enum_def        :   annotation_doxygen_ml_list_opt[list_opt] "enum" name_opt[name] doxy_il_comment_opt '{' enumerator_list_opt '}'
                         {
-                            $$ = new AstNode(*$2);
-                            $$->appendChild($name);
-                            $$->appendChild($enumerator_list_opt);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
+							if ($enumerator_list_opt == NULL)
+                            {
+								throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $2->getFirstLine()));	
+                            }
+                            else
+                            {
+								$$ = new AstNode(*$2);
+								$$->appendChild($name);
+								$$->appendChild($enumerator_list_opt);
+								$$->appendChild($list_opt->getChild(0));
+								$$->appendChild($list_opt->getChild(1));
+								$$->appendChild($doxy_il_comment_opt);
+							}
                         }
                 ;
 
@@ -637,12 +644,19 @@ typedef_def     :   annotation_doxygen_ml_list_opt[list_opt] "type"[type] ident[
  */
 struct_def      :   annotation_doxygen_ml_list_opt[list_opt] "struct"[struct] name_opt[name] doxy_il_comment_opt '{' struct_member_list_opt[members] '}'
                         {
-                            $$ = new AstNode(*$struct);
-                            $$->appendChild($name);
-                            $$->appendChild($members);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
+                            if ($members == NULL)
+                            {
+								throw semantic_error(format_string("Struct on the %d.line must have at least one member.", $struct->getFirstLine()));								
+                            }
+                            else
+                            {
+                                $$ = new AstNode(*$struct);
+                                $$->appendChild($name);
+                                $$->appendChild($members);
+                                $$->appendChild($list_opt->getChild(0));
+                                $$->appendChild($list_opt->getChild(1));
+                                $$->appendChild($doxy_il_comment_opt);
+                            }
                         }
                 ;
 

@@ -34,17 +34,10 @@
 */
 
 /*!
-@defgroup lpuart_transport LPUART
+@defgroup uart_transport CMSIS UART
 @ingroup transports
-@brief Kinetis SDK LPUART driver transport.
+@brief CMSIS UART driver transport.
 */
-
-/*!
-@defgroup uart_transport UART
-@ingroup transports
-@brief Kinetis SDK UART driver transport.
-*/
-
 /*!
 @defgroup serial_transport Serial port
 @ingroup transports
@@ -80,6 +73,3 @@
 @ingroup transports
 @brief Simple TCP/IP transport.
 */
-
-
-

@@ -42,8 +42,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Based server implementation.
  *
@@ -62,6 +61,7 @@ public:
     , m_isServerOn(true)
     {
     }
+
     /*!
      * @brief SimpleServer destructor
      */
@@ -73,12 +73,13 @@ public:
      * @param[in] transport Transport layer to use.
      */
     void setTransport(Transport *transport) { m_transport = transport; }
+
     /*!
      * @brief Run server in infinite loop.
      *
      * Will never jump out from this function.
      */
-    virtual status_t run();
+    virtual erpc_status_t run();
 
     /*!
      * @brief Run server implementation only if exist message to process.
@@ -89,7 +90,7 @@ public:
      *
      * @return Return true when server is ON, else false.
      */
-    virtual status_t poll();
+    virtual erpc_status_t poll();
 
     /*!
      * @brief This function sets server from ON to OFF
@@ -103,7 +104,7 @@ protected:
      * This function call functions for receiving data, process this data and
      * if reply exist, send it back.
      */
-    status_t runInternal();
+    erpc_status_t runInternal();
 
     /*!
      * @brief Disposing message buffers and codecs.

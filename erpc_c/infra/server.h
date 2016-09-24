@@ -42,8 +42,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Abstract interface for service, which can be executed on server side.
  *
@@ -62,39 +61,43 @@ public:
     , m_next(NULL)
     {
     }
+
     /*!
      * @brief Service destructor
      */
     virtual ~Service() {}
+
     /*!
      * @brief Return service id number.
      *
      * @return Service id number.
      */
     uint32_t getServiceId() const { return m_serviceId; }
+
     /*!
      * @brief Return next service.
      *
      * @return Pointer to next service.
      */
     Service *getNext() { return m_next; }
+
     /*!
      * @brief Set next service.
      *
      * @param[in] next Pointer to next service.
      */
     void setNext(Service *next) { m_next = next; }
+
     /*!
      * @brief This function call function implementation of current service.
      *
      * @param[in] methodId Id number of function, which is requested.
      * @param[in] sequence Sequence number. To be sure that reply from server belongs to client request.
-     * @param[in] inCodec For reading data.
-     * @param[in] outCodec For sending data.
+     * @param[in] codec For reading and writing data.
      *
      * @return Based on handleInvocation implementation.
      */
-    virtual status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *inCodec, Codec *outCodec) = 0;
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec) = 0;
 
 protected:
     uint32_t m_serviceId; /*!< Service unique id. */
@@ -121,28 +124,33 @@ public:
     , m_firstService()
     {
     }
+
     /*!
      * @brief ClientManager destructor
      */
     virtual ~Server() {}
+
     /*!
      * @brief Set MessageBufferFactory to use.
      *
      * @param[in] factory MessageBufferFactory to use.
      */
     void setMessageBufferFactory(MessageBufferFactory *factory) { m_messageFactory = factory; }
+
     /*!
      * @brief Set CodecFactory to use.
      *
      * @param[in] factory CodecFactory to use.
      */
     void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
+
     /*!
      * @brief Set TransportFactory to use.
      *
      * @param[in] factory TransportFactory to use.
      */
     void setTransportFactory(TransportFactory *factory) { m_transportFactory = factory; }
+
     /*!
      * @brief Add service.
      *
@@ -153,7 +161,7 @@ public:
     /*!
      * @brief This function runs the server.
      */
-    virtual status_t run() = 0;
+    virtual erpc_status_t run() = 0;
 
     /*!
      * @brief This function stop the server.
@@ -169,14 +177,13 @@ protected:
     /*!
      * @brief Process message.
      *
-     * @param[in] inCodec In codec to use.
-     * @param[in] outCodec Out codec to use.
+     * @param[in] inCodec Inout codec to use.
      * @param[out] msgType Type of received message. Based on message type will be (will be not) sent respond.
      *
      * @returns #kErpcStatus_Success, #kErpcStatus_InvalidArgument or based on codec startReadMessage,
      * or based on service handleInvocation.
      */
-    virtual status_t processMessage(Codec *inCodec, Codec *outCodec, message_type_t &msgType);
+    virtual erpc_status_t processMessage(Codec *codec, message_type_t &msgType);
 
     /*!
      * @brief This function finds service base on service ID.

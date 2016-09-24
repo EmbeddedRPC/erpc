@@ -27,9 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_transport_setup.h"
 #include "manually_constructed.h"
 #include "serial_transport.h"
-#include "erpc_transport_setup.h"
 
 using namespace erpc;
 
@@ -51,4 +51,3 @@ erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate)
     s_transport->init(vtime, vmin);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }
-

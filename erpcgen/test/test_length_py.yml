@@ -21,7 +21,7 @@ name: out list param
 desc: verify out list params with @length
 idl: |
   interface foo {
-    bar(out list<bool> l @length(c), out int32 c) -> void
+    bar(out list<bool> l @length(c) @max_length(10), out int32 c) -> void
   }
 lang: py
 test/interface.py:
@@ -43,7 +43,7 @@ name: inout list param
 desc: verify inout list params with @length
 idl: |
   interface foo {
-    bar(inout list<bool> l @length(c), inout int32 c) -> void
+    bar(inout list<bool> l @length(c) @max_length(10), inout int32 c) -> void
   }
 lang: py
 test/interface.py:
@@ -73,11 +73,11 @@ params:
     - out
     - inout
   type:
-    - string
+#    - string
     - binary
 idl: |
   interface foo {
-    bar({dir} {type} v @length(c), {dir} int32 c) -> void
+    bar({dir} {type} v @length(c) @max_length(10), {dir} int32 c) -> void
   }
 lang: py
 test/client.py:
@@ -150,7 +150,7 @@ name: other struct
 desc: verify non-list struct members with @length
 params:
   type:
-    - string
+#    - string
     - binary
 idl: |
  struct Fork {

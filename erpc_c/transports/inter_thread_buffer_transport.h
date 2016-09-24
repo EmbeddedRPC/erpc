@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__INTER_THREAD_BUFFER_TRANSPORT_H_
 #define _EMBEDDED_RPC__INTER_THREAD_BUFFER_TRANSPORT_H_
 
-#include "transport.h"
-#include "message_buffer.h"
 #include "erpc_threading.h"
+#include "message_buffer.h"
+#include "transport.h"
 
 /*!
  * @addtogroup itbp_transport
@@ -44,8 +44,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Very basic transport to send/receive messages between threads.
  *
@@ -78,10 +77,11 @@ public:
 
     void linkWithPeer(InterThreadBufferTransport *peer);
 
-    virtual status_t receive(MessageBuffer *message);
-    virtual status_t send(const MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
     virtual int32_t getAvailable() const { return 0; }
+
 protected:
     struct SharedState
     {

@@ -117,6 +117,27 @@ protected:
      * @return Filename with stripped extension
      */
     std::string stripExtension(const std::string &filename);
+
+    /*!
+     * @brief This function will return pointer to function parameter/structure member where given reference name is
+     * referenced for.
+     *
+     * @param[in] members Members contain references members and searched members.
+     * @param[in] referenceName Name of reference for which is member searched.
+     * @param[in] annName Annotation name for which is member searched.
+     *
+     * @return Searched member.
+     */
+    StructMember *findParamReferencedFrom(const StructType::member_vector_t &members,
+                                          const std::string &referenceName,
+                                          const std::string &annName);
+
+    /*!
+     * @brief This function return actual time string representation.
+     *
+     * @return Actual time.
+     */
+    std::string getTime();
 };
 
 } // namespace erpcgen

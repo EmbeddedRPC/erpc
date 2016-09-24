@@ -1,0 +1,112 @@
+{# Variebles #}
+{% if generateInfraErrorChecks %}
+{%   set infraErrIndents = "    " %}
+{%   set infraErrVar = "err = " %}
+{% else %}
+{%   set infraErrIndents = "" %}
+{%   set infraErrVar = "" %}
+{% endif %}
+{% if generateAllocErrorChecks %}
+{%   set allocErrIndents = "    " %}
+{%   set allocErrVar = "err = " %}
+{% else %}
+{%   set allocErrIndents = "" %}
+{%   set allocErrVar = "" %}
+{% endif %}
+{% if generateInfraErrorChecks or generateAllocErrorChecks %}
+{%   set errVar = "err = " %}
+{% else %}
+{%   set errVar = "" %}
+{% endif %}
+
+{# Code #}
+{%   set s_performRequest = infraErrVar & "g_client->performRequest(request);" %}
+{%   set s_endWriteMessage = infraErrVar & "codec->endWriteMessage();" %}
+{%   set s_startReadStruct = infraErrVar & "codec->startReadStruct();" %}
+{%   set s_endReadStruct = infraErrVar & "codec->endReadStruct();" %}
+{%   set s_endReadMessage = infraErrVar & "codec->endReadMessage();" %}
+
+{% def f_clientEncode(iface, fn) %}
+{$addInfraErrorChecks("    ", f_clientStartWriteMessage(fn.isReturnValue, iface.name, fn.name))}
+{%   if fn.isSendValue %}
+{%    for param in fn.parametersTo2Core %}
+{%     if param.isNullable %}
+{$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{%     else -- isNullable %}
+{$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{%     endif -- isNullable %}
+{%    endfor -- fn parametersTo2Core %}
+{%   endif -- isSendValue %}
+
+{$addInfraErrorChecks("    ", s_endWriteMessage)}
+
+    // Send message to server
+{$addInfraErrorChecks("    ", s_performRequest)}
+{% enddef %}
+
+{% def f_clientDecode(iface, fn) %}
+{%    if fn.needNullVariableOnClient %}
+    bool isNull;
+{%    endif -- needNullVariableOnClient %}
+{%    for param in fn.parametersTo1Core %}
+{%     if param.isNullable %}
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, ""))}{$loop.addNewLineIfNotLast}
+{%     else -- notNullable %}
+{$> addIndent("    ", param.mallocClient)}
+{$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{%     endif -- isNullable %}
+{%    endfor -- fn parametersTo1Core %}
+{%    if fn.returnValue.type.isNotVoid %}
+{%     if count(fn.parametersTo1Core) > 0 %}
+{# need empty line for this case #}
+
+{%     endif %}
+{$> addIndent("    ", fn.returnValue.firstAlloc)}
+{$addInfraErrorChecks("    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
+{%    endif -- isNotVoid %}
+{$addInfraErrorChecks("    ", s_endReadMessage)}
+{% enddef %}
+
+{% def f_clientStartWriteMessage(isReturnValue, interfaceName, functionName) %}
+{$infraErrVar}codec->startWriteMessage({% if not isReturnValue %}kOnewayMessage{%else%}kInvocationMessage{%endif%}, k{$interfaceName}_service_id, k{$interfaceName}_{$functionName}_id, request.getSequence());
+{% enddef %}
+
+{% def f_serverStartWriteMessage(interfaceName, functionName) %}
+{$infraErrVar}codec->startWriteMessage(kReplyMessage, k{$interfaceName}_service_id, k{$interfaceName}_{$functionName}_id, sequence);
+{% enddef %}
+
+{% def f_paramIsNullableEncode(coderCall) %}
+if ({$coderCall.name} == NULL)
+{
+    {$infraErrVar}codec->writeNullFlag(true);
+}
+else
+{
+    {$infraErrVar}codec->writeNullFlag(false);
+{$addInfraErrorChecks("    ", coderCall.encode(coderCall))}
+}
+{% enddef %}
+
+{% def f_paramIsNullableDecode(param, isServer) %}
+{$infraErrVar}codec->readNullFlag(&isNull);
+if (!isNull)
+{
+{% if isServer == "" %}
+{$> addIndent("    ", param.mallocClient)}
+{% else %}
+{%  if param.allocateToServer %}
+{$> addIndent("    ", param.mallocServer)}
+{%  endif -- allocateToServer %}
+{% endif %}
+{$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}
+}
+else
+{
+{$param.coderCall.name} = NULL;
+}
+{% enddef %}
+
+{% def f_startReadStruct()%}
+// Decode reply. startReadMessage has already been called for us by performRequest.
+{$infraErrVar}codec->startReadStruct();
+{% enddef %}

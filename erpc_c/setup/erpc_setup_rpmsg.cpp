@@ -48,4 +48,3 @@ erpc_transport_t erpc_transport_rpmsg_init(int dev_id, int role)
     s_transport->init(dev_id, role);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }
-

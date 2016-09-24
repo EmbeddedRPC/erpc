@@ -27,10 +27,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cassert>
-#include <cstdio>
 #include "framed_transport.h"
 #include "message_buffer.h"
+#include <cassert>
+#include <cstdio>
 
 using namespace erpc;
 
@@ -58,7 +58,7 @@ void FramedTransport::setCRCFunction(compute_crc_t crcFunction)
     m_crcImpl = crcFunction;
 }
 
-status_t FramedTransport::receive(MessageBuffer *message)
+erpc_status_t FramedTransport::receive(MessageBuffer *message)
 {
     Header h;
 
@@ -68,7 +68,7 @@ status_t FramedTransport::receive(MessageBuffer *message)
 #endif
 
         // Receive header first.
-        status_t ret = underlyingReceive((uint8_t *)&h, sizeof(h));
+        erpc_status_t ret = underlyingReceive((uint8_t *)&h, sizeof(h));
         if (ret != kErpcStatus_Success)
         {
             return ret;
@@ -93,7 +93,7 @@ status_t FramedTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-status_t FramedTransport::send(const MessageBuffer *message)
+erpc_status_t FramedTransport::send(const MessageBuffer *message)
 {
 #if ERPC_THREADS
     Mutex::Guard lock(m_sendLock);
@@ -105,7 +105,7 @@ status_t FramedTransport::send(const MessageBuffer *message)
     Header h;
     h.m_messageSize = messageLength;
     h.m_crc = m_crcImpl(message->get(), messageLength);
-    status_t ret = underlyingSend((uint8_t *)&h, sizeof(h));
+    erpc_status_t ret = underlyingSend((uint8_t *)&h, sizeof(h));
     if (ret != kErpcStatus_Success)
     {
         return ret;

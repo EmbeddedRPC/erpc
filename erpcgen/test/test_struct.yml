@@ -1,8 +1,30 @@
 ---
 name: basic struct
 desc:
+params:
+  type:
+    - int8
+    - int16
+    - int32
+    - uint8
+    - uint16
+    - uint32
+    - bool
+    - float
+    - double
 idl: |
   struct A {
+    {type} x
   }
 test.h:
- - typedef struct A A;
+  - typedef struct A A;
+  - struct A
+  - if: type in ('bool', 'float', 'double')
+    then:
+      - '{type} x;'
+    else:
+      - '{type}_t x;'
+test_client.cpp:
+  - static int32_t write_A_struct(erpc::Codec * codec, const A * data)
+test_server.cpp:
+  - static int32_t read_A_struct(erpc::Codec * codec, A * data)

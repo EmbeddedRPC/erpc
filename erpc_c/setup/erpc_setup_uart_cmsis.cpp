@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -26,57 +26,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-extern "C" {
-#include "lpuart_transport.h"
-#include "board.h"
-}
-#include <cassert>
-#include <cstdio>
-#include <string>
+
+#include "erpc_transport_setup.h"
+#include "manually_constructed.h"
+#include "uart_cmsis_transport.h"
 
 using namespace erpc;
+
+////////////////////////////////////////////////////////////////////////////////
+// Variables
+////////////////////////////////////////////////////////////////////////////////
+
+static ManuallyConstructed<UartTransport> s_transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-LpuartTransport::LpuartTransport(LPUART_Type *lpuartInstance, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_lpuartInstance(lpuartInstance)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
+erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv)
 {
-}
-
-LpuartTransport::~LpuartTransport()
-{
-    LPUART_Deinit(m_lpuartInstance);
-}
-
-status_t LpuartTransport::init()
-{
-    LPUART_GetDefaultConfig(&m_lpuartConfig);
-    /* Configure the LPUART for 8 data bits, No parity, and one stop bit
-       The baudrate speed is set in board.h via BOARD_DEBUG_UART_BAUD macro */
-    m_lpuartConfig.baudRate_Bps = m_baudRate;
-    m_lpuartConfig.parityMode = kLPUART_ParityDisabled;
-    m_lpuartConfig.stopBitCount = kLPUART_OneStopBit;
-    m_lpuartConfig.enableTx = true;
-    m_lpuartConfig.enableRx = true;
-
-    /* Initialize the LPUART module */
-    LPUART_Init(m_lpuartInstance, &m_lpuartConfig, m_srcClock_Hz);
-
-    return kErpcStatus_Success;
-}
-
-status_t LpuartTransport::underlyingReceive(uint8_t *data, uint32_t size)
-{
-    LPUART_ReadBlocking(m_lpuartInstance, data, size);
-    return kErpcStatus_Success;
-}
-
-status_t LpuartTransport::underlyingSend(const uint8_t *data, uint32_t size)
-{
-    LPUART_WriteBlocking(m_lpuartInstance, data, size);
-    return kErpcStatus_Success;
+    s_transport.construct((ARM_DRIVER_USART *)uartDrv);
+    s_transport->init();
+    return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

@@ -27,13 +27,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cassert>
-#include <cstdio>
 #include "dspi_master_transport.h"
+#include "board.h"
 #include "fsl_dspi.h"
 #include "fsl_gpio.h"
 #include "fsl_port.h"
-#include "board.h"
+#include <cassert>
+#include <cstdio>
 
 using namespace erpc;
 
@@ -59,12 +59,12 @@ DspiMasterTransport::~DspiMasterTransport()
     DSPI_Deinit(m_spiBaseAddr);
 }
 
-status_t DspiMasterTransport::init()
+erpc_status_t DspiMasterTransport::init()
 {
     dspi_master_config_t dspiConfig;
     gpio_pin_config_t gpioConfig;
-  
-    DSPI_MasterGetDefaultConfig(&dspiConfig);  
+
+    DSPI_MasterGetDefaultConfig(&dspiConfig);
     dspiConfig.ctarConfig.baudRate = m_baudRate;
     DSPI_MasterInit(m_spiBaseAddr, &dspiConfig, m_srcClock_Hz);
 
@@ -72,9 +72,9 @@ status_t DspiMasterTransport::init()
 
     PORT_SetPinInterruptConfig(ERPC_BOARD_DSPI_INT_PORT, ERPC_BOARD_DSPI_INT_PIN, kPORT_InterruptFallingEdge);
     EnableIRQ(ERPC_BOARD_DSPI_INT_PIN_IRQ);
-    
+
     GPIO_PinInit(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN, &gpioConfig);
-    if(!GPIO_ReadPinInput(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN))
+    if (!GPIO_ReadPinInput(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN))
     {
         s_isSlaveReady = true;
     }
@@ -82,44 +82,44 @@ status_t DspiMasterTransport::init()
     return kErpcStatus_Success;
 }
 
-status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size)
+erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    status_t status;
+    erpc_status_t status;
     dspi_transfer_t masterXfer;
-	
+
     masterXfer.txData = NULL;
     masterXfer.rxData = data;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
+    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
 
-    while(!s_isSlaveReady)
+    while (!s_isSlaveReady)
     {
     }
 
     status = DSPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
     s_isSlaveReady = false;
 
-    return status;
+    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
-status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
+erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    status_t status;
+    erpc_status_t status;
     dspi_transfer_t masterXfer;
 
     masterXfer.txData = (uint8_t *)data;
     masterXfer.rxData = NULL;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
-    
-    while(!s_isSlaveReady)
+    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+
+    while (!s_isSlaveReady)
     {
     }
 
     status = DSPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
     s_isSlaveReady = false;
 
-    return status;
+    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 extern "C" {

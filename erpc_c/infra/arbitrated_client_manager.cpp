@@ -28,8 +28,8 @@
  */
 
 #include "arbitrated_client_manager.h"
-#include "transport_arbitrator.h"
 #include "assert.h"
+#include "transport_arbitrator.h"
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -47,7 +47,7 @@ void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)
     m_transport = arbitrator;
 }
 
-status_t ArbitratedClientManager::performRequest(RequestContext &request)
+erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
 {
     assert(m_arbitrator && "arbitrator not set");
 
@@ -65,7 +65,7 @@ status_t ArbitratedClientManager::performRequest(RequestContext &request)
     }
 
     // Send the request.
-    status_t err = m_arbitrator->send(request.getOutCodec()->getBuffer());
+    erpc_status_t err = m_arbitrator->send(request.getCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -89,4 +89,3 @@ status_t ArbitratedClientManager::performRequest(RequestContext &request)
 
     return kErpcStatus_Success;
 }
-

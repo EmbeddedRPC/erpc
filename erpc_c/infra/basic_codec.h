@@ -47,8 +47,7 @@ using namespace std;
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Values of the uint8 flag prefixing nullable values.
  */
@@ -86,14 +85,14 @@ public:
      *
      * @retval kErpcStatus_Success or write function.
      */
-    virtual status_t startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
+    virtual erpc_status_t startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
 
     /*!
      * @brief Prototype for write end of message.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endWriteMessage();
+    virtual erpc_status_t endWriteMessage();
 
     /*!
      * @brief Prototype for write boolean value.
@@ -102,7 +101,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(bool value);
+    virtual erpc_status_t write(bool value);
 
     /*!
      * @brief Prototype for write int8_t value.
@@ -111,7 +110,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(int8_t value);
+    virtual erpc_status_t write(int8_t value);
 
     /*!
      * @brief Prototype for write int16_t value.
@@ -120,7 +119,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(int16_t value);
+    virtual erpc_status_t write(int16_t value);
 
     /*!
      * @brief Prototype for write int32_t value.
@@ -129,7 +128,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(int32_t value);
+    virtual erpc_status_t write(int32_t value);
 
     /*!
      * @brief Prototype for write int64_t value.
@@ -138,7 +137,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(int64_t value);
+    virtual erpc_status_t write(int64_t value);
 
     /*!
      * @brief Prototype for write uint8_t value.
@@ -147,7 +146,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(uint8_t value);
+    virtual erpc_status_t write(uint8_t value);
 
     /*!
      * @brief Prototype for write uint16_t value.
@@ -156,7 +155,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(uint16_t value);
+    virtual erpc_status_t write(uint16_t value);
 
     /*!
      * @brief Prototype for write uint32_t value.
@@ -165,7 +164,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(uint32_t value);
+    virtual erpc_status_t write(uint32_t value);
 
     /*!
      * @brief Prototype for write uint64_t value.
@@ -174,7 +173,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(uint64_t value);
+    virtual erpc_status_t write(uint64_t value);
 
     /*!
      * @brief Prototype for write float value.
@@ -183,7 +182,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(float value);
+    virtual erpc_status_t write(float value);
 
     /*!
      * @brief Prototype for write double value.
@@ -192,7 +191,7 @@ public:
      *
      * @return depends on cursor write function.
      */
-    virtual status_t write(double value);
+    virtual erpc_status_t write(double value);
 
     /*!
      * @brief Prototype for write string value.
@@ -202,7 +201,7 @@ public:
      *
      * @return depends on writeBinary function.
      */
-    virtual status_t writeString(uint32_t length, const char *value);
+    virtual erpc_status_t writeString(uint32_t length, const char *value);
 
     /*!
      * @brief Prototype for write binary value.
@@ -212,7 +211,7 @@ public:
      *
      * @return depends on write function and cursor write function.
      */
-    virtual status_t writeBinary(uint32_t length, const uint8_t *value);
+    virtual erpc_status_t writeBinary(uint32_t length, const uint8_t *value);
 
     /*!
      * @brief Prototype for start write list.
@@ -221,35 +220,35 @@ public:
      *
      * @return depends on write function.
      */
-    virtual status_t startWriteList(uint32_t length);
+    virtual erpc_status_t startWriteList(uint32_t length);
 
     /*!
      * @brief Prototype for end write list.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endWriteList();
+    virtual erpc_status_t endWriteList();
 
     /*!
      * @brief Prototype for start write structure.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t startWriteStruct();
+    virtual erpc_status_t startWriteStruct();
 
     /*!
      * @brief Prototype for end write structure.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endWriteStruct();
+    virtual erpc_status_t endWriteStruct();
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
      *
      * @retval kErpcStatus_Success
      */
-    virtual status_t writeNullFlag(bool isNull);
+    virtual erpc_status_t writeNullFlag(bool isNull);
     //@}
 
     //! @name Decoding
@@ -266,14 +265,17 @@ public:
      * @retval kErpcStatus_Success
      * @retval kErpcStatus_InvalidMessageVersion
      */
-    virtual status_t startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence);
+    virtual erpc_status_t startReadMessage(message_type_t *type,
+                                           uint32_t *service,
+                                           uint32_t *request,
+                                           uint32_t *sequence);
 
     /*!
      * @brief Prototype for read end of message.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endReadMessage();
+    virtual erpc_status_t endReadMessage();
 
     /*!
      * @brief Prototype for read boolean value.
@@ -282,7 +284,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(bool *value);
+    virtual erpc_status_t read(bool *value);
 
     /*!
      * @brief Prototype for read int8_t value.
@@ -291,7 +293,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(int8_t *value);
+    virtual erpc_status_t read(int8_t *value);
 
     /*!
      * @brief Prototype for read int16_t value.
@@ -300,7 +302,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(int16_t *value);
+    virtual erpc_status_t read(int16_t *value);
 
     /*!
      * @brief Prototype for read int32_t value.
@@ -309,7 +311,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(int32_t *value);
+    virtual erpc_status_t read(int32_t *value);
 
     /*!
      * @brief Prototype for read int64_t value.
@@ -318,7 +320,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(int64_t *value);
+    virtual erpc_status_t read(int64_t *value);
 
     /*!
      * @brief Prototype for read uint8_t value.
@@ -327,7 +329,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(uint8_t *value);
+    virtual erpc_status_t read(uint8_t *value);
 
     /*!
      * @brief Prototype for read uint16_t value.
@@ -336,7 +338,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(uint16_t *value);
+    virtual erpc_status_t read(uint16_t *value);
 
     /*!
      * @brief Prototype for read uint32_t value.
@@ -345,7 +347,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(uint32_t *value);
+    virtual erpc_status_t read(uint32_t *value);
 
     /*!
      * @brief Prototype for read uint64_t value.
@@ -354,7 +356,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(uint64_t *value);
+    virtual erpc_status_t read(uint64_t *value);
 
     /*!
      * @brief Prototype for read float value.
@@ -363,7 +365,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(float *value);
+    virtual erpc_status_t read(float *value);
 
     /*!
      * @brief Prototype for read double value.
@@ -372,7 +374,7 @@ public:
      *
      * @return Based on cursor read function.
      */
-    virtual status_t read(double *value);
+    virtual erpc_status_t read(double *value);
 
     /*!
      * @brief Prototype for read string value.
@@ -382,7 +384,7 @@ public:
      *
      * @return Based on readBinary function.
      */
-    virtual status_t readString(uint32_t *length, char **value);
+    virtual erpc_status_t readString(uint32_t *length, char **value);
 
     /*!
      * @brief Prototype for read binary value.
@@ -392,7 +394,7 @@ public:
      *
      * @retval kErpcStatus_Success or depends on read function.
      */
-    virtual status_t readBinary(uint32_t *length, uint8_t **value);
+    virtual erpc_status_t readBinary(uint32_t *length, uint8_t **value);
 
     /*!
      * @brief Prototype for start read list.
@@ -401,35 +403,35 @@ public:
      *
      * @return depends on read function.
      */
-    virtual status_t startReadList(uint32_t *length);
+    virtual erpc_status_t startReadList(uint32_t *length);
 
     /*!
      * @brief Prototype for end read list.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endReadList();
+    virtual erpc_status_t endReadList();
 
     /*!
      * @brief Prototype for start read structure.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t startReadStruct();
+    virtual erpc_status_t startReadStruct();
 
     /*!
      * @brief Prototype for end read structure.
      *
      * @retval kErpcStatus_Success.
      */
-    virtual status_t endReadStruct();
+    virtual erpc_status_t endReadStruct();
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
      * @retval kErpcStatus_Success
      */
-    virtual status_t readNullFlag(bool *isNull);
+    virtual erpc_status_t readNullFlag(bool *isNull);
     //@}
 };
 
@@ -447,6 +449,7 @@ public:
      * @return Pointer to created codec.
      */
     virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
+
     /*!
      * @brief Dispose codec.
      *

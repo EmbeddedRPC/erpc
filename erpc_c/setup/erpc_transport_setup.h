@@ -58,14 +58,9 @@ extern "C" {
 //@{
 
 /*!
- * @brief Create a UART transport.
+ * @brief Create a CMSIS UART transport.
  */
-erpc_transport_t erpc_transport_uart_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
-
-/*!
- * @brief Create an LPUART transport.
- */
-erpc_transport_t erpc_transport_lpuart_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
 
 /*!
  * @brief Create a host PC serial port transport.

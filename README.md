@@ -114,11 +114,12 @@ Steps are described in [`erpcgen/VisualStudio_v12/readme_erpcgen.txt`](erpcgen/V
 Install these packages:
 * bison: GNU yacc-complatible parser generator
 * flex: A fast lexical analyzer generator
-* libboost-devel: Boost C++ libraries (Linux needs to use libboost version 1.58.0)
+* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.58.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter (either 2.7 or 3.5+ work)
 * gcc-core: GNU Compiler Collection (C, OpenMP)
 * gcc-g++: GNU Compiler Collection (C++)
+* gcc-multilib, g++-multilib (mandatory for case, when build for different architecture is needed)
 
 #### Mac OS X
 

@@ -10,6 +10,7 @@ c_common_header.cpp
 c_server_header.cpp
 c_server_source.cpp
 c_common_functions.cpp
+c_defines.cpp
 py_client.cpp
 py_coders.cpp
 py_common.cpp
@@ -25,3 +26,6 @@ UNISTD_ERROR.readme
 win_bison.exe
 win_flex.exe
 README.txt
+
+#boost libraries
+boost_1_61_0

@@ -35,6 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
+/* clang-format off */
 
 // Determine if this is a POSIX system.
 #if !defined(ERPC_HAS_POSIX)
@@ -70,7 +71,7 @@
 
 // Handy macro to test threading model. You can also ERPC_THREADS directly to test for threading
 // support, i.e. "#if ERPC_THREADS", because ERPC_THREADS_NONE has a value of 0.
-#define ERPC_THREADS_IS(_n_) (ERPC_THREADS==(ERPC_THREADS_##_n_))
+#define ERPC_THREADS_IS(_n_) (ERPC_THREADS == (ERPC_THREADS_##_n_))
 
 // Set default buffer size.
 #if !defined(ERPC_DEFAULT_BUFFER_SIZE)
@@ -78,6 +79,7 @@
     #define ERPC_DEFAULT_BUFFER_SIZE (256)
 #endif
 
+/* clang-format on */
 #endif // _ERPC_DETECT_H_
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

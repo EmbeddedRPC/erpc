@@ -28,24 +28,18 @@
  */
 
 #include "erpc_client_setup.h"
+#include "erpc_setup.h"
+#include "basic_codec.h"
 #include "client_manager.h"
 #include "manually_constructed.h"
-#include "basic_codec.h"
-#include "erpc_setup.h"
-#include <new>
 #include <assert.h>
+#include <new>
 
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Classes
-////////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables

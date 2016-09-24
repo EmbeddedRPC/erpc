@@ -254,7 +254,7 @@ public:
 class StdoutLogger : public Logger
 {
 public:
-    StdoutLogger(Logger::log_level_t stderrLevel=Logger::kWarning)
+    StdoutLogger(Logger::log_level_t stderrLevel = Logger::kWarning)
     : m_stderrLevel(stderrLevel)
     {
     }

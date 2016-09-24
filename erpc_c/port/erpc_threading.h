@@ -39,8 +39,9 @@
 #if ERPC_THREADS_IS(PTHREADS)
 #include <pthread.h>
 #elif ERPC_THREADS_IS(FREERTOS)
-#include "task.h"
+#include "FreeRTOS.h"
 #include "semphr.h"
+#include "task.h"
 #endif // ERPC_THREADS_IS
 
 /*!
@@ -55,8 +56,7 @@
 
 #if defined(__cplusplus)
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Simple thread class.
  *
@@ -65,17 +65,40 @@ namespace erpc
 class Thread
 {
 public:
+    //! @brief Thread function type.
+    //!
+    //! @param arg User provided argument that was passed into the start() method.
     typedef void (*thread_entry_t)(void *arg);
+
+    //! @brief Unique identifier for a thread.
     typedef void *thread_id_t;
 
-    Thread(const char *name=0);
-    Thread(thread_entry_t entry, uint32_t priority=0, uint32_t stackSize=0, const char *name=0);
+    /*!
+     * @brief Default constructor for use with the init() method.
+     *
+     * If this constructor is used, the init() method must be called before the thread can be
+     * started.
+     *
+     * @param name Optional name for the thread.
+     */
+    Thread(const char *name = 0);
+
+    /*!
+     * @brief Constructor.
+     *
+     * This constructor fully initializes the thread object.
+     *
+     * @param entry
+     * @param priority
+     * @param stackSize
+     * @param name Optional name for the thread.
+     */
+    Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
     virtual ~Thread();
 
     void setName(const char *name) { m_name = name; }
     const char *getName() const { return m_name; }
-
-    void init(thread_entry_t entry, uint32_t priority=0, uint32_t stackSize=0);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0);
 
     void start(void *arg = 0);
 
@@ -102,6 +125,7 @@ public:
     static Thread *getCurrentThread();
 
     bool operator==(Thread &o);
+
 protected:
     virtual void threadEntryPoint();
 
@@ -132,13 +156,18 @@ private:
 };
 
 /*!
- * @brief Simple mutex class.
+ * @brief Mutex.
+ *
+ * If the OS supports it, the mutex will be recursive.
  *
  * @ingroup port_threads
  */
 class Mutex
 {
 public:
+    /*!
+     * @brief
+     */
     class Guard
     {
     public:
@@ -160,7 +189,10 @@ public:
     bool unlock();
 
 #if ERPC_THREADS_IS(PTHREADS)
-    pthread_mutex_t *getPtr() { return &m_mutex; }
+    pthread_mutex_t *getPtr()
+    {
+        return &m_mutex;
+    }
 #endif
 
 private:
@@ -191,6 +223,7 @@ public:
     void put();
     bool get(uint32_t timeout = kWaitForever);
     int getCount() const;
+
 private:
 #if ERPC_THREADS_IS(PTHREADS)
     int m_count;

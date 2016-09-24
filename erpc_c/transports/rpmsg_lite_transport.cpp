@@ -77,7 +77,7 @@ RPMsgTransport::~RPMsgTransport()
 {
 }
 
-status_t RPMsgTransport::init(
+erpc_status_t RPMsgTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id)
 {
     int i;
@@ -97,10 +97,10 @@ status_t RPMsgTransport::init(
 
     m_dst_addr = dst_addr;
 
-    return kErpcStatus_Success;
+    return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-status_t RPMsgTransport::init(
+erpc_status_t RPMsgTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
 {
     int i;
@@ -131,10 +131,10 @@ status_t RPMsgTransport::init(
 
     m_dst_addr = dst_addr;
 
-    return kErpcStatus_Success;
+    return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-status_t RPMsgTransport::receive(MessageBuffer *message)
+erpc_erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
 {
     while (m_messageQueue.size() < 1)
     {
@@ -158,18 +158,11 @@ status_t RPMsgTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-status_t RPMsgTransport::send(const MessageBuffer *message)
+erpc_erpc_status_t RPMsgTransport::send(const MessageBuffer *message)
 {
-    int ret_value;
-    ret_value =
+    int ret_val =
         rpmsg_lite_send(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed(), RL_DONT_BLOCK);
-
-    if (RL_SUCCESS == ret_value)
-    {
-        return kErpcStatus_Success;
-    }
-
-    return kErpcStatus_Fail;
+    return ret_val != RL_SUCCESS ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 MessageBuffer RPMsgMessageBufferFactory::create()

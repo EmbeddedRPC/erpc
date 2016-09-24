@@ -27,9 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstring>
-#include <cassert>
 #include "message_buffer.h"
+#include <cassert>
+#include <cstring>
 
 using namespace erpc;
 #if !(__embedded_cplusplus)
@@ -40,7 +40,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
+erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
 {
     if (offset + length > m_len)
     {
@@ -55,7 +55,7 @@ status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
     return kErpcStatus_Success;
 }
 
-status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t length)
+erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t length)
 {
     if (offset + length > m_len)
     {
@@ -70,7 +70,7 @@ status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t length
     return kErpcStatus_Success;
 }
 
-status_t MessageBuffer::copy(const MessageBuffer *other)
+erpc_status_t MessageBuffer::copy(const MessageBuffer *other)
 {
     assert(m_len >= other->m_len);
     m_used = other->m_used;
@@ -98,7 +98,7 @@ void MessageBuffer::Cursor::set(MessageBuffer *buffer)
     m_remaining = buffer->getLength();
 }
 
-status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
+erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 {
     if (m_remaining < length)
     {
@@ -112,7 +112,7 @@ status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
     return kErpcStatus_Success;
 }
 
-status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
+erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
     if (length > m_remaining)
     {

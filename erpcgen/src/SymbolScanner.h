@@ -603,6 +603,41 @@ protected:
      * @return Literal value assigned to const variable
      */
     Value *getValueForConst(AstNode *const node, DataType *const constDataType);
+
+    /*!
+     * @brief Handle @length annotations on structs.
+     *
+     * Struct members are examined for @length annotations, and the length member is denoted.
+     * This function is also used on function parameters, since they are represented as structs.
+     *
+     * @param[in] structType Reference to the struct type to scan and process.
+     */
+    void scanStructForLengthAnnotation(StructType *structType);
+
+    /*!
+     * @brief This function add annotations to vector of symbol annotations.
+     *
+     * @param[in] childTok AstNode contains annotations information.
+     * @param[in] symbol Symbol containing vector of annotations belongs to him.
+     */
+    void addAnnotations(AstNode *childTok, Symbol *symbol);
+
+    /*!
+     * @brief This function check annotation just before it will be added to symbol.
+     *
+     * @param[in] annotation Node containing information about annotation.
+     * @param[in] symbol Symbol containing vector of annotations belongs to him.
+     */
+    void checkAnnotaionBeforeAdding(AstNode *annotation, Symbol *symbol);
+
+    /*!
+     * @brief Helper function to get Value from annotation AstNode
+     *
+     * @param[in] annotationNode AstNode pointing to the annotation
+     *
+     * @return Value pointer for annotation
+     */
+    Value *getAnnotationValue(AstNode *annotationNode);
 };
 
 } // namespace erpcgen

@@ -30,8 +30,9 @@
 #ifndef _ERPC_ARBITRATED_CLIENT_SETUP_H_
 #define _ERPC_ARBITRATED_CLIENT_SETUP_H_
 
-#include <stdint.h>
+#include "erpc_common.h"
 #include "erpc_transport_setup.h"
+#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -46,6 +47,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handler function type. */
 
 //! @name Arbitrated client setup
 //@{
@@ -69,6 +72,15 @@ extern "C" {
  * @return Transport arbitrator reference that should be passed to the server setup API.
  */
 erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport);
+
+/*!
+ * @brief This function set error handler function.
+ *
+ * Given error_handler function is called when error occur inside eRPC infrastructure.
+ *
+ * @param[in] error_handler Pointer to function error handler.
+ */
+void erpc_client_set_error_handler(client_error_handler_t error_handler);
 
 /*!
  * @brief This function de-initializes client.

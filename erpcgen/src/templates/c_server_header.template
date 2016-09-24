@@ -25,12 +25,12 @@ public:
     {$iface.serviceClassName}() : Service(k{$iface.name}_service_id) {}
 
     /*! @brief Call the correct server shim based on method unique ID. */
-    virtual status_t handleInvocation(uint32_t methodId, uint32_t sequence, erpc::Codec * in, erpc::Codec * out);
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, erpc::Codec * codec);
 
 private:
 {%  for fn in iface.functions %}
     /*! @brief Server shim for {$fn.name} of {$iface.name} interface. */
-    status_t {$fn.name}_shim(erpc::Codec * in, erpc::Codec * out, uint32_t sequence);{$loop.addNewLineIfNotLast}
+    erpc_status_t {$fn.name}_shim(erpc::Codec * codec, uint32_t sequence);{$loop.addNewLineIfNotLast}
 {%  endfor -- fn %}
 };
 {% endfor -- iface %}

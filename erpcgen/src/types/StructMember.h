@@ -73,7 +73,6 @@ public:
     , m_paramDirection()
     , m_containList()
     , m_containString()
-    , m_lengthForMember(nullptr)
     {
     }
 
@@ -91,7 +90,6 @@ public:
     , m_paramDirection()
     , m_containList()
     , m_containString()
-    , m_lengthForMember(nullptr)
     {
     }
 
@@ -163,20 +161,11 @@ public:
      * @return Information about if member contains string data type.
      */
     bool getContainString() { return m_containString; }
-    /*!
-     * @brief Sets the sibling member for which this member is the length.
-     */
-    void setLengthForMember(StructMember *otherMember) { m_lengthForMember = otherMember; }
-    /*!
-     * @brief Returns the sibling member for which this member is the length.
-     */
-    StructMember *getLengthForMember() { return m_lengthForMember; }
 protected:
     DataType *m_dataType;              /*!< Struct member data type. */
     _param_direction m_paramDirection; /*!< Direction in which is member used. */
     bool m_containList;                /*!< True when member contains list type */
     bool m_containString;              /*!< True when member contains string type */
-    StructMember *m_lengthForMember;   /*!< The sibling struct member for which this member is the length. Only applies if a @length annotation was used on the sibling. */
 };
 
 } // namespace erpcgen

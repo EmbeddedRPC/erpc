@@ -120,9 +120,8 @@ public:
      *
      * @param[in] name Union case name.
      * @param[in] dataType Union case data type.
-     * @param[in] annotations Annotations for newly added member.
      */
-    bool addUnionMemberDeclaration(const std::string &name, DataType *dataType, AstNode *annotations);
+    bool addUnionMemberDeclaration(const std::string &name, DataType *dataType);
 
     /*!
      * @brief This function returns vector of union member declarations.

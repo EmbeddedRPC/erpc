@@ -27,9 +27,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "manually_constructed.h"
-#include "lpuart_transport.h"
-#include "erpc_transport_setup.h"
+#include "uart_cmsis_transport.h"
+#include "board.h"
+#include <cassert>
+#include <cstdio>
 
 using namespace erpc;
 
@@ -37,15 +38,64 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<LpuartTransport> s_transport;
+static volatile bool s_isTransferCompleted = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_lpuart_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
+UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv)
+: m_uartDrv(uartDrv)
 {
-    s_transport.construct((LPUART_Type *)baseAddr, baudRate, srcClock_Hz);
-    s_transport->init();
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+}
+
+UartTransport::~UartTransport()
+{
+    (*m_uartDrv).Uninitialize();
+}
+
+/* Transfer callback */
+void TransferCallback(uint32_t event)
+{
+    if (event == ARM_USART_EVENT_SEND_COMPLETE)
+    {
+        s_isTransferCompleted = true;
+    }
+
+    if (event == ARM_USART_EVENT_RECEIVE_COMPLETE)
+    {
+        s_isTransferCompleted = true;
+    }
+}
+
+erpc_status_t UartTransport::init()
+{
+    erpc_status_t status = (*m_uartDrv).Initialize(TransferCallback);
+    (*m_uartDrv).PowerControl(ARM_POWER_FULL);
+
+    return status != kStatus_Success ? kErpcStatus_InitFailed : kErpcStatus_Success;
+}
+
+erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
+{
+    s_isTransferCompleted = false;
+
+    erpc_status_t status = (*m_uartDrv).Receive(data, size);
+    while (!s_isTransferCompleted)
+    {
+    }
+
+    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+}
+
+erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
+{
+    s_isTransferCompleted = false;
+
+    (*m_uartDrv).Send(data, size);
+    while (!s_isTransferCompleted)
+    {
+    }
+
+    return kErpcStatus_Success;
 }

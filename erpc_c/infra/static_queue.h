@@ -47,8 +47,7 @@ using namespace std;
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Base class which implements static queue as ring buffer that operates on m_data type void*.
  *
@@ -155,6 +154,7 @@ public:
      * This function free allocated buffer for m_data.
      */
     ~StaticQueue() {}
+
     /*!
      * @brief This function adds element to queue.
      *
@@ -164,6 +164,7 @@ public:
      * @retval false Element was not added, queue is full.
      */
     bool add(T element) { return BaseStaticQueue::add(&element); }
+
     /*!
      * @brief This function returns element from queue.
      *

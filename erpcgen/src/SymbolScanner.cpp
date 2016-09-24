@@ -37,6 +37,7 @@
 #include "types/VoidType.h"
 #include "types/BuiltinType.h"
 #include "smart_ptr.h"
+#include <string.h>
 
 using namespace erpcgen;
 
@@ -49,7 +50,7 @@ AstNode *SymbolScanner::handleConst(AstNode *node, bottom_up)
     DataType *constDataType = getDataTypeForConst(node->getChild(0));
     Value *constVal = getValueForConst(node, constDataType);
     ConstType *constType = new ConstType(node->getChild(1)->getToken(), constDataType, constVal);
-    constType->addAnnotations(node->getChild(3));
+    addAnnotations(node->getChild(3), constType);
 
     // doxygen comment
     if (node->getChild(4))
@@ -202,7 +203,7 @@ AstNode *SymbolScanner::handleType(AstNode *node, bottom_up)
 {
     if (m_currentAlias)
     {
-        m_currentAlias->addAnnotations(node->getChild(2));
+        addAnnotations(node->getChild(2), m_currentAlias);
         m_globals->addSymbol(m_currentAlias);
         m_currentAlias = nullptr;
     }
@@ -263,7 +264,7 @@ AstNode *SymbolScanner::handleEnum(AstNode *node, bottom_up)
     }
     else
     {
-        m_currentEnum->addAnnotations(node->getChild(2));
+        addAnnotations(node->getChild(2), m_currentEnum);
     }
 
     m_globals->addSymbol(m_currentEnum);
@@ -623,7 +624,7 @@ AstNode *SymbolScanner::handleProgram(AstNode *node, top_down)
 
 AstNode *SymbolScanner::handleProgram(AstNode *node, bottom_up)
 {
-    m_currentProgram->addAnnotations(node->getChild(1));
+    addAnnotations(node->getChild(1), m_currentProgram);
     m_currentProgram = nullptr;
     return nullptr;
 }
@@ -701,10 +702,13 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, bottom_up)
     }
     else
     {
-        m_currentStruct->addAnnotations(node->getChild(2));
+        addAnnotations(node->getChild(2), m_currentStruct);
     }
 
     m_globals->addSymbol(m_currentStruct);
+
+    // Handle @length annotation for structure members
+    scanStructForLengthAnnotation(m_currentStruct);
 
     /* Clear current struct pointer. */
     m_currentStruct = nullptr;
@@ -732,7 +736,7 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
     }
     /* Create struct member object. */
     StructMember *param = new StructMember(tok, dataType);
-    param->addAnnotations(node->getChild(2));
+    addAnnotations(node->getChild(2), param);
 
     /* doxygen comment */
     if (node->getChild(3))
@@ -807,35 +811,34 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
             /* If the case value is an identifier, record the name and find the tru value */
             if (caseIdTok.isIdentifierTok())
             {
-                const std::string caseIdName = caseIdTok.getStringValue();
                 Value *caseIdValue = getValueFromSymbol(caseIdTok);
-                if (kIntegerValue == caseIdValue->getType())
+                if (kIntegerValue != caseIdValue->getType())
                 {
-                    caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdValue)->getValue();
+                    delete caseIdValue;
+                    throw semantic_error(
+                        format_string("line %d: Value for union case must be an int\n", caseIdTok.getFirstLine()));
                 }
-                else
-                {
-                    throw semantic_error(format_string("Value for union case must be an int\n"));
-                }
+
+                caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdValue)->getValue();
+                const std::string caseIdName = caseIdTok.getStringValue();
                 newCase = new UnionCase(caseIdName, caseIdIntValue);
                 delete caseIdValue;
             }
             /* If there is no identifier, simply record the case value */
             else if (caseIdTok.isNumberTok())
             {
-                if (kIntegerValue == caseIdTok.getValue()->getType())
+                if (kIntegerValue != caseIdTok.getValue()->getType())
                 {
-                    caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdTok.getValue())->getValue();
+                    throw semantic_error(
+                        format_string("line %d: Value for union case must be an int\n", caseIdTok.getFirstLine()));
                 }
-                else
-                {
-                    throw semantic_error(format_string("Value for union case must be an int\n"));
-                }
+                caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdTok.getValue())->getValue();
                 newCase = new UnionCase(caseIdIntValue);
             }
             else
             {
-                throw semantic_error(format_string("Invalid token for case value in union\n"));
+                throw semantic_error(
+                    format_string("line %d: Invalid token for case value in union\n", caseIdTok.getFirstLine()));
             }
             // Now that we've created the new case, add it to the union it is inside
             m_currentUnion->addCase(newCase);
@@ -867,7 +870,9 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
 
                 std::string name = unionDecl->getChild(0)->getTokenValue()->toString();
                 DataType *declType = lookupDataType(unionDecl->getChild(1));
-                m_currentUnion->addUnionMemberDeclaration(name, declType, unionDecl->getChild(2));
+                m_currentUnion->addUnionMemberDeclaration(name, declType);
+
+                addAnnotations(unionDecl->getChild(2), &m_currentUnion->getUnionMemberDeclarations().back());
 
                 declNames.push_back(name);
             }
@@ -914,7 +919,7 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, top_down)
 
 AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
 {
-    m_currentInterface->addAnnotations(node->getChild(2));
+    addAnnotations(node->getChild(2), m_currentInterface);
 
     // Interfaces cannot be nested, so we can just clear this. If they were nestable, we would
     // have to keep a stack of open interfaces.
@@ -1003,8 +1008,11 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
     Function *func = m_currentInterface->getFunctions().back();
     func->getParameters().getScope().setParent(&m_currentInterface->getScope());
 
+    // Handle @length annotation for function params
+    scanStructForLengthAnnotation(m_currentStruct);
+
     /* TOK_FUNCTION -> name retVal params annotations */
-    func->addAnnotations(node->getChild(3));
+    addAnnotations(node->getChild(3), func);
 
     m_currentStruct = nullptr;
 
@@ -1039,7 +1047,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
 AstNode *SymbolScanner::handleParam(AstNode *node, bottom_up)
 {
     StructMember *param = m_currentStruct->getMembers().back();
-    param->addAnnotations(node->getChild(3));
+    addAnnotations(node->getChild(3), param);
     return nullptr;
 }
 
@@ -1246,4 +1254,228 @@ uint32_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
     }
 
     return valueToken.getIntValue();
+}
+
+void SymbolScanner::scanStructForLengthAnnotation(StructType *structType)
+{
+    for (StructMember *structMember : structType->getMembers())
+    {
+        Annotation *ann = structMember->findAnnotation(LENGTH_ANNOTATION);
+        if (ann)
+        {
+            Value *value = ann->getValueObject();
+            if (value->getType() != kIntegerValue)
+            {
+                // Make sure the @length annotation names a valid member.
+                Symbol *symbol = structType->getScope().getSymbol(ann->getValueObject()->toString(), false);
+                if (!symbol)
+                {
+                    symbol = m_globals->getSymbol(ann->getValueObject()->toString());
+                    if (!symbol || !dynamic_cast<ConstType *>(symbol))
+                    {
+                        throw semantic_error(
+                            format_string("line %d: Length annotation must name a valid parameter, member, constant or "
+                                          "integer number",
+                                          ann->getLocation().m_firstLine));
+                    }
+                }
+
+                // Verify the length member is a scalar.
+                StructMember *structMemberRef = dynamic_cast<StructMember *>(symbol);
+                bool isInteger = false;
+                if (structMemberRef)
+                {
+                    DataType *refDataType = structMemberRef->getDataType()->getTrueDataType();
+                    BuiltinType *refDataTypeBuiltinType = dynamic_cast<BuiltinType *>(refDataType);
+                    if (refDataTypeBuiltinType && refDataTypeBuiltinType->isInt())
+                    {
+                        isInteger = true;
+                    }
+                }
+                else
+                {
+                    ConstType *refDataType = dynamic_cast<ConstType *>(symbol);
+                    if (refDataType && refDataType->getValue()->getType() == kIntegerValue)
+                    {
+                        isInteger = true;
+                    }
+                }
+                if (!isInteger)
+                {
+                    throw semantic_error(
+                        format_string("line %d: The parameter, member or constant named by a length annotation must be "
+                                      "an integer type",
+                                      ann->getLocation().m_firstLine));
+                }
+
+                bool isFunction = !m_globals->hasSymbol(structType->getName());
+                // Verify both the data and length members are the same direction.
+                if (!isFunction && structMemberRef && structMember->getDirection() != structMemberRef->getDirection())
+                {
+                    throw semantic_error(
+                        format_string("orig line %d, ref line %d: The parameter named by a length annotation must be "
+                                      "the same direction"
+                                      "as the data parameter.",
+                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                }
+                // Verify that length parameter for function parameter is always "in" direction type.
+                else if (isFunction && structMemberRef && structMemberRef->getDirection() == kOutDirection &&
+                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+                {
+                    throw semantic_error(
+                        format_string("orig line %d, ref line %d: The out parameter with set length annotation "
+                                      "must have also set max_length annotation",
+                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                }
+
+                else if (isFunction && structMemberRef && structMember->getDirection() == kInoutDirection &&
+                         structMemberRef->getDirection() == kInoutDirection &&
+                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+                {
+                    throw semantic_error(
+                        format_string("orig line %d, ref line %d: The inout parameter named by a length annotation "
+                                      "must have set max_length annotation",
+                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                }
+            }
+
+            DataType *memberType = structMember->getDataType()->getTrueDataType();
+            if (memberType->isList())
+            {
+                ListType *memberListType = dynamic_cast<ListType *>(memberType);
+                assert(memberListType);
+                memberListType->setLengthVariableName(value->toString());
+            }
+        }
+    }
+}
+
+void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
+{
+    if (childNode)
+    {
+        for (auto annotation : *childNode)
+        {
+            Log::SetOutputLevel logLevel(Logger::kDebug);
+
+            std::string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
+
+            Log::log("Handling annotations for %s\n", nameOfType.c_str());
+
+            // TOK_ANNOTATION -> ( (name) (TOK_EXPR -> (value)) )
+            AstNode *annotation_name = annotation->getChild(0);
+
+            checkAnnotaionBeforeAdding(annotation, symbol);
+
+            const Token &nameTok = annotation_name->getToken();
+            Value *annValue = getAnnotationValue(annotation);
+
+            Annotation ann = Annotation(nameTok, annValue);
+
+            symbol->addAnnotation(ann);
+
+            Log::log("\tAdding annotation: @%s() to %s\n", ann.getName().c_str(), nameOfType.c_str());
+        }
+    }
+}
+
+Value *SymbolScanner::getAnnotationValue(AstNode *annotation)
+{
+    Value *value;
+
+    if (AstNode *annotation_value = annotation->getChild(1))
+    {
+        // Strip TOK_EXPR token
+        if (0 == strcmp("TOK_EXPR", annotation_value->getToken().getTokenName()))
+        {
+            value = annotation_value->getChild(0)->getToken().getValue();
+        }
+        else
+        {
+            value = annotation_value->getToken().getValue();
+        }
+    }
+    else
+    {
+        return nullptr;
+    }
+    return value;
+}
+
+void SymbolScanner::checkAnnotaionBeforeAdding(AstNode *annotation, Symbol *symbol)
+{
+    AstNode *annotation_name = annotation->getChild(0);
+    Value *annValue = getAnnotationValue(annotation);
+
+    if (annotation_name->getTokenString().compare(LENGTH_ANNOTATION) == 0)
+    {
+        StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+        if (structMember)
+        {
+            DataType *trueDataType = structMember->getDataType()->getTrueDataType();
+            if (trueDataType && (!trueDataType->isList() && !trueDataType->isBinary()))
+            {
+                throw semantic_error(
+                    format_string("line %d: Length annotation can only be applied to list or binary types",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+
+            // Check @length annotation's value.
+            if (!annValue)
+            {
+                throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member",
+                                                   annotation_name->getToken().getFirstLine()));
+            }
+        }
+    }
+    else if (annotation_name->getTokenString().compare(MAX_LENGTH_ANNOTATION) == 0)
+    {
+        StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+        if (structMember)
+        {
+            DataType *trueDataType = structMember->getDataType()->getTrueDataType();
+            if (trueDataType && (!trueDataType->isList() && !trueDataType->isBinary() && !trueDataType->isString()))
+            {
+                throw semantic_error(
+                    format_string("line %d: Max_length annotation can only be applied to list, binary, or string types",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+
+            // Check @length annotation's value.
+            if (!annValue)
+            {
+                throw semantic_error(
+                    format_string("line %d: Max_length annotation must name a valid parameter or member",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+
+            if (annValue->getType() != kIntegerValue)
+            {
+                Symbol *symbolConst = m_globals->getSymbol(annValue->toString());
+                ConstType *constVar = dynamic_cast<ConstType *>(symbolConst);
+
+                if (symbolConst && constVar)
+                {
+                    DataType *trueBinaryType = constVar->getDataType()->getTrueDataType();
+                    if (trueBinaryType->isBuiltin())
+                    {
+                        BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueBinaryType);
+                        if (builtinType && !builtinType->isInt())
+                        {
+                            throw semantic_error(format_string(
+                                "line %d: The constant named by a max_length annotation must be an integer type",
+                                annotation_name->getToken().getFirstLine()));
+                        }
+                    }
+                }
+                else
+                {
+                    throw semantic_error(
+                        format_string("line %d: The parameter or member named by a max_length annotation must be "
+                                      "an integer type",
+                                      annotation_name->getToken().getFirstLine()));
+                }
+            }
+        }
+    }
 }

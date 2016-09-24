@@ -28,9 +28,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_port.h"
 #include <new>
 #include <stdlib.h>
-#include "erpc_port.h"
 
 #if __cplusplus >= 201103
 #define NOEXCEPT noexcept
@@ -98,18 +98,18 @@ void *operator new[](size_t count)
     return p;
 }
 
-void *operator new[](size_t count, const nothrow_t &tag)NOEXCEPT
+void *operator new[](size_t count, const nothrow_t &tag) NOEXCEPT
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void operator delete(void *ptr) NOEXCEPT
+void operator delete(void *ptr)NOEXCEPT
 {
     erpc_free(ptr);
 }
 
-void operator delete[](void *ptr)NOEXCEPT
+void operator delete[](void *ptr) NOEXCEPT
 {
     erpc_free(ptr);
 }
@@ -134,4 +134,3 @@ extern "C" void __cxa_pure_virtual()
         ;
 }
 #endif
-

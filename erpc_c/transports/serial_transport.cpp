@@ -27,13 +27,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "serial_transport.h"
+#include "message_buffer.h"
+#include "serial.h"
 #include <cassert>
 #include <cstdio>
 #include <string>
 #include <termios.h>
-#include "serial_transport.h"
-#include "message_buffer.h"
-#include "serial.h"
 
 using namespace erpc;
 
@@ -53,58 +53,41 @@ SerialTransport::~SerialTransport()
     serial_close(m_serialHandle);
 }
 
-status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
+erpc_status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
 {
     m_serialHandle = serial_open(m_portName);
     if (-1 == m_serialHandle)
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
     if (!isatty(m_serialHandle))
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
     if (-1 == serial_setup(m_serialHandle, m_baudRate))
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
     if (-1 == serial_set_read_timeout(m_serialHandle, vtime, vmin))
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
     if (-1 == tcflush(m_serialHandle, TCIOFLUSH))
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
     return kErpcStatus_Success;
 }
-/*
-status_t SerialTransport::receive(MessageBuffer * message)
-{
-    return kErpcStatus_Success;
-}
 
-status_t SerialTransport::send(const MessageBuffer * message)
-{
-    return kErpcStatus_Success;
-}
-*/
-
-status_t SerialTransport::underlyingSend(const uint8_t *data, uint32_t size)
+erpc_status_t SerialTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     uint32_t bytesWritten = serial_write(m_serialHandle, (char *)data, size);
-    if (size != bytesWritten)
-    {
-        return kErpcStatus_Fail;
-    }
-    return kErpcStatus_Success;
+
+    return size != bytesWritten ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
-status_t SerialTransport::underlyingReceive(uint8_t *data, uint32_t size)
+erpc_status_t SerialTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     uint32_t bytesRead = serial_read(m_serialHandle, (char *)data, size);
-    if (size != bytesRead)
-    {
-        return kErpcStatus_Fail;
-    }
-    return kErpcStatus_Success;
+
+    return size != bytesRead ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }

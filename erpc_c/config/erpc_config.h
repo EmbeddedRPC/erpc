@@ -42,9 +42,9 @@
 
 //! @name Threading model options
 //@{
-#define ERPC_THREADS_NONE (0)       //!< No threads.
-#define ERPC_THREADS_PTHREADS (1)   //!< POSIX pthreads.
-#define ERPC_THREADS_FREERTOS (2)   //!< FreeRTOS.
+#define ERPC_THREADS_NONE (0)     //!< No threads.
+#define ERPC_THREADS_PTHREADS (1) //!< POSIX pthreads.
+#define ERPC_THREADS_FREERTOS (2) //!< FreeRTOS.
 //@}
 
 //! @name Configuration options

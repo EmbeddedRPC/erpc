@@ -28,23 +28,18 @@
  */
 
 #include "erpc_server_setup.h"
-#include "simple_server.h"
-#include "manually_constructed.h"
-#include "basic_codec.h"
 #include "erpc_setup.h"
-#include <new>
+#include "basic_codec.h"
+#include "manually_constructed.h"
+#include "simple_server.h"
 #include <assert.h>
+#include <new>
 
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Classes
-////////////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -90,12 +85,12 @@ void erpc_add_service_to_server(void *service)
     }
 }
 
-status_t erpc_server_run()
+erpc_status_t erpc_server_run()
 {
     return g_server->run();
 }
 
-status_t erpc_server_poll()
+erpc_status_t erpc_server_poll()
 {
     return g_server->poll();
 }

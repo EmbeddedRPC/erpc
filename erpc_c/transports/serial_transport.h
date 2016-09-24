@@ -44,8 +44,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Serial transport layer for host PC
  *
@@ -57,11 +56,11 @@ public:
     SerialTransport(const char *portName, speed_t baudRate);
     virtual ~SerialTransport();
 
-    status_t init(uint8_t vtime, uint8_t vmin);
+    erpc_status_t init(uint8_t vtime, uint8_t vmin);
 
 private:
-    virtual status_t underlyingSend(const uint8_t *data, uint32_t size);
-    virtual status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
 private:
     int m_serialHandle;     /*!< */

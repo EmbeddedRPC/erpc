@@ -29,8 +29,8 @@
  */
 
 #include "erpc_port.h"
-#include <new>
 #include "FreeRTOS.h"
+#include <new>
 
 using namespace std;
 
@@ -126,4 +126,3 @@ extern "C" void __cxa_pure_virtual()
         ;
 }
 #endif
-

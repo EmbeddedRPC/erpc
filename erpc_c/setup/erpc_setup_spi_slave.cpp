@@ -27,9 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_transport_setup.h"
 #include "manually_constructed.h"
 #include "spi_slave_transport.h"
-#include "erpc_transport_setup.h"
 #include <new>
 
 using namespace erpc;

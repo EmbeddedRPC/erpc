@@ -74,7 +74,7 @@ int main(int argc, const char *argv[])
     Log::setLogger(m_logger);
     Log::info("Starting ERPC server...\n");
 
-    status_t result = g_transport.open();
+    erpc_status_t result = g_transport.open();
     if (result)
     {
         Log::error("Failed to open connection\n");
@@ -87,7 +87,7 @@ int main(int argc, const char *argv[])
     add_services(&g_server);
     add_common_service(&g_server);
     // run server infinitely
-    status_t err = g_server.run();
+    erpc_status_t err = g_server.run();
     if (err && err != kErpcStatus_ServerIsDown)
     {
         Log::error("Error occurred: %d\n", err);

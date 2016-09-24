@@ -73,55 +73,6 @@ Value *Annotation::getValueObject()
     }
 }
 
-Value *Symbol::getAnnotationValue(AstNode *annotation)
-{
-    Value *value;
-
-    if (AstNode *annotation_value = annotation->getChild(1))
-    {
-        // Strip TOK_EXPR token
-        if (0 == strcmp("TOK_EXPR", annotation_value->getToken().getTokenName()))
-        {
-            value = annotation_value->getChild(0)->getToken().getValue();
-        }
-        else
-        {
-            value = annotation_value->getToken().getValue();
-        }
-    }
-    else
-    {
-        return nullptr;
-    }
-    return value;
-}
-
-void Symbol::addAnnotations(AstNode *childNode)
-{
-    if (childNode)
-    {
-        for (auto annotation : *childNode)
-        {
-            Log::SetOutputLevel logLevel(Logger::kDebug);
-
-            std::string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
-
-            Log::log("Handling annotations for %s\n", nameOfType.c_str());
-
-            // TOK_ANNOTATION -> ( (name) (TOK_EXPR -> (value)) )
-            AstNode *annotation_name = annotation->getChild(0);
-            const Token &nameTok = annotation_name->getToken();
-
-            Value *annValue = getAnnotationValue(annotation);
-            Annotation ann = Annotation(nameTok, annValue);
-
-            addAnnotation(ann);
-
-            Log::log("\tAdding annotation: @%s() to %s\n", ann.getName().c_str(), nameOfType.c_str());
-        }
-    }
-}
-
 std::string Symbol::printAnnotations()
 {
     std::string ret;
@@ -671,14 +622,13 @@ bool UnionType::casesAreTheSame(UnionCase *a, UnionCase *b)
     return true;
 }
 
-bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dataType, AstNode *annotations)
+bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dataType)
 {
     if (declarationExists(name))
     {
         throw semantic_error(format_string("Redefinition of union member: '%s'\n", name.c_str()));
     }
     StructMember newMember = StructMember(name, dataType);
-    newMember.addAnnotations(annotations);
     m_caseMembers.push_back(newMember);
     return true;
 }

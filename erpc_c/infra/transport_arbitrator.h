@@ -29,10 +29,10 @@
 #if !defined(__embedded_rpc__transport_arbitrator__)
 #define __embedded_rpc__transport_arbitrator__
 
-#include "transport.h"
-#include "codec.h"
-#include "client_manager.h"
 #include "erpc_threading.h"
+#include "client_manager.h"
+#include "codec.h"
+#include "transport.h"
 
 /*!
  * @addtogroup infra_transport
@@ -44,8 +44,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 class Codec;
 
 /*!
@@ -61,18 +60,17 @@ class Codec;
 class TransportArbitrator : public Transport
 {
 public:
-
     //! @brief Represents a single client's receive request.
     typedef uintptr_t client_token_t;
 
     TransportArbitrator();
     virtual ~TransportArbitrator();
 
-    void setSharedTransport(Transport * shared) { m_sharedTransport = shared; }
-    void setCodec(Codec * codec) { m_codec = codec; }
+    void setSharedTransport(Transport *shared) { m_sharedTransport = shared; }
+    void setCodec(Codec *codec) { m_codec = codec; }
 
     //! @brief Receive method for the server.
-    virtual status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
 
     //! @brief Add a client request to the client list.
     //!
@@ -89,14 +87,14 @@ public:
     //! associated with @a token. The client must have called prepareClientReceive() previously.
     //!
     //! @param token The token previously returned by prepareClientReceive().
-    status_t clientReceive(client_token_t token);
+    erpc_status_t clientReceive(client_token_t token);
 
     //! @brief Shared client/server send method.
-    virtual status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
 protected:
-    Transport * m_sharedTransport;  //!< Transport being shared through this arbitrator.
-    Codec * m_codec;                //!< Codec used to read incoming message headers.
+    Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
+    Codec *m_codec;               //!< Codec used to read incoming message headers.
 
     /*!
      * @brief Request info for a client trying to receive a response.
@@ -112,9 +110,9 @@ protected:
         ~PendingClientInfo();
     };
 
-    PendingClientInfo *m_clientList;        //!< Active client receive requests.
-    PendingClientInfo *m_clientFreeList;    //!< Unused client receive info structs.
-    Mutex m_clientListMutex;                //!< Mutex guarding the client active and free lists.
+    PendingClientInfo *m_clientList;     //!< Active client receive requests.
+    PendingClientInfo *m_clientFreeList; //!< Unused client receive info structs.
+    Mutex m_clientListMutex;             //!< Mutex guarding the client active and free lists.
 
     PendingClientInfo *addPendingClient();
     void removePendingClient(PendingClientInfo *info);

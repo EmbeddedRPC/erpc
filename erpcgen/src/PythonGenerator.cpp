@@ -36,7 +36,6 @@
 #include <algorithm>
 #include <set>
 #include <sstream>
-#include <ctime>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -130,10 +129,7 @@ void PythonGenerator::generate()
 
     m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
 
-    std::time_t now = std::time(nullptr);
-    std::string nowString = std::ctime(&now);
-    nowString.pop_back(); // Remove trailing newline.
-    m_templateData["todaysDate"] = nowString;
+    m_templateData["todaysDate"] = getTime();
 
     parseSubtemplates();
 
@@ -142,7 +138,7 @@ void PythonGenerator::generate()
         Log::info("program: ");
         Log::info("%s\n", m_def->getOutputFilename().c_str());
 
-        for (auto anno: m_def->programSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
+        for (auto anno : m_def->programSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
         {
             m_suffixStrip = anno->getValueObject()->toString();
             m_suffixStripSize = m_suffixStrip.size();
@@ -220,76 +216,8 @@ data_list PythonGenerator::getFunctionsTemplateData(Interface *iface)
     return fns;
 }
 
-//! TODO This should be common code.
-void PythonGenerator::scanStructForLengthAnnotation(StructType *theStruct)
-{
-    SymbolScope &structScope = theStruct->getScope();
-    for (auto member : theStruct->getMembers())
-    {
-        DataType *memberType = member->getDataType();
-        DataType *memberTrueType = memberType->getTrueDataType();
-
-        // Look for @length annotation and skip this member if not present.
-        Annotation *lengthAnno = member->findAnnotation(LENGTH_ANNOTATION);
-        if (!lengthAnno)
-        {
-            continue;
-        }
-
-        // Check the type of the member with the @length annotation.
-        if (!(memberTrueType->isList() || memberTrueType->isBinary() || memberTrueType->isString()))
-        {
-            throw semantic_error(format_string("line %d: Length annotation can only be applied to list, binary, or string types", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Check @length annotation's value.
-        if (!lengthAnno->hasValue())
-        {
-            throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Make sure the @length annotation names a valid member.
-        std::string lengthIdent = lengthAnno->getValueObject()->toString();
-        if (!structScope.hasSymbol(lengthIdent))
-        {
-            throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member", lengthAnno->getLocation().m_firstLine));
-        }
-
-        Symbol *sym = structScope.getSymbol(lengthIdent);
-        StructMember *lengthMember = dynamic_cast<StructMember*>(sym);
-        assert(lengthMember);
-
-        // Verify the length member is a scalar.
-        DataType *lengthMemberType = lengthMember->getDataType()->getTrueDataType();
-        BuiltinType *lengthMemberBuiltinType = dynamic_cast<BuiltinType*>(lengthMemberType);
-        if (!lengthMemberBuiltinType || !lengthMemberBuiltinType->isInt())
-        {
-            throw semantic_error(format_string("line %d: The parameter or member named by a length annotation must be an integer type", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Verify both the data and length members are the same direction.
-        if (member->getDirection() != lengthMember->getDirection())
-        {
-            throw semantic_error(format_string("line %d: The parameter named by a length annotation must be the same direction as the data parameter", lengthAnno->getLocation().m_firstLine));
-        }
-
-        if (memberTrueType->isList())
-        {
-            ListType *memberListType = dynamic_cast<ListType*>(memberTrueType);
-            assert(memberListType);
-            memberListType->setLengthVariableName(lengthIdent);
-        }
-
-        // Record that the referenced member is the length for this member.
-        lengthMember->setLengthForMember(member);
-    }
-}
-
 data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
 {
-    // Process @length annotations for this function.
-    scanStructForLengthAnnotation(&fn->getParameters());
-
     data_map info;
     std::string proto = getFunctionPrototype(fn);
 
@@ -305,7 +233,7 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     data_map returnInfo;
     returnInfo["type"] = getTypeInfo(fn->getReturnType());
     // TODO support annotations on function return values
-//    returnInfo["isNullable"] = (fn->getReturnType()->findAnnotation(NULLABLE_ANNOTATION) != nullptr);
+    //    returnInfo["isNullable"] = (fn->getReturnType()->findAnnotation(NULLABLE_ANNOTATION) != nullptr);
     info["returnValue"] = returnInfo;
 
     // get function parameter info
@@ -324,8 +252,8 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         Annotation *anno = param->findAnnotation(NULLABLE_ANNOTATION);
         paramInfo["isNullable"] = (anno != nullptr);
 
-        StructMember *otherMember = param->getLengthForMember();
-        paramInfo["lengthForMember"] = (otherMember == nullptr ? "" : otherMember->getName());
+        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName(), LENGTH_ANNOTATION);
+        paramInfo["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
 
         _param_direction dir = param->getDirection();
         switch (dir)
@@ -370,7 +298,7 @@ std::string PythonGenerator::getFunctionPrototype(Function *fn)
         for (auto it : params)
         {
             // Skip params that are length for other params.
-            if (it->getLengthForMember() != nullptr)
+            if (findParamReferencedFrom(params, it->getName(), LENGTH_ANNOTATION))
             {
                 continue;
             }
@@ -473,40 +401,40 @@ void PythonGenerator::makeAliasesTemplateData()
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
-//        Annotation *externAnnotation = aliasType->findAnnotation(EXTERNAL_ANNOTATION);
-//        if (!externAnnotation)
-//        {
-            Log::info("%d: ", n);
-            data_map aliasInfo;
-            DataType *elementDataType = aliasType->getElementType();
-            DataType *trueDataType = elementDataType->getTrueDataType();
+        //        Annotation *externAnnotation = aliasType->findAnnotation(EXTERNAL_ANNOTATION);
+        //        if (!externAnnotation)
+        //        {
+        Log::info("%d: ", n);
+        data_map aliasInfo;
+        DataType *elementDataType = aliasType->getElementType();
+        DataType *trueDataType = elementDataType->getTrueDataType();
 
-            // Only generate aliases for enums and structs in Python.
-            if (!(trueDataType->isEnum() || trueDataType->isStruct()))
-            {
-                continue;
-            }
+        // Only generate aliases for enums and structs in Python.
+        if (!(trueDataType->isEnum() || trueDataType->isStruct()))
+        {
+            continue;
+        }
 
-            std::string realType = aliasType->getName();
-            Log::info("%s\n", realType.c_str());
+        std::string realType = aliasType->getName();
+        Log::info("%s\n", realType.c_str());
 
-            // Ignore aliases added by SymbolScanner to generate struct typedefs for C.
-            // TODO remove these C-specific aliases.
-            if (elementDataType->getName() == aliasType->getName())
-            {
-                continue;
-            }
+        // Ignore aliases added by SymbolScanner to generate struct typedefs for C.
+        // TODO remove these C-specific aliases.
+        if (elementDataType->getName() == aliasType->getName())
+        {
+            continue;
+        }
 
-            aliasInfo["name"] = filterName(realType);
-            aliasInfo["elementType"] = getTypeInfo(elementDataType);
-            aliasInfo["trueType"] = getTypeInfo(trueDataType);
+        aliasInfo["name"] = filterName(realType);
+        aliasInfo["elementType"] = getTypeInfo(elementDataType);
+        aliasInfo["trueType"] = getTypeInfo(trueDataType);
 
-            aliasInfo["mlComment"] = aliasType->getMlComment();
-            aliasInfo["ilComment"] = aliasType->getIlComment();
+        aliasInfo["mlComment"] = aliasType->getMlComment();
+        aliasInfo["ilComment"] = aliasType->getIlComment();
 
-            aliases.push_back(aliasInfo);
-            ++n;
-//        }
+        aliases.push_back(aliasInfo);
+        ++n;
+        //        }
     }
     m_templateData["aliases"] = aliases;
 }
@@ -521,9 +449,6 @@ void PythonGenerator::makeStructsTemplateData()
         assert(structType);
         std::string structDesc = structType->getDescription();
         Log::info("%s\n", structDesc.c_str());
-
-        // Process @length annotations for this struct.
-        scanStructForLengthAnnotation(structType);
 
         data_map structInfo;
         structInfo["name"] = filterName(structType->getName());
@@ -542,6 +467,10 @@ void PythonGenerator::setStructMembersTemplateData(StructType *structType, cppte
     for (auto member : structType->getMembers())
     {
         data_map member_info;
+        StructMember *referencedFrom =
+            findParamReferencedFrom(structType->getMembers(), member->getName(), LENGTH_ANNOTATION);
+        member_info["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+
         setOneStructMemberTemplateData(member, member_info);
         members.push_back(member_info);
     }
@@ -560,9 +489,6 @@ void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, cppte
     member_info["type"] = getTypeInfo(member->getDataType());
     member_info["mlComment"] = convertComment(member->getMlComment(), kMultilineComment);
     member_info["ilComment"] = convertComment(member->getIlComment(), kInlineComment);
-
-    StructMember *otherMember = member->getLengthForMember();
-    member_info["lengthForMember"] = (otherMember == nullptr ? "" : otherMember->getName());
 }
 
 cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
@@ -616,9 +542,10 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
             Symbol *discriminatorSym = unionType->getParentStruct()->getScope().getSymbol(discriminatorName);
             if (!discriminatorSym)
             {
-                throw semantic_error(format_string("unable to find union discriminator '%s' in struct", discriminatorName.c_str()));
+                throw semantic_error(
+                    format_string("unable to find union discriminator '%s' in struct", discriminatorName.c_str()));
             }
-            StructMember *discriminatorMember = dynamic_cast<StructMember*>(discriminatorSym);
+            StructMember *discriminatorMember = dynamic_cast<StructMember *>(discriminatorSym);
             if (!discriminatorMember)
             {
                 throw internal_error(format_string("union discriminator is not a struct member"));
@@ -705,7 +632,7 @@ std::string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
     }
 }
 
-std::string PythonGenerator::filterName(const std::string & name)
+std::string PythonGenerator::filterName(const std::string &name)
 {
     std::string result = name;
     if (result.size() >= m_suffixStripSize)
@@ -719,24 +646,11 @@ std::string PythonGenerator::filterName(const std::string & name)
     return result;
 }
 
-std::string PythonGenerator::convertComment(const std::string & comment, comment_type commentType)
+std::string PythonGenerator::convertComment(const std::string &comment, comment_type commentType)
 {
     // Longer patterns are ordered earlier than similar shorter patterns.
-    static const char * const kCommentBegins[] = {
-            "//!<",
-            "//!",
-            "///<",
-            "///",
-            "/*!<",
-            "/*!",
-            "/**<",
-            "/**",
-            0
-        };
-    static const char * const kCommentEnds[] = {
-            "*/",
-            0
-        };
+    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
+    static const char *const kCommentEnds[] = { "*/", 0 };
 
     std::string result = stripWhitespace(comment);
     int32_t i;
@@ -814,11 +728,11 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
         }
 
         // Look for comment line headers.
-        if (result[p] == '/' && result[p+1] == '/' && result[p+2] == '!')
+        if (result[p] == '/' && result[p + 1] == '/' && result[p + 2] == '!')
         {
             result.erase(p, 3);
         }
-        else if (result[p] == '/' && result[p+1] == '/')
+        else if (result[p] == '/' && result[p + 1] == '/')
         {
             result.erase(p, 2);
         }
@@ -832,12 +746,10 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
     }
 
     // Return comment converted to Python form.
-    return (commentType == kInlineComment
-        ? "# " + result
-        : "# " + result); // "\"\"\"" + result + " \"\"\"");
+    return (commentType == kInlineComment ? "# " + result : "# " + result); // "\"\"\"" + result + " \"\"\"");
 }
 
-std::string PythonGenerator::stripWhitespace(const std::string & s)
+std::string PythonGenerator::stripWhitespace(const std::string &s)
 {
     std::string result = s;
     int32_t i;
@@ -875,4 +787,3 @@ std::string PythonGenerator::stripWhitespace(const std::string & s)
 
     return result;
 }
-

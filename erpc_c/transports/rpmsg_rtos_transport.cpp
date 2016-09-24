@@ -59,19 +59,15 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport()
     rpmsg_rtos_deinit(m_rdev);
 }
 
-status_t RPMsgRTOSTransport::init(int dev_id, int role)
+erpc_status_t RPMsgRTOSTransport::init(int dev_id, int role)
 {
     int ret_value;
     ret_value = rpmsg_rtos_init(dev_id, &m_rdev, role, &m_app_rp_chnl);
-    if (ret_value != RPMSG_SUCCESS)
-    {
-        return kErpcStatus_Fail;
-    }
 
-    return kErpcStatus_Success;
+    return ret_value != RPMSG_SUCCESS ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 {
     uint32_t length = message->getLength();
     uint8_t *freeBuffer = message->get();
@@ -81,7 +77,7 @@ status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
     ret_value = rpmsg_rtos_recv(m_app_rp_chnl->rp_ept, freeBuffer, &readLength, length, NULL, -1);
     if (ret_value != RPMSG_SUCCESS)
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_ReceiveFailed;
     }
 
     message->setUsed(readLength);
@@ -89,17 +85,12 @@ status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-status_t RPMsgRTOSTransport::send(const MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::send(const MessageBuffer *message)
 {
     int ret_value;
     ret_value = rpmsg_rtos_send(m_app_rp_chnl->rp_ept, (void *)message->get(), message->getUsed(), m_app_rp_chnl->dst);
 
-    if (RPMSG_SUCCESS == ret_value)
-    {
-        return kErpcStatus_Success;
-    }
-
-    return kErpcStatus_Fail;
+    return RPMSG_SUCCESS != ret_value ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 MessageBuffer RPMsgMessageBufferFactory::create()

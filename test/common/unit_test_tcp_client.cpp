@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     Log::info("Starting ERPC client...\n");
 
     g_client = new ClientManager();
-    status_t result = g_transport.open();
+    erpc_status_t result = g_transport.open();
     if (result)
     {
         Log::error("Failed to open connection\n");

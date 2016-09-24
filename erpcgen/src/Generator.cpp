@@ -31,6 +31,7 @@
 #include "format_string.h"
 #include <string.h>
 #include <boost/filesystem.hpp>
+#include <ctime>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -105,4 +106,31 @@ std::string Generator::stripExtension(const std::string &filename)
     {
         return filename;
     }
+}
+
+StructMember *Generator::findParamReferencedFrom(const StructType::member_vector_t &members,
+                                                 const std::string &referenceName,
+                                                 const std::string &annName)
+{
+    for (StructMember *structMember : members)
+    {
+        Annotation *ann = structMember->findAnnotation(annName);
+        if (ann)
+        {
+            std::string lengthName = ann->getValueObject()->toString();
+            if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
+            {
+                return structMember;
+            }
+        }
+    }
+    return nullptr;
+}
+
+std::string Generator::getTime()
+{
+    std::time_t now = std::time(nullptr);
+    std::string nowString = std::ctime(&now);
+    nowString.pop_back(); // Remove trailing newline.
+    return nowString;
 }

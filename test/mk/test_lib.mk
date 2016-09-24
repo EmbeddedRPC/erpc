@@ -58,19 +58,19 @@ SOURCES +=  $(UT_COMMON_SRC)/addOne.cpp \
             $(UT_COMMON_SRC)/gtest/gtest.cpp \
             $(ERPC_ROOT)/erpcgen/src/format_string.cpp \
             $(ERPC_ROOT)/erpcgen/src/Logging.cpp \
-			$(ERPC_C_ROOT)/infra/basic_codec.cpp \
-			$(ERPC_C_ROOT)/infra/client_manager.cpp \
-			$(ERPC_C_ROOT)/infra/server.cpp \
-			$(ERPC_C_ROOT)/infra/simple_server.cpp \
-			$(ERPC_C_ROOT)/infra/framed_transport.cpp \
-			$(ERPC_C_ROOT)/infra/message_buffer.cpp \
-			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
-			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
-			$(ERPC_C_ROOT)/port/serial.cpp \
-			$(ERPC_C_ROOT)/transports/serial_transport.cpp \
-			$(ERPC_C_ROOT)/transports/tcp_transport.cpp \
-			$(UNIT_OUT_DIR)/unit_test_common_client.cpp \
-			$(UNIT_OUT_DIR)/unit_test_common_server.cpp
+            $(ERPC_C_ROOT)/infra/basic_codec.cpp \
+            $(ERPC_C_ROOT)/infra/client_manager.cpp \
+            $(ERPC_C_ROOT)/infra/server.cpp \
+            $(ERPC_C_ROOT)/infra/simple_server.cpp \
+            $(ERPC_C_ROOT)/infra/framed_transport.cpp \
+            $(ERPC_C_ROOT)/infra/message_buffer.cpp \
+            $(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
+            $(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
+            $(ERPC_C_ROOT)/port/serial.cpp \
+            $(ERPC_C_ROOT)/transports/serial_transport.cpp \
+            $(ERPC_C_ROOT)/transports/tcp_transport.cpp \
+            $(UNIT_OUT_DIR)/unit_test_common_client.cpp \
+            $(UNIT_OUT_DIR)/unit_test_common_server.cpp
 
 MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 

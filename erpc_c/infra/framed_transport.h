@@ -30,11 +30,11 @@
 #ifndef _EMBEDDED_RPC__FRAMED_TRANSPORT_H_
 #define _EMBEDDED_RPC__FRAMED_TRANSPORT_H_
 
-#include <stdint.h>
-#include <cstring>
-#include "transport.h"
-#include "message_buffer.h"
 #include "erpc_threading.h"
+#include "message_buffer.h"
+#include "transport.h"
+#include <cstring>
+#include <stdint.h>
 
 /*!
  * @addtogroup infra_transport
@@ -46,8 +46,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 class MessageBuffer;
 
 /*!
@@ -105,7 +104,7 @@ public:
      * @retval kErpcStatus_CrcCheckFailed When receiving failed.
      * @retval other Subclass may return other errors from the underlyingReceive() method.
      */
-    virtual status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
 
     /*!
      * @brief Function to send prepared message.
@@ -115,7 +114,7 @@ public:
      * @retval kErpcStatus_Success When sending was successful.
      * @retval other Subclass may return other errors from the underlyingSend() method.
      */
-    virtual status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
     //! @brief Override the CRC-16 implementation.
     void setCRCFunction(compute_crc_t crcFunction);
@@ -124,8 +123,8 @@ protected:
     compute_crc_t m_crcImpl; //!< CRC function.
 
 #if ERPC_THREADS
-    Mutex m_sendLock;       //!< Mutex protecting send.
-    Mutex m_receiveLock;    //!< Mutex protecting receive.
+    Mutex m_sendLock;    //!< Mutex protecting send.
+    Mutex m_receiveLock; //!< Mutex protecting receive.
 #endif
 
     /*!
@@ -137,7 +136,7 @@ protected:
      * @retval kErpcStatus_Success When data was written successfully.
      * @retval kErpcStatus_Fail When writing data ends with error.
      */
-    virtual status_t underlyingSend(const uint8_t *data, uint32_t size) = 0;
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) = 0;
 
     /*!
      * @brief Subclasses must implement this function to receive data.
@@ -148,7 +147,7 @@ protected:
      * @retval kErpcStatus_Success When data was read successfully.
      * @retval kErpcStatus_Fail When reading data ends with error.
      */
-    virtual status_t underlyingReceive(uint8_t *data, uint32_t size) = 0;
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) = 0;
 
     /*! @brief Contents of the header that prefixes each message. */
     struct Header

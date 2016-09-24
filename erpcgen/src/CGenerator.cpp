@@ -36,7 +36,6 @@
 #include <algorithm>
 #include <set>
 #include <sstream>
-#include <ctime>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -55,6 +54,7 @@ extern const char *const kCClientSource;
 extern const char *const kCServerSource;
 extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
+extern const char *const kCDefines;
 
 static std::vector<ListType *> s_binaryTypes;
 
@@ -123,17 +123,10 @@ void CGenerator::parseSubtemplates()
     try
     {
         parse(kCCoders, m_templateData);
+        templateName = "c_common_functions";
         parse(kCCommonFunctions, m_templateData);
-    }
-    catch (TemplateException &e)
-    {
-        throw TemplateException(format_string("Template %s: %s", templateName.c_str(), e.what()));
-    }
-    templateName = "c_common_functions";
-    try
-    {
-        parse(kCCoders, m_templateData);
-        parse(kCCommonFunctions, m_templateData);
+        templateName = "c_defines";
+        parse(kCDefines, m_templateData);
     }
     catch (TemplateException &e)
     {
@@ -299,7 +292,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
 
             for (StructMember *structMember : structType->getMembers())
             {
-                setListLength(structMember);
+                setBinaryList(structMember);
                 if (DataType::kUnionType == structMember->getDataType()->getDataType())
                 {
                     // Keil need extra pragma option when unions are used.
@@ -308,7 +301,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                     assert(currentUnion);
                     for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
                     {
-                        setListLength(&unionMember);
+                        setBinaryList(&unionMember);
                         unionMember.setDataType(transformDataType(unionMember.getDataType(), direction, topDataType));
                     }
                 }
@@ -352,40 +345,27 @@ void CGenerator::transformDataTypes()
             auto params = fn->getParameters().getMembers();
             for (auto mit : params)
             {
-                setListLength(mit);
+                setBinaryList(mit);
                 mit->setDataType(transformDataType(mit->getDataType(), mit->getDirection(), mit->getDataType()));
             }
         }
     }
 }
 
-void CGenerator::setListLength(StructMember *structMember)
+void CGenerator::setBinaryList(StructMember *structMember)
 {
-    Annotation *listLength = structMember->findAnnotation(LENGTH_ANNOTATION);
-    if (listLength)
+    DataType *dataType = structMember->getDataType();
+    if (dataType->isBinary())
     {
-        if (listLength->hasValue())
+        Annotation *listLength = structMember->findAnnotation(LENGTH_ANNOTATION);
+        if (listLength)
         {
-            DataType *dataType = structMember->getDataType();
-            if (dataType->isBinary())
-            {
-                BuiltinType *builtinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("uint8"));
-                assert(builtinType);
-                ListType *listType = new ListType(builtinType);
-                structMember->setDataType(listType);
-                dataType = listType;
-                s_binaryTypes.push_back(listType);
-            }
-            if (dataType->getTrueDataType()->isList())
-            {
-                ListType *currentListType = dynamic_cast<ListType *>(dataType);
-                assert(currentListType);
-                currentListType->setLengthVariableName(listLength->getValueObject()->toString());
-            }
-        }
-        else
-        {
-            throw semantic_error(format_string("Length annotation must have a value\n"));
+            BuiltinType *builtinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("uint8"));
+            assert(builtinType);
+            ListType *listType = new ListType(builtinType);
+            structMember->setDataType(listType);
+            listType->setLengthVariableName(listLength->getValueObject()->toString());
+            s_binaryTypes.push_back(listType);
         }
     }
 }
@@ -406,10 +386,7 @@ void CGenerator::generate()
 
     m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
 
-    std::time_t now = std::time(nullptr);
-    std::string nowString = std::ctime(&now);
-    nowString.pop_back(); // Remove trailing newline.
-    m_templateData["todaysDate"] = nowString;
+    m_templateData["todaysDate"] = getTime();
 
     // Keil need extra pragma option when unions are used.
     m_templateData["usedUnionType"] = false;
@@ -915,9 +892,10 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         data_map paramInfo;
         bool containsEnum;
         DataType *paramType = param->getDataType();
+        DataType *paramTrueType = paramType->getTrueDataType();
         std::string name = param->getName();
         // Handle nullable annotation.
-        if (paramType->isStruct())
+        if (paramTrueType->isStruct())
         {
             paramInfo["isNullable"] = param->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
 
@@ -947,6 +925,53 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         {
             paramInfo["isNullable"] = false;
         }
+        // Adding dereferencing pointer length variable
+        if (paramTrueType->isList())
+        {
+            Annotation *ann = param->findAnnotation(LENGTH_ANNOTATION);
+            if (ann)
+            {
+                std::string lengthName = ann->getValueObject()->toString();
+                Symbol *symbol = fn->getParameters().getScope().getSymbol(lengthName, false);
+                if (symbol)
+                {
+                    StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+                    assert(structMember);
+                    if (structMember->getDirection() != kInDirection)
+                    {
+                        ListType *listType = dynamic_cast<ListType *>(paramType);
+                        assert(listType);
+                        listType->setLengthVariableName("*" + lengthName);
+                    }
+                }
+            }
+        }
+        // Check if max_length annotation belongs to "in" param
+        // TODO: Should be global, also for PythonGenerator
+        if (paramTrueType->isList() || paramTrueType->isString())
+        {
+            Annotation *ann = param->findAnnotation(MAX_LENGTH_ANNOTATION);
+            if (ann)
+            {
+                std::string maxLengthName = ann->getValueObject()->toString();
+                Symbol *symbol = fn->getParameters().getScope().getSymbol(maxLengthName, false);
+                if (symbol)
+                {
+                    StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+                    assert(structMember);
+                    if (structMember->getDirection() != kInDirection)
+                    {
+                        throw semantic_error(
+                            format_string("line %d, ref %d: The parameter named by a max_length annotation must be "
+                                          "'in' direction type.",
+                                          ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                    }
+                }
+            }
+        }
+
+        paramInfo["isNullParam"] =
+            ((!paramTrueType->isBuiltin() && !paramTrueType->isEnum()) || paramTrueType->isString());
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
         paramInfo["mallocServerOut"] = firtAllocOutParamOnServerWhenIsNeed(name, param);
         paramInfo["mallocClient"] = firstAllocOnClientWhenIsNeed(name, param);
@@ -1062,6 +1087,7 @@ std::string CGenerator::getErrorReturnValue(Function *fn)
         if (dataType->isBuiltin() && !dataType->isString())
         {
             BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
+            assert(builtinType);
             switch (builtinType->getBuiltinType())
             {
                 case BuiltinType::kBoolType:
@@ -1140,8 +1166,7 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
             ++n;
         }
     }
-    proto += ")";
-    return proto;
+    return proto + ");";
 }
 
 std::string CGenerator::getFunctionPrototype(Function *fn)
@@ -1449,7 +1474,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
     templateData["freeingCall"] = make_template("", &params);
     templateData["isElementArrayType"] = false;
 
-    int32_t pos = name.rfind("*");
+    int pos = name.rfind("*");
     if ((pos == 0 || pos == 1) && t->getTrueDataType()->isStruct() && inDataContainer == false)
     {
         templateData["name"] = name.substr(1, name.length());
@@ -1541,6 +1566,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 // needDealloc(templateData, t, nullptr, structMember);
                 size += listType->getLengthVariableName();
                 templateData["sizeTemp"] = std::string("lengthTemp_") + std::to_string(listCounter);
+                templateData["dataTemp"] = std::string("dataTemp_") + std::to_string(listCounter);
                 std::string maxSize = getMaxLength(structMember);
                 if (maxSize != "")
                 {
@@ -1568,6 +1594,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                         size += "elementsCount";
                     }
                     templateData["sizeTemp"] = size;
+                    templateData["dataTemp"] = usedName + "_local";
                     templateData["maxSize"] = size;
                 }
                 else
@@ -1585,14 +1612,6 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 if (binaryType == listType)
                 {
                     templateData["useBinaryCoder"] = true;
-                    if (!listType->hasLengthVariable())
-                    {
-                        templateData["sizeTemp"] = "data_local";
-                    }
-                    else
-                    {
-                        templateData["maxSize"] = templateData["size"]->getvalue();
-                    }
                     break;
                 }
             }
@@ -1986,6 +2005,7 @@ std::string CGenerator::allocateCall(bool pointer, std::string &name, Symbol *sy
     else
     {
         dataType = dynamic_cast<DataType *>(symbol);
+        assert(dataType);
     }
     DataType *trueDataType = dataType->getTrueDataType();
     std::string pointers;
@@ -2033,7 +2053,7 @@ std::string CGenerator::allocateCall(bool pointer, std::string &name, Symbol *sy
     }
     std::string returnVal = format_string("%s = (%s) erpc_malloc(%ssizeof(%s));", name.c_str(),
                                           typePointerValue.c_str(), size.c_str(), typeValue.c_str());
-    if (m_templateData["generateInfraErrorChecks"]->getvalue() == "true")
+    if (m_templateData["generateAllocErrorChecks"]->getvalue() == "true")
     {
         returnVal += format_string("\nif (%s == NULL)\n{\n    err = kErpcStatus_MemoryError;\n}", name.c_str());
     }
@@ -2222,6 +2242,7 @@ bool CGenerator::isListStruct(StructType *structType)
         if (dataType->isList())
         {
             ListType *listType = dynamic_cast<ListType *>(dataType);
+            assert(listType);
             return !listType->hasLengthVariable();
         }
     }

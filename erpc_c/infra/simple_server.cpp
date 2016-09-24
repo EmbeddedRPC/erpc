@@ -81,64 +81,53 @@ Codec *SimpleServer::createBufferAndCodec()
     return codec;
 }
 
-status_t SimpleServer::runInternal()
+erpc_status_t SimpleServer::runInternal()
 {
     // Create codec to read the request.
-    Codec *inCodec = createBufferAndCodec();
-    if (!inCodec)
+    Codec *codec = createBufferAndCodec();
+    if (!codec)
     {
         return kErpcStatus_MemoryError;
     }
 
     // Receive the next invocation request.
-    status_t err = m_transport->receive(inCodec->getBuffer());
+    erpc_status_t err = m_transport->receive(codec->getBuffer());
     if (err)
     {
         // Dispose of buffers and codecs.
-        disposeBufferAndCodec(inCodec);
+        disposeBufferAndCodec(codec);
         return err;
     }
 
     // If is used RPMsg transport layer, the receive function changes
     // pointer to buffer(m_buf) of requestMessage, inCodec must be reseted
     // after this change to work with correct buffer
-    inCodec->reset();
-
-    // Create codec to write the request.
-    Codec *outCodec = createBufferAndCodec();
-    if (!outCodec)
-    {
-        // Dispose of buffers and codecs.
-        disposeBufferAndCodec(inCodec);
-        return kErpcStatus_MemoryError;
-    }
+    codec->reset();
 
     // Handle the request.
     message_type_t msgType;
-    err = processMessage(inCodec, outCodec, msgType);
+    err = processMessage(codec, msgType);
     if (err)
     {
         // Dispose of buffers and codecs.
-        disposeBufferAndCodec(outCodec);
-        disposeBufferAndCodec(inCodec);
+        disposeBufferAndCodec(codec);
         return err;
     }
 
     if (msgType != kOnewayMessage)
     {
-        err = m_transport->send(outCodec->getBuffer());
+        err = m_transport->send(codec->getBuffer());
     }
 
     // Dispose of buffers and codecs.
-    disposeBufferAndCodec(outCodec);
-    disposeBufferAndCodec(inCodec);
+    disposeBufferAndCodec(codec);
 
     return err;
 }
 
-status_t SimpleServer::run()
+erpc_status_t SimpleServer::run()
 {
-    status_t err = kErpcStatus_Success;
+    erpc_status_t err = kErpcStatus_Success;
     while (!err && m_isServerOn)
     {
         err = runInternal();
@@ -146,7 +135,7 @@ status_t SimpleServer::run()
     return err;
 }
 
-status_t SimpleServer::poll()
+erpc_status_t SimpleServer::poll()
 {
     if (m_isServerOn)
     {

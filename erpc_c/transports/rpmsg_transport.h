@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__RPMSG_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_TRANSPORT_H_
 
-#include "transport.h"
 #include "message_buffer.h"
 #include "static_queue.h"
+#include "transport.h"
 
 extern "C" {
 #include "rpmsg.h"
@@ -58,8 +58,7 @@ enum
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Transport that uses RPMsg for interprocessor messaging.
  *
@@ -89,9 +88,10 @@ public:
      *
      * @param[in] role Role of the other device.
      *
-     * @return kErpcStatus_Success when initialization was successful, else kErpcStatus_Fail.
+     * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
+     * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual status_t init(int dev_id, int role);
+    virtual erpc_status_t init(int dev_id, int role);
 
     /*!
      * @brief Set message to first received message.
@@ -102,16 +102,17 @@ public:
      *
      * @return kErpcStatus_Success
      */
-    virtual status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
 
     /*!
      * @brief Function to send prepared message.
      *
      * @param[in] message Pass message buffer to send.
      *
-     * @return kErpcStatus_Success when all buffers were send, else kErpcStatus_Fail.
+     * @retval kErpcStatus_SendFailed Failed to send message buffer.
+     * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
     /*!
      * @brief Function to check if is message in receive queue and wait for processing.
@@ -121,6 +122,7 @@ public:
      * @return True if exist received message, else false.
      */
     virtual bool hasMessage() { return messageQueue.size(); }
+
 protected:
     static StaticQueue<MessageBuffer *>
         messageQueue; /*!< Received messages. Queue of messages with buffers filled in rpmsg callback. */
@@ -178,10 +180,12 @@ public:
      * @brief Constructor.
      */
     RPMsgMessageBufferFactory() {}
+
     /*!
      * @brief CodecFactory destructor
      */
     virtual ~RPMsgMessageBufferFactory() {}
+
     /*!
      * @brief This function creates new message buffer.
      *

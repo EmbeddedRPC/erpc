@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__SERVER_SETUP_H_
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
-#include "erpc_transport_setup.h"
 #include "erpc_common.h"
-#include <stdint.h>
+#include "erpc_transport_setup.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * @addtogroup server_setup
@@ -88,7 +88,7 @@ void erpc_add_service_to_server(void *service);
  *
  * @return Return one of status from erpc_common.h
  */
-status_t erpc_server_run(void);
+erpc_status_t erpc_server_run(void);
 
 /*!
  * @brief This function calls server implementation only once.
@@ -97,7 +97,7 @@ status_t erpc_server_run(void);
  *
  * @return Return one of status from erpc_common.h
  */
-status_t erpc_server_poll(void);
+erpc_status_t erpc_server_poll(void);
 
 /*!
  * @brief This functions should be used when client is calling quit server.

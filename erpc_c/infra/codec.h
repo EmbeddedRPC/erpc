@@ -30,11 +30,11 @@
 #ifndef _EMBEDDED_RPC__CODEC_H_
 #define _EMBEDDED_RPC__CODEC_H_
 
-#include <stdint.h>
-#include <cstring>
 #include "erpc_common.h"
-#include "transport.h"
 #include "message_buffer.h"
+#include "transport.h"
+#include <cstring>
+#include <stdint.h>
 
 /*!
  * @addtogroup infra_codec
@@ -46,13 +46,11 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Types of messages that can be encoded.
  */
-typedef enum _message_type
-{
+typedef enum _message_type {
     kInvocationMessage = 0,
     kOnewayMessage,
     kReplyMessage,
@@ -84,12 +82,14 @@ public:
      * @brief Codec destructor
      */
     virtual ~Codec() {}
+
     /*!
      * @brief Return message buffer used for read and write data.
      *
      * @return Pointer to used message buffer.
      */
     MessageBuffer *getBuffer() { return &m_buffer; }
+
     /*!
      * @brief Prototype for set message buffer used for read and write data.
      *
@@ -103,6 +103,7 @@ public:
 
     /*! @brief Reset the codec to initial state. */
     virtual void reset() { m_cursor.set(&m_buffer); }
+
     //! @name Encoding
     //@{
     /*!
@@ -116,14 +117,17 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence) = 0;
+    virtual erpc_status_t startWriteMessage(message_type_t type,
+                                            uint32_t service,
+                                            uint32_t request,
+                                            uint32_t sequence) = 0;
 
     /*!
      * @brief Prototype for write end of message.
      *
      * @return Based on implementation.
      */
-    virtual status_t endWriteMessage() = 0;
+    virtual erpc_status_t endWriteMessage() = 0;
 
     /*!
      * @brief Prototype for write boolean value.
@@ -132,7 +136,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(bool value) = 0;
+    virtual erpc_status_t write(bool value) = 0;
 
     /*!
      * @brief Prototype for write int8_t value.
@@ -141,7 +145,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(int8_t value) = 0;
+    virtual erpc_status_t write(int8_t value) = 0;
 
     /*!
      * @brief Prototype for write int16_t value.
@@ -150,7 +154,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(int16_t value) = 0;
+    virtual erpc_status_t write(int16_t value) = 0;
 
     /*!
      * @brief Prototype for write int32_t value.
@@ -159,7 +163,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(int32_t value) = 0;
+    virtual erpc_status_t write(int32_t value) = 0;
 
     /*!
      * @brief Prototype for write int64_t value.
@@ -168,7 +172,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(int64_t value) = 0;
+    virtual erpc_status_t write(int64_t value) = 0;
 
     /*!
      * @brief Prototype for write uint8_t value.
@@ -177,7 +181,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(uint8_t value) = 0;
+    virtual erpc_status_t write(uint8_t value) = 0;
 
     /*!
      * @brief Prototype for write uint16_t value.
@@ -186,7 +190,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(uint16_t value) = 0;
+    virtual erpc_status_t write(uint16_t value) = 0;
 
     /*!
      * @brief Prototype for write uint32_t value.
@@ -195,7 +199,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(uint32_t value) = 0;
+    virtual erpc_status_t write(uint32_t value) = 0;
 
     /*!
      * @brief Prototype for write uint64_t value.
@@ -204,7 +208,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(uint64_t value) = 0;
+    virtual erpc_status_t write(uint64_t value) = 0;
 
     /*!
      * @brief Prototype for write float value.
@@ -213,7 +217,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(float value) = 0;
+    virtual erpc_status_t write(float value) = 0;
 
     /*!
      * @brief Prototype for write double value.
@@ -222,7 +226,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t write(double value) = 0;
+    virtual erpc_status_t write(double value) = 0;
 
     /*!
      * @brief Prototype for write string value.
@@ -232,7 +236,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t writeString(uint32_t length, const char *value) = 0;
+    virtual erpc_status_t writeString(uint32_t length, const char *value) = 0;
 
     /*!
      * @brief Prototype for write binary value.
@@ -242,7 +246,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t writeBinary(uint32_t length, const uint8_t *value) = 0;
+    virtual erpc_status_t writeBinary(uint32_t length, const uint8_t *value) = 0;
 
     /*!
      * @brief Prototype for start write list.
@@ -251,35 +255,35 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t startWriteList(uint32_t length) = 0;
+    virtual erpc_status_t startWriteList(uint32_t length) = 0;
 
     /*!
      * @brief Prototype for end write list.
      *
      * @return Based on implementation.
      */
-    virtual status_t endWriteList() = 0;
+    virtual erpc_status_t endWriteList() = 0;
 
     /*!
      * @brief Prototype for start write structure.
      *
      * @return Based on implementation.
      */
-    virtual status_t startWriteStruct() = 0;
+    virtual erpc_status_t startWriteStruct() = 0;
 
     /*!
      * @brief Prototype for end write structure.
      *
      * @return Based on implementation.
      */
-    virtual status_t endWriteStruct() = 0;
+    virtual erpc_status_t endWriteStruct() = 0;
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
      *
      * @return Based on implementation.
      */
-    virtual status_t writeNullFlag(bool isNull) = 0;
+    virtual erpc_status_t writeNullFlag(bool isNull) = 0;
     //@}
 
     //! @name Decoding
@@ -295,17 +299,17 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t startReadMessage(message_type_t *type,
-                                      uint32_t *service,
-                                      uint32_t *request,
-                                      uint32_t *sequence) = 0;
+    virtual erpc_status_t startReadMessage(message_type_t *type,
+                                           uint32_t *service,
+                                           uint32_t *request,
+                                           uint32_t *sequence) = 0;
 
     /*!
      * @brief Prototype for read end of message.
      *
      * @return Based on implementation.
      */
-    virtual status_t endReadMessage() = 0;
+    virtual erpc_status_t endReadMessage() = 0;
 
     /*!
      * @brief Prototype for read boolean value.
@@ -314,7 +318,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(bool *value) = 0;
+    virtual erpc_status_t read(bool *value) = 0;
 
     /*!
      * @brief Prototype for read int8_t value.
@@ -323,7 +327,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(int8_t *value) = 0;
+    virtual erpc_status_t read(int8_t *value) = 0;
 
     /*!
      * @brief Prototype for read int16_t value.
@@ -332,7 +336,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(int16_t *value) = 0;
+    virtual erpc_status_t read(int16_t *value) = 0;
 
     /*!
      * @brief Prototype for read int32_t value.
@@ -341,7 +345,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(int32_t *value) = 0;
+    virtual erpc_status_t read(int32_t *value) = 0;
 
     /*!
      * @brief Prototype for read int64_t value.
@@ -350,7 +354,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(int64_t *value) = 0;
+    virtual erpc_status_t read(int64_t *value) = 0;
 
     /*!
      * @brief Prototype for read uint8_t value.
@@ -359,7 +363,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(uint8_t *value) = 0;
+    virtual erpc_status_t read(uint8_t *value) = 0;
 
     /*!
      * @brief Prototype for read uint16_t value.
@@ -368,7 +372,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(uint16_t *value) = 0;
+    virtual erpc_status_t read(uint16_t *value) = 0;
 
     /*!
      * @brief Prototype for read uint32_t value.
@@ -377,7 +381,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(uint32_t *value) = 0;
+    virtual erpc_status_t read(uint32_t *value) = 0;
 
     /*!
     * @brief Prototype for read uint64_t value.
@@ -386,7 +390,7 @@ public:
     *
     * @return Based on implementation.
     */
-    virtual status_t read(uint64_t *value) = 0;
+    virtual erpc_status_t read(uint64_t *value) = 0;
 
     /*!
      * @brief Prototype for read float value.
@@ -395,7 +399,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(float *value) = 0;
+    virtual erpc_status_t read(float *value) = 0;
 
     /*!
      * @brief Prototype for read double value.
@@ -404,7 +408,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t read(double *value) = 0;
+    virtual erpc_status_t read(double *value) = 0;
 
     /*!
      * @brief Prototype for read string value.
@@ -414,7 +418,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t readString(uint32_t *length, char **value) = 0;
+    virtual erpc_status_t readString(uint32_t *length, char **value) = 0;
 
     /*!
      * @brief Prototype for read binary value.
@@ -424,7 +428,7 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t readBinary(uint32_t *length, uint8_t **value) = 0;
+    virtual erpc_status_t readBinary(uint32_t *length, uint8_t **value) = 0;
 
     /*!
      * @brief Prototype for start read list.
@@ -433,35 +437,35 @@ public:
      *
      * @return Based on implementation.
      */
-    virtual status_t startReadList(uint32_t *length) = 0;
+    virtual erpc_status_t startReadList(uint32_t *length) = 0;
 
     /*!
      * @brief Prototype for end read list.
      *
      * @return Based on implementation.
      */
-    virtual status_t endReadList() = 0;
+    virtual erpc_status_t endReadList() = 0;
 
     /*!
      * @brief Prototype for start read structure.
      *
      * @return Based on implementation.
      */
-    virtual status_t startReadStruct() = 0;
+    virtual erpc_status_t startReadStruct() = 0;
 
     /*!
      * @brief Prototype for end read structure.
      *
      * @return Based on implementation.
      */
-    virtual status_t endReadStruct() = 0;
+    virtual erpc_status_t endReadStruct() = 0;
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
      * @return Based on implementation.
      */
-    virtual status_t readNullFlag(bool *isNull) = 0;
+    virtual erpc_status_t readNullFlag(bool *isNull) = 0;
     //@}
 
 protected:
@@ -481,10 +485,12 @@ public:
      * @brief Constructor.
      */
     CodecFactory() {}
+
     /*!
      * @brief CodecFactory destructor
      */
     virtual ~CodecFactory() {}
+
     /*!
      * @brief Return created codec.
      *

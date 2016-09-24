@@ -30,13 +30,13 @@
 #ifndef _EMBEDDED_RPC__RPMSG_RTOS_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_RTOS_TRANSPORT_H_
 
-#include "transport.h"
 #include "message_buffer.h"
+#include "transport.h"
 
 extern "C" {
 #include "rpmsg.h"
-#include "rpmsg_rtos.h"
 #include "rpmsg.h"
+#include "rpmsg_rtos.h"
 }
 
 /*!
@@ -58,8 +58,7 @@ enum
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Transport that uses RPMsg RTOS API for interprocessor messaging.
  *
@@ -87,9 +86,9 @@ public:
      * @param[in] role Device role number.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
-     * @retval kErpcStatus_Fail When rpmsg init function wasn't executed successfully.
+     * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual status_t init(int dev_id, int role);
+    virtual erpc_status_t init(int dev_id, int role);
 
     /*!
      * @brief Store incoming message to message buffer.
@@ -98,18 +97,20 @@ public:
      *
      * @param[in] message Message buffer, to which will be stored incoming message.
      *
-     * @return kErpcStatus_Success
+     * @retval kErpcStatus_ReceiveFailed Failed to receive message buffer.
+     * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
 
     /*!
      * @brief Function to send prepared message.
      *
      * @param[in] message Pass message buffer to send.
      *
-     * @return kErpcStatus_Success when all buffers were send, else kErpcStatus_Fail.
+     * @retval kErpcStatus_SendFailed Failed to send message buffer.
+     * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
 protected:
     /* Remote device */
@@ -124,14 +125,17 @@ public:
      * @brief Constructor.
      */
     RPMsgMessageBufferFactory() {}
+
     /*!
      * @brief RPMsgMessageBufferFactory destructor
      */
     virtual ~RPMsgMessageBufferFactory() {}
+
     /*!
      * @brief This function create message buffer used for communication between devices.
      */
     virtual MessageBuffer create();
+
     /*!
      * @brief This function dispose message buffer used for communication between devices.
      */

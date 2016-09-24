@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 
-#include <stdlib.h>
-#include <stdbool.h>
 #include "framed_transport.h"
 #include "fsl_spi.h"
+#include <stdbool.h>
+#include <stdlib.h>
 
 /*!
  * @addtogroup spi_master_transport
@@ -45,8 +45,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Very basic transport to send/receive messages via SPI.
  *
@@ -63,12 +62,12 @@ public:
      *
      * @retval kErpcStatus_Success Always returns success status.
      */
-    virtual status_t init();
+    virtual erpc_status_t init();
 
 protected:
     SPI_Type *m_spiBaseAddr; /*!< Base address of SPI peripheral used in this transport layer */
-    uint32_t m_baudRate;       /*!< Baud rate of SPI peripheral used in this transport layer */
-    uint32_t m_srcClock_Hz;    /*!< Source clock of SPI peripheral used in this transport layer */
+    uint32_t m_baudRate;     /*!< Baud rate of SPI peripheral used in this transport layer */
+    uint32_t m_srcClock_Hz;  /*!< Source clock of SPI peripheral used in this transport layer */
 
 private:
     /*!
@@ -77,12 +76,10 @@ private:
      * @param[inout] data Preallocated buffer for receiving data.
      * @param[in] data Size of data to read.
      *
-     * @retval kStatus_DSPI_Busy DSPI transfer is busy.
-     * @retval kStatus_DSPI_Error DSPI driver error.
-     * @retval kStatus_DSPI_OutOfRange DSPI transfer out of range.
+     * @retval kErpcStatus_ReceiveFailed SPI failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
     /*!
      * @brief Write data to SPI peripheral.
@@ -90,12 +87,10 @@ private:
      * @param[in] data Buffer to send.
      * @param[in] data Size of data to send.
      *
-     * @retval kStatus_DSPI_Busy DSPI transfer is busy.
-     * @retval kStatus_DSPI_Error DSPI driver error.
-     * @retval kStatus_DSPI_OutOfRange DSPI transfer out of range.
+     * @retval kErpcStatus_SendFailed SPI failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
 };
 
 } // namespace erpc

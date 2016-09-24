@@ -96,23 +96,16 @@
     </CustomBuildStep>
     <PreBuildEvent>
       <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
-
+python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
 python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template</Command>
     </PreBuildEvent>
@@ -141,23 +134,16 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     </Link>
     <PreBuildEvent>
       <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
-
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
-
+python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
-
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
 python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template</Command>
     </PreBuildEvent>
@@ -243,6 +229,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     <ClCompile Include="c_server_header.cpp" />
     <ClCompile Include="c_server_source.cpp" />
     <ClCompile Include="c_common_functions.cpp" />
+    <ClCompile Include="c_defines.cpp" />
     <ClCompile Include="erpcgen_lexer.flex.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4005;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>

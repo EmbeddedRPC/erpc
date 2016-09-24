@@ -29,8 +29,8 @@
 
 #include "erpc_threading.h"
 #include "task.h"
-#include <time.h>
 #include <errno.h>
+#include <time.h>
 
 using namespace erpc;
 
@@ -87,13 +87,9 @@ void Thread::start(void *arg)
     // which will scan the linked list.
     taskENTER_CRITICAL();
 
-    xTaskCreate(
-        threadEntryPointStub,
-        (m_name ? m_name : "task"),
-        ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
-        this,
-        m_priority,
-        &m_task);
+    xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
+                ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
+                this, m_priority, &m_task);
 
     // Link in this thread to the list.
     if (s_first)
@@ -102,7 +98,7 @@ void Thread::start(void *arg)
     }
     s_first = this;
 
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
 }
 
 bool Thread::operator==(Thread &o)
@@ -125,7 +121,7 @@ Thread *Thread::getCurrentThread()
         }
         it = it->m_next;
     }
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
     return it;
 }
 
@@ -158,31 +154,31 @@ void Thread::threadEntryPointStub(void *arg)
     Thread *prev = NULL;
     while (it)
     {
-        if (it == this)
+        if (it == _this)
         {
             if (it == s_first)
             {
-                s_first = m_next;
+                s_first = _this->m_next;
             }
             else if (prev)
             {
-                prev->m_next = m_next;
+                prev->m_next = _this->m_next;
             }
-            m_next = NULL;
+            _this->m_next = NULL;
 
             break;
         }
         prev = it;
         it = it->m_next;
     }
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
 
-    // Handle a task returning from its function. Delete or suspend the task, if the API is
-    // available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
-    // is available, the loop sleeps this task the maximum time each cycle. If not, it just
-    // yields.
+// Handle a task returning from its function. Delete or suspend the task, if the API is
+// available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
+// is available, the loop sleeps this task the maximum time each cycle. If not, it just
+// yields.
 #if INCLUDE_vTaskDelete
-    m_task = 0;
+    _this->m_task = 0;
     vTaskDelete(NULL);
 #elif INCLUDE_vTaskSuspend
     vTaskSuspend(NULL);
@@ -191,7 +187,7 @@ void Thread::threadEntryPointStub(void *arg)
     {
 #if INCLUDE_vTaskDelay
         vTaskDelay(portMAX_DELAY);
-#else // INCLUDE_vTaskDelay
+#else  // INCLUDE_vTaskDelay
         taskYIELD();
 #endif // INCLUDE_vTaskDelay
     }
@@ -217,12 +213,12 @@ bool Mutex::tryLock()
 
 bool Mutex::lock()
 {
-    xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
+    return xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
 }
 
 bool Mutex::unlock()
 {
-    xSemaphoreGiveRecursive(m_mutex);
+    return xSemaphoreGiveRecursive(m_mutex);
 }
 
 Semaphore::Semaphore(int count)

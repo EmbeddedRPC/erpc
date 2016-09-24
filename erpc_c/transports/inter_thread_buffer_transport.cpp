@@ -59,7 +59,7 @@ void InterThreadBufferTransport::linkWithPeer(InterThreadBufferTransport *peer)
     }
 }
 
-status_t InterThreadBufferTransport::receive(MessageBuffer *message)
+erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
 {
     assert(m_state && m_peer);
 
@@ -78,7 +78,7 @@ status_t InterThreadBufferTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-status_t InterThreadBufferTransport::send(const MessageBuffer *message)
+erpc_status_t InterThreadBufferTransport::send(const MessageBuffer *message)
 {
     assert(m_state && m_peer);
 

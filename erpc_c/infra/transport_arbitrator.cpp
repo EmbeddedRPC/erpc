@@ -40,10 +40,10 @@ using namespace erpc;
 TransportArbitrator::TransportArbitrator()
 : Transport()
 , m_sharedTransport(NULL)
-, m_codec(NULL)
 , m_clientList(NULL)
 , m_clientFreeList(NULL)
 , m_clientListMutex()
+, m_codec(NULL)
 {
 }
 
@@ -54,14 +54,14 @@ TransportArbitrator::~TransportArbitrator()
     freeClientList(m_clientFreeList);
 }
 
-status_t TransportArbitrator::receive(MessageBuffer *message)
+erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 {
     assert(m_sharedTransport && "shared transport is not set");
 
     while (true)
     {
         // Receive a message.
-        status_t err = m_sharedTransport->receive(message);
+        erpc_status_t err = m_sharedTransport->receive(message);
         if (err)
         {
             return err;
@@ -99,7 +99,7 @@ status_t TransportArbitrator::receive(MessageBuffer *message)
             if (client->m_isValid && sequence == client->m_request->getSequence())
             {
                 // Swap the received message buffer with the client's message buffer.
-                client->m_request->getInCodec()->getBuffer()->swap(message);
+                client->m_request->getCodec()->getBuffer()->swap(message);
 
                 // Wake up the client receive thread.
                 client->m_sem.put();
@@ -109,7 +109,7 @@ status_t TransportArbitrator::receive(MessageBuffer *message)
     }
 }
 
-status_t TransportArbitrator::send(const MessageBuffer *message)
+erpc_status_t TransportArbitrator::send(const MessageBuffer *message)
 {
     assert(m_sharedTransport && "shared transport is not set");
     return m_sharedTransport->send(message);
@@ -127,7 +127,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
     return reinterpret_cast<client_token_t>(info);
 }
 
-status_t TransportArbitrator::clientReceive(client_token_t token)
+erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 {
     assert(token != 0 && "invalid client token");
 

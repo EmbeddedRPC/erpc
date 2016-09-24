@@ -69,8 +69,8 @@ public:
 
 protected:
     cpptempl::data_map m_templateData; //!< Data prepared for templates files.
-    std::string m_suffixStrip; //!< String to remove from suffixes of names.
-    size_t m_suffixStripSize; //!< Length of the suffix filter string.
+    std::string m_suffixStrip;         //!< String to remove from suffixes of names.
+    size_t m_suffixStripSize;          //!< Length of the suffix filter string.
 
     /*!
      * @brief This function prepare helpful functions located in template files.
@@ -244,19 +244,9 @@ protected:
     std::string getBuiltinTypename(const BuiltinType *t);
 
     /*!
-     * @brief Handle @length annotations on structs.
-     *
-     * Struct members are examined for @length annotations, and the length member is denoted.
-     * This function is also used on function parameters, since they are represented as structs.
-     *
-     * @param theStruct Reference to the struct type to scan and process.
-     */
-    void scanStructForLengthAnnotation(StructType *theStruct);
-
-    /*!
      * @brief Filter symbol names.
      */
-    std::string filterName(const std::string & name);
+    std::string filterName(const std::string &name);
 
     //! @brief Possible Doxygen comment styles.
     enum comment_type

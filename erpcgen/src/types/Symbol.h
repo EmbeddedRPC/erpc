@@ -30,7 +30,6 @@
 #ifndef _EMBEDDED_RPC__SYMBOL_H_
 #define _EMBEDDED_RPC__SYMBOL_H_
 
-#include <string>
 #include <vector>
 #include "Annotation.h"
 #include "Token.h"
@@ -183,15 +182,6 @@ public:
      */
     virtual std::string getDescription() const { return m_name; }
     /*!
-     * @brief This function add annotations to vector of symbol annotations.
-     *
-     * @param[in] childTok AstNode contains annotations information.
-     *
-     * @exception semantic_error Thrown, when more annotations are added with same name.
-     */
-    void addAnnotations(AstNode *childTok);
-
-    /*!
      * @brief This function add annotation to vector of symbol annotations.
      *
      * @param[in] a AstNode contains annotation information.
@@ -249,14 +239,6 @@ protected:
     std::vector<Annotation> m_annotations; /*!< Vector of annotations belong to symbol. */
     std::string m_mlComment;               /*!< Comment above to symbol. */
     std::string m_ilComment;               /*!< Comment next to symbol. */
-
-    /*!
-     * @brief Helper function to get Value from annotation AstNode
-     *
-     * @param[in] annotationNode AstNode pointing to the annotation
-     * @return Value pointer for annotation
-     */
-    Value *getAnnotationValue(AstNode *annotationNode);
 };
 
 } // namespace erpcgen

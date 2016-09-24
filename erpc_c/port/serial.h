@@ -35,8 +35,8 @@
 #include <stdint.h>
 
 #ifdef WIN32
-#include <windows.h>
 #include <time.h>
+#include <windows.h>
 
 #define B115200 115200
 #define B921600 921600
@@ -44,11 +44,11 @@
 typedef long speed_t;
 #else
 
-#include <unistd.h>
-#include <termios.h>
 #include <sys/select.h>
-#include <sys/types.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 
 #endif
 

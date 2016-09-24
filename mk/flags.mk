@@ -18,8 +18,13 @@
 # INCLUDES += ./include/
 #-----------------------------------------------
 
-#Force compilation to 32 or 64 bit architecture
-MARCH ?= # -m32 or -m64
+#Force compilation to 32 or 64 bit architectures
+#-m32 or -m64
+ifeq "$(is_darwin)" "1"
+    MARCH ?= -m64
+else
+    MARCH ?=    # -m32 or -m64
+endif
 
 CXXFLAGS += -std=gnu++11 -D LINUX -Wunused-variable -Wno-deprecated-register -Wno-narrowing -Werror $(MARCH)
 CFLAGS   += -std=gnu11 -D LINUX -D _GNU_SOURCE -Werror $(MARCH)

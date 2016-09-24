@@ -29,8 +29,8 @@
 #ifndef _EMBEDDED_RPC__TCP_TRANSPORT_H_
 #define _EMBEDDED_RPC__TCP_TRANSPORT_H_
 
-#include "framed_transport.h"
 #include "erpc_threading.h"
+#include "framed_transport.h"
 
 /*!
  * @addtogroup tcp_transport
@@ -42,8 +42,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Client side of TCP/IP transport.
  *
@@ -92,22 +91,22 @@ public:
      * @retval #kErpcStatus_UnknownName Host name resolution failed.
      * @retval #kErpcStatus_ConnectionFailure Connecting to the specified host failed.
      */
-    virtual status_t open();
+    virtual erpc_status_t open();
 
     /*!
      * @brief This function disconnects client or stop server host.
      *
      * @retval #kErpcStatus_Success Always return this.
      */
-    virtual status_t close();
+    virtual erpc_status_t close();
 
 protected:
-    bool m_isServer;        /*!< If true then server is using transport, else client. */
-    const char *m_host;     /*!< Specify the host name or IP address of the computer. */
-    uint16_t m_port;        /*!< Specify the listening port number. */
-    int m_socket;           /*!< Socket number. */
-    Thread m_serverThread;  /*!< Pointer to server thread. */
-    bool m_runServer;       /*!< Thread is executed while this is true. */
+    bool m_isServer;       /*!< If true then server is using transport, else client. */
+    const char *m_host;    /*!< Specify the host name or IP address of the computer. */
+    uint16_t m_port;       /*!< Specify the listening port number. */
+    int m_socket;          /*!< Socket number. */
+    Thread m_serverThread; /*!< Pointer to server thread. */
+    bool m_runServer;      /*!< Thread is executed while this is true. */
 
     /*!
      * @brief This function connect client to the server.
@@ -115,7 +114,7 @@ protected:
      * @retval kErpcStatus_Success When client connected successfully.
      * @retval kErpcStatus_Fail When client doesn't connected successfully.
      */
-    virtual status_t connectClient();
+    virtual erpc_status_t connectClient();
 
     /*!
      * @brief This function read data.
@@ -124,10 +123,10 @@ protected:
      * @param[in] size Size of data to read.
      *
      * @retval #kErpcStatus_Success When data was read successfully.
-     * @retval #kErpcStatus_Fail When reading data ends with error.
+     * @retval #kErpcStatus_ReceiveFailed When reading data ends with error.
      * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
      */
-    virtual status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
     /*!
      * @brief This function writes data.
@@ -136,10 +135,10 @@ protected:
      * @param[in] size Size of data to send.
      *
      * @retval #kErpcStatus_Success When data was written successfully.
-     * @retval #kErpcStatus_Fail When writing data ends with error.
+     * @retval #kErpcStatus_SendFailed When writing data ends with error.
      * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
      */
-    virtual status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
 
     /*!
      * @brief Server thread function.

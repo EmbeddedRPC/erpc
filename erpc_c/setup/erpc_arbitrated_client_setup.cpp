@@ -28,43 +28,19 @@
  */
 
 #include "erpc_arbitrated_client_setup.h"
+#include "erpc_setup.h"
 #include "arbitrated_client_manager.h"
-#include "manually_constructed.h"
 #include "basic_codec.h"
-#include "message_buffer.h"
+#include "manually_constructed.h"
 #include "transport_arbitrator.h"
-#include "erpc_config_internal.h"
-#include <new>
 #include <assert.h>
+#include <new>
 
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Classes
-////////////////////////////////////////////////////////////////////////////////
-
-class BasicMessageBufferFactory : public MessageBufferFactory
-{
-public:
-    virtual MessageBuffer create()
-    {
-        uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
-        return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
-    }
-
-    virtual void dispose(MessageBuffer *buf)
-    {
-        assert(buf);
-        if (*buf)
-        {
-            delete[] buf->get();
-        }
-    }
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -105,6 +81,14 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport)
     g_client = s_client;
 
     return reinterpret_cast<erpc_transport_t>(s_arbitrator.get());
+}
+
+void erpc_client_set_error_handler(client_error_handler_t error_handler)
+{
+    if (g_client)
+    {
+        g_client->setErrorHandler(error_handler);
+    }
 }
 
 void erpc_arbitrated_client_deinit()

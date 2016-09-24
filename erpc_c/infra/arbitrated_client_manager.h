@@ -42,8 +42,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 class TransportArbitrator;
 
 /*!
@@ -84,10 +83,10 @@ public:
      *
      * @param[in] request Request context to perform.
      */
-    status_t performRequest(RequestContext &request);
+    erpc_status_t performRequest(RequestContext &request);
 
 protected:
-    TransportArbitrator *m_arbitrator;      //!< Optional transport arbitrator. May be NULL.
+    TransportArbitrator *m_arbitrator; //!< Optional transport arbitrator. May be NULL.
 
     //! @brief This method is not used with this class.
     void setTransport(Transport *transport) {}

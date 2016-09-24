@@ -7,17 +7,6 @@ params:
     - E
 idl: |
   enum {name} {
-  }
-
----
-name: basic enum
-desc:
-params:
-  name:
-    - ""
-    - E
-idl: |
-  enum {name} {
     A,
     B,
     C

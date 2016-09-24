@@ -69,11 +69,15 @@ std::string format_string(const char *fmt, ...)
         result = _vsnprintf(buf, WIN32_FMT_BUF_LEN, fmt, vargs);
 #else  //__CYGWIN__
         result = vsnprintf(buf, WIN32_FMT_BUF_LEN, fmt, vargs);
-#endif // WIN32 __CYGWIN__
+#endif // WIN32
+    }
+    else
+    {
+        result = -1;
     }
 #else
     result = vasprintf(&buf, fmt, vargs);
-#endif // WIN32
+#endif // WIN32 __CYGWIN__
     va_end(vargs);
     if (result != -1 && buf)
     {

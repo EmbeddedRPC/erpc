@@ -159,14 +159,11 @@ protected:
     DataType *transformDataType(DataType *dataType, _param_direction direction, DataType *topDataType);
 
     /*!
-     * @brief This function set length parameter of list data type.
-     *
-     * When annotation "length" was used in eRPC IDL file, then this function will set list length parameter name as
-     * requested.
+     * @brief This function transform binary data type to list and set annotation to it.
      *
      * @param[in] structMember Structure member, Function parameter or Union member.
      */
-    void setListLength(StructMember *structMember);
+    void setBinaryList(StructMember *structMember);
 
     /*!
      * @brief This function return interfaces template data sorted in groups they are belong to.

@@ -82,12 +82,19 @@ enum _erpc_status
 
     //! Server is stopped.
     kErpcStatus_ServerIsDown,
+
+    //! Transport layer initialization failed.
+    kErpcStatus_InitFailed,
+
+    //! Failed to receive data.
+    kErpcStatus_ReceiveFailed,
+
+    //! Failed to send data.
+    kErpcStatus_SendFailed
 };
 
 /*! @brief Type used for all status and error return values. */
-#ifndef _FSL_COMMON_H_
-typedef int32_t status_t;
-#endif
+typedef int32_t erpc_status_t;
 
 /*! @} */
 

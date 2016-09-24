@@ -106,16 +106,16 @@ void RPMsgTransport::clearMessageQueue(StaticQueue<MessageBuffer *> *messageQueu
     }
 }
 
-status_t RPMsgTransport::init(int dev_id, int role)
+erpc_status_t RPMsgTransport::init(int dev_id, int role)
 {
     if (!messageQueue.init())
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
 
     if (!freeMessageQueue.init())
     {
-        return kErpcStatus_Fail;
+        return kErpcStatus_InitFailed;
     }
 
     // Allocate a few buffers, which will be used in rpmsg rx callback for incoming data
@@ -134,27 +134,23 @@ status_t RPMsgTransport::init(int dev_id, int role)
             {
                 delete[] buf;
                 clearMessageQueue(&freeMessageQueue);
-                return kErpcStatus_Fail;
+                return kErpcStatus_InitFailed;
             }
         }
         else
         {
             clearMessageQueue(&freeMessageQueue);
-            return kErpcStatus_Fail;
+            return kErpcStatus_InitFailed;
         }
     }
 
     int ret_value;
     ret_value = rpmsg_init(dev_id, &m_rdev, rpmsg_channel_created, rpmsg_channel_deleted, rpmsg_read_cb, role);
-    if (ret_value != RPMSG_SUCCESS)
-    {
-        return kErpcStatus_Fail;
-    }
 
-    return kErpcStatus_Success;
+    return ret_value != RPMSG_SUCCESS ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-status_t RPMsgTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
 {
     while (messageQueue.size() < 1)
     {
@@ -178,7 +174,7 @@ status_t RPMsgTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-status_t RPMsgTransport::send(const MessageBuffer *message)
+erpc_status_t RPMsgTransport::send(const MessageBuffer *message)
 {
     while (m_app_rp_chnl == NULL)
     {
@@ -187,12 +183,7 @@ status_t RPMsgTransport::send(const MessageBuffer *message)
     int ret_value;
     ret_value = rpmsg_send((struct rpmsg_channel *)m_app_rp_chnl, (void *)message->get(), message->getUsed());
 
-    if (RPMSG_SUCCESS == ret_value)
-    {
-        return kErpcStatus_Success;
-    }
-
-    return kErpcStatus_Fail;
+    return RPMSG_SUCCESS != ret_value ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 MessageBuffer RPMsgMessageBufferFactory::create()

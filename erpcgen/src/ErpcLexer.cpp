@@ -209,7 +209,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
 
     if (fileName.rfind(PATH_SEP_CHAR) != std::string::npos)
     {
-        int32_t fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
+        int fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
         currentFolderPath = foundFile.substr(0, fileSepPos);
         PathSearcher::getGlobalSearcher().setTempPath(currentFolderPath);
     }

@@ -42,8 +42,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc
-{
+namespace erpc {
 /*!
  * @brief Allocates static storage for an object.
  *
@@ -120,6 +119,7 @@ public:
      * Behaviour is undefined if the objected was not previously initialized.
      */
     void destroy() { get()->~T(); }
+
 protected:
     /*!
      * @brief Storage for the object.

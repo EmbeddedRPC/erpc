@@ -29,15 +29,15 @@
 #include "tcp_transport.h"
 #include <cassert>
 #include <cstdio>
-#include <string>
-#include <unistd.h>
+#include <err.h>
+#include <errno.h>
+#include <netdb.h>
+#include <new>
 #include <signal.h>
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <netdb.h>
-#include <errno.h>
-#include <err.h>
-#include <new>
+#include <unistd.h>
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -91,7 +91,7 @@ void TCPTransport::configure(const char *host, uint16_t port)
     m_port = port;
 }
 
-status_t TCPTransport::open()
+erpc_status_t TCPTransport::open()
 {
     if (m_isServer)
     {
@@ -105,7 +105,7 @@ status_t TCPTransport::open()
     }
 }
 
-status_t TCPTransport::connectClient()
+erpc_status_t TCPTransport::connectClient()
 {
     if (m_socket != -1)
     {
@@ -169,8 +169,8 @@ status_t TCPTransport::connectClient()
         return kErpcStatus_ConnectionFailure;
     }
 
-    // On some systems (BSD) we can disable SIGPIPE on the socket. For others (Linux), we have to
-    // ignore SIGPIPE.
+// On some systems (BSD) we can disable SIGPIPE on the socket. For others (Linux), we have to
+// ignore SIGPIPE.
 #if defined(SO_NOSIGPIPE)
     // Disable SIGPIPE for this socket. This will cause write() to return an EPIPE error if the
     // other side has disappeared instead of our process receiving a SIGPIPE.
@@ -190,7 +190,7 @@ status_t TCPTransport::connectClient()
     return kErpcStatus_Success;
 }
 
-status_t TCPTransport::close()
+erpc_status_t TCPTransport::close()
 {
     if (m_isServer)
     {
@@ -206,7 +206,7 @@ status_t TCPTransport::close()
     return kErpcStatus_Success;
 }
 
-status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
+erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     // Block until we have a valid connection.
     while (m_socket <= 0)
@@ -230,7 +230,7 @@ status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
         }
         else if (length < 0)
         {
-            return kErpcStatus_Fail;
+            return kErpcStatus_ReceiveFailed;
         }
         else
         {
@@ -239,10 +239,10 @@ status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
         }
     }
 
-    return length < 0 ? kErpcStatus_Fail : kErpcStatus_Success;
+    return kErpcStatus_Success;
 }
 
-status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
+erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     if (m_socket <= 0)
     {
@@ -266,7 +266,7 @@ status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
                 close();
                 return kErpcStatus_ConnectionClosed;
             }
-            return kErpcStatus_Fail;
+            return kErpcStatus_SendFailed;
         }
     }
 

@@ -4,8 +4,6 @@ Introduction
 # Before you begin
 This reference helps software developers use Remote Procedure Calls (RPC) in embedded multicore microcontrollers (eRPC).
 
-For more details, see the _NXP eRPC Getting Started User's Guide_ (document MCSDKERPCGSUG) in the ``<ksdk_install_dir>/doc/multicore/`` folder.
-
 # What is the eRPC?
 The eRPC (Embedded Remote Procedure Call) is a Remote Procedure Call (RPC) system created by NXP. An RPC is a mechanism used to invoke a software routine on a remote system using a simple local function call. The remote system may be any CPU connected by an arbitrary communications channel: a server across a network, another CPU core in a multicore system, and so on. To the client, it is just like calling a function in a library built into the application. The only difference is any latency or unreliability introduced by the communications channel.
 
@@ -48,18 +46,20 @@ The eRPC files are organized using a top folder (directory) and subfolders under
 
 ![RPC system](images/eRPC_directory.png)
 
-* ``erpc``: Contains all important files for the eRPC project layer, like primary ``Makefile``, and the Eclipse project (just use _import workspace_ option in Eclipse).
-  * ``erpc_c``: Contains source C-code for the eRPC infrastructure.
-    * ``infra``: Contains C++ infrastructure code used to build server and client applications. For most use cases, the APIs in the setup/ folder are easier. Accessing the C++ layer directly is only required if you need to extend eRPC, or for atypical configurations.
-    * ``port``: Contains the eRPC porting layer to adapt to different environments.
-    * ``setup``: Contains a set of plain C APIs that wrap the C++ infrastructure, providing client and server init and deinit routines that greatly simplify eRPC usage in C-based projects. No knowledge of C++ is required to use these APIs.
-    * ``transports``: Contains transport classes for the different methods of communication supported by eRPC. Some transports are applicable only to host PCs, while others are applicable only to embedded or multicore systems. Most transports have corresponding client and server setup functions, in the setup/ folder.
+* ``erpc``: Contains all important files for the eRPC project layer, like primary ``Makefile``.
+  * ``doc``: Contains eRPC documentation.
+  * ``doxygen``: Contains doxygen configuration files for generating doxygen documentations.
+  * ``erpc_c``: Contains source C/C++-code for the eRPC infrastructure.
+     * ``config``: Contains the eRPC configuration files.
+     * ``infra``: Contains C++ infrastructure code used to build server and client applications. For most use cases, the APIs in the setup/ folder are easier. Accessing the C++ layer directly is only required if you need to extend eRPC, or for atypical configurations.
+     * ``port``: Contains the eRPC porting layer to adapt to different environments.
+     * ``setup``: Contains a set of plain C APIs that wrap the C++ infrastructure, providing client and server init and deinit routines that greatly simplify eRPC usage in C-based projects. No knowledge of C++ is required to use these APIs.
+     * ``transports``: Contains transport classes for the different methods of communication supported by eRPC. Some transports are applicable only to host PCs, while others are applicable only to embedded or multicore systems. Most transports have corresponding client and server setup functions, in the setup/ folder.
   * ``erpc_python``: Holds source PY-code for the eRPC infrastructure.
   * ``erpcgen``: Holds source code for erpcgen and makefiles, project files for Visual Studio
 to build erpcgen on Windows, Linux and OS X.
   * ``mk``: Contains makefiles, which contain the settings necessary for building the eRPC generator under different environments.
   * ``test``: Each ``test_xxx/`` subdirectory contains acceptance tests. These tests can be built on Linux or OS X with gcc using makefiles.
-  * ``windows``: Contains the files necessary for getting ``erpcgen`` to work under Windows® OS.
 
 # How to create the IDL file
 This section describes how to create an Interface Definition Language (IDL) file for the eRPC generator, and what the expected output looks like.

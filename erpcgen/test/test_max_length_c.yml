@@ -22,3 +22,24 @@ test_server.cpp:
   - c = (char *) erpc_malloc((5 + 1) * sizeof(char));
   - b = (char *) erpc_malloc((5 + 1) * sizeof(char));
 
+---
+name: const
+desc:
+params:
+  type:
+    - int8
+    - int16
+    - int32
+    - uint8
+    - uint16
+    - uint32
+  value:
+    - 42
+idl: |
+  const {type} stringMaxSize = {value}
+  interface foo {
+    listString(string a @max_length(stringMaxSize)) -> void
+  }
+test_server.cpp:
+ - 'const {type}_t stringMaxSize = {value};'
+ - a = (char *) erpc_malloc((stringMaxSize + 1) * sizeof(char));
