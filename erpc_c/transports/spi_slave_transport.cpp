@@ -57,11 +57,16 @@ SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, u
 : m_spiBaseAddr(spiBaseAddr)
 , m_baudRate(baudRate)
 , m_srcClock_Hz(srcClock_Hz)
+, m_isInited(false)
 {
 }
 
 SpiSlaveTransport::~SpiSlaveTransport()
 {
+    if (m_isInited)
+    {
+      GPIO_ClearPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
+    }
     SPI_Deinit(m_spiBaseAddr);
 }
 
@@ -79,7 +84,7 @@ status_t SpiSlaveTransport::init()
     gpioConfig.outputLogic = 1U;
     
     GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
-    
+    m_isInited = true;
     return kErpcStatus_Success;
 }
 
