@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__CLIENT_SETUP_H_
 #define _EMBEDDED_RPC__CLIENT_SETUP_H_
 
-#include "erpc_common.h"
-#include "erpc_transport_setup.h"
 #include <stdint.h>
+#include "erpc_transport_setup.h"
+#include "erpc_common.h"
 
 /*!
  * @addtogroup client_setup
@@ -63,7 +63,7 @@ void erpc_client_init(erpc_transport_t transport);
 /*!
  * @brief This function set error handler function.
  *
- * Given error_handler function is called when error occur inside eRPC infrastructure.
+ * Given error_handler function is called when error occure inside eRPC infrastructure.
  *
  * @param[in] error_handler Pointer to function error handler.
  */

@@ -30,11 +30,11 @@
 #ifndef _EMBEDDED_RPC__CODEC_H_
 #define _EMBEDDED_RPC__CODEC_H_
 
-#include "erpc_common.h"
-#include "message_buffer.h"
-#include "transport.h"
-#include <cstring>
 #include <stdint.h>
+#include <cstring>
+#include "erpc_common.h"
+#include "transport.h"
+#include "message_buffer.h"
 
 /*!
  * @addtogroup infra_codec
@@ -46,11 +46,13 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Types of messages that can be encoded.
  */
-typedef enum _message_type {
+typedef enum _message_type
+{
     kInvocationMessage = 0,
     kOnewayMessage,
     kReplyMessage,
@@ -82,14 +84,12 @@ public:
      * @brief Codec destructor
      */
     virtual ~Codec() {}
-
     /*!
      * @brief Return message buffer used for read and write data.
      *
      * @return Pointer to used message buffer.
      */
     MessageBuffer *getBuffer() { return &m_buffer; }
-
     /*!
      * @brief Prototype for set message buffer used for read and write data.
      *
@@ -103,7 +103,6 @@ public:
 
     /*! @brief Reset the codec to initial state. */
     virtual void reset() { m_cursor.set(&m_buffer); }
-
     //! @name Encoding
     //@{
     /*!
@@ -485,12 +484,10 @@ public:
      * @brief Constructor.
      */
     CodecFactory() {}
-
     /*!
      * @brief CodecFactory destructor
      */
     virtual ~CodecFactory() {}
-
     /*!
      * @brief Return created codec.
      *

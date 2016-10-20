@@ -30,11 +30,11 @@
 #ifndef _EMBEDDED_RPC__FRAMED_TRANSPORT_H_
 #define _EMBEDDED_RPC__FRAMED_TRANSPORT_H_
 
-#include "erpc_threading.h"
-#include "message_buffer.h"
-#include "transport.h"
-#include <cstring>
 #include <stdint.h>
+#include <cstring>
+#include "transport.h"
+#include "message_buffer.h"
+#include "erpc_threading.h"
 
 /*!
  * @addtogroup infra_transport
@@ -46,7 +46,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 class MessageBuffer;
 
 /*!

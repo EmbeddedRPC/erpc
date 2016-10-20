@@ -27,9 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "message_buffer.h"
-#include <cassert>
 #include <cstring>
+#include <cassert>
+#include "message_buffer.h"
 
 using namespace erpc;
 #if !(__embedded_cplusplus)

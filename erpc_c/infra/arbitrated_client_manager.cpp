@@ -28,8 +28,8 @@
  */
 
 #include "arbitrated_client_manager.h"
-#include "assert.h"
 #include "transport_arbitrator.h"
+#include "assert.h"
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -65,7 +65,7 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
     }
 
     // Send the request.
-    erpc_status_t err = m_arbitrator->send(request.getCodec()->getBuffer());
+    erpc_status_t err = m_arbitrator->send(request.getOutCodec()->getBuffer());
     if (err)
     {
         return err;

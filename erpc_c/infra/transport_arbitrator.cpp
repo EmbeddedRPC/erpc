@@ -40,10 +40,10 @@ using namespace erpc;
 TransportArbitrator::TransportArbitrator()
 : Transport()
 , m_sharedTransport(NULL)
+, m_codec(NULL)
 , m_clientList(NULL)
 , m_clientFreeList(NULL)
 , m_clientListMutex()
-, m_codec(NULL)
 {
 }
 
@@ -99,7 +99,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             if (client->m_isValid && sequence == client->m_request->getSequence())
             {
                 // Swap the received message buffer with the client's message buffer.
-                client->m_request->getCodec()->getBuffer()->swap(message);
+                client->m_request->getInCodec()->getBuffer()->swap(message);
 
                 // Wake up the client receive thread.
                 client->m_sem.put();

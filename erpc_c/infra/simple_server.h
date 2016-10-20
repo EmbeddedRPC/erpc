@@ -42,7 +42,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Based server implementation.
  *
@@ -61,7 +62,6 @@ public:
     , m_isServerOn(true)
     {
     }
-
     /*!
      * @brief SimpleServer destructor
      */
@@ -73,7 +73,6 @@ public:
      * @param[in] transport Transport layer to use.
      */
     void setTransport(Transport *transport) { m_transport = transport; }
-
     /*!
      * @brief Run server in infinite loop.
      *

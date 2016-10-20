@@ -32,6 +32,7 @@
 
 #include "erpc_version.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 /*!
  * @addtogroup transport_setup
@@ -103,7 +104,7 @@ erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
  * @brief Create an RPMsg-Lite transport.
  */
 erpc_transport_t erpc_transport_rpmsg_lite_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void));
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void), bool send_nameservice);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -116,7 +117,7 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_ad
  * @brief Create an RPMsg-Lite RTOS transport.
  */
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void));
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void), bool send_nameservice);
 
 //@}
 

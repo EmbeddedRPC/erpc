@@ -29,6 +29,7 @@
 
 #include "manually_constructed.h"
 #include "rpmsg_lite_rtos_transport.h"
+#include "erpc_transport_setup.h"
 
 using namespace erpc;
 
@@ -43,9 +44,9 @@ static ManuallyConstructed<RPMsgRTOSTransport> s_transport;
 ////////////////////////////////////////////////////////////////////////////////
 
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void))
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, void (*ready_cb)(void), bool send_nameservice)
 {
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready_cb);
+    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready_cb, send_nameservice);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

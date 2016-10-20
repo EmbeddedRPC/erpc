@@ -27,13 +27,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "serial_transport.h"
-#include "message_buffer.h"
-#include "serial.h"
 #include <cassert>
 #include <cstdio>
 #include <string>
 #include <termios.h>
+#include "serial_transport.h"
+#include "message_buffer.h"
+#include "serial.h"
 
 using namespace erpc;
 

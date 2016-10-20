@@ -27,13 +27,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <cassert>
+#include <cstdio>
 #include "dspi_master_transport.h"
-#include "board.h"
 #include "fsl_dspi.h"
 #include "fsl_gpio.h"
 #include "fsl_port.h"
-#include <cassert>
-#include <cstdio>
+#include "board.h"
 
 using namespace erpc;
 
@@ -90,7 +90,7 @@ erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t siz
     masterXfer.txData = NULL;
     masterXfer.rxData = data;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
 
     while (!s_isSlaveReady)
     {
@@ -110,7 +110,7 @@ erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t 
     masterXfer.txData = (uint8_t *)data;
     masterXfer.rxData = NULL;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
 
     while (!s_isSlaveReady)
     {

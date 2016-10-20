@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__UART_TRANSPORT_H_
 #define _EMBEDDED_RPC__UART_TRANSPORT_H_
 
-#include "Driver_USART.h"
-#include "framed_transport.h"
-#include "fsl_common.h"
 #include <stdlib.h>
+#include "fsl_common.h"
+#include "framed_transport.h"
+#include "Driver_USART.h"
 
 /*!
  * @addtogroup uart_transport
@@ -45,7 +45,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Very basic transport to send/receive messages via UART.
  *

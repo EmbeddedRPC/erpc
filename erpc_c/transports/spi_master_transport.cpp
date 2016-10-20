@@ -27,13 +27,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "spi_master_transport.h"
-#include "board.h"
-#include "fsl_gpio.h"
-#include "fsl_port.h"
-#include "fsl_spi.h"
 #include <cassert>
 #include <cstdio>
+#include "spi_master_transport.h"
+#include "fsl_spi.h"
+#include "fsl_gpio.h"
+#include "fsl_port.h"
+#include "board.h"
 
 using namespace erpc;
 

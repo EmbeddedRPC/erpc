@@ -84,43 +84,54 @@ Codec *SimpleServer::createBufferAndCodec()
 erpc_status_t SimpleServer::runInternal()
 {
     // Create codec to read the request.
-    Codec *codec = createBufferAndCodec();
-    if (!codec)
+    Codec *inCodec = createBufferAndCodec();
+    if (!inCodec)
     {
         return kErpcStatus_MemoryError;
     }
 
     // Receive the next invocation request.
-    erpc_status_t err = m_transport->receive(codec->getBuffer());
+    erpc_status_t err = m_transport->receive(inCodec->getBuffer());
     if (err)
     {
         // Dispose of buffers and codecs.
-        disposeBufferAndCodec(codec);
+        disposeBufferAndCodec(inCodec);
         return err;
     }
 
     // If is used RPMsg transport layer, the receive function changes
     // pointer to buffer(m_buf) of requestMessage, inCodec must be reseted
     // after this change to work with correct buffer
-    codec->reset();
+    inCodec->reset();
+
+    // Create codec to write the request.
+    Codec *outCodec = createBufferAndCodec();
+    if (!outCodec)
+    {
+        // Dispose of buffers and codecs.
+        disposeBufferAndCodec(inCodec);
+        return kErpcStatus_MemoryError;
+    }
 
     // Handle the request.
     message_type_t msgType;
-    err = processMessage(codec, msgType);
+    err = processMessage(inCodec, outCodec, msgType);
     if (err)
     {
         // Dispose of buffers and codecs.
-        disposeBufferAndCodec(codec);
+        disposeBufferAndCodec(outCodec);
+        disposeBufferAndCodec(inCodec);
         return err;
     }
 
     if (msgType != kOnewayMessage)
     {
-        err = m_transport->send(codec->getBuffer());
+        err = m_transport->send(outCodec->getBuffer());
     }
 
     // Dispose of buffers and codecs.
-    disposeBufferAndCodec(codec);
+    disposeBufferAndCodec(outCodec);
+    disposeBufferAndCodec(inCodec);
 
     return err;
 }

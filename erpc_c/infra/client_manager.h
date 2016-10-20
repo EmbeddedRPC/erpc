@@ -42,7 +42,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 class RequestContext;
 
 /*!
@@ -54,7 +55,6 @@ class ClientManager
 {
 public:
     typedef void (*error_handler_t)(erpc_status_t err);
-
     /*!
      * @brief Constructor.
      *
@@ -68,33 +68,28 @@ public:
     , m_errorHandler(NULL)
     {
     }
-
     /*!
      * @brief ClientManager destructor
      */
     virtual ~ClientManager() {}
-
     /*!
      * @brief This function sets message buffer factory to use.
      *
      * @param[in] factory Message buffer factory to use.
      */
     void setMessageBufferFactory(MessageBufferFactory *factory) { m_messageFactory = factory; }
-
     /*!
      * @brief This function sets codec factory to use.
      *
      * @param[in] factory Codec factory to use.
      */
     void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
-
     /*!
      * @brief This function sets transport layer to use.
      *
      * @param[in] transport Transport layer to use.
      */
     void setTransport(Transport *transport) { m_transport = transport; }
-
     /*!
      * @brief This function creates request context.
      *
@@ -122,14 +117,12 @@ public:
      * @param[in] error_handler Pointer to error handler function.
      */
     void setErrorHandler(error_handler_t error_handler) { m_errorHandler = error_handler; }
-
     /*!
      * @brief This functions returns error handler function for infrastructure errors.
      *
      * @return Pointer to error handler function.
      */
     error_handler_t getErrorHandler() { return m_errorHandler; }
-
 protected:
     MessageBufferFactory *m_messageFactory; //!< Message buffer factory to use.
     CodecFactory *m_codecFactory;           //!< Codec to use.
@@ -169,47 +162,52 @@ public:
      * This function sets request context attributes.
      *
      * @param[in] sequence Sequence number.
-     * @param[in] codec Set in inout codec.
+     * @param[in] inCodec Set in codec.
+     * @param[out] outCodec Set out codec.
      * @param[in] isOneway Set information if codec is only oneway or bidirectional.
      */
-    RequestContext(uint32_t sequence, Codec *codec, bool isOneway)
+    RequestContext(uint32_t sequence, Codec *inCodec, Codec *outCodec, bool isOneway)
     : m_sequence(sequence)
-    , m_codec(codec)
+    , m_in(inCodec)
+    , m_out(outCodec)
     , m_oneway(isOneway)
     {
     }
 
     /*!
-     * @brief Get inout codec (for writing).
+     * @brief Get in codec (for reading).
      *
-     * @return Inout codec.
+     * @return In codec.
      */
-    Codec *getCodec() { return m_codec; }
-
+    Codec *getInCodec() { return m_in; }
+    /*!
+     * @brief Get out codec (for writing).
+     *
+     * @return Out codec.
+     */
+    Codec *getOutCodec() { return m_out; }
     /*!
      * @brief Get sequence number (be sure that reply belong to current request).
      *
      * @return Sequence number.
      */
     uint32_t getSequence() const { return m_sequence; }
-
     /*!
      * @brief Returns information if request context is oneway or not.
      *
      * @retval True when request context is oneway direction, else false.
      */
     bool isOneway() const { return m_oneway; }
-
     /*!
      * @brief Set request context to be oneway type (only send data).
      *
      * @return Set request context to be oneway.
      */
     void setIsOneway(bool oneway) { m_oneway = oneway; }
-
 protected:
     uint32_t m_sequence; //!< Sequence number. To be sure that reply belong to current request.
-    Codec *m_codec;      //!< Inout codec. Codec for receiving and sending data.
+    Codec *m_in;         //!< In codec. Codec for receiving data.
+    Codec *m_out;        //!< Out codec. Codec for sending data.
     bool m_oneway;       //!< When true, request context will be oneway type (only send data).
 };
 

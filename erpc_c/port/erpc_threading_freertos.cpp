@@ -29,8 +29,8 @@
 
 #include "erpc_threading.h"
 #include "task.h"
-#include <errno.h>
 #include <time.h>
+#include <errno.h>
 
 using namespace erpc;
 

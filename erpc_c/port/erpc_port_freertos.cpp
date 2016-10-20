@@ -29,8 +29,8 @@
  */
 
 #include "erpc_port.h"
-#include "FreeRTOS.h"
 #include <new>
+#include "FreeRTOS.h"
 
 using namespace std;
 

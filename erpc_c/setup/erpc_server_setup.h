@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__SERVER_SETUP_H_
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
-#include "erpc_common.h"
 #include "erpc_transport_setup.h"
-#include <stdbool.h>
+#include "erpc_common.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 /*!
  * @addtogroup server_setup

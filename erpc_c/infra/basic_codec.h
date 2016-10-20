@@ -47,7 +47,8 @@ using namespace std;
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Values of the uint8 flag prefixing nullable values.
  */
@@ -449,7 +450,6 @@ public:
      * @return Pointer to created codec.
      */
     virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
-
     /*!
      * @brief Dispose codec.
      *

@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__DSPI_MASTER_TRANSPORT_H_
 #define _EMBEDDED_RPC__DSPI_MASTER_TRANSPORT_H_
 
+#include <stdlib.h>
 #include "framed_transport.h"
 #include "fsl_dspi.h"
-#include <stdlib.h>
 
 /*!
  * @addtogroup dspi_master_transport
@@ -44,7 +44,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Very basic transport to send/receive messages via DSPI.
  *

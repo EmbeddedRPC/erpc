@@ -30,13 +30,13 @@
 #ifndef _EMBEDDED_RPC__RPMSG_RTOS_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_RTOS_TRANSPORT_H_
 
-#include "message_buffer.h"
 #include "transport.h"
+#include "message_buffer.h"
 
 extern "C" {
 #include "rpmsg.h"
-#include "rpmsg.h"
 #include "rpmsg_rtos.h"
+#include "rpmsg.h"
 }
 
 /*!
@@ -58,7 +58,8 @@ enum
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Transport that uses RPMsg RTOS API for interprocessor messaging.
  *
@@ -125,17 +126,14 @@ public:
      * @brief Constructor.
      */
     RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief RPMsgMessageBufferFactory destructor
      */
     virtual ~RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief This function create message buffer used for communication between devices.
      */
     virtual MessageBuffer create();
-
     /*!
      * @brief This function dispose message buffer used for communication between devices.
      */

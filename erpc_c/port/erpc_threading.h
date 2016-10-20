@@ -40,8 +40,8 @@
 #include <pthread.h>
 #elif ERPC_THREADS_IS(FREERTOS)
 #include "FreeRTOS.h"
-#include "semphr.h"
 #include "task.h"
+#include "semphr.h"
 #endif // ERPC_THREADS_IS
 
 /*!
@@ -56,7 +56,8 @@
 
 #if defined(__cplusplus)
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Simple thread class.
  *
@@ -65,34 +66,10 @@ namespace erpc {
 class Thread
 {
 public:
-    //! @brief Thread function type.
-    //!
-    //! @param arg User provided argument that was passed into the start() method.
     typedef void (*thread_entry_t)(void *arg);
-
-    //! @brief Unique identifier for a thread.
     typedef void *thread_id_t;
 
-    /*!
-     * @brief Default constructor for use with the init() method.
-     *
-     * If this constructor is used, the init() method must be called before the thread can be
-     * started.
-     *
-     * @param name Optional name for the thread.
-     */
     Thread(const char *name = 0);
-
-    /*!
-     * @brief Constructor.
-     *
-     * This constructor fully initializes the thread object.
-     *
-     * @param entry
-     * @param priority
-     * @param stackSize
-     * @param name Optional name for the thread.
-     */
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
     virtual ~Thread();
 
@@ -156,18 +133,13 @@ private:
 };
 
 /*!
- * @brief Mutex.
- *
- * If the OS supports it, the mutex will be recursive.
+ * @brief Simple mutex class.
  *
  * @ingroup port_threads
  */
 class Mutex
 {
 public:
-    /*!
-     * @brief
-     */
     class Guard
     {
     public:
@@ -189,10 +161,7 @@ public:
     bool unlock();
 
 #if ERPC_THREADS_IS(PTHREADS)
-    pthread_mutex_t *getPtr()
-    {
-        return &m_mutex;
-    }
+    pthread_mutex_t *getPtr() { return &m_mutex; }
 #endif
 
 private:
