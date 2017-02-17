@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -12,7 +14,7 @@
 #   list of conditions and the following disclaimer in the documentation and/or
 #   other materials provided with the distribution.
 #
-# o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+# o Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
 #   software without specific prior written permission.
 #
@@ -70,11 +72,9 @@ class ClientManager(object):
 
     def create_request(self, isOneway=False):
         msg = bytearray()
-        outCodec = self.codec_class()
-        outCodec.buffer = msg
-        if not isOneway:
-            inCodec = self.codec_class()
-        return RequestContext(self.sequence, msg, inCodec, outCodec, isOneway)
+        codec = self.codec_class()
+        codec.buffer = msg
+        return RequestContext(self.sequence, msg, codec, isOneway)
 
     def perform_request(self, request):
         # Arbitrate requests.
@@ -83,17 +83,16 @@ class ClientManager(object):
             token = self._arbitrator.prepare_client_receive(request)
 
         # Send serialized request to server.
-        self.transport.send(request.out_codec.buffer)
+        self.transport.send(request.codec.buffer)
 
         if not request.is_oneway:
             if token is not None:
                 msg = self._arbitrator.client_receive(token)
             else:
                 msg = self.transport.receive()
-            request.in_codec.buffer = msg
-            request.in_codec.reset()
+            request.codec.buffer = msg
 
-            info = request.in_codec.start_read_message()
+            info = request.codec.start_read_message()
             if info.type != MessageType.kReplyMessage:
                 raise RequestError("invalid reply message type")
             if info.sequence != request.sequence:
@@ -102,11 +101,10 @@ class ClientManager(object):
 
 
 class RequestContext(object):
-    def __init__(self, sequence, message, inCodec, outCodec, isOneway):
+    def __init__(self, sequence, message, codec, isOneway):
         self._sequence = sequence
         self._message = message
-        self._inCodec = inCodec
-        self._outCodec = outCodec
+        self._codec = codec
         self._isOneway = isOneway
 
     @property
@@ -118,12 +116,8 @@ class RequestContext(object):
         return self._message
 
     @property
-    def in_codec(self):
-        return self._inCodec
-
-    @property
-    def out_codec(self):
-        return self._outCodec
+    def codec(self):
+        return self._codec
 
     @property
     def is_oneway(self):

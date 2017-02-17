@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -12,7 +14,7 @@
 #   list of conditions and the following disclaimer in the documentation and/or
 #   other materials provided with the distribution.
 #
-# o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+# o Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
 #   software without specific prior written permission.
 #
@@ -45,38 +47,42 @@ class BasicCodec(Codec):
     def end_write_message(self):
         pass
 
+    def _write(self, fmt, value):
+        self._buffer += struct.pack(fmt, value)
+        self._cursor += struct.calcsize(fmt)
+
     def write_bool(self, value):
-        self._buffer += struct.pack('<?', value)
+        self._write('<?', value)
 
     def write_int8(self, value):
-        self._buffer += struct.pack('<b', value)
+        self._write('<b', value)
 
     def write_int16(self, value):
-        self._buffer += struct.pack('<h', value)
+        self._write('<h', value)
 
     def write_int32(self, value):
-        self._buffer += struct.pack('<i', value)
+        self._write('<i', value)
 
     def write_int64(self, value):
-        self._buffer += struct.pack('<q', value)
+        self._write('<q', value)
 
     def write_uint8(self, value):
-        self._buffer += struct.pack('<B', value)
+        self._write('<B', value)
 
     def write_uint16(self, value):
-        self._buffer += struct.pack('<H', value)
+        self._write('<H', value)
 
     def write_uint32(self, value):
-        self._buffer += struct.pack('<I', value)
+        self._write('<I', value)
 
     def write_uint64(self, value):
-        self._buffer += struct.pack('<Q', value)
+        self._write('<Q', value)
 
     def write_float(self, value):
-        self._buffer += struct.pack('<f', value)
+        self._write('<f', value)
 
     def write_double(self, value):
-        self._buffer += struct.pack('<d', value)
+        self._write('<d', value)
 
     def write_string(self, value):
         self.write_binary(value.encode())
