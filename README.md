@@ -159,5 +159,9 @@ To install the Python infrastructure for eRPC, first change to the `erpc_python/
 
 After installation, the `erpc` package is available via normal import statements. See the [erpc_python folder readme](erpc_python/readme.md) for more.
 
+## Code providing:
+
+Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
+
 ---
 Copyright © 2014-2016 Freescale Semiconductor, Inc.
