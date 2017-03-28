@@ -1,5 +1,0 @@
-<map id="erpc::DspiSlaveTransport" name="erpc::DspiSlaveTransport">
-<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers. " alt="" coords="45,105,202,131"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="5,5,117,31"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_mutex.html" title="Mutex. " alt="" coords="141,5,232,31"/>
-</map>

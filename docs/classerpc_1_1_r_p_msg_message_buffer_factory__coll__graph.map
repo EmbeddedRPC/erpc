@@ -1,8 +1,0 @@
-<map id="erpc::RPMsgMessageBufferFactory" name="erpc::RPMsgMessageBufferFactory">
-<area shape="rect" id="node2" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory. " alt="" coords="593,20,782,45"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_r_p_msg_transport.html" title="Transport that uses RPMsg for interprocessor messaging. " alt="" coords="610,89,765,115"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="254,60,365,85"/>
-<area shape="rect" id="node5" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer *\&gt;" alt="" coords="227,111,392,149"/>
-<area shape="rect" id="node6" href="$classerpc_1_1_base_static_queue.html" title="Base class which implements static queue as ring buffer that operates on m_data type void*..." alt="" coords="5,148,164,173"/>
-<area shape="rect" id="node7" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l kInitCountMessageBuffers \&gt;" alt="" coords="213,173,406,225"/>
-</map>

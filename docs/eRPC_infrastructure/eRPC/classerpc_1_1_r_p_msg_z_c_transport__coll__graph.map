@@ -1,0 +1,5 @@
+<map id="erpc::RPMsgZCTransport" name="erpc::RPMsgZCTransport">
+<area shape="rect" id="node2" href="$classerpc_1_1_r_p_msg_z_c_base_transport.html" title="Transport that other RPMsg transports inherts. " alt="" coords="164,5,363,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="5,5,115,32"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l ERPC_DEFAULT_BUFFERS\l_COUNT \&gt;" alt="" coords="166,57,361,127"/>
+</map>

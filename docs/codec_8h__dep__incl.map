@@ -1,8 +1,0 @@
-<map id="codec.h" name="codec.h">
-<area shape="rect" id="node2" href="$client__manager_8h.html" title="client_manager.h" alt="" coords="128,79,251,104"/>
-<area shape="rect" id="node4" href="$transport__arbitrator_8h.html" title="transport_arbitrator.h" alt="" coords="215,152,361,177"/>
-<area shape="rect" id="node5" href="$basic__codec_8h.html" title="basic_codec.h" alt="" coords="325,79,432,104"/>
-<area shape="rect" id="node6" href="$server_8h.html" title="server.h" alt="" coords="456,79,525,104"/>
-<area shape="rect" id="node3" href="$arbitrated__client__manager_8h.html" title="arbitrated_client_manager.h" alt="" coords="5,152,192,177"/>
-<area shape="rect" id="node7" href="$simple__server_8h.html" title="simple_server.h" alt="" coords="433,152,548,177"/>
-</map>

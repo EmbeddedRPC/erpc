@@ -1,5 +1,0 @@
-<map id="Porting" name="Porting">
-<area shape="rect" id="node1" href="$group__port__threads.html" title="Threading model. " alt="" coords="117,5,187,31"/>
-<area shape="rect" id="node2" href="$group__port__mem.html" title="Memory allocation. " alt="" coords="117,55,187,80"/>
-<area shape="rect" id="node3" href="$group__port__serial.html" title="Serial port. " alt="" coords="124,104,180,129"/>
-</map>

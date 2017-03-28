@@ -1,6 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classerpc_1_1_base_static_queue.html" title="Base class which implements static queue as ring buffer that operates on m_data type void*..." alt="" coords="5,75,164,100"/>
-<area shape="rect" id="node2" href="$classerpc_1_1_static_queue.html" title="Template subclass that wraps the member functions to use the template type parameter. " alt="" coords="240,5,376,44"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer *\&gt;" alt="" coords="226,68,390,107"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l kInitCountMessageBuffers \&gt;" alt="" coords="212,131,404,183"/>
-</map>

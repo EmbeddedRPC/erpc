@@ -1,9 +1,0 @@
-<map id="framed_transport.h" name="framed_transport.h">
-<area shape="rect" id="node2" href="$dspi__master__transport_8h.html" title="dspi_master_transport.h" alt="" coords="5,79,170,104"/>
-<area shape="rect" id="node3" href="$dspi__slave__transport_8h.html" title="dspi_slave_transport.h" alt="" coords="194,79,350,104"/>
-<area shape="rect" id="node4" href="$serial__transport_8h.html" title="serial_transport.h" alt="" coords="374,79,498,104"/>
-<area shape="rect" id="node5" href="$spi__master__transport_8h.html" title="spi_master_transport.h" alt="" coords="522,79,680,104"/>
-<area shape="rect" id="node6" href="$spi__slave__transport_8h.html" title="spi_slave_transport.h" alt="" coords="705,79,853,104"/>
-<area shape="rect" id="node7" href="$tcp__transport_8h.html" title="tcp_transport.h" alt="" coords="877,79,987,104"/>
-<area shape="rect" id="node8" href="$uart__cmsis__transport_8h.html" title="uart_cmsis_transport.h" alt="" coords="1011,79,1168,104"/>
-</map>

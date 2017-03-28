@@ -1,0 +1,18 @@
+<map id="Utilities" name="Utilities">
+<area shape="rect" id="node1" href="$group__dspi__slave__transport.html" title="Kinetis SDK DSPI slave driver transport. " alt="" coords="331,5,417,32"/>
+<area shape="rect" id="node2" href="$group__port__threads.html" title="Threading model. " alt="" coords="340,56,408,83"/>
+<area shape="rect" id="node3" href="$group__tcp__transport.html" title="Simple TCP/IP transport. " alt="" coords="343,107,405,133"/>
+<area shape="rect" id="node4" href="$group__infra.html" title="C++ core. " alt="" coords="5,360,103,387"/>
+<area shape="rect" id="node5" href="$group__infra__client.html" title="Client classes. " alt="" coords="347,157,401,184"/>
+<area shape="rect" id="node6" href="$group__rpmsg__lite__zc__transport.html" title="Rpmsg_lite_zc_transport" alt="" coords="291,208,457,235"/>
+<area shape="rect" id="node7" href="$group__infra__transport.html" title="Superclasses for building transports. " alt="" coords="333,259,415,285"/>
+<area shape="rect" id="node8" href="$group__serial__transport.html" title="POSIX and Win32 serial port transport. " alt="" coords="333,309,415,336"/>
+<area shape="rect" id="node10" href="$group__spi__slave__transport.html" title="Kinetis SDK SPI slave driver transport. " alt="" coords="335,360,413,387"/>
+<area shape="rect" id="node11" href="$group__uart__transport.html" title="CMSIS UART driver transport. " alt="" coords="323,411,425,437"/>
+<area shape="rect" id="node12" href="$group__spi__master__transport.html" title="Kinetis SDK SPI master driver transport. " alt="" coords="331,461,417,488"/>
+<area shape="rect" id="node13" href="$group__infra__server.html" title="Server classes. " alt="" coords="345,512,403,539"/>
+<area shape="rect" id="node14" href="$group__itbp__transport.html" title="Simple inter&#45;thread communications transport. " alt="" coords="331,563,417,589"/>
+<area shape="rect" id="node15" href="$group__dspi__master__transport.html" title="Kinetis SDK DSPI master driver transport. " alt="" coords="326,613,422,640"/>
+<area shape="rect" id="node16" href="$group__infra__codec.html" title="Classes used for message serialization. " alt="" coords="327,664,421,691"/>
+<area shape="rect" id="node17" href="$group__rpmsg__lite__zc__rtos__transport.html" title="Rpmsg_lite_zc_rtos\l_transport" alt="" coords="305,715,443,757"/>
+</map>

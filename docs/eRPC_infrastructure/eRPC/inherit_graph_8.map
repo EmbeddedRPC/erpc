@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory. " alt="" coords="5,56,191,83"/>
+<area shape="rect" id="node2" href="$class_dynamic_message_buffer_factory.html" title="DynamicMessageBufferFactory" alt="" coords="243,5,445,32"/>
+<area shape="rect" id="node3" href="$class_r_p_msg_z_c_message_buffer_factory.html" title="RPMsg zero copy message buffer factory. " alt="" coords="239,56,449,83"/>
+<area shape="rect" id="node4" href="$class_static_message_buffer_factory.html" title="Static Message buffer factory. " alt="" coords="251,107,437,133"/>
+</map>

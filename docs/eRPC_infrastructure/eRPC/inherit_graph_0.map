@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classerpc_1_1_client_manager.html" title="Base client implementation. " alt="" coords="5,5,144,32"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_arbitrated_client_manager.html" title="Client that can share a transport with a server. " alt="" coords="192,5,387,32"/>
+</map>

@@ -1,7 +1,0 @@
-<map id="erpc::InterThreadBufferTransport" name="erpc::InterThreadBufferTransport">
-<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="255,5,366,31"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_inter_thread_buffer_transport.html#structerpc_1_1_inter_thread_buffer_transport_1_1_shared_state" title="erpc::InterThreadBufferTransport\l::SharedState" alt="" coords="203,55,418,93"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_mutex.html" title="Mutex. " alt="" coords="5,61,96,87"/>
-<area shape="rect" id="node5" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="249,117,372,143"/>
-<area shape="rect" id="node6" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="239,167,383,192"/>
-</map>

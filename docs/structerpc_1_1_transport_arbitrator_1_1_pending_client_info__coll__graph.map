@@ -1,7 +1,0 @@
-<map id="erpc::TransportArbitrator::PendingClientInfo" name="erpc::TransportArbitrator::PendingClientInfo">
-<area shape="rect" id="node2" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="5,192,129,217"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="153,192,304,217"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="182,105,275,131"/>
-<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="72,5,217,44"/>
-<area shape="rect" id="node6" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="240,12,385,37"/>
-</map>
