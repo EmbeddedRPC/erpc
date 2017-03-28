@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,7 +32,8 @@
 #ifndef erpcgen_version_h
 #define erpcgen_version_h
 
-//! Current version of the erpcgen tool.
-#define ERPCGEN_VERSION "1.4.0"
+//! @brief Current version of the erpcgen tool. Version 1.4.1.
+#define ERPCGEN_VERSION "1.4.1"
+#define ERPCGEN_VERSION_NUMBER 10401
 
 #endif /* erpcgen_version_h */

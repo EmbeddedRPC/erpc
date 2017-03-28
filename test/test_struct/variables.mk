@@ -15,4 +15,4 @@
 # OF SUCH DAMAGE.
 #-------------------------------------------------------------------------------
 
-ERPC_NAME=$(TEST_NAME)_ArithmeticService
+ERPC_NAME_APP=test_ArithmeticService

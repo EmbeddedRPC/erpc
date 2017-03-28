@@ -30,10 +30,10 @@
  */
 
 #include "CGenerator.h"
+#include "erpc_version.h"
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
-#include "erpcgen_version.h"
 #include "format_string.h"
 #include <algorithm>
 #include <set>
@@ -57,10 +57,34 @@ extern const char *const kCServerSource;
 extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
 extern const char *const kCDefines;
+extern const char *const kCCrc;
+
+//ToDo: Temporary solution.
+std::vector<UnionType *> unionsToClient;
+std::vector<UnionType *> unionsToServer;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+CGenerator::CGenerator(InterfaceDefinition *def, uint16_t idlCrc16)
+: Generator(def, idlCrc16)
+, m_generateClientOutput(true)
+, m_generateServerOutput(true)
+{
+    /* Set copyright rules. */
+    if (m_def->hasProgramSymbol())
+    {
+        Symbol *program = m_globals->getSymbolsOfType(Symbol::kProgramSymbol)[0];
+        assert(program);
+        std::string copyright = program->getMlComment();
+        if (copyright.size() >= 3 && (copyright[2] == '*' || copyright[2] == '!'))
+        {
+            copyright = copyright.substr(0, 2) + copyright.substr(3, copyright.size() - 3);
+            program->setMlComment(copyright);
+        }
+        setTemplateComments(program, m_templateData);
+    }
+}
 
 void CGenerator::generateOutputFiles(const std::string &fileNameExtension)
 {
@@ -83,6 +107,13 @@ void CGenerator::generateOutputFiles(const std::string &fileNameExtension)
 
         generateServerSourceFile(fileName);
     }
+}
+
+void CGenerator::generateCrcFile()
+{
+    std::string filename = "erpc_crc16.h";
+    m_templateData["crcGuardMacro"] = generateIncludeGuardName(filename);
+    generateOutputFile(filename, "c_crc", m_templateData, kCCrc);
 }
 
 void CGenerator::generateCommonHeaderFile(std::string fileName)
@@ -119,6 +150,11 @@ void CGenerator::generateClientSourceFile(std::string fileName)
     m_templateData["source"] = "client";
     fileName += "_client.cpp";
     m_templateData["clientSourceName"] = fileName;
+    //TODO: temporary workaround for tests
+    if (fileName.compare("test_unit_test_common_client.cpp") == 0)
+    {
+        m_templateData["functions"] = "";
+    }
     generateOutputFile(fileName, "c_client_source", m_templateData, kCClientSource);
 }
 
@@ -135,6 +171,10 @@ void CGenerator::generateServerSourceFile(std::string fileName)
     m_templateData["source"] = "server";
     fileName += "_server.cpp";
     m_templateData["serverSourceName"] = fileName;
+    if (fileName.compare("test_unit_test_common_client.cpp") == 0)
+    {
+        m_templateData["functions"] = "";
+    }
     generateOutputFile(fileName, "c_server_source", m_templateData, kCServerSource);
 }
 
@@ -179,6 +219,20 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
 {
     switch (dataType->getDataType())
     {
+        case DataType::kAliasType:
+        {
+            AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
+            assert(aliasType);
+            aliasType->setElementType(transformDataType(aliasType->getElementType(), direction));
+            break;
+        }
+        case DataType::kArrayType:
+        {
+            ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
+            assert(arrayType);
+            arrayType->setElementType(transformDataType(arrayType->getElementType(), direction));
+            break;
+        }
         case DataType::kBuiltinType:
         {
             if (dataType->isBinary())
@@ -295,13 +349,6 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                 return newStruct;
             }
         }
-        case DataType::kArrayType:
-        {
-            ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
-            assert(arrayType);
-            arrayType->setElementType(transformDataType(arrayType->getElementType(), direction));
-            break;
-        }
         case DataType::kStructType:
         {
             StructType *structType = dynamic_cast<StructType *>(dataType);
@@ -328,29 +375,36 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             for (StructMember *structMember : structType->getMembers())
             {
                 setBinaryList(structMember);
-                if (DataType::kUnionType == structMember->getDataType()->getDataType())
-                {
-                    // Keil need extra pragma option when unions are used.
-                    m_templateData["usedUnionType"] = true;
-                    UnionType *currentUnion = dynamic_cast<UnionType *>(structMember->getDataType());
-                    assert(currentUnion);
-                    for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
-                    {
-                        setBinaryList(&unionMember);
-                        unionMember.setDataType(transformDataType(unionMember.getDataType(), direction));
-                    }
-                }
+                setNoSharedAnn(structType, structMember);
                 structMember->setDataType(transformDataType(structMember->getDataType(), direction));
                 structMember->setContainList(containsList(structMember->getDataType()));
                 structMember->setContainString(containsString(structMember->getDataType()));
             }
             break;
         }
-        case DataType::kAliasType:
+        case DataType::kUnionType:
         {
-            AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
-            assert(aliasType);
-            aliasType->setElementType(transformDataType(aliasType->getElementType(), direction));
+            // Keil need extra pragma option when unions are used.
+            m_templateData["usedUnionType"] = true;
+            UnionType *currentUnion = dynamic_cast<UnionType *>(dataType);
+            assert(currentUnion);
+
+            //ToDo: Temporary solution.
+            if (direction == kInDirection || direction == kInoutDirection)
+            {
+                unionsToServer.push_back(currentUnion);
+            }
+            if (direction == kOutDirection || direction == kInoutDirection || direction == kReturn)
+            {
+                unionsToClient.push_back(currentUnion);
+            }
+
+            for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
+            {
+                setBinaryList(&unionMember);
+                setNoSharedAnn(currentUnion, &unionMember);
+                unionMember.setDataType(transformDataType(unionMember.getDataType(), direction));
+            }
             break;
         }
         default:
@@ -363,7 +417,6 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
 
 void CGenerator::transformDataTypes()
 {
-
     for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
     {
         StructType *structType = dynamic_cast<StructType *>(it);
@@ -411,8 +464,12 @@ void CGenerator::setBinaryList(StructMember *structMember)
         }
     }
 }
+
 void CGenerator::generate()
 {
+    /* Generate file with shim code version. */
+    m_templateData["versionGuardMacro"] = generateIncludeGuardName(format_string("erpc_generated_shim_code_crc_%d", m_idlCrc16).c_str());
+
     m_templateData["generateInfraErrorChecks"] =
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kInfraErrors);
@@ -420,26 +477,20 @@ void CGenerator::generate()
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAllocErrors);
 
+    m_templateData["erpcVersion"] = ERPC_VERSION;
+
     data_list empty;
     m_templateData["enums"] = empty;
     m_templateData["aliases"] = empty;
     m_templateData["structs"] = empty;
+    m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
-
-    m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
-
-    m_templateData["todaysDate"] = getTime();
+    m_templateData["functions"] = empty;
 
     // Keil need extra pragma option when unions are used.
     m_templateData["usedUnionType"] = false;
 
     parseSubtemplates();
-
-    if (m_def->hasProgramSymbol())
-    {
-        Log::info("program: ");
-        Log::info("%s\n", m_def->getOutputFilename().c_str());
-    }
 
     transformDataTypes();
 
@@ -453,7 +504,9 @@ void CGenerator::generate()
 
     makeAliasesTemplateData();
 
-    makeStructsTemplateData();
+    makeUnionsStructsTemplateData();
+
+    generateCrcFile();
 
     generateInterfaceOutputFiles(m_templateData, interfaceLists);
 }
@@ -470,7 +523,16 @@ void CGenerator::makeConstTemplateData()
         Annotation *externAnnotation = constVar->findAnnotation(EXTERNAL_ANNOTATION);
         if (!externAnnotation)
         {
-            constInfo["typeAndName"] = getTypenameName(constVar->getDataType(), constVar->getName());
+            /* Use char[] for constants. */
+            if (constVar->getDataType()->getTrueDataType()->isString())
+            {
+                constInfo["typeAndName"] = format_string("char %s [%d]", constVar->getOutputName().c_str(), constVar->getValue()->toString().size() + 1);
+            }
+            else
+            {
+                constInfo["typeAndName"] = getTypenameName(constVar->getDataType(), constVar->getOutputName());
+            }
+            constInfo["name"] = constVar->getOutputName();
             // throw nullptr exception
             if (NULL == constVar->getValue())
             {
@@ -484,8 +546,7 @@ void CGenerator::makeConstTemplateData()
             {
                 constInfo["value"] = constVar->getValue()->toString();
             }
-            constInfo["mlComment"] = constVar->getMlComment();
-            constInfo["ilComment"] = constVar->getIlComment();
+            setTemplateComments(constVar, constInfo);
             Log::info("Name=%s\tType=%s\tValue=%s\n", constVar->getName().c_str(),
                       constVar->getDataType()->getName().c_str(), constVar->getValue()->toString().c_str());
             consts.push_back(constInfo);
@@ -517,10 +578,9 @@ void CGenerator::makeEnumsTemplateData()
 data_map CGenerator::getEnumTemplateData(EnumType *enumType)
 {
     data_map enumInfo;
-    enumInfo["name"] = enumType->getName();
+    enumInfo["name"] = enumType->getOutputName();
     enumInfo["members"] = getEnumMembersTemplateData(enumType);
-    enumInfo["mlComment"] = enumType->getMlComment();
-    enumInfo["ilComment"] = enumType->getIlComment();
+    setTemplateComments(enumType, enumInfo);
     return enumInfo;
 }
 
@@ -532,7 +592,7 @@ data_list CGenerator::getEnumMembersTemplateData(EnumType *enumType)
     {
         assert(member->hasValue());
         data_map enumMember;
-        string memberDeclaration = member->getName();
+        string memberDeclaration = member->getOutputName();
         if (member->hasValue())
         {
             memberDeclaration = format_string("%s = %d", memberDeclaration.c_str(), member->getValue());
@@ -543,8 +603,7 @@ data_list CGenerator::getEnumMembersTemplateData(EnumType *enumType)
         }
         enumMember["memberDeclaration"] = memberDeclaration;
         Log::info("    %d: %s = %d\n", j, member->getName().c_str(), member->getValue());
-        enumMember["mlComment"] = member->getMlComment();
-        enumMember["ilComment"] = member->getIlComment();
+        setTemplateComments(member, enumMember);
         enumMembersList.push_back(enumMember);
         ++j;
     }
@@ -560,7 +619,7 @@ void CGenerator::makeAliasesTemplateData()
     // All existing type declarations
     SymbolScope::symbol_vector_t aliasTypeVector = m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol);
 
-    // Structures in C has to be defined with typedef
+    /* type definions of structures */
     int i = 0;
     for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
     {
@@ -568,10 +627,81 @@ void CGenerator::makeAliasesTemplateData()
         assert(structType);
         if (structType->getName().compare("") != 0 && !structType->findAnnotation(EXTERNAL_ANNOTATION))
         {
-            AliasType *a = new AliasType(structType->getName(), structType);
+            AliasType *a = new AliasType(structType->getOutputName(), structType);
             aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
         }
     }
+
+    /* type definions of non-encapsulated unions */
+    for (auto it : m_globals->getSymbolsOfType(DataType::kUnionTypeSymbol))
+    {
+        UnionType *unionType = dynamic_cast<UnionType *>(it);
+        assert(unionType);
+        if (!unionType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            AliasType *a = new AliasType(unionType->getOutputName(), unionType);
+            aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
+        }
+    }
+
+    /* type definitions of functions and table of functions */
+    Log::info("Functions:\n");
+    data_list functions;
+    for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    {
+        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
+        data_map functionInfo;
+
+        // aware of external function definitions
+        if (!functionType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            AliasType *a = new AliasType(getFunctionPrototype(functionType), functionType);
+            a->setMlComment(functionType->getMlComment());
+            a->setIlComment(functionType->getIlComment());
+
+            /* Function type definition need be inserted after all parameters types definitions. */
+            DataType *callbackParamType = nullptr;
+            for (StructMember *callbackParam : functionType->getParameters().getMembers())
+            {
+                DataType *callbackParamDataType = callbackParam->getDataType();
+                if (!callbackParamType || callbackParamDataType->getFirstLine() > callbackParamType->getFirstLine())
+                {
+                    callbackParamType = callbackParamDataType;
+                }
+            }
+            if (!callbackParamType || !callbackParamType->isAlias())
+            {
+                /* order isn't important */
+                aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
+            }
+            else
+            {
+                /* skip structure, unions and functions type definitions */
+                for (int aliasTypesIt = i; aliasTypesIt < aliasTypeVector.size(); ++aliasTypesIt)
+                {
+                    if (callbackParamType == aliasTypeVector[i])
+                    {
+                        aliasTypeVector.insert(aliasTypeVector.begin() + aliasTypesIt + 1, a);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /* Table template data. */
+        data_list callbacks;
+        for (Function *fun : functionType->getCallbackFuns())
+        {
+            data_map callbacksInfo;
+            callbacksInfo["name"] = fun->getName();
+            callbacks.push_back(callbacksInfo);
+        }
+        functionInfo["callbacks"] = callbacks;
+        /* Function type name. */
+        functionInfo["name"] = functionType->getName();
+        functions.push_back(functionInfo);
+    }
+    m_templateData["functions"] = functions;
 
     for (auto it : aliasTypeVector)
     {
@@ -586,13 +716,31 @@ void CGenerator::makeAliasesTemplateData()
 
             if (elementDataType->getName() != "")
             {
-                std::string realType = getTypenameName(elementDataType, aliasType->getName());
+                std::string realType;
+                if (elementDataType->isFunction())
+                {
+                    realType = aliasType->getOutputName();
+                    aliasInfo["name"] = elementDataType->getName();
+                }
+                else
+                {
+                    realType = getTypenameName(elementDataType, aliasType->getOutputName());
+                    aliasInfo["name"] = aliasType->getOutputName();
+                }
+
                 Log::info("%s\n", realType.c_str());
 
-                /* For case typedef struct */
-                if (elementDataType->getName() == aliasType->getName())
+                /* For case typedef struct/union */
+                if (elementDataType->getName() == aliasType->getName() || elementDataType->getOutputName() == aliasType->getName())
                 {
-                    realType = "struct " + realType;
+                    if (elementDataType->isStruct())
+                    {
+                        realType = "struct " + realType;
+                    }
+                    else
+                    {
+                        realType = "union " + realType;
+                    }
                 }
 
                 aliasInfo["typenameName"] = realType;
@@ -600,7 +748,7 @@ void CGenerator::makeAliasesTemplateData()
             else
             {
                 aliasInfo["typenameName"] = "";
-                aliasInfo["unnamedName"] = aliasType->getName();
+                aliasInfo["unnamedName"] = aliasType->getOutputName();
                 switch (elementDataType->getDataType())
                 {
                     case DataType::kStructType:
@@ -623,8 +771,7 @@ void CGenerator::makeAliasesTemplateData()
                         throw internal_error("Only structs or enums are allowed as unnamed types.");
                 }
             }
-            aliasInfo["mlComment"] = aliasType->getMlComment();
-            aliasInfo["ilComment"] = aliasType->getIlComment();
+            setTemplateComments(aliasType, aliasInfo);
             aliases.push_back(aliasInfo);
             ++n;
         }
@@ -650,38 +797,100 @@ AliasType *CGenerator::getAliasType(DataType *dataType)
 string CGenerator::getAliasName(DataType *dataType)
 {
     AliasType *aliasType = getAliasType(dataType);
-    return (aliasType != nullptr) ? aliasType->getName() : "";
+    return (aliasType != nullptr) ? aliasType->getOutputName() : "";
+}
+
+void CGenerator::makeUnionsStructsTemplateData()
+{
+    makeUnionsTemplateData();
+    makeStructsTemplateData();
+
+    //mix structures and unions definitions
+    data_list &unions = dynamic_cast<DataList *>(m_templateData["unions"].get().get())->getlist();
+    data_list &structs = dynamic_cast<DataList *>(m_templateData["structs"].get().get())->getlist();
+
+    if (unions.size() != 0 || structs.size() != 0)
+    {
+        if (unions.size() == 0)
+        {
+            m_templateData["unionsStructs"] = structs;
+        }
+        else if (structs.size() == 0)
+        {
+            m_templateData["unionsStructs"] = unions;
+        }
+        else
+        {
+            data_list unionsStructs;
+            int structIt = 0;
+            int unionIt = 0;
+
+            SymbolScope::symbol_vector_t unionTypeSymbolVector = m_globals->getSymbolsOfType(Symbol::kUnionTypeSymbol);
+            SymbolScope::symbol_vector_t structureTypeSymbolVector = m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol);
+            for (; structIt < structureTypeSymbolVector.size();)
+            {
+                StructType *structType = dynamic_cast<StructType *>(structureTypeSymbolVector.at(0));
+                assert(structType);
+                if (isListStruct(structType) || isBinaryStruct(structType) || unionIt >= unions.size() || structType->getFirstLine() < structureTypeSymbolVector.at(unionIt)->getFirstLine())
+                {
+                    unionsStructs.push_back(dynamic_cast<DataMap *>(structs.at(structIt).get().get())->getmap());
+                    ++structIt;
+                }
+                else
+                {
+                    unionsStructs.push_back(dynamic_cast<DataMap *>(unions.at(unionIt).get().get())->getmap());
+                    ++unionIt;
+                }
+            }
+
+            //add rest of unions declared after structures
+            for (; unionIt < unions.size(); ++unionIt)
+            {
+                unionsStructs.push_back(dynamic_cast<DataMap *>(unions.at(unionIt).get().get())->getmap());
+            }
+            m_templateData["unionsStructs"] = unionsStructs;
+        }
+    }
 }
 
 void CGenerator::makeStructsTemplateData()
 {
     Log::info("Structs:\n");
     data_list structs;
-    data_list structsTo1Core;
-    data_list structsTo2Core;
+    data_list structsToClient;
+    data_list structsToServer;
     data_list structsServerFree;
     m_templateData["nonExternalStruct"] = false;
+
     for (auto it : m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol))
     {
         StructType *structType = dynamic_cast<StructType *>(it);
         assert(structType);
         Log::info("%s\n", structType->getDescription().c_str());
         data_map structInfo = getStructTemplateData(structType);
+
         if (structType->getName() == "")
         {
             structInfo["name"] = getAliasName(structType);
         }
 
-        setToCore(structType, structsTo1Core, structsTo2Core, structInfo);
-        structs.push_back(make_data(structInfo));
+        // Structure type definitions are mixed with unions.
+        structInfo["isStruct"] = true;
+
+        structInfo["noSharedMem"] = (structType->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
+
+        setToCore(structType, structsToClient, structsToServer, structInfo);
+
         if (structType->containStringMember() || structType->containListMember())
         {
             structsServerFree.push_back(structInfo);
         }
+
+        structs.push_back(structInfo);
     }
     m_templateData["structs"] = structs;
-    m_templateData["structsTo1Core"] = structsTo1Core;
-    m_templateData["structsTo2Core"] = structsTo2Core;
+    m_templateData["structsToClient"] = structsToClient;
+    m_templateData["structsToServer"] = structsToServer;
     m_templateData["structsServerFree"] = structsServerFree;
 }
 
@@ -697,11 +906,10 @@ data_map CGenerator::getStructTemplateData(StructType *structType)
         m_templateData["nonExternalStruct"] = true;
         structInfo["isExternal"] = false;
     }
-    structInfo["name"] = make_data(structType->getName());
-    structInfo["needEnumTmp"] = false;
+    structInfo["name"] = make_data(structType->getOutputName());
+    structInfo["needTempVariable"] = false;
     setStructMembersTemplateData(structType, structInfo);
-    structInfo["mlComment"] = structType->getMlComment();
-    structInfo["ilComment"] = structType->getIlComment();
+    setTemplateComments(structType, structInfo);
     bool isNeedIfDealloc = false;
     if (structType->hasStructDirectionType(kInDirection) && structType->hasStructDirectionType(kInoutDirection))
     {
@@ -720,36 +928,34 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
     uint32_t j = 0;
     for (auto member : structType->getMembers())
     {
-        bool containsEnum;
         data_map member_info;
         DataType *dataType = member->getDataType();
-        std::string memberName = member->getName();
+        DataType *trueDataType = member->getDataType()->getTrueDataType();
+        std::string memberName = member->getOutputName();
 
         // Handle nullable annotation
-        bool memberHasNullableAnn = member->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
-        member_info["isNullable"] = memberHasNullableAnn;
+        bool isNullable = ((member->findAnnotation(NULLABLE_ANNOTATION) != nullptr) && (trueDataType->isBinary() || trueDataType->isString() || trueDataType->isList() || trueDataType->isFunction() || (trueDataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(trueDataType)) || (isBinaryStruct(dynamic_cast<StructType *>(trueDataType)))))));
+        member_info["isNullable"] = isNullable;
         member_info["structElements"] = "";
         member_info["structElementsCount"] = "";
+        member_info["noSharedMem"] = (member->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
 
-        // hasNullableMember must be true if there at least one struct member with nullable annotation
-        if ("false" == structInfo["hasNullableMember"]->getvalue())
+        if (isNullable)
         {
-            structInfo["hasNullableMember"] = memberHasNullableAnn;
-        }
+            // hasNullableMember must be true if there at least one struct member with nullable annotation
+            structInfo["hasNullableMember"] = true;
 
-        if (dataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(dataType)) ||
-                                     isBinaryStruct(dynamic_cast<StructType *>(dataType))))
-        {
             // Set a flag on the struct indicating there are nullable members, but only
             // set it to true
-            if (memberHasNullableAnn)
+            if (dataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(dataType)) ||
+                                         isBinaryStruct(dynamic_cast<StructType *>(dataType))))
             {
                 if (isListStruct(dynamic_cast<StructType *>(dataType)))
                 {
                     member_info["structElements"] = ".elements";
                     member_info["structElementsCount"] = ".elementsCount";
                 }
-                else
+                else if (isBinaryStruct(dynamic_cast<StructType *>(dataType)))
                 {
                     member_info["structElements"] = ".data";
                     member_info["structElementsCount"] = ".dataLength";
@@ -758,8 +964,6 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
         }
 
         std::string name = "data->" + memberName;
-        // Subtemplate setup for read/write struct calls
-        member_info["coderCall"] = getEncodeDecodeCall(name, dataType, structType, true, member, containsEnum, false);
         // Info for declaring struct in common header
         member_info["name"] = memberName;
         member_info["memberDeclaration"] = getTypenameName(dataType, memberName) + ";";
@@ -775,17 +979,31 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
         {
             member_info["elementsCount"] = "";
         }
-        member_info["mlComment"] = member->getMlComment();
-        member_info["ilComment"] = member->getIlComment();
-        if (containsEnum)
-        {
-            structInfo["needEnumTmp"] = true;
-        }
+        setTemplateComments(member, member_info);
 
         // Skip data serialization for variables placed as @length value for lists.
+        // Skip data serialization for variables used as discriminator for unions.
         // These prevent to serialized data twice.
-        StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), memberName, LENGTH_ANNOTATION);
-        member_info["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+        StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), member->getName());
+        member_info["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
+
+        if (referencedFrom && !member->findAnnotation(SHARED_ANNOTATION))
+        {
+            Log::debug("Skipping EncodeDecode member %s with paramType %s (it's serialized with member %s).\n", memberName.c_str(), dataType->getName().c_str(), referencedFrom->getName().c_str());
+        }
+        else
+        {
+            bool needTempVariable = false;
+            Log::debug("Calling EncodeDecode member %s with paramType %s.\n", memberName.c_str(), dataType->getName().c_str());
+
+            // Subtemplate setup for read/write struct calls
+            member_info["coderCall"] = getEncodeDecodeCall(name, dataType, structType, true, member, needTempVariable, false);
+
+            if (needTempVariable)
+            {
+                structInfo["needTempVariable"] = true;
+            }
+        }
 
         members.push_back(member_info);
         if (isNeedCallFree(dataType))
@@ -798,10 +1016,139 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
     structInfo["membersToFree"] = membersToFree;
 }
 
-void CGenerator::getInterfaceComments(Interface *iface, data_map &ifaceInfo)
+void CGenerator::makeUnionsTemplateData()
 {
-    ifaceInfo["mlComment"] = iface->getMlComment();
-    ifaceInfo["ilComment"] = iface->getIlComment();
+    Log::info("Unions:\n");
+    m_templateData["nonExternalUnion"] = false;
+    data_list unions;
+    data_list unionsListToClient;
+    data_list unionsListToServer;
+    data_list unionsServerFree;
+
+    /* Get non-encapsulated unions declarations. */
+    for (Symbol *unionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kUnionTypeSymbol))
+    {
+        UnionType *unionType = dynamic_cast<UnionType *>(unionTypeSymbol);
+        Log::info("%s\n", unionType->getDescription().c_str());
+        data_map unionInfo;
+
+        // Structure type definitions are mixed with unions.
+        unionInfo["isStruct"] = false;
+
+        // aware of external union definitions
+        if (unionType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            unionInfo["isExternal"] = true;
+        }
+        else
+        {
+            m_templateData["nonExternalUnion"] = true;
+            unionInfo["isExternal"] = false;
+        }
+
+        unionInfo["name"] = unionType->getOutputName();
+        unionInfo["membersData"] = getUnionMembersData(unionType, "");
+        setTemplateComments(unionType, unionInfo);
+        bool needTempVariable = false;
+        unionInfo["coderCall"] = getEncodeDecodeCall("data->", unionType, nullptr, true, nullptr, needTempVariable, false);
+        unionInfo["needTempVariable"] = needTempVariable;
+
+        unionInfo["noSharedMem"] = (unionType->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
+
+        //ToDo: Temporary solution.
+        if (std::find(unionsToClient.begin(), unionsToClient.end(), unionType) != unionsToClient.end())
+        {
+            unionsListToClient.push_back(unionInfo);
+        }
+        if (std::find(unionsToServer.begin(), unionsToServer.end(), unionType) != unionsToServer.end())
+        {
+            unionsListToServer.push_back(unionInfo);
+        }
+
+        bool needUnionsServerFree = false; //free unions on server side.
+        for (auto unionCase : unionType->getUniqueCases())
+        {
+            if (!unionCase->caseMemberIsVoid())
+            {
+                for (auto memberName : unionCase->getMemberDeclarationNames())
+                {
+                    StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
+                    DataType *trueMemberDataType = unionMember->getDataType()->getTrueDataType();
+                    if (trueMemberDataType->isList() || trueMemberDataType->isBinary() || trueMemberDataType->isString())
+                    {
+                        needUnionsServerFree = true;
+                        break;
+                    }
+                    else if (trueMemberDataType->isStruct())
+                    {
+                        StructType *structType = dynamic_cast<StructType *>(trueMemberDataType);
+                        assert(structType);
+                        if (structType->containStringMember() || structType->containListMember())
+                        {
+                            needUnionsServerFree = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (needUnionsServerFree)
+            {
+                break;
+            }
+        }
+        if (needUnionsServerFree)
+        {
+            unionsServerFree.push_back(unionInfo);
+        }
+
+        unions.push_back(unionInfo);
+    }
+
+    m_templateData["unions"] = unions;
+    m_templateData["unionsToClient"] = unionsListToClient;
+    m_templateData["unionsToServer"] = unionsListToServer;
+    m_templateData["unionsServerFree"] = unionsServerFree;
+}
+
+/*
+ * TODO: Change to use
+ */
+std::string CGenerator::getUnionMembersData(UnionType *unionType, std::string ident)
+{
+    std::string returnName;
+    /* Get union cases declaration description. */
+    for (auto unionCase : unionType->getUniqueCases())
+    {
+        if (!unionCase->caseMemberIsVoid())
+        {
+            std::string caseBegin;
+            std::string caseEnd;
+            std::string caseIdent = ident + "    ";
+            if (1 < unionCase->getMemberDeclarationNames().size())
+            {
+                caseBegin = ident + std::string("    ") + std::string("struct\n") + ident + std::string("    {\n");
+                caseEnd = ident + std::string("    ") + std::string("};\n");
+                caseIdent += "    ";
+            }
+            std::string returnCase;
+            for (auto memberName : unionCase->getMemberDeclarationNames())
+            {
+                StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
+                returnCase += caseIdent;
+                returnCase += getTypenameName(unionMember->getDataType(), unionMember->getOutputName());
+                returnCase += ";\n";
+            }
+            returnName += caseBegin + returnCase + caseEnd;
+        }
+    }
+    return returnName;
+}
+
+void CGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo)
+{
+    symbolInfo["mlComment"] = symbol->getMlComment();
+    symbolInfo["ilComment"] = symbol->getIlComment();
 }
 
 data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
@@ -810,19 +1157,29 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     std::string proto = getFunctionPrototype(fn);
     std::string serverProto = getFunctionServerCall(fn);
 
-    info["name"] = fn->getName();
+    info["name"] = fn->getOutputName();
     info["prototype"] = proto;
     info["serverPrototype"] = serverProto;
     info["id"] = fn->getUniqueId();
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
     info["isSendValue"] = false;
-    info["mlComment"] = fn->getMlComment();
-    info["ilComment"] = fn->getIlComment();
-    info["needEnumTmpServer"] = false;
-    info["needEnumTmpClient"] = false;
+    setTemplateComments(fn, info);
+    info["needTempVariableServer"] = false;
+    info["needTempVariableClient"] = false;
     info["needNullVariableOnClient"] = false;
     info["needNullVariableOnServer"] = false;
+
+    /* Is function declared as external? */
+    Annotation *externalAnn = fn->findAnnotation(EXTERNAL_ANNOTATION);
+    if (!externalAnn)
+    {
+        info["isNonExternalFunction"] = true;
+    }
+    else
+    {
+        info["isNonExternalFunction"] = false;
+    }
 
     // Get return value info
     data_map returnInfo;
@@ -832,15 +1189,15 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     if (!trueDataType->isVoid())
     {
         std::string result = "result";
-        bool containsEnum;
+        bool needTempVariable = false;
         returnInfo["firstAlloc"] = firstAllocOnReturnWhenIsNeed(result, dataType);
         setCallingFreeFunctions(dataType, returnInfo);
         std::string extraPointer = getExtraPointerInReturn(trueDataType);
         std::string resultVariable = extraPointer + returnSpaceWhenNotEmpty(extraPointer) + result;
         result = extraPointer + result;
-        returnInfo["coderCall"] = getEncodeDecodeCall(result, dataType, nullptr, false, nullptr, containsEnum, true);
+        returnInfo["coderCall"] = getEncodeDecodeCall(result, dataType, nullptr, false, nullptr, needTempVariable, true);
         resultVariable = getTypenameName(dataType, resultVariable);
-        info["needEnumTmpClient"] = containsEnum;
+        info["needTempVariableClient"] = needTempVariable;
         returnInfo["resultVariable"] = resultVariable;
         returnInfo["isNeedFreeingCall"] = isNeedCallFree(dataType);
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
@@ -852,20 +1209,21 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     auto fnParams = fn->getParameters().getMembers();
     data_list params;
     data_list paramsToFree;
-    data_list paramsTo1Core;
-    data_list paramsTo2Core;
+    data_list paramsToClient;
+    data_list paramsToServer;
     for (StructMember *param : fnParams)
     {
         data_map paramInfo;
-        bool containsEnum;
+        bool needTempVariable = false;
         DataType *paramType = param->getDataType();
         DataType *paramTrueType = paramType->getTrueDataType();
-        std::string name = param->getName();
+        std::string name = param->getOutputName();
 
         // Handle nullable annotation.
-        bool memberHasNullableAnn = param->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
-        paramInfo["isNullable"] = memberHasNullableAnn;
-
+        bool isNullable = (paramTrueType->isString() || (!paramTrueType->isBuiltin() && !paramTrueType->isArray() && !paramTrueType->isEnum()));
+        paramInfo["isNullParam"] = isNullable;
+        isNullable = ((param->findAnnotation(NULLABLE_ANNOTATION) != nullptr) && isNullable);
+        paramInfo["isNullable"] = isNullable;
         // Set flags to indicate whether a local isNull variable is needed on the
         // server and client sides.
         //
@@ -873,18 +1231,15 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         // if a later parameter is not nullable. So, we will only try to set it
         // if it is not true. Once the variable's value is true, we know we need
         // a null variable at least once.
-        if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
+        if (isNullable)
         {
-            if ("false" == info["needNullVariableOnServer"]->getvalue())
+            if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
             {
-                info["needNullVariableOnServer"] = memberHasNullableAnn;
+                info["needNullVariableOnServer"] = true;
             }
-        }
-        if (param->getDirection() == kOutDirection || param->getDirection() == kInoutDirection)
-        {
-            if ("false" == info["needNullVariableOnClient"]->getvalue())
+            if (param->getDirection() == kOutDirection || param->getDirection() == kInoutDirection)
             {
-                info["needNullVariableOnClient"] = memberHasNullableAnn;
+                info["needNullVariableOnClient"] = true;
             }
         }
 
@@ -912,33 +1267,41 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
             }
         }
 
-        paramInfo["isNullParam"] =
-            ((!paramTrueType->isBuiltin() && !paramTrueType->isEnum()) || paramTrueType->isString());
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
         paramInfo["mallocServerOut"] = firtAllocOutParamOnServerWhenIsNeed(name, param);
         paramInfo["mallocClient"] = firstAllocOnClientWhenIsNeed(name, param);
         setCallingFreeFunctions(param, paramInfo);
         name = getExtraDirectionPointer(param) + name;
         std::string variable = getTypenameName(paramType, name);
+        paramInfo["variable"] = variable;
         paramInfo["name"] = name;
         paramInfo["type"] = getTypeInfo(paramType, false);
-        Log::debug("calling EncodeDecode with %s as paramType\n", paramType->getName().c_str());
-        paramInfo["coderCall"] = getEncodeDecodeCall(name, paramType, &fn->getParameters(), false, param, containsEnum, true);
-        paramInfo["variable"] = variable;
 
         // Skip data serialization for variables placed as @length value for lists.
+        // Skip data serialization for variables used as discriminator for unions.
         // These prevent to serialized data twice.
-        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName(), LENGTH_ANNOTATION);
-        paramInfo["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName());
+        paramInfo["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
 
-        setToCore(param, paramsTo1Core, paramsTo2Core, paramInfo);
-        if (containsEnum && param->getDirection() != kInDirection)
+        if (referencedFrom && !param->findAnnotation(SHARED_ANNOTATION))
         {
-            info["needEnumTmpClient"] = true;
+            Log::debug("Skipping EncodeDecode param %s with paramType %s (it's serialized with param %s).\n", param->getName().c_str(), paramType->getName().c_str(), referencedFrom->getName().c_str());
         }
-        if (containsEnum && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
+        else
         {
-            info["needEnumTmpServer"] = true;
+            Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(), paramType->getName().c_str());
+
+            paramInfo["coderCall"] = getEncodeDecodeCall(name, paramType, &fn->getParameters(), false, param, needTempVariable, true);
+        }
+
+        setToCore(param, paramsToClient, paramsToServer, paramInfo);
+        if (needTempVariable && param->getDirection() != kInDirection)
+        {
+            info["needTempVariableClient"] = true;
+        }
+        if (needTempVariable && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
+        {
+            info["needTempVariableServer"] = true;
         }
         params.push_back(paramInfo);
 
@@ -953,25 +1316,25 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
             paramsToFree.push_back(paramInfo);
         }
     }
-    if (paramsTo1Core.size() > 0)
+    if (paramsToClient.size() > 0)
     {
         info["isReturnValue"] = true;
     }
-    if (paramsTo2Core.size() > 0)
+    if (paramsToServer.size() > 0)
     {
         info["isSendValue"] = true;
     }
     info["parameters"] = make_data(params);
     info["paramsToFree"] = paramsToFree;
-    info["parametersTo1Core"] = paramsTo1Core;
-    info["parametersTo2Core"] = paramsTo2Core;
+    info["parametersToClient"] = paramsToClient;
+    info["parametersToServer"] = paramsToServer;
 
     Log::info("    %d: (%d) %s\n", fnIndex, fn->getUniqueId(), info["prototype"]->getvalue().c_str());
 
     return info;
 }
 
-void CGenerator::setToCore(Symbol *symbolType, data_list &to1Core, data_list &to2Core, data_map &dataMap)
+void CGenerator::setToCore(Symbol *symbolType, data_list &toClient, data_list &toServer, data_map &dataMap)
 {
     dataMap["allocateToServer"] = false;
     dataMap["allocateToClient"] = false;
@@ -981,20 +1344,20 @@ void CGenerator::setToCore(Symbol *symbolType, data_list &to1Core, data_list &to
         case 1: // in
         {
             dataMap["allocateToServer"] = true;
-            to2Core.push_back(dataMap);
+            toServer.push_back(dataMap);
             break;
         }
         case 2: // out
         {
             dataMap["allocateToClient"] = true;
-            to1Core.push_back(dataMap);
+            toClient.push_back(dataMap);
             break;
         }
         case 3: // inout
         {
             dataMap["allocateToClientAndServer"] = true;
-            to2Core.push_back(dataMap);
-            to1Core.push_back(dataMap);
+            toServer.push_back(dataMap);
+            toClient.push_back(dataMap);
             break;
         }
         default:
@@ -1084,7 +1447,7 @@ std::string CGenerator::getErrorReturnValue(Function *fn)
         }
         else if (dataType->isEnum())
         {
-            return "(" + fn->getReturnType()->getName() + ") -1";
+            return "(" + fn->getReturnType()->getOutputName() + ") -1";
         }
         else
         {
@@ -1100,7 +1463,7 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
     {
         proto += "result = ";
     }
-    proto += fn->getName();
+    proto += fn->getOutputName();
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
@@ -1111,19 +1474,16 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
-            DataType *dataType = it->getDataType();
             DataType *trueDataType = it->getDataType()->getTrueDataType();
-            if (dataType->isArray() && it->getDirection() == kInDirection)
-            {
-                std::string newDataType = getTypenameName(dataType, "*");
-                proto += "(const " + newDataType + ") ";
-            }
-            else if ((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
-                     (it->getDirection() != kInDirection && !trueDataType->isString()))
+
+            /* Builtin types and function types. */
+            if (((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
+                 (it->getDirection() != kInDirection && !trueDataType->isString())))
+
             {
                 proto += "&";
             }
-            proto += it->getName();
+            proto += it->getOutputName();
 
             if (!isLast)
             {
@@ -1135,7 +1495,7 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
     return proto + ");";
 }
 
-std::string CGenerator::getFunctionPrototype(Function *fn)
+std::string CGenerator::getFunctionPrototype(FunctionBase *fn)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     std::string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -1143,7 +1503,21 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
     {
         proto += " ";
     }
-    proto += fn->getName();
+
+    Symbol *symbol = dynamic_cast<Symbol *>(fn);
+    assert(symbol);
+    std::string functionName = symbol->getOutputName();
+
+    FunctionType *funType = dynamic_cast<FunctionType *>(fn);
+    if (funType) /* Need add '(*name)' for function type definition. */
+    {
+        proto += "(*" + functionName + ")";
+    }
+    else /* Use function name only. */
+    {
+        proto += functionName;
+    }
+
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
@@ -1153,11 +1527,14 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
-            std::string paramSignature = it->getName();
+            std::string paramSignature = it->getOutputName();
             DataType *dataType = it->getDataType();
             DataType *trueDataType = dataType->getTrueDataType();
-            if ((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
-                (it->getDirection() != kInDirection && !trueDataType->isString()))
+
+            /* Add '*' to data types. */
+            if (((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
+                 (it->getDirection() != kInDirection && !trueDataType->isString())) ||
+                (trueDataType->isFunction() && (it->getDirection() == kOutDirection || it->getDirection() == kInoutDirection)))
             {
                 paramSignature = "* " + paramSignature;
             }
@@ -1167,8 +1544,7 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
                 paramSignature = directionPointer + returnSpaceWhenNotEmpty(directionPointer) + paramSignature;
             }
             paramSignature = getTypenameName(dataType, paramSignature);
-            if ((dataType->isString() || trueDataType->isStruct() || trueDataType->isArray()) &&
-                it->getDirection() == kInDirection)
+            if ((dataType->isString() || dataType->isFunction() || trueDataType->isStruct() || trueDataType->isUnion()) && it->getDirection() == kInDirection)
             {
                 proto += "const ";
             }
@@ -1238,10 +1614,15 @@ std::string CGenerator::getTypenameName(DataType *t, const std::string &name)
     std::string returnName;
     switch (t->getDataType())
     {
-        case DataType::kVoidType:
+        case DataType::kArrayType:
         {
-            returnName = "void";
-            returnName += returnSpaceWhenNotEmpty(name) + name;
+            // Array type requires the array element count to come after the variable/member name.
+            returnName = name;
+            ArrayType *a = dynamic_cast<ArrayType *>(t);
+            assert(a);
+            giveBracesToArrays(returnName);
+            returnName = format_string("%s[%d]", returnName.c_str(), a->getElementCount());
+            returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
         case DataType::kBuiltinType:
@@ -1263,66 +1644,36 @@ std::string CGenerator::getTypenameName(DataType *t, const std::string &name)
             returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
-        case DataType::kArrayType:
+        case DataType::kUnionType:
         {
-            // Array type requires the array element count to come after the variable/member name.
-            returnName = name;
-            ArrayType *a = dynamic_cast<ArrayType *>(t);
-            assert(a);
-            giveBracesToArrays(returnName);
-            returnName = format_string("%s[%d]", returnName.c_str(), a->getElementCount());
-            returnName = getTypenameName(a->getElementType(), returnName);
+            UnionType *unionType = dynamic_cast<UnionType *>(t);
+            assert(unionType);
+            if (unionType->isNonEncapsulatedUnion())
+            {
+                returnName = t->getOutputName();
+                returnName += returnSpaceWhenNotEmpty(name) + name;
+            }
+            else
+            {
+                returnName += "union\n    {\n";
+                returnName += getUnionMembersData(unionType, "    ");
+                returnName += "    } " + name;
+            }
             break;
         }
-        case DataType::kEnumType:
+        case DataType::kVoidType:
         {
-            returnName = t->getName();
-            returnName += returnSpaceWhenNotEmpty(name) + name;
-            break;
-        }
-        case DataType::kStructType:
-        {
-            returnName = t->getName();
+            returnName = "void";
             returnName += returnSpaceWhenNotEmpty(name) + name;
             break;
         }
         case DataType::kAliasType:
+        case DataType::kEnumType:
+        case DataType::kFunctionType:
+        case DataType::kStructType:
         {
-            returnName = t->getName();
+            returnName = t->getOutputName();
             returnName += returnSpaceWhenNotEmpty(name) + name;
-            break;
-        }
-        case DataType::kUnionType:
-        {
-            returnName += "union\n    {\n";
-            assert(dynamic_cast<UnionType *>(t));
-            for (auto unionCase : dynamic_cast<UnionType *>(t)->getUniqueCases())
-            {
-                if (!unionCase->caseMemberIsVoid())
-                {
-                    if (1 == unionCase->getMemberDeclarationNames().size())
-                    {
-                        std::string memberName = unionCase->getMemberDeclarationNames()[0];
-                        StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
-                        returnName += "        ";
-                        returnName += getTypenameName(unionMember->getDataType(), unionMember->getName());
-                        returnName += ";\n";
-                    }
-                    else
-                    {
-                        returnName += std::string("        ") + std::string("struct {\n");
-                        for (auto memberName : unionCase->getMemberDeclarationNames())
-                        {
-                            StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
-                            returnName += "            ";
-                            returnName += getTypenameName(unionMember->getDataType(), unionMember->getName());
-                            returnName += ";\n";
-                        }
-                        returnName += std::string("        ") + std::string("};\n");
-                    }
-                }
-            }
-            returnName += "    } " + name;
             break;
         }
         default:
@@ -1385,8 +1736,8 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
                                            false;
         if (!isFunctionParam)
         {
-            templateData["stringAllocSize"] = structMember->getName() + "_len";
-            templateData["stringLocalName"] = structMember->getName();
+            templateData["stringAllocSize"] = structMember->getOutputName() + "_len";
+            templateData["stringLocalName"] = structMember->getOutputName();
         }
         else
         {
@@ -1398,7 +1749,7 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
             else
             {
                 templateData["checkStringNull"] = true;
-                templateData["stringLocalName"] = structMember->getName();
+                templateData["stringLocalName"] = structMember->getOutputName();
                 templateData["stringAllocSize"] = getMaxLength(structMember);
                 if (structMember->getDirection() == kInoutDirection || structMember->getDirection() == kOutDirection)
                 {
@@ -1433,23 +1784,75 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                                          StructType *structType,
                                          bool inDataContainer,
                                          StructMember *structMember,
-                                         bool &containsEnum,
+                                         bool &needTempVariable,
                                          bool isFunctionParam)
 {
     // prepare data for template
     data_map templateData;
     string_vector params = string_vector(1, "");
     templateData["freeingCall"] = make_template("", &params);
+    templateData["inDataContainer"] = inDataContainer;
     templateData["isElementArrayType"] = false;
 
     int pos = name.rfind("*");
-    if ((pos == 0 || pos == 1) && t->getTrueDataType()->isStruct() && inDataContainer == false)
+    if ((pos == 0 || pos == 1) && (t->getTrueDataType()->isStruct() || t->getTrueDataType()->isUnion()) && inDataContainer == false)
     {
         templateData["name"] = name.substr(1, name.length());
     }
     else
     {
         templateData["name"] = name;
+    }
+
+    /* Check if member should be serialized as shared. */
+    if ((structMember && structMember->findAnnotation(SHARED_ANNOTATION)) || (structType && structType->findAnnotation(SHARED_ANNOTATION)) || t->findAnnotation(SHARED_ANNOTATION))
+    {
+        templateData["encode"] = m_templateData["encodeSharedType"];
+        templateData["decode"] = m_templateData["decodeSharedType"];
+        templateData["name"] = name;
+        needTempVariable = true;
+        templateData["sharedTypeName"] = t->getName();
+
+        /* If shared member contains non-shared member, it has to be serialized. */
+        templateData["sharedType"] = "";
+        if (t->isStruct() || t->isUnion())
+        {
+            StructType *s = dynamic_cast<StructType *>(t);
+            if (s)
+            {
+                for (StructMember *m : s->getMembers())
+                {
+                    if (m->findAnnotation(NO_SHARED_ANNOTATION))
+                    {
+                        templateData["sharedType"] = "struct";
+                        templateData["dataLiteral"] = (inDataContainer) ? "data->" : "";
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                UnionType *u = dynamic_cast<UnionType *>(t);
+                assert(u);
+                if (u)
+                {
+                    for (StructMember m : u->getUnionMemberDeclarations())
+                    {
+                        if (m.findAnnotation(NO_SHARED_ANNOTATION))
+                        {
+                            templateData["sharedType"] = "union";
+                            if (setDiscriminatorTemp(u, structType, structMember, isFunctionParam, templateData))
+                            {
+                                needTempVariable = true;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return templateData;
     }
 
     if ((t->isBuiltin() || t->isEnum()) && !t->isString() && !t->isBinary())
@@ -1465,10 +1868,40 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
         }
     }
 
-    containsEnum = t->isEnum();
-
     switch (t->getDataType())
     {
+        case DataType::kAliasType:
+        {
+            AliasType *aliasType = dynamic_cast<AliasType *>(t);
+            assert(aliasType);
+            return getEncodeDecodeCall(name, aliasType->getElementType(), structType, inDataContainer, structMember,
+                                       needTempVariable, isFunctionParam);
+        }
+        case DataType::kArrayType:
+        {
+            static uint32_t arrayCounter;
+            ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
+            assert(arrayType);
+            std::string arrayName = name;
+            ++arrayCounter;
+            templateData["decode"] = m_templateData["decodeArrayType"];
+            templateData["encode"] = m_templateData["encodeArrayType"];
+            giveBracesToArrays(arrayName);
+            templateData["protoNext"] =
+                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
+                                    arrayType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
+            templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
+            templateData["size"] = format_string("%d", arrayType->getElementCount());
+            templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
+            templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
+            templateData["freeingCall"] =
+                (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
+                    m_templateData["freeArray"] :
+                    make_template("", &params);
+            templateData["pointerScalarTypes"] = false; // List is using array codec functions
+            --arrayCounter;
+            break;
+        }
         case DataType::kBuiltinType:
         {
             getEncodeDecodeBuiltin((BuiltinType *)t, templateData, structType, structMember, isFunctionParam);
@@ -1476,10 +1909,10 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
         }
         case DataType::kEnumType:
         {
-            containsEnum = true;
+            needTempVariable = true;
             templateData["decode"] = m_templateData["decodeEnumType"];
             templateData["encode"] = m_templateData["encodeEnumType"];
-            std::string typeName = t->getName();
+            std::string typeName = t->getOutputName();
             if (typeName != "")
             {
                 templateData["enumName"] = typeName;
@@ -1488,6 +1921,30 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             {
                 templateData["enumName"] = getAliasName(t);
             }
+            break;
+        }
+        case DataType::kFunctionType:
+        {
+            FunctionType *funType = dynamic_cast<FunctionType *>(t);
+            assert(funType);
+            const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+            if (callbacks.size() > 1)
+            {
+                templateData["tableName"] = "_" + funType->getName();
+                templateData["tableSize"] = callbacks.size();
+                needTempVariable = true;
+            }
+            else if (callbacks.size() == 1)
+            {
+                templateData["tableName"] = "";
+                templateData["callbackName"] = callbacks[0]->getName();
+            }
+            else
+            {
+                throw semantic_error(format_string("line %d: Function has function type parameter (callback parameter), but in IDL is missing function definition, which can be passed there.", structMember->getFirstLine()).c_str());
+            }
+            templateData["encode"] = m_templateData["encodeFunctionType"];
+            templateData["decode"] = m_templateData["decodeFunctionType"];
             break;
         }
         case DataType::kListType:
@@ -1572,6 +2029,15 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 std::string maxSize = getMaxLength(structMember);
                 if (maxSize != "")
                 {
+                    // preppend "data->" when maxSize is struct member
+                    if (!isFunctionParam && structType)
+                    {
+                        Symbol *symbolMax = structType->getScope().getSymbol(maxSize, false);
+                        if (symbolMax)
+                        {
+                            maxSize = "data->" + maxSize;
+                        }
+                    }
                     templateData["maxSize"] = maxSize;
                 }
                 else
@@ -1610,39 +2076,13 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["size"] = size;
             templateData["useBinaryCoder"] = isBinaryList(listType);
             templateData["protoNext"] =
-                getEncodeDecodeCall(nextName, listType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
-            break;
-        }
-        case DataType::kArrayType:
-        {
-            static uint32_t arrayCounter;
-            ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
-            assert(arrayType);
-            std::string arrayName = name;
-            ++arrayCounter;
-            templateData["decode"] = m_templateData["decodeArrayType"];
-            templateData["encode"] = m_templateData["encodeArrayType"];
-            giveBracesToArrays(arrayName);
-            templateData["protoNext"] =
-                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
-                                    arrayType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
-            templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
-            templateData["size"] = format_string("%d", arrayType->getElementCount());
-            templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
-            templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
-            --arrayCounter;
-            templateData["freeingCall"] =
-                (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
-                    m_templateData["freeArray"] :
-                    make_template("", &params);
-            templateData["pointerScalarTypes"] = false; // List is using array codec functions
+                getEncodeDecodeCall(nextName, listType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
             break;
         }
         case DataType::kStructType:
         {
-            templateData["inDataContainer"] = inDataContainer;
             // needDealloc(templateData, t, structType, structMember);
-            std::string typeName = t->getName();
+            std::string typeName = t->getOutputName();
             if (typeName != "")
             {
                 templateData["typeName"] = typeName;
@@ -1659,77 +2099,116 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                     make_template("", &params);
             break;
         }
-        case DataType::kAliasType:
-        {
-            AliasType *aliasType = dynamic_cast<AliasType *>(t);
-            assert(aliasType);
-            return getEncodeDecodeCall(name, aliasType->getElementType(), structType, inDataContainer, structMember,
-                                       containsEnum, isFunctionParam);
-        }
         case DataType::kUnionType:
         {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
-            assert(unionType);
-            templateData["dataLiteral"] = "data";
-            templateData["discriminatorName"] = unionType->getDiscriminatorName();
-            data_list unionCases;
-            data_list unionCasesToFree;
-            // call free function for this union, default not call any free function
-            templateData["freeingCall"] = make_template("", &params);
-            for (auto unionCase : unionType->getCases())
-            {
-                data_map caseData;
-                caseData["name"] = unionCase->getCaseName();
-                caseData["value"] = unionCase->getCaseValue();
-                // if current case need call free function, default false
-                caseData["needCaseFreeingCall"] = false;
-                data_list caseMembers;
-                data_map memberData;
-                data_map caseMembersFree;
-                if (unionCase->caseMemberIsVoid())
-                {
-                    // Create phony enocde/decode values for void function,
-                    // since we don't want to generate anything.
-                    data_map coderCalls;
-                    coderCalls["encode"] = make_template("", &params);
-                    coderCalls["decode"] = make_template("", &params);
-                    memberData["coderCall"] = coderCalls;
 
-                    caseMembers.push_back(memberData);
-                }
-                else
+            // need casting discriminator variable?
+            // set discriminator name
+            if (setDiscriminatorTemp(unionType, structType, structMember, isFunctionParam, templateData))
+            {
+                needTempVariable = true;
+            }
+
+            /* NonEncapsulated unions as a function/structure param/member. */
+            if (isFunctionParam || (structType && unionType->isNonEncapsulatedUnion()))
+            {
+                templateData["name"] = structMember->getOutputName();
+                templateData["inDataContainer"] = inDataContainer;
+                templateData["typeName"] = t->getOutputName();
+                templateData["decode"] = m_templateData["decodeUnionParamType"];
+                templateData["encode"] = m_templateData["encodeUnionParamType"];
+                templateData["freeingCall"] = (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
+                                                  m_templateData["freeUnionType"] :
+                                                  make_template("", &params);
+
+                // inout/out discriminator
+                templateData["discrimPtr"] = false;
+                if (isFunctionParam)
                 {
-                    // For each case member declaration, get its encode and decode data
-                    for (auto caseMemberName : unionCase->getMemberDeclarationNames())
+                    if (structMember->getDirection() != kInDirection)
                     {
-                        StructMember *memberDeclaration = unionCase->getUnionMemberDeclaration(caseMemberName);
-                        std::string unionCaseName = name + "." + memberDeclaration->getName();
-                        memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, memberDeclaration->getDataType(),
-                                                                      structType, true, structMember, containsEnum, isFunctionParam);
-                        if (generateServerFunctionParamFreeFunctions(structMember) &&
-                            isNeedCallFree(memberDeclaration->getDataType()))
-                        {
-                            // set freeing function for current union
-                            templateData["freeingCall"] = m_templateData["freeUnion"];
-                            // current case need free memory
-                            caseData["needCaseFreeingCall"] = true;
-                            // current member need free memory
-                            memberData["isNeedFreeingCall"] = true;
-                        }
-                        else
-                        {
-                            // current member don't need free memory
-                            memberData["isNeedFreeingCall"] = false;
-                        }
-                        caseMembers.push_back(memberData);
+                        templateData["discrimPtr"] = true;
                     }
                 }
-                caseData["members"] = caseMembers;
-                unionCases.push_back(caseData);
             }
-            templateData["cases"] = unionCases;
-            templateData["encode"] = m_templateData["encodeUnionType"];
-            templateData["decode"] = m_templateData["decodeUnionType"];
+            else
+            {
+                /* Serialize/deserialize encapsulated and non-encapsulated unions is almost same. */
+                assert(unionType);
+
+                std::string disriminatorSeparator = "";
+
+                /* Get disriminator separator for encapsulated unions. data->variable_name.case */
+                if (!unionType->isNonEncapsulatedUnion())
+                {
+                    disriminatorSeparator = ".";
+                }
+
+                data_list unionCases;
+                data_list unionCasesToFree;
+                // call free function for this union, default not call any free function
+                templateData["freeingCall"] = make_template("", &params);
+                for (auto unionCase : unionType->getCases())
+                {
+                    data_map caseData;
+                    caseData["name"] = unionCase->getCaseName();
+                    caseData["value"] = unionCase->getCaseValue();
+                    // if current case need call free function, default false
+                    caseData["needCaseFreeingCall"] = false;
+                    data_list caseMembers;
+                    data_map memberData;
+                    data_map caseMembersFree;
+                    if (unionCase->caseMemberIsVoid())
+                    {
+                        // Create phony enocde/decode values for void function,
+                        // since we don't want to generate anything.
+                        data_map coderCalls;
+                        coderCalls["encode"] = make_template("", &params);
+                        coderCalls["decode"] = make_template("", &params);
+                        memberData["coderCall"] = coderCalls;
+
+                        caseMembers.push_back(memberData);
+                    }
+                    else
+                    {
+                        bool casesNeedTempVariable = false;
+                        // For each case member declaration, get its encode and decode data
+                        for (auto caseMemberName : unionCase->getMemberDeclarationNames())
+                        {
+                            StructMember *memberDeclaration = unionCase->getUnionMemberDeclaration(caseMemberName);
+                            std::string unionCaseName = name + disriminatorSeparator + memberDeclaration->getOutputName();
+                            memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, memberDeclaration->getDataType(),
+                                                                          structType, true, structMember, casesNeedTempVariable, isFunctionParam);
+                            if (generateServerFunctionParamFreeFunctions(structMember) &&
+                                isNeedCallFree(memberDeclaration->getDataType()))
+                            {
+                                // set freeing function for current union
+                                templateData["freeingCall"] = m_templateData["freeUnion"];
+                                // current case need free memory
+                                caseData["needCaseFreeingCall"] = true;
+                                // current member need free memory
+                                memberData["isNeedFreeingCall"] = true;
+                            }
+                            else
+                            {
+                                // current member don't need free memory
+                                memberData["isNeedFreeingCall"] = false;
+                            }
+                            caseMembers.push_back(memberData);
+                            if (casesNeedTempVariable)
+                            {
+                                needTempVariable = true;
+                            }
+                        }
+                    }
+                    caseData["members"] = caseMembers;
+                    unionCases.push_back(caseData);
+                }
+                templateData["cases"] = unionCases;
+                templateData["encode"] = m_templateData["encodeUnionType"];
+                templateData["decode"] = m_templateData["decodeUnionType"];
+            }
             break;
         }
         default:
@@ -1751,7 +2230,7 @@ void CGenerator::giveBracesToArrays(std::string &name)
 std::string CGenerator::getExtraPointerInReturn(DataType *dataType)
 {
     DataType *trueDataType = dataType->getTrueDataType();
-    if (trueDataType->isStruct() || trueDataType->isArray())
+    if (trueDataType->isStruct() || trueDataType->isArray() || trueDataType->isUnion())
     {
         return "*";
     }
@@ -1767,14 +2246,14 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     std::string result;
     if (structMemberDir == kOutDirection) // between out and inout can be diferences in future. Maybe not.
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
         {
             result = "*";
         }
     }
     else if (structMemberDir == kInoutDirection)
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
         {
             result = "*";
         }
@@ -1790,9 +2269,12 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
             result = "**";
         }
     }
-    else //! Last else is for InDirection, which has same principle as return;
+    else
     {
-        result = getExtraPointerInReturn(dataType);
+        if (trueDataType->isStruct() || trueDataType->isUnion())
+        {
+            result = "*";
+        }
     }
 
     return result;
@@ -1801,7 +2283,7 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
 std::string CGenerator::firstAllocOnReturnWhenIsNeed(std::string name, DataType *dataType)
 {
     DataType *trueDataType = dataType->getTrueDataType();
-    if (trueDataType->isArray() || trueDataType->isStruct())
+    if (trueDataType->isArray() || trueDataType->isStruct() || trueDataType->isUnion())
     {
         return allocateCall(false, name, dataType);
     }
@@ -1816,14 +2298,14 @@ std::string CGenerator::firstAllocOnServerWhenIsNeed(std::string name, StructMem
     _param_direction structMemberDir = structMember->getDirection();
     if (structMemberDir == kInoutDirection)
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
         {
             return allocateCall(false, name, structMember);
         }
     }
     else if (structMemberDir == kInDirection)
     {
-        if (trueDataType->isArray() || trueDataType->isStruct())
+        if (trueDataType->isStruct() || trueDataType->isUnion())
         {
             return allocateCall(false, name, structMember);
         }
@@ -1853,7 +2335,7 @@ std::string CGenerator::firtAllocOutParamOnServerWhenIsNeed(std::string name, St
     if (structMember->getDirection() == kOutDirection)
     {
         DataType *trueDataType = structMember->getDataType()->getTrueDataType();
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray())
         {
             return allocateCall(false, name, structMember);
         }
@@ -1867,7 +2349,16 @@ std::string CGenerator::firtAllocOutParamOnServerWhenIsNeed(std::string name, St
                     format_string("For out string variable '%s' on line '%d' max_length annotation has to be set.",
                                   symbol->getName().c_str(), symbol->getLocation().m_firstLine));
             }
-            return allocateCall(false, name, structMember) + format_string("\n%s[0]=\'\\0\';", name.c_str());
+            std::string returnValue = allocateCall(false, name, structMember);
+            if (m_templateData["generateAllocErrorChecks"]->getvalue() == "true")
+            {
+                returnValue += format_string("\nelse\n{\n    %s[0]=\'\\0\';\n}", name.c_str());
+            }
+            else
+            {
+                returnValue += format_string("\n%s[0]=\'\\0\';", name.c_str());
+            }
+            return returnValue;
         }
     }
     return "";
@@ -1893,12 +2384,6 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
     DataType *trueDataType = dataType->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::kStructType:
-        {
-            StructType *structType = dynamic_cast<StructType *>(trueDataType);
-            assert(structType);
-            return structType->containListMember() || structType->containStringMember();
-        }
         case DataType::kArrayType:
         {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(trueDataType);
@@ -1914,6 +2399,12 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
         case DataType::kListType:
         {
             return true;
+        }
+        case DataType::kStructType:
+        {
+            StructType *structType = dynamic_cast<StructType *>(trueDataType);
+            assert(structType);
+            return structType->containListMember() || structType->containStringMember();
         }
         case DataType::kUnionType:
         {
@@ -1956,14 +2447,14 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
         switch (trueDataType->getDataType())
         {
             case DataType::kBuiltinType:
-            case DataType::kArrayType:
             case DataType::kStructType:
+            case DataType::kUnionType:
             {
                 BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
                 if (!builtinType || builtinType->isString())
                 {
                     _param_direction structMemberDir = structMember->getDirection();
-                    std::string name = structMember->getName();
+                    std::string name = structMember->getOutputName();
                     if (!((trueDataType->isString()) && structMemberDir != kOutDirectionByref))
                     {
                         firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
@@ -1976,6 +2467,7 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
                         firstFreeingCall2["name"] = name;
                     }
                 }
+                break;
             }
             default:
                 break;
@@ -1985,7 +2477,7 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
     {
         DataType *dataType = dynamic_cast<DataType *>(symbol);
         assert(dataType);
-        if (dataType->getTrueDataType()->isArray() || dataType->getTrueDataType()->isStruct())
+        if (dataType->getTrueDataType()->isArray() || dataType->getTrueDataType()->isStruct() || dataType->getTrueDataType()->isUnion())
         {
             firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
             firstFreeingCall1["name"] = "result";
@@ -2258,6 +2750,61 @@ bool CGenerator::isBinaryList(ListType *listType)
 bool CGenerator::generateServerFunctionParamFreeFunctions(StructMember *structMember)
 {
     return (structMember == nullptr || structMember->findAnnotation(RETAIN_ANNOTATION) == nullptr);
+}
+
+void CGenerator::setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol)
+{
+    if (Annotation *ann = childSymbol->findAnnotation(NO_SHARED_ANNOTATION))
+    {
+        parentSymbol->addAnnotation(*ann);
+    }
+}
+
+bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData)
+{
+    bool needTempVariable = false;
+    if (structType)
+    {
+        std::string discriminatorName;
+        if (unionType->isNonEncapsulatedUnion())
+        {
+            discriminatorName = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION)->getValueObject()->toString();
+            if (isFunctionParam)
+            {
+                templateData["dataLiteral"] = "";
+            }
+            else
+            {
+                templateData["dataLiteral"] = "data->";
+            }
+        }
+        else
+        {
+            templateData["dataLiteral"] = "data->";
+            discriminatorName = unionType->getDiscriminatorName();
+        }
+        StructMember *disMember = dynamic_cast<StructMember *>(structType->getScope().getSymbol(discriminatorName));
+        assert(disMember);
+        BuiltinType *disBuiltin = dynamic_cast<BuiltinType *>(disMember->getDataType()->getTrueDataType());
+        if (disBuiltin && disBuiltin->getBuiltinType() == BuiltinType::kInt32Type)
+        {
+            templateData["castDiscriminator"] = false;
+        }
+        else
+        {
+            needTempVariable = true;
+            templateData["castDiscriminator"] = true;
+            templateData["discriminatorType"] = disMember->getDataType()->getName();
+        }
+        templateData["discriminatorName"] = discriminatorName;
+    }
+    else
+    {
+        templateData["discriminatorName"] = "discriminator";
+        templateData["dataLiteral"] = "";
+        templateData["castDiscriminator"] = false;
+    }
+    return needTempVariable;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

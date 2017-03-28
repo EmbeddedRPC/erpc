@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
@@ -28,45 +28,60 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "rpmsg_lite_zc_rtos_transport.h"
 
-using namespace erpc;
+#ifndef _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
+#define _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
 
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
+#include "rpmsg_lite.h"
+#include "transport.h"
 
-#if !defined(SH_MEM_TOTAL_SIZE)
-#define SH_MEM_TOTAL_SIZE (6144)
-#endif
-
-#if defined(__ICCARM__) /* IAR Workbench */
-#pragma location = "rpmsg_sh_mem_section"
-char rpmsg_lite_base[SH_MEM_TOTAL_SIZE];
-#elif defined(__GNUC__) /* LPCXpresso */
-char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_sh_mem")));
-#elif defined(__CC_ARM) /* Keil MDK */
-char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section("rpmsg_sh_mem_section")));
-#else
-#error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"
-#endif
-
-static ManuallyConstructed<RPMsgZCRTOSTransport> s_transport;
+/*!
+ * @addtogroup rpmsg_lite_transport
+ * @addtogroup rpmsg_lite_rtos_transport
+ * @{
+ * @file
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
-// Code
+// Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr,
-                                                            unsigned long dst_addr,
-                                                            int rpmsg_link_id)
+////////////////////////////////////////////////////////////////////////////////
+// Classes
+////////////////////////////////////////////////////////////////////////////////
+
+namespace erpc {
+/*!
+ * @brief Transport that other RPMsg transports inherts.
+ *
+ * @ingroup rpmsg_lite_transport
+ * @ingroup rpmsg_lite_rtos_transport
+ */
+class RPMsgBaseTransport : public Transport
 {
-    s_transport.construct();
-    if (s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) != kErpcStatus_Success)
+public:
+    RPMsgBaseTransport()
+    : Transport(){};
+
+    virtual ~RPMsgBaseTransport() {}
+
+    /*!
+     * @brief This function returns pointer to instance of RPMSG lite
+     *
+     * @retval pointer to instance of RPMSG lite
+     */
+    struct rpmsg_lite_instance *get_rpmsg_lite_instance()
     {
-        return NULL;
+        return s_rpmsg;
     }
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
-}
+
+protected:
+    static struct rpmsg_lite_instance *s_rpmsg; /*!< Pointer to instance of RPMSG lite. */
+    static uint8_t s_initialized;               /*!< Represent information if the rpmsg-lite was initialized. */
+};
+
+} // namespace erpc
+
+/*! @} */
+
+#endif // _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_

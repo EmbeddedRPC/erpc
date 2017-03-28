@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,59 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
-#define _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
+#include "erpc_transport_setup.h"
+#include "manually_constructed.h"
+#include "rpmsg_tty_rtos_transport.h"
 
-#include "rpmsg_lite.h"
-#include "transport.h"
-
-/*!
- * @addtogroup rpmsg_lite_zc_transport
- * @addtogroup rpmsg_lite_zc_rtos_transport
- * @{
- * @file
- */
+using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Definitions
+// Variables
 ////////////////////////////////////////////////////////////////////////////////
 
+static ManuallyConstructed<RPMsgTTYRTOSTransport> s_transport;
+
 ////////////////////////////////////////////////////////////////////////////////
-// Classes
+// Code
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
-/*!
- * @brief Transport that other RPMsg transports inherts.
- *
- * @ingroup rpmsg_lite_transport
- * @ingroup rpmsg_lite_rtos_transport
- */
-class RPMsgZCBaseTransport : public Transport
+erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name)
 {
-public:
-    RPMsgZCBaseTransport()
-    : Transport(){};
-
-    virtual ~RPMsgZCBaseTransport() {}
-
-    /*!
-     * @brief This function returns pointer to instance of RPMSG lite
-     *
-     * @retval pointer to instance of RPMSG lite
-     */
-    struct rpmsg_lite_instance *get_rpmsg_lite_instance()
-    {
-        return s_rpmsg;
-    }
-
-protected:
-    static struct rpmsg_lite_instance *s_rpmsg; /*!< Pointer to instance of RPMSG lite. */
-    static uint8_t s_initialized;               /*!< Represent information if the rpmsg-lite was initialized. */
-};
-
-} // namespace erpc
-
-/*! @} */
-
-#endif // _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
+    s_transport.construct();
+    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready,
+                      nameservice_name);
+    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+}

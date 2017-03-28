@@ -1,0 +1,55 @@
+---
+name: name annotation test
+desc: This test @name annotation on different symbols
+idl: |
+
+  @name("EnumName")
+  enum {
+    A @name(D),
+    B,
+    C
+  }
+
+  @name("StructName")
+  struct S{
+    int32 a @name("d");
+    int32 b;
+    int32 c
+  }
+
+  @name("type")
+  type T = S
+
+  @name(I)
+  interface K
+  {
+
+    @name(function)
+    oneway functionName(S a @name(m))
+  }
+lang: py
+
+test/common.py:
+  - class EnumName
+  - D
+  - StructName
+  - d=None
+  - self.d = d
+  - self.d = codec.read_int32()
+  - if self.d is None
+  - codec.write_int32(self.d)
+  - self.d
+  - type = StructName
+
+test/client.py:
+  - def function(self, m)
+  - if m is None
+  - m._write(codec)
+
+test/server.py:
+  - _handle_function
+  - m = common.StructName()._read(codec)
+  - self._handler.function(m)
+
+test/interface.py:
+  - def function(self, m)

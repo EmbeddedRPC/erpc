@@ -92,7 +92,10 @@ enum _erpc_status
     kErpcStatus_ReceiveFailed,
 
     //! Failed to send data.
-    kErpcStatus_SendFailed
+    kErpcStatus_SendFailed,
+
+    //! Sending/Receiving callback function which is not defined in IDL.
+    kErpcStatus_UnknownCallback
 };
 
 /*! @brief Type used for all status and error return values. */

@@ -40,8 +40,8 @@
 #include "options.h"
 #include "types/Program.h"
 #include <cstdint>
+#include <cstdlib>
 #include <stdexcept>
-#include <stdlib.h>
 #include <vector>
 
 /*!
@@ -297,7 +297,7 @@ public:
 
             // Parse and build definition model.
             InterfaceDefinition def;
-            def.parse(m_ErpcFile);
+            uint16_t idlCrc16 = def.parse(m_ErpcFile);
 
             // Check for duplicate function IDs
             UniqueIdChecker uniqueIdCheck;
@@ -309,10 +309,10 @@ public:
             switch (m_outputLanguage)
             {
                 case kCLanguage:
-                    CGenerator(&def).generate();
+                    CGenerator(&def, idlCrc16).generate();
                     break;
                 case kPythonLanguage:
-                    PythonGenerator(&def).generate();
+                    PythonGenerator(&def, idlCrc16).generate();
                     break;
             }
         }

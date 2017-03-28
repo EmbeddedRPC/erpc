@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -31,11 +31,13 @@
 
 #include "Generator.h"
 #include "Logging.h"
+#include "ParseErrors.h"
 #include "annotations.h"
+#include "erpcgen_version.h"
 #include "format_string.h"
 #include <boost/filesystem.hpp>
+#include <cstring>
 #include <ctime>
-#include <string.h>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -44,10 +46,51 @@ using namespace cpptempl;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Generator::Generator(InterfaceDefinition *def)
+Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
 : m_def(def)
 , m_globals(&(m_def->getGlobals()))
+, m_idlCrc16(idlCrc16)
 {
+    m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
+
+    // crc of erpcgen version and idl files.
+    m_templateData["crc16"] = m_idlCrc16;
+
+    m_templateData["todaysDate"] = getTime();
+
+    if (m_def->hasProgramSymbol())
+    {
+        Log::info("program: ");
+        Log::info("%s\n", m_def->getOutputFilename().c_str());
+
+        /* Shared memory area. */
+        Annotation *sharedMemBAnn = def->programSymbol()->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
+        Annotation *sharedMemEAnn = def->programSymbol()->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
+        if (sharedMemBAnn && sharedMemEAnn)
+        {
+            Value *sharedMemAValue = sharedMemBAnn->getValueObject();
+            Value *sharedMemEValue = sharedMemEAnn->getValueObject();
+            if (sharedMemAValue && sharedMemEValue)
+            {
+                m_templateData["sharedMemBeginAddr"] = sharedMemAValue->toString();
+                m_templateData["sharedMemEndAddr"] = sharedMemEValue->toString();
+                Log::warning("Shared memory is supported only for C language used on embedded devices.\n");
+            }
+            else
+            {
+                throw semantic_error("Annotations @shared_memory_begin and @shared_memory_end need contains addresses.");
+            }
+        }
+        else if (sharedMemBAnn || sharedMemEAnn)
+        {
+            throw semantic_error("Need be defined both or no one of shared memory regions annotations through @shared_memory_begin and @shared_memory_end.");
+        }
+        else
+        {
+            m_templateData["sharedMemBeginAddr"] = "";
+            m_templateData["sharedMemEndAddr"] = "";
+        }
+    }
 }
 
 void Generator::openFile(std::ofstream &fileOutputStream, const std::string &fileName)
@@ -112,9 +155,9 @@ std::string Generator::stripExtension(const std::string &filename)
     }
 }
 
-StructMember *Generator::findParamReferencedFrom(const StructType::member_vector_t &members,
-                                                 const std::string &referenceName,
-                                                 const std::string &annName)
+StructMember *Generator::findParamReferencedFromAnn(const StructType::member_vector_t &members,
+                                                    const std::string &referenceName,
+                                                    const std::string &annName)
 {
     for (StructMember *structMember : members)
     {
@@ -129,6 +172,54 @@ StructMember *Generator::findParamReferencedFrom(const StructType::member_vector
         }
     }
     return nullptr;
+}
+
+StructMember *Generator::findParamReferencedFromUnion(const StructType::member_vector_t &members,
+                                                      const std::string &referenceName)
+{
+    for (StructMember *structMember : members)
+    {
+        DataType *trueDataType = structMember->getDataType()->getTrueDataType();
+        if (trueDataType->isUnion())
+        {
+            UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
+            if (unionType->isNonEncapsulatedUnion())
+            {
+                Annotation *ann = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION);
+                if (ann)
+                {
+                    std::string lengthName = ann->getValueObject()->toString();
+                    if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
+                    {
+                        return structMember;
+                    }
+                }
+            }
+            else
+            {
+                if (strcmp(unionType->getDiscriminatorName().c_str(), referenceName.c_str()) == 0)
+                {
+                    return structMember;
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+
+StructMember *Generator::findParamReferencedFrom(const StructType::member_vector_t &members,
+                                                 const std::string &referenceName)
+{
+    StructMember *referencedFrom = findParamReferencedFromAnn(members, referenceName, LENGTH_ANNOTATION);
+
+    if (referencedFrom)
+    {
+        return referencedFrom;
+    }
+    else
+    {
+        return findParamReferencedFromUnion(members, referenceName);
+    }
 }
 
 std::string Generator::getTime()
@@ -149,17 +240,29 @@ Generator::interfaceLists_t Generator::makeInterfacesTemplateData()
         Interface *iface = dynamic_cast<Interface *>(it);
         assert(iface);
         data_map ifaceInfo;
-        ifaceInfo["name"] = make_data(iface->getName());
+        ifaceInfo["name"] = make_data(iface->getOutputName());
         ifaceInfo["id"] = data_ptr(iface->getUniqueId());
 
-        getInterfaceComments(iface, ifaceInfo);
+        setTemplateComments(iface, ifaceInfo);
 
         // TODO: for C only?
-        ifaceInfo["serviceClassName"] = iface->getName() + "_service";
+        ifaceInfo["serviceClassName"] = iface->getOutputName() + "_service";
 
         Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
 
-        ifaceInfo["functions"] = getFunctionsTemplateData(iface);
+        /* Has interface function declared as non-external? */
+        data_list functions = getFunctionsTemplateData(iface);
+        ifaceInfo["functions"] = functions;
+        ifaceInfo["isNonExternalInterface"] = false;
+        for (int i = 0; i < functions.size(); ++i)
+        {
+            std::string isNonExternalFunction = dynamic_cast<DataMap *>(functions[i].get().get())->getmap()["isNonExternalFunction"]->getvalue();
+            if (isNonExternalFunction.compare("true") == 0)
+            {
+                ifaceInfo["isNonExternalInterface"] = true;
+                break;
+            }
+        }
         ++n;
 
         // Sorting interfaces into groups.
@@ -206,11 +309,18 @@ void Generator::fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
 
 void Generator::generateInterfaceOutputFiles(cpptempl::data_map &templateData, interfaceLists_t interfaceLists)
 {
+    templateData["groupClientC"] = "";  //when interface is not presented
+    templateData["groupClientPY"] = ""; //when interface is not presented
+
+    /* Generate file containing crc of IDL files. */
+    generateCrcFile();
+
     // Generate output files. We have to special case not having any interfaces define.
     if (interfaceLists.empty())
     {
         // empty list of interfaces
         data_list empty;
+        templateData["group"] = "";
         templateData["interfaces"] = empty;
 
         // Log template data.
@@ -223,8 +333,33 @@ void Generator::generateInterfaceOutputFiles(cpptempl::data_map &templateData, i
     }
     else
     {
+        /* TODO: temporary C/PY code. */
+        std::vector<std::string> groupNames;
+        if (m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol).size() > 0)
+        {
+            for (auto interfaceList : interfaceLists)
+            {
+                groupNames.push_back(interfaceList.first);
+            }
+        }
+
         for (auto interfaceList : interfaceLists)
         {
+            /* TODO: temporary C/PY code. */
+            std::string cName;
+            std::string pyName;
+            for (std::string groupName : groupNames)
+            {
+                if (groupName != interfaceList.first)
+                {
+                    cName += "#include \"" + stripExtension(m_def->getOutputFilename()) + "_" + groupName + ".h\"\n";
+                    pyName += "from ../" + stripExtension(m_def->getOutputFilename()) + "_" + groupName + " import interface\n";
+                }
+            }
+
+            templateData["groupClientC"] = cName;
+            templateData["groupClientPY"] = pyName;
+            templateData["group"] = interfaceList.first;
             templateData["interfaces"] = interfaceList.second;
 
             // Log template data.
@@ -250,4 +385,50 @@ void Generator::makeIncludesTemplateData(cpptempl::data_map &templateData)
         }
     }
     templateData["includes"] = includeData;
+
+    /* find server includes */
+    std::map<std::string, std::vector<std::string> > groupIncludes;
+    for (Symbol *interfaceSymbol : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+    {
+        Interface *interface = dynamic_cast<Interface *>(interfaceSymbol);
+        assert(interface);
+        Annotation *includeAnn = interface->findAnnotation(INCLUDE_ANNOTATION);
+        if (includeAnn)
+        {
+            Annotation *groupAnn = interface->findAnnotation(GROUP_ANNOTATION);
+            std::string groupName;
+            if (groupAnn)
+            {
+                groupName = groupAnn->getValueObject()->toString();
+            }
+            else
+            {
+                groupName = "";
+            }
+            auto includeList = groupIncludes.find(groupName);
+            if (includeList == groupIncludes.end())
+            {
+                std::vector<std::string> includeVector;
+                groupIncludes[groupName] = includeVector;
+                includeList = groupIncludes.find(groupName);
+            }
+            includeList->second.push_back(includeAnn->getValueObject()->toString());
+        }
+    }
+
+    /* fill templateData server includes */
+    data_list groupsIncludes;
+    for (auto includeList : groupIncludes)
+    {
+        data_list groupIncludesList;
+        data_map groupInfo;
+        groupInfo["name"] = includeList.first;
+        for (auto includeName : includeList.second)
+        {
+            groupIncludesList.push_back(includeName);
+        }
+        groupInfo["includes"] = groupIncludesList;
+        groupsIncludes.push_back(groupInfo);
+    }
+    templateData["groupsServer"] = groupsIncludes;
 }

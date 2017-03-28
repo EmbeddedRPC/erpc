@@ -29,17 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EMBEDDED_RPC__RPMSG_LITE_ZC_TRANSPORT_H_
-#define _EMBEDDED_RPC__RPMSG_LITE_ZC_TRANSPORT_H_
+#ifndef _EMBEDDED_RPC__RPMSG_LITE_RTOS_TRANSPORT_H_
+#define _EMBEDDED_RPC__RPMSG_LITE_RTOS_TRANSPORT_H_
 
-#include "erpc_config_internal.h"
 #include "message_buffer.h"
 #include "rpmsg_lite.h"
-#include "rpmsg_lite_zc_base_transport.h"
-#include "static_queue.h"
+#include "rpmsg_lite_base_transport.h"
+#include "rpmsg_queue.h"
 
 /*!
- * @addtogroup rpmsg_lite_zc_transport
+ * @addtogroup rpmsg_lite_rtos_transport
  * @{
  * @file
  */
@@ -54,11 +53,11 @@
 
 namespace erpc {
 /*!
- * @brief Transport that uses RPMsg zero copy API for interprocessor messaging.
+ * @brief Transport that uses RPMsg zero copy RTOS API for interprocessor messaging.
  *
- * @ingroup rpmsg_lite_transport
+ * @ingroup rpmsg_lite_rtos_transport
  */
-class RPMsgZCTransport : public RPMsgZCBaseTransport
+class RPMsgRTOSTransport : public RPMsgBaseTransport
 {
 public:
     /*!
@@ -66,17 +65,15 @@ public:
      *
      * This function initializes object attributes.
      */
-    RPMsgZCTransport();
+    RPMsgRTOSTransport();
 
     /*!
-     * @brief Codec destructor
+     * @brief RPMsgRTOSTransport destructor
      */
-    virtual ~RPMsgZCTransport();
+    virtual ~RPMsgRTOSTransport();
 
     /*!
-     * @brief Initialization of RPMsgTransport layer - as RPMsg master
-     *
-     * Call init() for RPMsg. Create buffers for receiving messages.
+     * @brief This function call RPMsg rtos init function - as RPMsg master
      *
      * @param[in] src_addr Source address.
      * @param[in] dst_addr Destination address.
@@ -91,9 +88,7 @@ public:
         unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id);
 
     /*!
-     * @brief Initialization of RPMsgTransport layer - as RPMsg remote
-     *
-     * Call init() for RPMsg. Create buffers for receiving messages.
+     * @brief This function call RPMsg rtos init function - as RPMsg remote
      *
      * @param[in] src_addr Source address.
      * @param[in] dst_addr Destination address.
@@ -108,13 +103,14 @@ public:
         unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
 
     /*!
-     * @brief Set message to first received message.
+     * @brief Store incoming message to message buffer.
      *
      * In loop while no message come.
      *
      * @param[in] message Message buffer, to which will be stored incoming message.
      *
-     * @return kErpcStatus_Success
+     * @retval kErpcStatus_ReceiveFailed Failed to receive message buffer.
+     * @retval kErpcStatus_Success Successfully received all data.
      */
     virtual erpc_status_t receive(MessageBuffer *message);
 
@@ -128,43 +124,17 @@ public:
      */
     virtual erpc_status_t send(MessageBuffer *message);
 
-    /*!
-     * @brief Function to check if is message in receive queue and wait for processing.
-     *
-     * This function should be called before function receive() to avoid waiting for new message.
-     *
-     * @return True if exist received message, else false.
-     */
-    virtual bool hasMessage() { return m_messageQueue.size(); }
-
 protected:
-    /*!
-     * @brief RPMSG callback for receiving data.
-     *
-     * This function is used as RPMSG receive callback in which is copied message
-     * to free message buffer.
-     *
-     * @param payload RPMSG data to receive.
-     * @param payload_len Length of data.
-     * @param src Source endpoint address.
-     * @param priv Callback data.
-     *
-     * @return
-     */
-    static int rpmsg_read_cb(void *payload, int payload_len, unsigned long src, void *priv);
-
-    StaticQueue<MessageBuffer, ERPC_DEFAULT_BUFFERS_COUNT>
-        m_messageQueue; /*!< Received messages. Queue of messages with buffers filled in rpmsg callback. */
-
-    unsigned long m_dst_addr;                                 /*!< Destination address used by rpmsg. */
-    struct rpmsg_lite_ept_static_context m_rpmsg_ept_context; /*!< RPMsg Lite Endpoint static context. */
-    struct rpmsg_lite_endpoint *m_rpmsg_ept;                  /*!< Pointer to RPMsg Lite Endpoint structure. */
-
-    static struct rpmsg_lite_instance s_rpmsg_ctxt; /*!< Context for RPMsg Lite stack instance. */
+    /* Remote device */
+    struct remote_device *m_rdev;            /*!< Device which represent the second core. */
+    struct rpmsg_channel *m_app_rp_chnl;     /*!< Represent connection between two device (two cores). */
+    unsigned long m_dst_addr;                /*!< Destination address used by rpmsg. */
+    rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */
+    struct rpmsg_lite_endpoint *m_rpmsg_ept; /*!< Pointer to RPMsg Lite Endpoint structure. */
 };
 
 } // namespace erpc
 
 /*! @} */
 
-#endif // _EMBEDDED_RPC__RPMSG_LITE_ZC_TRANSPORT_H_
+#endif // _EMBEDDED_RPC__RPMSG_LITE_RTOS_TRANSPORT_H_

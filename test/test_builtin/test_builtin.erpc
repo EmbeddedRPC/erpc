@@ -30,8 +30,11 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
-program test_builtin;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
+
 interface BuiltinServices
 {
     oneway test_int32_in(int32 a)

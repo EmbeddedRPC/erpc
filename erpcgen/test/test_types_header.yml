@@ -28,6 +28,6 @@ test_types.h:
   - '#include <stdint.h>'
   - // Aliases data types declarations
   - typedef struct Vector Vector;
-  - // Structures data types declarations
+  - // Structures/unions data types declarations
   - struct Vector
   - not: void bar(const Vector * x);

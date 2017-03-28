@@ -29,12 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myAlloc.h"
 #include "erpc_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 #include "gtest.h"
 #include "gtestListener.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 
 #if RPMSG || UART || LPUART
 extern "C" {
@@ -141,7 +142,7 @@ int main(int argc, char **argv)
     erpc_mbf_t message_buffer_factory;
 #if RPMSG
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transport);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transport);
 #else
 #if UART
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,

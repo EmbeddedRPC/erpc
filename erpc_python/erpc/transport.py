@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2017 NXP
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
@@ -33,7 +33,7 @@ import struct
 import serial
 import socket
 import threading
-from .crc16 import crc16
+from .crc16 import Crc16
 from .client import RequestError
 
 ##
@@ -51,15 +51,18 @@ class Transport(object):
 class FramedTransport(Transport):
     HEADER_LEN = 4
 
-    def __init__(self):
+    def __init__(self, crcStart):
         super(FramedTransport, self).__init__()
         self._sendLock = threading.Lock()
         self._receiveLock = threading.Lock()
+        self._Crc16 = crc16.Crc16(crcStart)
 
     def send(self, message):
         try:
             self._sendLock.acquire()
-            crc = crc16(message)
+
+            crc = self._Crc16.computeCRC16(message)
+
             header = bytearray(struct.pack('<HH', len(message), crc))
             assert len(header) == self.HEADER_LEN
             self._base_send(header + message)
@@ -76,7 +79,8 @@ class FramedTransport(Transport):
 
             # Now we know the length, read the rest of the message.
             data = self._base_receive(messageLength)
-            computedCrc = crc16(data)
+            computedCrc = self._Crc16.computeCRC16(data)
+
             if computedCrc != crc:
                 raise RequestError("invalid message CRC")
             return data

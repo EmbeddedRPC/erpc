@@ -58,7 +58,7 @@ public:
      * @param[in] caseValue Given case value.
      */
     UnionCase(const std::string &caseName, int32_t caseValue)
-    : Symbol(kUnionCaseTypeSymbol, caseName)
+    : Symbol(kUnionCaseMemberSymbol, caseName)
     , m_caseName(caseName)
     , m_caseValue(caseValue)
     , m_containingUnion(nullptr)
@@ -74,7 +74,7 @@ public:
      * @param[in] caseValue Given case value.
      */
     UnionCase(int32_t caseValue)
-    : Symbol(kUnionCaseTypeSymbol)
+    : Symbol(kUnionCaseMemberSymbol)
     , m_caseName("")
     , m_caseValue(caseValue)
     , m_containingUnion(nullptr)
@@ -90,7 +90,7 @@ public:
      * @param[in] caseName Given case name.
      */
     UnionCase(const std::string &caseName)
-    : Symbol(kUnionCaseTypeSymbol)
+    : Symbol(kUnionCaseMemberSymbol)
     , m_caseName(caseName)
     , m_caseValue(-1)
     , m_containingUnion(nullptr)

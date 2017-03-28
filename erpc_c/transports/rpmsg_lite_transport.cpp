@@ -28,7 +28,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "rpmsg_lite_zc_transport.h"
+#include "rpmsg_lite_transport.h"
 #include "erpc_config_internal.h"
 #include <cassert>
 #include <new>
@@ -42,17 +42,17 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgZCBaseTransport::s_initialized = 0;
-struct rpmsg_lite_instance RPMsgZCTransport::s_rpmsg_ctxt;
-struct rpmsg_lite_instance *RPMsgZCBaseTransport::s_rpmsg = NULL;
+uint8_t RPMsgBaseTransport::s_initialized = 0;
+struct rpmsg_lite_instance RPMsgTransport::s_rpmsg_ctxt;
+struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int RPMsgZCTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned long src, void *priv)
+int RPMsgTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned long src, void *priv)
 {
-    RPMsgZCTransport *transport = (RPMsgZCTransport *)priv;
+    RPMsgTransport *transport = (RPMsgTransport *)priv;
     if (payload_len <= ERPC_DEFAULT_BUFFER_SIZE)
     {
         MessageBuffer message((uint8_t *)payload, payload_len);
@@ -62,17 +62,17 @@ int RPMsgZCTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned lon
     return RL_HOLD;
 }
 
-RPMsgZCTransport::RPMsgZCTransport()
-: RPMsgZCBaseTransport()
+RPMsgTransport::RPMsgTransport()
+: RPMsgBaseTransport()
 , m_dst_addr(0)
 {
 }
 
-RPMsgZCTransport::~RPMsgZCTransport()
+RPMsgTransport::~RPMsgTransport()
 {
 }
 
-erpc_status_t RPMsgZCTransport::init(
+erpc_status_t RPMsgTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id)
 {
     if (!s_initialized)
@@ -88,7 +88,7 @@ erpc_status_t RPMsgZCTransport::init(
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCTransport::init(
+erpc_status_t RPMsgTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
 {
     if (!s_initialized)
@@ -115,7 +115,7 @@ erpc_status_t RPMsgZCTransport::init(
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
 {
     while (!m_messageQueue.get(message))
     {
@@ -124,7 +124,7 @@ erpc_status_t RPMsgZCTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCTransport::send(MessageBuffer *message)
+erpc_status_t RPMsgTransport::send(MessageBuffer *message)
 {
     int ret_val =
         rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());

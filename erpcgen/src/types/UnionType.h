@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -106,6 +106,14 @@ public:
      * @retval true Always return true.
      */
     virtual bool isUnion() const { return true; }
+
+    /*!
+     * @brief This function return "true" value for identify non-encapsulated discriminated union
+     * type.
+     *
+     * @retval true True when m_discriminator is not set.
+     */
+    bool isNonEncapsulatedUnion() const { return m_discriminator.compare("") == 0; }
 
     /*!
      * @brief This function returns union cases vector.

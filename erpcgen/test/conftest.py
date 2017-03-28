@@ -244,6 +244,7 @@ class Erpcgen(object):
         self._language = kwargs.get('language', None)
         self._output_dir = kwargs.get('output', None)
         self._include_dirs = kwargs.get('include', [])
+        self._include_dirs.append(str(erpc_dir.join("erpcgen").join("test")))
         self._verbosity = 0
 
     def set_language(self, lang):
@@ -483,8 +484,6 @@ class ErpcgenCompileTest(object):
 # the objects directory.
 class ErpcgenCCompileTest(ErpcgenCompileTest):
     MAIN_CODE = textwrap.dedent("""
-        #include "test.h"
-        #include "test_server.h"
         int main(void) {
             return 0;
         }
@@ -505,10 +504,15 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
         self._compiler.add_include(erpc_dir.join("erpc_c", "config"))
         self._compiler.add_include(erpc_dir.join("erpc_c", "infra"))
         self._compiler.add_include(self._out_dir)
+       
+        # Add all server and client cpp files
+        for file in os.listdir(str(self._out_dir)):
+            if '.cpp' in file:
+                self._compiler.add_source(self._out_dir.join(file))
 
-        # TODO support IDL-configured output filenames.
-        self._compiler.add_source(self._out_dir.join("test_client.cpp"))
-        self._compiler.add_source(self._out_dir.join("test_server.cpp"))
+        # Add all header includes into main code
+        headers = ['#include "'+f+'"' for f in os.listdir(str(self._out_dir)) if '.h' in f]
+        self.MAIN_CODE = '\n'.join(headers) + self.MAIN_CODE
 
         # Add both .c and .cpp copies of the main file.
         for main_filename in ("main_c.c", "main_cxx.cpp"):
@@ -609,6 +613,12 @@ class ErpcgenTestCase(object):
             traceback.print_exc()
             raise
 
+    def _get_line(self, pos):
+        return self._contents.count(os.linesep, 0, pos) + 1
+
+    def _get_column(self, pos):
+        return pos - self._contents.rfind(os.linesep, 0, pos)
+
     def _test_file(self, filename, tests):
         # Skip files listed with no patterns.
         if tests is None:
@@ -657,10 +667,10 @@ class ErpcgenTestCase(object):
         thenCases = case['then']
 
         if eval(ifPredicate, self._params):
-            print("File '{}':{} matched if predicate '{}'".format(self._filename, self._pos, ifPredicate))
+            print("File '{}':{} matched if predicate '{}'".format(self._filename, self._get_line(self._pos), ifPredicate))
             self._test_cases(thenCases)
         elif 'else' in case:
-            print("File '{}':{} taking else branch for if predicate '{}'".format(self._filename, self._pos, ifPredicate))
+            print("File '{}':{} taking else branch for if predicate '{}'".format(self._filename, self._get_line(self._pos), ifPredicate))
             self._test_cases(case['else'])
 
     def _test_one_case(self, case):
@@ -689,13 +699,13 @@ class ErpcgenTestCase(object):
 
         rx = re.compile(pattern, re.MULTILINE)
         match = rx.search(self._contents, self._pos)
-        if not match:
-            print("File '{}':{} FAILED to find pattern '{}'".format(self._filename, self._pos, pattern))
-            raise ErpcgenTestException("file '{}' failed to match against pattern '{!s}' from position {}".format(self._filename, pattern, self._pos))
-        else:
-            print("File '{}':{} found pattern '{}' at offset {}".format(self._filename, self._pos, pattern, match.start()))
 
-        self._pos = match.end() + 1
+        if not match:
+            print("File '{}':{} FAILED to find pattern '{}'".format(self._filename, self._get_line(self._pos), pattern))
+            raise ErpcgenTestException("file '{}' failed to match against pattern '{!s}' from {}. line".format(self._filename, pattern, self._get_line(self._pos)))
+        else:
+            self._pos = match.end()
+            print("File '{}':{} found pattern '{}' at column {}".format(self._filename, self._get_line(self._pos), pattern, self._get_column(match.start())))
 
         # Match not cases now that we have an end range for them.
         if self._not_cases:
@@ -703,7 +713,6 @@ class ErpcgenTestCase(object):
 
     def _test_nots(self, endPos):
         pos = self._not_start_pos
-#         endPos = self._pos
 
         for case in self._not_cases:
             isRegex = False
@@ -719,10 +728,10 @@ class ErpcgenTestCase(object):
             rx = re.compile(pattern, re.MULTILINE)
             match = rx.search(self._contents, pos, endPos)
             if match:
-                print("File '{}':{} FAILED unexpectedly found pattern '{}' at offset {}".format(self._filename, self._pos, pattern, match.start()))
-                raise ErpcgenTestException("file '{}' unexpected matched pattern '{!s}' from position {}".format(self._filename, pattern, pos))
+                print("File '{}':{} FAILED unexpectedly found pattern '{}'".format(self._filename, self._get_line(self._pos), pattern))
+                raise ErpcgenTestException("file '{}' unexpected matched pattern '{!s}' from at {}. line".format(self._filename, pattern, self._get_line(pos)))
             else:
-                print("File '{}':{}-{} passed negative search for '{}'".format(self._filename, pos, endPos, pattern))
+                print("File '{}':{}-{} passed negative search for '{}'".format(self._filename, self._get_line(pos), self._get_line(endPos), pattern))
 
         # Reset not cases.
         self._not_cases = []

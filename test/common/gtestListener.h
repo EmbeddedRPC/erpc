@@ -33,7 +33,7 @@
 #define _EMBEDDED_RPC__GTESTLISTENER_H_
 
 #include "gtest.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes

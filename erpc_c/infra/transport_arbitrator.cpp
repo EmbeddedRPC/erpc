@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -54,6 +54,13 @@ TransportArbitrator::~TransportArbitrator()
     // Dispose of client info objects.
     freeClientList(m_clientList);
     freeClientList(m_clientFreeList);
+}
+
+void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+{
+    assert(crcImpl);
+    assert(m_sharedTransport);
+    m_sharedTransport->setCrc16(crcImpl);
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)

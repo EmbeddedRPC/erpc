@@ -637,18 +637,42 @@ protected:
      *
      * Struct members are examined for @length and @max_length annotations, and the length member is denoted.
      * This function is also used on function parameters, since they are represented as structs.
-     *
-     * @param[in] structType Reference to the struct type to scan and process.
      */
-    void scanStructForAnnotations(StructType *structType);
+    void scanStructForAnnotations();
 
     /*!
      * @brief Check if annotation is integer number or integer type variable.
      *
      * Annotation can contain reference to integer data type or it can be integer number.
      * Referenced integer data type can be presented in global scope or in same structure scope.
+     *
+     * @param[in] ann Annotation to check.
      */
-    void checkIfAnnValueIsIntNumberOrIntType(StructType *structType, Annotation *ann);
+    void checkIfAnnValueIsIntNumberOrIntType(Annotation *ann);
+
+    /*!
+     * @brief This function sets to given symbol given doxygen comments.
+     *
+     * Comments can be placed above declaration or as trailing comments.
+     *
+     * @param[in] symbol Symbol where doxygen comments will be added.
+     * @param[in] above Doxygen comments placed above.
+     * @param[in] trailing Trailing doxygen comments.
+     */
+    void addDoxygenComments(Symbol *symbol, AstNode *above, AstNode *trailing);
+
+    /*!
+     * @brief This function creates new function parameter.
+     *
+     * Function parameter information are set based on given structure member, which is
+     * param member of function type.
+     *
+     * @param[in] structMember Function type param member.
+     * @param[in] name Param name.
+     *
+     * @return new function (callback) parameter.
+     */
+    StructMember *createCallbackParam(StructMember *structMember, const std::string &name);
 };
 
 } // namespace erpcgen

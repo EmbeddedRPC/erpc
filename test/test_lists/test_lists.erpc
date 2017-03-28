@@ -30,9 +30,11 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
+@output_dir("erpc_outputs")
 @separateInterfaceOutput(false)
-program test_lists;
+program test;
+
+import "../common/unit_test_common.erpc"
 
 enum enumColor{red, green = 10, blue}
 

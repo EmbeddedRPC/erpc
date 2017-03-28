@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "rpmsg_lite_zc_rtos_transport.h"
+#include "rpmsg_lite_rtos_transport.h"
 #include "erpc_config_internal.h"
 #include <cassert>
 
@@ -42,26 +42,26 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgZCBaseTransport::s_initialized = 0;
-struct rpmsg_lite_instance *RPMsgZCBaseTransport::s_rpmsg;
+uint8_t RPMsgBaseTransport::s_initialized = 0;
+struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgZCRTOSTransport::RPMsgZCRTOSTransport()
-: RPMsgZCBaseTransport()
+RPMsgRTOSTransport::RPMsgRTOSTransport()
+: RPMsgBaseTransport()
 , m_dst_addr(0)
 {
 }
 
-RPMsgZCRTOSTransport::~RPMsgZCRTOSTransport()
+RPMsgRTOSTransport::~RPMsgRTOSTransport()
 {
     rpmsg_lite_deinit(s_rpmsg);
     s_initialized = 0;
 }
 
-erpc_status_t RPMsgZCRTOSTransport::init(
+erpc_status_t RPMsgRTOSTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id)
 {
     if (!s_initialized)
@@ -86,7 +86,7 @@ erpc_status_t RPMsgZCRTOSTransport::init(
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCRTOSTransport::init(
+erpc_status_t RPMsgRTOSTransport::init(
     unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
 {
     if (!s_initialized)
@@ -121,7 +121,7 @@ erpc_status_t RPMsgZCRTOSTransport::init(
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCRTOSTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 {
     char *buf = NULL;
     int length = 0;
@@ -133,7 +133,7 @@ erpc_status_t RPMsgZCRTOSTransport::receive(MessageBuffer *message)
     return ret_val != RL_SUCCESS ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgZCRTOSTransport::send(MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::send(MessageBuffer *message)
 {
     uint8_t *buf = message->get();
     uint32_t length = message->getLength();

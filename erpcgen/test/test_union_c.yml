@@ -1,0 +1,364 @@
+---
+name: basic external non-encapsulated union
+desc: Verify @external annotation usage on non-encapsulated unions.
+idl: |
+
+  @include("../../../../../test_includes/test_includes_union.h")
+  program test
+
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+
+  @external
+  union unionType
+  {
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+  }
+
+  interface foo {
+    myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
+  }
+
+test.h:
+ - not: typedef union unionType unionType;
+ - not: union unionType
+ - not: int32 x;
+ - not: float y;
+
+test_client.cpp:
+    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+
+test_server.cpp:
+  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
+  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+
+---
+name: basic non-encapsulated union
+desc: Verify "in" direction usage of non-encapsulated unions.
+idl: |
+
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+
+  struct foobar
+  {
+      float a
+      binary rawString
+  }
+
+  const int32 returnVal = 10;
+
+  union unionType
+  {
+    case apple:
+        foobar myFoobar
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+    case orange:
+        list<int32> a
+    case coconut:
+        uint32 cx;
+        list<int32> cc @length(cx)
+    case returnVal:
+        int32 ret
+    default:
+        bool c
+        int32 blah
+  }
+
+  interface foo {
+    myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
+  }
+
+test.h:
+  - typedef union unionType unionType;
+  - union unionType
+  - "{"
+  - foobar myFoobar;
+  - struct
+  - "{"
+  - int32_t x;
+  - float y;
+  - "};"
+  - list_0_t a;
+  - struct
+  - "{"
+  - int32_t cx;
+  - list_0_t cc;
+  - "};"
+  - int32_t ret;
+  - struct
+  - "{"
+  - bool c;
+  - int32_t blah;
+  - "};"
+  - "};"
+  - void myUnion(fruitType discriminator, const unionType * unionVariable);
+
+test_client.cpp:
+  - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+  - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+  - "{"
+  - erpc_status_t err = kErpcStatus_Success;
+  - codec->startWriteUnion(discriminator);
+  - switch (discriminator)
+  - "{"
+  - "case apple:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = write_foobar_struct(codec, &(data->myFoobar));
+  - "}"
+  - break;
+  - "}"
+  - "case banana:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->x);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->y);
+  - "}"
+  - break;
+  - "}"
+  - "case papaya:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->x);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->y);
+  - "}"
+  - break;
+  - "}"
+  - "case orange:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = write_list_0_t_struct(codec, &(data->a));
+  - "}"
+  - break;
+  - "}"
+  - "case coconut:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->cx);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = write_list_0_t_struct(codec, &(data->cc));
+  - "}"
+  - break;
+  - "}"
+  - "case returnVal:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->ret);
+  - "}"
+  - break;
+  - "}"
+  - "default:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->c);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->write(data->blah);
+  - "}"
+  - break;
+  - "}"
+  - "}"
+  - codec->endWriteUnion();
+  - return err;
+  - "}"
+  - void myUnion(fruitType discriminator, const unionType * unionVariable)
+  - not: err = codec->write(static_cast<int32_t>(discriminator));
+  - if (!err)
+  - "{"
+  - err = write_unionType_union(codec, static_cast<int32_t>(discriminator), unionVariable)
+  - "}"
+
+
+test_server.cpp:
+  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
+  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+  - "{"
+  - erpc_status_t err = kErpcStatus_Success;
+  - codec->startReadUnion(discriminator);
+  - switch (*discriminator)
+  - "{"
+  - "case apple:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = read_foobar_struct(codec, &(data->myFoobar));
+  - "}"
+  - break;
+  - "}"
+  - "case banana:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->x);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->y);
+  - "}"
+  - break;
+  - "}"
+  - "case papaya:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->x);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->y);
+  - "}"
+  - break;
+  - "}"
+  - "case orange:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = read_list_0_t_struct(codec, &(data->a));
+  - "}"
+  - break;
+  - "}"
+  - "case coconut:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->cx);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = read_list_0_t_struct(codec, &(data->cc));
+  - "}"
+  - break;
+  - "}"
+  - "case returnVal:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->ret);
+  - "}"
+  - break;
+  - "}"
+  - "default:"
+  - "{"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->c);
+  - "}"
+  - if (!err)
+  - "{"
+  - err = codec->read(&data->blah);
+  - "}"
+  - break;
+  - "}"
+  - "}"
+  - codec->endReadUnion()
+  - return err;
+  - "}"
+  - static void free_unionType_union(int32_t discriminator, unionType * data);
+  - static void free_unionType_union(int32_t discriminator, unionType * data)
+  - "{"
+  - switch (discriminator)
+  - "{"
+  - "case apple:"
+  - "{"
+  - free_foobar_struct(&data->myFoobar);
+  - break;
+  - "}"
+  - "case orange:"
+  - "{"
+  - free_list_0_t_struct(&data->a);
+  - break;
+  - "}"
+  - "case coconut:"
+  - "{"
+  - free_list_0_t_struct(&data->cc);
+  - break;
+  - "}"
+  - "}"
+  - "}"
+  - fruitType discriminator;
+  - unionType *unionVariable = NULL;
+  - unionVariable = (unionType *) erpc_malloc(sizeof(unionType));
+  - if (unionVariable == NULL)
+  - "{"
+  - err = kErpcStatus_MemoryError;
+  - "}"
+  - int32_t _tmp_local;
+  - not: err = codec->read(&_tmp_local);
+  - not: discriminator = static_cast<fruitType>(_tmp_local);
+  - if (!err)
+  - "{"
+  - err = read_unionType_union(codec, &_tmp_local, unionVariable);
+  - discriminator = static_cast<fruitType>(_tmp_local);
+  - "}"
+  - if (!err)
+  - "{"
+  - myUnion(discriminator, unionVariable);
+  - "}"
+
+---
+name: basic non-encapsulated union inside struct
+desc: Verify non-encapsulated unions usage in structures.
+idl: |
+
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+
+  union unionType
+  {
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+  }
+
+  struct structType
+  {
+    fruitType discriminator
+    unionType unionVariable @discriminator(discriminator)
+  }
+
+  interface foo {
+    myUnion(structType structVariable) -> void
+  }
+
+test.h:
+  - struct structType
+  - fruitType discriminator
+  - unionType unionVariable
+  - void myUnion(const structType * structVariable);
+
+test_client.cpp:
+  - write_unionType_union(codec, static_cast<int32_t>(data->discriminator), &data->unionVariable);
+
+test_server.cpp:
+  - int32_t _tmp_local;
+  - read_unionType_union(codec, &_tmp_local, &data->unionVariable);
+
+#test_client.cpp:
+#    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+#    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+
+#test_server.cpp:
+#  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t discriminator, unionType * data);
+#  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t discriminator, unionType * data)

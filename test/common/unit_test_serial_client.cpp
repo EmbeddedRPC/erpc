@@ -29,13 +29,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myAlloc.h"
 #include "Logging.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "serial_transport.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 
 using namespace erpc;
 

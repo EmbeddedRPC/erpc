@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -281,6 +281,22 @@ public:
     virtual erpc_status_t endWriteStruct() = 0;
 
     /*!
+     * @brief Prototype for start write union.
+     *
+     * @param[in] discriminator Discriminator of union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t startWriteUnion(int32_t discriminator) = 0;
+
+    /*!
+     * @brief Prototype for end write union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t endWriteUnion() = 0;
+
+    /*!
      * @brief Writes a flag indicating whether the next value is null.
      *
      * @return Based on implementation.
@@ -386,12 +402,12 @@ public:
     virtual erpc_status_t read(uint32_t *value) = 0;
 
     /*!
-    * @brief Prototype for read uint64_t value.
-    *
-    * @param[in] value uint64_t typed value to read.
-    *
-    * @return Based on implementation.
-    */
+     * @brief Prototype for read uint64_t value.
+     *
+     * @param[in] value uint64_t typed value to read.
+     *
+     * @return Based on implementation.
+     */
     virtual erpc_status_t read(uint64_t *value) = 0;
 
     /*!
@@ -461,6 +477,22 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t endReadStruct() = 0;
+
+    /*!
+     * @brief Prototype for start read union.
+     *
+     * @param[in] discriminator Discriminator of union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t startReadUnion(int32_t *discriminator) = 0;
+
+    /*!
+     * @brief Prototype for end read Union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t endReadUnion() = 0;
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.

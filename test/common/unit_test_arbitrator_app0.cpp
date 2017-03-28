@@ -42,8 +42,8 @@
 
 #include "gtest.h"
 
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface_server.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface_server.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -141,7 +141,7 @@ void runInit(void *arg)
 
     // MessageBufferFactory initialization
     erpc_mbf_t message_buffer_factory;
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transportClient);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transportClient);
 
     // eRPC client side initialization
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);

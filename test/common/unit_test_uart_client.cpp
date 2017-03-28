@@ -29,10 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myAlloc.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "gtest.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 extern "C" {
 #include "board.h"
 #include "fsl_clock_manager.h"

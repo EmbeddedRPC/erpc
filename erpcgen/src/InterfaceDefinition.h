@@ -85,9 +85,11 @@ public:
      *
      * @param[in] inputFile File, which is parsed.
      *
+     * @return Crc16 of all used IDL files.
+     *
      * @exception std::runtime_error Thrown if is bad return result for parse function or no ast node three is created.
      */
-    void parse(const char *inputFile);
+    uint16_t parse(const char *inputFile);
 
     /*!
      * @brief This function returns node belong to this object.

@@ -36,8 +36,8 @@
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "test_arbitrator_firstInterface_server.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface_server.h"
+#include "test_secondInterface.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -153,7 +153,7 @@ void runInit(void *arg)
 
     // MessageBufferFactory initialization
     erpc_mbf_t message_buffer_factory;
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transportClient);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transportClient);
 
     // eRPC client side initialization
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);

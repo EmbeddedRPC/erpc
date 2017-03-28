@@ -35,8 +35,8 @@
 #ifndef _EMBEDDED_RPC__ERPCLEXER_H_
 #define _EMBEDDED_RPC__ERPCLEXER_H_
 
-#include "AstNode.h"
 #undef yyFlexLexer
+#include "AstNode.h"
 #include "ParseErrors.h"
 #include <FlexLexer.h>
 #include <fstream>
@@ -174,29 +174,18 @@ public:
     inline std::string &getFileName() { return m_currentFileInfo->m_fileName; }
 
     /*!
-     * @brief This function open file.
+     * @brief This function returns crc16 of all used IDL files.
      *
-     * This function will try find and open file, which is given be file name
-     * variable. When file is found and opened new current file info object is
-     * created.
-     *
-     * @param[in] fileName File name, which can contains also path to file,
-     *          which is given to flex lexical analysis.
-     *
-     * @return return new current file info object if file is
-     *          found and opened.
-     *
-     * @exception std::runtime_error Thrown if file is not found.
-     * @exception std::runtime_error Thrown if file can not open.
-     * @exception std::runtime_error Thrown if can not create ifstream object from file.
+     * @return Crc16 of all used IDL files.
      */
-    CurrentFileInfo *openFile(const std::string &fileName);
+    uint16_t getIdlCrc16() { return m_idlCrc16; }
 
 protected:
     Value *m_value;                     /*!< Value for the current token. */
     token_loc_t m_location;             /*!< Location for the current token. */
     CurrentFileInfo *m_currentFileInfo; /*!< Pointer to current file info. */
     uint32_t m_indents;                 /*!< How much indents can be removed from newlines in doxygen comments. */
+    uint16_t m_idlCrc16;                /*!< Crc16 of IDL files. */
 
     /*!
      * @brief This function thrown lexical_error with given message.
@@ -227,8 +216,27 @@ protected:
      *@return returns one token.
      */
     virtual int yylex();
+
+    /*!
+     * @brief This function open file.
+     *
+     * This function will try find and open file, which is given be file name
+     * variable. When file is found and opened new current file info object is
+     * created.
+     *
+     * @param[in] fileName File name, which can contains also path to file,
+     *          which is given to flex lexical analysis.
+     *
+     * @return return new current file info object if file is
+     *          found and opened.
+     *
+     * @exception std::runtime_error Thrown if file is not found.
+     * @exception std::runtime_error Thrown if file can not open.
+     * @exception std::runtime_error Thrown if can not create ifstream object from file.
+     */
+    CurrentFileInfo *openFile(const std::string &fileName);
 };
 
-}; // namespace erpcgen
+} // namespace erpcgen
 
 #endif // _EMBEDDED_RPC__ERPCLEXER_H_

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -42,6 +42,7 @@
 #include "types/EnumMember.h"
 #include "types/EnumType.h"
 #include "types/Function.h"
+#include "types/FunctionType.h"
 #include "types/Interface.h"
 #include "types/ListType.h"
 #include "types/StructMember.h"
@@ -68,9 +69,10 @@ public:
      *
      * Interface definition contains all information about parsed files and builtin types.
      *
-     * @param[in] def Pointer to interface definition.
+     * @param[in] def Contains all Symbols parsed from IDL files.
+     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    Generator(InterfaceDefinition *def);
+    Generator(InterfaceDefinition *def, uint16_t idlCrc16);
 
     /*!
      * @brief Destructor.
@@ -83,6 +85,9 @@ public:
     virtual void generate() = 0;
 
 protected:
+    uint16_t m_idlCrc16;               /*!< Storing crc16 of IDL files and erpcgen verssion. */
+    cpptempl::data_map m_templateData; /*!< Data prepared for templates files. */
+
     InterfaceDefinition *m_def; /*!< Interface definitions. */
     SymbolScope *m_globals;     /*!< Symbol scope data. */
     typedef std::map<std::string, std::vector<cpptempl::data_ptr> >
@@ -133,9 +138,33 @@ protected:
      *
      * @return Searched member.
      */
+    StructMember *findParamReferencedFromAnn(const StructType::member_vector_t &members,
+                                             const std::string &referenceName,
+                                             const std::string &annName);
+
+    /*!
+     * @brief This function will return pointer to function parameter/structure member where given reference name is
+     * referenced for.
+     *
+     * @param[in] members Members contain references members and searched members.
+     * @param[in] referenceName Name of reference for which is member searched.
+     *
+     * @return Searched member.
+     */
+    StructMember *findParamReferencedFromUnion(const StructType::member_vector_t &members,
+                                               const std::string &referenceName);
+
+    /*!
+     * @brief This function will return pointer to function parameter/structure member where given reference name is
+     * referenced for. Combines findParamReferencedFromUnion and findParamReferencedFromAnn.
+     *
+     * @param[in] members Members contain references members and searched members.
+     * @param[in] referenceName Name of reference for which is member searched.
+     *
+     * @return Searched member.
+     */
     StructMember *findParamReferencedFrom(const StructType::member_vector_t &members,
-                                          const std::string &referenceName,
-                                          const std::string &annName);
+                                          const std::string &referenceName);
 
     /*!
      * @brief This function return actual time string representation.
@@ -178,12 +207,12 @@ protected:
     virtual cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex) = 0;
 
     /*!
-     * @brief This function will get interface comments and convert to language specific ones
+     * @brief This function will get symbol comments and convert to language specific ones
      *
-     * @param[in] iface Pointer to interface.
-     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     * @param[in] symbol Pointer to symbol.
+     * @param[inout] symbolInfo Data map, which contains information about symbol.
      */
-    virtual void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo) = 0;
+    virtual void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo) = 0;
 
     /*!
      * @brief This function generates output files.
@@ -221,6 +250,8 @@ protected:
      * @param[inout] templateData Data prepared for templates files
      */
     void makeIncludesTemplateData(cpptempl::data_map &templateData);
+
+    virtual void generateCrcFile() = 0;
 };
 
 } // namespace erpcgen

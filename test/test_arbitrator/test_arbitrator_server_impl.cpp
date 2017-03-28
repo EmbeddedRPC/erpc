@@ -30,8 +30,8 @@
  */
 
 #include "simple_server.h"
-#include "test_arbitrator_firstInterface_server.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface_server.h"
+#include "test_secondInterface.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

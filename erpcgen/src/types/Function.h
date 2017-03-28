@@ -44,11 +44,11 @@
 namespace erpcgen {
 
 /*!
- * @brief Function declaration.
+ * @brief Function base declaration.
  *
  * The function's parameters are represented by a StructType object.
  */
-class Function : public Symbol
+class FunctionBase
 {
 public:
     /*!
@@ -58,32 +58,14 @@ public:
      *
      * @param[in] tok Given token.
      */
-    Function(const Token &tok)
-    : Symbol(kFunctionSymbol, tok)
-    , m_parameters("(fn)")
+    FunctionBase()
+    : m_parameters("(fn)")
     , m_returnType(nullptr)
     , m_isOneway(false)
-    , m_uniqueId(++s_idCounter)
     {
     }
 
-    /*!
-     * @brief Constructor.
-     *
-     * This function set symbol token to given token, uniqueId and idCounter to given uniqueId.
-     *
-     * @param[in] tok Given token.
-     * @param[in] uniqueId Given unique function id.
-     */
-    Function(const Token &tok, uint32_t uniqueId)
-    : Symbol(kFunctionSymbol, tok)
-    , m_parameters("(fn)")
-    , m_returnType(nullptr)
-    , m_isOneway(false)
-    , m_uniqueId(uniqueId)
-    {
-        s_idCounter = uniqueId;
-    }
+    virtual ~FunctionBase(){};
 
     /*!
      * @brief This function returns function parameters.
@@ -122,6 +104,66 @@ public:
     void setIsOneway(bool isOneway) { m_isOneway = isOneway; }
 
     /*!
+     * @brief This function returns description about the interface function.
+     *
+     * @return String description about interface function.
+     *
+     * @see std::string AliasType::getDescription() const
+     * @see std::string EnumMember::getDescription() const
+     * @see std::string EnumType::getDescription() const
+     * @see std::string StructMember::getDescription() const
+     * @see std::string StructType::getDescription() const
+     * @see std::string VoidType::getDescription() const
+     * @see std::string ArrayType::getDescription() const
+     * @see std::string ListType::getDescription() const
+     */
+    virtual std::string getDescription() const = 0;
+
+protected:
+    StructType m_parameters; /*!< Function parameters are saved as structure members. */
+    DataType *m_returnType;  /*!< Function return data type. */
+    bool m_isOneway;         /*!< If false then communication is bidirectional. */
+};
+
+/*!
+ * @brief Function declaration.
+ *
+ * The function's parameters are represented by a StructType object.
+ */
+class Function : public FunctionBase, public Symbol
+{
+public:
+    /*!
+     * @brief Constructor.
+     *
+     * This function set symbol token to given token.
+     *
+     * @param[in] tok Given token.
+     */
+    Function(const Token &tok)
+    : Symbol(kFunctionSymbol, tok)
+    , FunctionBase()
+    , m_uniqueId(++s_idCounter)
+    {
+    }
+
+    /*!
+     * @brief Constructor.
+     *
+     * This function set symbol token to given token, uniqueId and idCounter to given uniqueId.
+     *
+     * @param[in] tok Given token.
+     * @param[in] uniqueId Given unique function id.
+     */
+    Function(const Token &tok, uint32_t uniqueId)
+    : Symbol(kFunctionSymbol, tok)
+    , FunctionBase()
+    , m_uniqueId(uniqueId)
+    {
+        s_idCounter = uniqueId;
+    }
+
+    /*!
      * @brief This function returns function unique id.
      *
      * @return Function unique id.
@@ -152,10 +194,7 @@ public:
     virtual std::string getDescription() const;
 
 protected:
-    StructType m_parameters; /*!< Function parameters are saved as structure members. */
-    DataType *m_returnType;  /*!< Function return data type. */
-    bool m_isOneway;         /*!< If false then communication is bidirectional. */
-    uint32_t m_uniqueId;     /*!< Function unique id. */
+    uint32_t m_uniqueId; /*!< Function unique id. */
 
     static uint32_t s_idCounter; /*!< Function id counter. Each function will increase this. */
 };

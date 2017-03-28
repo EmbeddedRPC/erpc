@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2017 NXP
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
@@ -117,6 +117,12 @@ class Codec(object):
     def end_write_struct(self):
         raise NotImplementedError()
 
+    def start_write_union(self, discriminator):
+        raise NotImplementedError()
+
+    def end_write_union(self):
+        raise NotImplementedError()
+
     def write_null_flag(self, flag):
         raise NotImplementedError()
 
@@ -179,6 +185,14 @@ class Codec(object):
         raise NotImplementedError()
 
     def end_read_struct(self):
+        raise NotImplementedError()
+
+    ##
+    # @return Int of union discriminator.
+    def start_read_list(self):
+        raise NotImplementedError()
+
+    def end_read_list(self):
         raise NotImplementedError()
 
     def read_null_flag(self):

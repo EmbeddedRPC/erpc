@@ -55,6 +55,7 @@ public:
 
     static int allocated() { return allocated_; }
     static void allocated(int allocated) { allocated_ = allocated; }
+
 private:
     static int allocated_;
 };

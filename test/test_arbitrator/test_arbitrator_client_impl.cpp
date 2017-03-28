@@ -31,8 +31,8 @@
 
 #include "gtest.h"
 #include "simple_server.h"
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface_server.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface_server.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

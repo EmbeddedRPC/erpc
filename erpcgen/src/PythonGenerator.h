@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -52,9 +52,10 @@ public:
     /*!
      * @brief This function is constructor of PythonGenerator class.
      *
-     * @param[in] prog Pointer to program with generating options.
+     * @param[in] def Contains all Symbols parsed from IDL files.
+     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    PythonGenerator(InterfaceDefinition *def);
+    PythonGenerator(InterfaceDefinition *def, uint16_t idlCrc16);
 
     /*!
      * @brief This function is destructor of PythonGenerator class.
@@ -71,9 +72,8 @@ public:
     virtual void generate();
 
 protected:
-    cpptempl::data_map m_templateData; //!< Data prepared for templates files.
-    std::string m_suffixStrip;         //!< String to remove from suffixes of names.
-    size_t m_suffixStripSize;          //!< Length of the suffix filter string.
+    std::string m_suffixStrip; //!< String to remove from suffixes of names.
+    size_t m_suffixStripSize;  //!< Length of the suffix filter string.
 
     /*!
      * @brief This function prepare helpful functions located in template files.
@@ -140,12 +140,12 @@ protected:
     cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
 
     /*!
-     * @brief This function will get interface comments and convert to language specific ones
+     * @brief This function will get symbol comments and convert to language specific ones
      *
-     * @param[in] iface Pointer to interface.
-     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     * @param[in] symbol Pointer to symbol.
+     * @param[inout] symbolInfo Data map, which contains information about symbol.
      */
-    void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo);
+    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo);
 
     /*!
      * @brief This function return interface function prototype.
@@ -196,6 +196,21 @@ protected:
      * are necessary for generating output code for output files.
      */
     void makeStructsTemplateData();
+
+    /*!
+     * @brief This function sets non-encapsulated unions template data.
+     *
+     * This function sets non-encapsulated unions template data with all data, which
+     * are necessary for generating output code for output files.
+     */
+    void makeUnionsTemplateData();
+
+    /*!
+     * @brief This function sets function type template data.
+     *
+     * This is used for registering callback functions in generated output.
+     */
+    void makeFunctionsTemplateData();
 
     /*!
      * @brief This function sets struct member information to struct data map variable.
@@ -258,8 +273,19 @@ protected:
 
     /*!
      * @brief Strip leading and trailing whitespace.
+     *
+     * @param[in] s String from which is stripped whitespaces.
      */
     std::string stripWhitespace(const std::string &s);
+
+    /*!
+     * @brief Check if character is whitespace type.
+     *
+     * @param[in] c Checked character.
+     */
+    bool checkWhitspaceChar(char c);
+
+    virtual void generateCrcFile();
 };
 
 } // namespace erpcgen

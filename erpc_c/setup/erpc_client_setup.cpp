@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,6 +32,7 @@
 #include "erpc_client_setup.h"
 #include "basic_codec.h"
 #include "client_manager.h"
+#include "crc16.h"
 #include "manually_constructed.h"
 #include <assert.h>
 #include <new>
@@ -50,6 +51,9 @@ using namespace erpc;
 static ManuallyConstructed<ClientManager> s_client;
 ClientManager *g_client;
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
+static ManuallyConstructed<Crc16> s_crc16;
+
+extern const uint32_t erpc_generated_crc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -62,7 +66,10 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
 
     // Init client manager with the provided transport.
     s_client.construct();
-    s_client->setTransport(reinterpret_cast<Transport *>(transport));
+    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    s_crc16.construct(erpc_generated_crc);
+    castedTransport->setCrc16(s_crc16.get());
+    s_client->setTransport(castedTransport);
     s_client->setCodecFactory(s_codecFactory);
     s_client->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
     g_client = s_client;
@@ -78,6 +85,7 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler)
 
 void erpc_client_deinit()
 {
+    s_crc16.destroy();
     s_client.destroy();
     s_codecFactory.destroy();
 }

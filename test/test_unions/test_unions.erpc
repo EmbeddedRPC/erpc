@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -30,9 +30,11 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
+@output_dir("erpc_outputs")
 @separateInterfaceOutput(true)
-program test_unions;
+program test;
+
+import "../common/unit_test_common.erpc"
 
 enum caseValues { bar, baz }
 enum fruit { apple, orange, banana, coconut, grape, papaya, kiwi }
@@ -45,6 +47,26 @@ struct foobar
 {
     float a
     binary rawString
+}
+
+union unionType
+{
+    case apple:
+        foobar myFoobar
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+    case orange:
+        list<int32> a
+    case coconut:
+        uint32 cx;
+        list<int32> cc @length(cx)
+    case returnVal:
+        int32 ret
+    default:
+        bool c
+        int32 blah
 }
 
 struct foo
@@ -145,5 +167,6 @@ struct Foop {
 interface ArithmeticService {
     testGenericCallback(gapGenericEvent_t event) -> gapGenericEvent_t
     sendMyFoo(foo f @retain) -> foo
+    sendMyUnion(fruit discriminator, unionType unionVariable @discriminator(discriminator)) -> foo
     testInnerList(InnerList il) -> InnerList
 }

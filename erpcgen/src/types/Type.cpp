@@ -36,6 +36,7 @@
 #include "EnumMember.h"
 #include "EnumType.h"
 #include "Function.h"
+#include "FunctionType.h"
 #include "Interface.h"
 #include "ListType.h"
 #include "Logging.h"
@@ -46,7 +47,8 @@
 #include "SymbolScope.h"
 #include "UnionCase.h"
 #include "UnionType.h"
-#include <string.h>
+#include "annotations.h"
+#include <cstring>
 
 using namespace erpcgen;
 
@@ -72,6 +74,29 @@ Value *Annotation::getValueObject()
     {
         throw semantic_error(format_string("Missing value for annotation named '%s' on line '%d'", m_name.c_str(),
                                            m_location.m_firstLine));
+    }
+}
+
+std::string Symbol::getOutputName()
+{
+    Annotation *ann = findAnnotation(NAME_ANNOTATION);
+    if (ann)
+    {
+        Value *annValue = ann->getValueObject();
+        if (annValue)
+        {
+            Log::warning("line %d: Be careful when @name annotation is used. This can cause compile issue. See documentation.\n", ann->getLocation().m_firstLine);
+            return annValue->toString();
+        }
+        else
+        {
+            throw semantic_error(format_string("Missing value for annotation named '%s' on line '%d'", ann->toString().c_str(),
+                                               ann->getLocation().m_firstLine));
+        }
+    }
+    else
+    {
+        return m_name;
     }
 }
 
@@ -196,8 +221,7 @@ void SymbolScope::addSymbol(Symbol *sym, int32_t pos)
 {
     assert(sym);
 
-    // Check for existing symbol with same name except structs. Structs are already added as typedef and it always call
-    // semantic error.
+    // Check for existing symbol with same name.
     // sym->getName() == "" for anonymous struct and enums
     if (hasSymbol(sym->getName()) && sym->getName() != "")
     {
@@ -489,6 +513,13 @@ DataType *DataType::getTrueContainerDataType()
         default:
             return trueDataType;
     }
+}
+
+std::string FunctionType::getDescription() const
+{
+    return format_string("<function %s->%s [%s]>", m_name.c_str(),
+                         (m_returnType ? m_returnType->getDescription().c_str() : "(oneway)"),
+                         m_parameters.getDescription().c_str());
 }
 
 std::string Function::getDescription() const

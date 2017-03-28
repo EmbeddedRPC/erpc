@@ -60,7 +60,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;$(ProjectDir)\..\..\erpc_c\infra;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <BrowseInformation>true</BrowseInformation>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -102,12 +102,14 @@ python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
+python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
-python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,7 +120,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_RELEASE;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_61_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;$(ProjectDir)\..\..\erpc_c\infra;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -140,12 +142,14 @@ python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
+python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
 python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
-python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
     </PreBuildEvent>
     <Flex>
       <OutputFile>$(ProjectDir)\%(Filename).flex.cpp</OutputFile>
@@ -159,6 +163,8 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\erpc_c\infra\crc16.h" />
+    <ClInclude Include="..\..\erpc_c\infra\erpc_version.h" />
     <ClInclude Include="..\src\format_string.h" />
     <ClInclude Include="..\src\HexValues.h" />
     <ClInclude Include="..\src\Logging.h" />
@@ -201,6 +207,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\erpc_c\infra\crc16.cpp" />
     <ClCompile Include="..\src\format_string.cpp" />
     <ClCompile Include="..\src\HexValues.cpp" />
     <ClCompile Include="..\src\Logging.cpp" />
@@ -226,6 +233,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     <ClCompile Include="c_client_source.cpp" />
     <ClCompile Include="c_coders.cpp" />
     <ClCompile Include="c_common_header.cpp" />
+    <ClCompile Include="c_crc.cpp" />
     <ClCompile Include="c_server_header.cpp" />
     <ClCompile Include="c_server_source.cpp" />
     <ClCompile Include="c_common_functions.cpp" />
@@ -237,6 +245,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_serve
     <ClCompile Include="py_client.cpp" />
     <ClCompile Include="py_coders.cpp" />
     <ClCompile Include="py_common.cpp" />
+    <ClCompile Include="py_global_init.cpp" />
     <ClCompile Include="py_init.cpp" />
     <ClCompile Include="py_interface.cpp" />
     <ClCompile Include="py_server.cpp" />

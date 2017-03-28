@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,9 +33,9 @@
 #define _EMBEDDED_RPC__TRANSPORT_H_
 
 #include "erpc_common.h"
+#include "crc16.h"
 #include "message_buffer.h"
 #include <cstring>
-#include <stdint.h>
 
 /*!
  * @addtogroup infra_transport
@@ -101,6 +101,13 @@ public:
      * @retval True when a message is available to process, else false.
      */
     virtual bool hasMessage() { return true; }
+
+    /*!
+     * @brief This functions sets thre CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl){};
 };
 
 /*!

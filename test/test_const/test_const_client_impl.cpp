@@ -30,7 +30,7 @@
  */
 
 #include "gtest.h"
-#include "test_const.h"
+#include "test.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

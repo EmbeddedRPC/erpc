@@ -30,7 +30,7 @@
  */
 
 #include "gtest.h"
-#include "test_struct_ArithmeticService.h"
+#include "test_ArithmeticService.h"
 #include <string.h>
 
 using namespace std;
@@ -130,7 +130,7 @@ TEST(test_struct, TestStudent2)
 {
     student *stud;
     float scores[3] = { 65.32, 69.68, 0 };
-    stud = createStudent("George Bush", &scores, FRESHMAN, 68);
+    stud = createStudent("George Bush", scores, FRESHMAN, 68);
     char *resultStudent = getStudentName(stud);
     EXPECT_STREQ("George Bush", resultStudent);
     erpc_free(resultStudent);

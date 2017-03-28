@@ -29,18 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-interface ArithmeticService6 {
-oneway hello(int32 a);
-}
+import "test21.erpc"
 
-interface ArithmeticService5 {
-oneway hello(int32 a);
-}
-
-interface ArithmeticService4 {
-oneway hello(int32 a);
-}
-
-interface ArithmeticService7 {
-oneway hello(int32 a);
+interface ArithmeticService2 {
+oneway hello5(int32 a);
 }

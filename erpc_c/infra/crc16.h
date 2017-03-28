@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,70 +28,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
-this is comment which is not tracked
-    */
-/*this is comment which is not tracked*/
-@outputDir("erpc_outputs")
-program test_others
+#ifndef _EMBEDDED_RPC__CRC16_H_
+#define _EMBEDDED_RPC__CRC16_H_
 
-import "imports/test2.erpc"
-/*!
-1 comment
-*/
-/*! 2 comment*/
-/*!3 comment*/
-/** 4 comment */
-/**5 comment*/
-/**
-6 comment
-*/
+#include <stdint.h>
 
 /*!
-7 comment
-*/
-//this is comment which is not tracked
-// this is comment which is not tracked
-/// 8 comment
-///9 comment
-//! 10 comment
-//!11 comment
-const int32 ii = 5 //!< 12 comment
-
-/**
- * 13 comment
+ * @addtogroup infra_transport
+ * @{
+ * @file
  */
-enum enumColor //!< 14 comment
-{
-    /** 15 comment */
-    /**
-    15 comment again
-    */
-    red,  /**< 16 comment */
-    green,  /**<17 comment */
-    blue  /*!< 18 comment */
-}
 
-/*!
-19 comment
-*/
-struct A //!< 20 comment
-{
-    ///21 comment
-    int32 m    //!< 22 comment
-    ///23 comment
-    int32 n    //!<24 comment
-}
+////////////////////////////////////////////////////////////////////////////////
+// Classes
+////////////////////////////////////////////////////////////////////////////////
 
-/// 25 comment
-///26 comment
-type ListType = list<int32> /*!<27 comment */
+namespace erpc {
 
-//! 28 comment
-//!29 comment
-interface DoxygenComments /*!<30 comment */
+class Crc16
 {
-//! 31 comment
-    //!32 comment
-    sendReceiveInt(ListType a) -> ListType ///< 33 comment;
-}
+public:
+    /*!
+     * @brief Constructor.
+     */
+    Crc16(uint32_t crcStart);
+
+    /*!
+     * @brief Codec destructor
+     */
+    ~Crc16();
+
+    /*!
+     * @brief Compute a ITU-CCITT CRC-16 over the provided data.
+     *
+     * This implementation is slow but small in size.
+     *
+     * @param[in] data Pointer to data used for crc16.
+     * @param[in] dataLength Data length.
+     */
+    uint16_t computeCRC16(const uint8_t *data, uint32_t lengthInBytes);
+
+protected:
+    uint32_t m_crcStart; /*!< CRC start number. */
+};
+
+} // namespace erpc
+
+/*! @} */
+
+#endif // _EMBEDDED_RPC__CRC16_H_

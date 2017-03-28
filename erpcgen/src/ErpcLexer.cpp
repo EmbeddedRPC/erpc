@@ -29,10 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ErpcLexer.h"
+#include "Generator.h"
 #include "HexValues.h"
 #include "SearchPath.h"
+#include "crc16.h"
+#include "erpcgen_version.h"
 #include <algorithm>
 #include <fstream>
+#include <streambuf>
+#include <string>
 
 using namespace erpcgen;
 
@@ -50,6 +55,7 @@ ErpcLexer::ErpcLexer(const char *inputFile)
 : m_value(nullptr)
 , m_indents(0)
 , m_currentFileInfo(NULL)
+, m_idlCrc16(0)
 {
     m_currentFileInfo = openFile(inputFile);
     yyrestart(m_currentFileInfo->m_savedFile.get()); // instead of yyFlexLexer(idlFile);
@@ -240,6 +246,15 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
     {
         throw runtime_error(format_string("could not create ifstream object from file %s", foundFile.c_str()));
     }
+
+    /* Counting CRC16 for Generator. */
+    std::string str((std::istreambuf_iterator<char>(*inputFile)), std::istreambuf_iterator<char>());
+    erpc::Crc16 crc16 = erpc::Crc16(ERPCGEN_VERSION_NUMBER);
+    m_idlCrc16 += crc16.computeCRC16((const uint8_t *)str.c_str(), str.size());
+
+    /* Reset state to beginning of file. */
+    inputFile->clear();
+    inputFile->seekg(0, ios::beg);
 
     return new CurrentFileInfo(inputFile, foundFile, currentFolderPath);
 }

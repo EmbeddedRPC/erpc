@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -35,8 +35,8 @@
 #include "gtest.h"
 #include "simple_server.h"
 #include "tcp_transport.h"
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface.h"
 #include "transport_arbitrator.h"
 #include "unit_test.h"
 #include <unistd.h>
@@ -69,6 +69,9 @@ ArbitratedClientManager *g_client;
 TransportArbitrator g_arbitrator;
 SimpleServer g_server;
 Mutex waitQuitMutex;
+
+extern const uint32_t erpc_generated_crc;
+Crc16 g_crc16(erpc_generated_crc);
 
 int waitQuit = 0;
 
@@ -140,6 +143,8 @@ int main(int argc, char **argv)
     g_client->setArbitrator(&g_arbitrator);
     g_client->setCodecFactory(&g_basicCodecFactory);
     g_client->setMessageBufferFactory(&g_msgFactory);
+
+    g_arbitrator.setCrc16(&g_crc16);
 
     g_server.setTransport(&g_arbitrator);
     g_server.setCodecFactory(&g_basicCodecFactory);

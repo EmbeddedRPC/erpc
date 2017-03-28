@@ -31,7 +31,7 @@
 
 #include "erpc_transport_setup.h"
 #include "manually_constructed.h"
-#include "rpmsg_lite_zc_transport.h"
+#include "rpmsg_lite_transport.h"
 
 using namespace erpc;
 
@@ -54,7 +54,7 @@ char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section("rpmsg_sh_mem_sec
 #error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"
 #endif
 
-static ManuallyConstructed<RPMsgZCTransport> s_transport;
+static ManuallyConstructed<RPMsgTransport> s_transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

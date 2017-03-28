@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2017 NXP
 # All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -53,6 +53,7 @@ INCLUDES += $(ERPC_C_ROOT)/config \
 SOURCES += 	$(ERPC_C_ROOT)/infra/arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/basic_codec.cpp \
 			$(ERPC_C_ROOT)/infra/client_manager.cpp \
+			$(ERPC_C_ROOT)/infra/crc16.cpp \
 			$(ERPC_C_ROOT)/infra/framed_transport.cpp \
 			$(ERPC_C_ROOT)/infra/message_buffer.cpp \
 			$(ERPC_C_ROOT)/infra/server.cpp \
@@ -74,6 +75,7 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/infra/basic_codec.h \
 			$(ERPC_C_ROOT)/infra/client_manager.h \
 			$(ERPC_C_ROOT)/infra/codec.h \
+			$(ERPC_C_ROOT)/infra/crc16.h \
 			$(ERPC_C_ROOT)/infra/erpc_common.h \
 			$(ERPC_C_ROOT)/infra/erpc_version.h \
 			$(ERPC_C_ROOT)/infra/framed_transport.h \

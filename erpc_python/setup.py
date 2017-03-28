@@ -30,10 +30,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup
+from erpc import erpc_version
 
 setup(
     name="erpc",
-    version="1.4.0",
+    version=erpc_version.ERPC_VERSION,
     description="eRPC Python infrastructure",
     long_description='',
     author="NXP",

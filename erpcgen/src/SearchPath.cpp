@@ -30,7 +30,7 @@
  */
 
 #include "SearchPath.h"
-#include <stdio.h>
+#include <cstdio>
 
 #if __WIN32__
 #define PATH_SEP_CHAR '\\'

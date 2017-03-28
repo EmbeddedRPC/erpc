@@ -52,14 +52,10 @@ public:
      *
      * Interface definition contains all information about parsed files and builtin types.
      *
-     * @param[in] def Pointer to interface definition.
+     * @param[in] def Contains all Symbols parsed from IDL files.
+     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    CGenerator(InterfaceDefinition *def)
-    : Generator(def)
-    , m_generateClientOutput(true)
-    , m_generateServerOutput(true)
-    {
-    }
+    CGenerator(InterfaceDefinition *def, uint16_t idlCrc16);
 
     /*!
      * @brief This function is destructor of CGenerator class.
@@ -76,8 +72,6 @@ public:
     virtual void generate();
 
 protected:
-    cpptempl::data_map m_templateData; /*!< Data prepared for templates files. */
-
     // TODO: not sure how to get rid of these members yet. Talk to Chris about it.
     bool m_generateClientOutput; /*!< For generating only client output. */
     bool m_generateServerOutput; /*!< For generating only server output. */
@@ -189,12 +183,12 @@ protected:
     cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
 
     /*!
-     * @brief This function will get interface comments and convert to language specific ones
+     * @brief This function will get symbol comments and convert to language specific ones
      *
-     * @param[in] iface Pointer to interface.
-     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     * @param[in] symbol Pointer to symbol.
+     * @param[inout] symbolInfo Data map, which contains information about symbol.
      */
-    void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo);
+    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo);
 
     /*!
      * @brief This function sets const template data.
@@ -205,6 +199,14 @@ protected:
     void makeConstTemplateData();
 
     // Functions that populate type-specific template data
+
+    /*!
+    * @brief This function sets non-encapsulated unions and structures template data.
+    *
+    * This function sets non-encapsulated unions and structures template data with all data, which
+    * are necessary for generating output code for output files.
+    */
+    void makeUnionsStructsTemplateData();
 
     /*!
      * @brief This function sets structures template data.
@@ -237,6 +239,27 @@ protected:
      * @param[in,out] structInfo Data map, which contains information about struct and struct members.
      */
     void setStructMembersTemplateData(StructType *structType, cpptempl::data_map &structInfo);
+
+    /*!
+     * @brief This function sets non-encapsulated unions template data.
+     *
+     * This function sets non-encapsulated unions template data with all data, which
+     * are necessary for generating output code for output files.
+     */
+    void makeUnionsTemplateData();
+
+    /*!
+     * @brief This function returns union cases declaration description to union.
+     *
+     * This function returns unions cases declaration description to union, which
+     * is necessary for generating output code for output files.
+     *
+     * @param[in] unionType Union, which contains union cases.
+     * @param[in] ident Additional ident used for member data.
+     *
+     * @return Union cases declaration description.
+     */
+    std::string getUnionMembersData(UnionType *unionType, std::string ident);
 
     /*!
      * @brief This function sets enum template data.
@@ -322,7 +345,7 @@ protected:
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Function *fn);
+    std::string getFunctionPrototype(FunctionBase *fn);
 
     /*!
      * @brief This function return interface function representation called by server side.
@@ -377,7 +400,7 @@ protected:
      * @param[in] structType Structure holdings structure members.
      * @param[in] inDataContainer Is inside data container (struct, list, array).
      * @param[in] structMember Null for return.
-     * @param[out] containsEnum Return true, when data type contains enum type.
+     * @param[out] needTempVariable Return true, when data type contains enum, function, union type.
      * @param[in] isFunctionParam Tru for function param else false (structure member).
      *
      * @return Template data for decode or encode data type.
@@ -387,7 +410,7 @@ protected:
                                            StructType *structType,
                                            bool inDataContainer,
                                            StructMember *structMember,
-                                           bool &containsEnum,
+                                           bool &needTempVariable,
                                            bool isFunctionParam);
 
     /*!
@@ -499,13 +522,13 @@ protected:
      * Based on directions of structures or functions parameters, given map will be added to given lists.
      *
      * @param[in] symbolType Contains structure or function parameter.
-     * @param[in,out] to1Core List structures map, which are use for core 1 direction.
-     * @param[in,out] to2Core List structures map, which are use for core 2 direction.
+     * @param[in,out] toClient List structures map, which are use for core 1 direction.
+     * @param[in,out] toServer List structures map, which are use for core 2 direction.
      * @param[in] dataMap Map with information about structure or function parameter.
      */
     void setToCore(Symbol *symbolType,
-                   cpptempl::data_list &to1Core,
-                   cpptempl::data_list &to2Core,
+                   cpptempl::data_list &toClient,
+                   cpptempl::data_list &toServer,
                    cpptempl::data_map &dataMap);
 
     /*!
@@ -634,6 +657,20 @@ protected:
      * @retval false When "retain" annotation was set to the function parameter.
      */
     bool generateServerFunctionParamFreeFunctions(StructMember *structMember);
+
+    /*!
+     * @brief Set no_shared annotation to struct/union type.
+     *
+     * This annotation will be set to these data types if one of theirs members will contain mentioned annotation.
+     *
+     * @param[in] parentSymbol Struct/union type.
+     * @param[in] childSymbol It's member type.
+     */
+    void setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol);
+
+    bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData);
+
+    virtual void generateCrcFile();
 };
 } // namespace erpcgen
 

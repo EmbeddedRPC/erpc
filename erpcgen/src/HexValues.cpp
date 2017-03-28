@@ -30,7 +30,7 @@
  */
 
 #include "HexValues.h"
-#include <ctype.h>
+#include <cctype>
 
 bool isHexDigit(char c)
 {

@@ -29,10 +29,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myAlloc.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "gtest.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 #define BAREMETAL_MASTER 1
 extern "C" {
 #include "app_core0.h"

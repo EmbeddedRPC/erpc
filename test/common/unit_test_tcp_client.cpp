@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,13 +29,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "myAlloc.h"
 #include "Logging.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "tcp_transport.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 
 using namespace erpc;
 
@@ -63,6 +64,9 @@ TCPTransport g_transport("localhost", 12345, false);
 BasicCodecFactory g_basicCodecFactory;
 ClientManager *g_client;
 
+extern const uint32_t erpc_generated_crc;
+Crc16 g_crc16(erpc_generated_crc);
+
 int MyAlloc::allocated_ = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +92,7 @@ int main(int argc, char **argv)
         Log::error("Failed to open connection\n");
         return 1;
     }
+    g_transport.setCrc16(&g_crc16);
     g_client->setMessageBufferFactory(&g_msgFactory);
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);

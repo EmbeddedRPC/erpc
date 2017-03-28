@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -36,7 +36,6 @@
 #include "message_buffer.h"
 #include "transport.h"
 #include <cstring>
-#include <stdint.h>
 
 #if ERPC_THREADS
 #include "erpc_threading.h"
@@ -53,7 +52,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace erpc {
-class MessageBuffer;
 
 /*!
  * @brief Base class for framed transport layers.
@@ -78,13 +76,8 @@ class MessageBuffer;
 class FramedTransport : public Transport
 {
 public:
-    //! @brief Function type for a CRC-16 implementation.
-    typedef uint16_t (*compute_crc_t)(const uint8_t *data, uint32_t lengthInBytes);
-
     /*!
      * @brief Constructor.
-     *
-     * Sets the CRC-16 implementation to the internal function.
      */
     FramedTransport();
 
@@ -122,11 +115,22 @@ public:
      */
     virtual erpc_status_t send(MessageBuffer *message);
 
-    //! @brief Override the CRC-16 implementation.
-    void setCRCFunction(compute_crc_t crcFunction);
+    /*! @brief Contents of the header that prefixes each message. */
+    struct Header
+    {
+        uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
+        uint16_t m_crc;         //!< CRC-16 over the message data.
+    };
+
+    /*!
+     * @brief This functions sets thre CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl);
 
 protected:
-    compute_crc_t m_crcImpl; //!< CRC function.
+    Crc16 *m_crcImpl; /*!< CRC object. */
 
 #if ERPC_THREADS
     Mutex m_sendLock;    //!< Mutex protecting send.
@@ -154,21 +158,9 @@ protected:
      * @retval kErpcStatus_Fail When reading data ends with error.
      */
     virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) = 0;
-
-    /*! @brief Contents of the header that prefixes each message. */
-    struct Header
-    {
-        uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
-        uint16_t m_crc;         //!< CRC-16 over the message data.
-    };
-
-    //! @brief Compute a ITU-CCITT CRC-16 over the provided data.
-    //!
-    //! This implementation is slow but small in size.
-    static uint16_t computeCRC16(const uint8_t *data, uint32_t lengthInBytes);
 };
 
-} // namespace
+} // namespace erpc
 
 /*! @} */
 

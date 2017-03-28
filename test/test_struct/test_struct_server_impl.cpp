@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_struct_ArithmeticService_server.h"
+#include "test_ArithmeticService_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -141,14 +141,14 @@ int32_t getStudentAge(const student *stud)
     return studAge;
 }
 
-student *createStudent(const char *name, const float (*test_scores)[3], school_year_t year, int32_t age)
+student *createStudent(const char *name, float test_scores[3], school_year_t year, int32_t age)
 {
     // Log::info("returning from createStudent()\n");
     student *newStudent = (student *)erpc_malloc(sizeof(student));
     newStudent->name = (char *)erpc_malloc((strlen(name) + 1) * sizeof(char));
     strcpy(newStudent->name, name);
     for (uint8_t i = 0; i < 3; ++i)
-        newStudent->test_grades[i] = (*test_scores)[i];
+        newStudent->test_grades[i] = test_scores[i];
     newStudent->school_year = year;
     newStudent->age = age;
     // Log::info("returning from createStudent()\n");

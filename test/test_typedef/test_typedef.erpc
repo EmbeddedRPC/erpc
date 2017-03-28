@@ -30,8 +30,11 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
-program test_typedef;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
+
 struct A
 {
     int32 m

@@ -30,9 +30,9 @@
  */
 
 #include "Logging.h"
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 
 // init global logger to null
 Logger *Log::s_logger = NULL;

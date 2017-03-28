@@ -30,10 +30,13 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
+@output_dir("erpc_outputs")
 //@clientOutputFormat(C)
 //@serverOutputFormat(C)
-program test_struct;
+program test;
+
+import "../common/unit_test_common.erpc"
+
 // Hello world!
 
 struct C

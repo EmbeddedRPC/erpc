@@ -31,7 +31,7 @@
 
 #include "erpc_server_setup.h"
 #include "Logging.h"
-#include "test_typedef_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>

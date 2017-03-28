@@ -31,8 +31,8 @@
 #if !defined(_Logging_h_)
 #define _Logging_h_
 
-#include <assert.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdarg>
 #include <string>
 
 #if !(__embedded_cplusplus)

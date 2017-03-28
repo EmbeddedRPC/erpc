@@ -30,13 +30,13 @@
 {% def f_clientEncode(iface, fn) %}
 {$addInfraErrorChecks("    ", f_clientStartWriteMessage(fn.isReturnValue, iface.name, fn.name))}
 {%   if fn.isSendValue %}
-{%    for param in fn.parametersTo2Core if not param.lengthForMember %}
+{%    for param in fn.parametersToServer if not param.serializedViaMember %}
 {%     if param.isNullable %}
 {$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     else -- isNullable %}
 {$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
-{%    endfor -- fn parametersTo2Core %}
+{%    endfor -- fn parametersToServer %}
 {%   endif -- isSendValue %}
 
 {$addInfraErrorChecks("    ", s_endWriteMessage)}
@@ -49,16 +49,16 @@
 {%    if fn.needNullVariableOnClient %}
     bool isNull;
 {%    endif -- needNullVariableOnClient %}
-{%    for param in fn.parametersTo1Core if not param.lengthForMember %}
+{%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
 {$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, ""))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
 {$> addIndent("    ", param.mallocClient)}
 {$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
-{%    endfor -- fn parametersTo1Core %}
+{%    endfor -- fn parametersToClient %}
 {%    if fn.returnValue.type.isNotVoid %}
-{%     if count(fn.parametersTo1Core) > 0 %}
+{%     if count(fn.parametersToClient) > 0 %}
 {# need empty line for this case #}
 
 {%     endif %}
@@ -104,7 +104,7 @@ if (!isNull)
 }
 else
 {
-{$param.coderCall.name} = NULL;
+    {$param.coderCall.name} = NULL;
 }
 {% enddef %}
 

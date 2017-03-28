@@ -62,7 +62,7 @@ void InterfaceDefinition::init()
     createBuiltinTypes();
 }
 
-void InterfaceDefinition::parse(const char *inputFile)
+uint16_t InterfaceDefinition::parse(const char *inputFile)
 {
     // create lexer instance
     ErpcLexer lexer(inputFile);
@@ -85,6 +85,8 @@ void InterfaceDefinition::parse(const char *inputFile)
     scanner.walk(m_ast);
 
     m_globals.dump();
+
+    return lexer.getIdlCrc16();
 }
 
 void InterfaceDefinition::createBuiltinTypes()
@@ -159,11 +161,11 @@ void InterfaceDefinition::setErrorHandlingChecksType()
 {
     if (hasProgramSymbol())
     {
-        if (programSymbol()->findAnnotation(NO_ALLOC_ERRORS))
+        if (programSymbol()->findAnnotation(NO_ALLOC_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 1);
         }
-        if (programSymbol()->findAnnotation(NO_INFRA_ERRORS))
+        if (programSymbol()->findAnnotation(NO_INFRA_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 2);
         }

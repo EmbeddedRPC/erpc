@@ -1,5 +1,7 @@
-@outputDir("erpc_outputs/")
-program test_arbitrator;
+@output_dir("erpc_outputs/")
+program test;
+
+import "../common/unit_test_common.erpc"
 
 @group("firstInterface")
 interface FirstInterface

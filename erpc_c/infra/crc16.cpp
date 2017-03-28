@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,26 +28,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "rpmsg_lite_zc_rtos_transport.h"
+#include "crc16.h"
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
-
-static ManuallyConstructed<RPMsgZCRTOSTransport> s_transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready)
+Crc16::Crc16(uint32_t crcStart)
+: m_crcStart(crcStart)
 {
-    s_transport.construct();
-    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready);
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+}
+
+Crc16::~Crc16()
+{
+}
+
+uint16_t Crc16::computeCRC16(const uint8_t *data, uint32_t lengthInBytes)
+{
+    uint32_t crc = m_crcStart;
+
+    uint32_t j;
+    for (j = 0; j < lengthInBytes; ++j)
+    {
+        uint32_t i;
+        uint32_t byte = data[j];
+        crc ^= byte << 8;
+        for (i = 0; i < 8; ++i)
+        {
+            uint32_t temp = crc << 1;
+            if (crc & 0x8000)
+            {
+                temp ^= 0x1021;
+            }
+            crc = temp;
+        }
+    }
+
+    return crc;
 }

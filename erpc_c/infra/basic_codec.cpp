@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -156,6 +156,17 @@ erpc_status_t BasicCodec::endWriteStruct()
     return kErpcStatus_Success;
 }
 
+erpc_status_t BasicCodec::startWriteUnion(int32_t discriminator)
+{
+    // Write the union discriminator as a u32.
+    return write(discriminator);
+}
+
+erpc_status_t BasicCodec::endWriteUnion()
+{
+    return kErpcStatus_Success;
+}
+
 erpc_status_t BasicCodec::writeNullFlag(bool isNull)
 {
     return write(static_cast<uint8_t>(isNull ? kIsNull : kNotNull));
@@ -288,6 +299,17 @@ erpc_status_t BasicCodec::startReadStruct()
 }
 
 erpc_status_t BasicCodec::endReadStruct()
+{
+    return kErpcStatus_Success;
+}
+
+erpc_status_t BasicCodec::startReadUnion(int32_t *discriminator)
+{
+    // Read union discriminator as u32.
+    return read(discriminator);
+}
+
+erpc_status_t BasicCodec::endReadUnion()
 {
     return kErpcStatus_Success;
 }

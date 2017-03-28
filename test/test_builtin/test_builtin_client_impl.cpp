@@ -30,7 +30,7 @@
  */
 
 #include "gtest.h"
-#include "test_builtin.h"
+#include "test.h"
 #include <string.h>
 
 using namespace std;

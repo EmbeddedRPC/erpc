@@ -1,0 +1,55 @@
+---
+name: name annotation test
+desc: This test @name annotation on different symbols
+idl: |
+
+  @name("EnumName")
+  enum {
+    A @name(D),
+    B,
+    C
+  }
+
+  @name("StructName")
+  struct S{
+    int32 a @name("d");
+    int32 b;
+    int32 c
+  }
+
+  @name("type")
+  type T = S
+
+  @name(I)
+  interface K
+  {
+
+    @name(function)
+    oneway functionName(S a @name(m))
+  }
+
+test.h:
+  - enum EnumName
+  - D
+  - struct StructName StructName
+  - StructName type
+  - struct StructName
+  - int32_t d
+  - function(const StructName * m)
+
+test_client.cpp:
+  - write_StructName_struct
+  - write_StructName_struct
+  - data->d
+  - void function(const StructName * m)
+  - write_StructName_struct(codec, m)
+
+test_server.cpp:
+  - read_StructName_struct
+  - read_StructName_struct
+  - data->d
+  - function_shim
+  - StructName *m = NULL;
+  - read_StructName_struct(codec, m)
+  - function(m);
+  - erpc_free(m);

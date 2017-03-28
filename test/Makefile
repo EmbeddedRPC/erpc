@@ -26,10 +26,10 @@ SUBDIRS = \
 		test_arrays \
 		test_binary \
 		test_builtin \
+		test_callbacks \
 		test_const \
 		test_enums \
 		test_lists \
-		test_others \
 		test_struct \
 		test_typedef \
 		test_unions

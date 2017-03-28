@@ -31,11 +31,12 @@
 
 //Add data structures and function prototypes here
 //using Freescale's eRPC IDL language
-@outputDir("erpc_outputs/") // testing directory with slash on end
+@include("myAlloc.h")
+@output_dir("erpc_outputs/") // testing directory with slash on end
 @include("addOne.h")
 @include("external.h")
-@include("myAlloc.h")
-program test_annotations;
+program test;
+import "../common/unit_test_common.erpc"
 
 //test for external type
 @external

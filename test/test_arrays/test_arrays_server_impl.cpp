@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_arrays_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -40,82 +40,82 @@
 // Implementation of function code
 ////////////////////////////////////////////////////////////////////////////////
 
-int32_t (*sendReceivedInt32(const int32_t (*arrayNumbers)[12]))[12]
+int32_t (*sendReceivedInt32(int32_t arrayNumbers[12]))[12]
 {
     int32_t(*sendArrays)[12] = (int32_t(*)[12])erpc_malloc(sizeof(int32_t[12]));
 
     for (int32_t i = 0; i < 12; ++i)
     {
-        (*sendArrays)[i] = (*arrayNumbers)[i];
+        (*sendArrays)[i] = arrayNumbers[i];
     }
     return sendArrays;
 }
 
-int32_t (*sendReceived2Int32(const int32_t (*arrayNumbers)[12][10]))[12][10]
+int32_t (*sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
 {
     int32_t(*sendArrays)[12][10] = (int32_t(*)[12][10])erpc_malloc(sizeof(int32_t[12][10]));
     for (int32_t i = 0; i < 12; ++i)
     {
         for (int32_t j = 0; j < 10; ++j)
         {
-            (*sendArrays)[i][j] = (*arrayNumbers)[i][j];
+            (*sendArrays)[i][j] = arrayNumbers[i][j];
         }
     }
     return sendArrays;
 }
 
-char *(*sendReceivedString(const char *(*arrayStrings)[12]))[12]
+char *(*sendReceivedString(char *arrayStrings[12]))[12]
 {
     char *(*sendArrays)[12] = (char *(*)[12])erpc_malloc(sizeof(char * [12]));
     for (int32_t i = 0; i < 12; ++i)
     {
-        uint32_t textLen = strlen((*arrayStrings)[i]);
+        uint32_t textLen = strlen(arrayStrings[i]);
         (*sendArrays)[i] = (char *)erpc_malloc(textLen + 1);
-        strcpy((*sendArrays)[i], (*arrayStrings)[i]);
+        strcpy((*sendArrays)[i], arrayStrings[i]);
     }
     return sendArrays;
 }
 
-char *(*sendReceived2String(const char *(*arrayStrings)[3][5]))[3][5]
+char *(*sendReceived2String(char *arrayStrings[3][5]))[3][5]
 {
     char *(*sendArrays)[3][5] = (char *(*)[3][5])erpc_malloc(sizeof(char * [3][5]));
     for (int32_t i = 0; i < 3; ++i)
     {
         for (int32_t j = 0; j < 5; ++j)
         {
-            uint32_t textLen = strlen((*arrayStrings)[i][j]);
+            uint32_t textLen = strlen(arrayStrings[i][j]);
             (*sendArrays)[i][j] = (char *)erpc_malloc(textLen + 1);
-            strcpy((*sendArrays)[i][j], (*arrayStrings)[i][j]);
+            strcpy((*sendArrays)[i][j], arrayStrings[i][j]);
         }
     }
     return sendArrays;
 }
 
-enumColor (*sendReceivedEnum(const enumColor (*arrayEnums)[3]))[3]
+enumColor (*sendReceivedEnum(enumColor arrayEnums[3]))[3]
 {
     enumColor(*sendArrays)[3] = (enumColor(*)[3])erpc_malloc(sizeof(enumColor[3]));
 
     for (int32_t i = 0; i < 3; ++i)
     {
-        (*sendArrays)[i] = (*arrayEnums)[i];
+        (*sendArrays)[i] = arrayEnums[i];
     }
     return sendArrays;
 }
 
-enumColor (*sendReceived2Enum(const enumColor (*arrayEnums)[3][3]))[3][3]
+enumColor (*sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
 {
     enumColor(*sendArrays)[3][3] = (enumColor(*)[3][3])erpc_malloc(sizeof(enumColor[3][3]));
     for (int32_t i = 0; i < 3; ++i)
     {
         for (int32_t j = 0; j < 3; ++j)
         {
-            (*sendArrays)[i][j] = (*arrayEnums)[i][j];
+            (*sendArrays)[i][j] = arrayEnums[i][j];
         }
     }
     return sendArrays;
 }
 
-list_0_t (*sendReceivedList(const list_0_t (*arrayLists)[2]))[2]
+list_0_t (*sendReceivedList(list_0_t arrayLists[2]))[2]
 {
     uint32_t array_count = 2;
 
@@ -123,18 +123,18 @@ list_0_t (*sendReceivedList(const list_0_t (*arrayLists)[2]))[2]
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        uint32_t elements_count = (*arrayLists)[i].elementsCount;
+        uint32_t elements_count = arrayLists[i].elementsCount;
         (*sendArrays)[i].elementsCount = elements_count;
         (*sendArrays)[i].elements = (int32_t *)erpc_malloc(elements_count * sizeof(int32_t));
         for (uint32_t j = 0; j < elements_count; ++j)
         {
-            (*sendArrays)[i].elements[j] = (*arrayLists)[i].elements[j];
+            (*sendArrays)[i].elements[j] = arrayLists[i].elements[j];
         }
     }
     return sendArrays;
 }
 
-list_0_t (*sendReceived2List(const list_0_t (*arrayLists)[2][2]))[2][2]
+list_0_t (*sendReceived2List(list_0_t arrayLists[2][2]))[2][2]
 {
     list_0_t(*sendArrays)[2][2] = (list_0_t(*)[2][2])erpc_malloc(sizeof(list_0_t[2][2]));
 
@@ -142,58 +142,56 @@ list_0_t (*sendReceived2List(const list_0_t (*arrayLists)[2][2]))[2][2]
     {
         for (int32_t i = 0; i < 2; ++i)
         {
-            uint32_t elements_count = (*arrayLists)[k][i].elementsCount;
+            uint32_t elements_count = arrayLists[k][i].elementsCount;
             (*sendArrays)[k][i].elementsCount = elements_count;
             (*sendArrays)[k][i].elements = (int32_t *)erpc_malloc(elements_count * sizeof(int32_t));
             for (uint32_t j = 0; j < elements_count; ++j)
             {
-                (*sendArrays)[k][i].elements[j] = (*arrayLists)[k][i].elements[j];
+                (*sendArrays)[k][i].elements[j] = arrayLists[k][i].elements[j];
             }
-            erpc_free((*arrayLists)[k][i].elements);
         }
     }
-    erpc_free((void *)arrayLists);
     return sendArrays;
 }
 
-ArrayIntType *sendReceivedInt32Type(const ArrayIntType *arrayNumbers)
+ArrayIntType *sendReceivedInt32Type(ArrayIntType arrayNumbers)
 {
     ArrayIntType *send = (ArrayIntType *)erpc_malloc(sizeof(ArrayIntType));
 
     for (int32_t i = 0; i < 12; ++i)
     {
-        (*send)[i] = (*arrayNumbers)[i];
+        (*send)[i] = arrayNumbers[i];
     }
 
     return send;
 }
 
-Array2IntType *sendReceived2Int32Type(const Array2IntType *arrayNumbers)
+Array2IntType *sendReceived2Int32Type(Array2IntType arrayNumbers)
 {
     Array2IntType *sendArrays = (Array2IntType *)erpc_malloc(sizeof(Array2IntType));
     for (int32_t i = 0; i < 12; ++i)
     {
         for (int32_t j = 0; j < 10; ++j)
         {
-            (*sendArrays)[i][j] = (*arrayNumbers)[i][j];
+            (*sendArrays)[i][j] = arrayNumbers[i][j];
         }
     }
     return sendArrays;
 }
 
-ArrayStringType *sendReceivedStringType(const ArrayStringType *arrayStrings)
+ArrayStringType *sendReceivedStringType(ArrayStringType arrayStrings)
 {
     ArrayStringType *sendArrays = (ArrayStringType *)erpc_malloc(sizeof(ArrayStringType));
     for (int32_t i = 0; i < 12; ++i)
     {
-        uint32_t textLen = strlen((*arrayStrings)[i]);
+        uint32_t textLen = strlen(arrayStrings[i]);
         (*sendArrays)[i] = (char *)erpc_malloc(textLen + 1);
-        strcpy((*sendArrays)[i], (*arrayStrings)[i]);
+        strcpy((*sendArrays)[i], arrayStrings[i]);
     }
     return sendArrays;
 }
 
-Array2StringType *sendReceived2StringType(const Array2StringType *arrayStrings)
+Array2StringType *sendReceived2StringType(Array2StringType arrayStrings)
 {
     Array2StringType *sendArrays = (Array2StringType *)erpc_malloc(sizeof(Array2StringType));
 
@@ -201,83 +199,83 @@ Array2StringType *sendReceived2StringType(const Array2StringType *arrayStrings)
     {
         for (int32_t j = 0; j < 5; ++j)
         {
-            uint32_t textLen = strlen((*arrayStrings)[i][j]);
+            uint32_t textLen = strlen(arrayStrings[i][j]);
             (*sendArrays)[i][j] = (char *)erpc_malloc(textLen + 1);
-            strcpy((*sendArrays)[i][j], (*arrayStrings)[i][j]);
+            strcpy((*sendArrays)[i][j], arrayStrings[i][j]);
         }
     }
     return sendArrays;
 }
 
-ArrayEnumType *sendReceivedEnumType(const ArrayEnumType *arrayEnums)
+ArrayEnumType *sendReceivedEnumType(ArrayEnumType arrayEnums)
 {
     ArrayEnumType *sendArrays = (ArrayEnumType *)erpc_malloc(sizeof(ArrayEnumType));
 
     for (int32_t i = 0; i < 3; ++i)
     {
-        (*sendArrays)[i] = (*arrayEnums)[i];
+        (*sendArrays)[i] = arrayEnums[i];
     }
     return sendArrays;
 }
 
-Array2EnumType *sendReceived2EnumType(const Array2EnumType *arrayEnums)
+Array2EnumType *sendReceived2EnumType(Array2EnumType arrayEnums)
 {
     Array2EnumType *sendArrays = (Array2EnumType *)erpc_malloc(sizeof(Array2EnumType));
     for (int32_t i = 0; i < 3; ++i)
     {
         for (int32_t j = 0; j < 3; ++j)
         {
-            (*sendArrays)[i][j] = (*arrayEnums)[i][j];
+            (*sendArrays)[i][j] = arrayEnums[i][j];
         }
     }
     return sendArrays;
 }
 
-ArrayStructType *sendReceivedStructType(const ArrayStructType *arrayStructs)
+ArrayStructType *sendReceivedStructType(ArrayStructType arrayStructs)
 {
     ArrayStructType *sendArrays = (ArrayStructType *)erpc_malloc(sizeof(ArrayStructType));
 
     for (int32_t i = 0; i < 3; ++i)
     {
-        (*sendArrays)[i].m = (*arrayStructs)[i].m;
-        (*sendArrays)[i].n = (*arrayStructs)[i].n;
+        (*sendArrays)[i].m = arrayStructs[i].m;
+        (*sendArrays)[i].n = arrayStructs[i].n;
     }
     return sendArrays;
 }
 
-Array2StructType *sendReceived2StructType(const Array2StructType *arrayStructs)
+Array2StructType *sendReceived2StructType(Array2StructType arrayStructs)
 {
     Array2StructType *sendArrays = (Array2StructType *)erpc_malloc(sizeof(Array2StructType));
     for (int32_t i = 0; i < 3; ++i)
     {
         for (int32_t j = 0; j < 3; ++j)
         {
-            (*sendArrays)[i][j].m = (*arrayStructs)[i][j].m;
-            (*sendArrays)[i][j].n = (*arrayStructs)[i][j].n;
+            (*sendArrays)[i][j].m = arrayStructs[i][j].m;
+            (*sendArrays)[i][j].n = arrayStructs[i][j].n;
         }
     }
     return sendArrays;
 }
 
-ArrayListType *sendReceivedListType(const ArrayListType *arrayLists)
+ArrayListType *sendReceivedListType(ArrayListType arrayLists)
 {
     uint32_t array_count = 2;
     ArrayListType *sendArrays = (ArrayListType *)erpc_malloc(sizeof(ArrayListType));
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        uint32_t elements_count = (*arrayLists)[i].elementsCount;
+        uint32_t elements_count = arrayLists[i].elementsCount;
         (*sendArrays)[i].elementsCount = elements_count;
         (*sendArrays)[i].elements = (int32_t *)erpc_malloc(elements_count * sizeof(int32_t));
         for (uint32_t j = 0; j < elements_count; ++j)
         {
-            (*sendArrays)[i].elements[j] = (*arrayLists)[i].elements[j];
+            (*sendArrays)[i].elements[j] = arrayLists[i].elements[j];
         }
     }
     return sendArrays;
 }
 
-Array2ListType *sendReceived2ListType(const Array2ListType *arrayLists)
+Array2ListType *sendReceived2ListType(Array2ListType arrayLists)
 {
     Array2ListType *sendArrays = (Array2ListType *)erpc_malloc(sizeof(Array2ListType));
 
@@ -285,21 +283,21 @@ Array2ListType *sendReceived2ListType(const Array2ListType *arrayLists)
     {
         for (int32_t i = 0; i < 2; ++i)
         {
-            uint32_t elements_count = (*arrayLists)[k][i].elementsCount;
+            uint32_t elements_count = arrayLists[k][i].elementsCount;
             (*sendArrays)[k][i].elementsCount = elements_count;
             (*sendArrays)[k][i].elements = (int32_t *)erpc_malloc(elements_count * sizeof(int32_t));
             for (uint32_t j = 0; j < elements_count; ++j)
             {
-                (*sendArrays)[k][i].elements[j] = (*arrayLists)[k][i].elements[j];
+                (*sendArrays)[k][i].elements[j] = arrayLists[k][i].elements[j];
             }
         }
     }
     return sendArrays;
 }
 
-AllTypes (*sendReceiveStruct(const AllTypes (*all_types)[2]))[2]
+AllTypes (*sendReceiveStruct(AllTypes all_types[2]))[2]
 {
-    const AllTypes(*received_struct)[2] = all_types;
+    AllTypes(**received_struct) = &all_types;
     AllTypes(*send_struct)[2] = (AllTypes(*)[2])erpc_malloc(sizeof(AllTypes[2]));
 
     for (uint32_t k = 0; k < 2; ++k)
@@ -338,9 +336,9 @@ AllTypes (*sendReceiveStruct(const AllTypes (*all_types)[2]))[2]
     return send_struct;
 }
 
-AllTypes (*sendReceive2Struct(const AllTypes (*all_types)[1][1]))[1][1]
+AllTypes (*sendReceive2Struct(AllTypes all_types[1][1]))[1][1]
 {
-    const AllTypes(*received_struct)[1][1] = all_types;
+    AllTypes(**received_struct)[1] = &all_types;
     AllTypes(*send_struct)[1][1] = (AllTypes(*)[1][1])erpc_malloc(sizeof(AllTypes[1][1]));
 
     for (uint32_t k = 0; k < 1; ++k)
@@ -384,13 +382,12 @@ AllTypes (*sendReceive2Struct(const AllTypes (*all_types)[1][1]))[1][1]
 }
 
 void test_array_allDirection(
-    const int32_t (*a)[5], const int32_t (*b)[5], int32_t (*c)[5], int32_t (**d)[5], int32_t (*e)[5])
+    int32_t a[5], int32_t b[5], int32_t c[5], int32_t d[5])
 {
     for (uint32_t i = 0; i < 5; ++i)
     {
-        (*c)[i] = i + 1;
-        (**d)[i] = i + 2;
-        (*e)[i] = i * 8;
+        c[i] = i + 1;
+        d[i] = i * 8;
     }
 }
 

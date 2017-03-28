@@ -29,8 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@outputDir("erpc_outputs")
-program test_enums;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
 
 enum enumColor{red = 1, green = 10, blue}
 enum enumColor2{yellow, black, pink = 20}
