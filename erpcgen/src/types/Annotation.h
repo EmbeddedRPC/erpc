@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,17 +32,17 @@
 #ifndef _EMBEDDED_RPC__ANNOTATION_H_
 #define _EMBEDDED_RPC__ANNOTATION_H_
 
-#include <string>
-#include "Value.h"
-#include "Token.h"
 #include "AstNode.h"
+#include "Token.h"
+#include "Value.h"
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Annotation class
  */
@@ -96,12 +98,14 @@ public:
      * @return Annotation name.
      */
     std::string getName() const { return m_name; }
+
     /*!
      * @brief Checks to see if value instance member is null
      *
      * @retval True if m_value is not null
      */
     bool hasValue() { return nullptr != m_value; }
+
     /*!
      * @brief This function returns annotation value.
      *
@@ -117,12 +121,14 @@ public:
      * @return Returns "name = value".
      */
     std::string toString() { return m_name + " = " + m_value->toString(); }
+
     /*!
      * @brief This function returns location for symbol.
      *
      * @returns Return location for symbol.
      */
     token_loc_t &getLocation() { return m_location; }
+
 private:
     std::string m_name;     /*!< Annotation name. */
     Value *m_value;         /*!< Value of annotation*/

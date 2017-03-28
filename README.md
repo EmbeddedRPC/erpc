@@ -68,7 +68,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](doc/README.md) is in the `doc/` folder.
+[Documentation](docs/README.md) is in the `docs/` folder.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -51,6 +53,15 @@
  */
 
 ////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////
+
+//! @brief Thread function type.
+//!
+//! @param arg User provided argument that was passed into the start() method.
+typedef void (*thread_entry_t)(void *arg);
+
+////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -65,11 +76,6 @@ namespace erpc {
 class Thread
 {
 public:
-    //! @brief Thread function type.
-    //!
-    //! @param arg User provided argument that was passed into the start() method.
-    typedef void (*thread_entry_t)(void *arg);
-
     //! @brief Unique identifier for a thread.
     typedef void *thread_id_t;
 
@@ -177,6 +183,7 @@ public:
             m_mutex.lock();
         }
         ~Guard() { m_mutex.unlock(); }
+
     private:
         Mutex &m_mutex;
     };

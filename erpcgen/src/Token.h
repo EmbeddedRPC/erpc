@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,15 +32,15 @@
 #ifndef _EMBEDDED_RPC__TOKEN_H_
 #define _EMBEDDED_RPC__TOKEN_H_
 
-#include "smart_ptr.h"
 #include "Value.h"
+#include "smart_ptr.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Token location in the source file.
  */
@@ -57,6 +59,7 @@ struct token_loc_t
     {
     }
     token_loc_t(const token_loc_t &other) = default;
+
     token_loc_t &operator=(const token_loc_t &other) = default;
 };
 
@@ -156,6 +159,7 @@ public:
      * @brief Destructor.
      */
     ~Token() {}
+
     //! @name Token
     //@{
     /*!
@@ -166,6 +170,7 @@ public:
      * @see void Token::setToken()
      */
     int getToken() const { return m_token; }
+
     /*!
      * @brief This function set token number.
      *
@@ -174,6 +179,7 @@ public:
      * @see int Token::getToken()
      */
     void setToken(int tok) { m_token = tok; }
+
     /*!
      * @brief This function returns token name.
      *
@@ -211,6 +217,7 @@ public:
      * @see void Token::setValue()
      */
     bool hasValue() const { return m_value.get() != nullptr; }
+
     /*!
      * @brief This function returns token value.
      *
@@ -221,6 +228,7 @@ public:
      * @see void Token::setValue()
      */
     Value *getValue() { return m_value; }
+
     /*!
      * @brief This function returns const token value.
      *
@@ -231,6 +239,7 @@ public:
      * @see void Token::setValue()
      */
     const Value *getValue() const { return m_value; }
+
     /*!
      * @brief This function set token value.
      *
@@ -243,6 +252,7 @@ public:
      * @see const Value * Token::getValue()
      */
     void setValue(Value *val) { m_value = val; }
+
     /*!
      * @brief This function returns string value.
      *
@@ -280,6 +290,7 @@ public:
      * @see void Token::setLocation()
      */
     const token_loc_t &getLocation() const { return m_location; }
+
     /*!
      * @brief This function set token location (location from analysed file).
      *
@@ -288,6 +299,7 @@ public:
      * @see void Token::getLocation()
      */
     void setLocation(const token_loc_t &loc) { m_location = loc; }
+
     /*!
      * @brief This function set token location (location from analysed file).
      *
@@ -305,6 +317,7 @@ public:
      * @see void Token::getLastLine()
      */
     int getFirstLine() const { return m_location.m_firstLine; }
+
     /*!
      * @brief This function returns last line of token from token location
      * (location from analysed file).
@@ -314,6 +327,7 @@ public:
      * @see void Token::getFirstLine()
      */
     int getLastLine() const { return m_location.m_lastLine; }
+
     /*!
      * @brief This function returns last line of token from token location
      * (location from analysed file).

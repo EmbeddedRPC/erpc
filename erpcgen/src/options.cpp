@@ -40,9 +40,9 @@
 //    - Added PARSE_POS control flag and POSITIONAL return value.
 // ^^**************************************************************************
 
+#include <cstdlib>
 #include <ctype.h>
 #include <string.h>
-#include <cstdlib>
 
 #include "options.h"
 
@@ -56,7 +56,7 @@ using namespace std;
 #define TOLOWER(c) (isupper(c) ? tolower(c) : c)
 
 // Use this to shut the compiler up about NULL strings
-#define NULLSTR (char *) NULL
+#define NULLSTR (char *)NULL
 
 // ******************************************************** insertion operators
 

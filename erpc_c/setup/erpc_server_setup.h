@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,6 +33,7 @@
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
 #include "erpc_common.h"
+#include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -57,7 +60,7 @@ extern "C" {
  *
  * This function initializes server with all components necessary for running server.
  */
-void erpc_server_init(erpc_transport_t transport);
+void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
 
 /*!
  * @brief This function de-initializes server.

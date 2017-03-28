@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,6 +32,7 @@
 #ifndef _EMBEDDED_RPC__CLIENT_MANAGER_H_
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
+#ifdef __cplusplus
 #include "codec.h"
 
 /*!
@@ -37,6 +40,14 @@
  * @{
  * @file
  */
+
+extern "C" {
+#endif
+
+typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handler function type. */
+
+#ifdef __cplusplus
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -53,8 +64,6 @@ class RequestContext;
 class ClientManager
 {
 public:
-    typedef void (*error_handler_t)(erpc_status_t err);
-
     /*!
      * @brief Constructor.
      *
@@ -91,9 +100,11 @@ public:
     /*!
      * @brief This function sets transport layer to use.
      *
+     * It also set messageBufferFactory to the same as in transport layer.
+     *
      * @param[in] transport Transport layer to use.
      */
-    void setTransport(Transport *transport) { m_transport = transport; }
+    void setTransport(Transport *transport);
 
     /*!
      * @brief This function creates request context.
@@ -121,21 +132,21 @@ public:
      *
      * @param[in] error_handler Pointer to error handler function.
      */
-    void setErrorHandler(error_handler_t error_handler) { m_errorHandler = error_handler; }
+    void setErrorHandler(client_error_handler_t error_handler) { m_errorHandler = error_handler; }
 
     /*!
      * @brief This functions returns error handler function for infrastructure errors.
      *
      * @return Pointer to error handler function.
      */
-    error_handler_t getErrorHandler() { return m_errorHandler; }
+    client_error_handler_t getErrorHandler() { return m_errorHandler; }
 
 protected:
     MessageBufferFactory *m_messageFactory; //!< Message buffer factory to use.
     CodecFactory *m_codecFactory;           //!< Codec to use.
     Transport *m_transport;                 //!< Transport layer to use.
     uint32_t m_sequence;                    //!< Sequence number.
-    error_handler_t m_errorHandler;         //!< Pointer to function error handler.
+    client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
 
     //! @brief Validate that an incoming message is a reply.
     virtual erpc_status_t verifyReply(RequestContext &request);
@@ -216,5 +227,7 @@ protected:
 } // namespace erpc
 
 /*! @} */
+
+#endif
 
 #endif // _EMBEDDED_RPC__CLIENT_MANAGER_H_

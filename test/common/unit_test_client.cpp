@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,16 +30,17 @@
  */
 
 #include "erpc_client_setup.h"
+#include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
-#include "unit_test_common/unit_test_common.h"
 #include "gtest.h"
 #include "gtestListener.h"
+#include "unit_test_common/unit_test_common.h"
 
 #if RPMSG || UART || LPUART
 extern "C" {
-#include "fsl_debug_console.h"
-#include "board.h"
 #include "app_core0.h"
+#include "board.h"
+#include "fsl_debug_console.h"
 #include "mcmgr.h"
 #if RPMSG
 #include "rpmsg_lite.h"
@@ -135,17 +138,22 @@ int main(int argc, char **argv)
 #endif
 
     erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
 #if RPMSG
-    transport = erpc_transport_rpmsg_lite_init(101, 100);
-#elif UART
+    transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
+    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transport);
+#else
+#if UART
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #elif LPUART
     transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #endif
+    message_buffer_factory = erpc_mbf_dynamic_init();
+#endif
 
-    erpc_client_init(transport);
+    erpc_client_init(transport, message_buffer_factory);
 
     int i = RUN_ALL_TESTS();
     quit();

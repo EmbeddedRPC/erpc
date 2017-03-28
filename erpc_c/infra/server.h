@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -94,10 +96,11 @@ public:
      * @param[in] methodId Id number of function, which is requested.
      * @param[in] sequence Sequence number. To be sure that reply from server belongs to client request.
      * @param[in] codec For reading and writing data.
+     * @param[in] messageFactory Used for setting output buffer.
      *
      * @return Based on handleInvocation implementation.
      */
-    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec) = 0;
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec, MessageBufferFactory *messageFactory) = 0;
 
 protected:
     uint32_t m_serviceId; /*!< Service unique id. */
@@ -120,7 +123,7 @@ public:
     Server()
     : m_messageFactory()
     , m_codecFactory()
-    , m_transportFactory()
+    , m_transport()
     , m_firstService()
     {
     }
@@ -145,11 +148,13 @@ public:
     void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
 
     /*!
-     * @brief Set TransportFactory to use.
+     * @brief This function sets transport layer to use.
      *
-     * @param[in] factory TransportFactory to use.
+     * It also set messageBufferFactory to the same as in transport layer.
+     *
+     * @param[in] transport Transport layer to use.
      */
-    void setTransportFactory(TransportFactory *factory) { m_transportFactory = factory; }
+    void setTransport(Transport *transport);
 
     /*!
      * @brief Add service.
@@ -171,7 +176,7 @@ public:
 protected:
     MessageBufferFactory *m_messageFactory; /*!< Contains MessageBufferFactory to use. */
     CodecFactory *m_codecFactory;           /*!< Contains CodecFactory to use. */
-    TransportFactory *m_transportFactory;   /*!< Contains TransportFatcory to use. */
+    Transport *m_transport;                 /*!< Transport layer used to send and receive data. */
     Service *m_firstService;                /*!< Contains pointer to first service. */
 
     /*!

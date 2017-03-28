@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,6 +30,7 @@
  */
 
 #include "client_manager.h"
+#include "assert.h"
 
 using namespace erpc;
 #if !(__embedded_cplusplus)
@@ -37,6 +40,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+
+void ClientManager::setTransport(Transport *transport)
+{
+    m_transport = transport;
+}
 
 RequestContext ClientManager::createRequest(bool isOneway)
 {
@@ -58,10 +66,6 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
     // If the request is oneway, then there is nothing more to do.
     if (!request.isOneway())
     {
-        // reset codec for receiving data
-        request.getCodec()->getBuffer()->setUsed(0);
-        request.getCodec()->reset();
-
         // Receive reply.
         err = m_transport->receive(request.getCodec()->getBuffer());
         if (err)

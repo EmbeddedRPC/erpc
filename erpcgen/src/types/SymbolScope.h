@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,17 +32,17 @@
 #ifndef _EMBEDDED_RPC__SYMBOLSCOPE_H_
 #define _EMBEDDED_RPC__SYMBOLSCOPE_H_
 
-#include <string>
-#include <map>
-#include <vector>
 #include "Symbol.h"
+#include <map>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief A scoped namespace containing symbols.
  */
@@ -59,6 +61,7 @@ public:
         operator value_type &() { return *m_vec; }
         value_type &operator*() { return *m_vec; }
         value_type &operator->() { return *m_vec; }
+
         /*!
          * @brief
          */
@@ -66,6 +69,7 @@ public:
 
         bool operator==(const typed_iterator &other) { return (m_vec == other.m_vec); }
         bool operator!=(const typed_iterator &other) { return !(*this == other); }
+
     private:
         symbol_vector_t::iterator m_vec;
         symbol_vector_t::iterator m_endvec;
@@ -94,6 +98,7 @@ public:
      * @brief Destructor.
      */
     virtual ~SymbolScope() {}
+
     /*!
      * @brief This function returns true when name is found in symbol map.
      *
@@ -178,30 +183,35 @@ public:
      * @retval false When parent isn't set.
      */
     bool hasParent() const { return m_parent != nullptr; }
+
     /*!
      * @brief Return pointer to parent.
      *
      * @return Pointer to parent.
      */
     SymbolScope *getParent() { return m_parent; }
+
     /*!
      * @brief This function set parent for this object.
      *
      * @param[in] parent Pointer to given parent.
      */
     void setParent(SymbolScope *parent) { m_parent = parent; }
+
     /*!
      * @brief Return begin of symbol vector.
      *
      * @return Return begin of symbol vector.
      */
     symbol_vector_t::iterator begin() { return m_symbolVector.begin(); }
+
     /*!
      * @brief Return end of symbol vector.
      *
      * @return Return end of symbol vector.
      */
     symbol_vector_t::iterator end() { return m_symbolVector.end(); }
+
     /*!
      * @brief
      *

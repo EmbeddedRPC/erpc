@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013-14, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,9 +31,9 @@
 #if !defined(_Logging_h_)
 #define _Logging_h_
 
-#include <string>
 #include <assert.h>
 #include <stdarg.h>
+#include <string>
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -99,10 +100,13 @@ public:
     //@{
     //! \brief Changes the logging level to \a level.
     inline void setFilterLevel(log_level_t level) { m_filter = level; }
+
     //! \brief Returns the current logging filter level.
     inline log_level_t getFilterLevel() const { return m_filter; }
+
     //! \brief Changes the logging output level to \a level.
     inline void setOutputLevel(log_level_t level) { m_level = level; }
+
     //! \brief Returns the current logging output level.
     inline log_level_t getOutputLevel() const { return m_level; }
     //@}
@@ -114,6 +118,7 @@ public:
 
     //! \brief Log a string object.
     virtual void log(const string &msg) { log(msg.c_str()); }
+
     //! \brief Log with format at a specific output level.
     virtual void log(log_level_t level, const char *fmt, ...);
 
@@ -155,6 +160,7 @@ public:
     //@{
     //! \brief Returns the current global logger singleton.
     static inline Logger *getLogger() { return s_logger; }
+
     //! \brief Sets the global logger singleton instance.
     static inline void setLogger(Logger *logger) { s_logger = logger; }
     //@}
@@ -242,6 +248,7 @@ public:
         //!
         //! Restores the saved logging output level.
         ~SetOutputLevel() { m_logger->setOutputLevel(m_saved); }
+
     protected:
         Logger *m_logger;            //!< The logger instance we're controlling.
         Logger::log_level_t m_saved; //!< Original logging output level.

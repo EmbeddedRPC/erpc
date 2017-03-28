@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,8 +31,8 @@
 #if !defined(_searchpath_h_)
 #define _searchpath_h_
 
-#include <string>
 #include <list>
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -64,6 +65,7 @@ public:
 public:
     //! \brief Constructor.
     PathSearcher() {}
+
     //! \brief Add a new search path to the end of the list.
     void addSearchPath(const std::string &path);
 

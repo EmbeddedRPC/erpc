@@ -251,6 +251,9 @@
     <ClCompile Include="py_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="c_defines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Flex Include="..\src\erpcgen_lexer.l" />

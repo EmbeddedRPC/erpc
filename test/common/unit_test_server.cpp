@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -27,18 +29,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "unit_test_wrapped.h"
-#include "unit_test_common/unit_test_common_server.h"
+#include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 #include "simple_server.h"
+#include "unit_test_common/unit_test_common_server.h"
+#include "unit_test_wrapped.h"
 
 #if RPMSG || UART || LPUART
 extern "C" {
 #include "app_core1.h"
 #if RPMSG
-#include "rpmsg_lite.h"
 #include "mcmgr.h"
+#include "rpmsg_lite.h"
 #endif
 }
 #endif
@@ -52,30 +55,44 @@ int MyAlloc::allocated_ = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+static void SignalReady(void)
+{
+    /* Signal the other core we are ready */
+    MCMGR_SignalReady(kMCMGR_Core1);
+}
 
 int main(int argc, const char *argv[])
 {
 #if RPMSG
+    uint32_t startupData;
     // MU_Init(MU0_B);
     /* Initialize GIC */
     // env_init();
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
+    /* Get the startup data */
+    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
 #endif
 
     erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
 #if RPMSG
-    transport = erpc_transport_rpmsg_lite_init(101, 100);
-#elif UART
+    transport = erpc_transport_rpmsg_lite_remote_init(101, 100, (void *)startupData, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID,
+                                                      SignalReady);
+    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transport);
+#else
+#if UART
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #elif LPUART
     transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #endif
+    message_buffer_factory = erpc_mbf_dynamic_init();
+#endif
 
     /* Init server */
-    erpc_server_init(transport);
+    erpc_server_init(transport, message_buffer_factory);
 
     /* Add test services. This function call erpc_add_service_to_server for all necessary services. */
     add_services_to_server();

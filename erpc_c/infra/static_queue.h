@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -49,50 +50,45 @@ using namespace std;
 
 namespace erpc {
 /*!
- * @brief Base class which implements static queue as ring buffer that operates on m_data type void*.
+ * @brief Template class which implements static queue as ring buffer
  *
  * @ingroup infra_utility
  */
-class BaseStaticQueue
+template <class T, uint32_t elementCount>
+class StaticQueue
 {
-protected:
-    uint32_t m_capacity;      //!< m_capacity of queue
-    void *volatile m_data;    //!< Pointer to m_data of queue
-    uint32_t volatile m_head; //!< Index to free slot
-    uint32_t volatile m_tail; //!< Index to slot with m_data
-    uint32_t m_elementSize;   //!< Size of one element
-
+public:
     /*!
-     * @brief Constructor of BaseStaticQueue class.
+     * @brief Constructor of StaticQueue class.
      *
-     * This function sets m_capacity of queue, size of one element in bytes, m_head and m_tail indexes to zero.
-     *
-     * @param[in] max_capacity m_capacity of queue.
-     * @param[in] elementSize Size of one element in bytes.
-     * @param[in] buffer Queue preallocated buffer.
+     * This function sets capacity of queue, m_head and m_tail indexes to zero.
      */
-    BaseStaticQueue(uint32_t max_capacity, uint32_t elementSize, void *buffer)
+    StaticQueue()
     {
-        m_data = buffer;
-        m_elementSize = elementSize;
-        m_capacity = max_capacity;
+        m_capacity = elementCount;
         m_head = 0;
         m_tail = 0;
     }
 
     /*!
+     * @brief Destructor of StaticQueue class.
+     *
+     * This function free allocated buffer for m_data.
+     */
+    ~StaticQueue() {}
+    /*!
      * @brief This function adds element to queue.
      *
-     * @param[in] element Pointer to element for adding.
+     * @param[in] element Element for adding.
      *
      * @retval true Element was added.
      * @retval false Element was not added, queue is full.
      */
-    bool add(void *element)
+    bool add(T element)
     {
         if ((m_head + 1) % m_capacity != m_tail)
         {
-            memcpy((void *)((uintptr_t)m_data + m_head * m_elementSize), element, m_elementSize);
+            memcpy(m_storage[m_head], &element, sizeof(T));
             m_head = (m_head + 1) % m_capacity;
             return true;
         }
@@ -100,22 +96,24 @@ protected:
     }
 
     /*!
-     * @brief This function returns pointer to element from queue.
+     * @brief This function returns element from queue.
      *
-     * @return Pointer to element.
+     * @param[out] element Pointer to element to which will be copied element from queue.
+     *
+     * @retval true Element was copied from queue.
+     * @retval false Element was not copied, queue is empty.
      */
-    void *get()
+    bool get(T *element)
     {
-        void *element = NULL;
         if (m_tail != m_head)
         {
-            element = (void *)((uintptr_t)m_data + m_tail * m_elementSize);
+            memcpy(element, m_storage[m_tail], sizeof(T));
             m_tail = (m_tail + 1) % m_capacity;
+            return true;
         }
-        return element;
+        return false;
     }
 
-public:
     /*!
     * @brief This function returns number of elements in queue.
     *
@@ -129,61 +127,14 @@ public:
         }
         return (m_capacity - m_tail + m_head);
     }
-};
-
-/*!
- * @brief Template subclass that wraps the member functions to use the template type parameter.
- *
- * @ingroup infra_utility
- */
-template <class T, uint32_t elementCount>
-class StaticQueue : public BaseStaticQueue
-{
-public:
-    /*!
-     * @brief Constructor of StaticQueue class.
-     */
-    StaticQueue()
-    : BaseStaticQueue(elementCount, sizeof(T), m_storage)
-    {
-    }
-
-    /*!
-     * @brief Destructor of StaticQueue class.
-     *
-     * This function free allocated buffer for m_data.
-     */
-    ~StaticQueue() {}
-
-    /*!
-     * @brief This function adds element to queue.
-     *
-     * @param[in] element Element for adding.
-     *
-     * @retval true Element was added.
-     * @retval false Element was not added, queue is full.
-     */
-    bool add(T element) { return BaseStaticQueue::add(&element); }
-
-    /*!
-     * @brief This function returns element from queue.
-     *
-     * @return Element.
-     */
-    T *get()
-    {
-        void *element = BaseStaticQueue::get();
-        if (element == NULL)
-        {
-            return NULL;
-        }
-        return (T *)element;
-    }
 
 protected:
     uint64_t m_storage[elementCount][(sizeof(T) + sizeof(uint64_t) - 1) /
                                      sizeof(uint64_t)]; /*!< Preallocated space based on data type size and elements
                                                            count. */
+    uint32_t m_capacity;                                /*!< Capacity of queue */
+    uint32_t volatile m_head;                           /*!< Index to free slot */
+    uint32_t volatile m_tail;                           /*!< Index to slot with m_data */
 };
 
 } // namespace erpc

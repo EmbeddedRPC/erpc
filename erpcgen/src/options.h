@@ -55,6 +55,7 @@ class OptIter
 {
 public:
     OptIter(void) {}
+
     virtual ~OptIter(void);
 
     //! curr() returns the current item in the iterator without
@@ -158,6 +159,7 @@ public:
     //! delimiters() with NO arguments returns the current set of delimiters,
     //! If an argument is given then it is used as the new set of delimiters.
     const char *delimiters(void) { return seps; }
+
     void delimiters(const char *delims) { seps = (delims) ? delims : default_delims; }
 };
 
@@ -423,12 +425,16 @@ public:
 
     //! name() returns the command name
     const char *name(void) const { return cmdname; }
+
     //! ctrls() (with no arguments) returns the existing control settings
     unsigned ctrls(void) const { return optctrls; }
+
     //! ctrls() (with 1 argument) sets new control settings
     void ctrls(unsigned newctrls) { optctrls = newctrls; }
+
     //! reset for another pass to parse for options
     void reset(void) { nextchar = listopt = NULL; }
+
     //! usage() prints options usage (followed by any positional arguments
     //! listed in the parameter "positionals") on the given outstream
     void usage(std::ostream &os, const char *positionals) const;

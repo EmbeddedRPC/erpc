@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -69,22 +71,14 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
 #-------------------------------
 IDL_FILE = $(CUR_DIR).erpc
 
+ifneq "$(TEST_NAME)" "test_arbitrator"
 SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
             $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
-ifeq "$(is_linux)" "1"
-LIBRARIES += -lpthread -lrt
-endif
-
-# Add libtest.a to build.
-LIBRARIES += -ltest
-LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
-
 .PHONY: all
 all: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
 
-include $(ERPC_ROOT)/mk/targets.mk
 
 # Define dependency.
 $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp
@@ -98,3 +92,21 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp: $(IDL_FILE)
 $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
 	@$(call printmessage,orange,Running erpcgen-py $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
+else
+    ifeq "$(TYPE)" "CLIENT"
+include $(TEST_ROOT)/$(TEST_NAME)/client.mk
+    else
+include $(TEST_ROOT)/$(TEST_NAME)/server.mk
+    endif
+endif
+
+ifeq "$(is_linux)" "1"
+LIBRARIES += -lpthread -lrt
+endif
+
+# Add libtest.a to build.
+LIBRARIES += -ltest
+LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+
+include $(ERPC_ROOT)/mk/targets.mk
+

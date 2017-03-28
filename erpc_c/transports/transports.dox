@@ -47,25 +47,13 @@
 /*!
 @defgroup rpmsg_lite_rtos_transport RPMsg-Lite RTOS
 @ingroup transports
-@brief RPMsg-Lite transport using RTOS API.
+@brief RPMsg-Lite zero copy transport using RTOS API.
 */
 
 /*!
 @defgroup rpmsg_lite_transport RPMsg-Lite
 @ingroup transports
-@brief RPMsg-Lite transport.
-*/
-
-/*!
-@defgroup rpmsg_rtos_transport RPMsg RTOS
-@ingroup transports
-@brief OpenAMP RPMsg RTOS layer transport.
-*/
-
-/*!
-@defgroup rpmsg_transport RPMsg
-@ingroup transports
-@brief OpenAMP RPMsg transport.
+@brief RPMsg-Lite zero copy transport.
 */
 
 /*!

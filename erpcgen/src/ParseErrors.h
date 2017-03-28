@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,10 +32,10 @@
 #ifndef _EMBEDDED_RPC__PARSEERRORS_H
 #define _EMBEDDED_RPC__PARSEERRORS_H
 
-#include <stdexcept>
 #include "Logging.h"
 #include "Token.h"
 #include "os_config.h"
+#include <stdexcept>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
@@ -45,8 +47,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 class erpc_error : public std::runtime_error
 {
 public:
@@ -82,6 +84,7 @@ public:
                            m_message.c_str()))
     {
     }
+
     explicit syntax_error2(const char *__arg, token_loc_t loc, std::string &fileName)
     : erpc_error(std::string(__arg), "syntax error")
     , m_errLoc(loc)
@@ -93,6 +96,7 @@ public:
                            m_message.c_str()))
     {
     }
+
     virtual const char *what() const NOEXCEPT NOTHROW;
 
 private:

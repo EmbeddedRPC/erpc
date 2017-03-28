@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -32,7 +33,9 @@
 #include "FreeRTOS.h"
 #include <new>
 
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
 
 #if defined(__CC_ARM) /* Keil MDK */
 void *operator new(std::size_t count) throw(std::bad_alloc)

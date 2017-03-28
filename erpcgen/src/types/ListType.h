@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,15 +32,15 @@
 #ifndef _EMBEDDED_RPC__LISTTYPE_H_
 #define _EMBEDDED_RPC__LISTTYPE_H_
 
-#include <string>
 #include "DataType.h"
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Variable length list of another data type.
  */
@@ -65,18 +67,21 @@ public:
      * @return Element data type.
      */
     DataType *getElementType() const { return m_elementType; }
+
     /*!
      * @brief This function set element data type.
      *
      * @param[in] elementType Element data type.
      */
     void setElementType(DataType *elementType) { m_elementType = elementType; }
+
     /*!
      * @brief This function return "true" value for identify list type.
      *
      * @retval true Always return true.
      */
     virtual bool isList() const { return true; }
+
     /*!
      * @brief This function returns description about the list.
      *
@@ -99,12 +104,14 @@ public:
      * @param[in] lengthVariableName Given name for variable.
      */
     void setLengthVariableName(const std::string &lengthVariableName) { m_lengthVariableName = lengthVariableName; }
+
     /*!
      * @brief This function returns variable name. This variable is used in generated file to store size of list.
      *
      * @return Return name for variable.
      */
     std::string &getLengthVariableName() { return m_lengthVariableName; }
+
     /*!
      * @brief This function returns information if object contains length variable.
      *
@@ -112,6 +119,7 @@ public:
      * @retval false When list doesn't contain length variable.
      */
     bool hasLengthVariable() { return "" != m_lengthVariableName; }
+
 protected:
     DataType *m_elementType;          /*!< List element data type. */
     std::string m_lengthVariableName; /*!< List length variable name. */

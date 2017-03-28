@@ -67,7 +67,7 @@
 {#--------------- list, array ---------------#}
 {% elif info.type == "list" || info.type == "array" %}
 {%  if info.type == "list" %}
-{$codec}.start_write_list(len({$name}))
+{$codec}.start_write_list(self.length)
 {%  endif %}
 {%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
 {$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}

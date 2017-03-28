@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -12,7 +14,7 @@
 #   list of conditions and the following disclaimer in the documentation and/or
 #   other materials provided with the distribution.
 #
-# o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+# o Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
 #   software without specific prior written permission.
 #
@@ -39,9 +41,9 @@ class Service(object):
     def service_id(self):
         return self._id
 
-    def handle_invocation(self, methodId, sequence, inCodec, outCodec):
+    def handle_invocation(self, methodId, sequence, codec):
         try:
-            self._methods[methodId](sequence, inCodec, outCodec)
+            self._methods[methodId](sequence, codec)
         except KeyError:
             raise RequestError("invalid method ID (%d)" % (methodId))
 
@@ -88,14 +90,15 @@ class Server(object):
     def stop(self):
         pass
 
-    def _process_request(self, inCodec, outCodec):
-        info = inCodec.start_read_message()
-        if info.type != MessageType.kInvocationMessage:
+    def _process_request(self, codec):
+        info = codec.start_read_message()
+        if info.type not in [MessageType.kInvocationMessage, MessageType.kOnewayMessage]:
             raise RequestError("invalid type of incoming request")
 
         service = self.get_service_with_id(info.service)
         if service is None:
             raise RequestError("invalid service ID (%d)" % info.service)
-        service.handle_invocation(info.request, info.sequence, inCodec, outCodec)
+        service.handle_invocation(info.request, info.sequence, codec)
 
-
+        if info.type is MessageType.kOnewayMessage:
+            codec.reset()

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,31 +32,31 @@
 #ifndef _EMBEDDED_RPC__GENERATOR_H_
 #define _EMBEDDED_RPC__GENERATOR_H_
 
-#include "cpptempl.h"
 #include "InterfaceDefinition.h"
-#include <string>
-#include <fstream>
+#include "cpptempl.h"
+#include "types/AliasType.h"
+#include "types/ArrayType.h"
+#include "types/BuiltinType.h"
+#include "types/ConstType.h"
+#include "types/DataType.h"
+#include "types/EnumMember.h"
+#include "types/EnumType.h"
 #include "types/Function.h"
 #include "types/Interface.h"
 #include "types/ListType.h"
-#include "types/ArrayType.h"
-#include "types/EnumType.h"
-#include "types/EnumMember.h"
-#include "types/StructType.h"
 #include "types/StructMember.h"
-#include "types/VoidType.h"
-#include "types/DataType.h"
-#include "types/BuiltinType.h"
-#include "types/AliasType.h"
-#include "types/ConstType.h"
+#include "types/StructType.h"
 #include "types/UnionType.h"
+#include "types/VoidType.h"
+#include <fstream>
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Abstract code generator base class.
  */
@@ -74,6 +76,7 @@ public:
      * @brief Destructor.
      */
     virtual ~Generator() {}
+
     /*!
      * @brief Generate output files.
      */
@@ -82,6 +85,8 @@ public:
 protected:
     InterfaceDefinition *m_def; /*!< Interface definitions. */
     SymbolScope *m_globals;     /*!< Symbol scope data. */
+    typedef std::map<std::string, std::vector<cpptempl::data_ptr> >
+        interfaceLists_t; /*!< Contains list of interfaces belonging to different groups. */
 
     /*!
      * @brief This function open file
@@ -138,6 +143,84 @@ protected:
      * @return Actual time.
      */
     std::string getTime();
+
+    /*!
+     * @brief This function sets interfaces template data.
+     *
+     * This function sets interfaces template data with all data, which
+     * are necessary for generating output code for output files.
+     */
+    interfaceLists_t makeInterfacesTemplateData();
+
+    /*!
+     * @brief This function return interface functions list.
+     *
+     * This function return interface functions list with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] iface Pointer to interface.
+     *
+     * @return Contains interface functions data.
+     */
+    cpptempl::data_list getFunctionsTemplateData(Interface *iface);
+
+    /*!
+     * @brief This function return interface function template data.
+     *
+     * This function return interface function template data with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] fn From this are set interface function template data.
+     * @param[in] fnIndex Function index.
+     *
+     * @return Contains interface function data.
+     */
+    virtual cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex) = 0;
+
+    /*!
+     * @brief This function will get interface comments and convert to language specific ones
+     *
+     * @param[in] iface Pointer to interface.
+     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     */
+    virtual void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo) = 0;
+
+    /*!
+     * @brief This function generates output files.
+     *
+     * This function call functions for generating client/server header/source files.
+     *
+     * @param[in] fileNameExtension Extension for file name (for example for case that each interface will be generated
+     * in its
+     * set of output files).
+     */
+    virtual void generateOutputFiles(const std::string &fileNameExtension) = 0;
+
+    /*!
+     * @brief This function generates output files for defined interfaces.
+     *
+     * @param[inout] templateData Data prepared for templates files
+     * @param[in] interfaceLists Lists of interfaces sorted by map name.
+     */
+    void generateInterfaceOutputFiles(cpptempl::data_map &templateData, interfaceLists_t interfaceLists);
+
+    /*!
+     * @brief This function will insert given interface map into vector of interfaces based on given map name.
+     *
+     * @param[inout] interfaceLists Lists of interfaces sorted by map name.
+     * @param[in] interfaceMap Interface data map information.
+     * @param[in] mapName Name used for sorting interface data maps.
+     */
+    void fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
+                                   cpptempl::data_ptr interfaceMap,
+                                   std::string mapName);
+
+    /*!
+     * @brief This function sets template data for include directives from an IDL file
+     *
+     * @param[inout] templateData Data prepared for templates files
+     */
+    void makeIncludesTemplateData(cpptempl::data_map &templateData);
 };
 
 } // namespace erpcgen

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,10 +32,10 @@
 #include "Logging.h"
 #include "basic_codec.h"
 #include "client_manager.h"
-#include "unit_test_common/unit_test_common.h"
 #include "gtest.h"
-#include "serial_transport.h"
 #include "gtestListener.h"
+#include "serial_transport.h"
+#include "unit_test_common/unit_test_common.h"
 
 using namespace erpc;
 
@@ -85,8 +86,9 @@ int main(int argc, char **argv)
     uint8_t vmin = 1;
     while (kErpcStatus_Success != g_transport.init(vtime, vmin))
         ;
-    g_client->setTransport(&g_transport);
+
     g_client->setMessageBufferFactory(&g_msgFactory);
+    g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);
 
     int i = RUN_ALL_TESTS();

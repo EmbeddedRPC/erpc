@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -93,7 +95,7 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-erpc_status_t FramedTransport::send(const MessageBuffer *message)
+erpc_status_t FramedTransport::send(MessageBuffer *message)
 {
 #if ERPC_THREADS
     Mutex::Guard lock(m_sendLock);
@@ -112,7 +114,7 @@ erpc_status_t FramedTransport::send(const MessageBuffer *message)
     }
 
     // Send the rest of the message.
-    return underlyingSend(message->get(), message->getUsed());
+    return underlyingSend(message->get(), messageLength);
 }
 
 uint16_t FramedTransport::computeCRC16(const uint8_t *data, uint32_t lengthInBytes)

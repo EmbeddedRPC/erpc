@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,12 +33,12 @@
 #include "ErpcLexer.h"
 #include "Logging.h"
 #include "annotations.h"
+#include "smart_ptr.h"
+#include "types/ArrayType.h"
+#include "types/BuiltinType.h"
 #include "types/ConstType.h"
 #include "types/ListType.h"
-#include "types/ArrayType.h"
 #include "types/VoidType.h"
-#include "types/BuiltinType.h"
-#include "smart_ptr.h"
 #include <string.h>
 
 using namespace erpcgen;
@@ -669,19 +671,6 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
 
     m_currentStruct = newStruct;
 
-    if (structNameNode)
-    {
-        Annotation *externAnnotation = newStruct->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
-        {
-            // Do typedef for struct.
-            const Token &tok = structNameNode->getToken();
-
-            AliasType *type = new AliasType(tok, newStruct);
-            m_globals->addSymbol(type);
-        }
-    }
-
     return nullptr;
 }
 
@@ -707,8 +696,8 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, bottom_up)
 
     m_globals->addSymbol(m_currentStruct);
 
-    // Handle @length annotation for structure members
-    scanStructForLengthAnnotation(m_currentStruct);
+    // Handle annotations for function params
+    scanStructForAnnotations(m_currentStruct);
 
     /* Clear current struct pointer. */
     m_currentStruct = nullptr;
@@ -1008,8 +997,8 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
     Function *func = m_currentInterface->getFunctions().back();
     func->getParameters().getScope().setParent(&m_currentInterface->getScope());
 
-    // Handle @length annotation for function params
-    scanStructForLengthAnnotation(m_currentStruct);
+    // Handle annotations for function params
+    scanStructForAnnotations(m_currentStruct);
 
     /* TOK_FUNCTION -> name retVal params annotations */
     addAnnotations(node->getChild(3), func);
@@ -1256,100 +1245,6 @@ uint32_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
     return valueToken.getIntValue();
 }
 
-void SymbolScanner::scanStructForLengthAnnotation(StructType *structType)
-{
-    for (StructMember *structMember : structType->getMembers())
-    {
-        Annotation *ann = structMember->findAnnotation(LENGTH_ANNOTATION);
-        if (ann)
-        {
-            Value *value = ann->getValueObject();
-            if (value->getType() != kIntegerValue)
-            {
-                // Make sure the @length annotation names a valid member.
-                Symbol *symbol = structType->getScope().getSymbol(ann->getValueObject()->toString(), false);
-                if (!symbol)
-                {
-                    symbol = m_globals->getSymbol(ann->getValueObject()->toString());
-                    if (!symbol || !dynamic_cast<ConstType *>(symbol))
-                    {
-                        throw semantic_error(
-                            format_string("line %d: Length annotation must name a valid parameter, member, constant or "
-                                          "integer number",
-                                          ann->getLocation().m_firstLine));
-                    }
-                }
-
-                // Verify the length member is a scalar.
-                StructMember *structMemberRef = dynamic_cast<StructMember *>(symbol);
-                bool isInteger = false;
-                if (structMemberRef)
-                {
-                    DataType *refDataType = structMemberRef->getDataType()->getTrueDataType();
-                    BuiltinType *refDataTypeBuiltinType = dynamic_cast<BuiltinType *>(refDataType);
-                    if (refDataTypeBuiltinType && refDataTypeBuiltinType->isInt())
-                    {
-                        isInteger = true;
-                    }
-                }
-                else
-                {
-                    ConstType *refDataType = dynamic_cast<ConstType *>(symbol);
-                    if (refDataType && refDataType->getValue()->getType() == kIntegerValue)
-                    {
-                        isInteger = true;
-                    }
-                }
-                if (!isInteger)
-                {
-                    throw semantic_error(
-                        format_string("line %d: The parameter, member or constant named by a length annotation must be "
-                                      "an integer type",
-                                      ann->getLocation().m_firstLine));
-                }
-
-                bool isFunction = !m_globals->hasSymbol(structType->getName());
-                // Verify both the data and length members are the same direction.
-                if (!isFunction && structMemberRef && structMember->getDirection() != structMemberRef->getDirection())
-                {
-                    throw semantic_error(
-                        format_string("orig line %d, ref line %d: The parameter named by a length annotation must be "
-                                      "the same direction"
-                                      "as the data parameter.",
-                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
-                }
-                // Verify that length parameter for function parameter is always "in" direction type.
-                else if (isFunction && structMemberRef && structMemberRef->getDirection() == kOutDirection &&
-                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
-                {
-                    throw semantic_error(
-                        format_string("orig line %d, ref line %d: The out parameter with set length annotation "
-                                      "must have also set max_length annotation",
-                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
-                }
-
-                else if (isFunction && structMemberRef && structMember->getDirection() == kInoutDirection &&
-                         structMemberRef->getDirection() == kInoutDirection &&
-                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
-                {
-                    throw semantic_error(
-                        format_string("orig line %d, ref line %d: The inout parameter named by a length annotation "
-                                      "must have set max_length annotation",
-                                      ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
-                }
-            }
-
-            DataType *memberType = structMember->getDataType()->getTrueDataType();
-            if (memberType->isList())
-            {
-                ListType *memberListType = dynamic_cast<ListType *>(memberType);
-                assert(memberListType);
-                memberListType->setLengthVariableName(value->toString());
-            }
-        }
-    }
-}
-
 void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
 {
     if (childNode)
@@ -1365,7 +1260,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
             // TOK_ANNOTATION -> ( (name) (TOK_EXPR -> (value)) )
             AstNode *annotation_name = annotation->getChild(0);
 
-            checkAnnotaionBeforeAdding(annotation, symbol);
+            checkAnnotationBeforeAdding(annotation, symbol);
 
             const Token &nameTok = annotation_name->getToken();
             Value *annValue = getAnnotationValue(annotation);
@@ -1402,7 +1297,7 @@ Value *SymbolScanner::getAnnotationValue(AstNode *annotation)
     return value;
 }
 
-void SymbolScanner::checkAnnotaionBeforeAdding(AstNode *annotation, Symbol *symbol)
+void SymbolScanner::checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol)
 {
     AstNode *annotation_name = annotation->getChild(0);
     Value *annValue = getAnnotationValue(annotation);
@@ -1448,34 +1343,140 @@ void SymbolScanner::checkAnnotaionBeforeAdding(AstNode *annotation, Symbol *symb
                     format_string("line %d: Max_length annotation must name a valid parameter or member",
                                   annotation_name->getToken().getFirstLine()));
             }
+        }
+    }
+}
 
-            if (annValue->getType() != kIntegerValue)
+void SymbolScanner::scanStructForAnnotations(StructType *structType)
+{
+    // go trough all structure members
+    for (StructMember *structMember : structType->getMembers())
+    {
+        // looking for references
+        Annotation *lengthAnn = structMember->findAnnotation(LENGTH_ANNOTATION);
+        Annotation *maxLengthAnn = structMember->findAnnotation(MAX_LENGTH_ANNOTATION);
+        if (lengthAnn)
+        {
+            checkIfAnnValueIsIntNumberOrIntType(structType, lengthAnn);
+
+            if (lengthAnn->getValueObject()->getType() != kIntegerValue)
             {
-                Symbol *symbolConst = m_globals->getSymbol(annValue->toString());
-                ConstType *constVar = dynamic_cast<ConstType *>(symbolConst);
+                StructMember *structMemberRef = NULL;
 
-                if (symbolConst && constVar)
+                // search in structure scope for member referenced with annotation
+                for (StructMember *memberRef : structType->getMembers())
                 {
-                    DataType *trueBinaryType = constVar->getDataType()->getTrueDataType();
-                    if (trueBinaryType->isBuiltin())
+                    if (memberRef->getName().compare(lengthAnn->getValueObject()->toString()) == 0)
                     {
-                        BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueBinaryType);
-                        if (builtinType && !builtinType->isInt())
-                        {
-                            throw semantic_error(format_string(
-                                "line %d: The constant named by a max_length annotation must be an integer type",
-                                annotation_name->getToken().getFirstLine()));
-                        }
+                        structMemberRef = memberRef;
+                        break;
                     }
                 }
-                else
+
+                // when m_currentInterface then m_currentStructure pointing to function parameters
+                bool isFunction = m_currentInterface != NULL;
+
+                // Verify both the data and length members are the same direction.
+                if (!isFunction && structMemberRef && structMember->getDirection() != structMemberRef->getDirection())
                 {
                     throw semantic_error(
-                        format_string("line %d: The parameter or member named by a max_length annotation must be "
-                                      "an integer type",
-                                      annotation_name->getToken().getFirstLine()));
+                        format_string("orig line %d, ref line %d: The parameter named by a length annotation must be "
+                                      "the same direction"
+                                      "as the data parameter.",
+                                      lengthAnn->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                }
+                // Verify using max_length annotation when referenced variable is out.
+                else if (isFunction && structMemberRef && structMemberRef->getDirection() == kOutDirection &&
+                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+                {
+                    throw semantic_error(
+                        format_string("orig line %d, ref line %d: The out parameter with set length annotation "
+                                      "must have also set max_length annotation",
+                                      lengthAnn->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                }
+                // Verify using max_length annotation when referenced variable is inout.
+                else if (isFunction && structMemberRef && structMember->getDirection() == kInoutDirection &&
+                         structMemberRef->getDirection() == kInoutDirection &&
+                         !structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+                {
+                    throw semantic_error(
+                        format_string("orig line %d, ref line %d: The inout parameter named by a length annotation "
+                                      "must have set max_length annotation",
+                                      lengthAnn->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
                 }
             }
+
+            // Set length variable name.
+            DataType *memberType = structMember->getDataType()->getTrueDataType();
+            if (memberType->isList())
+            {
+                ListType *memberListType = dynamic_cast<ListType *>(memberType);
+                assert(memberListType);
+                memberListType->setLengthVariableName(lengthAnn->getValueObject()->toString());
+            }
+        }
+
+        if (maxLengthAnn)
+        {
+            checkIfAnnValueIsIntNumberOrIntType(structType, maxLengthAnn);
+        }
+    }
+}
+
+void SymbolScanner::checkIfAnnValueIsIntNumberOrIntType(StructType *structType, Annotation *ann)
+{
+    // skip if value is integer number
+    if (ann->getValueObject()->getType() != kIntegerValue)
+    {
+        std::string annName = ann->getName();
+        int annNameFirstLine = ann->getLocation().m_firstLine;
+        std::string annValue = ann->getValueObject()->toString();
+
+        DataType *trueDataType = nullptr;
+
+        // search in structure scope for member referenced with annotation
+        for (StructMember *structMember : structType->getMembers())
+        {
+            if (structMember->getName().compare(annValue) == 0)
+            {
+                trueDataType = structMember->getDataType()->getTrueDataType();
+                break;
+            }
+        }
+
+        if (!trueDataType)
+        {
+            // search in global scope for member referenced with annotation
+            Symbol *symbolConst = m_globals->getSymbol(annValue);
+            if (symbolConst)
+            {
+                ConstType *constVar = dynamic_cast<ConstType *>(symbolConst);
+                if (constVar)
+                {
+                    trueDataType = constVar->getDataType();
+                }
+            }
+        }
+
+        if (trueDataType)
+        {
+            //check if data type is integer type
+            if (trueDataType->isBuiltin())
+            {
+                BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
+                if (builtinType && !builtinType->isInt())
+                {
+                    throw semantic_error(format_string(
+                        "line %d: Annotation %s contains reference to non-integer parameter or member %s declared on line %d.",
+                        annNameFirstLine, annName.c_str(), annValue.c_str(), trueDataType->getLocation().m_firstLine));
+                }
+            }
+        }
+        else
+        {
+            throw semantic_error(
+                format_string("line %d: The parameter or member named by a %s annotation must exist.",
+                              annNameFirstLine, annName.c_str()));
         }
     }
 }

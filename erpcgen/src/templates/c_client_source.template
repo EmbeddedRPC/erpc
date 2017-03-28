@@ -47,10 +47,10 @@ extern ClientManager *g_client;
 {%    endif %}
 {%   endif %}
 {%   if generateInfraErrorChecks or not generateAllocErrorChecks %}
+
 {$f_clientEncode(iface, fn)}
 {%   endif %}
 {%   if fn.isReturnValue %}
-
 {%    if fn.needEnumTmpClient %}
     int32_t enum_tmp_local;
 {%    endif %}
@@ -66,7 +66,6 @@ extern ClientManager *g_client;
 {$f_clientDecode(iface, fn)}
 {% endif %}
 {%   endif -- isReturnValue %}
-
     // Dispose of the request.
     g_client->releaseRequest(request);
 {%   if errVar != ""  %}
@@ -74,7 +73,7 @@ extern ClientManager *g_client;
 
     if (err)
     {
-        ClientManager::error_handler_t errorHandler = g_client->getErrorHandler();
+        client_error_handler_t errorHandler = g_client->getErrorHandler();
         if (errorHandler != NULL)
         {
             (*errorHandler)(err);

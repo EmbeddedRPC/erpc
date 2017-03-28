@@ -27,9 +27,9 @@
 #ifndef _MSC_VER
 #include <boost/locale.hpp>
 #else
-#include <boost/scoped_array.hpp>
 #include "windows.h"
 #include "winnls.h" // unicode-multibyte conversion
+#include <boost/scoped_array.hpp>
 #endif
 
 inline std::wstring utf8_to_wide(const std::string &text)
@@ -59,8 +59,7 @@ inline std::string wide_to_utf8(const std::wstring &text)
 #endif
 }
 
-namespace std
-{
+namespace std {
 inline ostream &operator<<(ostream &out, const wchar_t *value)
 {
     wstring text(value);

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,18 +32,18 @@
 #ifndef _EMBEDDED_RPC__STRUCTTYPE_H_
 #define _EMBEDDED_RPC__STRUCTTYPE_H_
 
-#include <string>
-#include <vector>
-#include "SymbolScope.h"
 #include "DataType.h"
 #include "StructMember.h"
+#include "SymbolScope.h"
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Structure data type.
  */
@@ -94,18 +96,21 @@ public:
      * @return Symbol scope.
      */
     SymbolScope &getScope() { return m_scope; }
+
     /*!
      * @brief This function returns struct members vector.
      *
      * @return Vector of struct members.
      */
     member_vector_t &getMembers() { return m_members; }
+
     /*!
      * @brief This function return "true" value for identify struct type.
      *
      * @retval true Always return true.
      */
     virtual bool isStruct() const { return true; }
+
     /*!
      * @brief @brief This function returns description about the struct.
      *

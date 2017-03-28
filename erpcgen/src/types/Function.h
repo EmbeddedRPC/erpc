@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,17 +32,17 @@
 #ifndef _EMBEDDED_RPC__FUNCTION_H_
 #define _EMBEDDED_RPC__FUNCTION_H_
 
-#include <string>
-#include "Symbol.h"
 #include "DataType.h"
 #include "StructType.h"
+#include "Symbol.h"
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Function declaration.
  *
@@ -89,18 +91,21 @@ public:
      * @return Function parameters.
      */
     StructType &getParameters() { return m_parameters; }
+
     /*!
      * @brief This function returns data type of function return value.
      *
      * @return Return data type of function return value.
      */
     DataType *getReturnType() { return m_returnType; }
+
     /*!
      * @brief This function set data type of function return value.
      *
      * @param[in] returnType Function return value data type.
      */
     void setReturnType(DataType *returnType) { m_returnType = returnType; }
+
     /*!
      * @brief This function returns true/false, when function return type is/isn't oneway.
      *
@@ -108,24 +113,28 @@ public:
      * @retval false Function return type isn't oneway.
      */
     bool isOneway() const { return m_isOneway; }
+
     /*!
      * @brief This function set true/false, when function return type is/isn't oneway.
      *
      * @param[in] isOneway Set, if function return type is oneway.
      */
     void setIsOneway(bool isOneway) { m_isOneway = isOneway; }
+
     /*!
      * @brief This function returns function unique id.
      *
      * @return Function unique id.
      */
     uint32_t getUniqueId() const { return m_uniqueId; }
+
     /*!
      * @brief This function set function unique id.
      *
      * @param[in] newId New function unique id.
      */
     void setUniqueId(uint32_t newId) { m_uniqueId = newId; }
+
     /*!
      * @brief This function returns description about the interface function.
      *

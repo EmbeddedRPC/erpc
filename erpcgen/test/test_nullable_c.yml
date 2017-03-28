@@ -1,4 +1,49 @@
 ---
+name: param buildin
+desc:
+params:
+  dir:
+    - "in"
+    - "out"
+    - "inout"
+idl: |  
+  interface foo {
+    bar({dir} string a @nullable @max_length(8)) -> void
+  }
+test_client.cpp:
+  - re: void bar\(\w*\s*char \* a\)
+  - if: dir in ('in', 'inout')
+    then:
+      - if (a == NULL)
+      - codec->writeNullFlag(true)
+      - if (a)
+      - codec->writeString(strlen(a), a);
+  - if: dir in ('out', 'inout')
+    then:
+      - bool isNull;
+      - codec->readNullFlag(&isNull);
+      - if (!isNull)
+      - codec->readString(&a_len, &a_local);
+test_server.cpp:
+  - ::bar_shim
+  - char * a = NULL;
+  - if: dir in ('in', 'inout')
+    then:      
+      - bool isNull;
+      - codec->readNullFlag(&isNull)
+      - if (!isNull)
+      - err = codec->readString(&a_len, &a_local)
+      - else
+      - a = NULL;
+  - if: dir in ('out', 'inout')
+    then:
+      - if (a == NULL)
+      - codec->writeNullFlag(true);
+      - else
+      - codec->writeNullFlag(false);      
+      - if (a)
+      - codec->writeString(strlen(a), a);
+---
 name: in param struct
 desc:
 params:
@@ -41,7 +86,7 @@ test_server.cpp:
   - endReadMessage
 
 ---
-name: struct field
+name: struct list field
 desc:
 idl: |
   struct pair {
@@ -72,3 +117,92 @@ test_server.cpp:
   - data->b.elementsCount = 0
   - endReadStruct
 
+name: struct binary field
+desc:
+idl: |
+  struct pair {
+    binary b @nullable
+  }
+  interface foo {
+    bar(pair s) -> void
+  }
+test_client.cpp:
+  - int32_t write_pair_struct
+  - if (data->b.data == NULL)
+  - writeNullFlag(true)
+  - '{'
+  - writeNullFlag(false)
+  - write_binary_t_struct
+  - '}'
+  - void bar(const pair * s)
+  - write_pair_struct
+test_server.cpp:
+  - int32_t read_pair_struct
+  - bool isNull
+  - readNullFlag
+  - if (!isNull)
+  - read_binary_t_struct
+  - else
+  - data->b.data = NULL
+  - data->b.dataLength = 0
+
+---
+name: struct string field
+desc:
+params:
+  dir:
+    - "in"
+    - "out"
+    - "inout" 
+idl: |
+  struct pair {
+    string a @nullable
+  }
+
+  interface foo {
+    bar({dir} pair s) -> void
+  }
+test_client.cpp:
+  - if: dir in ('in', 'inout')
+    then:
+      - int32_t write_pair_struct
+      - codec->startWriteStruct();
+      - if (data->a == NULL)
+      - codec->writeNullFlag(true);
+      - else
+      - codec->writeNullFlag(false);
+      - if (data->a)
+      - codec->writeString(strlen(data->a), data->a);
+  - if: dir in ('out', 'inout')
+    then:
+      - int32_t read_pair_struct
+      - bool isNull;
+      - codec->startReadStruct();
+      - codec->readNullFlag(&isNull);
+      - if (!isNull)
+      - codec->readString(&a_len, &a_local);
+      - else
+      - data->a = NULL;
+      - data->a = 0;
+test_server.cpp:
+  - if: dir in ('in', 'inout')
+    then:
+      - int32_t read_pair_struct
+      - bool isNull;
+      - codec->startReadStruct();
+      - codec->readNullFlag(&isNull);
+      - if (!isNull)
+      - codec->readString(&a_len, &a_local);
+      - else
+      - data->a = NULL;
+      - data->a = 0;
+  - if: dir in ('out', 'inout')
+    then:
+      - int32_t write_pair_struct
+      - codec->startWriteStruct();
+      - if (data->a == NULL)
+      - codec->writeNullFlag(true);
+      - else
+      - codec->writeNullFlag(false);
+      - if (data->a)
+      - codec->writeString(strlen(data->a), data->a);

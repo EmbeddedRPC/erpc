@@ -52,6 +52,9 @@ uint32_t {$info.sizeTemp};
 {% endif %}
 uint8_t * {$info.dataTemp};
 {$infraErrVar}codec->readBinary(&{$info.sizeTemp}, &{$info.dataTemp});
+{% if info.hasLengthVariable && not info.constantVariable %}
+{% if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
+{% endif %}
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}if ({$info.sizeTemp} > 0 {% if info.maxSize != info.sizeTemp %}&& {$info.sizeTemp} <= {$info.maxSize}{% endif %})
 {$infraErrIndents}{
@@ -99,6 +102,9 @@ uint8_t * {$info.dataTemp};
 uint32_t {$info.sizeTemp};
 {%  endif %}
 {$infraErrVar}codec->startReadList(&{$info.sizeTemp});
+{% if info.hasLengthVariable && not info.constantVariable %}
+{% if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
+{% endif %}
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}if ({$info.sizeTemp} > 0)
 {$infraErrIndents}{
@@ -197,7 +203,7 @@ else
 {% enddef --------------------------------------- BuiltinType %}
 
 {% def encodeBinaryType(info) -----------------  %}
-{$infraErrVar}codec->writeBinary({$info.size}, {$info.name});
+{$infraErrVar}codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
 
 {% def encodeEnumType(info) ---------------------%}
@@ -212,9 +218,9 @@ else
 {% if info.useBinaryCoder %}
 {$encodeBinaryType(info)}
 {% else %}
-if ({$info.size} > 0 && {$info.name})
+if ({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} > 0 && {$info.name})
 {
-    {$infraErrVar}codec->startWriteList({$info.size});
+    {$infraErrVar}codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size});
 {$addIndent("    ", encodeArrayType(info))}
 }
 else
@@ -228,7 +234,7 @@ else
 {% enddef ------------------------------------ ListType %}
 
 {% def encodeArrayType(info) --------------------- %}
-for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{$info.forLoopCount})
+for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}; ++{$info.forLoopCount})
 {
 {% if info.isElementArrayType %}
 {$addIndent("    ", info.protoNext.encode(info.protoNext))}

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,9 +32,9 @@
 #include "Logging.h"
 #include "basic_codec.h"
 #include "simple_server.h"
+#include "tcp_transport.h"
 #include "unit_test.h"
 #include "unit_test_common/unit_test_common_server.h"
-#include "tcp_transport.h"
 
 using namespace erpc;
 
@@ -80,8 +81,8 @@ int main(int argc, const char *argv[])
         Log::error("Failed to open connection\n");
         return 1;
     }
-    g_server.setTransport(&g_transport);
     g_server.setMessageBufferFactory(&g_msgFactory);
+    g_server.setTransport(&g_transport);
     g_server.setCodecFactory(&g_basicCodecFactory);
 
     add_services(&g_server);
@@ -91,6 +92,7 @@ int main(int argc, const char *argv[])
     if (err && err != kErpcStatus_ServerIsDown)
     {
         Log::error("Error occurred: %d\n", err);
+        return err;
     }
 
     //    Thread::sleep(10000000);

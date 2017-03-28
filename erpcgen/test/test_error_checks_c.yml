@@ -456,7 +456,7 @@ idl: |
 test_client.cpp:
   - if (err)
   - '{'
-  - ClientManager::error_handler_t errorHandler = g_client->getErrorHandler();
+  - client_error_handler_t errorHandler = g_client->getErrorHandler();
   - if (errorHandler != NULL)
   - '{'
   - (*errorHandler)(err);
@@ -500,7 +500,7 @@ idl: |
 test_client.cpp:
   - if (err)
   - '{'
-  - ClientManager::error_handler_t errorHandler = g_client->getErrorHandler();
+  - client_error_handler_t errorHandler = g_client->getErrorHandler();
   - if (errorHandler != NULL)
   - '{'
   - (*errorHandler)(err);

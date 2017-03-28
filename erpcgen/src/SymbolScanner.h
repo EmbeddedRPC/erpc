@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,21 +33,21 @@
 #define _EMBEDDED_RPC__SYMBOLSCANNER_H_
 
 #include "AstWalker.h"
-#include "types/SymbolScope.h"
-#include "types/Program.h"
-#include "types/Interface.h"
-#include "types/StructType.h"
-#include "types/EnumType.h"
-#include "types/EnumMember.h"
 #include "types/AliasType.h"
+#include "types/EnumMember.h"
+#include "types/EnumType.h"
+#include "types/Interface.h"
+#include "types/Program.h"
+#include "types/StructType.h"
+#include "types/SymbolScope.h"
 #include "types/UnionType.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Scans for symbol names.
  */
@@ -96,9 +98,10 @@ public:
      * @brief Destructor.
      */
     virtual ~SymbolScanner() {}
+
 protected:
     SymbolScope
-        *m_globals; /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
+        *m_globals;                             /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
     Interface *m_currentInterface;              /*!< Contains pointer to interface when interface is handled. */
     StructType *m_currentStruct;                /*!< Contains pointer to structure when structure is handled. */
     Program *m_currentProgram;                  /*!< Contains pointer to program when program was set in parsed file. */
@@ -605,16 +608,6 @@ protected:
     Value *getValueForConst(AstNode *const node, DataType *const constDataType);
 
     /*!
-     * @brief Handle @length annotations on structs.
-     *
-     * Struct members are examined for @length annotations, and the length member is denoted.
-     * This function is also used on function parameters, since they are represented as structs.
-     *
-     * @param[in] structType Reference to the struct type to scan and process.
-     */
-    void scanStructForLengthAnnotation(StructType *structType);
-
-    /*!
      * @brief This function add annotations to vector of symbol annotations.
      *
      * @param[in] childTok AstNode contains annotations information.
@@ -628,7 +621,7 @@ protected:
      * @param[in] annotation Node containing information about annotation.
      * @param[in] symbol Symbol containing vector of annotations belongs to him.
      */
-    void checkAnnotaionBeforeAdding(AstNode *annotation, Symbol *symbol);
+    void checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol);
 
     /*!
      * @brief Helper function to get Value from annotation AstNode
@@ -638,6 +631,24 @@ protected:
      * @return Value pointer for annotation
      */
     Value *getAnnotationValue(AstNode *annotationNode);
+
+    /*!
+     * @brief Controlling annotations used on structure members.
+     *
+     * Struct members are examined for @length and @max_length annotations, and the length member is denoted.
+     * This function is also used on function parameters, since they are represented as structs.
+     *
+     * @param[in] structType Reference to the struct type to scan and process.
+     */
+    void scanStructForAnnotations(StructType *structType);
+
+    /*!
+     * @brief Check if annotation is integer number or integer type variable.
+     *
+     * Annotation can contain reference to integer data type or it can be integer number.
+     * Referenced integer data type can be presented in global scope or in same structure scope.
+     */
+    void checkIfAnnValueIsIntNumberOrIntType(StructType *structType, Annotation *ann);
 };
 
 } // namespace erpcgen

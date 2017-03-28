@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,20 +32,20 @@
 #ifndef _EMBEDDED_RPC__ASTNODE_H_
 #define _EMBEDDED_RPC__ASTNODE_H_
 
-#include <typeinfo>
-#include <string>
-#include <vector>
+#include "Token.h"
+#include "smart_ptr.h"
 #include <map>
 #include <stack>
-#include "smart_ptr.h"
-#include "Token.h"
+#include <string>
+#include <typeinfo>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Homogeneous AST node class.
  *
@@ -134,12 +136,14 @@ public:
      * @return Pointer to new (cloned) AstNode object.
      */
     virtual AstNode *clone() const { return new AstNode(*this); }
+
     /*!
      * @brief This function returns name of this node.
      *
      * @return Node name as string representation.
      */
     virtual std::string nodeName() const { return typeid(*this).name(); }
+
     //! @name Token
     //@{
     /*!
@@ -150,6 +154,7 @@ public:
      * @see const Token * getToken()
      */
     Token &getToken() { return m_token; }
+
     /*!
      * @brief This function returns constant token of this node.
      *
@@ -158,18 +163,21 @@ public:
      * @see Token * getToken()
      */
     const Token &getToken() const { return m_token; }
+
     /*!
      * @brief This function set token to this node.
      *
      * @param[in] token Pointer to given token.
      */
     void setToken(Token &token) { m_token = token; }
+
     /*!
      * @brief This function returns value of token of this node.
      *
      * @return Node token value pointer.
      */
     Value *getTokenValue() { return m_token.getValue(); }
+
     /*!
      * @brief This function returns string representation of this node token value.
      *
@@ -186,6 +194,7 @@ public:
      * @return Pointer to parent node.
      */
     AstNode *getParent() const { return m_parent; }
+
     /*!
      * @brief This function set parent for this node.
      *
@@ -202,6 +211,7 @@ public:
      * @return Size of node attributes.
      */
     size_t attributeCount() const { return m_attributes.size(); }
+
     /*!
      * @brief This function find attribute in AstNode attributes.
      *
@@ -291,6 +301,7 @@ public:
      * @return Count of children for current node.
      */
     size_t childCount() const { return m_children.size(); }
+
     /*!
      * @brief This function return child node from node children.
      *
@@ -301,8 +312,8 @@ public:
      * @see size_t AstNode::getIndex()
      * @see size_t getIndexOfChild()
      */
-
     AstNode *getChild(int index) const { return m_children[index]; }
+
     /*!
      * @brief This function return index of searched child node.
      *
@@ -360,6 +371,7 @@ public:
      * @see const AstNode *& operator [] ()
      */
     AstNode *&operator[](int index) { return m_children[index]; }
+
     /*!
      * @brief Square brackets.
      *
@@ -424,6 +436,7 @@ public:
      * @see void dispatch(AstNode * node, int childIndex=0)
      */
     void dispatch() { dispatch(m_root, 0); }
+
     /*!
      * @brief This function call for print AstNode tree information and dispatch children.
      *

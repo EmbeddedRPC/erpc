@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,9 +30,10 @@
  */
 
 #include "erpc_threading.h"
-#include "task.h"
+#include <cassert>
 #include <errno.h>
-#include <time.h>
+
+#if ERPC_THREADS_IS(FREERTOS)
 
 using namespace erpc;
 
@@ -143,10 +146,8 @@ void Thread::threadEntryPoint()
 void Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
-    {
-        _this->threadEntryPoint();
-    }
+    assert(_this && "Reinterpreting 'void *arg' to 'Thread *' failed.");
+    _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
     taskENTER_CRITICAL();
@@ -258,6 +259,7 @@ int Semaphore::getCount() const
 {
     return static_cast<int>(uxQueueMessagesWaiting(m_sem));
 }
+#endif /* ERPC_THREADS_IS(FREERTOS) */
 
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

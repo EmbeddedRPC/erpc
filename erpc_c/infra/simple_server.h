@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -57,8 +59,7 @@ public:
      * This function initializes object attributes.
      */
     SimpleServer()
-    : m_transport()
-    , m_isServerOn(true)
+    : m_isServerOn(true)
     {
     }
 
@@ -66,13 +67,6 @@ public:
      * @brief SimpleServer destructor
      */
     virtual ~SimpleServer();
-
-    /*!
-     * @brief This function sets transport layer to use.
-     *
-     * @param[in] transport Transport layer to use.
-     */
-    void setTransport(Transport *transport) { m_transport = transport; }
 
     /*!
      * @brief Run server in infinite loop.
@@ -113,15 +107,7 @@ protected:
      */
     void disposeBufferAndCodec(Codec *codec);
 
-    /*!
-     * @brief Create message buffers and codecs.
-     *
-     * @return Pointer to created codec with message buffer.
-     */
-    Codec *createBufferAndCodec();
-
-    Transport *m_transport; /*!< Transport layer used to send and receive data. */
-    bool m_isServerOn;      /*!< Information if server is ON or OFF. */
+    bool m_isServerOn; /*!< Information if server is ON or OFF. */
 };
 
 } // namespace erpc

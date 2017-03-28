@@ -13,8 +13,13 @@
 #endif
 {% endif -- usedUnionType %}
 
-#include <stdint.h>
+{% if not commonTypesFile == "" %}
+// Common types header file
+#include "{$commonTypesFile}"
+{% else %}
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 {% for inc in includes %}
 #include "{$inc}"
 {% endfor -- includes %}
@@ -74,6 +79,8 @@ struct {$st.name}{$st.ilComment}
 extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- consts %}
 {% endif -- consts %}
+{% endif -- commonTypesFile %}
+{% if not genCommonTypesFile %}
 {% for iface in interfaces %}
 
 /*! @brief {$iface.name} identifiers */
@@ -104,5 +111,6 @@ extern "C" {
 #if defined(__cplusplus)
 }
 #endif
+{% endif -- genCommonTypesFile %}
 
 #endif // {$commonGuardMacro}

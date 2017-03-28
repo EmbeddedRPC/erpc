@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,18 +32,18 @@
 #ifndef _EMBEDDED_RPC__INTERFACEDEFINITION_H_
 #define _EMBEDDED_RPC__INTERFACEDEFINITION_H_
 
-#include <iostream>
 #include "AstNode.h"
-#include "types/SymbolScope.h"
 #include "types/Program.h"
+#include "types/SymbolScope.h"
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Collects all definitions from an IDL.
  *
@@ -67,6 +69,7 @@ public:
      * @brief Destructor.
      */
     virtual ~InterfaceDefinition() {}
+
     /*!
      * @brief This function initialize symbol scope variable m_globals.
      *
@@ -92,12 +95,14 @@ public:
      * return AstNode * Node belong to this object.
      */
     AstNode *getAst() { return m_ast; }
+
     /*!
      * @brief This function returns global symbol scope.
      *
      * return SymbolScope & Global symbol scope.
      */
     SymbolScope &getGlobals() { return m_globals; }
+
     /*!
      * @brief This function sets program information.
      *
@@ -115,24 +120,28 @@ public:
      * @param[in] programName Name of program.
      */
     void setProgramName(const std::string &programName) { m_programName = programName; }
+
     /*!
      * @brief This function returns program name.
      *
      * @return Return name of program.
      */
     const std::string getProgramName() { return programSymbol()->getName(); }
+
     /*!
      * @brief This function returns output directory path.
      *
      * @return Return output directory path.
      */
     boost::filesystem::path getOutputDirectory() { return m_outputDirectory; }
+
     /*!
      * @brief This function returns output file name.
      *
      * @return Return name of output file.
      */
     std::string getOutputFilename() { return m_outputFilename; }
+
     /*!
      * @brief This function sets output file name.
      *
@@ -164,6 +173,7 @@ public:
      * @brief This functions returns type of checks which should be present in generated file.
      */
     _error_handling_checks getErrorHandlingChecksType() { return m_error_handling_check; }
+
 private:
     /* Instance Variables */
     AstNode *m_ast;                                /*!< Root of AstNode tree. */

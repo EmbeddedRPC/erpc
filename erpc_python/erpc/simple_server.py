@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
@@ -12,7 +14,7 @@
 #   list of conditions and the following disclaimer in the documentation and/or
 #   other materials provided with the distribution.
 #
-# o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+# o Neither the name of the copyright holder nor the names of its
 #   contributors may be used to endorse or promote products derived from this
 #   software without specific prior written permission.
 #
@@ -51,18 +53,14 @@ class SimpleServer(Server):
 
     def _receive_request(self):
         msg = self.transport.receive()
+        
+        codec = self.codec_class()
+        codec.buffer = msg
+        
+        self._process_request(codec)
 
-        inCodec = self.codec_class()
-        inCodec.buffer = msg
-        inCodec.reset()
-
-        outCodec = self.codec_class()
-        outCodec.buffer = bytearray()
-
-        self._process_request(inCodec, outCodec)
-
-        if len(outCodec.buffer):
-            self.transport.send(outCodec.buffer)
+        if len(codec.buffer):
+            self.transport.send(codec.buffer)
 
 class ServerThread(SimpleServer):
     def __init__(self, transport, codecClass):
