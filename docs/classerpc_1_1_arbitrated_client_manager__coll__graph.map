@@ -1,0 +1,14 @@
+<map id="erpc::ArbitratedClientManager" name="erpc::ArbitratedClientManager">
+<area shape="rect" id="node2" href="$classerpc_1_1_client_manager.html" title="Base client implementation. " alt="" coords="1090,77,1232,103"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_codec_factory.html" title="Abstract interface for codec factory. " alt="" coords="746,5,884,31"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="759,143,871,168"/>
+<area shape="rect" id="node6" href="$classerpc_1_1_transport_arbitrator.html" title="Interposer to share transport between client and server. " alt="" coords="1078,207,1244,232"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory. " alt="" coords="721,55,909,80"/>
+<area shape="rect" id="node7" href="$classerpc_1_1_mutex.html" title="Mutex. " alt="" coords="770,216,861,241"/>
+<area shape="rect" id="node8" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="257,300,350,325"/>
+<area shape="rect" id="node13" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="456,367,606,392"/>
+<area shape="rect" id="node9" href="$classerpc_1_1_message_buffer_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="5,265,149,304"/>
+<area shape="rect" id="node10" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="5,328,149,353"/>
+<area shape="rect" id="node11" href="$structerpc_1_1_transport_arbitrator_1_1_pending_client_info.html" title="Request info for a client trying to receive a response. " alt="" coords="732,355,898,393"/>
+<area shape="rect" id="node12" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="469,317,593,343"/>
+</map>

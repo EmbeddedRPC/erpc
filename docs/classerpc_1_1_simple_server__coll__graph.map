@@ -1,0 +1,8 @@
+<map id="erpc::SimpleServer" name="erpc::SimpleServer">
+<area shape="rect" id="node2" href="$classerpc_1_1_server.html" title="Based server functionality. " alt="" coords="300,92,394,117"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport_factory.html" title="Abstract interface for transport factory. " alt="" coords="5,5,161,31"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_codec_factory.html" title="Abstract interface for codec factory. " alt="" coords="185,5,323,31"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory. " alt="" coords="346,5,535,31"/>
+<area shape="rect" id="node6" href="$classerpc_1_1_service.html" title="Abstract interface for service, which can be executed on server side. " alt="" coords="559,5,658,31"/>
+<area shape="rect" id="node7" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="418,92,529,117"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Setup API" name="Setup API">
+<area shape="rect" id="node1" href="$group__transport__setup.html" title="Transport layer initialization. " alt="" coords="134,5,250,31"/>
+<area shape="rect" id="node2" href="$group__client__setup.html" title="Client side setup functions. " alt="" coords="145,55,239,80"/>
+<area shape="rect" id="node3" href="$group__server__setup.html" title="Server side setup and control functions. " alt="" coords="143,104,242,129"/>
+</map>

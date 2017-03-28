@@ -1,0 +1,5 @@
+<map id="erpc::BaseStaticQueue" name="erpc::BaseStaticQueue">
+<area shape="rect" id="node2" href="$classerpc_1_1_static_queue.html" title="Template subclass that wraps the member functions to use the template type parameter. " alt="" coords="240,5,376,44"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer *\&gt;" alt="" coords="226,68,390,107"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l kInitCountMessageBuffers \&gt;" alt="" coords="212,131,404,183"/>
+</map>

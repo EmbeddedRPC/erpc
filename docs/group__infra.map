@@ -1,0 +1,7 @@
+<map id="Infrastructure" name="Infrastructure">
+<area shape="rect" id="node2" href="$group__infra__client.html" title="Client classes. " alt="" coords="172,5,228,31"/>
+<area shape="rect" id="node3" href="$group__infra__transport.html" title="Superclasses for building transports. " alt="" coords="158,55,242,80"/>
+<area shape="rect" id="node4" href="$group__infra__utility.html" title="Utility code used by the infrastructure. " alt="" coords="168,104,232,129"/>
+<area shape="rect" id="node5" href="$group__infra__server.html" title="Server classes. " alt="" coords="170,153,230,179"/>
+<area shape="rect" id="node6" href="$group__infra__codec.html" title="Classes used for message serialization. " alt="" coords="153,203,247,228"/>
+</map>

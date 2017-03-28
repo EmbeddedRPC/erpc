@@ -1,0 +1,6 @@
+<map id="erpc::RPMsgTransport" name="erpc::RPMsgTransport">
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="254,5,365,31"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer *\&gt;" alt="" coords="227,56,392,95"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_base_static_queue.html" title="Base class which implements static queue as ring buffer that operates on m_data type void*..." alt="" coords="5,93,164,119"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l kInitCountMessageBuffers \&gt;" alt="" coords="213,119,406,171"/>
+</map>
