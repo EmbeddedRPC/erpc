@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,8 +31,8 @@
 #if !defined(_format_string_h_)
 #define _format_string_h_
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 /*!
  * \brief Returns a formatted STL string using printf format strings.

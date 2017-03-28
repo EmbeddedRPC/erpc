@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF

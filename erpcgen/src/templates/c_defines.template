@@ -1,4 +1,4 @@
-{# Variebles #}
+{# Variables #}
 {% if generateInfraErrorChecks %}
 {%   set infraErrIndents = "    " %}
 {%   set infraErrVar = "err = " %}
@@ -25,11 +25,12 @@
 {%   set s_startReadStruct = infraErrVar & "codec->startReadStruct();" %}
 {%   set s_endReadStruct = infraErrVar & "codec->endReadStruct();" %}
 {%   set s_endReadMessage = infraErrVar & "codec->endReadMessage();" %}
+{%   set s_prepareServerBufferForSend = infraErrVar & "messageFactory->prepareServerBufferForSend(codec->getBuffer());" %}
 
 {% def f_clientEncode(iface, fn) %}
 {$addInfraErrorChecks("    ", f_clientStartWriteMessage(fn.isReturnValue, iface.name, fn.name))}
 {%   if fn.isSendValue %}
-{%    for param in fn.parametersTo2Core %}
+{%    for param in fn.parametersTo2Core if not param.lengthForMember %}
 {%     if param.isNullable %}
 {$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     else -- isNullable %}
@@ -48,7 +49,7 @@
 {%    if fn.needNullVariableOnClient %}
     bool isNull;
 {%    endif -- needNullVariableOnClient %}
-{%    for param in fn.parametersTo1Core %}
+{%    for param in fn.parametersTo1Core if not param.lengthForMember %}
 {%     if param.isNullable %}
 {$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, ""))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
@@ -64,6 +65,7 @@
 {$> addIndent("    ", fn.returnValue.firstAlloc)}
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
 {%    endif -- isNotVoid %}
+
 {$addInfraErrorChecks("    ", s_endReadMessage)}
 {% enddef %}
 

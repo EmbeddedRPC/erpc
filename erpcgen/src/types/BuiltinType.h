@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,15 +32,15 @@
 #ifndef _EMBEDDED_RPC__BUILTINTYPE_H_
 #define _EMBEDDED_RPC__BUILTINTYPE_H_
 
-#include <string>
 #include "DataType.h"
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Represents the builtin atomic types.
  */
@@ -85,16 +87,19 @@ public:
      * @return Builtin type of current object.
      */
     _builtin_type getBuiltinType() const { return m_builtinType; }
+
     /*!
      * @brief This function return "true" value for identify builtin type.
      *
      * @retval true Always return true.
      */
     virtual bool isBuiltin() const { return true; }
+
     /*!
      * @brief Returns whether the type is a scalar builtin type.
      */
     virtual bool isScalar() const { return (isInt() || isFloat() || isBool()) && !(isString() || isBinary()); }
+
     /*!
      * @brief This function return "true" value for identify int type.
      *
@@ -102,6 +107,7 @@ public:
      * @retval false When builtin type isn't int.
      */
     virtual bool isInt() const { return kInt8Type <= m_builtinType && m_builtinType <= kUInt64Type; }
+
     /*!
      * @brief This function return "true" value for identify float type.
      *
@@ -109,6 +115,7 @@ public:
      * @retval false When builtin type isn't float.
      */
     virtual bool isFloat() const { return m_builtinType == kFloatType || m_builtinType == kDoubleType; }
+
     /*!
      * @brief This function return "true" value for identify bool type.
      *
@@ -116,6 +123,7 @@ public:
      * @retval false When builtin type isn't bool.
      */
     virtual bool isBool() const { return m_builtinType == kBoolType; }
+
     /*!
      * @brief This function return true/false value for identify string type.
      *
@@ -123,6 +131,7 @@ public:
      * @retval false When builtin type isn't string.
      */
     virtual bool isString() const { return m_builtinType == kStringType; }
+
     /*!
      * @brief This function return true/false value for identify binary type.
      *
@@ -130,6 +139,7 @@ public:
      * @retval false When builtin type isn't binary.
      */
     virtual bool isBinary() const { return m_builtinType == kBinaryType; }
+
 protected:
     _builtin_type m_builtinType; /*!< Builtin type of current object. */
 };

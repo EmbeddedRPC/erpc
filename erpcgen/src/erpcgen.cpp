@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -27,28 +29,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdint>
-#include <stdlib.h>
-#include <stdexcept>
-#include <vector>
-#include "options.h"
-#include "Logging.h"
+#include "CGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
-#include "CGenerator.h"
+#include "Logging.h"
 #include "PythonGenerator.h"
-#include "types/Program.h"
 #include "SearchPath.h"
 #include "UniqueIdChecker.h"
 #include "erpcgen_version.h"
+#include "options.h"
+#include "types/Program.h"
+#include <cstdint>
+#include <stdexcept>
+#include <stdlib.h>
+#include <vector>
 
 /*!
  * @brief Entry point for the tool.
  */
 int main(int argc, char *argv[], char *envp[]);
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +62,7 @@ const char k_toolName[] = "erpcgen";
 const char k_version[] = ERPCGEN_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright (c) 2014-2016 Freescale Semiconductor, Inc.";
+const char k_copyright[] = "Copyright 2016 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = {
     "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", NULL
@@ -148,6 +150,7 @@ public:
      * @brief Destructor.
      */
     ~erpcgenTool() {}
+
     /*!
      * @brief Reads the command line options passed into the constructor.
      *

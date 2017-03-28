@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
-# Copyright (C) 2014 Freescale Semiconductor, Inc. All Rights Reserved.
+# Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -49,8 +51,8 @@ endif
 
 ifeq "$(build)" "debug"
 DEBUG_OR_RELEASE := Debug
-CFLAGS += -g3 -O0 -DDEBUG
-CXXFLAGS += -g3 -O0 -DDEBUG
+CFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
+CXXFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
 LDFLAGS +=
 else
 DEBUG_OR_RELEASE := Release
@@ -62,5 +64,9 @@ ifneq "$(is_mingw)" "1"
 LIBRARIES += -lc
 endif
 
-LIBRARIES += -lstdc++ -lm
+ifneq "$(is_cygwin)" "1"
+LIBRARIES += -lstdc++
+endif
+
+LIBRARIES += -lm
 

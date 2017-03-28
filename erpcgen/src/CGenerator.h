@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -38,8 +40,7 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
 /*!
  * @brief Code generator for C.
  */
@@ -66,6 +67,7 @@ public:
      * This function close opened files.
      */
     virtual ~CGenerator() {}
+
     /*!
      * @brief This function generate output code for output files.
      *
@@ -74,14 +76,22 @@ public:
     virtual void generate();
 
 protected:
-    typedef std::map<std::string, std::vector<cpptempl::data_ptr> >
-        interfaceLists_t; /*!< Contains list of interfaces belongs to different groups. */
-
     cpptempl::data_map m_templateData; /*!< Data prepared for templates files. */
 
     // TODO: not sure how to get rid of these members yet. Talk to Chris about it.
     bool m_generateClientOutput; /*!< For generating only client output. */
     bool m_generateServerOutput; /*!< For generating only server output. */
+
+    std::vector<ListType *> m_listBinaryTypes; /*!<
+                                                 * Contains binary types transformed to list<uint8>.
+                                                 * More ListType are present when @length annotation is used for binary type.
+                                                 * If binary without @length is used then it is placed on first place in this vector.
+                                                 */
+
+    std::vector<StructType *> m_structListTypes; /*!<
+                                                  * Contains list types transformed to struct{list<>}.
+                                                  * To distinguish between user defined struct{list<>} and transformed list<> to struct{list<>}.
+                                                  */
 
     /*!
      * @brief This function prepare helpful functions located in template files.
@@ -99,7 +109,7 @@ protected:
      * in its
      * set of output files).
      */
-    void generateClientServerOutputFiles(const std::string &fileNameExtension);
+    void generateOutputFiles(const std::string &fileNameExtension);
 
     /*!
      * @brief This function generate output common header file.
@@ -156,7 +166,7 @@ protected:
      *
      * @return Pointer to given or new DataType.
      */
-    DataType *transformDataType(DataType *dataType, _param_direction direction, DataType *topDataType);
+    DataType *transformDataType(DataType *dataType, _param_direction direction);
 
     /*!
      * @brief This function transform binary data type to list and set annotation to it.
@@ -164,40 +174,6 @@ protected:
      * @param[in] structMember Structure member, Function parameter or Union member.
      */
     void setBinaryList(StructMember *structMember);
-
-    /*!
-     * @brief This function return interfaces template data sorted in groups they are belong to.
-     *
-     * This function return interfaces template data with all data, which
-     * are necessary for generating output code for output files. This interfaces
-     * template data are stored in vectors of interfaces template data mapped to common group name.
-     *
-     * @return Mapped vector of interfaces template data to common group name.
-     */
-    interfaceLists_t makeInterfacesTemplateData();
-
-    /*!
-     * @brief This function will insert given interface map into vector of interfaces based on given map name.
-     *
-     * @param[inout] interfaceLists Lists of interfaces sorted by map name.
-     * @param[in] interfaceMap Interface data map information.
-     * @param[in] mapName Name used for sorting interface data maps.
-     */
-    void fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
-                                   cpptempl::data_ptr interfaceMap,
-                                   std::string mapName);
-
-    /*!
-     * @brief This function return interface functions list.
-     *
-     * This function return interface functions list with all data, which
-     * are necessary for generating output code for output files.
-     *
-     * @param[in] iface Pointer to interface.
-     *
-     * @return Contains interface functions data.
-     */
-    cpptempl::data_list getFunctionsTemplateData(Interface *iface);
 
     /*!
      * @brief This function return interface function template data.
@@ -213,12 +189,21 @@ protected:
     cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
 
     /*!
+     * @brief This function will get interface comments and convert to language specific ones
+     *
+     * @param[in] iface Pointer to interface.
+     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     */
+    void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo);
+
+    /*!
      * @brief This function sets const template data.
      *
      * This function sets const template data with all data, which
      * are necessary for generating output code for output files.
      */
     void makeConstTemplateData();
+
     // Functions that populate type-specific template data
 
     /*!
@@ -331,11 +316,6 @@ protected:
     std::string getErrorReturnValue(Function *fn);
 
     /*!
-     * @brief This function sets template data for include directives from an IDL file
-     */
-    void makeIncludesTemplateData();
-
-    /*!
      * @brief This function return interface function prototype.
      *
      * @param[in] fn Function for prototyping.
@@ -394,10 +374,11 @@ protected:
      *
      * @param[in] name Variable name.
      * @param[in] t Variable data type.
-     * @param[in] structType Structure if data type is inside structure.
+     * @param[in] structType Structure holdings structure members.
      * @param[in] inDataContainer Is inside data container (struct, list, array).
      * @param[in] structMember Null for return.
      * @param[out] containsEnum Return true, when data type contains enum type.
+     * @param[in] isFunctionParam Tru for function param else false (structure member).
      *
      * @return Template data for decode or encode data type.
      */
@@ -406,20 +387,23 @@ protected:
                                            StructType *structType,
                                            bool inDataContainer,
                                            StructMember *structMember,
-                                           bool &containsEnum);
+                                           bool &containsEnum,
+                                           bool isFunctionParam);
 
     /*!
      * @brief This function add to template data, which kind of BuiltinType is data type.
      *
      * @param[in] t Data type.
      * @param[out] templateData Template data.
-     * @param[in] structType Structure if data type is inside structure.
+     * @param[in] structType Structure holdings structure members.
      * @param[in] structMember Null for return.
+     * @param[in] isFunctionParam Tru for function param else false (structure member).
      */
     void getEncodeDecodeBuiltin(BuiltinType *t,
                                 cpptempl::data_map &templateData,
                                 StructType *structType,
-                                StructMember *structMember);
+                                StructMember *structMember,
+                                bool isFunctionParam);
 
     /*!
      * @brief This function encapsulate gave name, if it start with pointer.
@@ -607,12 +591,26 @@ protected:
     /*!
      * @brief This function returns true when structure is used as a wrapper for binary type.
      *
+     * Binary type which is not using length annotation is in CGenerator presented as struct{ list<uint8> }.
+     *
      * @param[in] structType Potential structure wrapper.
      *
      * @retval true When structure is used as a wrapper for binary type.
      * @retval false When structure is not used as a wrapper for binary type.
      */
     bool isBinaryStruct(StructType *structType);
+
+    /*!
+     * @brief This function returns true when list was created for replacing binary type.
+     *
+     * Binary type which is using length annotation is in CGenerator presented as list<uint8>.
+     *
+     * @param[in] structType Potential structure wrapper.
+     *
+     * @retval true When structure is used as a wrapper for binary type.
+     * @retval false When structure is not used as a wrapper for binary type.
+     */
+    bool isBinaryList(ListType *listType);
 
     /*!
      * @brief This function returns true when structure is used as a wrapper for list type.

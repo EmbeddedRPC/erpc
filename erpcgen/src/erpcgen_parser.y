@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -276,13 +278,13 @@ root_def        :  program def_list
                             *resultAST = new AstNode(Token(TOK_CHILDREN));
                             (*resultAST)->appendChild($1);
                         }
-                |/* empty */
+                |   /* empty */
                         {
                             *resultAST = new AstNode(Token(TOK_CHILDREN));
                         }
                 ;
 
-program :   annotation_list_opt[annotations] TOK_PROGRAM ident[name] semi_opt
+program         :   annotation_list_opt[annotations] TOK_PROGRAM ident[name] semi_opt
                         {
                             AstNode * prog  = new AstNode(Token(TOK_PROGRAM));
                             prog->appendChild(new AstNode(*$name));
@@ -360,26 +362,26 @@ const_def       :    annotation_doxygen_ml_list_opt[list_opt] "const" simple_dat
                             $$->appendChild($list_opt->getChild(1));
                             $$->appendChild($doxy_il_comment_opt);
                         }
-                    ;
+                ;
 
 /*
  * TOK_ENUM -> ( ident, ( TOK_CHILDREN -> enums* ) )
  */
 enum_def        :   annotation_doxygen_ml_list_opt[list_opt] "enum" name_opt[name] doxy_il_comment_opt '{' enumerator_list_opt '}'
                         {
-							if ($enumerator_list_opt == NULL)
+                            if ($enumerator_list_opt == NULL)
                             {
-								throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $2->getFirstLine()));	
+                                throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $2->getFirstLine()));
                             }
                             else
                             {
-								$$ = new AstNode(*$2);
-								$$->appendChild($name);
-								$$->appendChild($enumerator_list_opt);
-								$$->appendChild($list_opt->getChild(0));
-								$$->appendChild($list_opt->getChild(1));
-								$$->appendChild($doxy_il_comment_opt);
-							}
+                                $$ = new AstNode(*$2);
+                                $$->appendChild($name);
+                                $$->appendChild($enumerator_list_opt);
+                                $$->appendChild($list_opt->getChild(0));
+                                $$->appendChild($list_opt->getChild(1));
+                                $$->appendChild($doxy_il_comment_opt);
+                            }
                         }
                 ;
 
@@ -398,7 +400,7 @@ comma_opt       :   ','
                 |   /* empty */
                 ;
 
-semi_opt       :   ';'
+semi_opt        :   ';'
                 |   /* empty */
                 ;
 
@@ -533,7 +535,7 @@ param_list_opt  :   param_list
                 ;
 
 param_list_opt_in
-                :    param_list_in
+                :   param_list_in
                         {
                             $$ = $1;
                         }
@@ -584,7 +586,7 @@ param_def       :   param_dir[dir] simple_data_type[datatype] ident[name] annota
                         }
                 ;
 
-param_def_in       :   param_dir_in[dir] simple_data_type[datatype] ident[name] annotation_list_opt[annotations]
+param_def_in    :   param_dir_in[dir] simple_data_type[datatype] ident[name] annotation_list_opt[annotations]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
                             $$->appendChild($name);
@@ -646,7 +648,7 @@ struct_def      :   annotation_doxygen_ml_list_opt[list_opt] "struct"[struct] na
                         {
                             if ($members == NULL)
                             {
-								throw semantic_error(format_string("Struct on the %d.line must have at least one member.", $struct->getFirstLine()));								
+                                throw semantic_error(format_string("Struct on the %d.line must have at least one member.", $struct->getFirstLine()));
                             }
                             else
                             {
@@ -783,15 +785,15 @@ union_case      :   "case" union_case_expr_list[case_exprs] ':' union_member_dec
 
 union_case_expr_list
                 :   int_const_expr[case_expr]
-                    {
-                        $$ = new AstNode(Token(TOK_CHILDREN));
-                        $$->appendChild($case_expr);
-                    }
+                        {
+                            $$ = new AstNode(Token(TOK_CHILDREN));
+                            $$->appendChild($case_expr);
+                        }
                 |   union_case_expr_list ',' int_const_expr[case_expr]
-                    {
-                        $1->appendChild($case_expr);
-                        $$ = $1;
-                    }
+                        {
+                            $1->appendChild($case_expr);
+                            $$ = $1;
+                        }
                 ;
 
 union_member_decl_list_opt
@@ -860,9 +862,9 @@ data_type       :   simple_data_type
                             $$ = $1;
                         }
                 |   enum_def
-                    {
-                        $$ = $1;
-                    }
+                        {
+                            $$ = $1;
+                        }
                 ;
 
 typename        :   ident
@@ -903,7 +905,8 @@ array_type      :   simple_data_type '[' int_const_expr ']'
                         }
                 ;
 
-annotation_doxygen_ml_list_opt: doxy_ml_comment annotation_list[annotations]
+annotation_doxygen_ml_list_opt
+                :   doxy_ml_comment annotation_list[annotations]
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild($annotations);
@@ -967,7 +970,7 @@ annotation      :   '@' ident annotation_value_opt
                 ;
 
 annotation_value_opt
-                :  '(' const_expr ')'
+                :   '(' const_expr ')'
                         {
                             $$ = $2;
                         }
@@ -987,7 +990,8 @@ const_expr      :   int_const_expr
                         }
                 ;
 
-doxy_ml_comment_opt:   doxy_ml_comment
+doxy_ml_comment_opt
+                :   doxy_ml_comment
                         {
                             $$ = $1;
                         }
@@ -1013,159 +1017,167 @@ doxy_ml_comment:   TOK_ML_COMMENT
                         }
                 ;
 
-doxy_il_comment_opt:   TOK_IL_COMMENT
+doxy_il_comment_opt
+                :   doxy_il_comment_opt TOK_IL_COMMENT
+                        {
+                            if($1)
                             {
-                                $$ = new AstNode(*$1);
+                                $$ =  mergeString(&$1->getToken(), $2);
                             }
-                        |   /* empty */
+                            else
                             {
-                                $$ = NULL;
+                                $$ =  new AstNode(*$2);
                             }
-                        ;
+                        }
+                |   /* empty */
+                        {
+                            $$ = NULL;
+                        }
+                ;
 
 /*
  * TOK_EXPR -> ( expr )
  */
 int_const_expr  :   expr
-                            {
-                                $$ = new AstNode(Token(TOK_EXPR, NULL, @1));
-                                $$->appendChild($1);
-                            }
+                        {
+                            $$ = new AstNode(Token(TOK_EXPR, NULL, @1));
+                            $$->appendChild($1);
+                        }
                 ;
 
-expr            :       int_value
+expr            :   int_value
+                        {
+                            $$ = $1;
+                        }
+                |   float_value
+                        {
+                            $$ = $1;
+                        }
+                |   ident
+                        {
+                            $$ = $1;
+                        }
+                |   expr '+' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '-' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '*' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '/' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '%' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '&' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '|' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr '^' expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr "<<" expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   expr ">>" expr
+                        {
+                            $$ = new AstNode(*$2);
+                            $$->appendChild($1);
+                            $$->appendChild($3);
+                        }
+                |   unary_expr
                             {
                                 $$ = $1;
                             }
-                |       float_value
-                            {
-                                $$ = $1;
-                            }
-                |       ident
-                            {
-                                $$ = $1;
-                            }
-                |       expr '+' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '-' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '*' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '/' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '%' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '&' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '|' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr '^' expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr "<<" expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       expr ">>" expr
-                            {
-                                $$ = new AstNode(*$2);
-                                $$->appendChild($1);
-                                $$->appendChild($3);
-                            }
-                |       unary_expr
-                            {
-                                $$ = $1;
-                            }
-                |       '(' expr ')'
-                            {
-                                $$ = $2;
-                                //$$->setLocation(@1, @3);
-                            }
+                |   '(' expr ')'
+                        {
+                            $$ = $2;
+                            //$$->setLocation(@1, @3);
+                        }
                 ;
 
-unary_expr      :       '+' expr %prec UNARY_OP
-                            {
-                                $$ = $2;
-                            }
-                |       '-' expr %prec UNARY_OP
-                            {
-                                $$ = new AstNode(Token(TOK_UNARY_NEGATE, NULL, @1));
-                                $$->appendChild($2);
-                            }
-                |       '~' expr %prec UNARY_OP
-                            {
-                                $$ = new AstNode(*$1);
-                                $$->appendChild($2);
-                            }
+unary_expr      :   '+' expr %prec UNARY_OP
+                        {
+                            $$ = $2;
+                        }
+                |   '-' expr %prec UNARY_OP
+                        {
+                            $$ = new AstNode(Token(TOK_UNARY_NEGATE, NULL, @1));
+                            $$->appendChild($2);
+                        }
+                |   '~' expr %prec UNARY_OP
+                        {
+                            $$ = new AstNode(*$1);
+                            $$->appendChild($2);
+                        }
                 ;
 
-int_value       :       TOK_INT_LITERAL
-                            {
-                                $$ = new AstNode(*$1);
-                            }
-                |       "true"
-                            {
-                                $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(1), @1));
-                            }
-                |       "false"
-                            {
-                                $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(0), @1));
-                            }
+int_value       :   TOK_INT_LITERAL
+                        {
+                            $$ = new AstNode(*$1);
+                        }
+                |   "true"
+                        {
+                            $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(1), @1));
+                        }
+                |   "false"
+                        {
+                            $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(0), @1));
+                        }
                 ;
 
-float_value     :       TOK_FLOAT_LITERAL
-                            {
-                                $$ = new AstNode(*$1);
-                            }
+float_value     :   TOK_FLOAT_LITERAL
+                        {
+                            $$ = new AstNode(*$1);
+                        }
                 ;
 
-string_literal  :       TOK_STRING_LITERAL
-                            {
-                                $$ = new AstNode(*$1);
-                            }
-                |       string_literal TOK_STRING_LITERAL
-                            {
-                                $$ =  mergeString(&$1->getToken(), $2);
-                            }
+string_literal  :   TOK_STRING_LITERAL
+                        {
+                            $$ = new AstNode(*$1);
+                        }
+                |   string_literal TOK_STRING_LITERAL
+                        {
+                            $$ =  mergeString(&$1->getToken(), $2);
+                        }
                 ;
 
-ident           :       TOK_IDENT
-                            {
-                                $$ = new AstNode(*$1);
-                            }
+ident           :   TOK_IDENT
+                        {
+                            $$ = new AstNode(*$1);
+                        }
                 ;
 
 %%
@@ -1201,6 +1213,7 @@ static AstNode * mergeString(Token * t1, Token * t2)
     // Merge string literals into one string.
     Value * v1 = t1->getValue();
     Value * v2 = t2->getValue();
+
     if (v1 && v2)
     {
         StringValue * s1 = dynamic_cast<StringValue *>(v1);
@@ -1212,7 +1225,8 @@ static AstNode * mergeString(Token * t1, Token * t2)
             return new AstNode(Token(t2->getToken(), s, newTokLocation));
         }
     }
-   return new AstNode(*t2);
+
+    return new AstNode(*t2);
 }
 
 token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2)

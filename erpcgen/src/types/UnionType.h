@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -31,16 +33,16 @@
 #define _EMBEDDED_RPC__UNIONTYPE_H_
 
 #include "DataType.h"
-#include "UnionCase.h"
 #include "StructType.h"
+#include "UnionCase.h"
 #include <map>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Discriminated union data type.
  */
@@ -70,10 +72,12 @@ public:
      * @brief Returns the struct owning this union.
      */
     StructType *getParentStruct() { return m_parentStruct; }
+
     /*!
      * @brief Sets the struct owning this union.
      */
     void setParentStruct(StructType *parent) { m_parentStruct = parent; }
+
     /*!
      * @brief This function will add union case to current union.
      *
@@ -102,12 +106,14 @@ public:
      * @retval true Always return true.
      */
     virtual bool isUnion() const { return true; }
+
     /*!
      * @brief This function returns union cases vector.
      *
      * @return Vector of union cases vector.
      */
     case_vector_t &getCases() { return m_unionCases; }
+
     /*!
      * @brief This function returns unique union cases vector.
      *
@@ -129,6 +135,7 @@ public:
      * @return Vector of union member declarations.
      */
     memberDecl_vector_t &getUnionMemberDeclarations() { return m_caseMembers; }
+
     /*!
      * @brief This function returns union member declaration.
      *
@@ -144,6 +151,7 @@ public:
      * @return Union discriminator name.
      */
     std::string getDiscriminatorName() { return m_discriminator; }
+
     /*!
      * @brief This function prints information about union members.
      */

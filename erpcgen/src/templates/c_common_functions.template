@@ -53,11 +53,13 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 {%    if st.needEnumTmp %}
     int32_t enum_tmp_local;
 {%    endif %}
-    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}codec->startReadStruct();
+    {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startReadStruct();
 {%   else %}
-    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}kErpcStatus_Success;
+{%    if errVar != "" %}
+    erpc_status_t {$errVar}kErpcStatus_Success;
+{%    endif %}
 {%   endif %}
-{%   for mem in st.members %}
+{%   for mem in st.members if not mem.lengthForMember %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ")}
 {$infraErrIndents}    {$infraErrVar}codec->readNullFlag(&isNull);
@@ -66,7 +68,7 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 {$addInfraErrorChecks(infraErrIndents & "        ", mem.coderCall.decode(mem.coderCall))}
 {$infraErrIndents}    }
 {$infraErrIndents}    else
-{$infraErrIndents}     {
+{$infraErrIndents}    {
 {$infraErrIndents}        {$mem.coderCall.name}{$mem.structElements} = NULL;
 {$infraErrIndents}        {$mem.coderCall.name}{$mem.structElementsCount} = 0;
 {$infraErrIndents}    }
@@ -76,15 +78,16 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 {%    endif -- notNullable %}
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
+
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    {$infraErrVar}codec->endReadStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
-{% if errVar != ""  %}
+{%   if errVar != ""  %}
     return err;
-{% else %}
+{%   else %}
     return kErpcStatus_Success;
-{% endif %}
+{%   endif %}
 }
 {%  endfor -- structs %}
 {% endif %}
@@ -100,11 +103,13 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * data)
 {
 {%   if st.genStructWrapperF %}
-    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}codec->startWriteStruct();
+    {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startWriteStruct();
 {%   else %}
-    {% if errVar != ""  %}erpc_status_t {$errVar}{% endif %}kErpcStatus_Success;
+{%    if errVar != "" %}
+    erpc_status_t {$errVar}kErpcStatus_Success;
+{%    endif %}
 {%   endif %}
-{%   for mem in st.members %}
+{%   for mem in st.members if not mem.lengthForMember %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$mem.coderCall.name}{$mem.structElements} == NULL)
@@ -122,15 +127,16 @@ static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * d
 {%    endif -- notNullable %}
 {%   endfor -- st.members %}
 {%   if st.genStructWrapperF %}
+
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    {$infraErrVar}codec->endWriteStruct();
 {$> addInfraErrorChecksEnd("    ") }
 {%   endif %}
-{% if errVar != ""  %}
+{%   if errVar != ""  %}
     return err;
-{% else %}
+{%   else %}
     return kErpcStatus_Success;
-{% endif %}
+{%   endif %}
 }
 {%  endfor -- structs %}
 {% endif %}
@@ -238,10 +244,8 @@ switch ({$info.dataLiteral}->{$info.discriminatorName})
 {$ indent}if (!err)
 {$ indent}{
 {$addIndent(indent & "    ", code)}
-{$ indent}}
-{% else %}
-{$addIndent(indent, code)}
-{% endif %}
+{$ indent}}{% else %}
+{$addIndent(indent, code)}{% endif >%}
 {% enddef ------------------------------- addInfraErrorChecks %}
 
 {% def addErrorChecks(indent, code) %}
@@ -249,10 +253,8 @@ switch ({$info.dataLiteral}->{$info.discriminatorName})
 {$ indent}if (!err)
 {$ indent}{
 {$addIndent(indent & "    ", code)}
-{$ indent}}
-{% else %}
-{$addIndent(indent, code)}
-{% endif %}
+{$ indent}}{% else %}
+{$addIndent(indent, code)}{% endif >%}
 {% enddef ------------------------------- addInfraErrorChecks %}
 
 {# ---------------- addInfraErrorChecksBegin---------------- #}

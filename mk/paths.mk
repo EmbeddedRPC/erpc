@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
-# Copyright (C) 2014-2015 Freescale Semiconductor, Inc. All Rights Reserved.
+# Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -49,7 +51,7 @@ INC_INSTALL_DIR = $(PREFIX)/include/erpc
 # ----------------------------------------------
 
 ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
-LD := g++
+LD := $(CXX)
 PYTHON ?= python
 
 # Tool paths. Use different paths for OS X.

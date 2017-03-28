@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,10 +30,12 @@
  */
 
 #include "Generator.h"
+#include "Logging.h"
+#include "annotations.h"
 #include "format_string.h"
-#include <string.h>
 #include <boost/filesystem.hpp>
 #include <ctime>
+#include <string.h>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -133,4 +137,117 @@ std::string Generator::getTime()
     std::string nowString = std::ctime(&now);
     nowString.pop_back(); // Remove trailing newline.
     return nowString;
+}
+
+Generator::interfaceLists_t Generator::makeInterfacesTemplateData()
+{
+    Log::info("interfaces:\n");
+    int n = 0;
+    interfaceLists_t interfaceLists;
+    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+    {
+        Interface *iface = dynamic_cast<Interface *>(it);
+        assert(iface);
+        data_map ifaceInfo;
+        ifaceInfo["name"] = make_data(iface->getName());
+        ifaceInfo["id"] = data_ptr(iface->getUniqueId());
+
+        getInterfaceComments(iface, ifaceInfo);
+
+        // TODO: for C only?
+        ifaceInfo["serviceClassName"] = iface->getName() + "_service";
+
+        Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
+
+        ifaceInfo["functions"] = getFunctionsTemplateData(iface);
+        ++n;
+
+        // Sorting interfaces into groups.
+        if (it->findAnnotation(GROUP_ANNOTATION))
+        {
+            for (auto group : it->getAnnotations(GROUP_ANNOTATION))
+            {
+                std::string groupName = (group->hasValue()) ? group->getValueObject()->toString() : "";
+                fillInterfaceListsWithMap(interfaceLists, ifaceInfo, groupName);
+            }
+        }
+        else
+        {
+            fillInterfaceListsWithMap(interfaceLists, ifaceInfo, "");
+        }
+    }
+    return interfaceLists;
+}
+
+data_list Generator::getFunctionsTemplateData(Interface *iface)
+{
+    data_list fns;
+    int j = 0;
+    for (auto fit : iface->getFunctions())
+    {
+        fns.push_back(make_data(getFunctionTemplateData(fit, j++)));
+    }
+    return fns;
+}
+
+void Generator::fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
+                                          cpptempl::data_ptr interfaceMap,
+                                          std::string mapName)
+{
+    auto interfaceList = interfaceLists.find(mapName);
+    if (interfaceList == interfaceLists.end())
+    {
+        std::vector<cpptempl::data_ptr> interfaceVector;
+        interfaceLists[mapName] = interfaceVector;
+        interfaceList = interfaceLists.find(mapName);
+    }
+    interfaceList->second.push_back(interfaceMap);
+}
+
+void Generator::generateInterfaceOutputFiles(cpptempl::data_map &templateData, interfaceLists_t interfaceLists)
+{
+    // Generate output files. We have to special case not having any interfaces define.
+    if (interfaceLists.empty())
+    {
+        // empty list of interfaces
+        data_list empty;
+        templateData["interfaces"] = empty;
+
+        // Log template data.
+        if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
+        {
+            dump_data(templateData);
+        }
+
+        generateOutputFiles("");
+    }
+    else
+    {
+        for (auto interfaceList : interfaceLists)
+        {
+            templateData["interfaces"] = interfaceList.second;
+
+            // Log template data.
+            if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
+            {
+                dump_data(templateData);
+            }
+
+            generateOutputFiles(interfaceList.first);
+        }
+    }
+}
+
+void Generator::makeIncludesTemplateData(cpptempl::data_map &templateData)
+{
+    data_list includeData;
+    if (m_def->hasProgramSymbol())
+    {
+        for (auto include : m_def->programSymbol()->getAnnotations(INCLUDE_ANNOTATION))
+        {
+            includeData.push_back(make_data(include->getValueObject()->toString()));
+            Log::info("include %s\n", include->getValueObject()->toString().c_str());
+        }
+    }
+    templateData["includes"] = includeData;
 }

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -27,23 +29,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "AliasType.h"
+#include "Annotation.h"
+#include "ArrayType.h"
+#include "DataType.h"
+#include "EnumMember.h"
+#include "EnumType.h"
 #include "Function.h"
 #include "Interface.h"
 #include "ListType.h"
-#include "ArrayType.h"
-#include "AliasType.h"
-#include "EnumType.h"
-#include "EnumMember.h"
-#include "StructType.h"
-#include "StructMember.h"
-#include "UnionType.h"
-#include "UnionCase.h"
-#include "Symbol.h"
-#include "SymbolScope.h"
-#include "DataType.h"
-#include "Annotation.h"
 #include "Logging.h"
 #include "ParseErrors.h"
+#include "StructMember.h"
+#include "StructType.h"
+#include "Symbol.h"
+#include "SymbolScope.h"
+#include "UnionCase.h"
+#include "UnionType.h"
 #include <string.h>
 
 using namespace erpcgen;
@@ -193,12 +195,11 @@ Symbol *SymbolScope::getSymbol(const std::string &name, bool recursive)
 void SymbolScope::addSymbol(Symbol *sym, int32_t pos)
 {
     assert(sym);
-    DataType *dataType = dynamic_cast<DataType *>(sym);
 
     // Check for existing symbol with same name except structs. Structs are already added as typedef and it always call
     // semantic error.
     // sym->getName() == "" for anonymous struct and enums
-    if (hasSymbol(sym->getName()) && !(dataType && dataType->isStruct()) && sym->getName() != "")
+    if (hasSymbol(sym->getName()) && sym->getName() != "")
     {
         Symbol *existing = getSymbol(sym->getName());
         if (existing->isBuiltin())

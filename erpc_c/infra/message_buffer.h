@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -304,6 +306,23 @@ public:
      * @return New created MessageBuffer.
      */
     virtual MessageBuffer create() = 0;
+
+    /*!
+     * @brief This function inform server if it has to create buffer for received message.
+     *
+     * @return Has to return TRUE when server need create buffer for receiving message.
+     */
+    virtual bool createServerBuffer() { return true; }
+
+    /*!
+     * @brief This function is preparing output buffer on server side.
+     *
+     * This function do decision if this function want reuse buffer, or use new buffer.
+     * In case of using new buffer function has to free given buffer.
+     *
+     * @param[in] message MessageBuffer which can be reused.
+     */
+    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message);
 
     /*!
      * @brief This function disposes message buffer.

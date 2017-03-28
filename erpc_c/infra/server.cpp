@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,6 +30,7 @@
  */
 
 #include "server.h"
+#include "assert.h"
 
 using namespace erpc;
 #if !(__embedded_cplusplus)
@@ -37,6 +40,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+
+void Server::setTransport(Transport *transport)
+{
+    m_transport = transport;
+}
 
 void Server::addService(Service *service)
 {
@@ -77,7 +85,7 @@ erpc_status_t Server::processMessage(Codec *codec, message_type_t &msgType)
         return kErpcStatus_InvalidArgument;
     }
 
-    return service->handleInvocation(methodId, sequence, codec);
+    return service->handleInvocation(methodId, sequence, codec, m_messageFactory);
 }
 
 Service *Server::findServiceWithId(uint32_t serviceId)

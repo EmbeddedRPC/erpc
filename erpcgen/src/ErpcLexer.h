@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -35,11 +37,11 @@
 
 #include "AstNode.h"
 #undef yyFlexLexer
-#include <FlexLexer.h>
 #include "ParseErrors.h"
-#include <vector>
-#include <string>
+#include <FlexLexer.h>
 #include <fstream>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
@@ -53,16 +55,16 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 class ErpcLexer;
 }
 #include "erpcgen_parser.tab.hpp"
 
 using namespace std;
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief This class contains necessary information about analysed file.
  */
@@ -149,6 +151,7 @@ public:
      *@return Current token's location.
      */
     inline token_loc_t &getLocation() { return m_location; }
+
     /*!
      * @brief Suspend actual and give new file to flex.
      *
@@ -169,6 +172,7 @@ public:
      * @return Current file name.
      */
     inline std::string &getFileName() { return m_currentFileInfo->m_fileName; }
+
     /*!
      * @brief This function open file.
      *

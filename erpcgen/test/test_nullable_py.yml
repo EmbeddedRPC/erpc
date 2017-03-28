@@ -17,7 +17,7 @@ test/client.py:
   - v._write
 test/server.py:
   - def _handle_
-  - 'if not inCodec.read_null_flag():'
+  - 'if not codec.read_null_flag():'
   - Vector()._read
   - else
   - v = None

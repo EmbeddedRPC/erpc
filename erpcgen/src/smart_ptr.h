@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2013-14, Freescale Semiconductor, Inc.
+ * Copyright (c) 2013-2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -98,10 +99,13 @@ public:
     //! Destructor. If an object (pointer) has been set, it will be deleted.
     //! Deletes the object using safe_delete().
     ~smart_ptr() { safe_delete(); }
+
     //! Return the current pointer value.
     ptr_type get() { return _p; }
+
     //! Return the const form of the current pointer value.
     const_ptr_type get() const { return _p; }
+
     //! Change the pointer value, or set if if the default constructor was used.
     //! If a pointer had previously been associated with the object, and \a p is
     //! different than that previous pointer, it will be deleted before taking
@@ -117,8 +121,10 @@ public:
 
     //! Dissociates any previously set pointer value without deleting it.
     void reset() { _p = nullptr; }
+
     //! Dissociates a previously set pointer value, deleting it at the same time.
     void clear() { safe_delete(); }
+
     //! Forces immediate deletion of the object. If you are planning on using
     //! this method, think about just using a normal pointer. It probably makes
     //! more sense.
@@ -136,14 +142,19 @@ public:
 
     //! Makes the object transparent as the template type.
     operator ptr_type() { return _p; }
+
     //! Const version of the pointer operator.
     operator const_ptr_type() const { return _p; }
+
     //! Makes the object transparent as a reference of the template type.
     operator ref_type() { return *_p; }
+
     //! Const version of the reference operator.
     operator const_ref_type() const { return *_p; }
+
     //! Returns a boolean indicating whether the object has a pointer set or not.
     operator bool() const { return _p != nullptr; }
+
     //! To allow setting the pointer directly. Equivalent to a call to set().
     smart_ptr<T> &operator=(ptr_type p)
     {
@@ -153,6 +164,7 @@ public:
 
     //! Another operator to allow you to treat the object just like a pointer.
     ptr_type operator->() { return _p; }
+
     //! Another operator to allow you to treat the object just like a pointer.
     const_ptr_type operator->() const { return _p; }
     //@}

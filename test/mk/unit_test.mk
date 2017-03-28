@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -57,8 +59,12 @@ test_client_tcp: erpcgen
 
 .PHONY: test_client_serial
 test_client_serial: erpcgen
+ifneq "$(TEST_NAME)" "test_arbitrator"
 	@$(call printmessage,build,Building, $(CUR_DIR) $@ ,gray,,,\n)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test.mk TEST_NAME=$(CUR_DIR) TYPE=CLIENT TRANSPORT=serial
+else
+	@$(call printmessage,green,Skipping, $(CUR_DIR) $@ ,gray,,,\n)
+endif
 
 .PHONY: test_server
 test_server: test_server_tcp test_server_serial
@@ -70,8 +76,12 @@ test_server_tcp: erpcgen
 
 .PHONY: test_server_serial
 test_server_serial: erpcgen
+ifneq "$(TEST_NAME)" "test_arbitrator"
 	@$(call printmessage,build,Building, $(CUR_DIR) $@ ,gray,,,\n)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test.mk TEST_NAME=$(CUR_DIR) TYPE=SERVER TRANSPORT=serial
+else
+	@$(call printmessage,green,Skipping, $(CUR_DIR) $@ ,gray,,,\n)
+endif
 
 .PHONY: erpcgen
 erpcgen:

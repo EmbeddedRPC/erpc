@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,9 +31,9 @@
 
 #include "format_string.h"
 #include "smart_ptr.h"
-#include <stdio.h>
 #include <stdarg.h>
 #include <stdexcept>
+#include <stdio.h>
 #include <stdlib.h>
 
 //! Size of the temporary buffer to hold the formatted output string.

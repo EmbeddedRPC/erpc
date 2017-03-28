@@ -23,50 +23,45 @@ class {$iface.name}Client(interface.I{$iface.name}):
 
 {% endif %}
         # Build remote function invocation message.
-        request = self._clientManager.create_request()
-        outCodec = request.out_codec
-        outCodec.start_write_message(erpc.codec.MessageInfo(
-                type=erpc.codec.MessageType.kInvocationMessage,
+        request = self._clientManager.create_request({% if fn.isOneway %}isOneway=True{% endif %})
+        codec = request.codec
+        codec.start_write_message(erpc.codec.MessageInfo(
+                type=erpc.codec.MessageType.{% if fn.isReturnValue %}kInvocationMessage{% else %}kOnewayMessage{% endif %},
                 service=self.SERVICE_ID,
                 request=self.{$upper(fn.name)}_ID,
                 sequence=request.sequence))
-{% for p in fn.inParameters %}
-{%  if not p.lengthForMember %}
-{%   if p.isNullable %}
+{% for p in fn.inParameters if not p.lengthForMember %}
+{%  if p.isNullable %}
         if {$p.name} is None:
-            outCodec.write_null_flag(True)
+            codec.write_null_flag(True)
         else:
-            outCodec.write_null_flag(False)
-            {$encodeValue(p.type, p.name, "outCodec", "            ", 0)}
-{%   else -- isNullable %}
+            codec.write_null_flag(False)
+            {$encodeValue(p.type, p.name, "codec", "            ", 0)}
+{%  else -- isNullable %}
         if {$p.name} is None:
             raise ValueError("{$p.name} is None")
-        {$encodeValue(p.type, p.name, "outCodec", "        ", 0)}
-{%   endif -- isNullable %}
-{%  else -- lengthForMember %}
-        {$encodeValue(p.type, "len(" & p.lengthForMember & ")", "outCodec", "        ", 0)}
-{%  endif -- lengthForMember %}
+        {$encodeValue(p.type, p.name, "codec", "        ", 0)}
+{%  endif -- isNullable %}
 {% endfor -- inParams %}
-        outCodec.end_write_message()
+        codec.end_write_message()
 
         # Send request{% if not fn.isOneway %} and process reply{% endif %}.
         self._clientManager.perform_request(request)
 {% if not fn.isOneway %}
-        inCodec = request.in_codec
-{% for p in fn.outParameters %}
+{% for p in fn.outParameters if not p.lengthForMember %}
 {%  if p.isNullable %}
-        if not inCodec.read_null_flag():
-            {$decodeValue(p.type, p.name & ".value", "common.", "inCodec", "            ", 0)}
+        if not codec.read_null_flag():
+            {$decodeValue(p.type, p.name & ".value", "common.", "codec", "            ", 0)}
         else:
             {$p.name}.value = None
 {%  else -- isNullable %}
-        {$decodeValue(p.type, (p.name & ".value") if not p.lengthForMember else "_", "common.", "inCodec", "        ", 0)}
+        {$decodeValue(p.type, (p.name & ".value"), "common.", "codec", "        ", 0)}
 {%  endif -- isNullable %}
 {% endfor -- outParams %}
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
-        {$decodeValue(fn.returnValue.type, "_result", "common.", "inCodec", "        ", 0)}
+        {$decodeValue(fn.returnValue.type, "_result", "common.", "codec", "        ", 0)}
 {% endif %}
-        inCodec.end_read_message()
+        codec.end_read_message()
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
         return _result
 {% endif %}

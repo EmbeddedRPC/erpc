@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,13 +31,13 @@
 
 #include "basic_codec.h"
 #include "client_manager.h"
-#include "unit_test_common/unit_test_common.h"
 #include "gtest.h"
+#include "unit_test_common/unit_test_common.h"
 extern "C" {
-#include "fsl_device_registers.h"
-#include "fsl_clock_manager.h"
-#include "fsl_os_abstraction.h"
 #include "board.h"
+#include "fsl_clock_manager.h"
+#include "fsl_device_registers.h"
+#include "fsl_os_abstraction.h"
 #include "uart_transport.h"
 }
 #include "gtestListener.h"

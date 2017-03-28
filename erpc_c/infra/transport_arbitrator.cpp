@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -40,10 +42,10 @@ using namespace erpc;
 TransportArbitrator::TransportArbitrator()
 : Transport()
 , m_sharedTransport(NULL)
+, m_codec(NULL)
 , m_clientList(NULL)
 , m_clientFreeList(NULL)
 , m_clientListMutex()
-, m_codec(NULL)
 {
 }
 
@@ -109,7 +111,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
     }
 }
 
-erpc_status_t TransportArbitrator::send(const MessageBuffer *message)
+erpc_status_t TransportArbitrator::send(MessageBuffer *message)
 {
     assert(m_sharedTransport && "shared transport is not set");
     return m_sharedTransport->send(message);

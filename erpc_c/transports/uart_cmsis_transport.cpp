@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -38,7 +40,8 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static volatile bool s_isTransferCompleted = false;
+static volatile bool s_isTransferReceiveCompleted = false;
+static volatile bool s_isTransferSendCompleted = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -59,12 +62,12 @@ void TransferCallback(uint32_t event)
 {
     if (event == ARM_USART_EVENT_SEND_COMPLETE)
     {
-        s_isTransferCompleted = true;
+        s_isTransferSendCompleted = true;
     }
 
     if (event == ARM_USART_EVENT_RECEIVE_COMPLETE)
     {
-        s_isTransferCompleted = true;
+        s_isTransferReceiveCompleted = true;
     }
 }
 
@@ -78,10 +81,10 @@ erpc_status_t UartTransport::init()
 
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    s_isTransferCompleted = false;
+    s_isTransferReceiveCompleted = false;
 
     erpc_status_t status = (*m_uartDrv).Receive(data, size);
-    while (!s_isTransferCompleted)
+    while (!s_isTransferReceiveCompleted)
     {
     }
 
@@ -90,10 +93,10 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 
 erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    s_isTransferCompleted = false;
+    s_isTransferSendCompleted = false;
 
     (*m_uartDrv).Send(data, size);
-    while (!s_isTransferCompleted)
+    while (!s_isTransferSendCompleted)
     {
     }
 

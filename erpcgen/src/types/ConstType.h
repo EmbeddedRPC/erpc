@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,16 +32,16 @@
 #ifndef _EMBEDDED_RPC__CONST_H_
 #define _EMBEDDED_RPC__CONST_H_
 
-#include <string>
 #include "DataType.h"
 #include "Symbol.h"
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Const class
  */
@@ -68,24 +70,28 @@ public:
      * @return Pointer to element data type.
      */
     DataType *getDataType() { return m_dataType; }
+
     /*!
      * @brief This function returns value of constant data type.
      *
      * @return Pointer to value.
      */
     Value *getValue() { return m_value; }
+
     /*!
      * @brief This function sets constant data type.
      *
      * @param[in] dataType Constant data type.
      */
     void setDataType(DataType *dataType) { m_dataType = dataType; }
+
     /*!
      * @brief This function sets constant value.
      *
      * @param[in] value Constant value.
      */
     void setValue(Value *value) { m_value = value; }
+
 protected:
     DataType *m_dataType; /*!< Constant data type. */
     Value *m_value;       /*!< Constant value. */

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -39,8 +41,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Code generator for Python.
  */
@@ -60,6 +62,7 @@ public:
      * This function close opened files.
      */
     virtual ~PythonGenerator() {}
+
     /*!
      * @brief This function generate output code for output files.
      *
@@ -124,26 +127,6 @@ protected:
     void generateInterfaceFile(std::string fileName);
 
     /*!
-     * @brief This function sets interfaces template data.
-     *
-     * This function sets interfaces template data with all data, which
-     * are necessary for generating output code for output files.
-     */
-    void makeInterfacesTemplateData();
-
-    /*!
-     * @brief This function return interface functions list.
-     *
-     * This function return interface functions list with all data, which
-     * are necessary for generating output code for output files.
-     *
-     * @param[in] iface Pointer to interface.
-     *
-     * @return Contains interface functions data.
-     */
-    cpptempl::data_list getFunctionsTemplateData(Interface *iface);
-
-    /*!
      * @brief This function return interface function template data.
      *
      * This function return interface function template data with all data, which
@@ -155,6 +138,14 @@ protected:
      * @return Contains interface function data.
      */
     cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
+
+    /*!
+     * @brief This function will get interface comments and convert to language specific ones
+     *
+     * @param[in] iface Pointer to interface.
+     * @param[inout] ifaceInfo Data map, which contains information about interface and interface members.
+     */
+    void getInterfaceComments(Interface *iface, cpptempl::data_map &ifaceInfo);
 
     /*!
      * @brief This function return interface function prototype.

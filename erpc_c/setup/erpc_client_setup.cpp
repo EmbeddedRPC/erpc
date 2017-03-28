@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,7 +30,6 @@
  */
 
 #include "erpc_client_setup.h"
-#include "erpc_setup.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "manually_constructed.h"
@@ -48,25 +49,22 @@ using namespace erpc;
 // global client variables
 static ManuallyConstructed<ClientManager> s_client;
 ClientManager *g_client;
-
-static ManuallyConstructed<BasicMessageBufferFactory> s_msgFactory;
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void erpc_client_init(erpc_transport_t transport)
+void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
     // Init factories.
-    s_msgFactory.construct();
     s_codecFactory.construct();
 
     // Init client manager with the provided transport.
     s_client.construct();
     s_client->setTransport(reinterpret_cast<Transport *>(transport));
-    s_client->setMessageBufferFactory(s_msgFactory);
     s_client->setCodecFactory(s_codecFactory);
+    s_client->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
     g_client = s_client;
 }
 
@@ -81,6 +79,5 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler)
 void erpc_client_deinit()
 {
     s_client.destroy();
-    s_msgFactory.destroy();
     s_codecFactory.destroy();
 }

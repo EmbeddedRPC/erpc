@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,11 +30,11 @@
  */
 
 #include "CGenerator.h"
-#include "format_string.h"
 #include "Logging.h"
 #include "ParseErrors.h"
-#include "erpcgen_version.h"
 #include "annotations.h"
+#include "erpcgen_version.h"
+#include "format_string.h"
 #include <algorithm>
 #include <set>
 #include <sstream>
@@ -56,13 +58,11 @@ extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
 extern const char *const kCDefines;
 
-static std::vector<ListType *> s_binaryTypes;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void CGenerator::generateClientServerOutputFiles(const std::string &fileNameExtension)
+void CGenerator::generateOutputFiles(const std::string &fileNameExtension)
 {
     std::string fileName = stripExtension(m_def->getOutputFilename());
     if (fileNameExtension != "")
@@ -87,9 +87,30 @@ void CGenerator::generateClientServerOutputFiles(const std::string &fileNameExte
 
 void CGenerator::generateCommonHeaderFile(std::string fileName)
 {
+    // generate common types header file
+    m_templateData["commonTypesFile"] = "";
+    if (m_def->hasProgramSymbol())
+    {
+        Annotation *anno = m_def->programSymbol()->findAnnotation(TYPES_HEADER_ANNOTATION);
+        if (nullptr != anno)
+        {
+            // get name of types header file from annotation
+            std::string commonTypesHeaderFileName = anno->getValueObject()->toString();
+
+            m_templateData["commonGuardMacro"] = generateIncludeGuardName(commonTypesHeaderFileName);
+            m_templateData["genCommonTypesFile"] = true;
+            generateOutputFile(commonTypesHeaderFileName, "c_common_header", m_templateData, kCCommonHeader);
+
+            // set name of types header file, which is used in common header file
+            m_templateData["commonTypesFile"] = commonTypesHeaderFileName;
+        }
+    }
+
+    // generate common header file
     fileName += ".h";
     m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["commonHeaderName"] = fileName;
+    m_templateData["genCommonTypesFile"] = false;
     generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
 }
 
@@ -150,15 +171,11 @@ void CGenerator::transformBinaryDataType()
     newStruct->addMember(elements);
     newStruct->getScope().setParent(m_globals);
 
-    // Type definition for created structure
-    AliasType *type = new AliasType("binary_t", newStruct);
-    int32_t symbolPos = m_globals->getSymbolPos(replacedBuiltinType);
-    m_globals->replaceSymbol(replacedBuiltinType, type);
-    m_globals->addSymbol(newStruct, ++symbolPos);
-    s_binaryTypes.push_back(listType);
+    m_globals->replaceSymbol(replacedBuiltinType, newStruct);
+    m_listBinaryTypes.insert(m_listBinaryTypes.begin(), listType);
 }
 
-DataType *CGenerator::transformDataType(DataType *dataType, _param_direction direction, DataType *topDataType)
+DataType *CGenerator::transformDataType(DataType *dataType, _param_direction direction)
 {
     switch (dataType->getDataType())
     {
@@ -166,6 +183,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
         {
             if (dataType->isBinary())
             {
+                // check if binary data type was replaced with structure wrapper
                 dataType = dynamic_cast<DataType *>(m_globals->getSymbol("binary_t"));
                 if (!dataType)
                 {
@@ -187,7 +205,8 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             // The only child node of a list node is the element type.
             ListType *listType = dynamic_cast<ListType *>(dataType);
             assert(listType);
-            DataType *elementType = transformDataType(listType->getElementType(), direction, topDataType);
+            DataType *elementType = transformDataType(listType->getElementType(), direction);
+            listType->setElementType(elementType);
 
             // If the list has a length variable, we do need to create a list struct.
             // Instead, we leave the list data type as is, and use that information
@@ -200,8 +219,6 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             }
             else
             {
-                listType->setElementType(elementType);
-
                 // Check if list already exist. If yes then use existing list. We need it for generating only one
                 // send/received method.
                 uint32_t nameCount = 0;
@@ -216,6 +233,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                     {
                         StructType *structType = dynamic_cast<StructType *>(symDataType);
                         assert(structType);
+
                         // For sure that structure hasn't zero members. Also this type of structure has only one member.
                         if (isListStruct(structType))
                         {
@@ -230,10 +248,13 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                                 {
                                     structType->addStructDirectionType(direction);
                                 }
+
                                 return symDataType;
                             }
                         }
                     }
+
+                    // search for next list
                     ++nameCount;
                     structName = format_string("list_%d_t", nameCount);
                     symbol = m_globals->getSymbol(structName);
@@ -251,13 +272,24 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                     newStruct->addStructDirectionType(direction);
                 }
 
-                AliasType *type = new AliasType(structName, newStruct);
-                int32_t symbolPos = m_globals->getSymbolPos(topDataType);
-                m_globals->addSymbol(type, symbolPos);
-                if (symbolPos >= 0)
+                m_structListTypes.push_back(newStruct);
+
+                // Add newStruct at right place in m_globals.
+                int symbolPos;
+                // if list element is transformed list or structure then this will allow add this list after it.
+                if (listType->getElementType()->getTrueContainerDataType()->isStruct())
                 {
-                    ++symbolPos;
+                    symbolPos = m_globals->getSymbolPos(listType->getElementType()->getTrueContainerDataType()) + 1;
                 }
+                else
+                {
+                    // list <base types> will be at the beginning of structures declarations.
+                    // This is will sort them in order as they were used.
+                    static int s_symbolPos = 0;
+                    symbolPos = s_symbolPos++;
+                }
+
+                // put new structure definition in globals before this structure
                 m_globals->addSymbol(newStruct, symbolPos);
 
                 return newStruct;
@@ -267,7 +299,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
         {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             assert(arrayType);
-            arrayType->setElementType(transformDataType(arrayType->getElementType(), direction, topDataType));
+            arrayType->setElementType(transformDataType(arrayType->getElementType(), direction));
             break;
         }
         case DataType::kStructType:
@@ -280,14 +312,17 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             }
 
             StructMember *structMember = structType->getMembers()[0];
-            // Todo: if list name will be changed to list_<type>_<number>_t this can be maybe optimized and more
-            // precise.
             if (isListStruct(structType))
             {
                 /* Not necessary catch return value. Should be same (already transformed). This is only because of
                  adding direction type. */
-                transformDataType(structMember->getDataType()->getTrueContainerDataType(), direction, topDataType);
-                return dataType;
+                transformDataType(structMember->getDataType()->getTrueContainerDataType(), direction);
+                break;
+            }
+
+            if (isBinaryStruct(structType))
+            {
+                break;
             }
 
             for (StructMember *structMember : structType->getMembers())
@@ -302,10 +337,10 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                     for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
                     {
                         setBinaryList(&unionMember);
-                        unionMember.setDataType(transformDataType(unionMember.getDataType(), direction, topDataType));
+                        unionMember.setDataType(transformDataType(unionMember.getDataType(), direction));
                     }
                 }
-                structMember->setDataType(transformDataType(structMember->getDataType(), direction, topDataType));
+                structMember->setDataType(transformDataType(structMember->getDataType(), direction));
                 structMember->setContainList(containsList(structMember->getDataType()));
                 structMember->setContainString(containsString(structMember->getDataType()));
             }
@@ -315,7 +350,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
         {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             assert(aliasType);
-            aliasType->setElementType(transformDataType(aliasType->getElementType(), direction, topDataType));
+            aliasType->setElementType(transformDataType(aliasType->getElementType(), direction));
             break;
         }
         default:
@@ -328,25 +363,32 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
 
 void CGenerator::transformDataTypes()
 {
+
+    for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
+    {
+        StructType *structType = dynamic_cast<StructType *>(it);
+        assert(structType);
+        transformDataType(structType, kNone);
+    }
+
     for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
-        transformDataType(aliasType, kNone, aliasType);
+        transformDataType(aliasType, kNone);
     }
-
     for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
     {
         Interface *iface = dynamic_cast<Interface *>(it);
         assert(iface);
         for (Function *fn : iface->getFunctions())
         {
-            fn->setReturnType(transformDataType(fn->getReturnType(), kReturn, fn->getReturnType()));
+            fn->setReturnType(transformDataType(fn->getReturnType(), kReturn));
             auto params = fn->getParameters().getMembers();
             for (auto mit : params)
             {
                 setBinaryList(mit);
-                mit->setDataType(transformDataType(mit->getDataType(), mit->getDirection(), mit->getDataType()));
+                mit->setDataType(transformDataType(mit->getDataType(), mit->getDirection()));
             }
         }
     }
@@ -365,7 +407,7 @@ void CGenerator::setBinaryList(StructMember *structMember)
             ListType *listType = new ListType(builtinType);
             structMember->setDataType(listType);
             listType->setLengthVariableName(listLength->getValueObject()->toString());
-            s_binaryTypes.push_back(listType);
+            m_listBinaryTypes.push_back(listType);
         }
     }
 }
@@ -401,7 +443,7 @@ void CGenerator::generate()
 
     transformDataTypes();
 
-    makeIncludesTemplateData();
+    makeIncludesTemplateData(m_templateData);
 
     interfaceLists_t interfaceLists = makeInterfacesTemplateData();
 
@@ -413,113 +455,7 @@ void CGenerator::generate()
 
     makeStructsTemplateData();
 
-    // Generate output files. We have to special case not having any interfaces define.
-    if (interfaceLists.empty())
-    {
-        // empty list of interfaces
-        m_templateData["interfaces"] = empty;
-
-        // Log template data.
-        if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
-        {
-            dump_data(m_templateData);
-        }
-
-        generateClientServerOutputFiles("");
-    }
-    else
-    {
-        for (auto interfaceList : interfaceLists)
-        {
-            m_templateData["interfaces"] = interfaceList.second;
-
-            // Log template data.
-            if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
-            {
-                dump_data(m_templateData);
-            }
-
-            generateClientServerOutputFiles(interfaceList.first);
-        }
-    }
-}
-
-void CGenerator::makeIncludesTemplateData()
-{
-    data_list includeData;
-    if (m_def->hasProgramSymbol())
-    {
-        for (auto include : m_def->programSymbol()->getAnnotations(INCLUDE_ANNOTATION))
-        {
-            includeData.push_back(make_data(include->getValueObject()->toString()));
-            Log::info("#include %s\n", include->getValueObject()->toString().c_str());
-        }
-    }
-    m_templateData["includes"] = includeData;
-}
-
-CGenerator::interfaceLists_t CGenerator::makeInterfacesTemplateData()
-{
-    Log::info("interfaces:\n");
-    int n = 0;
-    interfaceLists_t interfaceLists;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
-    {
-        Interface *iface = dynamic_cast<Interface *>(it);
-        assert(iface);
-        data_map ifaceInfo;
-        ifaceInfo["name"] = make_data(iface->getName());
-        ifaceInfo["id"] = data_ptr(iface->getUniqueId());
-        ifaceInfo["serviceClassName"] = iface->getName() + "_service";
-        ifaceInfo["mlComment"] = iface->getMlComment();
-        ifaceInfo["ilComment"] = iface->getIlComment();
-
-        Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
-        // Log::info("%s\n", iface->printAnnotations().c_str());
-
-        ifaceInfo["functions"] = getFunctionsTemplateData(iface);
-        ++n;
-
-        // Sorting interfaces into groups.
-        if (it->findAnnotation(GROUP_ANNOTATION))
-        {
-            for (auto group : it->getAnnotations(GROUP_ANNOTATION))
-            {
-                std::string groupName = (group->hasValue()) ? group->getValueObject()->toString() : "";
-                fillInterfaceListsWithMap(interfaceLists, ifaceInfo, groupName);
-            }
-        }
-        else
-        {
-            fillInterfaceListsWithMap(interfaceLists, ifaceInfo, "");
-        }
-    }
-    return interfaceLists;
-}
-
-void CGenerator::fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
-                                           cpptempl::data_ptr interfaceMap,
-                                           std::string mapName)
-{
-    auto interfaceList = interfaceLists.find(mapName);
-    if (interfaceList == interfaceLists.end())
-    {
-        vector<cpptempl::data_ptr> interfaceVector;
-        interfaceLists[mapName] = interfaceVector;
-        interfaceList = interfaceLists.find(mapName);
-    }
-    interfaceList->second.push_back(interfaceMap);
-}
-
-data_list CGenerator::getFunctionsTemplateData(Interface *iface)
-{
-    data_list fns;
-    int j = 0;
-    for (auto fit : iface->getFunctions())
-    {
-        fns.push_back(make_data(getFunctionTemplateData(fit, j++)));
-    }
-    return fns;
+    generateInterfaceOutputFiles(m_templateData, interfaceLists);
 }
 
 void CGenerator::makeConstTemplateData()
@@ -620,7 +556,24 @@ void CGenerator::makeAliasesTemplateData()
     Log::info("Type definition:\n");
     data_list aliases;
     int n = 0;
-    for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
+
+    // All existing type declarations
+    SymbolScope::symbol_vector_t aliasTypeVector = m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol);
+
+    // Structures in C has to be defined with typedef
+    int i = 0;
+    for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
+    {
+        StructType *structType = dynamic_cast<StructType *>(it);
+        assert(structType);
+        if (structType->getName().compare("") != 0 && !structType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            AliasType *a = new AliasType(structType->getName(), structType);
+            aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
+        }
+    }
+
+    for (auto it : aliasTypeVector)
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
@@ -772,17 +725,25 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
         DataType *dataType = member->getDataType();
         std::string memberName = member->getName();
 
-        // Handle nullable annotation.
+        // Handle nullable annotation
+        bool memberHasNullableAnn = member->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
+        member_info["isNullable"] = memberHasNullableAnn;
+        member_info["structElements"] = "";
+        member_info["structElementsCount"] = "";
+
+        // hasNullableMember must be true if there at least one struct member with nullable annotation
+        if ("false" == structInfo["hasNullableMember"]->getvalue())
+        {
+            structInfo["hasNullableMember"] = memberHasNullableAnn;
+        }
+
         if (dataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(dataType)) ||
                                      isBinaryStruct(dynamic_cast<StructType *>(dataType))))
         {
             // Set a flag on the struct indicating there are nullable members, but only
             // set it to true
-            if (member->findAnnotation(NULLABLE_ANNOTATION) != nullptr)
+            if (memberHasNullableAnn)
             {
-                member_info["isNullable"] = true;
-                structInfo["hasNullableMember"] = true;
-
                 if (isListStruct(dynamic_cast<StructType *>(dataType)))
                 {
                     member_info["structElements"] = ".elements";
@@ -794,20 +755,12 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
                     member_info["structElementsCount"] = ".dataLength";
                 }
             }
-            else
-            {
-                member_info["isNullable"] = false;
-            }
-        }
-        else
-        {
-            member_info["isNullable"] = false;
         }
 
         std::string name = "data->" + memberName;
         // Subtemplate setup for read/write struct calls
-        member_info["coderCall"] = getEncodeDecodeCall(name, dataType, structType, true, member, containsEnum);
-        // Info for delcaring struct in common header
+        member_info["coderCall"] = getEncodeDecodeCall(name, dataType, structType, true, member, containsEnum, false);
+        // Info for declaring struct in common header
         member_info["name"] = memberName;
         member_info["memberDeclaration"] = getTypenameName(dataType, memberName) + ";";
         if (isBinaryStruct(structType))
@@ -828,6 +781,12 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
         {
             structInfo["needEnumTmp"] = true;
         }
+
+        // Skip data serialization for variables placed as @length value for lists.
+        // These prevent to serialized data twice.
+        StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), memberName, LENGTH_ANNOTATION);
+        member_info["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+
         members.push_back(member_info);
         if (isNeedCallFree(dataType))
         {
@@ -837,6 +796,12 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
     }
     structInfo["members"] = members;
     structInfo["membersToFree"] = membersToFree;
+}
+
+void CGenerator::getInterfaceComments(Interface *iface, data_map &ifaceInfo)
+{
+    ifaceInfo["mlComment"] = iface->getMlComment();
+    ifaceInfo["ilComment"] = iface->getIlComment();
 }
 
 data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
@@ -873,12 +838,14 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         std::string extraPointer = getExtraPointerInReturn(trueDataType);
         std::string resultVariable = extraPointer + returnSpaceWhenNotEmpty(extraPointer) + result;
         result = extraPointer + result;
-        returnInfo["coderCall"] = getEncodeDecodeCall(result, dataType, nullptr, false, nullptr, containsEnum);
+        returnInfo["coderCall"] = getEncodeDecodeCall(result, dataType, nullptr, false, nullptr, containsEnum, true);
         resultVariable = getTypenameName(dataType, resultVariable);
         info["needEnumTmpClient"] = containsEnum;
         returnInfo["resultVariable"] = resultVariable;
         returnInfo["isNeedFreeingCall"] = isNeedCallFree(dataType);
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
+        returnInfo["isNullReturnType"] =
+            ((!trueDataType->isBuiltin() && !trueDataType->isEnum()) || trueDataType->isString());
     }
     info["returnValue"] = returnInfo;
     // get function parameter info
@@ -894,58 +861,33 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         DataType *paramType = param->getDataType();
         DataType *paramTrueType = paramType->getTrueDataType();
         std::string name = param->getName();
-        // Handle nullable annotation.
-        if (paramTrueType->isStruct())
-        {
-            paramInfo["isNullable"] = param->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
 
-            // Set flags to indicate whether a local isNull variable is needed on the
-            // server and client sides.
-            //
-            // If needNullVariableX is true, we don't want to overwrite it to false
-            // if a later parameter is not nullable. So, we will only try to set it
-            // if it is not true. Once the variable's value is true, we know we need
-            // a null variable at least once.
-            if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
-            {
-                if ("false" == info["needNullVariableOnServer"]->getvalue())
-                {
-                    info["needNullVariableOnServer"] = paramInfo["isNullable"];
-                }
-            }
-            if (param->getDirection() == kOutDirection || param->getDirection() == kInoutDirection)
-            {
-                if ("false" == info["needNullVariableOnClient"]->getvalue())
-                {
-                    info["needNullVariableOnClient"] = paramInfo["isNullable"];
-                }
-            }
-        }
-        else
+        // Handle nullable annotation.
+        bool memberHasNullableAnn = param->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
+        paramInfo["isNullable"] = memberHasNullableAnn;
+
+        // Set flags to indicate whether a local isNull variable is needed on the
+        // server and client sides.
+        //
+        // If needNullVariableX is true, we don't want to overwrite it to false
+        // if a later parameter is not nullable. So, we will only try to set it
+        // if it is not true. Once the variable's value is true, we know we need
+        // a null variable at least once.
+        if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
         {
-            paramInfo["isNullable"] = false;
-        }
-        // Adding dereferencing pointer length variable
-        if (paramTrueType->isList())
-        {
-            Annotation *ann = param->findAnnotation(LENGTH_ANNOTATION);
-            if (ann)
+            if ("false" == info["needNullVariableOnServer"]->getvalue())
             {
-                std::string lengthName = ann->getValueObject()->toString();
-                Symbol *symbol = fn->getParameters().getScope().getSymbol(lengthName, false);
-                if (symbol)
-                {
-                    StructMember *structMember = dynamic_cast<StructMember *>(symbol);
-                    assert(structMember);
-                    if (structMember->getDirection() != kInDirection)
-                    {
-                        ListType *listType = dynamic_cast<ListType *>(paramType);
-                        assert(listType);
-                        listType->setLengthVariableName("*" + lengthName);
-                    }
-                }
+                info["needNullVariableOnServer"] = memberHasNullableAnn;
             }
         }
+        if (param->getDirection() == kOutDirection || param->getDirection() == kInoutDirection)
+        {
+            if ("false" == info["needNullVariableOnClient"]->getvalue())
+            {
+                info["needNullVariableOnClient"] = memberHasNullableAnn;
+            }
+        }
+
         // Check if max_length annotation belongs to "in" param
         // TODO: Should be global, also for PythonGenerator
         if (paramTrueType->isList() || paramTrueType->isString())
@@ -981,8 +923,14 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         paramInfo["name"] = name;
         paramInfo["type"] = getTypeInfo(paramType, false);
         Log::debug("calling EncodeDecode with %s as paramType\n", paramType->getName().c_str());
-        paramInfo["coderCall"] = getEncodeDecodeCall(name, paramType, nullptr, false, param, containsEnum);
+        paramInfo["coderCall"] = getEncodeDecodeCall(name, paramType, &fn->getParameters(), false, param, containsEnum, true);
         paramInfo["variable"] = variable;
+
+        // Skip data serialization for variables placed as @length value for lists.
+        // These prevent to serialized data twice.
+        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName(), LENGTH_ANNOTATION);
+        paramInfo["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+
         setToCore(param, paramsTo1Core, paramsTo2Core, paramInfo);
         if (containsEnum && param->getDirection() != kInDirection)
         {
@@ -1064,6 +1012,7 @@ data_map CGenerator::getTypeInfo(DataType *t, bool isFunction)
 std::string CGenerator::getErrorReturnValue(Function *fn)
 {
     Annotation *ann = fn->findAnnotation(ERROR_RETURN_ANNOTATION);
+    DataType *dataType = fn->getReturnType()->getTrueDataType();
     if (ann)
     {
         if (!ann->hasValue() || ann->getValueObject()->toString() == "")
@@ -1073,17 +1022,34 @@ std::string CGenerator::getErrorReturnValue(Function *fn)
         }
         else
         {
-            std::string returnVal = ann->getValueObject()->toString();
-            if (fn->getReturnType()->getTrueDataType()->isString())
+            Value *returnVal = ann->getValueObject();
+            if (dataType->isString())
             {
-                return "(char *) " + returnVal;
+                return "(char *) " + returnVal->toString();
             }
-            return returnVal;
+            else if (dataType->isBuiltin())
+            {
+                BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
+                assert(builtinType);
+                switch (builtinType->getBuiltinType())
+                {
+                    case BuiltinType::kUInt8Type:
+                    case BuiltinType::kUInt16Type:
+                    case BuiltinType::kUInt32Type:
+                    case BuiltinType::kUInt64Type:
+                    {
+                        IntegerValue *integerValue = dynamic_cast<IntegerValue *>(returnVal);
+                        return format_string("%lu", integerValue->getValue());
+                    }
+                    default:
+                        return returnVal->toString();
+                }
+            }
+            return returnVal->toString();
         }
     }
     else
     {
-        DataType *dataType = fn->getReturnType()->getTrueDataType();
         if (dataType->isBuiltin() && !dataType->isString())
         {
             BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
@@ -1404,7 +1370,8 @@ std::string CGenerator::getBuiltinTypename(const BuiltinType *t)
 void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
                                         data_map &templateData,
                                         StructType *structType,
-                                        StructMember *structMember)
+                                        StructMember *structMember,
+                                        bool isFunctionParam)
 {
     templateData["decode"] = m_templateData["decodeBuiltinType"];
     templateData["encode"] = m_templateData["encodeBuiltinType"];
@@ -1416,7 +1383,7 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
                                         (structType && structType->hasStructDirectionType(kInoutDirection))) ?
                                            true :
                                            false;
-        if (structType)
+        if (!isFunctionParam)
         {
             templateData["stringAllocSize"] = structMember->getName() + "_len";
             templateData["stringLocalName"] = structMember->getName();
@@ -1466,7 +1433,8 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                                          StructType *structType,
                                          bool inDataContainer,
                                          StructMember *structMember,
-                                         bool &containsEnum)
+                                         bool &containsEnum,
+                                         bool isFunctionParam)
 {
     // prepare data for template
     data_map templateData;
@@ -1503,7 +1471,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
     {
         case DataType::kBuiltinType:
         {
-            getEncodeDecodeBuiltin((BuiltinType *)t, templateData, structType, structMember);
+            getEncodeDecodeBuiltin((BuiltinType *)t, templateData, structType, structMember, isFunctionParam);
             break;
         }
         case DataType::kEnumType:
@@ -1528,9 +1496,9 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             assert(listType);
 
             bool isInOut = ((structMember && structMember->getDirection() == kInoutDirection) ||
-                            (structType && structType->hasStructDirectionType(kInoutDirection)));
-            bool isTopDataTYpe = (!structType && structMember && structMember->getDataType()->getTrueDataType() == t);
-            templateData["useMallocOnClientSide"] = (!isInOut && !isTopDataTYpe); // Because cpptempl don't know do
+                            (!isFunctionParam && structType->hasStructDirectionType(kInoutDirection)));
+            bool isTopDataType = (isFunctionParam && structMember && structMember->getDataType()->getTrueDataType() == t);
+            templateData["useMallocOnClientSide"] = (!isInOut && !isTopDataType); // Because cpptempl don't know do
                                                                                   // correct complicated conditions like
                                                                                   // if(a || (b && c))
 
@@ -1556,6 +1524,8 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             {
                 size = name.substr(0, sizePrefix + 1);
             }
+            templateData["pointerScalarTypes"] = false;
+            templateData["constantVariable"] = false;
 
             if (listType->hasLengthVariable())
             {
@@ -1564,7 +1534,39 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 ++listCounter;
                 nextName = format_string("%s[listCount%d]", name.c_str(), listCounter);
                 // needDealloc(templateData, t, nullptr, structMember);
-                size += listType->getLengthVariableName();
+                // length is global constant. Should be defined in IDL as array[global_constant] @nullable?
+                Symbol *symbol = m_globals->getSymbol(listType->getLengthVariableName());
+                if (symbol)
+                {
+                    ConstType *constType = dynamic_cast<ConstType *>(symbol);
+                    assert(constType);
+                    size = constType->getValue()->toString();
+                    templateData["constantVariable"] = true;
+                }
+                else
+                {
+                    symbol = structType->getScope().getSymbol(listType->getLengthVariableName(), false);
+                    if (!symbol)
+                    {
+                        //it is just number.
+                        templateData["constantVariable"] = true;
+                    }
+
+                    // on client has to be used dereferencing out length variable when writeBinary/list is used.
+                    if (isFunctionParam)
+                    {
+                        if (symbol)
+                        {
+                            StructMember *lengthVariable = dynamic_cast<StructMember *>(symbol);
+                            assert(lengthVariable);
+                            if (lengthVariable->getDirection() != kInDirection)
+                            {
+                                templateData["pointerScalarTypes"] = true;
+                            }
+                        }
+                    }
+                    size += listType->getLengthVariableName();
+                }
                 templateData["sizeTemp"] = std::string("lengthTemp_") + std::to_string(listCounter);
                 templateData["dataTemp"] = std::string("dataTemp_") + std::to_string(listCounter);
                 std::string maxSize = getMaxLength(structMember);
@@ -1606,17 +1608,9 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 templateData["forLoopCount"] = "listCount";
             }
             templateData["size"] = size;
-            templateData["useBinaryCoder"] = false;
-            for (ListType *binaryType : s_binaryTypes)
-            {
-                if (binaryType == listType)
-                {
-                    templateData["useBinaryCoder"] = true;
-                    break;
-                }
-            }
+            templateData["useBinaryCoder"] = isBinaryList(listType);
             templateData["protoNext"] =
-                getEncodeDecodeCall(nextName, listType->getElementType(), structType, true, structMember, containsEnum);
+                getEncodeDecodeCall(nextName, listType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
             break;
         }
         case DataType::kArrayType:
@@ -1631,7 +1625,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             giveBracesToArrays(arrayName);
             templateData["protoNext"] =
                 getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
-                                    arrayType->getElementType(), structType, true, structMember, containsEnum);
+                                    arrayType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
             templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
             templateData["size"] = format_string("%d", arrayType->getElementCount());
             templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
@@ -1641,6 +1635,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
                     m_templateData["freeArray"] :
                     make_template("", &params);
+            templateData["pointerScalarTypes"] = false; // List is using array codec functions
             break;
         }
         case DataType::kStructType:
@@ -1669,7 +1664,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             AliasType *aliasType = dynamic_cast<AliasType *>(t);
             assert(aliasType);
             return getEncodeDecodeCall(name, aliasType->getElementType(), structType, inDataContainer, structMember,
-                                       containsEnum);
+                                       containsEnum, isFunctionParam);
         }
         case DataType::kUnionType:
         {
@@ -1679,12 +1674,15 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["discriminatorName"] = unionType->getDiscriminatorName();
             data_list unionCases;
             data_list unionCasesToFree;
+            // call free function for this union, default not call any free function
             templateData["freeingCall"] = make_template("", &params);
             for (auto unionCase : unionType->getCases())
             {
                 data_map caseData;
                 caseData["name"] = unionCase->getCaseName();
                 caseData["value"] = unionCase->getCaseValue();
+                // if current case need call free function, default false
+                caseData["needCaseFreeingCall"] = false;
                 data_list caseMembers;
                 data_map memberData;
                 data_map caseMembersFree;
@@ -1702,22 +1700,25 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 else
                 {
                     // For each case member declaration, get its encode and decode data
-                    caseData["needCaseFreeingCall"] = false;
                     for (auto caseMemberName : unionCase->getMemberDeclarationNames())
                     {
                         StructMember *memberDeclaration = unionCase->getUnionMemberDeclaration(caseMemberName);
                         std::string unionCaseName = name + "." + memberDeclaration->getName();
                         memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, memberDeclaration->getDataType(),
-                                                                      structType, true, structMember, containsEnum);
+                                                                      structType, true, structMember, containsEnum, isFunctionParam);
                         if (generateServerFunctionParamFreeFunctions(structMember) &&
                             isNeedCallFree(memberDeclaration->getDataType()))
                         {
+                            // set freeing function for current union
                             templateData["freeingCall"] = m_templateData["freeUnion"];
+                            // current case need free memory
                             caseData["needCaseFreeingCall"] = true;
+                            // current member need free memory
                             memberData["isNeedFreeingCall"] = true;
                         }
                         else
                         {
+                            // current member don't need free memory
                             memberData["isNeedFreeingCall"] = false;
                         }
                         caseMembers.push_back(memberData);
@@ -2212,38 +2213,12 @@ bool CGenerator::containsList(DataType *dataType)
 
 bool CGenerator::isListStruct(StructType *structType)
 {
-    std::string structName = structType->getName();
-    if (structName != "binary_t")
+    // if structure is transformed list<> to struct{list<>}
+    for (StructType *structList : m_structListTypes)
     {
-        uint32_t nameCount = 0;
-        std::string structuresNames = format_string("list_%d_t", nameCount);
-        Symbol *symbol = m_globals->getSymbol(structuresNames);
-        while (symbol)
+        if (structType == structList)
         {
-            if (structuresNames == structName)
-            {
-                break;
-            }
-            ++nameCount;
-            structuresNames = format_string("list_%d_t", nameCount);
-            symbol = m_globals->getSymbol(structuresNames);
-        }
-        if (!symbol)
-        {
-            return false;
-        }
-    }
-
-    StructType::member_vector_t &structMembers = structType->getMembers();
-    if (structMembers.size() == 1 &&
-        (structMembers[0]->getName() == "elements" || structMembers[0]->getName() == "data"))
-    {
-        DataType *dataType = structMembers[0]->getDataType();
-        if (dataType->isList())
-        {
-            ListType *listType = dynamic_cast<ListType *>(dataType);
-            assert(listType);
-            return !listType->hasLengthVariable();
+            return true;
         }
     }
     return false;
@@ -2251,8 +2226,33 @@ bool CGenerator::isListStruct(StructType *structType)
 
 bool CGenerator::isBinaryStruct(StructType *structType)
 {
-    return (structType->getName() == "binary_t" && structType->getMembers().size() == 1 &&
-            structType->getMembers()[0]->getDataType()->isList());
+    // if structure contains one member list<>
+    if (structType->getMembers().size() == 1 && structType->getMembers()[0]->getDataType()->isList())
+    {
+        /*
+         * If list is same as in s_listBinaryTypes.
+         * This list is always in 0-position of vector s_listBinaryTypes.
+         */
+        if (m_listBinaryTypes.size() && structType->getMembers()[0]->getDataType() == m_listBinaryTypes.at(0))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CGenerator::isBinaryList(ListType *listType)
+{
+
+    // If list is same as in s_listBinaryTypes.
+    for (ListType *list : m_listBinaryTypes)
+    {
+        if (listType == list)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CGenerator::generateServerFunctionParamFreeFunctions(StructMember *structMember)

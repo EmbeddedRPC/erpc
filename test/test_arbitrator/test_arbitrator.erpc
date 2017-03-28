@@ -1,0 +1,20 @@
+@outputDir("erpc_outputs/")
+program test_arbitrator;
+
+@group("firstInterface")
+interface FirstInterface
+{
+    whenReady() -> void
+    oneway firstSendInt(int32 a)
+    firstReceiveInt() -> int32
+    getResultFromSecondSide() -> int32
+    oneway quitFirstInterfaceServer()
+}
+
+@group("secondInterface")
+interface SecondInterface
+{
+    oneway secondSendInt(int32 a)
+    secondReceiveInt() -> int32
+    oneway quitSecondInterfaceServer()
+}

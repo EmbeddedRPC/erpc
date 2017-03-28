@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,13 +31,12 @@
 #if !defined(_Value_h_)
 #define _Value_h_
 
+#include "format_string.h"
 #include <stdint.h>
 #include <string>
-#include "format_string.h"
 //#include "Blob.h"
 
-typedef enum
-{
+typedef enum {
     kIntegerValue,
     kSizedIntegerValue,
     kStringValue,
@@ -53,9 +53,13 @@ public:
     : m_type(theType)
     {
     }
+
     virtual ~Value() {}
+
     virtual value_type_t getType() const { return m_type; }
+
     virtual std::string getTypeName() const = 0;
+
     virtual size_t getSize() const = 0;
 
     virtual std::string toString() const = 0;
@@ -77,11 +81,13 @@ public:
     , m_value(0)
     {
     }
+
     IntegerValue(int32_t value)
     : Value(kIntegerValue)
     , m_value(value)
     {
     }
+
     IntegerValue(const IntegerValue &other)
     : Value(kIntegerValue)
     , m_value(other.m_value)
@@ -89,9 +95,13 @@ public:
     }
 
     virtual std::string getTypeName() const { return "integer"; }
+
     virtual size_t getSize() const { return sizeof(m_value); }
+
     int32_t getValue() const { return m_value; }
+
     operator int32_t() const { return m_value; }
+
     IntegerValue &operator=(int32_t value)
     {
         m_value = value;
@@ -99,7 +109,9 @@ public:
     }
 
     virtual std::string toString() const { return format_string("%d", m_value); }
+
     virtual Value *clone() const { return new IntegerValue(*this); }
+
 protected:
     int32_t m_value; //!< The integer value.
 };
@@ -115,21 +127,25 @@ public:
     , m_value(0.0)
     {
     }
+
     FloatValue(double value)
     : Value(kFloatValue)
     , m_value(value)
     {
     }
+
     FloatValue(float value)
     : Value(kFloatValue)
     , m_value(value)
     {
     }
+
     FloatValue(const FloatValue &other)
     : Value(kFloatValue)
     , m_value(other.m_value)
     {
     }
+
     FloatValue &operator=(const FloatValue &other)
     {
         m_value = other.m_value;
@@ -137,15 +153,21 @@ public:
     }
 
     virtual std::string getTypeName() const { return "float"; }
+
     virtual size_t getSize() const { return sizeof(m_value); }
+
     double getValue() const { return m_value; }
+
     operator double() const { return m_value; }
+
     operator float() const { return static_cast<float>(m_value); }
+
     FloatValue &operator=(double value)
     {
         m_value = value;
         return *this;
     }
+
     FloatValue &operator=(float value)
     {
         m_value = value;
@@ -153,7 +175,9 @@ public:
     }
 
     virtual std::string toString() const { return format_string("%f", m_value); }
+
     virtual Value *clone() const { return new FloatValue(*this); }
+
 protected:
     double m_value; //!< The double value.
 };
@@ -172,8 +196,7 @@ class SizedIntegerValue : public IntegerValue
 {
 public:
     //! Supported sizes of integers.
-    typedef enum
-    {
+    typedef enum {
         kWordSize,     //!< 32-bit word.
         kHalfWordSize, //!< 16-bit half word.
         kByteSize      //!< 8-bit byte.
@@ -185,24 +208,28 @@ public:
     {
         m_value = kSizedIntegerValue;
     }
+
     SizedIntegerValue(uint32_t value, int_size_t size = kWordSize)
     : IntegerValue(value)
     , m_size(size)
     {
         m_value = kSizedIntegerValue;
     }
+
     SizedIntegerValue(uint16_t value)
     : IntegerValue(value)
     , m_size(kHalfWordSize)
     {
         m_value = kSizedIntegerValue;
     }
+
     SizedIntegerValue(uint8_t value)
     : IntegerValue(value)
     , m_size(kByteSize)
     {
         m_value = kSizedIntegerValue;
     }
+
     SizedIntegerValue(const SizedIntegerValue &other)
     : IntegerValue(other)
     , m_size(other.m_size)
@@ -211,10 +238,13 @@ public:
     }
 
     virtual std::string getTypeName() const { return "sized integer"; }
+
     virtual size_t getSize() const;
 
     int_size_t getWordSize() const { return m_size; }
+
     void setWordSize(int_size_t size) { m_size = size; }
+
     //! \brief Returns a 32-bit mask value dependant on the word size attribute.
     uint32_t getWordSizeMask() const;
 
@@ -227,12 +257,14 @@ public:
         m_size = kByteSize;
         return *this;
     }
+
     SizedIntegerValue &operator=(uint16_t value)
     {
         m_value = value;
         m_size = kHalfWordSize;
         return *this;
     }
+
     SizedIntegerValue &operator=(uint32_t value)
     {
         m_value = value;
@@ -242,6 +274,7 @@ public:
     //@}
 
     virtual Value *clone() const { return new SizedIntegerValue(*this); }
+
 protected:
     int_size_t m_size; //!< Size of the integer.
 };
@@ -259,16 +292,19 @@ public:
     , m_value()
     {
     }
+
     StringValue(const std::string &value)
     : Value(kStringValue)
     , m_value(value)
     {
     }
+
     StringValue(const std::string *value)
     : Value(kStringValue)
     , m_value(*value)
     {
     }
+
     StringValue(const StringValue &other)
     : Value(kStringValue)
     , m_value(other.m_value)
@@ -276,23 +312,33 @@ public:
     }
 
     virtual std::string getTypeName() const { return "string"; }
+
     virtual size_t getSize() const { return m_value.size(); }
+
     const std::string &getString() const { return m_value; }
+
     operator const char *() const { return m_value.c_str(); }
+
     operator const std::string &() const { return m_value; }
+
     operator std::string &() { return m_value; }
+
     operator const std::string *() { return &m_value; }
+
     operator std::string *() { return &m_value; }
+
     StringValue &operator=(const StringValue &other)
     {
         m_value = other.m_value;
         return *this;
     }
+
     StringValue &operator=(const std::string &value)
     {
         m_value = value;
         return *this;
     }
+
     StringValue &operator=(const char *value)
     {
         m_value = value;
@@ -300,7 +346,9 @@ public:
     }
 
     virtual std::string toString() const { return m_value; }
+
     virtual Value *clone() const { return new StringValue(*this); }
+
 protected:
     std::string m_value; //!< The string value.
 };
@@ -312,10 +360,11 @@ protected:
 class BinaryValue : public Value, public Blob
 {
 public:
-	BinaryValue() : Value(), Blob() {}
+    BinaryValue() : Value(), Blob() {}
 
-	virtual std::string getTypeName() const { return "binary"; }
-	virtual size_t getSize() const { return getLength(); }
+    virtual std::string getTypeName() const { return "binary"; }
+
+    virtual size_t getSize() const { return getLength(); }
 };
 #endif
 

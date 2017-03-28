@@ -16,13 +16,13 @@ using namespace std;
 {% for iface in interfaces -- service subclass method impl %}
 
 // Call the correct server shim based on method unique ID.
-erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec)
+erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
     switch (methodId)
     {
 {%  for fn in iface.functions %}
         case k{$iface.name}_{$fn.name}_id:
-            return {$fn.name}_shim(codec, sequence);
+            return {$fn.name}_shim(codec, messageFactory, sequence);
 
 {%  endfor -- fn %}
         default:
@@ -32,13 +32,14 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
 {%  for fn in iface.functions %}
 
 // Server shim for {$fn.name} of {$iface.name} interface.
-erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, uint32_t sequence)
+erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
 {
 {% if errVar != "" %}
     erpc_status_t {$errVar}kErpcStatus_Success;
+
 {% endif %}
 {%   for param in fn.parameters %}
-    {$param.variable}{% if param.isNullParam && generateAllocErrorChecks %} = NULL{%endif%};
+    {$param.variable}{% if param.isNullParam && errVar != "" %} = NULL{%endif%};
 {%    if param.isNullable %}
 {%     if param.allocateToClientAndServer || param.allocateToClient %}
 {$> addIndent("    ", param.mallocServer)}
@@ -59,36 +60,41 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, uint32_t
 {%   endif %}
     // startReadMessage() was already called before this shim was invoked.
 {%   if fn.isSendValue %}
-{$addInfraErrorChecks("    ", s_startReadStruct)}
-{%    for param in fn.parametersTo2Core %}
+
+{%    for param in fn.parametersTo2Core if not param.lengthForMember %}
 {%     if param.isNullable %}
 {$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, "TRUE"))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
 {$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
 {%    endfor -- parametersTo2Core %}
-{$addInfraErrorChecks("    ", s_endReadStruct)}
 {%   endif -- isSendValue %}
+
 {$addInfraErrorChecks("    ", s_endReadMessage)}
 {%   for param in fn.parametersTo1Core %}
 {%    if param.mallocServerOut != "" %}
 
-    {$param.mallocServerOut}
+{$> addIndent("    ", param.mallocServerOut)}
 {%    endif %}
 {%   endfor -- parametersTo1Core %}
+
     // Invoke the actual served function.
 {%   if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable};
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType && generateInfraErrorChecks %} = NULL{%endif%};
 {%   endif %}
 {$addInfraErrorChecks("    ", fn.serverPrototype)}
+
 {%   if fn.isReturnValue %}
-    // reset codec for sending data
-    codec->getBuffer()->setUsed(0);
+    // preparing MessageBuffer for serializing data
+{$addInfraErrorChecks("    ", s_prepareServerBufferForSend)}
+
+    // preparing codec for serializing data
     codec->reset();
 
     // Build response message.
 {$addInfraErrorChecks("    ", f_serverStartWriteMessage(iface.name, fn.name))}
-{%    for param in fn.parametersTo1Core %}
+
+{%    for param in fn.parametersTo1Core if not param.lengthForMember %}
 {%     if param.isNullable %}
 {$addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     else -- isNullable %}
@@ -102,6 +108,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, uint32_t
 {%     endif %}
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.encode(fn.returnValue.coderCall))}
 {%    endif -- notVoid %}
+
 {$addInfraErrorChecks("    ", s_endWriteMessage)}
 {%   endif -- isReturnValue %}
 {%   if fn.isReturnValue %}

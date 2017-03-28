@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,18 +32,18 @@
 #ifndef _EMBEDDED_RPC__INTERFACE_H_
 #define _EMBEDDED_RPC__INTERFACE_H_
 
+#include "Function.h"
+#include "Symbol.h"
+#include "SymbolScope.h"
 #include <string>
 #include <vector>
-#include "Symbol.h"
-#include "Function.h"
-#include "SymbolScope.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief An interface that contains functions.
  */
@@ -80,24 +82,28 @@ public:
      * @return Symbol scope.
      */
     SymbolScope &getScope() { return m_scope; }
+
     /*!
      * @brief This function return interface functions vector.
      *
      * @return Interface functions vector.
      */
     function_vector_t &getFunctions() { return m_functions; }
+
     /*!
      * @brief This function get unique id of interface.
      *
      * @return Unique id for interface.
      */
     uint32_t getUniqueId() const { return m_uniqueId; }
+
     /*!
      * @brief This function set unique id for interface.
      *
      * @param[in] newId Unique id for interface.
      */
     void setUniqueId(uint32_t newId) { m_uniqueId = newId; }
+
     /*!
      * @brief This function returns description about the interface.
      *

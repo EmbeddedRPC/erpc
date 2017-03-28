@@ -10,11 +10,11 @@ test/interface.py:
   - def bar(self, l)
 test/client.py:
   - def bar(self, l)
-  - start_write_list(len(l))
+  - start_write_list(self.length)
 test/server.py:
   - start_read_list
   - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 
 ---
 name: out list param
@@ -31,12 +31,12 @@ test/client.py:
   - perform_request
   - start_read_list
   - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
   - self._handler.bar(l)
-  - outCodec.start_write_message
-  - outCodec.write_int32(len(l.value))
+  - codec.start_write_message
+  - not: codec.write_int32(len(l.value))
 
 ---
 name: inout list param
@@ -50,19 +50,19 @@ test/interface.py:
   - def bar(self, l)
 test/client.py:
   - def bar(self, l)
-  - start_write_list(len(l))
+  - start_write_list(self.length)
   - perform_request
   - start_read_list
   - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
   - start_read_list
   - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
   - self._handler.bar(l)
-  - outCodec.start_write_message
-  - outCodec.write_int32(len(l.value))
+  - codec.start_write_message
+  - not: codec.write_int32(len(l.value))
 
 ---
 name: other param
@@ -85,23 +85,23 @@ test/client.py:
   - if: dir in ('in', 'inout')
     then:
       - write_{type}(v)
-      - write_int32(len(v))
+      - not: write_int32(len(v))
   - perform_request
   - if: dir in ('inout',)
     then:
-      - v.value = inCodec.read_{type}()
-      - _ = inCodec.read_int32()
+      - v.value = codec.read_{type}()
+      - not: _ = codec.read_int32()
 test/server.py:
   - def _handle_bar
   - if: dir in ('in', 'inout')
     then:
-      - re: v(\.value)? = inCodec.read_{type}()
-      - _ = inCodec.read_int32()
+      - re: v(\.value)? = codec.read_{type}()
+      - not: _ = codec.read_int32()
       - self._handler.bar(v)
   - if: dir in ('out',)
     then:
       - write_{type}(v.value)
-      - write_int32(len(v.value))
+      - not: write_int32(len(v.value))
 
 ---
 name: list struct
@@ -131,19 +131,19 @@ test/common.py:
   - def _read
   - if: members.startswith('int32')
     then:
-      - _ = inCodec.read_int32()
+      - not: _ = codec.read_int32()
       - start_read_list
     else:
       - start_read_list
-      - _ = inCodec.read_int32()
+      - not: _ = codec.read_int32()
   - def _write
   - if: members.startswith('int32')
     then:
-      - outCodec.write_int32(self.cnt)
+      - not: codec.write_int32(self.cnt)
       - start_write_list
     else:
       - start_write_list
-      - outCodec.write_int32(self.cnt)
+      - not: codec.write_int32(self.cnt)
 
 ---
 name: other struct
@@ -168,8 +168,8 @@ test/common.py:
   - "@property"
   - def cnt
   - def _read
-  - _ = inCodec.read_int32()
+  - not: _ = codec.read_int32()
   - read_{type}
   - def _write
-  - outCodec.write_int32(self.cnt)
+  - not: codec.write_int32(self.cnt)
   - write_{type}

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -60,50 +62,39 @@ void SimpleServer::disposeBufferAndCodec(Codec *codec)
     }
 }
 
-Codec *SimpleServer::createBufferAndCodec()
-{
-    Codec *codec = m_codecFactory->create();
-    if (!codec)
-    {
-        return NULL;
-    }
-
-    MessageBuffer message = m_messageFactory->create();
-    if (!message.get())
-    {
-        // Dispose of buffers and codecs.
-        disposeBufferAndCodec(codec);
-        return NULL;
-    }
-
-    codec->setBuffer(message);
-
-    return codec;
-}
-
 erpc_status_t SimpleServer::runInternal()
 {
-    // Create codec to read the request.
-    Codec *codec = createBufferAndCodec();
-    if (!codec)
+    MessageBuffer buff;
+
+    if (m_messageFactory->createServerBuffer())
     {
-        return kErpcStatus_MemoryError;
+        buff = m_messageFactory->create();
+        if (!buff.get())
+        {
+            return kErpcStatus_MemoryError;
+        }
     }
 
     // Receive the next invocation request.
-    erpc_status_t err = m_transport->receive(codec->getBuffer());
+    erpc_status_t err = m_transport->receive(&buff);
     if (err)
     {
-        // Dispose of buffers and codecs.
-        disposeBufferAndCodec(codec);
+        // Dispose of buffers.
+        if (!buff.get())
+        {
+            m_messageFactory->dispose(&buff);
+        }
         return err;
     }
 
-    // If is used RPMsg transport layer, the receive function changes
-    // pointer to buffer(m_buf) of requestMessage, inCodec must be reseted
-    // after this change to work with correct buffer
-    codec->reset();
+    Codec *codec = m_codecFactory->create();
+    if (!codec)
+    {
+        m_messageFactory->dispose(&buff);
+        return kErpcStatus_MemoryError;
+    }
 
+    codec->setBuffer(buff);
     // Handle the request.
     message_type_t msgType;
     err = processMessage(codec, msgType);

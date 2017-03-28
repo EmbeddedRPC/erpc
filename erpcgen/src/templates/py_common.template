@@ -5,6 +5,9 @@
 #
 
 import erpc
+{% for inc in includes %}
+import {$inc}
+{% endfor -- includes %}
 
 {% for c in consts %}
 {$>c.mlComment}
@@ -54,45 +57,39 @@ class {$s.name}(object):
         return len(self.{$m.lengthForMember})
 
 {% endfor -- s.members %}
-    def _read(self, inCodec):
-        inCodec.start_read_struct()
-{% for m in s.members %}
-{%  if not m.lengthForMember %}
+    def _read(self, codec):
+        codec.start_read_struct()
+{% for m in s.members if not m.lengthForMember %}
 {%   set self_m_name = "self." & m.name %}
 {%   if m.isNullable %}
-        if not inCodec.read_null_flag():
-            {$decodeValue(m.type, self_m_name, "", "inCodec", "            ", 0)}
+        if not codec.read_null_flag():
+            {$decodeValue(m.type, self_m_name, "", "codec", "            ", 0)}
         else:
             {$self_m_name} = None
 {%   else -- isNullable %}
-        {$decodeValue(m.type, self_m_name, "", "inCodec", "        ", 0)}
+        {$decodeValue(m.type, self_m_name, "", "codec", "        ", 0)}
 {%   endif -- isNullable %}
-{%  else -- lengthForMember %}
-        {$decodeValue(m.type, "_", "", "inCodec", "        ", 0)}
-{%  endif -- lengthForMember %}
 {% endfor -- members %}
-        inCodec.end_read_struct()
+        codec.end_read_struct()
         return self
 
-    def _write(self, outCodec):
-        outCodec.start_write_struct()
-{% for m in s.members %}
+    def _write(self, codec):
+        codec.start_write_struct()
+{% for m in s.members if not m.lengthForMember %}
 {%  set self_m_name = "self." & m.name %}
 {%  if m.isNullable %}
         if {$self_m_name} is None:
-            outCodec.write_null_flag(True)
+            codec.write_null_flag(True)
         else:
-            outCodec.write_null_flag(False)
-            {$encodeValue(m.type, self_m_name, "outCodec", "            ", 0)}
+            codec.write_null_flag(False)
+            {$encodeValue(m.type, self_m_name, "codec", "            ", 0)}
 {%  else -- isNullable %}
-{%   if not m.lengthForMember %}
         if {$self_m_name} is None:
             raise ValueError("{$m.name} is None")
-{%   endif -- lengthForMember %}
-        {$encodeValue(m.type, self_m_name, "outCodec", "        ", 0)}
+        {$encodeValue(m.type, self_m_name, "codec", "        ", 0)}
 {%   endif -- isNullable %}
 {% endfor -- members %}
-        outCodec.end_write_struct()
+        codec.end_write_struct()
 
     def __str__(self):
         return "<%s@%x{% for m in s.members if not m.lengthForMember %} {$m.name}=%s{% endfor %}>" % (self.__class__.__name__, id(self){% for m in s.members if not m.lengthForMember %}, self.{$m.name}{% endfor %})

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -28,11 +30,11 @@
  */
 
 #include "PythonGenerator.h"
-#include "format_string.h"
 #include "Logging.h"
 #include "ParseErrors.h"
-#include "erpcgen_version.h"
 #include "annotations.h"
+#include "erpcgen_version.h"
+#include "format_string.h"
 #include <algorithm>
 #include <set>
 #include <sstream>
@@ -62,7 +64,11 @@ PythonGenerator::PythonGenerator(InterfaceDefinition *def)
 void PythonGenerator::generateOutputFiles(const std::string &fileName)
 {
     boost::filesystem::path outputDir = m_def->getOutputDirectory();
-    std::string commonFileName = stripExtension(m_def->getOutputFilename()) + fileName;
+    std::string commonFileName = stripExtension(m_def->getOutputFilename());
+    if (fileName != "")
+    {
+        commonFileName += "_" + fileName;
+    }
 
     // Make sure the package folder is created.
     boost::filesystem::path dir(commonFileName);
@@ -145,9 +151,9 @@ void PythonGenerator::generate()
         }
     }
 
-    // makeIncludesTemplateData();
+    makeIncludesTemplateData(m_templateData);
 
-    makeInterfacesTemplateData();
+    interfaceLists_t interfaceLists = makeInterfacesTemplateData();
 
     makeConstTemplateData();
 
@@ -157,63 +163,13 @@ void PythonGenerator::generate()
 
     makeStructsTemplateData();
 
-    // Log template data.
-    if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
-    {
-        dump_data(m_templateData);
-    }
-
-    generateOutputFiles("");
+    generateInterfaceOutputFiles(m_templateData, interfaceLists);
 }
 
-// void PythonGenerator::makeIncludesTemplateData()
-//{
-//    data_list includeData;
-//    if(m_def->hasProgramSymbol())
-//    {
-//        for(auto include: m_def->programSymbol()->getAnnotations(INCLUDE_ANNOTATION))
-//        {
-//            includeData.push_back(make_data(include->getValueObject()->toString()));
-//            Log::info("#include %s\n", include->getValueObject()->toString().c_str());
-//        }
-//    }
-//    m_templateData["includes"] = includeData;
-//}
-
-void PythonGenerator::makeInterfacesTemplateData()
+void PythonGenerator::getInterfaceComments(Interface *iface, data_map &ifaceInfo)
 {
-    Log::info("interfaces:\n");
-    int n = 0;
-    data_list ifaces;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
-    {
-        Interface *iface = dynamic_cast<Interface *>(it);
-        assert(iface);
-
-        data_map ifaceInfo;
-        ifaceInfo["name"] = make_data(iface->getName());
-        ifaceInfo["id"] = data_ptr(iface->getUniqueId());
-        ifaceInfo["mlComment"] = convertComment(iface->getMlComment(), kMultilineComment);
-        ifaceInfo["ilComment"] = convertComment(iface->getIlComment(), kInlineComment);
-
-        Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
-
-        ifaceInfo["functions"] = getFunctionsTemplateData(iface);
-        ifaces.push_back(make_data(ifaceInfo));
-        ++n;
-    }
-    m_templateData["interfaces"] = ifaces;
-}
-
-data_list PythonGenerator::getFunctionsTemplateData(Interface *iface)
-{
-    data_list fns;
-    int j = 0;
-    for (auto fit : iface->getFunctions())
-    {
-        fns.push_back(getFunctionTemplateData(fit, j++));
-    }
-    return fns;
+    ifaceInfo["mlComment"] = convertComment(iface->getMlComment(), kMultilineComment);
+    ifaceInfo["ilComment"] = convertComment(iface->getIlComment(), kInlineComment);
 }
 
 data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)

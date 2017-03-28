@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -11,7 +13,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -30,17 +32,17 @@
 #ifndef _EMBEDDED_RPC__ENUMTYPE_H_
 #define _EMBEDDED_RPC__ENUMTYPE_H_
 
-#include <string>
-#include <vector>
 #include "DataType.h"
 #include "EnumMember.h"
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Enumerate data type.
  */
@@ -86,6 +88,7 @@ public:
      * @return Enum members vector.
      */
     member_vector_t &getMembers() { return m_members; }
+
     /*!
      * @brief This function returns enum member based on given name.
      *
@@ -99,18 +102,21 @@ public:
      * @retval true Always return true.
      */
     virtual bool isEnum() const { return true; }
+
     /*!
      * @brief This function returns the next value to use for an enum member
      *
      * @retval uint32_t next value for enum
      */
     uint32_t getNextValue() { return m_currentValue++; }
+
     /*!
      * @brief This function set current value.
      *
      * @param[in] value Current value.
      */
     void setCurrentValue(uint32_t value) { m_currentValue = value; }
+
     /*!
      * @brief This function returns description about the enum.
      *
