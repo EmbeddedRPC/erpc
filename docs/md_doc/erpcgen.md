@@ -7,23 +7,19 @@ This chapter describes how to create and use the eRPC generator (_erpcgen_), a t
 The generated shim code handles marshalling and unmarshalling a request. After unmarshalling, on the server side, the shim code implements a function call to the appropriate function (based on the request). An IDL (interface definition language) is used to tell the generator tool about data types and RPC services.
 
 ## How to create an eRPC generator
-This section can be skipped, because the _erpcgen_ is distributed within the Multicore SDK as a prebuilt application.
-* The _erpcgen_ source files are located in the ``erpc/`` directory.
-* On Windows operating system, users can use Visual Studio Express 2013 or higher (steps for using Visual Studio are in the ``erpc/windows/ReadMe.txt`` file).
+* The _erpcgen_ source files are located in the ``erpc/erpcgen/src`` directory.
+* On Windows operating system, users can use Visual Studio Express 2013 or higher (steps for using Visual Studio are in the ``erpc/erpcgen/VisualStudio_v12/ReadMe.txt`` file).
 * To build the _erpcgen_ application on Linux OS or MacOS, the compiler (gcc, g++), make, flex/bison applications, and boost libraries are needed.
 * If you are using the Linux OS or MacOS, build the application using the command (which must be executed in the ``erpc/`` directory):
 ```
 make erpcgen
 ```
-or
-```
-make –f Makefile.erpcgen
-```
 
 The output _erpcgen_ applicaton is located in the ``erpc/Debug/<os_type>/erpcgen/`` folder. The ``<os_type>`` is set automatically, based on which build system is used.
 
 ## How to use an eRPC generator
-When the _erpcgen_ application is available, you can run it from the command line using the appropriate command line options. Prebuilt applications are located in the ``<ksdk_install_dir>/middleware/multicore_<version>/tools/erpcgen/<os_type>/`` folder, where ``<os_type>`` is Windows OS, Linux OS, or MacOS.
+When the _erpcgen_ application is available, you can run it from the command line using the appropriate command line options. Prebuilt applications are located in the 
+``<os_type>`` is Windows OS, Linux OS, or MacOS.
 
 ## _erpcgen_ command line options
 ###### ``-?`` or ``—help``

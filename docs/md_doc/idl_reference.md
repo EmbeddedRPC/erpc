@@ -45,69 +45,132 @@ Annotations provide a way to inform the eRPC generator about specific requests f
 * Each annotation starts with the “``@``” character.
 * It is followed by the annotation name; for example, ``@external``.
 
-This is enough for one type of annotation (when you want to only inform the eRPC generator about a specific attribute of the code).
+This is enough for one type of annotation (when you want to only inform the eRPC generator about a specific attribute of the code). Second type of annotation is extended using the “( )” parentheses. A specific parameter can be placed inside parentheses, and this can be a number, text, and others.
 
-#### ``@external int32 i``
+####Supported annotations:
+
+#####``@error_return(value)``
+When annotation ``@error_return`` is set then this _value _ is used for return value from client-side called function, when error will occur inside.
+
+#####``@external int32 i``
 The ``@external`` annotation allows you to reference a type in an IDL file that already exists in another header file. In order for this to work, however, the type must be identically defined in the IDL file.
 
-For example, if you have a typedef in a header file (``typedef uint32_t status_t``), and you wish to use this typedef, then you can define the type in your IDL file using the @external annotation: ``@external type status_t = uint32``.
+For example, if you have a typedef in a header file (``typedef uint32_t erpc_status_t``), and you wish to use this typedef, then you can define the type in your IDL file using the @external annotation: ``@external type erpc_status_t = uint32``.
 * This allows *erpcgen* to perform type checking when parsing the IDL file, but it will not generate any code for the type.
 * This will prevent duplicate definitions of the same type.
 * This should work for all type definitions in an IDL file (struct, const, enum, typedef).
 
-#### ``i @value(b)``
-Means that the variable ``i`` has the same value as the variable ``b``.
+#####``@group(string)``
+Interfaces can be grouped and stored in their set of output files via using ``@group`` annotation. ``String`` represent group name, which is used for output files. The file names look like: ``<fileName>_<groupName>``.
 
-This second type of annotation is extended using the “( )” characters. A specific parameter can be placed inside parentheses, and this can be a number, text, and others.
+Filename | Description
+---|---
+<*outputFileName*>_<*groupName*>.h | Common header file for group
+<*outputFileName*>_<*groupName*>_client.cpp | Client shim implementation for group
+<*outputFileName*>_<*groupName*>_server.h | Server side header for group
+<*outputFileName*>_<*groupName*>_server.cpp | Server shim implementation for group
+
+#####``@id(number)``
+Annotation  ``@id`` set interface/function id number. The _number_ must be unique for each interface/function.
+
+#####``@include(string)``
+The ``string`` value represents the header file to include.
+
+#####``@length(value)``
+This annotation set reference for length _variable_. This can be either number or variable. This prevent from wrapping list and binary data type to structure. Instead of structure these data types will be present as pointer to element type. Length of pointer variable will depend on _value_.
+
+#####``@no_alloc_errors``
+Generated files has as default enabled generating error checking code for catching errors with allocations. For disabling generating errors checking for allocation just add ``@no_alloc_errors``.
+
+#####``@no_infra_errors``
+Generated files has as default enabled generating error checking code for catching errors from codec functions. For disabling generating errors checking from codec just add ``@no_infra_errors`` annotation. 
+
+#####``@max_length(value)``
+Annotation ``@max_length`` set maximal size of string value. This size need be allocated by client. This annotation is just informing server how big space should allocate to working with this variable. For example when variable is used as ``inout`` type and server need send back bigger string then client send to him.
+
+#####``@nullable``
+Annotation ``@nullable`` inform shim code that variables can be set to NULL. Without this annotation, variable (passed by client, or returned from server function implementation) need be always not NULL. 
+
+#####``@outputDir(string)``
+String value that represents the output path. The output directory can also be set as a command line option for the eRPC generator. When ``@outputDir(string)`` and the eRPC generator command line option are both used, then the path from the IDL file is appended to the path given to the eRPC generator.
+
+#####``@retain``
+Annotation ``@retain`` prevents server to call freeing functions on variables, which were used in server function implementation.
+
 
 ## Program
 The optional ``program`` statement is used to specify the name of the input as a whole. This name is used for the output file name.
 
-```
+```C
 program some_program_name
 ```
 
 The ``program`` statement does not cause any code generate by itself. It is used both for documentation purposes, and as an anchor point to which annotations may be attached. Annotations must be placed before the ``program`` statement.
 
 ### Supported annotations
-#### ``@outputDir(string)``
-String value that represents the output path. The output directory can also be set as a command line option for the eRPC generator. When ``@outputDir(string)`` and the eRPC generator command line option are both used, then the path from the IDL file is appended to the path given to the eRPC generator.
-
-#### ``@separateInterfaceOutput(bool)``
-Interfaces are not generated into the same files, but in their own set of output files. The file names look like ``<fileName>_<interfaceName>``.
-
-Filename | Description
----|---
-_<outputFileName>_.h | Common header file with types
-*<outputFileName>*_*<interfaceName>*.h | Common header file for interface
-*<outputFileName>*_*<interfaceName>*_client.cpp | Client shim implementation for interface
-*<outputFileName>*_*<interfaceName>*_server.h | Server side header for interface
-*<outputFileName>*_*<interfaceName>*_server.cpp | Server shim implementation for interface
-
-#### ``@include(string)``
-The ``string`` value represents the header file to include.
+```
+@outputDir(string)
+@include(string)
+@no_infra_errors
+@no_alloc_errors
+```
 
 ## Interfaces
 The interface contains one or more functions, which are called on the client side; the implementations are written on the server side.
 
 *Prototype:*
-```
+```C
 interface _interfaceName_ {}
 ```
 
 Interfaces also generate one more special function. Because generated functions are written as C++ functions (they use classes), C-users generate C-function ``create_<interfaceName>_service()``. This function should be the call function.
 
+### Supported annotations
+Supported annotations are used _before a interface declaration_.
+
+```
+@group(string)
+@id(number)
+```
+
 ## Functions
 Functions are called by the client, and the implementations are written on the server side. There are 2 supported IDL function declarations:
-#### ``oneway function()``
-The oneway function should be used when no return message is expected.
-#### ``function() -> returnDataType``
-This function should be used when a return message is expected (for example, the returning value).
 
-Attributes are placed inside parentheses ( ), similar to how it is done in C-functions (using the supported IDL data types). Supported annotations are used _before a function declaration_. For example,  ``@id(number)`` the _number_ must be unique for each function within the interface.
+```C
+oneway function()
+```
+
+The oneway function should be used when no return message is expected.
+
+```C
+function() -> returnDataType
+```
+
+This function should be used when a return message is expected (for example, the returning value). Difference between using ``oneway`` and ``void`` is that ``void`` function will wait for response from server side. 
+Attributes are placed inside parentheses ( ), similar to how it is done in C-functions (using the supported IDL data types). 
+
+### Supported annotations
+Supported annotations are used _before a function declaration_.
+
+```
+@id(number)
+@error_return(value)
+```
+
+### Functions parameters annotations
+Parameters annotations are set after parameter name. Supported annotations are described for each data type in chapters bellow.
+*Prototype:*
+```C
+oneway function(string a @max_length(10), list<int32> b @length(c), int32 c)
+```
 
 ## Data types supported
 These are the built-in, atomic, scalar, complex types supported by ``erpcgen``. These types are mostly self-explanatory.
+
+##### Supported annotations
+```
+@external
+```
 
 ### Alias (type definition)
 The IDL type representation for this is: ``type _aliasName_ = _originalType_``
@@ -133,7 +196,14 @@ string |  char* | double | double
 #### Strings and UTF-8
 The string length is determined by the terminating null byte, which means that no null characters may be included in the middle of the string. The major impact of this is that UTF-8 is not fully supported. If the arbitrary UTF-8 text is intended to be transferred, then the binary type must be used.
 
-The binary type generates a C-type equivalent to ``list<uint8>``. Differencies between binary type and list type are:
+##### Supported annotations
+```
+@max_length(value)
+@retain
+```
+
+#### Binary
+As default the binary type generates a C-type equivalent to ``list<uint8>``. Differences between binary type and list type are:
 * Binary data type is handled far more efficiently when serializing and deserializing.
 * Binary type has different names of structure members.
 ```C
@@ -143,6 +213,14 @@ struct binary_t {
     uint32_t *dataLength;
 };
 ```
+
+##### Supported annotations
+```
+@retain
+@length(value)
+@max_length(value)
+```
+
 
 ### Enumerations
 Enumerations in the IDL input generate matching enumeration definitions in C; the only difference is that constant expressions are evaluated in the output. Additionally, a ``typedef`` with a matching name is generated.
@@ -190,6 +268,12 @@ Two helper functions are generated for encoding and decoding structures. The pro
   * ``int32_t write_<struct_typename>_struct(erpc::Codec * out, <struct_typename> * data);``
 
 For all functions that either _return a structure_ or _pass a structure as a parameter_, those functions expect a pointer to the structure type.
+
+#### Supported annotations
+```
+@retain
+@nullable
+```
 
 ### Discriminated Unions
 A discriminated union is simply a struct with one or more scalar types, one or more unions, and any other necessary data members for the struct. A discriminated union allows a user to create a kind of variant object, thereby allowing a user to send or return data of different types wrapped in a common struct definition. Definition of a discriminated union in the IDL file uses a _switch-statement-like_ syntax to define which union member is valid for the corresponding discriminator value.
@@ -241,6 +325,12 @@ Discriminated unions have a few special features:
 * Case F shows that discriminated unions also allow generation of anonymous structs within the union.
 * There is also the ‘default’ case, which is invoked if the discriminator value is set to something not defined explicitly by one of the union cases within the IDL.
 
+#### Supported annotations
+```
+@retain
+@nullable
+```
+
 ### Lists
 The IDL type representation for this type is ``list<typename>``.
 
@@ -257,6 +347,13 @@ Type definitions for the list structures are generated in a separate _forward de
 
 For simplicity, the names of the synthesized list structures are currently set to "list_x", where x is a unique integer. It is recommended to create a type alias to define a user-friendly name for the list structure. The issue is that list structure names _that include an element type description_ could potentially become excessively long.
 
+#### Supported annotations
+```
+@retain
+@length
+@max_length
+```
+
 ### Arrays
 The IDL type representation for this type is ``typeName[N] variableName``, where ``N`` is an integer constant expression.
 
@@ -265,18 +362,18 @@ The IDL type representation for this type is ``typeName[N] variableName``, where
 int32[10] variable | int32_t variable[10];
 int32[10][6] variable | int32_t variable[10][6];
 
-The return type for arrays is different between the eRPC definition and output definition. Because this type cannot be returned, each "[]" is replaced with "*", for example:
-* erpc:
+#### IDL definition
 ```C
 functionName(int [8][10] a) -> int [8][4]
 ```
 
-* output:
+#### C definition
 ```C
-int *** functionName(int (*a)[8][10]);
+int * (functionName(const int32_t (*a)[8][10]))[8][4];
 ```
 
 One “*” character is added because arrays and structures are sent as _pointers to the parameter_. This is shown in the routing section below. If a type alias is used, then the return value is a pointer to the typedef name.
+
 * erpc:
 ```C
 type INTTYPE = int[8][10]
@@ -287,13 +384,18 @@ functionName(INTTYPE a) -> INTTYPE;
 INTTYPE* functionName(INTTYPE *a);
 ```
 
+#### Supported annotations
+```
+@retain
+```
+
 ### Constants
 The IDL supports declarations of constants. These constants are replicated in the generated output. Constants are defined with the ``const`` keyword. They look just like constant global variables in C, and include a type and name (in that order).
 
 String constant prototype: ``const string kVersion = stringValue``
 
 ## Generating functions based on parameter direction and return value
-Supported keywords for parameter directions are: ``in``, ``out``, and ``inout``. These keywords are used to specify the parameter direction type. The direction keywords are placed before the parameter type. If the direction for a parameter is not specified, then it is the “in” direction.
+Supported keywords for parameter directions are: ``in``, ``out``, and ``inout``. These keywords are used to specify the parameter direction type. The direction keywords are placed before the parameter type. If the direction for a parameter is not specified, then it is the ``in`` direction.
 
 For example: ``void function(out int32 param)``
 
@@ -305,18 +407,19 @@ How memory allocations are provided depends on the type of application:
 * **On client-side applications:** all memory allocations have to be provided by user code.
 * **On server-side applications:** all memory allocations are provided by server shim code. The user cannot change the memory allocation provided by the shim code.
 
-The next table shows how data types are translated from IDL to C as function parameters. A shaded blank field indicates options that are not supported.
+The next table shows how data types are translated from IDL to C as function parameters. 
 
 Data type | in | out | inout | Returns |
 ---|---|---|---|---
 **Built-in types** | int32 param | int32 *param | int32 *param | int32
-**string** | char *param | _Not supported_ | char *param | _Not supported_
+**string** | char *param | _char *param_ | char *param | _Not supported_
 **enum** | B param | B *param | B *param | B
 **struct** | const A *param | A *param | A *param | _Not supported_
-**list** | const list_0 *param | _Not supported_ | list_0 *param | _Not supported_
+**list** | const list_0 *param | _const list_0 *param_ | list_0 *param | _Not supported_
 **array** | const int32 (*param)[5] | int32 (*param)[5] | int32 (*param)[5] | _Not supported_
 
 If a type definition is used, then all pointers are generated as shown in the two previous tables. Instead of these types, the type definition name is used.
+Sometimes variable need have set annotation to work for some cases. For example ``out string`` need set ``@max_length`` annotation to inform server how big memory space need allocate for string. This size should client allocate on client side and it will be filled by shim code.
 
 ### Allocating and freeing space policy
 * **On the client side:** All memory space has to be allocated and provided by user code. Shim code will only read from or write into this memory space.
