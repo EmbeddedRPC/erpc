@@ -65,6 +65,10 @@ Supported transports:
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 
+## Releases
+
+[eRPC releases](https://github.com/EmbeddedRPC/erpc/releases)
+
 ## Documentation
 
 [Documentation](docs/README.md) is in the `docs/` folder.
