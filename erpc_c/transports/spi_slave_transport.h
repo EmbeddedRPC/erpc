@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 
-#include "framed_transport.h"
-#include "fsl_gpio.h"
-#include "fsl_spi.h"
 #include <stdlib.h>
+#include "framed_transport.h"
+#include "fsl_spi.h"
+#include "fsl_gpio.h"
 
 /*!
  * @addtogroup spi_slave_transport
@@ -45,7 +45,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Very basic transport to send/receive messages via SPI.
  *
@@ -68,7 +69,6 @@ protected:
     SPI_Type *m_spiBaseAddr; /*!< Base address of SPI peripheral used in this transport layer */
     uint32_t m_baudRate;     /*!< Baud rate of SPI peripheral used in this transport layer */
     uint32_t m_srcClock_Hz;  /*!< Source clock of SPI peripheral used in this transport layer */
-    bool m_isInited;         /*!< the SPI peripheral init status flag */
 
 private:
     /*!

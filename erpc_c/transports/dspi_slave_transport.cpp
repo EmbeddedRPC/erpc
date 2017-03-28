@@ -27,12 +27,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dspi_slave_transport.h"
-#include "board.h"
-#include "fsl_dspi.h"
-#include "fsl_gpio.h"
 #include <cassert>
 #include <cstdio>
+#include "dspi_slave_transport.h"
+#include "fsl_dspi.h"
+#include "fsl_gpio.h"
+#include "board.h"
 
 using namespace erpc;
 
@@ -57,16 +57,11 @@ DspiSlaveTransport::DspiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate,
 : m_spiBaseAddr(spiBaseAddr)
 , m_baudRate(baudRate)
 , m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
 {
 }
 
 DspiSlaveTransport::~DspiSlaveTransport()
 {
-    if (m_isInited)
-    {
-      GPIO_ClearPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
-    }
     DSPI_Deinit(m_spiBaseAddr);
 }
 
@@ -85,7 +80,6 @@ erpc_status_t DspiSlaveTransport::init()
 
     GPIO_PinInit(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN, &gpioConfig);
 
-    m_isInited = true;
     return kErpcStatus_Success;
 }
 

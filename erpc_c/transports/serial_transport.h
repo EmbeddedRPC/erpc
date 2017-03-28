@@ -44,7 +44,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Serial transport layer for host PC
  *

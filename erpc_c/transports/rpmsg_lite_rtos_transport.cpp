@@ -75,7 +75,7 @@ erpc_status_t RPMsgRTOSTransport::init(
 }
 
 erpc_status_t RPMsgRTOSTransport::init(
-    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
+    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void), bool send_nameservice)
 {
     if (!s_initialized)
     {
@@ -97,18 +97,25 @@ erpc_status_t RPMsgRTOSTransport::init(
     m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
     m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
 
+    if(send_nameservice)
+    {
+        rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept,
+                                        "rpmsg-openamp-demo-channel",
+                                         0);
+    }
+
     m_dst_addr = dst_addr;
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 {
     int ret_val = rpmsg_queue_recv(s_rpmsg, m_rpmsg_queue, &m_dst_addr, (char *)message->get(), kRpmsgMessageBufferSize,
                                    NULL, RL_BLOCK);
     return ret_val != RL_SUCCESS ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
-erpc_erpc_status_t RPMsgRTOSTransport::send(const MessageBuffer *message)
+erpc_status_t RPMsgRTOSTransport::send(const MessageBuffer *message)
 {
     int ret_val =
         rpmsg_lite_send(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed(), RL_BLOCK);

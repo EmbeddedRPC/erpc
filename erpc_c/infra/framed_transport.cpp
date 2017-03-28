@@ -27,10 +27,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "framed_transport.h"
-#include "message_buffer.h"
 #include <cassert>
 #include <cstdio>
+#include "framed_transport.h"
+#include "message_buffer.h"
 
 using namespace erpc;
 

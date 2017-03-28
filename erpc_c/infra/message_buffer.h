@@ -30,10 +30,6 @@
 #ifndef _EMBEDDED_RPC__MESSAGE_BUFFER_H_
 #define _EMBEDDED_RPC__MESSAGE_BUFFER_H_
 
-#include "erpc_common.h"
-#include <cstddef>
-#include <stdint.h>
-
 /*!
  * @addtogroup infra_codec
  * @{
@@ -41,10 +37,19 @@
  */
 
 ////////////////////////////////////////////////////////////////////////////////
+// Definitions
+////////////////////////////////////////////////////////////////////////////////
+
+#include "erpc_common.h"
+#include <stdint.h>
+#include <cstddef>
+
+////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Represents a memory buffer containing a message.
  *
@@ -104,35 +109,30 @@ public:
      * @return Pointer to buffer to read/write.
      */
     uint8_t *get() { return m_buf; }
-
     /*!
      * @brief This function returns pointer to buffer to read/write.
      *
      * @return Pointer to buffer to read/write.
      */
     const uint8_t *get() const { return m_buf; }
-
     /*!
      * @brief This function returns length of buffer.
      *
      * @return Length of buffer.
      */
     uint16_t getLength() const { return m_len; }
-
     /*!
      * @brief This function returns length of used space of buffer.
      *
      * @return Length of used space of buffer.
      */
     uint16_t getUsed() const { return m_used; }
-
     /*!
      * @brief This function returns length of free space of buffer.
      *
      * @return Length of free space of buffer.
      */
     uint16_t getFree() const { return m_len - m_used; }
-
     /*!
      * @brief This function sets length of used space of buffer.
      *
@@ -148,7 +148,6 @@ public:
     operator const uint8_t *() const { return m_buf; }
     uint8_t &operator[](int index) { return m_buf[index]; }
     const uint8_t &operator[](int index) const { return m_buf[index]; }
-
     /*!
      * @brief Cursor within a MessageBuffer.
      */
@@ -166,7 +165,6 @@ public:
         , m_remaining(0)
         {
         }
-
         /*!
          * @brief Constructor.
          *
@@ -196,7 +194,6 @@ public:
          * @return Return position in buffer.
          */
         uint8_t *get() { return m_pos; }
-
         /*!
          * @brief Return position in buffer.
          *
@@ -205,14 +202,12 @@ public:
          * @return Return position in buffer.
          */
         const uint8_t *get() const { return m_pos; }
-
         /*!
          * @brief Return remaining free space in current buffer.
          *
          * @return Remaining free space in current buffer.
          */
         uint16_t getRemaining() const { return m_remaining; }
-
         /*!
          * @brief Read data from current buffer.
          *
@@ -239,7 +234,6 @@ public:
         operator const uint8_t *() const { return m_pos; }
         uint8_t &operator[](int index) { return m_pos[index]; }
         const uint8_t &operator[](int index) const { return m_pos[index]; }
-
         Cursor &operator+=(uint16_t n)
         {
             m_pos += n;
@@ -292,12 +286,10 @@ public:
      * This function initializes object attributes.
      */
     MessageBufferFactory() {}
-
     /*!
      * @brief ClientManager destructor
      */
     virtual ~MessageBufferFactory() {}
-
     /*!
      * @brief This function creates new message buffer.
      *

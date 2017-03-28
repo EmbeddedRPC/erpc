@@ -29,15 +29,15 @@
 #include "tcp_transport.h"
 #include <cassert>
 #include <cstdio>
-#include <err.h>
-#include <errno.h>
-#include <netdb.h>
-#include <new>
-#include <signal.h>
 #include <string>
+#include <unistd.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <netdb.h>
+#include <errno.h>
+#include <err.h>
+#include <new>
 
 #if !(__embedded_cplusplus)
 using namespace std;
@@ -239,7 +239,7 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
         }
     }
 
-    return kErpcStatus_Success;
+    return length < 0 ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)

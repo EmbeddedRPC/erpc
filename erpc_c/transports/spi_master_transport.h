@@ -30,10 +30,10 @@
 #ifndef _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 
+#include <stdlib.h>
+#include <stdbool.h>
 #include "framed_transport.h"
 #include "fsl_spi.h"
-#include <stdbool.h>
-#include <stdlib.h>
 
 /*!
  * @addtogroup spi_master_transport
@@ -45,7 +45,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Very basic transport to send/receive messages via SPI.
  *

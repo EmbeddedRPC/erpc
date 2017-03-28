@@ -27,10 +27,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "uart_cmsis_transport.h"
-#include "board.h"
 #include <cassert>
 #include <cstdio>
+#include "uart_cmsis_transport.h"
+#include "board.h"
 
 using namespace erpc;
 

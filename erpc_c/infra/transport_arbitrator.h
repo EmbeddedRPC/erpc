@@ -29,10 +29,10 @@
 #if !defined(__embedded_rpc__transport_arbitrator__)
 #define __embedded_rpc__transport_arbitrator__
 
-#include "erpc_threading.h"
-#include "client_manager.h"
-#include "codec.h"
 #include "transport.h"
+#include "codec.h"
+#include "client_manager.h"
+#include "erpc_threading.h"
 
 /*!
  * @addtogroup infra_transport
@@ -44,7 +44,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 class Codec;
 
 /*!
@@ -68,7 +69,6 @@ public:
 
     void setSharedTransport(Transport *shared) { m_sharedTransport = shared; }
     void setCodec(Codec *codec) { m_codec = codec; }
-
     //! @brief Receive method for the server.
     virtual erpc_status_t receive(MessageBuffer *message);
 

@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__TRANSPORT_H_
 #define _EMBEDDED_RPC__TRANSPORT_H_
 
-#include "erpc_common.h"
-#include <cstring>
 #include <stdint.h>
+#include <cstring>
+#include "erpc_common.h"
 
 /*!
  * @addtogroup infra_transport
@@ -44,7 +44,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 class MessageBuffer;
 
 /*!
@@ -59,12 +60,10 @@ public:
      * @brief Constructor.
      */
     Transport() {}
-
     /*!
      * @brief Transport destructor
      */
     virtual ~Transport() {}
-
     /*!
      * @brief Prototype for receiving message.
      *

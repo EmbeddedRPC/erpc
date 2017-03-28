@@ -29,8 +29,8 @@
 #ifndef _EMBEDDED_RPC__TCP_TRANSPORT_H_
 #define _EMBEDDED_RPC__TCP_TRANSPORT_H_
 
-#include "erpc_threading.h"
 #include "framed_transport.h"
+#include "erpc_threading.h"
 
 /*!
  * @addtogroup tcp_transport
@@ -42,7 +42,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Client side of TCP/IP transport.
  *

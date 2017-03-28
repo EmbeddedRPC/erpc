@@ -30,10 +30,11 @@
 #ifndef _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 
-#include "message_buffer.h"
-#include "rpmsg_lite.h"
-#include "static_queue.h"
 #include "transport.h"
+#include "message_buffer.h"
+#include "static_queue.h"
+#include "rpmsg_lite.h"
+#include "rpmsg_ns.h"
 
 /*!
  * @addtogroup rpmsg_lite_transport
@@ -54,7 +55,8 @@ enum
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Transport that uses RPMsg for interprocessor messaging.
  *
@@ -104,12 +106,13 @@ public:
      * @param[in] base_address RPMsg base address in the shared memory.
      * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
      * @param[in] ready_cb Callback called after RPMsg init is done and the core is ready.
+     * @param[in] send_nameservice If true, RPMsg master notified by nameservice.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
     virtual erpc_status_t init(
-        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void), bool send_nameservice);
 
     /*!
      * @brief Set message to first received message.
@@ -120,7 +123,7 @@ public:
      *
      * @return kErpcStatus_Success
      */
-    virtual erpc_erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message);
 
     /*!
      * @brief Function to send prepared message.
@@ -130,7 +133,7 @@ public:
      * @retval kErpcStatus_SendFailed Failed to send message buffer.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_erpc_status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(const MessageBuffer *message);
 
     /*!
      * @brief Function to check if is message in receive queue and wait for processing.
@@ -140,7 +143,6 @@ public:
      * @return True if exist received message, else false.
      */
     virtual bool hasMessage() { return m_messageQueue.size(); }
-
 protected:
     /*!
      * @brief RPMSG callback for receiving data.
@@ -184,12 +186,10 @@ public:
      * @brief Constructor.
      */
     RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief CodecFactory destructor
      */
     virtual ~RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief This function creates new message buffer.
      *
@@ -210,7 +210,6 @@ public:
      * @param[in] transport Transport to set.
      */
     void setTransport(RPMsgTransport *transport) { m_transport = transport; }
-
 protected:
     RPMsgTransport *m_transport; /*!< Transport layer used for sending and receiving data. */
 };

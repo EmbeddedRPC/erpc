@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__RPMSG_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_TRANSPORT_H_
 
+#include "transport.h"
 #include "message_buffer.h"
 #include "static_queue.h"
-#include "transport.h"
 
 extern "C" {
 #include "rpmsg.h"
@@ -58,7 +58,8 @@ enum
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Transport that uses RPMsg for interprocessor messaging.
  *
@@ -122,7 +123,6 @@ public:
      * @return True if exist received message, else false.
      */
     virtual bool hasMessage() { return messageQueue.size(); }
-
 protected:
     static StaticQueue<MessageBuffer *>
         messageQueue; /*!< Received messages. Queue of messages with buffers filled in rpmsg callback. */
@@ -180,12 +180,10 @@ public:
      * @brief Constructor.
      */
     RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief CodecFactory destructor
      */
     virtual ~RPMsgMessageBufferFactory() {}
-
     /*!
      * @brief This function creates new message buffer.
      *

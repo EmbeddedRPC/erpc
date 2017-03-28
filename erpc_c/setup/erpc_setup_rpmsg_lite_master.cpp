@@ -27,9 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "erpc_transport_setup.h"
 #include "manually_constructed.h"
 #include "rpmsg_lite_transport.h"
+#include "erpc_transport_setup.h"
 
 using namespace erpc;
 

@@ -35,38 +35,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
-/* clang-format off */
 
 // Determine if this is a POSIX system.
 #if !defined(ERPC_HAS_POSIX)
-    // Detect Linux, BSD, Cygwin, and Mac OS X.
-    #if defined(__linux__) || defined(__GNU__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
-        defined(__OpenBSD__) || defined(__DragonFly__) || defined(__CYGWIN__) || defined(__MACH__)
-        #define ERPC_HAS_POSIX (1)
-    #else
-        #define ERPC_HAS_POSIX (0)
-    #endif
+// Detect Linux, BSD, Cygwin, and Mac OS X.
+#if defined(__linux__) || defined(__GNU__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
+    defined(__DragonFly__) || defined(__CYGWIN__) || defined(__MACH__)
+#define ERPC_HAS_POSIX (1)
+#else
+#define ERPC_HAS_POSIX (0)
+#endif
 #endif
 
 // Safely detect FreeRTOSConfig.h.
 #if defined(__has_include)
-    #if __has_include("FreeRTOSConfig.h")
-        #define ERPC_HAS_FREERTOSCONFIG_H (1)
-    #endif
+#if __has_include("FreeRTOSConfig.h")
+#define ERPC_HAS_FREERTOSCONFIG_H (1)
+#endif
 #endif
 
 // Detect threading model if not already set.
 #if !defined(ERPC_THREADS)
-    #if ERPC_HAS_POSIX
-        // Default to pthreads for POSIX systems.
-        #define ERPC_THREADS (ERPC_THREADS_PTHREADS)
-    #elif ERPC_HAS_FREERTOSCONFIG_H
-        // Use FreeRTOS if we can auto detect it.
-        #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
-    #else
-        // Otherwise default to no threads.
-        #define ERPC_THREADS (ERPC_THREADS_NONE)
-    #endif
+#if ERPC_HAS_POSIX
+// Default to pthreads for POSIX systems.
+#define ERPC_THREADS (ERPC_THREADS_PTHREADS)
+#elif ERPC_HAS_FREERTOSCONFIG_H
+// Use FreeRTOS if we can auto detect it.
+#define ERPC_THREADS (ERPC_THREADS_FREERTOS)
+#else
+// Otherwise default to no threads.
+#define ERPC_THREADS (ERPC_THREADS_NONE)
+#endif
 #endif
 
 // Handy macro to test threading model. You can also ERPC_THREADS directly to test for threading
@@ -75,11 +74,10 @@
 
 // Set default buffer size.
 #if !defined(ERPC_DEFAULT_BUFFER_SIZE)
-    //! @brief Size of buffers allocated by BasicMessageBufferFactory in setup functions.
-    #define ERPC_DEFAULT_BUFFER_SIZE (256)
+//! @brief Size of buffers allocated by BasicMessageBufferFactory in setup functions.
+#define ERPC_DEFAULT_BUFFER_SIZE (256)
 #endif
 
-/* clang-format on */
 #endif // _ERPC_DETECT_H_
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

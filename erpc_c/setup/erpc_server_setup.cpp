@@ -28,18 +28,42 @@
  */
 
 #include "erpc_server_setup.h"
-#include "erpc_setup.h"
-#include "basic_codec.h"
-#include "manually_constructed.h"
 #include "simple_server.h"
-#include <assert.h>
+#include "manually_constructed.h"
+#include "basic_codec.h"
+#include "message_buffer.h"
+#include "erpc_config_internal.h"
 #include <new>
+#include <assert.h>
 
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
 using namespace erpc;
+
+////////////////////////////////////////////////////////////////////////////////
+// Classes
+////////////////////////////////////////////////////////////////////////////////
+
+class BasicMessageBufferFactory : public MessageBufferFactory
+{
+public:
+    virtual MessageBuffer create()
+    {
+        uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
+        return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
+    }
+
+    virtual void dispose(MessageBuffer *buf)
+    {
+        assert(buf);
+        if (*buf)
+        {
+            delete[] buf->get();
+        }
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables

@@ -40,16 +40,29 @@ using namespace std;
 
 RequestContext ClientManager::createRequest(bool isOneway)
 {
-    // Create codec to read and write the request.
-    Codec *codec = createBufferAndCodec();
+    // Create codec to write the request.
+    Codec *outCodec = createBufferAndCodec();
 
-    return RequestContext(++m_sequence, codec, isOneway);
+    // Create codec to read the request.
+    Codec *inCodec = NULL;
+    if (!isOneway && outCodec)
+    {
+        inCodec = createBufferAndCodec();
+        if (!inCodec)
+        {
+            m_messageFactory->dispose(outCodec->getBuffer());
+            m_codecFactory->dispose(outCodec);
+            outCodec = NULL;
+        }
+    }
+
+    return RequestContext(++m_sequence, inCodec, outCodec, isOneway);
 }
 
 erpc_status_t ClientManager::performRequest(RequestContext &request)
 {
     // Send invocation request to server.
-    erpc_status_t err = m_transport->send(request.getCodec()->getBuffer());
+    erpc_status_t err = m_transport->send(request.getOutCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -58,12 +71,8 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
     // If the request is oneway, then there is nothing more to do.
     if (!request.isOneway())
     {
-        // reset codec for receiving data
-        request.getCodec()->getBuffer()->setUsed(0);
-        request.getCodec()->reset();
-
         // Receive reply.
-        err = m_transport->receive(request.getCodec()->getBuffer());
+        err = m_transport->receive(request.getInCodec()->getBuffer());
         if (err)
         {
             return err;
@@ -84,14 +93,14 @@ erpc_status_t ClientManager::verifyReply(RequestContext &request)
 {
     // Some transport layers change the request's message buffer pointer (for things like zero
     // copy support), so inCodec must be reset to work with correct buffer.
-    request.getCodec()->reset();
+    request.getInCodec()->reset();
 
     // Extract the reply header.
     message_type_t msgType;
     uint32_t service;
     uint32_t requestNumber;
     uint32_t sequence;
-    erpc_status_t err = request.getCodec()->startReadMessage(&msgType, &service, &requestNumber, &sequence);
+    erpc_status_t err = request.getInCodec()->startReadMessage(&msgType, &service, &requestNumber, &sequence);
     if (err)
     {
         return err;
@@ -129,6 +138,12 @@ Codec *ClientManager::createBufferAndCodec()
 
 void ClientManager::releaseRequest(RequestContext &request)
 {
-    m_messageFactory->dispose(request.getCodec()->getBuffer());
-    m_codecFactory->dispose(request.getCodec());
+    m_messageFactory->dispose(request.getOutCodec()->getBuffer());
+    m_codecFactory->dispose(request.getOutCodec());
+
+    if (!request.isOneway())
+    {
+        m_messageFactory->dispose(request.getInCodec()->getBuffer());
+        m_codecFactory->dispose(request.getInCodec());
+    }
 }

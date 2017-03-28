@@ -30,9 +30,9 @@
 #ifndef _EMBEDDED_RPC__DSPI_SLAVE_TRANSPORT_H_
 #define _EMBEDDED_RPC__DSPI_SLAVE_TRANSPORT_H_
 
+#include <stdlib.h>
 #include "framed_transport.h"
 #include "fsl_dspi.h"
-#include <stdlib.h>
 
 /*!
  * @addtogroup dspi_slave_transport
@@ -44,7 +44,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpc {
+namespace erpc
+{
 /*!
  * @brief Very basic transport to send/receive messages via DSPI.
  *
@@ -67,7 +68,6 @@ protected:
     SPI_Type *m_spiBaseAddr; /*!< Base address of DSPI peripheral used in this transport layer */
     uint32_t m_baudRate;     /*!< Baud rate of DSPI peripheral used in this transport layer */
     uint32_t m_srcClock_Hz;  /*!< Source clock of DSPI peripheral used in this transport layer */
-    bool m_isInited;         /*!< the SPI peripheral init status flag */
 
 private:
     /*!
