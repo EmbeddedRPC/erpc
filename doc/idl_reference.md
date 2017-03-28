@@ -209,8 +209,8 @@ As default the binary type generates a C-type equivalent to ``list<uint8>``. Dif
 ```C
 typedef struct binary_t binary_t;
 struct binary_t {
-    int8_t data;
-    uint32_t *dataLength;
+    int8_t *data;
+    uint32_t dataLength;
 };
 ```
 
