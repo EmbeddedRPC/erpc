@@ -71,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](docs/README.md) is in the `docs/` folder.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 1e80561f942ac78be5dda7fe16139cbc32d8f9c6.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
