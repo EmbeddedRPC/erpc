@@ -16,6 +16,10 @@ idl: |
   struct A {
     {type} x
   }
+
+  interface B {
+    testF(inout A b) ->void
+  }
 test.h:
   - typedef struct A A;
   - struct A

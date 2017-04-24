@@ -47,14 +47,6 @@ TEST(test_enum, test_enumColor_in_out)
     EXPECT_TRUE(enumColorA == c);
 }
 
-TEST(test_enum, test_enumColor_in2_outbyref)
-{
-    enumColor d;
-    test_enumColor_in2(enumColorB);
-    test_enumColor_outbyref(&d);
-    EXPECT_TRUE(enumColorB == d);
-}
-
 TEST(test_enum, test_enumColor_inout)
 {
     enumColor e = enumColorA;
@@ -72,13 +64,11 @@ TEST(test_enum, test_enumColor_return)
 TEST(test_enum, test_enumColor_allDirection)
 {
     enumColor c;
-    enumColor d;
     enumColor e = enumColorA;
 
-    enumColor r = test_enumColor_allDirection(enumColorA, enumColorB, &c, &d, &e);
+    enumColor r = test_enumColor_allDirection(enumColorA, enumColorB, &c, &e);
 
     EXPECT_TRUE(enumColorA == c);
-    EXPECT_TRUE(enumColorB == d);
     EXPECT_TRUE(enumColorB == e);
     EXPECT_TRUE(enumColorA == r);
 }
@@ -88,20 +78,11 @@ TEST(test_enum, test_enumColor2_allDirection)
     enumColor2 a = pink;
     enumColor2 b = yellow;
     enumColor2 c;
-    enumColor2 d;
     enumColor2 e = a;
 
-    enumColor2 r = test_enumColor2_allDirection(a, b, &c, &d, &e);
+    enumColor2 r = test_enumColor2_allDirection(a, b, &c, &e);
 
     EXPECT_TRUE(a == c);
-    EXPECT_TRUE(b == d);
     EXPECT_TRUE(b == e);
     EXPECT_TRUE(a == r);
-}
-
-TEST(test_enum, getAnonymousEnum)
-{
-    AnonymousEnum a = aRed;
-    AnonymousEnum r = getAnonymousEnum(a);
-    EXPECT_TRUE(aOrange == r);
 }

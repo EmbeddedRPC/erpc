@@ -30,7 +30,7 @@ endif
 
 CXXFLAGS += -std=gnu++11 -D LINUX -Wunused-variable -Wno-deprecated-register -Wno-narrowing -Werror $(MARCH)
 CFLAGS   += -std=gnu11 -D LINUX -D _GNU_SOURCE -Werror $(MARCH)
-YYFLAGS  += -Wno-other
+YYFLAGS  += -Wno-other # --debug --verbose
 LLFLAGS  +=
 LDFLAGS += $(MARCH)
 

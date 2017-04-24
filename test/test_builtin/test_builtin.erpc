@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -40,10 +40,9 @@ interface BuiltinServices
     oneway test_int32_in(int32 a)
     test_int32_in2(in int32 b) -> void
     test_int32_out(out int32 c) -> void
-    test_int32_outbyref(out byref int32 d) -> void
     test_int32_inout(inout int32 e) -> void
     test_int32_return() -> int32
-    test_int32_allDirection(int32 a, in int32 b, out int32 c, out byref int32 d, inout int32 e) -> int32
+    test_int32_allDirection(int32 a, in int32 b, out int32 c, inout int32 e) -> int32
 
     test_float_inout(in float a, out float b) -> void
 
@@ -52,11 +51,10 @@ interface BuiltinServices
     oneway test_string_in(string a)
     test_string_in2(in string b) -> void
     test_string_out(out string c @max_length(6)) -> void
-    test_string_outbyref(out byref string d) -> void
     test_string_inout(inout string e @max_length(13)) -> void
     test_string_return() -> string
-    test_string_allDirection(string a, in string b, out string c @max_length(6), out byref string d, inout string e @max_length(13)) -> string
-    test_string_empty(string a, in string b, out string c @max_length(6), out byref string d, inout string e @max_length(0)) -> string
+    test_string_allDirection(string a, in string b, out string c @max_length(6), inout string e @max_length(13)) -> string
+    test_string_empty(string a, in string b, out string c @max_length(6), inout string e @max_length(0)) -> string
     sendHello(string str) -> int32
     sendTwoStrings(string myStr1, string myStr2) -> int32
     returnHello() -> string

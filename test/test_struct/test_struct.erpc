@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -163,7 +163,4 @@ interface ArithmeticService2 {
     createStudent(string name, float[3] test_scores, school_year_t year, int32 age) -> student
 
     test_struct_allDirection(AllTypes a, in AllTypes b, inout AllTypes e) -> void
-    //test_struct_allDirection(AllTypes a, in AllTypes b, out AllTypes c, out byref AllTypes d, inout AllTypes e) -> void
-
-//    getAnonymousStruct(AnonymousStruct a) -> AnonymousStruct
 }

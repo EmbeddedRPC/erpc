@@ -57,6 +57,10 @@ extern "C" {
 }
 #endif
 
+#ifdef UNITY_DUMP_RESULTS
+#include "corn_g_test.h"
+#endif
+
 using namespace erpc;
 
 SemaphoreHandle_t g_waitQuitMutex;
@@ -205,6 +209,9 @@ int main(int argc, char **argv)
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     delete listeners.Release(listeners.default_result_printer());
     listeners.Append(new MinimalistPrinter);
+#ifdef UNITY_DUMP_RESULTS
+    listeners.Append(new CornTestingFrameworkPrint());
+#endif
 
 #ifdef CORE1_IMAGE_COPY_TO_RAM
     // Calculate size of the image

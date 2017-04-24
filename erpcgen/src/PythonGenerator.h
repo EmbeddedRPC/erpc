@@ -127,6 +127,11 @@ protected:
     void generateInterfaceFile(std::string fileName);
 
     /*!
+     * @brief This function generate output crc16 source file.
+     */
+    virtual void generateCrcFile();
+
+    /*!
      * @brief This function return interface function template data.
      *
      * This function return interface function template data with all data, which
@@ -284,8 +289,6 @@ protected:
      * @param[in] c Checked character.
      */
     bool checkWhitspaceChar(char c);
-
-    virtual void generateCrcFile();
 };
 
 } // namespace erpcgen

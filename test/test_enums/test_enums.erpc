@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -36,9 +36,6 @@ import "../common/unit_test_common.erpc"
 
 enum enumColor{red = 1, green = 10, blue}
 enum enumColor2{yellow, black, pink = 20}
-
-type AnonymousEnum = enum {aRed = 2, aGray = 8, aOrange = 9}
-
 enum {eRed = 2, eGray = 8, eOrange = 9}
 
 enum bleResult_t {
@@ -50,12 +47,9 @@ interface EnumsService {
     oneway test_enumColor_in(enumColor a)
     test_enumColor_in2(in enumColor b) -> void
     test_enumColor_out(out enumColor c) -> void
-    test_enumColor_outbyref(out byref enumColor d) -> void
     test_enumColor_inout(inout enumColor e) -> void
     test_enumColor_return() -> enumColor
-    test_enumColor_allDirection(enumColor a, in enumColor b, out enumColor c, out byref enumColor d, inout enumColor e) -> enumColor
-    test_enumColor2_allDirection(enumColor2 a, in enumColor2 b, out enumColor2 c, out byref enumColor2 d, inout enumColor2 e) -> enumColor2
-
-    getAnonymousEnum(AnonymousEnum a) -> AnonymousEnum
+    test_enumColor_allDirection(enumColor a, in enumColor b, out enumColor c, inout enumColor e) -> enumColor
+    test_enumColor2_allDirection(enumColor2 a, in enumColor2 b, out enumColor2 c, inout enumColor2 e) -> enumColor2
 }
 

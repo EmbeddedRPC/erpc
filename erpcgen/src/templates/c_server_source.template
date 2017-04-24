@@ -22,13 +22,12 @@ extern "C"
 
 {$checkCrc()}
 
-#pragma weak erpc_generated_crc
-extern const uint32_t erpc_generated_crc = {$crc16};
-
 using namespace erpc;
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
+
+{$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {$> callbackTable(functions)}
 {$> constantsDefinitions(consts)}
@@ -83,13 +82,15 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {% endif %}
 {%   for param in fn.parameters %}
     {$param.variable}{% if param.isNullParam && errVar != "" %} = NULL{%endif%};
-{%    if param.isNullable %}
-{%     if param.allocateToClientAndServer || param.allocateToClient %}
+{%    if !param.shared %}
+{%     if param.isNullable && !param.shared %}
+{%      if param.allocateToClientAndServer || param.allocateToClient %}
 {$> addIndent("    ", param.mallocServer)}
-{%     endif -- allocate %}
-{%    else -- notNullable %}
+{%      endif -- allocate %}
+{%     else -- notNullable %}
 {$> addIndent("    ", param.mallocServer)}
-{%    endif -- isNullable %}
+{%     endif -- isNullable %}
+{%    endif -- shared %}
 {%   endfor -- param %}
 {%   if fn.needNullVariableOnServer %}
     bool isNull;
@@ -106,7 +107,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 
 {%    for param in fn.parametersToServer if not param.serializedViaMember %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, "TRUE"))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
 {$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}

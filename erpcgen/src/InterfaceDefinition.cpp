@@ -118,9 +118,9 @@ bool InterfaceDefinition::hasProgramSymbol()
     return 1 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size();
 }
 
-Program *InterfaceDefinition::programSymbol()
+Program *InterfaceDefinition::getProgramSymbol()
 {
-    if (0 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
+    if (1 != m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
     {
         return nullptr;
     }
@@ -137,7 +137,7 @@ void InterfaceDefinition::setOutputDirectory(const std::string &outputDir)
 
     if (hasProgramSymbol())
     {
-        Annotation *an = programSymbol()->findAnnotation(OUTPUT_DIR_ANNOTATION);
+        Annotation *an = getProgramSymbol()->findAnnotation(OUTPUT_DIR_ANNOTATION);
         if (an)
         {
             m_outputDirectory /= an->getValueObject()->toString();
@@ -149,7 +149,7 @@ void InterfaceDefinition::setOutputFilename(const std::string &filename)
 {
     if (hasProgramSymbol())
     {
-        m_outputFilename = programSymbol()->getName();
+        m_outputFilename = getProgramSymbol()->getName();
     }
     else
     {
@@ -161,11 +161,11 @@ void InterfaceDefinition::setErrorHandlingChecksType()
 {
     if (hasProgramSymbol())
     {
-        if (programSymbol()->findAnnotation(NO_ALLOC_ERRORS_ANNOTATION))
+        if (getProgramSymbol()->findAnnotation(NO_ALLOC_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 1);
         }
-        if (programSymbol()->findAnnotation(NO_INFRA_ERRORS_ANNOTATION))
+        if (getProgramSymbol()->findAnnotation(NO_INFRA_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 2);
         }

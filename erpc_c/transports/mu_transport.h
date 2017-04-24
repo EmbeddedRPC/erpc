@@ -39,7 +39,7 @@
 #include "transport.h"
 
 /*!
- * @addtogroup rpmsg_lite_transport
+ * @addtogroup mu_transport
  * @{
  * @file
  */

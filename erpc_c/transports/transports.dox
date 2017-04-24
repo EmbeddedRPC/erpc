@@ -61,3 +61,9 @@
 @ingroup transports
 @brief Simple TCP/IP transport.
 */
+
+/*!
+@defgroup mu_transport Messaging Unit
+@ingroup transports
+@brief Messaging Unit transport.
+*/

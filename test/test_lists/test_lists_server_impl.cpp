@@ -266,29 +266,6 @@ void test_list_allDirection(const list_8_t *a, const list_8_t *b, list_8_t *e)
     }
 }
 
-/*void test_list_allDirection(const list_0_t *a, const list_0_t *b, list_0_t *c, list_0_t **d, list_0_t *e)
-{
-    (*d)->elements = (int32_t *)erpc_malloc((a)->elementsCount * sizeof(int32_t));
-    c->elements = (int32_t *)erpc_malloc((a)->elementsCount * sizeof(int32_t));
-    (*d)->elementsCount = (c)->elementsCount = (a)->elementsCount;
-    int32_t *s_list_c = (c)->elements;
-    int32_t *s_list_d = (*d)->elements;
-    int32_t *s_list_e = (e)->elements;
-    for (uint32_t i = 0; i < (a)->elementsCount; ++i)
-    {
-        *s_list_c = (int32_t)i * 4;
-        *s_list_d = (int32_t)i * 5;
-        *s_list_e = 2 * (*s_list_e);
-        ++s_list_c;
-        ++s_list_d;
-        ++s_list_e;
-    }
-    free((void *)a->elements);
-    free((void *)b->elements);
-    free((void *)a);
-    free((void *)b);
-}*/
-
 int32_t testLengthAnnotation(int32_t *myList, int32_t len)
 {
     int32_t *itr = myList;

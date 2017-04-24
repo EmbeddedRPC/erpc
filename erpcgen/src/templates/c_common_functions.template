@@ -19,6 +19,13 @@
 #endif
 {% enddef --checkCrc %}
 
+{% def generateCrcVariable() %}
+// for mdk/keil do not forgett add "--muldefweak" for linker
+extern const uint32_t erpc_generated_crc;
+#pragma weak erpc_generated_crc
+extern const uint32_t erpc_generated_crc = {$crc16};
+{% enddef --checkCrc %}
+
 {# ---------------- constantsDefinitions ---------------- #}
 {% def constantsDefinitions(consts) %}
 {% if not empty(consts) %}
@@ -218,7 +225,7 @@ static void free_{$st.name}_struct({$st.name} * data)
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to read  no shared member of shared union {$union.name}
 static int32_t read_{$union.name}_union_shared(erpc::Codec * codec, int32_t * discriminator, {$union.name} * data);
 {%   else %}
@@ -234,7 +241,7 @@ static int32_t read_{$union.name}_union(erpc::Codec * codec, int32_t * discrimin
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to write  no shared member of shared union {$union.name}
 static int32_t write_{$union.name}_union_shared(erpc::Codec * codec, int32_t discriminator, const {$union.name} * data);
 {%   else %}
@@ -250,7 +257,7 @@ static int32_t write_{$union.name}_union(erpc::Codec * codec, int32_t discrimina
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 // Read no shared member of shared union {$union.name} function implementation
 static int32_t read_{$union.name}_union_shared(erpc::Codec * codec, int32_t * discriminator, {$union.name} * data)
 {%   else %}
@@ -280,7 +287,7 @@ static int32_t read_{$union.name}_union(erpc::Codec * codec, int32_t * discrimin
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 // Write no shared member of shared union {$union.name} function implementation
 static int32_t write_{$union.name}_union_shared(erpc::Codec * codec, int32_t discriminator, const {$union.name} * data)
 {%   else %}
@@ -307,7 +314,7 @@ static int32_t write_{$union.name}_union(erpc::Codec * codec, int32_t discrimina
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to free space allocated inside no shared member of shared union {$union.name}
 static void free_{$union.name}_union_shared(int32_t discriminator, {$union.name} * data);
 {%   else %}
@@ -323,7 +330,7 @@ static void free_{$union.name}_union(int32_t discriminator, {$union.name} * data
 {% if unions %}
 {%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
 
-{%   if st.noSharedMem && shared == "noSharedMem" %}
+{%   if union.noSharedMem && shared == "noSharedMem" %}
 // Free space allocated inside no shared member of shared union {$union.name} function implementation
 static void free_{$union.name}_union_shared(int32_t discriminator, {$union.name} * data)
 {%   else %}

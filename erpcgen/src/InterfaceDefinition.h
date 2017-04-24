@@ -128,7 +128,7 @@ public:
      *
      * @return Return name of program.
      */
-    const std::string getProgramName() { return programSymbol()->getName(); }
+    const std::string getProgramName() { return getProgramSymbol()->getName(); }
 
     /*!
      * @brief This function returns output directory path.
@@ -164,7 +164,7 @@ public:
      *
      * @return Pointer to program symbol.
      */
-    Program *programSymbol();
+    Program *getProgramSymbol();
 
     /*!
      * @brief This functions sets type of checks which should be present in generated file.

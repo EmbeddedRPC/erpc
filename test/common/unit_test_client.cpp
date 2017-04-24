@@ -29,24 +29,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "myAlloc.h"
 #include "erpc_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 #include "gtest.h"
 #include "gtestListener.h"
+#include "myAlloc.h"
 #include "test_unit_test_common.h"
 
-#if RPMSG || UART || LPUART
+#if (defined(RPMSG) || defined(UART) || defined(LPUART))
 extern "C" {
 #include "app_core0.h"
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "mcmgr.h"
-#if RPMSG
+#if defined(RPMSG)
 #include "rpmsg_lite.h"
 #endif
 }
+
+#ifdef UNITY_DUMP_RESULTS
+#include "corn_g_test.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -87,7 +91,7 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 
 int MyAlloc::allocated_ = 0;
 
-#if RPMSG
+#if defined(RPMSG)
 extern char rpmsg_lite_base[];
 #endif
 
@@ -102,9 +106,12 @@ int main(int argc, char **argv)
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     listeners.Append(new LeakChecker);
 
-#if RPMSG || UART || LPUART
+#if (defined(RPMSG) || defined(UART) || defined(LPUART))
     delete listeners.Release(listeners.default_result_printer());
     listeners.Append(new MinimalistPrinter);
+#ifdef UNITY_DUMP_RESULTS
+    listeners.Append(new CornTestingFrameworkPrint());
+#endif
 
     /* Initialize GIC */
     BOARD_InitHardware();
@@ -119,12 +126,12 @@ int main(int argc, char **argv)
     memcpy(CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
 #endif
 
-#if RPMSG
+#if defined(RPMSG)
     env_init();
 #endif
 #endif
 
-#if RPMSG
+#if defined(RPMSG)
     // MU_Init(MU0_A);
 
     /* start the second core */
@@ -140,14 +147,14 @@ int main(int argc, char **argv)
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
-#if RPMSG
+#if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
 #else
-#if UART
+#if defined(UART)
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif LPUART
+#elif defined(LPUART)
     transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #endif
@@ -158,7 +165,7 @@ int main(int argc, char **argv)
 
     int i = RUN_ALL_TESTS();
     quit();
-#if RPMSG
+#if defined(RPMSG)
     /* wait a while to allow the erpc server side to finalize shutdown,
        otherwise an IPC interrupt can be triggered on the client side at the
        time the rpmsg is deinitilaized yet => hardfault */

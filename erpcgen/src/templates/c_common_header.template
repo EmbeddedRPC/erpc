@@ -40,13 +40,13 @@
 {% if enum.name != "" %}
 {% endif %}
 {$> enum.mlComment}
-{%   if enum.name %}typedef {% endif --enum.name  %}enum{$addIndent(" ", enum.name)}{$enum.ilComment}
+{%   if enum.name %}typedef {% endif --enum.name  %}enum{$addIndent(" ", enum.name)}
 {
 {%   for enumMember in enum.members %}
 {$> addIndent("    ", enumMember.mlComment)}
     {$enumMember.memberDeclaration}{$enumMember.ilComment}
 {%   endfor -- enumsMembers %}
-}{$addIndent(" ", enum.name)};{$loop.addNewLineIfNotLast}
+}{$addIndent(" ", enum.name)};{$enum.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- enums %}
 {% endif -- enums %}
 {% if not empty(aliases) %}
@@ -73,22 +73,22 @@ typedef {$alias.typenameName};{$alias.ilComment}
 {%   if us.isStruct == true %}
 {%    if !us.isExternal %}
 {$> us.mlComment}
-struct {$us.name}{$us.ilComment}
+struct {$us.name}
 {
 {%     for mem in us.members %}
 {$> addIndent("    ", mem.mlComment)}
     {$mem.memberDeclaration}{$mem.ilComment}
 {$> addIndent("    ", mem.elementsCount)}
 {%     endfor %}
-};{$loop.addNewLineIfNotLast}
+};{$us.ilComment}{$loop.addNewLineIfNotLast}
 {%    endif -- !us.isExternal %}
 {%   else -- us.type == "union" %}
 {%   if !us.isExternal %}
 {$> us.mlComment}
-union {$us.name}{$us.ilComment}
+union {$us.name}
 {
 {$us.membersData}
-};{$loop.addNewLineIfNotLast}
+};{$us.ilComment}{$loop.addNewLineIfNotLast}
 {%   endif -- !us.isExternal %}
 {%   endif -- us.type == "union/struct" %}
 {%  endfor -- structs %}
@@ -123,13 +123,13 @@ extern "C" {
 {% for iface in interfaces if iface.isNonExternalInterface == true %}
 
 {$> iface.mlComment}
-//! @name {$iface.name}{$iface.ilComment}
+//! @name {$iface.name}
 //@{
 {%  for fn in iface.functions if fn.isNonExternalFunction == true %}
 {$> fn.mlComment}
 {$fn.prototype};{$fn.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- functions %}
-//@}
+//@} {$iface.ilComment}
 {% endfor -- iface %}
 
 #if defined(__cplusplus)

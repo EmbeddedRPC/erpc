@@ -62,6 +62,9 @@
 //! Turn off error checking code for allocations in generated output
 #define NO_ALLOC_ERRORS_ANNOTATION "no_alloc_errors"
 
+//! Turn off generating of "const" keyword for function parameters data types.
+#define NO_CONST_PARAM "no_const_param"
+
 //! Turn off error checking code for infrastructure in generated output
 #define NO_INFRA_ERRORS_ANNOTATION "no_infra_errors"
 

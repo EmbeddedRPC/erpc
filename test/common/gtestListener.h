@@ -33,6 +33,7 @@
 #define _EMBEDDED_RPC__GTESTLISTENER_H_
 
 #include "gtest.h"
+#include "myAlloc.h"
 #include "test_unit_test_common.h"
 
 ////////////////////////////////////////////////////////////////////////////////

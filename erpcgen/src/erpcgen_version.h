@@ -33,7 +33,7 @@
 #define erpcgen_version_h
 
 //! @brief Current version of the erpcgen tool. Version 1.4.1.
-#define ERPCGEN_VERSION "1.4.1"
-#define ERPCGEN_VERSION_NUMBER 10401
+#define ERPCGEN_VERSION "1.4.2"
+#define ERPCGEN_VERSION_NUMBER 10402
 
 #endif /* erpcgen_version_h */

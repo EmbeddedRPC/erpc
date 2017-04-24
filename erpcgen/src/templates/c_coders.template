@@ -163,14 +163,18 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp};
 {% if info.inDataContainer %}
 {%  if info.castDiscriminator %}
 {$infraErrVar}read_{$info.typeName}_union(codec, &_tmp_local, &{$info.dataLiteral}{$info.name});
+{%   if !info.isConstant %}
 {$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{%   endif %}
 {%  else %}
 {$infraErrVar}read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.dataLiteral}{$info.name});
 {%  endif -- castDiscriminator%}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
 {$infraErrVar}read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
-{%   if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{%   if !info.isConstant %}
+{%    if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{%   endif %}
 {%  else %}
 {$infraErrVar}read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
 {%  endif  -- castDiscriminator%}
@@ -225,21 +229,7 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {% enddef -------------------------- FunctionType %}
 
 {% def decodeSharedType(info) %}
-{$infraErrVar}codec->read(&_tmp_local);
-{% if sharedMemBeginAddr != "" %}
-{$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}if (_tmp_local >= ERPC_SHARED_MEMORY_BEGIN && _tmp_local <= ERPC_SHARED_MEMORY_END)
-{$infraErrIndents}{
-{$infraErrIndents}    {$info.name} = static_cast<{$info.sharedTypeName} *>(_tmp_local);
-{$infraErrIndents}}
-{$infraErrIndents}else
-{$infraErrIndents}{
-{$infraErrIndents}    {$infraErrVar}kErpcStatus_MemoryError;
-{$infraErrIndents}}
-{$> addInfraErrorChecksEnd("") }
-{% else%}
-{$info.name} = static_cast<{$info.sharedTypeName} *>(_tmp_local);
-{% endif%}
+{$infraErrVar}codec->read(reinterpret_cast<uintptr_t *>({% if not ((info.funcParam == true && info.InoutOutDirection == true) && source == "client") %}&{%  endif %}{$info.name}));
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}
 {%   if info.inDataContainer %}
@@ -413,7 +403,7 @@ else
     {$infraErrVar}kErpcStatus_MemoryError;
 }
 {% else %}
-{$infraErrVar}codec->write(static_cast<int32_t>({$info.name}));
+{$infraErrVar}codec->write(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
 {% endif %}
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}

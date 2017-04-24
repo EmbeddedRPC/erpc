@@ -7,7 +7,7 @@ compiler:
 os:
 - linux
 - osx
-osx_image: xcode8 # use 10.11
+osx_image: xcode8.3 # OS X 10.12
 before_install:
 - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update -qq; fi
 - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install python bison flex libboost-dev libboost-filesystem-dev libboost-system-dev python ; fi

@@ -51,9 +51,8 @@
 {%    endif -- needNullVariableOnClient %}
 {%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, ""))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
-{$> addIndent("    ", param.mallocClient)}
 {$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
 {%    endfor -- fn parametersToClient %}
@@ -89,13 +88,11 @@ else
 }
 {% enddef %}
 
-{% def f_paramIsNullableDecode(param, isServer) %}
+{% def f_paramIsNullableDecode(param) %}
 {$infraErrVar}codec->readNullFlag(&isNull);
 if (!isNull)
 {
-{% if isServer == "" %}
-{$> addIndent("    ", param.mallocClient)}
-{% else %}
+{% if source == "server" %}
 {%  if param.allocateToServer %}
 {$> addIndent("    ", param.mallocServer)}
 {%  endif -- allocateToServer %}

@@ -120,6 +120,11 @@ protected:
                             const char *const kParseFile);
 
     /*!
+     * @brief This function generate output crc16 source file.
+     */
+    virtual void generateCrcFile() = 0;
+
+    /*!
      * @brief
      *
      * @param[in] filename
@@ -250,8 +255,6 @@ protected:
      * @param[inout] templateData Data prepared for templates files
      */
     void makeIncludesTemplateData(cpptempl::data_map &templateData);
-
-    virtual void generateCrcFile() = 0;
 };
 
 } // namespace erpcgen

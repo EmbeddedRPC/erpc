@@ -91,9 +91,6 @@ testDirs = filter(isTestDir, dirs)
 build = "build=" + target
 
 for dir in testDirs:
-    # skip doxy comment testing. There is nothing to run, only need to see output.
-    if dir == "test_others":
-        continue
     print(bcolors.BLUE + "\nRunning " + bcolors.ORANGE + dir + bcolors.BLUE +" unit tests with "
             + bcolors.ORANGE + transportLayer + bcolors.BLUE + " transport layer." + bcolors.ENDC)
     os.chdir(dir)

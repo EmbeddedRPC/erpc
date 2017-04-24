@@ -37,7 +37,7 @@ idl: |
     /**
      * 13 comment
      */
-    enum enumColor //!< 14 comment
+    enum enumColor
     {
         /** 15 comment */
         /**
@@ -46,18 +46,18 @@ idl: |
         red,  /**< 16 comment */
         green,  /**<17 comment */
         blue  /*!< 18 comment */
-    }
+    } //!< 14 comment
 
     /*!
     19 comment
     */
-    struct A //!< 20 comment
+    struct A
     {
         ///21 comment
         int32 m    //!< 22 comment
         ///23 comment
         int32 n    //!<24 comment
-    }
+    } //!< 20 comment
 
     /// 25 comment
     ///26 comment
@@ -65,12 +65,13 @@ idl: |
 
     //! 28 comment
     //!29 comment
-    interface DoxygenComments /*!<30 comment */
+    interface DoxygenComments
     {
     //! 31 comment
         //!32 comment
-        sendReceiveInt(ListType a) -> ListType ///< 33 comment;
-    }
+        sendReceiveList(ListType a) -> ListType ///< 33 comment;
+        sendReceiveStruct(A a) -> A ///< 33 comment;
+    } /*!<30 comment */
 
 test.h:
   - "/*"
@@ -86,7 +87,6 @@ test.h:
   - /**
   - "* 13 comment"
   - "*/"
-  - //!< 14 comment
   - /** 15 comment */
   - /**
   - 15 comment again
@@ -94,6 +94,7 @@ test.h:
   - /**< 16 comment */
   - /**<17 comment */
   - /*!< 18 comment */
+  - //!< 14 comment
   - // Aliases data types declarations
   - /// 25 comment
   - ///26 comment
@@ -102,11 +103,11 @@ test.h:
   - /*!
   - 19 comment
   - "*/"
-  - //!< 20 comment
   - ///21 comment
   - //!< 22 comment
   - ///23 comment
   - //!<24 comment
+  - //!< 20 comment
   - // Constant variable declarations
   - /*!
   - 1 comment
@@ -129,12 +130,12 @@ test.h:
   - /*! @brief DoxygenComments identifiers */
   - //! 28 comment
   - //!29 comment
-  - //! @name DoxygenComments /*!<30 comment */
   - //@{
   - //! 31 comment
   - //!32 comment
   - ///< 33 comment;
-  - //@}
+  -
+  - //@} /*!<30 comment */
   - // _test_h_
 
 test_client.cpp:
@@ -154,7 +155,7 @@ test_client.cpp:
   - // Write struct A function implementation
   - //! @brief Function to read struct list_0_t
   - // Read struct list_0_t function implementation
-  - // DoxygenComments interface sendReceiveInt function client shim.
+  - // DoxygenComments interface sendReceiveList function client shim.
 
 test_server.h:
   - "/*"
@@ -170,7 +171,7 @@ test_server.h:
   - "* @brief Service subclass for DoxygenComments."
   - "*/"
   - /*! @brief Call the correct server shim based on method unique ID. */
-  - /*! @brief Server shim for sendReceiveInt of DoxygenComments interface. */
+  - /*! @brief Server shim for sendReceiveList of DoxygenComments interface. */
   - // _test_server_h_
 
 test_server.cpp:
@@ -193,14 +194,14 @@ test_server.cpp:
   - //! @brief Function to free space allocated inside struct list_0_t
   - // Free space allocated inside struct list_0_t function implementation
   - // Call the correct server shim based on method unique ID.
-  - // Server shim for sendReceiveInt of DoxygenComments interface.
+  - // Server shim for sendReceiveList of DoxygenComments interface.
 
 ---
 name: Py comments test
 desc: This test is testing if comments are present in generated output.
 idl: |
 
-    /*
+   /*
     this is comment which is not tracked
         */
     /*this is comment which is not tracked*/
@@ -234,7 +235,7 @@ idl: |
     /**
      * 13 comment
      */
-    enum enumColor //!< 14 comment
+    enum enumColor
     {
         /** 15 comment */
         /**
@@ -243,18 +244,18 @@ idl: |
         red,  /**< 16 comment */
         green,  /**<17 comment */
         blue  /*!< 18 comment */
-    }
+    } //!< 14 comment
 
     /*!
     19 comment
     */
-    struct A //!< 20 comment
+    struct A
     {
         ///21 comment
         int32 m    //!< 22 comment
         ///23 comment
         int32 n    //!<24 comment
-    }
+    } //!< 20 comment
 
     /// 25 comment
     ///26 comment
@@ -262,12 +263,13 @@ idl: |
 
     //! 28 comment
     //!29 comment
-    interface DoxygenComments /*!<30 comment */
+    interface DoxygenComments
     {
     //! 31 comment
         //!32 comment
-        sendReceiveInt(ListType a) -> ListType ///< 33 comment;
-    }
+        sendReceiveList(ListType a) -> ListType ///< 33 comment;
+        sendReceiveStruct(A a) -> A ///< 33 comment;
+    } /*!<30 comment */
 lang: py
 
 test/__init__.py:

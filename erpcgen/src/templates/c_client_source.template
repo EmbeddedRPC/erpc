@@ -14,9 +14,6 @@ extern "C"
 
 {$checkVersion()}
 
-#pragma weak erpc_generated_crc
-extern const uint32_t erpc_generated_crc = {$crc16};
-
 {$checkCrc()}
 
 using namespace erpc;
@@ -25,6 +22,7 @@ using namespace std;
 #endif
 
 extern ClientManager *g_client;
+{$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {$> callbackTable(functions)}
 {$> constantsDefinitions(consts)}

@@ -540,15 +540,19 @@ class ErpcgenPythonCompileTest(ErpcgenCompileTest):
                 info[0].close()
 
     def run(self):
-        # Load generated package.
-        pkg = self._load_module("test", self._out_dir)
+        # List all available packages.
+        pkgNames = [f for f in os.listdir(str(self._out_dir)) if os.path.isdir(f)]
 
-        # Load modules in the package.
-        packageDir = path.local(pkg.__path__[0])
-        self._load_module("test.interface", packageDir)
-        self._load_module("test.common", packageDir)
-        self._load_module("test.client", packageDir)
-        self._load_module("test.server", packageDir)
+        for pkgName in pkgNames:
+            # Load generated package.
+            pkg = self._load_module(pkgName, self._out_dir)
+
+            # Load modules in the package.
+            packageDir = path.local(pkg.__path__[0])
+            self._load_module("{}.interface".format(pkgName), packageDir)
+            self._load_module("{}.common".format(pkgName), packageDir)
+            self._load_module("{}.client".format(pkgName), packageDir)
+            self._load_module("{}.server".format(pkgName), packageDir)
 
 ## @brief A fully parameterized test case.
 #

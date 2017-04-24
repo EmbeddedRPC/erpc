@@ -134,6 +134,11 @@ protected:
     void generateServerSourceFile(std::string fileName);
 
     /*!
+     * @brief This function generate output crc16 source file.
+     */
+    virtual void generateCrcFile();
+
+    /*!
      * @brief This function transforms binary data type to list or structure.
      *
      * @return Pointer to List or Struct wrapper of list type.
@@ -482,24 +487,12 @@ protected:
     std::string firtAllocOutParamOnServerWhenIsNeed(std::string name, StructMember *structMember);
 
     /*!
-     * @brief This function call first erpc_alloc function on client side for parameters if it is need.
-     *
-     * It is need by rules of passing data types for each direction type.
-     *
-     * @param[in] name Parameter name.
-     * @param[in] structMember Contains direction type and data type.
-     *
-     * @return Erpc_alloc function or empty.
-     */
-    std::string firstAllocOnClientWhenIsNeed(std::string name, StructMember *structMember);
-
-    /*!
      * @brief This function call first erpc_alloc on client side return statement if it is need.
      *
      * It is need by rules of taking data types from return type.
      *
      * @param[in] name Parameter name.
-     * @param[in] dataType Contains direction type and data type.
+     * @param[in] dataType Contains data type information.
      *
      * @return Erpc_alloc function or empty.
      */
@@ -669,8 +662,6 @@ protected:
     void setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol);
 
     bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData);
-
-    virtual void generateCrcFile();
 };
 } // namespace erpcgen
 

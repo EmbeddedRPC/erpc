@@ -80,10 +80,9 @@ int32_t test_int32_return()
     return saveVariables1.int32A * saveVariables1.int32B;
 }
 
-int32_t test_int32_allDirection(int32_t a, int32_t b, int32_t *c, int32_t *d, int32_t *e)
+int32_t test_int32_allDirection(int32_t a, int32_t b, int32_t *c, int32_t *e)
 {
     *c = a;
-    *d = b;
     *e = 2 * (*e);
     return a * b;
 }
@@ -119,12 +118,6 @@ void test_string_out(char *c)
     erpc_free(saveVariables1.stringA);
 }
 
-void test_string_outbyref(char **d)
-{
-    // allocated via test_string_in2()
-    *d = saveVariables1.stringB;
-}
-
 void test_string_inout(char *e)
 {
     strcat(e, saveVariables1.stringB);
@@ -139,18 +132,16 @@ char *test_string_return()
     return r;
 }
 
-char *test_string_allDirection(const char *a, const char *b, char *c, char **d, char *e)
+char *test_string_allDirection(const char *a, const char *b, char *c, char *e)
 {
     char *r = (char *)erpc_malloc(13 * sizeof(char));
     strcpy(c, a);
-    *d = (char *)erpc_malloc(strlen(b));
-    strcpy(*d, b);
     strcat(e, b);
     strcpy(r, e);
     return r;
 }
 
-char *test_string_empty(const char *a, const char *b, char *c, char **d, char *e)
+char *test_string_empty(const char *a, const char *b, char *c, char *e)
 {
     return NULL;
 }

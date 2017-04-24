@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -73,7 +73,6 @@ interface PointersService {
     sendReceivedString(list<string> listNumbers) -> list<string>
     sendReceived2String(list< list<string> > listNumbers) -> list< list<string> >
     test_list_allDirection(list<uint32> a, in list<uint32> b, inout list<uint32> e) -> void
-    //test_list_allDirection(list<int32> a, in list<int32> b, out list<int32> c, out byref list<int32> d, inout list<int32> e) -> void
     testLengthAnnotation(list<int32> myList @length(len), int32 len) -> int32
     testLengthAnnotationInStruct(listStruct s) -> int32
     returnSentStructLengthAnnotation(listStruct s) -> listStruct

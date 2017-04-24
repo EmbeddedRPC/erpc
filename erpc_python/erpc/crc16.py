@@ -34,7 +34,7 @@ class Crc16(object):
 
     def __init__(self, crcStart):
         self._crcStart = crcStart
-        self._table = [compute_table(i) for i in range(256)]
+        self._table = [self.compute_table(i) for i in range(256)]
 
     def compute_table(self, i):
         crc = 0

@@ -20,19 +20,7 @@ include ../mk/erpc_common.mk
 .NOTPARALLEL:
 
 # Unit test directories.
-SUBDIRS = \
-		test_annotations \
-		test_arbitrator \
-		test_arrays \
-		test_binary \
-		test_builtin \
-		test_callbacks \
-		test_const \
-		test_enums \
-		test_lists \
-		test_struct \
-		test_typedef \
-		test_unions
+SUBDIRS =  $(shell echo test_*)
 
 .PHONY: all
 all : $(SUBDIRS)

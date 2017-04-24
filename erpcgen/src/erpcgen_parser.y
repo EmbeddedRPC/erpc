@@ -185,6 +185,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %token <m_token> TOK_UNION_CASE
 %token <m_token> TOK_FUNCTION
 %token <m_token> TOK_PARAM
+%token <m_token> TOK_RETURN
 %token <m_token> TOK_EXPR
 %token <m_token> TOK_ANNOTATION
 %token <m_token> TOK_UNARY_NEGATE
@@ -203,7 +204,6 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> annotation
 %type <m_ast> annotation_list
 %type <m_ast> annotation_list_opt
-%type <m_ast> annotation_doxygen_ml_list_opt
 %type <m_ast> annotation_value_opt
 %type <m_ast> array_type
 %type <m_ast> callback_def
@@ -215,6 +215,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> data_type
 %type <m_ast> def_list
 %type <m_ast> definition
+%type <m_ast> definition_base
 %type <m_ast> doxy_ml_comment
 %type <m_ast> doxy_ml_comment_opt
 %type <m_ast> doxy_il_comment_opt
@@ -228,6 +229,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> function_def_list
 %type <m_ast> function_def_list_opt
 %type <m_ast> function_return_type
+%type <m_ast> function_type_base_def
 %type <m_ast> function_type_def
 %type <m_ast> ident
 %type <m_ast> ident_opt
@@ -289,12 +291,12 @@ root_def        :   program def_list
                         }
                 ;
 
-program         :   annotation_doxygen_ml_list_opt[list_opt] TOK_PROGRAM ident[name] semi_opt
+program         :  doxy_ml_comment_opt annotation_list_opt TOK_PROGRAM ident[name] semi_opt
                         {
                             AstNode * prog  = new AstNode(Token(TOK_PROGRAM));
                             prog->appendChild(new AstNode(*$name));
-                            prog->appendChild($list_opt->getChild(0));
-                            prog->appendChild($list_opt->getChild(1));
+                            prog->appendChild($annotation_list_opt);
+                            prog->appendChild($doxy_ml_comment_opt);
                             $$ = prog;
                         }
                 ;
@@ -306,19 +308,19 @@ def_list[result]
                 :   definition
                         {
                             AstNode * l = new AstNode(Token(TOK_CHILDREN));
-                            if ($1)
+                            if ($definition)
                             {
-                                l->appendChild($1);
+                                l->appendChild($definition);
                             }
                             $result = l;
                         }
                 |   def_list definition
                         {
-                            if ($2)
+                            if ($definition)
                             {
-                                $1->appendChild($2);
+                                $def_list->appendChild($definition);
                             }
-                            $result = $1;
+                            $result = $def_list;
                         }
                 ;
 
@@ -326,40 +328,48 @@ definition      :   import_stmt
                         {
                             $$ = NULL;
                         }
-                |   const_def
+                |   doxy_ml_comment_opt annotation_list_opt definition_base semi_opt doxy_il_comment_opt
                         {
-                            $$ = $1;
+                            $$ = $definition_base;
+                            $$->appendChild($annotation_list_opt);
+                            $$->appendChild($doxy_ml_comment_opt);
+                            $$->appendChild($doxy_il_comment_opt);
+                        }
+
+definition_base :   const_def
+                        {
+                            $$ = $const_def;
                         }
                 |   enum_def
                         {
-                            $$ = $1;
+                            $$ = $enum_def;
                         }
                 |   struct_def
                         {
-                            $$ = $1;
+                            $$ = $struct_def;
                         }
                 |   union_type_def
                         {
-                            $$ = $1;
+                            $$ = $union_type_def;
                         }
                 |   typedef_def
                         {
-                            $$ = $1;
+                            $$ = $typedef_def;
                         }
                 |   interface_def
                         {
-                            $$ = $1;
+                            $$ = $interface_def;
                         }
                 |
                     function_type_def
                         {
-                            $$ = $1;
+                            $$ = $function_type_def;
                         }
                 ;
 
 import_stmt     :   "import" TOK_STRING_LITERAL
                         {
-                            std::string s = $2->getStringValue();
+                            std::string s = $TOK_STRING_LITERAL->getStringValue();
                             lexer->pushFile(s);
                         }
                 ;
@@ -367,35 +377,29 @@ import_stmt     :   "import" TOK_STRING_LITERAL
 /*
  * TOK_CONST -> ( simple_data_type ident const_expr )
  */
-const_def       :    annotation_doxygen_ml_list_opt[list_opt] "const" simple_data_type ident '=' const_expr semi_opt doxy_il_comment_opt
+const_def       :   "const" simple_data_type ident '=' const_expr
                         {
-                            $$ = new AstNode(*$2);
-                            $$->appendChild($3);
-                            $$->appendChild($4);
-                            $$->appendChild($6);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
+                            $$ = new AstNode(*$1);
+                            $$->appendChild($simple_data_type);
+                            $$->appendChild($ident);
+                            $$->appendChild($const_expr);
                         }
                 ;
 
 /*
  * TOK_ENUM -> ( ident, ( TOK_CHILDREN -> enums* ) )
  */
-enum_def        :   annotation_doxygen_ml_list_opt[list_opt] "enum" name_opt[name] doxy_il_comment_opt '{' enumerator_list_opt '}'
+enum_def        :   "enum" name_opt[name] '{' enumerator_list_opt '}'
                         {
                             if ($enumerator_list_opt == NULL)
                             {
-                                throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $2->getFirstLine()));
+                                throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $1->getFirstLine()));
                             }
                             else
                             {
-                                $$ = new AstNode(*$2);
+                                $$ = new AstNode(*$1);
                                 $$->appendChild($name);
                                 $$->appendChild($enumerator_list_opt);
-                                $$->appendChild($list_opt->getChild(0));
-                                $$->appendChild($list_opt->getChild(1));
-                                $$->appendChild($doxy_il_comment_opt);
                             }
                         }
                 ;
@@ -403,7 +407,7 @@ enum_def        :   annotation_doxygen_ml_list_opt[list_opt] "enum" name_opt[nam
 enumerator_list_opt
                 :   enumerator_list
                         {
-                            $$ = $1;
+                            $$ = $enumerator_list;
                         }
                 |   /* empty */
                         {
@@ -430,13 +434,13 @@ enumerator_list[result]
                 :   enumerator
                         {
                             AstNode * n = new AstNode(Token(TOK_CHILDREN));
-                            n->appendChild($1);
+                            n->appendChild($enumerator);
                             $result = n;
                         }
-                |   enumerator_list enumerator
+                |   enumerator_list[enum_list] enumerator
                         {
-                            $1->appendChild($2);
-                            $result = $1;
+                            $enum_list->appendChild($enumerator);
+                            $result = $enum_list;
                         }
                 ;
 
@@ -446,8 +450,8 @@ enumerator_list[result]
 enumerator      :   doxy_ml_comment_opt ident '=' int_const_expr annotation_list_opt[annotations] comma_opt doxy_il_comment_opt
                         {
                             $$ = new AstNode(Token(TOK_ENUM_MEMBER, NULL, @1));
-                            $$->appendChild($2);
-                            $$->appendChild($4);
+                            $$->appendChild($ident);
+                            $$->appendChild($int_const_expr);
                             $$->appendChild($annotations);
                             $$->appendChild($doxy_ml_comment_opt);
                             $$->appendChild($doxy_il_comment_opt);
@@ -455,7 +459,7 @@ enumerator      :   doxy_ml_comment_opt ident '=' int_const_expr annotation_list
                 |   doxy_ml_comment_opt ident annotation_list_opt[annotations] comma_opt doxy_il_comment_opt
                         {
                             $$ = new AstNode(Token(TOK_ENUM_MEMBER, NULL, @1));
-                            $$->appendChild($2);
+                            $$->appendChild($ident);
                             $$->appendChild(NULL);
                             $$->appendChild($annotations);
                             $$->appendChild($doxy_ml_comment_opt);
@@ -466,21 +470,18 @@ enumerator      :   doxy_ml_comment_opt ident '=' int_const_expr annotation_list
 /*
  * TOK_INTERFACE -> ( ident ( TOK_CHILDREN -> TOK_FUNCTION* ) ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
-interface_def   :    annotation_doxygen_ml_list_opt[list_opt] "interface"[iface] ident[name] doxy_il_comment_opt '{' function_def_list_opt[functions] '}'
+interface_def   :   "interface"[iface] ident[name] '{' function_def_list_opt[functions] '}'
                         {
                             $$ = new AstNode(*$iface);
                             $$->appendChild($name);
                             $$->appendChild($functions);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
                 ;
 
 function_def_list_opt
                 :   function_def_list
                         {
-                            $$ = $1;
+                            $$ = $function_def_list;
                         }
                 |   /* empty */
                         {
@@ -495,67 +496,78 @@ function_def_list
                 :   function_def
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($function_def);
                         }
-                |   function_def_list function_def
+                |   function_def_list[fun_def_list] function_def
                         {
-                            $1->appendChild($2);
-                            $$ = $1;
+                            $fun_def_list->appendChild($function_def);
+                            $$ = $fun_def_list;
                         }
                 ;
 
-function_def    :   function_type_def
+function_def    :   doxy_ml_comment_opt annotation_list_opt function_type_base_def comma_semi_opt doxy_il_comment_opt
                         {
-                            $$ = $1;
+                            $$ = $function_type_base_def;
+                            $$->appendChild($annotation_list_opt);
+                            $$->appendChild($doxy_ml_comment_opt);
+                            $$->appendChild($doxy_il_comment_opt);
+                        }
+
+function_type_base_def
+                :   function_type_def
+                        {
+                            $$ = $function_type_def;
                         }
                 |   callback_def
                         {
-                            $$ = $1;
+                            $$ = $callback_def;
                         }
                 ;
 /*
  * TOK_FUNCTION -> ( ident ( simple_data_type | TOK_VOID | TOK_ONEWAY ) ( TOK_CHILDREN -> param_def* ) ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
 function_type_def
-                :   annotation_doxygen_ml_list_opt[list_opt] ident[name] '(' param_list_opt[params] ')' "->" function_return_type[return_type] comma_semi_opt doxy_il_comment_opt
+                :   ident[name] '(' param_list_opt[params] ')' "->" function_return_type[return_type]
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
                             $$->appendChild($return_type);
                             $$->appendChild(NULL);  // function type null to recognize function and callback
                             $$->appendChild($params);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
-                |   annotation_doxygen_ml_list_opt[list_opt] "oneway"[oneway] ident[name] '(' param_list_opt_in[params] ')' comma_semi_opt doxy_il_comment_opt
+                |    "oneway"[oneway] ident[name] '(' param_list_opt_in[params] ')'
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
-                            $$->appendChild(new AstNode(*$oneway));
+                            AstNode * returnAst = new AstNode(Token(TOK_RETURN));
+                            returnAst->appendChild(new AstNode(*$oneway));
+                            returnAst->appendChild(NULL);
+                            $$->appendChild(returnAst);
                             $$->appendChild(NULL);  // function type null to recognize function and callback
                             $$->appendChild($params);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
 
                 ;
 
+/* TODO: Annotations should be defined after data type. */
 function_return_type
-                :   simple_data_type
+                :   annotation_list_opt simple_data_type
                         {
-                            $$ = $1;
+                            $$ = new AstNode(Token(TOK_RETURN));
+                            $$->appendChild($simple_data_type);
+                            $$->appendChild($annotation_list_opt);
                         }
                 |   "void"
                         {
-                            $$ = new AstNode(*$1);
+                            $$ = new AstNode(Token(TOK_RETURN));
+                            $$->appendChild(new AstNode(*$1));
+                            $$->appendChild(NULL);
                         }
                 ;
 
 param_list_opt  :   param_list
                         {
-                            $$ = $1;
+                            $$ = $param_list;
                         }
                 |   /* empty */
                         {
@@ -566,7 +578,7 @@ param_list_opt  :   param_list
 param_list_opt_in
                 :   param_list_in
                         {
-                            $$ = $1;
+                            $$ = $param_list_in;
                         }
                 |   /* empty */
                         {
@@ -580,24 +592,24 @@ param_list_opt_in
 param_list      :   param_def
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($param_def);
                         }
-                |   param_list ',' param_def
+                |   param_list[parameter_list] ',' param_def
                         {
-                            $1->appendChild($3);
-                            $$ = $1;
+                            $parameter_list->appendChild($param_def);
+                            $$ = $parameter_list;
                         }
                 ;
 
 param_list_in   :   param_def_in
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($param_def_in);
                         }
-                |   param_list_in ',' param_def_in
+                |   param_list_in[param_list] ',' param_def_in
                         {
-                            $1->appendChild($3);
-                            $$ = $1;
+                            $param_list->appendChild($param_def_in);
+                            $$ = $param_list;
                         }
                 ;
 
@@ -640,7 +652,7 @@ param_dir_in    :   "in"
 
 param_dir       :   param_dir_in
                         {
-                            $$ = $1;
+                            $$ = $param_dir_in;
                         }
                 |   "out"
                         {
@@ -650,43 +662,33 @@ param_dir       :   param_dir_in
                         {
                             $$ = $1;
                         }
-                |   "out" "byref"
-                        {
-                            $$ = $2;
-                        }
                 ;
 
 /*
  * TOK_FUNCTION -> ( ident ( IDENT ) ( TOK_CHILDREN -> ident* ) ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
-callback_def    :   annotation_doxygen_ml_list_opt[list_opt] ident[type] ident[name] comma_semi_opt doxy_il_comment_opt
+callback_def    :  ident[type] ident[name]
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
                             $$->appendChild(NULL);  // return type null to recognize function and callback
                             $$->appendChild($type);
                             $$->appendChild(NULL);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
-                |   annotation_doxygen_ml_list_opt[list_opt] ident[type] ident[name] '(' callback_param_list_opt[params] ')' comma_semi_opt doxy_il_comment_opt
+                |   ident[type] ident[name] '(' callback_param_list_opt[params] ')'
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
                             $$->appendChild(NULL);  // return type null to recognize function and callback
                             $$->appendChild($type);
                             $$->appendChild($params);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
                 ;
 
 callback_param_list_opt
                 :   callback_param_list
                         {
-                            $$ = $1;
+                            $$ = $callback_param_list;
                         }
                 |   /* empty */
                         {
@@ -698,19 +700,19 @@ callback_param_list
                 :   callback_param
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($callback_param);
                         }
-                |   callback_param_list comma_opt callback_param
+                |   callback_param_list[param_list] comma_opt callback_param
                         {
-                            $$ = $1;
-                            $1->appendChild($3);
+                            $$ = $param_list;
+                            $param_list->appendChild($callback_param);
                         }
                 ;
 
 callback_param  :   ident[name]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
-                            $$->appendChild($1);
+                            $$->appendChild($name);
                             /* To be commaptible with param_def. */
                             $$->appendChild(NULL);
                             $$->appendChild(NULL);
@@ -721,28 +723,22 @@ callback_param  :   ident[name]
 /*
  * TOK_TYPE -> ( ident data_type ( TOK_CHILDREN -> annotation* ) )
  */
-typedef_def     :   annotation_doxygen_ml_list_opt[list_opt] "type"[type] ident[name] '=' data_type[typedef] semi_opt doxy_il_comment_opt
+typedef_def     :   "type"[type] ident[name] '=' data_type[typedef]
                         {
                             $$ = new AstNode(*$type);
                             $$->appendChild($name);
                             $$->appendChild($typedef);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
                 ;
 
 /*
  * TOK_STRUCT -> ( ident ( TOK_CHILDREN -> struct_member* ) ( TOK_CHILDREN -> annotation* ) )
  */
-struct_def      :   annotation_doxygen_ml_list_opt[list_opt] "struct"[struct] name_opt[name] doxy_il_comment_opt '{' struct_member_list[members] '}'
+struct_def      :   "struct"[struct] name_opt[name] '{' struct_member_list[members] '}'
                         {
                             $$ = new AstNode(*$struct);
                             $$->appendChild($name);
                             $$->appendChild($members);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
                 ;
 
@@ -753,12 +749,12 @@ struct_member_list[result]
                 :   struct_member
                         {
                             $result = new AstNode(Token(TOK_CHILDREN));
-                            $result->appendChild($1);
+                            $result->appendChild($struct_member);
                         }
-                |   struct_member_list  struct_member
+                |   struct_member_list[member_list]  struct_member
                         {
-                            $1->appendChild($2);
-                            $result = $1;
+                            $member_list->appendChild($struct_member);
+                            $result = $member_list;
                         }
                 ;
 
@@ -777,9 +773,9 @@ struct_member   :   doxy_ml_comment_opt struct_member_options_list struct_data_t
                 ;
 
 struct_member_options_list
-                :   struct_member_options_list struct_member_options
+                :   struct_member_options_list[member_options_list] struct_member_options
                         {
-                            $$ = $1 | $2;
+                            $$ = $member_options_list | $struct_member_options;
                         }
                 |   /* empty */
                         {
@@ -801,11 +797,11 @@ struct_member_options
 struct_data_type
                 :   simple_data_type
                         {
-                            $$ = $1;
+                            $$ = $simple_data_type;
                         }
                 |   union_def
                         {
-                            $$ = $1;
+                            $$ = $union_def;
                         }
                 ;
 
@@ -817,27 +813,24 @@ union_def       :   "union"[union] '(' ident[discriminator] ')' '{' union_case_l
                             $$->appendChild($cases);
                         }
 
-union_type_def       :  annotation_doxygen_ml_list_opt[list_opt] "union"[union] ident[name] '{' union_case_list[cases] '}' doxy_il_comment_opt
+union_type_def       :   "union"[union] ident[name] '{' union_case_list[cases] '}'
                         {
                             $$ = new AstNode(*$union);
                             $$->appendChild($name);
                             $$->appendChild(NULL);
                             $$->appendChild($cases);
-                            $$->appendChild($list_opt->getChild(0));
-                            $$->appendChild($list_opt->getChild(1));
-                            $$->appendChild($doxy_il_comment_opt);
                         }
 
 union_case_list
                 :   union_case
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($union_case);
                         }
-                |   union_case_list union_case
+                |   union_case_list[case_list] union_case
                         {
-                            $1->appendChild($2);
-                            $$ = $1;
+                            $case_list->appendChild($union_case);
+                            $$ = $case_list;
                         }
                 ;
 
@@ -862,10 +855,10 @@ union_case_expr_list
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild($case_expr);
                         }
-                |   union_case_expr_list ',' int_const_expr[case_expr]
+                |   union_case_expr_list[case_expr_list] ',' int_const_expr[case_expr]
                         {
-                            $1->appendChild($case_expr);
-                            $$ = $1;
+                            $case_expr_list->appendChild($case_expr);
+                            $$ = $case_expr_list;
                         }
                 ;
 
@@ -889,13 +882,13 @@ union_member_decl_list
                 :   union_member_decl
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($union_member_decl);
 
                         }
-                |   union_member_decl_list union_member_decl
+                |   union_member_decl_list[member_decl_list] union_member_decl
                         {
-                            $1->appendChild($2);
-                            $$ = $1;
+                            $member_decl_list->appendChild($union_member_decl);
+                            $$ = $member_decl_list;
                         }
                 ;
 
@@ -913,42 +906,42 @@ union_member_decl
 simple_data_type
                 :   list_type
                         {
-                            $$ = $1;
+                            $$ = $list_type;
                         }
                 |   array_type
                         {
-                            $$ = $1;
+                            $$ = $array_type;
                         }
                 |   typename
                         {
-                            $$ = $1;
+                            $$ = $typename;
                         }
 
                 ;
 
 data_type       :   simple_data_type
                         {
-                            $$ = $1;
+                            $$ = $simple_data_type;
                         }
                 |   struct_def
                         {
-                            $$ = $1;
+                            $$ = $struct_def;
                         }
                 |   enum_def
                         {
-                            $$ = $1;
+                            $$ = $enum_def;
                         }
                 ;
 
 typename        :   ident
                         {
-                            $$ = $1;
+                            $$ = $ident;
                         }
                 ;
 
 name_opt        :   ident
                         {
-                            $$ = $1;
+                            $$ = $ident;
                         }
                 |   /* empty */
                         {
@@ -962,7 +955,7 @@ name_opt        :   ident
 list_type       :   "list" '<' simple_data_type '>'
                         {
                             $$ = new AstNode(*$1);
-                            $$->appendChild($3);
+                            $$->appendChild($simple_data_type);
                         }
                 ;
 
@@ -972,43 +965,16 @@ list_type       :   "list" '<' simple_data_type '>'
 array_type      :   simple_data_type '[' int_const_expr ']'
                         {
                             $$ = new AstNode(Token(TOK_ARRAY));
-                            $$->appendChild($1);
-                            $$->appendChild($3);
+                            $$->appendChild($simple_data_type);
+                            $$->appendChild($int_const_expr);
                             $$->reverseExpr();
-                        }
-                ;
-
-annotation_doxygen_ml_list_opt
-                :   doxy_ml_comment annotation_list[annotations]
-                        {
-                            $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($annotations);
-                            $$->appendChild($doxy_ml_comment);
-                        }
-                |    doxy_ml_comment
-                        {
-                            $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild(NULL);
-                            $$->appendChild($doxy_ml_comment);
-                        }
-                |    annotation_list[annotations]
-                        {
-                            $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($annotations);
-                            $$->appendChild(NULL);
-                        }
-                |   /* empty */
-                        {
-                            $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild(NULL);
-                            $$->appendChild(NULL);
                         }
                 ;
 
 annotation_list_opt
                 :   annotation_list
                         {
-                            $$ = $1;
+                            $$ = $annotation_list;
                         }
                 |   /* empty */
                         {
@@ -1022,12 +988,12 @@ annotation_list_opt
 annotation_list :   annotation
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($1);
+                            $$->appendChild($annotation);
                         }
-                |   annotation_list annotation
+                |   annotation_list[ann_list] annotation
                         {
-                            $1->appendChild($2);
-                            $$ = $1;
+                            $ann_list->appendChild($annotation);
+                            $$ = $ann_list;
                         }
                 ;
 
@@ -1037,15 +1003,15 @@ annotation_list :   annotation
 annotation      :   '@' ident annotation_value_opt
                         {
                             $$ = new AstNode(Token(TOK_ANNOTATION));
-                            $$->appendChild($2);
-                            $$->appendChild($3);
+                            $$->appendChild($ident);
+                            $$->appendChild($annotation_value_opt);
                         }
                 ;
 
 annotation_value_opt
                 :   '(' const_expr ')'
                         {
-                            $$ = $2;
+                            $$ = $const_expr;
                         }
                 |   /* empty */
                         {
@@ -1055,18 +1021,18 @@ annotation_value_opt
 
 const_expr      :   int_const_expr
                         {
-                            $$ = $1;
+                            $$ = $int_const_expr;
                         }
                 |   string_literal
                         {
-                            $$ = $1;
+                            $$ = $string_literal;
                         }
                 ;
 
 doxy_ml_comment_opt
                 :   doxy_ml_comment
                         {
-                            $$ = $1;
+                            $$ = $doxy_ml_comment;
                         }
                 |   /* empty */
                         {
@@ -1077,25 +1043,25 @@ doxy_ml_comment_opt
 doxy_ml_comment:   TOK_ML_COMMENT
                         {
                             // Merge string literals into one string. Remove first '\n'
-                            Value * v = $1->getValue();
+                            Value * v = $TOK_ML_COMMENT->getValue();
                             StringValue * s = dynamic_cast<StringValue *>(v);
                             assert(s);
                             s = new StringValue(s->toString().substr(1, s->toString().size() - 1));
-                            $1->setValue(s);
-                            $$ = new AstNode(*$1);
+                            $TOK_ML_COMMENT->setValue(s);
+                            $$ = new AstNode(*$TOK_ML_COMMENT);
                         }
-                |   doxy_ml_comment TOK_ML_COMMENT
+                |   doxy_ml_comment[doxygen_ml_comment] TOK_ML_COMMENT
                         {
-                            $$ =  mergeString(&$1->getToken(), $2);
+                            $$ =  mergeString(&$doxygen_ml_comment->getToken(), $2);
                         }
                 ;
 
 doxy_il_comment_opt
-                :   doxy_il_comment_opt TOK_IL_COMMENT
+                :   doxy_il_comment_opt[doxygen_il_comment] TOK_IL_COMMENT
                         {
-                            if($1)
+                            if($doxygen_il_comment)
                             {
-                                $$ =  mergeString(&$1->getToken(), $2);
+                                $$ =  mergeString(&$doxygen_il_comment->getToken(), $2);
                             }
                             else
                             {
@@ -1114,21 +1080,21 @@ doxy_il_comment_opt
 int_const_expr  :   expr
                         {
                             $$ = new AstNode(Token(TOK_EXPR, NULL, @1));
-                            $$->appendChild($1);
+                            $$->appendChild($expr);
                         }
                 ;
 
 expr            :   int_value
                         {
-                            $$ = $1;
+                            $$ = $int_value;
                         }
                 |   float_value
                         {
-                            $$ = $1;
+                            $$ = $float_value;
                         }
                 |   ident
                         {
-                            $$ = $1;
+                            $$ = $ident;
                         }
                 |   expr '+' expr
                         {
@@ -1192,7 +1158,7 @@ expr            :   int_value
                         }
                 |   unary_expr
                             {
-                                $$ = $1;
+                                $$ = $unary_expr;
                             }
                 |   '(' expr ')'
                         {
@@ -1203,23 +1169,23 @@ expr            :   int_value
 
 unary_expr      :   '+' expr %prec UNARY_OP
                         {
-                            $$ = $2;
+                            $$ = $expr;
                         }
                 |   '-' expr %prec UNARY_OP
                         {
                             $$ = new AstNode(Token(TOK_UNARY_NEGATE, NULL, @1));
-                            $$->appendChild($2);
+                            $$->appendChild($expr);
                         }
                 |   '~' expr %prec UNARY_OP
                         {
                             $$ = new AstNode(*$1);
-                            $$->appendChild($2);
+                            $$->appendChild($expr);
                         }
                 ;
 
 int_value       :   TOK_INT_LITERAL
                         {
-                            $$ = new AstNode(*$1);
+                            $$ = new AstNode(*$TOK_INT_LITERAL);
                         }
                 |   "true"
                         {
@@ -1233,29 +1199,29 @@ int_value       :   TOK_INT_LITERAL
 
 float_value     :   TOK_FLOAT_LITERAL
                         {
-                            $$ = new AstNode(*$1);
+                            $$ = new AstNode(*$TOK_FLOAT_LITERAL);
                         }
                 ;
 
 string_literal  :   TOK_STRING_LITERAL
                         {
-                            $$ = new AstNode(*$1);
+                            $$ = new AstNode(*$TOK_STRING_LITERAL);
                         }
-                |   string_literal TOK_STRING_LITERAL
+                |   string_literal[string] TOK_STRING_LITERAL
                         {
-                            $$ =  mergeString(&$1->getToken(), $2);
+                            $$ =  mergeString(&$string->getToken(), $TOK_STRING_LITERAL);
                         }
                 ;
 
 ident           :   TOK_IDENT
                         {
-                            $$ = new AstNode(*$1);
+                            $$ = new AstNode(*$TOK_IDENT);
                         }
                 ;
 
 ident_opt       :   ident
                         {
-                            $$ = $1;
+                            $$ = $ident;
                         }
                 |   /* empty */
                         {

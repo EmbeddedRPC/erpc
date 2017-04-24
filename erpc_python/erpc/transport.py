@@ -51,11 +51,21 @@ class Transport(object):
 class FramedTransport(Transport):
     HEADER_LEN = 4
 
-    def __init__(self, crcStart):
+    def __init__(self, crcStart=0):
         super(FramedTransport, self).__init__()
         self._sendLock = threading.Lock()
         self._receiveLock = threading.Lock()
-        self._Crc16 = crc16.Crc16(crcStart)
+        self._Crc16 = crcStart
+
+    @property
+    def crc_16(self):
+        return self._Crc16
+
+    @crc_16.setter
+    def crc_16(self, crcStart):
+        if type(crcStart) is not int:
+            raise RequestError("invalid CRC, not a number")
+        self._Crc16 = Crc16(crcStart)
 
     def send(self, message):
         try:

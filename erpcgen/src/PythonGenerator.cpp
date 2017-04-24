@@ -68,12 +68,6 @@ PythonGenerator::PythonGenerator(InterfaceDefinition *def, uint16_t idlCrc16)
     }
 }
 
-void PythonGenerator::generateCrcFile()
-{
-    /* Generate file with shim code version. */
-    generateOutputFile("__init__.py", "py_global_init", m_templateData, kPyGlobalInit);
-}
-
 void PythonGenerator::generateOutputFiles(const std::string &fileName)
 {
     boost::filesystem::path outputDir = m_def->getOutputDirectory();
@@ -125,6 +119,12 @@ void PythonGenerator::generateInterfaceFile(std::string fileName)
     generateOutputFile(fileName, "py_interface", m_templateData, kPyInterface);
 }
 
+void PythonGenerator::generateCrcFile()
+{
+    /* Generate file with shim code version. */
+    generateOutputFile("__init__.py", "py_global_init", m_templateData, kPyGlobalInit);
+}
+
 void PythonGenerator::parseSubtemplates()
 {
     const char *templateName = "py_coders";
@@ -151,7 +151,7 @@ void PythonGenerator::generate()
 
     if (m_def->hasProgramSymbol())
     {
-        for (auto anno : m_def->programSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
+        for (auto anno : m_def->getProgramSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
         {
             m_suffixStrip = anno->getValueObject()->toString();
             m_suffixStripSize = m_suffixStrip.size();

@@ -58,14 +58,19 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
 
     m_templateData["todaysDate"] = getTime();
 
+    m_templateData["sharedMemBeginAddr"] = "";
+    m_templateData["sharedMemEndAddr"] = "";
+
     if (m_def->hasProgramSymbol())
     {
         Log::info("program: ");
         Log::info("%s\n", m_def->getOutputFilename().c_str());
 
+        Program *program = m_def->getProgramSymbol();
+
         /* Shared memory area. */
-        Annotation *sharedMemBAnn = def->programSymbol()->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
-        Annotation *sharedMemEAnn = def->programSymbol()->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
+        Annotation *sharedMemBAnn = program->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
+        Annotation *sharedMemEAnn = program->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
         if (sharedMemBAnn && sharedMemEAnn)
         {
             Value *sharedMemAValue = sharedMemBAnn->getValueObject();
@@ -85,11 +90,11 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
         {
             throw semantic_error("Need be defined both or no one of shared memory regions annotations through @shared_memory_begin and @shared_memory_end.");
         }
-        else
-        {
-            m_templateData["sharedMemBeginAddr"] = "";
-            m_templateData["sharedMemEndAddr"] = "";
-        }
+    }
+    else
+    {
+        m_templateData["mlComment"] = "";
+        m_templateData["ilComment"] = "";
     }
 }
 
@@ -378,7 +383,7 @@ void Generator::makeIncludesTemplateData(cpptempl::data_map &templateData)
     data_list includeData;
     if (m_def->hasProgramSymbol())
     {
-        for (auto include : m_def->programSymbol()->getAnnotations(INCLUDE_ANNOTATION))
+        for (auto include : m_def->getProgramSymbol()->getAnnotations(INCLUDE_ANNOTATION))
         {
             includeData.push_back(make_data(include->getValueObject()->toString()));
             Log::info("include %s\n", include->getValueObject()->toString().c_str());

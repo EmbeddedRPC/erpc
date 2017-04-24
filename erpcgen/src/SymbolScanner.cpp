@@ -960,40 +960,40 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
     m_currentStruct = &(func->getParameters());
 
     // Get return type.
-    AstNode *returnTypeNode = (*node)[1];
-    if (returnTypeNode) /* Function type/definition */
+    AstNode *returnNode = (*node)[1];
+    if (returnNode) /* Function type/definition */
     {
-        Token &returnTypeToken = returnTypeNode->getToken();
-        switch (returnTypeToken.getToken())
+        Token &returnTokenType = returnNode->getToken();
+        if (returnTokenType.getToken() == TOK_RETURN)
         {
-            case TOK_ONEWAY:
-                func->setIsOneway(true);
-                func->setReturnType(new VoidType);
-                break;
+            AstNode *returnTypeNode = returnNode->getChild(0);
+            Token &returnTypeToken = returnTypeNode->getToken();
+            switch (returnTypeToken.getToken())
+            {
+                case TOK_ONEWAY:
+                    func->setIsOneway(true);
+                    func->setReturnType(new VoidType);
+                    break;
 
-            case TOK_VOID:
-                func->setReturnType(new VoidType);
-                break;
+                case TOK_VOID:
+                    func->setReturnType(new VoidType);
+                    break;
 
-            default:
-                DataType *dataType = lookupDataType(returnTypeNode);
-                func->setReturnType(dataType);
-                DataType *trueContainerDataType = dataType->getTrueContainerDataType();
-                if (trueContainerDataType->isStruct())
-                {
-                    if (nullptr != dynamic_cast<StructType *>(trueContainerDataType))
-                    {
-                        StructType *a = dynamic_cast<StructType *>(trueContainerDataType);
-                        assert(a);
-                        a->addStructDirectionType(kReturn);
-                    }
-                    else
-                    {
-                        throw semantic_error(
-                            format_string("failed dynamic cast for trueContainerDataType in handleFunction\n"));
-                    }
-                }
-                break;
+                default:
+                    DataType *dataType = lookupDataType(returnTypeNode);
+                    func->setReturnType(dataType);
+                    break;
+            }
+            if (returnTypeToken.getToken() != TOK_ONEWAY)
+            {
+                //TODO: Return dataType covered with something like StructMember. To do not mess annotations for dataType.
+                addAnnotations(returnNode->getChild(1), func->getReturnType());
+            }
+        }
+        else
+        {
+            throw semantic_error(
+                format_string("line %d: Unexpected token type. Expected TOK_RETURN\n", returnTokenType.getFirstLine()));
         }
     }
     else
@@ -1209,13 +1209,6 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
         param_direction = kInDirection;
     }
     param->setDirection(param_direction);
-    DataType *trueContainerDataType = param->getDataType()->getTrueContainerDataType();
-    if (trueContainerDataType->isStruct())
-    {
-        StructType *a = dynamic_cast<StructType *>(trueContainerDataType);
-        assert(a);
-        a->addStructDirectionType(param_direction);
-    }
 }
 
 AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
@@ -1233,7 +1226,6 @@ DataType *SymbolScanner::lookupDataTypeByName(const Token &tok, SymbolScope *sco
         throw semantic_error(format_string("line %d: undefined name '%s'", tok.getFirstLine(), typeName.c_str()));
     }
     DataType *dataType = dynamic_cast<DataType *>(dataTypeSym);
-    assert(dataType);
     if (!dataType)
     {
         throw semantic_error(format_string("line %d: '%s' is not a type", tok.getFirstLine(), typeName.c_str()));
@@ -1535,9 +1527,13 @@ void SymbolScanner::scanStructForAnnotations()
                 disSymbol = m_currentStruct->getScope().getSymbol(discriminatorAnn->getValueObject()->toString(), false);
                 if (!disSymbol)
                 {
+                    disSymbol = m_globals->getSymbol(discriminatorAnn->getValueObject()->toString(), false);
+                }
+                if (!disSymbol)
+                {
                     throw syntax_error(
                         format_string("Value defined in annotation discriminator used for union "
-                                      "variable %s on line %d has to point to variable in same scope.",
+                                      "variable %s on line %d has to point to variable in same/global scope.",
                                       structMember->getName().c_str(), structMember->getFirstLine()));
                 }
             }
@@ -1554,9 +1550,18 @@ void SymbolScanner::scanStructForAnnotations()
             }
 
             // check discriminator data type
-            StructMember *disMember = dynamic_cast<StructMember *>(disSymbol);
-            assert(disMember);
-            DataType *disType = dynamic_cast<DataType *>(disMember->getDataType()->getTrueDataType());
+            DataType *disType;
+            if (StructMember *disStructMember = dynamic_cast<StructMember *>(disSymbol))
+            {
+                disType = disStructMember->getDataType()->getTrueDataType();
+            }
+            else
+            {
+                ConstType *disConstMember = dynamic_cast<ConstType *>(disSymbol);
+                assert(disConstMember);
+                disType = disConstMember->getDataType()->getTrueDataType();
+            }
+
             assert(disType);
             if (disType->isString() || disType->isBinary() || !(disType->isBuiltin() || disType->isEnum()))
             {
