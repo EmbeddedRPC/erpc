@@ -42,6 +42,9 @@ interface FirstInterface
     firstReceiveInt() -> int32
     getResultFromSecondSide() -> int32
     oneway quitFirstInterfaceServer()
+    nestedCallTest() -> int32
+    @nested
+    callSecondSide() -> int32
 }
 
 @group("secondInterface")
@@ -50,4 +53,6 @@ interface SecondInterface
     oneway secondSendInt(int32 a)
     secondReceiveInt() -> int32
     oneway quitSecondInterfaceServer()
+    @nested
+    callFirstSide() -> int32
 }

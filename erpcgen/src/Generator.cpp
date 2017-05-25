@@ -30,10 +30,10 @@
  */
 
 #include "Generator.h"
+#include "erpc_version.h"
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
-#include "erpcgen_version.h"
 #include "format_string.h"
 #include <boost/filesystem.hpp>
 #include <cstring>
@@ -51,7 +51,8 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
 , m_globals(&(m_def->getGlobals()))
 , m_idlCrc16(idlCrc16)
 {
-    m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
+    m_templateData["erpcVersion"] = ERPC_VERSION;
+    m_templateData["erpcVersionNumber"] = ERPC_VERSION_NUMBER;
 
     // crc of erpcgen version and idl files.
     m_templateData["crc16"] = m_idlCrc16;

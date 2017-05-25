@@ -53,6 +53,16 @@ int32_t firstReceiveInt()
     return numbers[i];
 }
 
+int32_t nestedCallTest()
+{
+    return callFirstSide() + 1;
+}
+
+int32_t callSecondSide()
+{
+    return callFirstSide() + 1;
+}
+
 void add_services(erpc::SimpleServer *server)
 {
     /* Define services to add using dynamic memory allocation

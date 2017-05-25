@@ -30,7 +30,6 @@
  */
 
 #include "CGenerator.h"
-#include "erpc_version.h"
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
@@ -478,7 +477,8 @@ void CGenerator::generate()
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAllocErrors);
 
-    m_templateData["erpcVersion"] = ERPC_VERSION;
+    /* Need handle nested calls. */
+    m_templateData["nestedCall"] = false;
 
     data_list empty;
     m_templateData["enums"] = empty;
@@ -1212,6 +1212,16 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     else
     {
         info["isNonExternalFunction"] = false;
+    }
+
+    if ((fn->findAnnotation(NESTED_CALL) != nullptr))
+    {
+        info["nestedCall"] = true;
+        m_templateData["nestedCall"] = true;
+    }
+    else
+    {
+        info["nestedCall"] = false;
     }
 
     // Get return value info

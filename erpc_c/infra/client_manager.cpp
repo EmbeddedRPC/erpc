@@ -84,6 +84,41 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
     return kErpcStatus_Success;
 }
 
+#if ERPC_NESTED_CALLS
+erpc_status_t ClientManager::performNestedRequest(RequestContext &request)
+{
+    assert(m_transport && "transport/arbitrator not set");
+
+    // Send invocation request to server.
+    erpc_status_t err = m_transport->send(request.getCodec()->getBuffer());
+    if (err)
+    {
+        return err;
+    }
+
+    // If the request is oneway, then there is nothing more to do.
+    if (!request.isOneway())
+    {
+        // Receive reply.
+        assert(m_server && "server for nesting calls was not set");
+        err = m_server->run(request);
+        if (err)
+        {
+            return err;
+        }
+
+        // Check the reply.
+        err = verifyReply(request);
+        if (err)
+        {
+            return err;
+        }
+    }
+
+    return kErpcStatus_Success;
+}
+#endif
+
 erpc_status_t ClientManager::verifyReply(RequestContext &request)
 {
     // Some transport layers change the request's message buffer pointer (for things like zero

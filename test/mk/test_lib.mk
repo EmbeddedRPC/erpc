@@ -42,6 +42,8 @@ ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
 RPC_OBJS_ROOT = $(TARGET_OUTPUT_ROOT)
 UNIT_OUT_DIR = $(RPC_OBJS_ROOT)/unit_test_common
 
+CXXFLAGS += -DERPC_NESTED_CALLS=1
+
 #-----------------------------------------------
 # Include path. Add the include paths like this:
 # INCLUDES += ./include/

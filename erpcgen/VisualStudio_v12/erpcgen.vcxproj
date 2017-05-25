@@ -160,17 +160,16 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     </Bison>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\erpc_c\infra\crc16.h" />
     <ClInclude Include="..\..\erpc_c\infra\erpc_version.h" />
+    <ClInclude Include="..\src\annotations.h" />
     <ClInclude Include="..\src\format_string.h" />
     <ClInclude Include="..\src\HexValues.h" />
     <ClInclude Include="..\src\Logging.h" />
     <ClInclude Include="..\src\options.h" />
     <ClInclude Include="..\src\SearchPath.h" />
     <ClInclude Include="..\src\smart_ptr.h" />
+    <ClInclude Include="..\src\types\FunctionType.h" />
     <ClInclude Include="..\src\types\UnionCase.h" />
     <ClInclude Include="..\src\types\UnionType.h" />
     <ClInclude Include="..\src\Value.h" />
@@ -259,6 +258,9 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
   </ItemGroup>
   <ItemGroup>
     <Bison Include="..\src\erpcgen_parser.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme_erpcgen.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

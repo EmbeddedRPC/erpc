@@ -32,7 +32,11 @@
 #ifndef _EMBEDDED_RPC__SERVER_H_
 #define _EMBEDDED_RPC__SERVER_H_
 
+#include "erpc_config_internal.h"
 #include "codec.h"
+#if ERPC_NESTED_CALLS
+#include "client_manager.h"
+#endif
 
 /*!
  * @addtogroup infra_server
@@ -45,6 +49,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace erpc {
+#if ERPC_NESTED_CALLS
+class RequestContext;
+#endif
 /*!
  * @brief Abstract interface for service, which can be executed on server side.
  *
@@ -182,13 +189,28 @@ protected:
     /*!
      * @brief Process message.
      *
-     * @param[in] inCodec Inout codec to use.
-     * @param[out] msgType Type of received message. Based on message type will be (will be not) sent respond.
+     * @param[in] codec Inout codec to use.
+     * @param[in] msgType Type of received message. Based on message type will be (will be not) sent respond.
+     * @param[in] serviceId To identify interface.
+     * @param[in] methodId To identify function in interface.
+     * @param[in] sequence To connect correct answer with correct request.
      *
-     * @returns #kErpcStatus_Success, #kErpcStatus_InvalidArgument or based on codec startReadMessage,
-     * or based on service handleInvocation.
+     * @returns #kErpcStatus_Success or based on codec startReadMessage.
      */
-    virtual erpc_status_t processMessage(Codec *codec, message_type_t &msgType);
+    virtual erpc_status_t processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId, uint32_t sequence);
+
+    /*!
+     * @brief Read head of message to identify type of message.
+     *
+     * @param[in] codec Inout codec to use.
+     * @param[out] msgType Type of received message. Based on message type will be (will be not) sent respond.
+     * @param[out] serviceId To identify interface.
+     * @param[out] methodId To identify function in interface.
+     * @param[out] sequence To connect correct answer with correct request.
+     *
+     * @returns #kErpcStatus_Success or based on service handleInvocation.
+     */
+    virtual erpc_status_t readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence);
 
     /*!
      * @brief This function finds service base on service ID.
@@ -198,6 +220,18 @@ protected:
      * @return Pointer to service or NULL.
      */
     virtual Service *findServiceWithId(uint32_t serviceId);
+
+#if ERPC_NESTED_CALLS
+    friend class ClientManager;
+    friend class ArbitratedClientManager;
+
+    /*!
+     * @brief This function runs the server.
+     *
+     * @param[in] Request context to check that answer was for nested call.
+     */
+    virtual erpc_status_t run(RequestContext &request) = 0;
+#endif
 
 private:
     // Disable copy ctor.

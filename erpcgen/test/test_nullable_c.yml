@@ -20,9 +20,7 @@ test_client.cpp:
       - codec->writeString(strlen(a), a);
   - if: dir in ('out', 'inout')
     then:
-      - bool isNull;
-      - codec->readNullFlag(&isNull);
-      - if (!isNull)
+      - if (a != NULL)
       - codec->readString(&a_len, &a_local);
 test_server.cpp:
   - ::bar_shim
@@ -37,11 +35,7 @@ test_server.cpp:
       - a = NULL;
   - if: dir in ('out', 'inout')
     then:
-      - if (a == NULL)
-      - codec->writeNullFlag(true);
-      - else
-      - codec->writeNullFlag(false);
-      - not: if (a)
+      - if (a != NULL)
       - codec->writeString(strlen(a), a);
 ---
 name: in param struct

@@ -59,7 +59,7 @@ extern const uint32_t erpc_generated_crc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
+erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
     // Init factories.
     s_codecFactory.construct();
@@ -73,6 +73,7 @@ void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
     s_server->setCodecFactory(s_codecFactory);
     s_server->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
     g_server = s_server;
+    return reinterpret_cast<erpc_server_t>(g_server);
 }
 
 void erpc_server_deinit()

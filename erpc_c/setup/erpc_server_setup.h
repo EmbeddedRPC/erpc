@@ -33,6 +33,7 @@
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
 #include "erpc_common.h"
+#include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 #include <stdbool.h>
@@ -52,6 +53,9 @@
 extern "C" {
 #endif
 
+//! @brief Opaque server object type.
+typedef struct ServerType *erpc_server_t;
+
 //! @name Server setup
 //@{
 
@@ -59,8 +63,10 @@ extern "C" {
  * @brief This function initializes server.
  *
  * This function initializes server with all components necessary for running server.
+ *
+ * @return Server object type.
  */
-void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
+erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
 
 /*!
  * @brief This function de-initializes server.

@@ -1048,6 +1048,10 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
         AstNode *callbackTypeNode = (*node)[2];
         if (callbackTypeNode)
         {
+            if (!func->findAnnotation(NESTED_CALL))
+            {
+                Log::info("This function should be marked as @nested and in erpc_config.h should be presented #ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED).\n");
+            }
             DataType *callbackDataType = lookupDataType(callbackTypeNode);
             FunctionType *callbackFunctionType = dynamic_cast<FunctionType *>(callbackDataType);
             assert(callbackFunctionType);

@@ -158,9 +158,6 @@ void PythonGenerator::generate()
         }
     }
 
-    //ToDo: Right now hardcoded eRPC python version.
-    m_templateData["erpcVersion"] = "1.4.1";
-
     makeIncludesTemplateData(m_templateData);
 
     interfaceLists_t interfaceLists = makeInterfacesTemplateData();

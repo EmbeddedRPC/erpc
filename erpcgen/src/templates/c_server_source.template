@@ -83,7 +83,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {%   for param in fn.parameters %}
     {$param.variable}{% if param.isNullParam && errVar != "" %} = NULL{%endif%};
 {%    if !param.shared %}
-{%     if param.isNullable && !param.shared %}
+{%     if param.isNullable %}
 {%      if param.allocateToClientAndServer || param.allocateToClient %}
 {$> addIndent("    ", param.mallocServer)}
 {%      endif -- allocate %}
@@ -140,7 +140,10 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 
 {%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
+    if ({$param.coderCall.name} != NULL)
+    {
+{$addInfraErrorChecks("        ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
+    }
 {%     else -- isNullable %}
 {$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}

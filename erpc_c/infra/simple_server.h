@@ -93,6 +93,42 @@ public:
 
 protected:
     /*!
+     * @brief This function handle receiving request message and reding base info about message.
+     *
+     * @param[in] codec Inout codec to use.
+     * @param[in] buff Inout codec to use.
+     * @param[out] msgType Type of received message. Based on message type will be (will be not) sent respond.
+     * @param[out] serviceId To identify interface.
+     * @param[out] methodId To identify function in interface.
+     * @param[out] sequence To connect correct answer with correct request.
+     *
+     * @returns #kErpcStatus_Success or based on service handleInvocation.
+     */
+    erpc_status_t runInternalBegin(Codec **codec, MessageBuffer &buff, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence);
+
+    /*!
+     * @brief This function process message and handle sending respond.
+     *
+     * @param[in] codec Inout codec to use.
+     * @param[in] msgType Type of received message. Based on message type will be (will be not) sent respond.
+     * @param[in] serviceId To identify interface.
+     * @param[in] methodId To identify function in interface.
+     * @param[in] sequence To connect correct answer with correct request.
+     *
+     * @returns #kErpcStatus_Success or based on service handleInvocation.
+     */
+    erpc_status_t runInternalEnd(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId, uint32_t sequence);
+
+#if ERPC_NESTED_CALLS
+    /*!
+     * @brief This function runs the server.
+     *
+     * @param[in] Request context to check that answer was for nested call.
+     */
+    virtual erpc_status_t run(RequestContext &request);
+#endif
+
+    /*!
      * @brief Run server implementation.
      *
      * This function call functions for receiving data, process this data and

@@ -47,6 +47,12 @@
 #define ERPC_THREADS_NONE (0)     //!< No threads.
 #define ERPC_THREADS_PTHREADS (1) //!< POSIX pthreads.
 #define ERPC_THREADS_FREERTOS (2) //!< FreeRTOS.
+
+#define ERPC_NOEXCEPT_DISABLED (0) //!< Disabling noexcept feature.
+#define ERPC_NOEXCEPT_ENABLED (1)  //!<  Enabling noexcept feature.
+
+#define ERPC_NESTED_CALLS_DISABLED (0) //!< No nested calls support.
+#define ERPC_NESTED_CALLS_ENABLED (1)  //!< Nested calls support.
 //@}
 
 //! @name Configuration options
@@ -68,6 +74,19 @@
 //! Uncomment to change the size of buffers allocated by BasicMessageBufferFactory in the client
 //! and server setup functions (@ref client_setup and @ref server_setup). The default size is 256.
 //#define ERPC_DEFAULT_BUFFER_SIZE (256)
+
+//! @def ERPC_NOEXCEPT
+//!
+//! @brief Disable/enable noexcept support.
+//!
+//! Uncomment for using noexcept feature.
+//#define ERPC_NOEXCEPT (ERPC_NOEXCEPT_ENABLED)
+
+//! @def ERPC_NESTED_CALLS
+//!
+//! Default set to ERPC_NESTED_CALLS_DISABLED. Uncomment when callbacks, or other eRPC
+//! functions are called from server implementation of another eRPC call.
+//#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
 
 //@}
 

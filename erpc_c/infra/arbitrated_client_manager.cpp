@@ -82,6 +82,7 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
             return err;
         }
 
+        // Check the reply.
         err = verifyReply(request);
         if (err)
         {

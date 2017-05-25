@@ -150,6 +150,7 @@ int main(int argc, char **argv)
     g_server.setCodecFactory(&g_basicCodecFactory);
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
+    g_client->setServer(&g_server);
 
     int i = -1;
     err = (erpc_status_t)-1;

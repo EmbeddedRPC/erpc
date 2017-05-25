@@ -41,8 +41,9 @@
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-//! @brief Version 1.4.1.
-#define ERPC_VERSION 10401
+//! @brief Version 1.4.3.
+#define ERPC_VERSION "1.4.3"
+#define ERPC_VERSION_NUMBER 10403
 
 /*! @} */
 

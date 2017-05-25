@@ -33,6 +33,7 @@
 #define _ERPC_ARBITRATED_CLIENT_SETUP_H_
 
 #include "erpc_common.h"
+#include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 #include <stdint.h>
@@ -84,6 +85,15 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
  * @param[in] error_handler Pointer to function error handler.
  */
 void erpc_client_set_error_handler(client_error_handler_t error_handler);
+
+#if ERPC_NESTED_CALLS
+/*!
+ * @brief This function set server object for handling nested eRPC calls.
+ *
+ * @param[in] server Initiated server.
+ */
+void erpc_client_set_server(erpc_server_t server);
+#endif
 
 /*!
  * @brief This function de-initializes client.

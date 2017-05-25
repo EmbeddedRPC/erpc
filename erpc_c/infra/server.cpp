@@ -63,17 +63,13 @@ void Server::addService(Service *service)
     link->setNext(service);
 }
 
-erpc_status_t Server::processMessage(Codec *codec, message_type_t &msgType)
+erpc_status_t Server::readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence)
 {
-    uint32_t serviceId;
-    uint32_t methodId;
-    uint32_t sequence;
-    erpc_status_t err = codec->startReadMessage(&msgType, &serviceId, &methodId, &sequence);
-    if (err)
-    {
-        return err;
-    }
+    return codec->startReadMessage(&msgType, &serviceId, &methodId, &sequence);
+}
 
+erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId, uint32_t sequence)
+{
     if (msgType != kInvocationMessage && msgType != kOnewayMessage)
     {
         return kErpcStatus_InvalidArgument;

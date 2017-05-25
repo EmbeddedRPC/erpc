@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "transport_arbitrator.h"
+#include "erpc_config_internal.h"
 #include <cassert>
 #include <cstdio>
 #include <string>
@@ -115,6 +116,14 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
                 break;
             }
         }
+
+#if ERPC_NESTED_CALLS
+        // If received answer is not for postponed client, it can be for nested server call.
+        if (client == NULL)
+        {
+            return kErpcStatus_Success;
+        }
+#endif
     }
 }
 
@@ -129,7 +138,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
     PendingClientInfo *info = addPendingClient();
     if (!info)
     {
-        return 0;
+        return kErpcStatus_Fail;
     }
     info->m_request = &request;
     info->m_isValid = true;

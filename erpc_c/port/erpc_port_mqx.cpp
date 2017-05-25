@@ -33,88 +33,44 @@
 #include "mqx.h"
 #include <new>
 
-#if __cplusplus >= 201103
-#define NOEXCEPT noexcept
-#else
-#define NOEXCEPT
-#endif // NOEXCEPT
-
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
-#if defined(__CC_ARM) /* Keil MDK */
-void *operator new(std::size_t count) throw(std::bad_alloc)
+void *operator new(std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new(std::size_t count, const std::nothrow_t &tag) throw()
+void *operator new(std::size_t count, const std::nothrow_t &tag) THROW
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new[](std::size_t count) throw(std::bad_alloc)
+void *operator new[](std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new[](std::size_t count, const std::nothrow_t &tag) throw()
+void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW
 
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void operator delete(void *ptr) throw()
+void operator delete(void *ptr) THROW
 {
     erpc_free(ptr);
 }
 
-void operator delete[](void *ptr) throw()
+void operator delete[](void *ptr) THROW
 {
     erpc_free(ptr);
 }
-
-#else
-
-void *operator new(size_t count)
-{
-    void *p = erpc_malloc(count);
-    return p;
-}
-
-void *operator new(size_t count, const nothrow_t &tag)
-{
-    void *p = erpc_malloc(count);
-    return p;
-}
-
-void *operator new[](size_t count)
-{
-    void *p = erpc_malloc(count);
-    return p;
-}
-
-void *operator new[](size_t count, const nothrow_t &tag)
-{
-    void *p = erpc_malloc(count);
-    return p;
-}
-
-void operator delete(void *ptr)
-{
-    erpc_free(ptr);
-}
-
-void operator delete[](void *ptr)
-{
-    erpc_free(ptr);
-}
-#endif
 
 void *erpc_malloc(size_t size)
 {

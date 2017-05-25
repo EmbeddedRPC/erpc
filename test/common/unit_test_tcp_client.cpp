@@ -29,12 +29,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "myAlloc.h"
 #include "Logging.h"
 #include "basic_codec.h"
 #include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
+#include "myAlloc.h"
 #include "tcp_transport.h"
 #include "test_unit_test_common.h"
 

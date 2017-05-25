@@ -29,13 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "myAlloc.h"
 #include "Logging.h"
 #include "basic_codec.h"
+#include "myAlloc.h"
 #include "simple_server.h"
 #include "tcp_transport.h"
-#include "unit_test.h"
 #include "test_unit_test_common_server.h"
+#include "unit_test.h"
 
 using namespace erpc;
 

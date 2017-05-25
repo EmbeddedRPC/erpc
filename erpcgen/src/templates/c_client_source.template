@@ -16,6 +16,12 @@ extern "C"
 
 {$checkCrc()}
 
+{% if nestedCall %}
+#if !ERPC_NESTED_CALLS
+#error "When @nested annotation is used, then ERPC_NESTED_CALLS macro need be enabled and server need be set."
+#endif
+{% endif %}
+
 using namespace erpc;
 #if !(__embedded_cplusplus)
 using namespace std;

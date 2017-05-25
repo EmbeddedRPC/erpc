@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_version.h"
 #include "CGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
@@ -36,7 +37,6 @@
 #include "PythonGenerator.h"
 #include "SearchPath.h"
 #include "UniqueIdChecker.h"
-#include "erpcgen_version.h"
 #include "options.h"
 #include "types/Program.h"
 #include <cstdint>
@@ -59,7 +59,7 @@ namespace erpcgen {
 const char k_toolName[] = "erpcgen";
 
 /*! Current version number for the tool. */
-const char k_version[] = ERPCGEN_VERSION;
+const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
 const char k_copyright[] = "Copyright 2016 NXP. All rights reserved.";

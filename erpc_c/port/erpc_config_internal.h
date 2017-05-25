@@ -87,6 +87,35 @@
     #define ERPC_DEFAULT_BUFFERS_COUNT (2)
 #endif
 
+// Disable/enable noexcept.
+#if !defined(ERPC_NOEXCEPT)
+    #if ERPC_HAS_POSIX
+        #define ERPC_NOEXCEPT (ERPC_NOEXCEPT_ENABLED)
+    #else
+        #define ERPC_NOEXCEPT (ERPC_NOEXCEPT_DISABLED)
+    #endif
+#endif
+
+//NOEXCEPT support
+#if __cplusplus >= 201103 && ERPC_NOEXCEPT
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif // NOEXCEPT
+
+// Disabling nesting calls support as default.
+#if !defined(ERPC_NESTED_CALLS)
+    #define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_DISABLED)
+#endif
+
+#if defined(__CC_ARM) /* Keil MDK */
+#define THROW_BADALLOC throw(std::bad_alloc)
+#define THROW throw()
+#else
+#define THROW_BADALLOC
+#define THROW
+#endif
+
 /* clang-format on */
 #endif // _ERPC_DETECT_H_
 ////////////////////////////////////////////////////////////////////////////////

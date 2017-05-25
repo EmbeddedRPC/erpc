@@ -83,6 +83,13 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler)
     }
 }
 
+#if ERPC_NESTED_CALLS
+void erpc_client_set_server(erpc_server_t server)
+{
+    g_client->setServer(server);
+}
+#endif
+
 void erpc_client_deinit()
 {
     s_crc16.destroy();

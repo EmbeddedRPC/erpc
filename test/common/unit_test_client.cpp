@@ -132,12 +132,10 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(RPMSG)
-    // MU_Init(MU0_A);
+    /* Initialize MCMGR before calling its API */
+    MCMGR_Init();
 
-    /* start the second core */
-    // MU_BootCoreB(MU0_A, kMU_CoreBootFromImem);
-    /* Boot source for Core 1 */
-    // MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS);
+    /* Boot Secondary core application */
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
     /* Wait for remote side to come up. This delay is arbitrary and may

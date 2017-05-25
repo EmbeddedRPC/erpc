@@ -68,9 +68,6 @@ int main(int argc, const char *argv[])
 {
 #if defined(RPMSG)
     uint32_t startupData;
-    // MU_Init(MU0_B);
-    /* Initialize GIC */
-    // env_init();
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
     /* Get the startup data */

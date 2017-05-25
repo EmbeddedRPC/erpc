@@ -29,10 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "myAlloc.h"
 #include "Logging.h"
 #include "arbitrated_client_manager.h"
 #include "basic_codec.h"
+#include "myAlloc.h"
 #include "simple_server.h"
 #include "tcp_transport.h"
 #include "test_firstInterface.h"
@@ -163,6 +163,7 @@ int main(int argc, char **argv)
     g_server.setCodecFactory(&g_basicCodecFactory);
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
+    g_client->setServer(&g_server);
 
     err = (erpc_status_t)-1;
 

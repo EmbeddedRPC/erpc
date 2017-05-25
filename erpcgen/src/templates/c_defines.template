@@ -21,6 +21,7 @@
 
 {# Code #}
 {%   set s_performRequest = infraErrVar & "g_client->performRequest(request);" %}
+{%   set s_performNestedRequest = infraErrVar & "g_client->performNestedRequest(request);" %}
 {%   set s_endWriteMessage = infraErrVar & "codec->endWriteMessage();" %}
 {%   set s_startReadStruct = infraErrVar & "codec->startReadStruct();" %}
 {%   set s_endReadStruct = infraErrVar & "codec->endReadStruct();" %}
@@ -42,16 +43,22 @@
 {$addInfraErrorChecks("    ", s_endWriteMessage)}
 
     // Send message to server
+{% if fn.nestedCall %}
+{$addInfraErrorChecks("    ", s_performNestedRequest)}
+{% else  -- fn.nestedCall %}
 {$addInfraErrorChecks("    ", s_performRequest)}
+{% endif  -- fn.nestedCall %}
 {% enddef %}
 
 {% def f_clientDecode(iface, fn) %}
 {%    if fn.needNullVariableOnClient %}
-    bool isNull;
 {%    endif -- needNullVariableOnClient %}
 {%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}{$loop.addNewLineIfNotLast}
+    if ({$param.coderCall.name} != NULL)
+    {
+{$addInfraErrorChecks("        ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
+    }
 {%     else -- notNullable %}
 {$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
