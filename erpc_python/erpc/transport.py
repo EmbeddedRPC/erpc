@@ -35,7 +35,12 @@ import socket
 import threading
 from .crc16 import Crc16
 from .client import RequestError
-
+try:
+    from rpmsg.sysfs import RpmsgEndpoint
+    RpmsgEndpointReady = True
+except ImportError:
+    RpmsgEndpointReady = False
+    
 ##
 # @brief Base transport class.
 class Transport(object):
@@ -174,4 +179,36 @@ class TCPTransport(FramedTransport):
                 remaining -= len(data)
             return result
 
+
+class RpmsgTransport(Transport):
+    def __init__(self, ept_addr_local = None, ept_addr_remote = None, channel_name = None):
+        if not RpmsgEndpointReady:
+            print("Please, install RPMsg from: https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-python")
+            raise ImportError
+
+        if ept_addr_local is None:
+            ept_addr_local = RpmsgEndpoint.LOCAL_DEFAULT_ADDRESS
+        if ept_addr_remote is None:
+            ept_addr_remote = RpmsgEndpoint.REMOTE_DEFAULT_ADDRESS
+        if channel_name is None:
+            channel_name = RpmsgEndpoint.rpmsg_openamp_channel
+
+        self.ept_addr_remote = ept_addr_remote
+        self.ept = RpmsgEndpoint(
+            channel_name,
+            ept_addr_local,
+            RpmsgEndpoint.Types.DATAGRAM)
+
+
+    def send(self, message):
+        self.ept.send(message, self.ept_addr_remote)
+
+    def receive(self):
+        while True:
+            ret = self.ept.recv(-1)
+            if len(ret[1]) != 0:
+                return ret[1]
+            else:
+                time.sleep(0.001)
+        return ret[1] 
 
