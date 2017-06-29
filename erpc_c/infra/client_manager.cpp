@@ -41,6 +41,12 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
+#if ERPC_NESTED_CALLS_DETECTION
+extern bool nestingDetection;
+#pragma weak nestingDetection
+bool nestingDetection = false;
+#endif
+
 void ClientManager::setTransport(Transport *transport)
 {
     m_transport = transport;
@@ -56,6 +62,13 @@ RequestContext ClientManager::createRequest(bool isOneway)
 
 erpc_status_t ClientManager::performRequest(RequestContext &request)
 {
+#if ERPC_NESTED_CALLS_DETECTION
+    if (!request.isOneway() && nestingDetection)
+    {
+        return kErpcStatus_NestedCallFailure;
+    }
+#endif
+
     // Send invocation request to server.
     erpc_status_t err = m_transport->send(request.getCodec()->getBuffer());
     if (err)

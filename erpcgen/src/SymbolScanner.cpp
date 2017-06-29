@@ -66,9 +66,10 @@ AstNode *SymbolScanner::handleConst(AstNode *node, bottom_up)
 Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const constDataType)
 {
     Value *constVal = nullptr;
+    bool isStringConst = constDataType->getTrueDataType()->isString();
     if (rhsIsAStringLiteral(node))
     {
-        if (!dataTypeIsAString(constDataType))
+        if (!isStringConst)
         {
             throw syntax_error2("Attempt to assign a string to a non-string data type",
                                 node->getChild(0)->getToken().getLocation(), m_fileName);
@@ -84,7 +85,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
         Token &rhsExpressionChildTok = node->getChild(2)->getChild(0)->getToken();
         if (rhsExpressionChildTok.isNumberTok())
         {
-            if (dataTypeIsAString(constDataType))
+            if (isStringConst)
             {
                 throw syntax_error2("Attempt to assign a number to a string data type",
                                     node->getChild(0)->getToken().getLocation(), m_fileName);
@@ -99,7 +100,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
             constVal = getValueFromSymbol(rhsExpressionChildTok);
             if (kStringValue == constVal->getType())
             {
-                if (!dataTypeIsAString(constDataType))
+                if (!isStringConst)
                 {
                     delete constVal;
                     throw syntax_error2("Attempt to assign a string to a non-string data type",
@@ -108,7 +109,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
             }
             else // kStringValue != constVal->getType()
             {
-                if (dataTypeIsAString(constDataType))
+                if (isStringConst)
                 {
                     delete constVal;
                     throw syntax_error2("Attempt to assign a number to a string data type",
@@ -128,26 +129,6 @@ bool SymbolScanner::rhsIsAnExpression(AstNode *rhs)
 bool SymbolScanner::rhsIsAStringLiteral(AstNode *rhs)
 {
     return TOK_STRING_LITERAL == rhs->getChild(2)->getToken().getToken();
-}
-
-bool SymbolScanner::dataTypeIsAString(DataType *const constDataType)
-{
-    if (constDataType->isBuiltin())
-    {
-        BuiltinType *b = dynamic_cast<BuiltinType *>(constDataType);
-        assert(b);
-        if (b->isString())
-        {
-            return true;
-        }
-    }
-    else if (constDataType->isAlias())
-    {
-        assert(dynamic_cast<AliasType *>(constDataType));
-        return SymbolScanner::dataTypeIsAString(dynamic_cast<AliasType *>(constDataType)->getElementType());
-    }
-
-    return false;
 }
 
 DataType *SymbolScanner::getDataTypeForConst(AstNode *typeNode)
@@ -698,12 +679,18 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
             format_string("line %d: invalid data type. Structure member has same data type name as structure name.",
                           tok.getFirstLine()));
     }
+
     /* Create struct member object. */
     StructMember *param = new StructMember(tok, dataType);
-    addAnnotations(node->getChild(2), param);
+
+    //Set byref flag for structure member.
+    AstNode *memberType = node->getChild(2);
+    param->setByref(memberType->getTokenString().compare("2") == 0);
+
+    addAnnotations(node->getChild(3), param);
 
     /* doxygen comment */
-    addDoxygenComments(param, node->getChild(3), node->getChild(4));
+    addDoxygenComments(param, node->getChild(4), node->getChild(5));
 
     m_currentStruct->addMember(param);
 
@@ -879,7 +866,8 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
                 DataType *declType = lookupDataType(unionDecl->getChild(1));
                 m_currentUnion->addUnionMemberDeclaration(name, declType);
 
-                addAnnotations(unionDecl->getChild(2), &m_currentUnion->getUnionMemberDeclarations().back());
+                addAnnotations(unionDecl->getChild(3), &m_currentUnion->getUnionMemberDeclarations().back());
+                addDoxygenComments(&m_currentUnion->getUnionMemberDeclarations().back(), unionDecl->getChild(4), unionDecl->getChild(5));
 
                 declNames.push_back(name);
             }
@@ -1065,7 +1053,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
                     {
                         throw semantic_error(format_string("Missing function param name. That has to be defined in function definition %d or function type definition %d.\n", func->getFirstLine(), callbackFunctionType->getFirstLine()));
                     }
-                    func->getParameters().getMembers().push_back(createCallbackParam(callbackParams[i], callbackParams[i]->getName()));
+                    func->getParameters().addMember(createCallbackParam(callbackParams[i], callbackParams[i]->getName()));
                 }
             }
         }
@@ -1240,11 +1228,7 @@ DataType *SymbolScanner::lookupDataTypeByName(const Token &tok, SymbolScope *sco
 bool SymbolScanner::containsStructEnumDeclaration(const AstNode *typeNode)
 {
     const Token &typeToken = typeNode->getToken();
-    if (typeToken.getToken() == TOK_ENUM || typeToken.getToken() == TOK_STRUCT)
-    {
-        return true;
-    }
-    return false;
+    return (typeToken.getToken() == TOK_ENUM || typeToken.getToken() == TOK_STRUCT);
 }
 
 DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
@@ -1426,25 +1410,18 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
 
 Value *SymbolScanner::getAnnotationValue(AstNode *annotation)
 {
-    Value *value;
-
     if (AstNode *annotation_value = annotation->getChild(1))
     {
         // Strip TOK_EXPR token
         if (0 == strcmp("TOK_EXPR", annotation_value->getToken().getTokenName()))
         {
-            value = annotation_value->getChild(0)->getToken().getValue();
+            return annotation_value->getChild(0)->getToken().getValue();
         }
-        else
-        {
-            value = annotation_value->getToken().getValue();
-        }
+
+        return annotation_value->getToken().getValue();
     }
-    else
-    {
-        return nullptr;
-    }
-    return value;
+
+    return nullptr;
 }
 
 void SymbolScanner::checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol)
@@ -1512,26 +1489,19 @@ void SymbolScanner::scanStructForAnnotations()
             Symbol *disSymbol;
             if (unionType->isNonEncapsulatedUnion())
             {
-                Annotation *discriminatorAnn = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION);
-                if (!discriminatorAnn)
+                std::string discrimintorName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+                if (discrimintorName.empty())
                 {
                     throw syntax_error(
-                        format_string("Missing annotation discriminator for union variable %s on line %d",
-                                      structMember->getName().c_str(), structMember->getFirstLine()));
-                }
-
-                if (!discriminatorAnn->getValueObject())
-                {
-                    throw syntax_error(
-                        format_string("Missing value for annotation discriminator used for union variable %s on line %d",
+                        format_string("Missing discriminator for union variable %s on line %d",
                                       structMember->getName().c_str(), structMember->getFirstLine()));
                 }
 
                 // search in structure scope for member referenced with annotation
-                disSymbol = m_currentStruct->getScope().getSymbol(discriminatorAnn->getValueObject()->toString(), false);
+                disSymbol = m_currentStruct->getScope().getSymbol(discrimintorName, false);
                 if (!disSymbol)
                 {
-                    disSymbol = m_globals->getSymbol(discriminatorAnn->getValueObject()->toString(), false);
+                    disSymbol = m_globals->getSymbol(discrimintorName, false);
                 }
                 if (!disSymbol)
                 {
@@ -1567,7 +1537,7 @@ void SymbolScanner::scanStructForAnnotations()
             }
 
             assert(disType);
-            if (disType->isString() || disType->isBinary() || !(disType->isBuiltin() || disType->isEnum()))
+            if (!disType->isScalar() && !disType->isEnum())
             {
                 throw syntax_error(
                     format_string("Discriminator used for union variable %s on line %d has to be "
@@ -1685,16 +1655,18 @@ void SymbolScanner::checkIfAnnValueIsIntNumberOrIntType(Annotation *ann)
         if (trueDataType)
         {
             //check if data type is integer type
-            if (trueDataType->isBuiltin())
+            if (trueDataType->isScalar())
             {
                 BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
-                if (builtinType && !builtinType->isInt())
+                if (builtinType && builtinType->isInt())
                 {
-                    throw semantic_error(format_string(
-                        "line %d: Annotation %s contains reference to non-integer parameter or member %s declared on line %d.",
-                        annNameFirstLine, annName.c_str(), annValue.c_str(), trueDataType->getLocation().m_firstLine));
+                    return;
                 }
             }
+
+            throw semantic_error(format_string(
+                "line %d: Annotation %s contains reference to non-integer parameter or member %s declared on line %d.",
+                annNameFirstLine, annName.c_str(), annValue.c_str(), trueDataType->getLocation().m_firstLine));
         }
         else
         {

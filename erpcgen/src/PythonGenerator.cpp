@@ -70,23 +70,16 @@ PythonGenerator::PythonGenerator(InterfaceDefinition *def, uint16_t idlCrc16)
 
 void PythonGenerator::generateOutputFiles(const std::string &fileName)
 {
-    boost::filesystem::path outputDir = m_def->getOutputDirectory();
-    std::string commonFileName = stripExtension(m_def->getOutputFilename());
-    if (fileName != "")
-    {
-        commonFileName += "_" + fileName;
-    }
-
     // Make sure the package folder is created.
-    boost::filesystem::path dir(commonFileName);
-    dir = outputDir / dir;
+    boost::filesystem::path dir(fileName);
+    dir = m_def->getOutputDirectory() / dir;
     boost::filesystem::create_directories(dir);
 
-    generateInitFile(commonFileName);
-    generateCommonFile(commonFileName);
-    generateClientFile(commonFileName);
-    generateServerFile(commonFileName);
-    generateInterfaceFile(commonFileName);
+    generateInitFile(fileName);
+    generateCommonFile(fileName);
+    generateClientFile(fileName);
+    generateServerFile(fileName);
+    generateInterfaceFile(fileName);
 }
 
 void PythonGenerator::generateInitFile(std::string fileName)
@@ -149,6 +142,9 @@ void PythonGenerator::generate()
 
     parseSubtemplates();
 
+    // Generate file containing crc of IDL files
+    generateCrcFile();
+
     if (m_def->hasProgramSymbol())
     {
         for (auto anno : m_def->getProgramSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
@@ -158,23 +154,29 @@ void PythonGenerator::generate()
         }
     }
 
-    makeIncludesTemplateData(m_templateData);
+    findGroupDataTypes();
 
-    interfaceLists_t interfaceLists = makeInterfacesTemplateData();
+    makeIncludesTemplateData();
+
+    makeAliasesTemplateData();
 
     makeConstTemplateData();
 
     makeEnumsTemplateData();
 
-    makeUnionsTemplateData();
-
     makeFunctionsTemplateData();
 
-    makeAliasesTemplateData();
+    for (Group *group : m_groups)
+    {
+        data_map groupTemplate;
+        groupTemplate["name"] = group->getName();
+        groupTemplate["includes"] = makeGroupIncludesTemplateData(group);
+        groupTemplate["symbolsMap"] = makeGroupSymbolsTemplateData(group);
+        groupTemplate["interfaces"] = makeGroupInterfacesTemplateData(group);
+        group->setTemplate(groupTemplate);
 
-    makeStructsTemplateData();
-
-    generateInterfaceOutputFiles(m_templateData, interfaceLists);
+        generateGroupOutputFiles(group);
+    }
 }
 
 void PythonGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo)
@@ -183,7 +185,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &sy
     symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
 }
 
-data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
+data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnIndex)
 {
     data_map info;
     std::string proto = getFunctionPrototype(fn);
@@ -196,15 +198,7 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     setTemplateComments(fn, info);
 
     /* Is function declared as external? */
-    Annotation *externalAnn = fn->findAnnotation(EXTERNAL_ANNOTATION);
-    if (!externalAnn)
-    {
-        info["isNonExternalFunction"] = true;
-    }
-    else
-    {
-        info["isNonExternalFunction"] = false;
-    }
+    info["isNonExternalFunction"] = fn->findAnnotation(EXTERNAL_ANNOTATION) == nullptr;
 
     // Get return value info
     data_map returnInfo;
@@ -254,11 +248,7 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         paramInfo["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
 
         /* Necassary for handling non-discriminated unions */
-        Annotation *annDiscriminator = param->findAnnotation(DISCRIMINATOR_ANNOTATION);
-        if (annDiscriminator)
-        {
-            paramInfo["discriminator"] = annDiscriminator->getValueObject()->toString();
-        }
+        paramInfo["discriminator"] = param->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
 
         _param_direction dir = param->getDirection();
         switch (dir)
@@ -325,8 +315,7 @@ void PythonGenerator::makeConstTemplateData()
         ConstType *constVar = dynamic_cast<ConstType *>(it);
         assert(constVar);
         data_map constInfo;
-        Annotation *externAnnotation = constVar->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!constVar->findAnnotation(EXTERNAL_ANNOTATION))
         {
             constInfo["name"] = constVar->getOutputName();
 
@@ -361,8 +350,7 @@ void PythonGenerator::makeEnumsTemplateData()
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
-        Annotation *externAnnotation = enumType->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!enumType->findAnnotation(EXTERNAL_ANNOTATION))
         {
             Log::info("%d: %s\n", n, enumType->getName().c_str());
             data_map enumInfo;
@@ -433,25 +421,81 @@ void PythonGenerator::makeAliasesTemplateData()
     m_templateData["aliases"] = aliases;
 }
 
-void PythonGenerator::makeStructsTemplateData()
+data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 {
-    Log::info("Structs:\n");
+    data_map symbolsTemplate;
+    std::set<std::string> names;
+
     data_list structs;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol))
+    data_list unions;
+
+    Log::info("Group symbols:\n");
+
+    // generate templates for group symbols or for all symbols if group has no interface defined
+    for (Symbol *symbol : (group->getInterfaces().empty() ? m_globals->getSymbolVector() : group->getSymbols()))
     {
-        StructType *structType = dynamic_cast<StructType *>(it);
-        assert(structType);
-        std::string structDesc = structType->getDescription();
-        Log::info("%s\n", structDesc.c_str());
+        data_map info;
 
-        data_map structInfo;
-        structInfo["name"] = filterName(structType->getOutputName());
-        setTemplateComments(structType, structInfo);
-        setStructMembersTemplateData(structType, structInfo);
+        switch (symbol->getSymbolType())
+        {
+            case DataType::kStructTypeSymbol:
+            {
+                StructType *structType = dynamic_cast<StructType *>(symbol);
+                if (structType == nullptr)
+                {
+                    break;
+                }
 
-        structs.push_back(structInfo);
+                Log::info("%s\n", structType->getDescription().c_str());
+
+                std::string name = filterName(structType->getOutputName());
+
+                // check if template for this structure has not already been generated
+                if (names.find(name) == names.end())
+                {
+                    info["name"] = name;
+
+                    setTemplateComments(structType, info);
+                    setStructMembersTemplateData(structType, info);
+
+                    names.insert(name);
+                    structs.push_back(info);
+                }
+                break;
+            }
+            case DataType::kUnionTypeSymbol:
+            {
+                UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                if (unionType == nullptr)
+                {
+                    break;
+                }
+
+                Log::info("%s\n", unionType->getDescription().c_str());
+
+                std::string name = filterName(unionType->getOutputName());
+
+                // check if template for this structure has not already been generated
+                if (names.find(name) == names.end())
+                {
+                    info["name"] = name;
+                    info["type"] = getTypeInfo(unionType);
+
+                    setTemplateComments(unionType, info);
+                    //setUnionMembersTemplateData(unionType, info);
+
+                    names.insert(name);
+                    unions.push_back(info);
+                }
+                break;
+            }
+        }
     }
-    m_templateData["structs"] = structs;
+
+    symbolsTemplate["structs"] = structs;
+    symbolsTemplate["unions"] = unions;
+
+    return symbolsTemplate;
 }
 
 void PythonGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::data_map &structInfo)
@@ -501,35 +545,9 @@ void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, cppte
     member_info["isNullable"] = isNullable;
     member_info["type"] = getTypeInfo(member->getDataType());
     /* Necassary for handling non-discriminated unions */
-    Annotation *annDiscriminator = member->findAnnotation(DISCRIMINATOR_ANNOTATION);
-    if (annDiscriminator)
-    {
-        member_info["discriminator"] = annDiscriminator->getValueObject()->toString();
-    }
+    member_info["discriminator"] = member->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
 
     setTemplateComments(member, member_info);
-}
-
-void PythonGenerator::makeUnionsTemplateData()
-{
-    Log::info("Unions:\n");
-    data_list unions;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kUnionTypeSymbol))
-    {
-        UnionType *unionType = dynamic_cast<UnionType *>(it);
-        assert(unionType);
-        std::string structDesc = unionType->getDescription();
-        Log::info("%s\n", structDesc.c_str());
-
-        data_map unionInfo;
-        unionInfo["name"] = filterName(unionType->getOutputName());
-        unionInfo["type"] = getTypeInfo(unionType);
-        setTemplateComments(unionType, unionInfo);
-        //setUnionMembersTemplateData(unionType, unionInfo);
-
-        unions.push_back(unionInfo);
-    }
-    m_templateData["unions"] = unions;
 }
 
 void PythonGenerator::makeFunctionsTemplateData()

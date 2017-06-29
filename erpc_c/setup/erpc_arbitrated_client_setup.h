@@ -35,6 +35,9 @@
 #include "erpc_common.h"
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
+#if ERPC_NESTED_CALLS
+#include "erpc_server_setup.h"
+#endif
 #include "erpc_transport_setup.h"
 #include <stdint.h>
 

@@ -569,15 +569,6 @@ protected:
     uint32_t getIntExprValue(const AstNode *exprNode);
 
     /*!
-     * @brief Determines if the datatype (aliased or not) can hold string data
-     *
-     * @param[in] constDataType Data type to check.
-     *
-     * @retval True when given data type is string, else false.
-     */
-    bool dataTypeIsAString(DataType *const constDataType);
-
-    /*!
      * @brief Determines if the right hand side of a constant declaration
      * is a string literal.
      *

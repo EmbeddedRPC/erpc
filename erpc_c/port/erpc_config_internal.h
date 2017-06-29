@@ -108,6 +108,15 @@
     #define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_DISABLED)
 #endif
 
+// Enabling nesting calls detection as default for debug.
+#if !defined(ERPC_NESTED_CALLS_DETECTION)
+    #if defined(NDEBUG)
+        #define ERPC_NESTED_CALLS_DETECTION (ERPC_NESTED_CALLS_DETECTION_DISABLED)
+    #else
+        #define ERPC_NESTED_CALLS_DETECTION (ERPC_NESTED_CALLS_DETECTION_ENABLED)
+    #endif
+#endif
+
 #if defined(__CC_ARM) /* Keil MDK */
 #define THROW_BADALLOC throw(std::bad_alloc)
 #define THROW throw()

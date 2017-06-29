@@ -10,7 +10,13 @@
 
 import erpc
 from . import common, interface
-{$groupClientPY}
+{% if groupNames %}
+# import callbacks declaration from other groups
+{% for name in groupNames if name != group.name %}
+from ..{$outputFilename}_{$name} import interface as interface_{$name}
+{% endfor %}
+{% endif %}
+
 {% if functions %}
 {%  for f in functions %}
 {%   if count(f.callbacks) > 1 %}
@@ -19,7 +25,7 @@ _{$f.name} = [ {%    for c in f.callbacks %}{$c.name}{%     if !loop.last %}, {%
 {%  endfor -- functions %}
 
 {%  endif -- functions %}
-{% for iface in interfaces %}
+{% for iface in group.interfaces %}
 # Client for {$iface.name}
 class {$iface.name}Client(interface.I{$iface.name}):
     def __init__(self, manager):

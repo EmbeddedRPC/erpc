@@ -196,6 +196,11 @@ public:
     virtual bool isList() const { return false; }
 
     /*!
+     * @brief Returns whether the type is a scalar builtin type.
+     */
+    virtual bool isScalar() const { return false; }
+
+    /*!
      * @brief This function return "false" value as default for identify string type.
      *
      * @retval false Always return false.

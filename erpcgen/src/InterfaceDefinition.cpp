@@ -137,10 +137,10 @@ void InterfaceDefinition::setOutputDirectory(const std::string &outputDir)
 
     if (hasProgramSymbol())
     {
-        Annotation *an = getProgramSymbol()->findAnnotation(OUTPUT_DIR_ANNOTATION);
-        if (an)
+        std::string outputDir = getProgramSymbol()->getAnnStringValue(OUTPUT_DIR_ANNOTATION);
+        if (!outputDir.empty())
         {
-            m_outputDirectory /= an->getValueObject()->toString();
+            m_outputDirectory /= outputDir;
         }
     }
 }

@@ -12,12 +12,17 @@ import erpc
 {% for inc in includes %}
 import {$inc}
 {% endfor -- includes %}
+{% if not empty(consts) %}
 
+# Constant variable declarations
 {% for c in consts %}
 {$>c.mlComment}
 {$c.name} = {$c.value}{% if c.ilComment %} {$c.ilComment}{% endif %}
 {% endfor -- constants %}
+{% endif -- consts %}
+{% if not empty(enums) %}
 
+# Enumerators data types declarations
 {% for enum in enums %}
 {$>(enum.mlComment or enum.ilComment)}
 {% if enum.name %}
@@ -31,7 +36,11 @@ class {$enum.name}:
 {% endfor -- member %}
 
 {% endfor -- enum %}
-{% for s in structs %}
+{% endif -- enums %}
+
+{% if not empty(group.symbolsMap.structs) %}
+# Structures data types declarations
+{% for s in group.symbolsMap.structs %}
 {$>(s.mlComment or s.ilComment)}
 class {$s.name}(object):
 {% for m in s.members if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == false) %}
@@ -108,10 +117,13 @@ class {$s.name}(object):
 
     def __repr__(self):
         return self.__str__()
+        
+{% endfor -- group.symbolsMap.structs %}
+{% endif -- not empty(group.symbolsMap.structs) %}
+{% if not empty(group.symbolsMap.unions) %}
 
-{% endfor -- structs %}
-
-{% for u in unions %}
+# Unions data types declarations
+{% for u in group.symbolsMap.unions %}
 {$>(u.mlComment or u.ilComment)}
 class {$u.name}(object):
 {%  for c in u.type.cases %}
@@ -136,7 +148,8 @@ class {$u.name}(object):
     def __repr__(self):
         return self.__str__()
 
-{% endfor -- unions %}
+{% endfor -- group.symbolsMap.unions %}
+{% endif -- not empty(group.symbolsMap.unions) %}
 
 {% if aliases %}
 # Type aliases

@@ -137,12 +137,13 @@ protected:
      * This function return interface function template data with all data, which
      * are necessary for generating output code for output files.
      *
+     * @param[in] group Pointer to a group.
      * @param[in] fn From this are set interface function template data.
      * @param[in] fnIndex Function index.
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, int fnIndex);
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -178,6 +179,18 @@ protected:
     void makeEnumsTemplateData();
 
     /*!
+     * @brief This function sets group symbols template data.
+     *
+     * This function sets group symbols template data with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] group Pointer to a group.
+     *
+     * @return Data map with group symbols templates.
+     */
+    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group);
+
+    /*!
      * @brief This function return enum members template data.
      *
      * This function return enum members template data with all data, which
@@ -193,22 +206,6 @@ protected:
      * @brief Fill in template data for type aliases.
      */
     void makeAliasesTemplateData();
-
-    /*!
-     * @brief This function sets structures template data.
-     *
-     * This function sets structures template data with all data, which
-     * are necessary for generating output code for output files.
-     */
-    void makeStructsTemplateData();
-
-    /*!
-     * @brief This function sets non-encapsulated unions template data.
-     *
-     * This function sets non-encapsulated unions template data with all data, which
-     * are necessary for generating output code for output files.
-     */
-    void makeUnionsTemplateData();
 
     /*!
      * @brief This function sets function type template data.

@@ -18,7 +18,11 @@ test_client.cpp:
       - codec->writeNullFlag(true)
       - if (a)
       - codec->writeString(strlen(a), a);
-  - if: dir in ('out', 'inout')
+  - if: dir == 'out'
+    then:
+      - not: if (a != NULL)
+      - codec->readString(&a_len, &a_local);
+  - if: dir == 'inout'
     then:
       - if (a != NULL)
       - codec->readString(&a_len, &a_local);
@@ -33,7 +37,11 @@ test_server.cpp:
       - err = codec->readString(&a_len, &a_local)
       - else
       - a = NULL;
-  - if: dir in ('out', 'inout')
+  - if: dir == 'out'
+    then:
+      - not: if (a != NULL)
+      - codec->writeString(strlen(a), a);
+  - if: dir =='inout'
     then:
       - if (a != NULL)
       - codec->writeString(strlen(a), a);

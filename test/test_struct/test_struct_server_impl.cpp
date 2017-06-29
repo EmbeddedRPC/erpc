@@ -187,6 +187,15 @@ void test_struct_allDirection(const AllTypes *a, const AllTypes *b, AllTypes *e)
     }
 }
 
+bool testSendingByrefMembers(const StructWithByrefMembers *s)
+{
+    if (s->a == (A*)0xED && *s->b == 4)
+    {
+        return true;
+    }
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////

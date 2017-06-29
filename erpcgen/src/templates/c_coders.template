@@ -102,34 +102,41 @@ uint8_t * {$info.dataTemp};
 uint32_t {$info.sizeTemp};
 {%  endif %}
 {$infraErrVar}codec->startReadList(&{$info.sizeTemp});
-{% if info.hasLengthVariable && not info.constantVariable %}
-{% if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
-{% endif %}
+{%  if info.hasLengthVariable && not info.constantVariable %}
+{%   if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
+{%  endif %}
 {$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}if ({$info.sizeTemp} > 0)
+{%  if info.isNullable %}
+{$infraErrIndents}{$infraErrVar}codec->readNullFlag(&isNull);
+{$> addInfraErrorChecksBegin("") }
+{%  endif --info.isNullable %}
+{$infraErrIndents}if ({$info.sizeTemp} > 0{%  if info.isNullable %} && !isNull{%  endif --info.isNullable %})
 {$infraErrIndents}{
-{%  if source == "server" || info.useMallocOnClientSide %}
+{%   if source == "server" || info.useMallocOnClientSide %}
 {$infraErrIndents}    {$info.name} = ({$info.mallocType}) erpc_malloc({$info.maxSize} * sizeof({$info.mallocSizeType}));
-{% if generateAllocErrorChecks %}
+{%    if generateAllocErrorChecks %}
 {$infraErrIndents}    if ({$info.name} == NULL)
 {$infraErrIndents}    {
 {$infraErrIndents}        {$allocErrVar}kErpcStatus_MemoryError;
 {$infraErrIndents}    }
 {$infraErrIndents}    else
 {$infraErrIndents}    {
-{%  endif %}
+{%    endif %}
 {$addIndent(infraErrIndents & allocErrIndents & "        ", decodeArrayType(info))}
-{% if generateAllocErrorChecks %}
+{%    if generateAllocErrorChecks %}
 {$infraErrIndents}    }
-{%  endif %}
-{%  else %}
+{%    endif %}
+{%   else %}
 {$addIndent(infraErrIndents & "    ", decodeArrayType(info))}
-{%  endif %}
+{%   endif %}
 {$infraErrIndents}}
 {$infraErrIndents}else
 {$infraErrIndents}{
 {$infraErrIndents}    {$info.name} = NULL;
 {$infraErrIndents}}
+{%  if info.isNullable %}
+{$> addInfraErrorChecksEnd("") }
+{%  endif --info.isNullable %}
 {$> addInfraErrorChecksEnd("") }
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}{$infraErrVar}codec->endReadList();
@@ -196,6 +203,9 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {%  endif -- default or case %}
     {
 {%  for member in case.members %}
+{% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
+{$mem.coderCall.memberAllocation}
+{% endif %}
 {$addInfraErrorChecks("        ", member.coderCall.decode(member.coderCall))}
 {%  endfor -- members %}
 {$addIndent("        ", "break;")}
@@ -206,7 +216,7 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {% enddef -------------------------- UnionType %}
 
 {% def decodeFunctionType(info) %}
-{% if info.tableName != "" %}
+{% if !empty(info.tableName) %}
 {$infraErrVar}codec->read(&_tmp_local);
 {$> addInfraErrorChecksBegin("") }
 {%  if infraErrVar != "" %}
@@ -229,7 +239,7 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {% enddef -------------------------- FunctionType %}
 
 {% def decodeSharedType(info) %}
-{$infraErrVar}codec->read(reinterpret_cast<uintptr_t *>({% if not ((info.funcParam == true && info.InoutOutDirection == true) && source == "client") %}&{%  endif %}{$info.name}));
+{$infraErrVar}codec->readPtr(reinterpret_cast<uintptr_t *>({% if not ((info.funcParam == true && info.InoutOutDirection == true) && source == "client") %}&{%  endif %}{$info.name}));
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}
 {%   if info.inDataContainer %}
@@ -301,10 +311,22 @@ else
 {% if info.useBinaryCoder %}
 {$encodeBinaryType(info)}
 {% else %}
-if ({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} > 0 && {$info.name})
+if ({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} > 0)
 {
     {$infraErrVar}codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size});
+{%  if info.isNullable %}
+    if ({$info.name} == NULL)
+    {
+        {$infraErrVar}codec->writeNullFlag(true);
+    }
+    else
+    {
+        {$infraErrVar}codec->writeNullFlag(false);
+{$addIndent("        ", encodeArrayType(info))}
+    }
+{%  else %}
 {$addIndent("    ", encodeArrayType(info))}
+{%  endif --info.isNullable %}
 }
 else
 {
@@ -366,7 +388,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {% enddef -------------------------- UnionType %}
 
 {% def encodeFunctionType(info) %}
-{% if info.tableName != "" %}
+{% if !empty(info.tableName) %}
 for(int32_t i{$info.tableName} = 0; i{$info.tableName} < {$info.tableSize}; ++i{$info.tableName})
 {
     if ({$info.tableName}[i{$info.tableName}] == {$info.name})
@@ -403,7 +425,7 @@ else
     {$infraErrVar}kErpcStatus_MemoryError;
 }
 {% else %}
-{$infraErrVar}codec->write(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
+{$infraErrVar}codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
 {% endif %}
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}

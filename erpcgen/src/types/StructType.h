@@ -63,7 +63,6 @@ public:
      */
     StructType(const std::string &name)
     : DataType(name, kStructType, kStructTypeSymbol)
-    , m_structDirectionTypes()
     {
     }
 
@@ -76,7 +75,6 @@ public:
      */
     StructType(const Token &tok)
     : DataType(tok, kStructType, kStructTypeSymbol)
-    , m_structDirectionTypes()
     {
     }
 
@@ -128,24 +126,6 @@ public:
     virtual std::string getDescription() const;
 
     /*!
-     * @brief This function will add direction type in which way is struct used.
-     *
-     * This function also add this type for every members which contains structures.
-     *
-     * @param[in] structDirectionType Direction type.
-     */
-    void addStructDirectionType(_param_direction structDirectionType);
-
-    /*!
-     * @brief This function return true, when structure contains given direction type.
-     *
-     * @param[in] structDirectionType Given direction type.
-     *
-     * @return True if given direction type was found, else false.
-     */
-    bool hasStructDirectionType(_param_direction structDirectionType);
-
-    /*!
      * @brief This function return true, when has member, which contains list type.
      *
      * @return True if structure contains list type.
@@ -160,16 +140,15 @@ public:
     bool containStringMember();
 
     /*!
-     * @brief This function return true if structure is used for function parameter or return value.
+     * @brief This function return true, when has member, which contains flag byref.
      *
-     * @retval True if structure is used, else false.
+     * @return True if structure contains byref parameter.
      */
-    bool structIsUsed();
+    bool containByrefMember();
 
 protected:
-    SymbolScope m_scope;                             /*!< Symbol scope of current structure. */
-    member_vector_t m_members;                       /*!< Vector of structure members. */
-    struct_direction_types_t m_structDirectionTypes; /*!< Vector of directions in which is structure used. */
+    SymbolScope m_scope;       /*!< Symbol scope of current structure. */
+    member_vector_t m_members; /*!< Vector of structure members. */
 };
 
 } // namespace erpcgen

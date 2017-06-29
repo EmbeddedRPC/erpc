@@ -1,6 +1,5 @@
-/*!
- * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+/*
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,32 +28,4 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@output_dir("erpc_outputs/")
-program test;
-
-import "../common/unit_test_common.erpc"
-
-@group("firstInterface")
-interface FirstInterface
-{
-    whenReady() -> void
-    oneway firstSendInt(int32 a)
-    firstReceiveInt() -> int32
-    stopSecondSide() -> void
-    getResultFromSecondSide() -> int32
-    oneway quitFirstInterfaceServer()
-    nestedCallTest() -> int32
-    @nested
-    callSecondSide() -> int32
-}
-
-@group("secondInterface")
-interface SecondInterface
-{
-    oneway secondSendInt(int32 a)
-    secondReceiveInt() -> int32
-    oneway quitSecondInterfaceServer()
-    oneway enableFirstSide()
-    @nested
-    callFirstSide() -> int32
-}
+void callback3(int32_t param1, int32_t param2);

@@ -53,6 +53,9 @@
 
 #define ERPC_NESTED_CALLS_DISABLED (0) //!< No nested calls support.
 #define ERPC_NESTED_CALLS_ENABLED (1)  //!< Nested calls support.
+
+#define ERPC_NESTED_CALLS_DETECTION_DISABLED (0) //!< Nested calls detection disabled.
+#define ERPC_NESTED_CALLS_DETECTION_ENABLED (1)  //!< Nested calls detection enabled.
 //@}
 
 //! @name Configuration options
@@ -75,6 +78,11 @@
 //! and server setup functions (@ref client_setup and @ref server_setup). The default size is 256.
 //#define ERPC_DEFAULT_BUFFER_SIZE (256)
 
+//! @def ERPC_DEFAULT_BUFFERS_COUNT
+//!
+//! Uncomment to change the count of buffers allocated by StaticMessageBufferFactory
+//#define ERPC_DEFAULT_BUFFERS_COUNT (2)
+
 //! @def ERPC_NOEXCEPT
 //!
 //! @brief Disable/enable noexcept support.
@@ -85,8 +93,17 @@
 //! @def ERPC_NESTED_CALLS
 //!
 //! Default set to ERPC_NESTED_CALLS_DISABLED. Uncomment when callbacks, or other eRPC
-//! functions are called from server implementation of another eRPC call.
+//! functions are called from server implementation of another eRPC call. Nested functions
+//! need to be marked as @nested in IDL.
 //#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
+
+//! @def ERPC_NESTED_CALLS_DETECTION
+//!
+//! Default set to ERPC_NESTED_CALLS_DETECTION_ENABLED when NDEBUG macro is presented.
+//! This serve for locating nested calls in code. Nested calls are calls where inside eRPC function
+//! on server side is called another eRPC function (like callbacks). Code need be a bit changed
+//! to support nested calls. See ERPC_NESTED_CALLS macro.
+//#define ERPC_NESTED_CALLS_DETECTION (ERPC_NESTED_CALLS_DETECTION_DISABLED)
 
 //@}
 

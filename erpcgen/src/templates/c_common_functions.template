@@ -38,56 +38,111 @@ extern const {$c.typeAndName} = {$c.value};
 {% endif %}
 {% enddef -- constantsDefinitions %}
 
-{# ---------------- structDeserialHeader ---------------- #}
-{% def structDeserialHeader(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-//! @brief Function to read no shared member of shared struct {$st.name}
-static int32_t read_{$st.name}_struct_shared(erpc::Codec * codec, {$st.name} * data);
+{# ---------------- symbolHeader ---------------- #}
+{% def symbolHeader(symbols, way, shared) %}
+{% if symbols %}
+{%  for s in symbols if (shared == "def") || (shared == "noSharedMem" && s.noSharedMem) %}
+{%   if s.type == "struct" %}
+{%    if way == "serial" %}
+{$ structSerialHeader(s, shared)}
+{%    else %}
+{$ structDeserialHeader(s, shared)}
+{%    endif -- way == "serial" %}
 {%   else %}
-//! @brief Function to read struct {$st.name}
-static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data);
+{%    if way == "serial" %}
+{$ unionSerialHeader(s, shared)}
+{%    else %}
+{$ unionDeserialHeader(s, shared)}
+{%    endif -- way == "serial" %}
+{%   endif -- s.type == "union/struct" %}
+{%  endfor -- symbols %}
+{% endif -- symbols%}
+{% enddef -- serialHeader %}
+
+{# ---------------- symbolSource ---------------- #}
+{% def symbolSource(symbols, way, shared) %}
+{% if symbols %}
+{%  for s in symbols if (shared == "def") || (shared == "noSharedMem" && s.noSharedMem) %}
+{%   if s.type == "struct" %}
+{%    if way == "serial" %}
+{$ structSerialSource(s, shared)}
+{%    else %}
+{$ structDeserialSource(s, shared)}
+{%    endif -- way == "serial" %}
+{%   else -- s.type == "union/struct" %}
+{%    if way == "serial" %}
+{$ unionSerialSource(s, shared)}
+{%    else %}
+{$ unionDeserialSource(s, shared)}
+{%    endif -- way == "serial" %}
+{%   endif -- s.type == "union/struct" %}
+{%  endfor -- symbols %}
+{% endif -- symbols%}
+{% enddef -- serialHeader %}
+
+{# ---------------- symbolFreeSpaceHeader ---------------- #}
+{% def symbolFreeSpaceHeader(symbols, shared) %}
+{% if symbols %}
+{%  for s in symbols if (shared == "def") || (shared == "noSharedMem" && s.noSharedMem) %}
+{%   if s.type == "struct" %}
+{$ structFreeSpaceHeader(s, shared)}
+{%   else %}
+{$ unionFreeSpaceHeader(s, shared)}
 {%   endif %}
-{%  endfor -- structs %}
-{% endif %}
+{%  endfor -- symbols %}
+{% endif -- symbols%}
+{% enddef -- serialHeader %}
+
+{# ---------------- symbolFreeSpaceSource ---------------- #}
+{% def symbolFreeSpaceSource(symbols, shared) %}
+{% if symbols %}
+{%  for s in symbols if (shared == "def") || (shared == "noSharedMem" && s.noSharedMem) %}
+{%   if s.type == "struct" %}
+{$ structFreeSpaceSource(s, shared)}
+{%   else %}
+{$ unionFreeSpaceSource(s, shared)}
+{%   endif %}
+{%  endfor -- symbols %}
+{% endif -- symbols%}
+{% enddef -- serialHeader %}
+
+{# ---------------- structDeserialHeader ---------------- #}
+{% def structDeserialHeader(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+//! @brief Function to read no shared member of shared struct {$struct.name}
+static int32_t read_{$struct.name}_struct_shared(erpc::Codec * codec, {$struct.name} * data);
+{%   else %}
+//! @brief Function to read struct {$struct.name}
+static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * data);
+{%   endif %}
 {% enddef -- structDeserialHeader %}
 
 {# ---------------- structSerialHeader ---------------- #}
-{% def structSerialHeader(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-//! @brief Function to write no shared member of shared struct {$st.name}
-static int32_t write_{$st.name}_struct_shared(erpc::Codec * codec, const {$st.name} * data);
+{% def structSerialHeader(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+//! @brief Function to write no shared member of shared struct {$struct.name}
+static int32_t write_{$struct.name}_struct_shared(erpc::Codec * codec, const {$struct.name} * data);
 {%   else %}
-//! @brief Function to write struct {$st.name}
-static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * data);
+//! @brief Function to write struct {$struct.name}
+static int32_t write_{$struct.name}_struct(erpc::Codec * codec, const {$struct.name} * data);
 {%   endif %}
-{%  endfor -- structs %}
-{% endif %}
 {% enddef  -- structSerialHeader %}
 
 {# ---------------- structDeserialSource ---------------- #}
-{% def structDeserialSource(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-//! @brief Read no shared member of shared struct {$st.name} function implementation
-static int32_t read_{$st.name}_struct_shared(erpc::Codec * codec, {$st.name} * data)
+{% def structDeserialSource(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+//! @brief Read no shared member of shared struct {$struct.name} function implementation
+static int32_t read_{$struct.name}_struct_shared(erpc::Codec * codec, {$struct.name} * data)
 {%   else %}
-// Read struct {$st.name} function implementation
-static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
+// Read struct {$struct.name} function implementation
+static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * data)
 {%   endif %}
 {
-{%   if st.hasNullableMember %}
+{%   if struct.hasNullableMember %}
     bool isNull;
 {%   endif -- hasNullableMember %}
-{%   if st.genStructWrapperF %}
-{%    if st.needTempVariable %}
+{%   if struct.genStructWrapperF %}
+{%    if struct.needTempVariable %}
     int32_t _tmp_local;
 {%    endif %}
     {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startReadStruct();
@@ -96,12 +151,15 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
     erpc_status_t {$errVar}kErpcStatus_Success;
 {%    endif %}
 {%   endif %}
-{%   for mem in st.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
+{%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ")}
 {$infraErrIndents}    {$infraErrVar}codec->readNullFlag(&isNull);
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
+{% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
+{$mem.coderCall.memberAllocation}
+{% endif %}
 {$addInfraErrorChecks(infraErrIndents & "        ", mem.coderCall.decode(mem.coderCall))}
 {$infraErrIndents}    }
 {$infraErrIndents}    else
@@ -111,10 +169,13 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
 {$infraErrIndents}    }
 {$> addInfraErrorChecksEnd("    ") }{$loop.addNewLineIfNotLast}
 {%    else -- notNullable %}
+{% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
+{$mem.coderCall.memberAllocation}
+{% endif %}
 {$addInfraErrorChecks("    ", mem.coderCall.decode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
-{%   endfor -- st.members %}
-{%   if st.genStructWrapperF %}
+{%   endfor -- struct.members %}
+{%   if struct.genStructWrapperF %}
 
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    {$infraErrVar}codec->endReadStruct();
@@ -126,31 +187,26 @@ static int32_t read_{$st.name}_struct(erpc::Codec * codec, {$st.name} * data)
     return kErpcStatus_Success;
 {%   endif %}
 }
-{%  endfor -- structs %}
-{% endif %}
 {% enddef -- structDeserialSource %}
 
 {# ---------------- structSerialSource ---------------- #}
-{% def structSerialSource(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-// Write no shared member of shared struct {$st.name} function implementation
-static int32_t write_{$st.name}_struct_shared(erpc::Codec * codec, const {$st.name} * data)
+{% def structSerialSource(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+// Write no shared member of shared struct {$struct.name} function implementation
+static int32_t write_{$struct.name}_struct_shared(erpc::Codec * codec, const {$struct.name} * data)
 {%   else %}
-// Write struct {$st.name} function implementation
-static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * data)
+// Write struct {$struct.name} function implementation
+static int32_t write_{$struct.name}_struct(erpc::Codec * codec, const {$struct.name} * data)
 {%   endif %}
 {
-{%   if st.genStructWrapperF %}
+{%   if struct.genStructWrapperF %}
     {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startWriteStruct();
 {%   else %}
 {%    if errVar != "" %}
     erpc_status_t {$errVar}kErpcStatus_Success;
 {%    endif %}
 {%   endif %}
-{%   for mem in st.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
+{%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    if ({$mem.coderCall.name}{$mem.structElements} == NULL)
@@ -166,8 +222,8 @@ static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * d
 {%    else -- notNullable %}
 {$addInfraErrorChecks("    ", mem.coderCall.encode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
-{%   endfor -- st.members %}
-{%   if st.genStructWrapperF %}
+{%   endfor -- struct.members %}
+{%   if struct.genStructWrapperF %}
 
 {$> addInfraErrorChecksBegin("    ") }
 {$infraErrIndents}    {$infraErrVar}codec->endWriteStruct();
@@ -179,52 +235,40 @@ static int32_t write_{$st.name}_struct(erpc::Codec * codec, const {$st.name} * d
     return kErpcStatus_Success;
 {%   endif %}
 }
-{%  endfor -- structs %}
-{% endif %}
 {% enddef -- structSerialSource %}
 
 {# ---------------- structFreeSpaceHeader ---------------- #}
-{% def structFreeSpaceHeader(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-//! @brief Function to free space allocated inside no shared member of shared struct {$st.name}
-static void free_{$st.name}_struct_shared({$st.name} * data);
+{% def structFreeSpaceHeader(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+//! @brief Function to free space allocated inside no shared member of shared struct {$struct.name}
+static void free_{$struct.name}_struct_shared({$struct.name} * data);
 {%   else %}
-//! @brief Function to free space allocated inside struct {$st.name}
-static void free_{$st.name}_struct({$st.name} * data);
+//! @brief Function to free space allocated inside struct {$struct.name}
+static void free_{$struct.name}_struct({$struct.name} * data);
 {%   endif %}
-{%  endfor -- structs %}
-{% endif %}
-{% enddef  -- structDeSerialHeader %}
+{% enddef  -- structFreeSpaceHeader %}
 
 {# ---------------- structFreeSpaceSource ---------------- #}
-{% def structFreeSpaceSource(structs, shared) %}
-{% if structs %}
-{%  for st in structs if (shared == "def") || (shared == "noSharedMem" && st.noSharedMem) %}
-
-{%   if st.noSharedMem && shared == "noSharedMem" %}
-// Free space allocated inside no shared member of shared struct {$st.name} function implementation
-static void free_{$st.name}_struct_shared({$st.name} * data)
+{% def structFreeSpaceSource(struct, shared) %}
+{%   if struct.noSharedMem && shared == "noSharedMem" %}
+// Free space allocated inside no shared member of shared struct {$struct.name} function implementation
+static void free_{$struct.name}_struct_shared({$struct.name} * data)
 {%   else %}
-// Free space allocated inside struct {$st.name} function implementation
-static void free_{$st.name}_struct({$st.name} * data)
+// Free space allocated inside struct {$struct.name} function implementation
+static void free_{$struct.name}_struct({$struct.name} * data)
 {%   endif %}
 {
-{%   for mem in st.membersToFree if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
-{$addIndent("    ", mem.coderCall.freeingCall(mem.coderCall))}{$loop.addNewLineIfNotLast}
-{%   endfor -- st.members %}
+{%   for mem in struct.membersToFree if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
+{$addIndent("    ", mem.coderCall.freeingCall(mem.coderCall))}
+{%    if !empty(mem.coderCall.memberAllocation) %}
+{$addIndent("    ", mem.coderCall.freeingCall2(mem.coderCall))}
+{%    endif%}{$loop.addNewLineIfNotLast}
+{%   endfor -- struct.members %}
 }
-{%  endfor -- structs %}
-{% endif %}
-{% enddef -- structSerialSource %}
+{% enddef -- structFreeSpaceSource %}
 
 {# ---------------- unionDeserialHeader ---------------- #}
-{% def unionDeserialHeader(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionDeserialHeader(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to read  no shared member of shared union {$union.name}
 static int32_t read_{$union.name}_union_shared(erpc::Codec * codec, int32_t * discriminator, {$union.name} * data);
@@ -232,15 +276,10 @@ static int32_t read_{$union.name}_union_shared(erpc::Codec * codec, int32_t * di
 //! @brief Function to read union {$union.name}
 static int32_t read_{$union.name}_union(erpc::Codec * codec, int32_t * discriminator, {$union.name} * data);
 {%   endif %}
-{%  endfor -- unions %}
-{% endif %}
 {% enddef -- unionDeserialHeader %}
 
 {# ---------------- unionSerialHeader ---------------- #}
-{% def unionSerialHeader(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionSerialHeader(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to write  no shared member of shared union {$union.name}
 static int32_t write_{$union.name}_union_shared(erpc::Codec * codec, int32_t discriminator, const {$union.name} * data);
@@ -248,15 +287,10 @@ static int32_t write_{$union.name}_union_shared(erpc::Codec * codec, int32_t dis
 //! @brief Function to write union {$union.name}
 static int32_t write_{$union.name}_union(erpc::Codec * codec, int32_t discriminator, const {$union.name} * data);
 {%   endif %}
-{%  endfor -- unions %}
-{% endif %}
 {% enddef  -- unionSerialHeader %}
 
 {# ---------------- unionDeserialSource ---------------- #}
-{% def unionDeserialSource(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionDeserialSource(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 // Read no shared member of shared union {$union.name} function implementation
 static int32_t read_{$union.name}_union_shared(erpc::Codec * codec, int32_t * discriminator, {$union.name} * data)
@@ -278,15 +312,10 @@ static int32_t read_{$union.name}_union(erpc::Codec * codec, int32_t * discrimin
     return kErpcStatus_Success;
 {%   endif %}
 }
-{%  endfor -- unions %}
-{% endif %}
 {% enddef -- unionDeserialSource %}
 
 {# ---------------- unionSerialSource ---------------- #}
-{% def unionSerialSource(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionSerialSource(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 // Write no shared member of shared union {$union.name} function implementation
 static int32_t write_{$union.name}_union_shared(erpc::Codec * codec, int32_t discriminator, const {$union.name} * data)
@@ -305,15 +334,10 @@ static int32_t write_{$union.name}_union(erpc::Codec * codec, int32_t discrimina
     return kErpcStatus_Success;
 {%   endif %}
 }
-{%  endfor -- unions %}
-{% endif %}
 {% enddef -- unionSerialSource %}
 
 {# ---------------- unionFreeSpaceHeader ---------------- #}
-{% def unionFreeSpaceHeader(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionFreeSpaceHeader(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to free space allocated inside no shared member of shared union {$union.name}
 static void free_{$union.name}_union_shared(int32_t discriminator, {$union.name} * data);
@@ -321,15 +345,10 @@ static void free_{$union.name}_union_shared(int32_t discriminator, {$union.name}
 //! @brief Function to free space allocated inside union {$union.name}
 static void free_{$union.name}_union(int32_t discriminator, {$union.name} * data);
 {%   endif %}
-{%  endfor -- unions %}
-{% endif %}
 {% enddef  -- unionFreeSpaceHeader %}
 
 {# ---------------- unionFreeSpaceSource ---------------- #}
-{% def unionFreeSpaceSource(unions, shared) %}
-{% if unions %}
-{%  for union in unions if (shared == "def") || (shared == "noSharedMem" && union.noSharedMem) %}
-
+{% def unionFreeSpaceSource(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 // Free space allocated inside no shared member of shared union {$union.name} function implementation
 static void free_{$union.name}_union_shared(int32_t discriminator, {$union.name} * data)
@@ -340,8 +359,6 @@ static void free_{$union.name}_union(int32_t discriminator, {$union.name} * data
 {
 {$addIndent("    ", freeUnion(union.coderCall))}
 }
-{%  endfor -- unions %}
-{% endif %}
 {% enddef -- unionFreeSpaceSource %}
 
 {# ---------------- callbacksTable ---------------- #}
@@ -357,9 +374,9 @@ static const {$f.name} _{$f.name}[] = { {%    for c in f.callbacks %}{$c.name}{%
 
 {# ---------------- freeData ---------------- #}
 {% def freeData(info) %}
-if ({$info.name})
+if ({$info.freeName})
 {
-    erpc_free({$info.name});
+    erpc_free({$info.freeName});
 }
 {% enddef ------------------------------- freeData %}
 
@@ -410,6 +427,9 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {%    if member.isNeedFreeingCall %}
 {$addIndent("        ", member.coderCall.freeingCall(member.coderCall))}
 {%    endif %}
+{%    if !empty(mem.coderCall.memberAllocation) %}
+{$addIndent("    ", mem.coderCall.freeingCall2(mem.coderCall))}
+{%    endif%}
 {%   endfor -- members %}
 {$addIndent("        ", "break;")}
     }
@@ -468,4 +488,22 @@ free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>(
 #define ERPC_SHARED_MEMORY_BEGIN {$sharedMemBeginAddr}
 #define ERPC_SHARED_MEMORY_END {$sharedMemEndAddr}
 {% endif %}
+{% enddef ------------------------------- addInfraErrorChecksElse%}
+
+{% def unionMembersDeclaration(info) %}
+{% for unionCase in info.unionCases %}
+{%  if count(unionCase) > 1 %}
+struct
+{
+{%   set indent = "    " %}
+{%  else %}
+{%   set indent = "" %}
+{%  endif %}
+{%  for unionMember in unionCase %}
+{$indent}{$unionMember.typenameName};
+{%  endfor %}
+{%  if count(unionCase) > 1 %}
+};
+{%  endif %}
+{% endfor%}
 {% enddef ------------------------------- addInfraErrorChecksElse%}

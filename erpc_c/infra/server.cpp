@@ -41,6 +41,10 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
+#if ERPC_NESTED_CALLS_DETECTION
+bool nestingDetection = false;
+#endif
+
 void Server::setTransport(Transport *transport)
 {
     m_transport = transport;

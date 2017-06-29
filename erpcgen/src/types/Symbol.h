@@ -238,6 +238,24 @@ public:
     const std::vector<Annotation> &getAnnotations() const { return m_annotations; };
 
     /*!
+     * @brief This function search and returns Value object for given annotation name.
+     *
+     * @param[in] annName Given annotation name.
+     *
+     * @return NULL if annotation is not found else value object.
+     */
+    Value *getAnnValue(const std::string annName);
+
+    /*!
+     * @brief This function search and returns string for given annotation name.
+     *
+     * @param[in] ann Given annotation name.
+     *
+     * @return empty string if annotation is not found else string value.
+     */
+    std::string getAnnStringValue(const std::string annName);
+
+    /*!
      * @brief This function returns multiline comment for this symbol declared in IDL file.
      *
      * @return Multiline comment for symbol.

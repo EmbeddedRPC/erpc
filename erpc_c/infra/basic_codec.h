@@ -196,6 +196,15 @@ public:
     virtual erpc_status_t write(double value);
 
     /*!
+     * @brief Prototype for write uintptr value.
+     *
+     * @param[in] value uintptr typed value to write.
+     *
+     * @return depends on cursor write function.
+     */
+    virtual erpc_status_t writePtr(uintptr_t value);
+
+    /*!
      * @brief Prototype for write string value.
      *
      * @param[in] length of string.
@@ -393,6 +402,15 @@ public:
      * @return Based on cursor read function.
      */
     virtual erpc_status_t read(double *value);
+
+    /*!
+     * @brief Prototype for read uintptr value.
+     *
+     * @param[out] value uintptr typed value to read.
+     *
+     * @return Based on cursor read function.
+     */
+    virtual erpc_status_t readPtr(uintptr_t *value);
 
     /*!
      * @brief Prototype for read string value.

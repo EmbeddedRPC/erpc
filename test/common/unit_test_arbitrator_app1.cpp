@@ -65,6 +65,7 @@ int waitQuit = 0;
 int waitClient = 0;
 int isTestPassing = 0;
 uint32_t startupData;
+int stopTest = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -109,8 +110,9 @@ void runClient(void *arg)
     {
         isTestPassing = testClient();
 
-        if (waitQuit != 0 || isTestPassing != 0)
+        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
+            enableFirstSide();
             break;
         }
         vTaskDelay(10);
@@ -195,6 +197,11 @@ int main(int argc, char **argv)
     while (1)
     {
     }
+}
+
+void stopSecondSide()
+{
+    ++stopTest;
 }
 
 int32_t getResultFromSecondSide()

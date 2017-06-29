@@ -136,9 +136,15 @@ struct structOfAllTypes
 
 type TypeOfAllTypes = AllTypes
 
+struct StructWithByrefMembers
+{
+    byref A a @shared;
+    byref int32 b;
+}
+
 @group("group")
 interface GroupService {
-	oneway groupFunction()
+    oneway groupFunction()
 }
 
 @group("ArithmeticService")
@@ -163,4 +169,6 @@ interface ArithmeticService2 {
     createStudent(string name, float[3] test_scores, school_year_t year, int32 age) -> student
 
     test_struct_allDirection(AllTypes a, in AllTypes b, inout AllTypes e) -> void
+
+    testSendingByrefMembers(StructWithByrefMembers s) -> bool
 }

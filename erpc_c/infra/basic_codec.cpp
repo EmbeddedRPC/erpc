@@ -117,6 +117,11 @@ erpc_status_t BasicCodec::write(double value)
     return m_cursor.write(&value, sizeof(value));
 }
 
+erpc_status_t BasicCodec::writePtr(uintptr_t value)
+{
+    return m_cursor.write(&value, sizeof(value));
+}
+
 erpc_status_t BasicCodec::writeString(uint32_t length, const char *value)
 {
     // Just treat the string as binary.
@@ -259,6 +264,11 @@ erpc_status_t BasicCodec::read(double *value)
     return m_cursor.read(value, sizeof(*value));
 }
 
+erpc_status_t BasicCodec::readPtr(uintptr_t *value)
+{
+    return m_cursor.read(value, sizeof(*value));
+}
+
 erpc_status_t BasicCodec::readString(uint32_t *length, char **value)
 {
     return readBinary(length, reinterpret_cast<uint8_t **>(value));
@@ -318,7 +328,7 @@ erpc_status_t BasicCodec::readNullFlag(bool *isNull)
 {
     uint8_t flag;
     erpc_status_t status = read(&flag);
-    if (!status)
+    if (status)
     {
         return status;
     }

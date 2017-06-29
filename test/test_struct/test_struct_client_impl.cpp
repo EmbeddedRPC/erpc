@@ -279,3 +279,13 @@ TEST(test_struct, test_struct_allDirection)
     erpc_free(b.binary_numbers.data);
     erpc_free(e.binary_numbers.data);
 }
+
+TEST(test_struct, TestSendingByrefMembers)
+{
+    StructWithByrefMembers s;
+    int32_t b = 4;
+    s.a = (A*)0xED;
+    s.b = &b;
+
+    EXPECT_TRUE(testSendingByrefMembers(&s));
+}

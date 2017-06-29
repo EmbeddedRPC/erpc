@@ -231,6 +231,15 @@ public:
     virtual erpc_status_t write(double value) = 0;
 
     /*!
+     * @brief Prototype for write uintptr value.
+     *
+     * @param[in] value uintptr typed value to write.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t writePtr(uintptr_t value) = 0;
+
+    /*!
      * @brief Prototype for write string value.
      *
      * @param[in] length of string.
@@ -429,6 +438,15 @@ public:
     virtual erpc_status_t read(double *value) = 0;
 
     /*!
+     * @brief Prototype for read uintptr value.
+     *
+     * @param[in] value uintptr typed value to read.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t readPtr(uintptr_t *value) = 0;
+
+    /*!
      * @brief Prototype for read string value.
      *
      * @param[in] length of string.
@@ -500,7 +518,6 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t readNullFlag(bool *isNull) = 0;
-    //@}
 
 protected:
     MessageBuffer m_buffer;         /*!< Message buffer object */

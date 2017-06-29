@@ -43,6 +43,12 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
+#if ERPC_NESTED_CALLS_DETECTION
+extern bool nestingDetection;
+#pragma weak nestingDetection
+bool nestingDetection = false;
+#endif
+
 void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)
 {
     m_arbitrator = arbitrator;
@@ -59,6 +65,12 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
     // before we get to the clientReceive() call below the arbitrator already has the buffer.
     if (!request.isOneway())
     {
+#if ERPC_NESTED_CALLS_DETECTION
+        if (nestingDetection)
+        {
+            return kErpcStatus_NestedCallFailure;
+        }
+#endif
         token = m_arbitrator->prepareClientReceive(request);
         if (!token)
         {

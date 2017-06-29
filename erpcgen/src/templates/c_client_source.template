@@ -8,14 +8,18 @@
 #include "erpc_port.h"
 extern "C"
 {
-#include "{$commonHeaderName}"
-{$groupClientC}
+#include "{$commonHeaderName}.h"
+{% if groupNames %}
+// import callbacks declaration from other groups
+{% for name in groupNames if name != group.name %}
+#include "{$outputFilename}_{$name}.h"
+{% endfor %}
+{% endif %}
 }
 
 {$checkVersion()}
 
 {$checkCrc()}
-
 {% if nestedCall %}
 #if !ERPC_NESTED_CALLS
 #error "When @nested annotation is used, then ERPC_NESTED_CALLS macro need be enabled and server need be set."
@@ -30,25 +34,19 @@ using namespace std;
 extern ClientManager *g_client;
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
+{% if unitTest %}
 {$> callbackTable(functions)}
+{% endif %}
 {$> constantsDefinitions(consts)}
-{$> structSerialHeader(structsToServer, "def")}
-{$> unionSerialHeader(unionsToServer, "def")}
-{$> structSerialSource(structsToServer, "def")}
-{$> unionSerialSource(unionsToServer, "def")}
-{$> structDeserialHeader(structsToClient, "def")}
-{$> unionDeserialHeader(unionsToClient, "def")}
-{$> structDeserialSource(structsToClient, "def")}
-{$> unionDeserialSource(unionsToClient, "def")}
-{$> structSerialHeader(structsToServer, "noSharedMem")}
-{$> unionSerialHeader(unionsToServer, "noSharedMem")}
-{$> structSerialSource(structsToServer, "noSharedMem")}
-{$> unionSerialSource(unionsToServer, "noSharedMem")}
-{$> structDeserialHeader(structsToClient, "noSharedMem")}
-{$> unionDeserialHeader(unionsToClient, "noSharedMem")}
-{$> structDeserialSource(structsToClient, "noSharedMem")}
-{$> unionDeserialSource(unionsToClient, "noSharedMem")}
-{% for iface in interfaces %}
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "serial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "deserial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "deserial", "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "serial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "noSharedMem")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
+{% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 
 // {$iface.name} interface {$fn.name} function client shim.
@@ -77,8 +75,8 @@ extern ClientManager *g_client;
     {
 {$addIndent("    ", f_clientEncode(iface, fn))}
     }
-{%    endif %}
-{%   endif %}
+{%    endif -- not generateInfraErrorChecks %}
+{%   endif -- generateAllocErrorChecks%}
 {%   if generateInfraErrorChecks or not generateAllocErrorChecks %}
 
 {$f_clientEncode(iface, fn)}

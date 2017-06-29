@@ -11,7 +11,7 @@
 #include "server.h"
 extern "C"
 {
-#include "{$commonHeaderName}"
+#include "{$commonHeaderName}.h"
 #include <stdint.h>
 #include <stdbool.h>
 }
@@ -20,7 +20,7 @@ extern "C"
 
 {$checkCrc()}
 
-{% for iface in interfaces %}
+{% for iface in group.interfaces %}
 
 /*!
  * @brief Service subclass for {$iface.name}.
@@ -43,12 +43,12 @@ private:
 
 extern "C" {
 #else
-#include "{$commonHeaderName}"
+#include "{$commonHeaderName}.h"
 #endif // __cplusplus
 
 typedef void * erpc_service_t;
 
-{% for iface in interfaces %}
+{% for iface in group.interfaces %}
 erpc_service_t create_{$iface.serviceClassName}(void);
 {% endfor -- iface %}
 #ifdef __cplusplus

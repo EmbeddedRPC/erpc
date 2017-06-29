@@ -260,9 +260,9 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> union_case_list
 %type <m_ast> union_case_expr_list
 %type <m_ast> union_case
-%type <m_ast> union_member_decl
-%type <m_ast> union_member_decl_list_opt
-%type <m_ast> union_member_decl_list
+%type <m_ast> union_member
+%type <m_ast> union_member_list_opt
+%type <m_ast> union_member_list
 %type <m_token> param_dir
 %type <m_token> param_dir_in
 %type <m_int> struct_member_options
@@ -766,6 +766,7 @@ struct_member   :   doxy_ml_comment_opt struct_member_options_list struct_data_t
                             $$ = new AstNode(Token(TOK_STRUCT_MEMBER));
                             $$->appendChild($name);
                             $$->appendChild($datatype);
+                            $$->appendChild(new AstNode(Token(TOK_INT_LITERAL, new IntegerValue($struct_member_options_list))));
                             $$->appendChild($annotations);
                             $$->appendChild($doxy_ml_comment_opt);
                             $$->appendChild($doxy_il_comment_opt);
@@ -835,13 +836,13 @@ union_case_list
                 ;
 
 /* only allowing one type per case at first, including structs */
-union_case      :   "case" union_case_expr_list[case_exprs] ':' union_member_decl_list_opt[decl_list]
+union_case      :   "case" union_case_expr_list[case_exprs] ':' union_member_list_opt[decl_list]
                         {
                             $$ = new AstNode(Token(TOK_UNION_CASE));
                             $$->appendChild($case_exprs);
                             $$->appendChild($decl_list);
                         }
-                |   "default" ':' union_member_decl_list_opt[decl_list]
+                |   "default" ':' union_member_list_opt[decl_list]
                         {
                             $$ = new AstNode(Token(TOK_UNION_CASE));
                             $$->appendChild(new AstNode(*$1));
@@ -862,8 +863,8 @@ union_case_expr_list
                         }
                 ;
 
-union_member_decl_list_opt
-                :   union_member_decl_list[decl]
+union_member_list_opt
+                :   union_member_list[decl]
                         {
                             $$ = $decl;
                         }
@@ -878,28 +879,29 @@ union_member_decl_list_opt
                         }
                 ;
 
-union_member_decl_list
-                :   union_member_decl
+union_member_list
+                :   union_member
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
-                            $$->appendChild($union_member_decl);
+                            $$->appendChild($union_member);
 
                         }
-                |   union_member_decl_list[member_decl_list] union_member_decl
+                |   union_member_list[member_list] union_member
                         {
-                            $member_decl_list->appendChild($union_member_decl);
-                            $$ = $member_decl_list;
+                            $member_list->appendChild($union_member);
+                            $$ = $member_list;
                         }
                 ;
-
-union_member_decl
-                :   simple_data_type[decl_type] ident[decl_name] annotation_list_opt[annotations] semi_opt doxy_il_comment_opt[comment]
+union_member
+                :   doxy_ml_comment_opt struct_member_options_list simple_data_type[decl_type] ident[decl_name] annotation_list_opt[annotations] semi_opt doxy_il_comment_opt
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild($decl_name);
                             $$->appendChild($decl_type);
+                            $$->appendChild(new AstNode(Token(TOK_INT_LITERAL, new IntegerValue($struct_member_options_list))));
                             $$->appendChild($annotations);
-                            $$->appendChild($comment);
+                            $$->appendChild($doxy_ml_comment_opt);
+                            $$->appendChild($doxy_il_comment_opt);
                         }
                 ;
 

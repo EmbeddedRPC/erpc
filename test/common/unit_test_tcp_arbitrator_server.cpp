@@ -78,6 +78,7 @@ Crc16 g_crc16(erpc_generated_crc);
 int waitQuit = 0;
 int waitClient = 0;
 int isTestPassing = 0;
+int stopTest = 0;
 
 void increaseWaitQuit()
 {
@@ -105,8 +106,10 @@ void runClient(void *arg)
     {
         isTestPassing = testClient();
         Mutex::Guard lock(waitQuitMutex);
-        if (waitQuit != 0 || isTestPassing != 0)
+        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
+            enableFirstSide();
+            Mutex::Guard unlock(waitQuitMutex);
             break;
         }
         Mutex::Guard unlock(waitQuitMutex);
@@ -196,6 +199,11 @@ int main(int argc, char **argv)
     }
 
     return isTestPassing;
+}
+
+void stopSecondSide()
+{
+    ++stopTest;
 }
 
 int32_t getResultFromSecondSide()

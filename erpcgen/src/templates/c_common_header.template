@@ -29,10 +29,10 @@
 {$checkVersion()}
 
 {$checkCrc()}
-
+{% endif -- not commonTypesFile %}
+{% if commonTypesFile == "" %}
 #if !defined(ERPC_TYPE_DEFINITIONS)
 #define ERPC_TYPE_DEFINITIONS
-
 {% if not empty(enums) %}
 
 // Enumerators data types declarations
@@ -66,12 +66,12 @@ typedef {$alias.typenameName};{$alias.ilComment}
 {%   endif -- alias.typenameName %}
 {%  endfor -- aliases %}
 {% endif -- aliases %}
-{% if nonExternalStruct || nonExternalUnion %}
+{% if nonExternalStructUnion %}
 
 // Structures/unions data types declarations
-{%  for us in unionsStructs %}
-{%   if us.isStruct == true %}
-{%    if !us.isExternal %}
+{%  for us in symbols %}
+{%   if !us.isExternal %}
+{%    if us.type == "struct" %}
 {$> us.mlComment}
 struct {$us.name}
 {
@@ -81,17 +81,16 @@ struct {$us.name}
 {$> addIndent("    ", mem.elementsCount)}
 {%     endfor %}
 };{$us.ilComment}{$loop.addNewLineIfNotLast}
-{%    endif -- !us.isExternal %}
-{%   else -- us.type == "union" %}
-{%   if !us.isExternal %}
+{%    else -- us.type == "union" %}
 {$> us.mlComment}
 union {$us.name}
 {
-{$us.membersData}
+{$ addIndent("    ", unionMembersDeclaration(us))}
 };{$us.ilComment}{$loop.addNewLineIfNotLast}
+{%    endif -- us.type == "union/struct" %}
 {%   endif -- !us.isExternal %}
-{%   endif -- us.type == "union/struct" %}
-{%  endfor -- structs %}
+{%  endfor -- symbols %}
+
 {% endif -- nonExternalStruct || nonExternalUnion %}
 {% if not empty(consts) %}
 
@@ -104,9 +103,9 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 
 #endif // ERPC_TYPE_DEFINITIONS
 {% endif -- commonTypesFile %}
-{% if not genCommonTypesFile %}
-{% for iface in interfaces %}
 
+{% if not genCommonTypesFile %}
+{% for iface in group.interfaces %}
 /*! @brief {$iface.name} identifiers */
 enum _{$iface.name}_ids
 {
@@ -120,7 +119,7 @@ enum _{$iface.name}_ids
 #if defined(__cplusplus)
 extern "C" {
 #endif
-{% for iface in interfaces if iface.isNonExternalInterface == true %}
+{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
 
 {$> iface.mlComment}
 //! @name {$iface.name}

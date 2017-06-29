@@ -7,16 +7,14 @@
 #include "{$serverHeaderName}"
 #include <new>
 #include "erpc_port.h"
-{% if empty(groupsServer) == false %}
+{% if empty(group.includes) == false %}
 extern "C"
 {
-{%  for groupInc in groupsServer if groupInc.name == group %}
-{%   for inc in groupInc.includes %}
+{%  for inc in group.includes %}
 #include "{$inc}"
-{%   endfor -- includes %}
-{%  endfor -- includes %}
+{%  endfor -- group.includes %}
 }
-{% endif -- empty(groupsServer) %}
+{% endif -- empty(group.includes) %}
 
 {$checkVersion()}
 
@@ -27,36 +25,29 @@ using namespace erpc;
 using namespace std;
 #endif
 
+#if ERPC_NESTED_CALLS_DETECTION
+extern bool nestingDetection;
+#endif
+
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
+{% if unitTest %}
 {$> callbackTable(functions)}
+{% endif %}
 {$> constantsDefinitions(consts)}
-{$> structDeserialHeader(structsToServer, "def")}
-{$> unionDeserialHeader(unionsToServer, "def")}
-{$> structDeserialSource(structsToServer, "def")}
-{$> unionDeserialSource(unionsToServer, "def")}
-{$> structSerialHeader(structsToClient, "def")}
-{$> unionSerialHeader(unionsToClient, "def")}
-{$> structSerialSource(structsToClient, "def")}
-{$> unionSerialSource(unionsToClient, "def")}
-{$> structFreeSpaceHeader(structsServerFree, "def")}
-{$> unionFreeSpaceHeader(unionsServerFree, "def")}
-{$> structFreeSpaceSource(structsServerFree, "def")}
-{$> unionFreeSpaceSource(unionsServerFree, "def")}
-{$> structDeserialHeader(structsToServer, "noSharedMem")}
-{$> unionDeserialHeader(unionsToServer, "noSharedMem")}
-{$> structDeserialSource(structsToServer, "noSharedMem")}
-{$> unionDeserialSource(unionsToServer, "noSharedMem")}
-{$> structSerialHeader(structsToClient, "noSharedMem")}
-{$> unionSerialHeader(unionsToClient, "noSharedMem")}
-{$> structSerialSource(structsToClient, "noSharedMem")}
-{$> unionSerialSource(unionsToClient, "noSharedMem")}
-{$> structFreeSpaceHeader(structsServerFree, "noSharedMem")}
-{$> unionFreeSpaceHeader(unionsServerFree, "noSharedMem")}
-{$> structFreeSpaceSource(structsServerFree, "noSharedMem")}
-{$> unionFreeSpaceSource(unionsServerFree, "noSharedMem")}
-{% for iface in interfaces -- service subclass method impl %}
-
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "deserial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "deserial", "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "serial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "serial", "def")}
+{$> symbolFreeSpaceHeader(group.symbolsMap.symbolsServerFree, "def")}
+{$> symbolFreeSpaceSource(group.symbolsMap.symbolsServerFree, "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "deserial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "deserial", "noSharedMem")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "serial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "serial", "noSharedMem")}
+{$> symbolFreeSpaceHeader(group.symbolsMap.symbolsServerFree, "noSharedMem")}
+{$> symbolFreeSpaceSource(group.symbolsMap.symbolsServerFree, "noSharedMem")}
+{% for iface in group.interfaces -- service subclass method impl %}
 // Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
@@ -105,7 +96,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
     // startReadMessage() was already called before this shim was invoked.
 {%   if fn.isSendValue %}
 
-{%    for param in fn.parametersToServer if not param.serializedViaMember %}
+{%    for param in fn.parametersToServer if !param.serializedBothDirection %}
 {%     if param.isNullable %}
 {$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
@@ -126,7 +117,13 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {%   if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType && generateInfraErrorChecks %} = NULL{%endif%};
 {%   endif %}
+#if ERPC_NESTED_CALLS_DETECTION
+nestingDetection = true;
+#endif
 {$addInfraErrorChecks("    ", fn.serverPrototype)}
+#if ERPC_NESTED_CALLS_DETECTION
+nestingDetection = false;
+#endif
 
 {%   if fn.isReturnValue %}
     // preparing MessageBuffer for serializing data
@@ -140,7 +137,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 
 {%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
-    if ({$param.coderCall.name} != NULL)
+    if ({$param.name} != NULL)
     {
 {$addInfraErrorChecks("        ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
     }
@@ -183,7 +180,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}
-{% for iface in interfaces %}
+{% for iface in group.interfaces %}
 erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();

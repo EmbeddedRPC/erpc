@@ -10,16 +10,11 @@
 
 import erpc
 from . import common, interface
-{% if empty(groupsServer) == false %}
-extern "C"
-{
-{%  for groupInc in groupsServer if groupInc.name == group %}
-{%   for inc in groupInc.includes %}
+{% if empty(group.includes) == false %}
+{%  for inc in group.includes %}
 from . import {$inc}
-{%   endfor -- includes %}
-{%  endfor -- includes %}
-}
-{% endif -- empty(groupsServer) %}
+{%  endfor -- group.includes %}
+{% endif -- empty(group.includes) %}
 
 {% if functions %}
 {%  for f in functions %}
@@ -29,7 +24,7 @@ _{$f.name} = [ {%    for c in f.callbacks %}{$c.name}{%     if !loop.last %}, {%
 {%  endfor -- functions %}
 
 {%  endif -- functions %}
-{% for iface in interfaces %}
+{% for iface in group.interfaces %}
 # Client for {$iface.name}
 class {$iface.name}Service(erpc.server.Service):
     def __init__(self, handler):
@@ -49,7 +44,7 @@ class {$iface.name}Service(erpc.server.Service):
         {$p.name} = erpc.Reference()
 {%  endfor -- outParams %}
 
-{% endif -- outParams %}
+{% endif -- fn.outParameters %}
         # Read incoming parameters.
 {% for p in fn.inParameters if not p.serializedViaMember %}
 {%  if p.direction == "in" %}

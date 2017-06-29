@@ -70,33 +70,82 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
         Program *program = m_def->getProgramSymbol();
 
         /* Shared memory area. */
-        Annotation *sharedMemBAnn = program->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
-        Annotation *sharedMemEAnn = program->findAnnotation(SHARED_MEMORY_BEGIN_ANNOTATION);
-        if (sharedMemBAnn && sharedMemEAnn)
+        Value *sharedMemBValue = program->getAnnValue(SHARED_MEMORY_BEGIN_ANNOTATION);
+        Value *sharedMemEValue = program->getAnnValue(SHARED_MEMORY_END_ANNOTATION);
+        if (sharedMemBValue && sharedMemEValue)
         {
-            Value *sharedMemAValue = sharedMemBAnn->getValueObject();
-            Value *sharedMemEValue = sharedMemEAnn->getValueObject();
-            if (sharedMemAValue && sharedMemEValue)
-            {
-                m_templateData["sharedMemBeginAddr"] = sharedMemAValue->toString();
-                m_templateData["sharedMemEndAddr"] = sharedMemEValue->toString();
-                Log::warning("Shared memory is supported only for C language used on embedded devices.\n");
-            }
-            else
-            {
-                throw semantic_error("Annotations @shared_memory_begin and @shared_memory_end need contains addresses.");
-            }
+            m_templateData["sharedMemBeginAddr"] = sharedMemBValue->toString();
+            m_templateData["sharedMemEndAddr"] = sharedMemEValue->toString();
+            Log::warning("Shared memory is supported only for C language used on embedded devices.\n");
         }
-        else if (sharedMemBAnn || sharedMemEAnn)
+        else if (sharedMemBValue || sharedMemEValue)
         {
-            throw semantic_error("Need be defined both or no one of shared memory regions annotations through @shared_memory_begin and @shared_memory_end.");
+            throw semantic_error("Annotations @shared_memory_begin and @shared_memory_end both (or no one) need exists and contains addresses.");
         }
     }
-    else
+
+    // get group annotation with vector of theirs interfaces
+    m_groups.clear();
+    data_list groupNames;
+    Group *defaultGroup = new Group("");
+
+    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
     {
-        m_templateData["mlComment"] = "";
-        m_templateData["ilComment"] = "";
+        Interface *iface = dynamic_cast<Interface *>(it);
+        assert(iface);
+
+        // interface has group annotation
+        std::vector<Annotation *> groupAnns = iface->getAnnotations(GROUP_ANNOTATION);
+        if (!groupAnns.empty())
+        {
+            for (auto groupAnnIt : groupAnns)
+            {
+                std::string name = (groupAnnIt->hasValue()) ? groupAnnIt->getValueObject()->toString() : "";
+                Group *group = getGroupByName(name);
+                if (group == nullptr)
+                {
+                    group = new Group(name);
+                    m_groups.push_back(group);
+                    groupNames.push_back(name);
+                }
+
+                group->addInterface(iface);
+            }
+        }
+        else
+        {
+            // interface belongs to default group
+            defaultGroup->addInterface(iface);
+        }
     }
+
+    // add default group only if it has any interface or there is no other group
+    if (defaultGroup->getInterfaces().size() > 0 || m_groups.size() == 0)
+    {
+        m_groups.push_back(defaultGroup);
+    }
+
+    Log::debug("Groups:\n");
+    for (Group *group : m_groups)
+    {
+        Log::log("    %s\n", group->getDescription().c_str());
+    }
+
+    // list of group names (used for including group header files for callbacks)
+    m_templateData["groupNames"] = groupNames;
+}
+
+Group *Generator::getGroupByName(std::string name)
+{
+    for (Group *group : m_groups)
+    {
+        if (group->getName() == name)
+        {
+            return group;
+        }
+    }
+
+    return nullptr;
 }
 
 void Generator::openFile(std::ofstream &fileOutputStream, const std::string &fileName)
@@ -167,14 +216,10 @@ StructMember *Generator::findParamReferencedFromAnn(const StructType::member_vec
 {
     for (StructMember *structMember : members)
     {
-        Annotation *ann = structMember->findAnnotation(annName);
-        if (ann)
+        std::string lengthName = structMember->getAnnStringValue(annName);
+        if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
         {
-            std::string lengthName = ann->getValueObject()->toString();
-            if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
-            {
-                return structMember;
-            }
+            return structMember;
         }
     }
     return nullptr;
@@ -191,14 +236,10 @@ StructMember *Generator::findParamReferencedFromUnion(const StructType::member_v
             UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
             if (unionType->isNonEncapsulatedUnion())
             {
-                Annotation *ann = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION);
-                if (ann)
+                std::string lengthName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+                if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
                 {
-                    std::string lengthName = ann->getValueObject()->toString();
-                    if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
-                    {
-                        return structMember;
-                    }
+                    return structMember;
                 }
             }
             else
@@ -217,7 +258,6 @@ StructMember *Generator::findParamReferencedFrom(const StructType::member_vector
                                                  const std::string &referenceName)
 {
     StructMember *referencedFrom = findParamReferencedFromAnn(members, referenceName, LENGTH_ANNOTATION);
-
     if (referencedFrom)
     {
         return referencedFrom;
@@ -236,15 +276,140 @@ std::string Generator::getTime()
     return nowString;
 }
 
-Generator::interfaceLists_t Generator::makeInterfacesTemplateData()
+DataType *Generator::findChildDataType(std::vector<DataType *> *dataTypes, DataType *dataType)
+{
+    switch (dataType->getDataType())
+    {
+        case DataType::kAliasType:
+        {
+            AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
+            if (aliasType != nullptr)
+            {
+                findChildDataType(dataTypes, aliasType->getElementType());
+            }
+            break;
+        }
+        case DataType::kArrayType:
+        {
+            ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
+            if (arrayType != nullptr)
+            {
+                findChildDataType(dataTypes, arrayType->getElementType());
+            }
+            break;
+        }
+        case DataType::kBuiltinType:
+        {
+            if (dataType->isBinary())
+            {
+                DataType *binaryDataType = dynamic_cast<DataType *>(m_globals->getSymbol("binary_t"));
+                if (binaryDataType != nullptr)
+                {
+                    dataType = binaryDataType;
+                }
+            }
+            break;
+        }
+        case DataType::kListType:
+        {
+            ListType *listType = dynamic_cast<ListType *>(dataType);
+            if (listType != nullptr)
+            {
+                findChildDataType(dataTypes, listType->getElementType());
+            }
+            break;
+        }
+        case DataType::kStructType:
+        {
+            StructType *structType = dynamic_cast<StructType *>(dataType);
+            if (structType != nullptr)
+            {
+                for (StructMember *structMember : structType->getMembers())
+                {
+                    findChildDataType(dataTypes, structMember->getDataType());
+                }
+            }
+            break;
+        }
+        case DataType::kUnionType:
+        {
+            // Keil need extra pragma option when unions are used.
+            m_templateData["usedUnionType"] = true;
+            UnionType *unionType = dynamic_cast<UnionType *>(dataType);
+            if (unionType != nullptr)
+            {
+                for (auto &unionMember : unionType->getUnionMemberDeclarations())
+                {
+                    findChildDataType(dataTypes, unionMember.getDataType());
+                }
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+
+    dataTypes->push_back(dataType);
+
+    return dataType;
+}
+
+void Generator::findGroupDataTypes()
+{
+    for (Group *group : m_groups)
+    {
+        for (Interface *iface : group->getInterfaces())
+        {
+            for (Function *fn : iface->getFunctions())
+            {
+                // handle return value
+                std::vector<DataType *> dataTypes;
+                DataType *transformedDataType = findChildDataType(&dataTypes, fn->getReturnType());
+                fn->setReturnType(transformedDataType);
+
+                // save all transformed data types directions into data type map
+                if (!fn->getReturnType()->findAnnotation(SHARED_ANNOTATION))
+                {
+                    for (DataType *dataType : dataTypes)
+                    {
+                        group->addDirToSymbolsMap(dataType, kReturn);
+                    }
+                }
+
+                // handle function parameters
+                auto params = fn->getParameters().getMembers();
+                for (auto mit : params)
+                {
+                    dataTypes.clear();
+
+                    setBinaryList(mit);
+
+                    mit->setDataType(findChildDataType(&dataTypes, mit->getDataType()));
+
+                    // save all transformed data types directions into data type map
+                    if (!mit->findAnnotation(SHARED_ANNOTATION))
+                    {
+                        for (DataType *dataType : dataTypes)
+                        {
+                            group->addDirToSymbolsMap(dataType, mit->getDirection());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+data_list Generator::makeGroupInterfacesTemplateData(Group *group)
 {
     Log::info("interfaces:\n");
+    data_list interfaces;
     int n = 0;
-    interfaceLists_t interfaceLists;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+
+    for (Interface *iface : group->getInterfaces())
     {
-        Interface *iface = dynamic_cast<Interface *>(it);
-        assert(iface);
         data_map ifaceInfo;
         ifaceInfo["name"] = make_data(iface->getOutputName());
         ifaceInfo["id"] = data_ptr(iface->getUniqueId());
@@ -254,10 +419,10 @@ Generator::interfaceLists_t Generator::makeInterfacesTemplateData()
         // TODO: for C only?
         ifaceInfo["serviceClassName"] = iface->getOutputName() + "_service";
 
-        Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
+        Log::info("%d: (%d) %s\n", n++, iface->getUniqueId(), iface->getName().c_str());
 
         /* Has interface function declared as non-external? */
-        data_list functions = getFunctionsTemplateData(iface);
+        data_list functions = getFunctionsTemplateData(group, iface);
         ifaceInfo["functions"] = functions;
         ifaceInfo["isNonExternalInterface"] = false;
         for (int i = 0; i < functions.size(); ++i)
@@ -269,117 +434,54 @@ Generator::interfaceLists_t Generator::makeInterfacesTemplateData()
                 break;
             }
         }
-        ++n;
 
-        // Sorting interfaces into groups.
-        if (it->findAnnotation(GROUP_ANNOTATION))
-        {
-            for (auto group : it->getAnnotations(GROUP_ANNOTATION))
-            {
-                std::string groupName = (group->hasValue()) ? group->getValueObject()->toString() : "";
-                fillInterfaceListsWithMap(interfaceLists, ifaceInfo, groupName);
-            }
-        }
-        else
-        {
-            fillInterfaceListsWithMap(interfaceLists, ifaceInfo, "");
-        }
+        interfaces.push_back(ifaceInfo);
     }
-    return interfaceLists;
+
+    return interfaces;
 }
 
-data_list Generator::getFunctionsTemplateData(Interface *iface)
+data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
 {
     data_list fns;
+
     int j = 0;
     for (auto fit : iface->getFunctions())
     {
-        fns.push_back(make_data(getFunctionTemplateData(fit, j++)));
+        fns.push_back(make_data(getFunctionTemplateData(group, fit, j++)));
     }
     return fns;
 }
 
-void Generator::fillInterfaceListsWithMap(interfaceLists_t &interfaceLists,
-                                          cpptempl::data_ptr interfaceMap,
-                                          std::string mapName)
+void Generator::generateGroupOutputFiles(Group *group)
 {
-    auto interfaceList = interfaceLists.find(mapName);
-    if (interfaceList == interfaceLists.end())
+    // generate output files only for groups with interfaces or for IDLs with no interfaces at all
+    if (!group->getInterfaces().empty() || (m_groups.size() == 1 && group->getName() == ""))
     {
-        std::vector<cpptempl::data_ptr> interfaceVector;
-        interfaceLists[mapName] = interfaceVector;
-        interfaceList = interfaceLists.find(mapName);
-    }
-    interfaceList->second.push_back(interfaceMap);
-}
+        std::string groupName = group->getName();
+        std::string fileName = stripExtension(m_def->getOutputFilename());
+        m_templateData["outputFilename"] = fileName;
+        if (groupName != "")
+        {
+            fileName += "_" + groupName;
+        }
+        Log::info("File name %s\n", fileName.c_str());
+        m_templateData["commonHeaderName"] = fileName;
 
-void Generator::generateInterfaceOutputFiles(cpptempl::data_map &templateData, interfaceLists_t interfaceLists)
-{
-    templateData["groupClientC"] = "";  //when interface is not presented
-    templateData["groupClientPY"] = ""; //when interface is not presented
-
-    /* Generate file containing crc of IDL files. */
-    generateCrcFile();
-
-    // Generate output files. We have to special case not having any interfaces define.
-    if (interfaceLists.empty())
-    {
-        // empty list of interfaces
-        data_list empty;
-        templateData["group"] = "";
-        templateData["interfaces"] = empty;
+        // group templates
+        m_templateData["group"] = group->getTemplate();
 
         // Log template data.
         if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
         {
-            dump_data(templateData);
+            dump_data(m_templateData);
         }
 
-        generateOutputFiles("");
-    }
-    else
-    {
-        /* TODO: temporary C/PY code. */
-        std::vector<std::string> groupNames;
-        if (m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol).size() > 0)
-        {
-            for (auto interfaceList : interfaceLists)
-            {
-                groupNames.push_back(interfaceList.first);
-            }
-        }
-
-        for (auto interfaceList : interfaceLists)
-        {
-            /* TODO: temporary C/PY code. */
-            std::string cName;
-            std::string pyName;
-            for (std::string groupName : groupNames)
-            {
-                if (groupName != interfaceList.first)
-                {
-                    cName += "#include \"" + stripExtension(m_def->getOutputFilename()) + "_" + groupName + ".h\"\n";
-                    pyName += "from ../" + stripExtension(m_def->getOutputFilename()) + "_" + groupName + " import interface\n";
-                }
-            }
-
-            templateData["groupClientC"] = cName;
-            templateData["groupClientPY"] = pyName;
-            templateData["group"] = interfaceList.first;
-            templateData["interfaces"] = interfaceList.second;
-
-            // Log template data.
-            if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
-            {
-                dump_data(templateData);
-            }
-
-            generateOutputFiles(interfaceList.first);
-        }
+        generateOutputFiles(fileName);
     }
 }
 
-void Generator::makeIncludesTemplateData(cpptempl::data_map &templateData)
+void Generator::makeIncludesTemplateData()
 {
     data_list includeData;
     if (m_def->hasProgramSymbol())
@@ -390,51 +492,41 @@ void Generator::makeIncludesTemplateData(cpptempl::data_map &templateData)
             Log::info("include %s\n", include->getValueObject()->toString().c_str());
         }
     }
-    templateData["includes"] = includeData;
+    m_templateData["includes"] = includeData;
+}
 
-    /* find server includes */
-    std::map<std::string, std::vector<std::string> > groupIncludes;
-    for (Symbol *interfaceSymbol : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+data_list Generator::makeGroupIncludesTemplateData(Group *group)
+{
+    data_list includes;
+    std::set<std::string> tempSet;
+
+    for (Interface *iface : group->getInterfaces())
     {
-        Interface *interface = dynamic_cast<Interface *>(interfaceSymbol);
-        assert(interface);
-        Annotation *includeAnn = interface->findAnnotation(INCLUDE_ANNOTATION);
+        Annotation *includeAnn = iface->findAnnotation(INCLUDE_ANNOTATION);
         if (includeAnn)
         {
-            Annotation *groupAnn = interface->findAnnotation(GROUP_ANNOTATION);
-            std::string groupName;
-            if (groupAnn)
+            std::string include = includeAnn->getValueObject()->toString();
+            if (tempSet.find(include) == tempSet.end())
             {
-                groupName = groupAnn->getValueObject()->toString();
+                includes.push_back(include);
+                tempSet.insert(include);
             }
-            else
+        }
+
+        for (Function *func : iface->getFunctions())
+        {
+            Annotation *funcAnn = func->findAnnotation(INCLUDE_ANNOTATION);
+            if (funcAnn)
             {
-                groupName = "";
+                std::string include = funcAnn->getValueObject()->toString();
+                if (tempSet.find(include) == tempSet.end())
+                {
+                    includes.push_back(include);
+                    tempSet.insert(include);
+                }
             }
-            auto includeList = groupIncludes.find(groupName);
-            if (includeList == groupIncludes.end())
-            {
-                std::vector<std::string> includeVector;
-                groupIncludes[groupName] = includeVector;
-                includeList = groupIncludes.find(groupName);
-            }
-            includeList->second.push_back(includeAnn->getValueObject()->toString());
         }
     }
 
-    /* fill templateData server includes */
-    data_list groupsIncludes;
-    for (auto includeList : groupIncludes)
-    {
-        data_list groupIncludesList;
-        data_map groupInfo;
-        groupInfo["name"] = includeList.first;
-        for (auto includeName : includeList.second)
-        {
-            groupIncludesList.push_back(includeName);
-        }
-        groupInfo["includes"] = groupIncludesList;
-        groupsIncludes.push_back(groupInfo);
-    }
-    templateData["groupsServer"] = groupsIncludes;
+    return includes;
 }

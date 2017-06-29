@@ -10,7 +10,7 @@
 
 import erpc
 
-{% for iface in interfaces if iface.isNonExternalInterface == true %}
+{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
 {% if iface.mlComment %}
 {$iface.mlComment}
 {% else %}

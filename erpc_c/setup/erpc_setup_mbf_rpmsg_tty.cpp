@@ -138,7 +138,7 @@ static ManuallyConstructed<RPMsgTTYMessageBufferFactory> s_msgFactory;
 
 erpc_mbf_t erpc_mbf_rpmsg_tty_init(erpc_transport_t transport)
 {
-    s_msgFactory.construct(reinterpret_cast<RPMsgZCBaseTransport *>(transport)
+    s_msgFactory.construct(reinterpret_cast<RPMsgBaseTransport *>(transport)
                                ->get_rpmsg_lite_instance());
     return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());
 }

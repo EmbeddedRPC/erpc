@@ -42,6 +42,7 @@
 #define nestedCallsCount 10
 int i = 0;
 int numbers[number];
+bool enabled = false;
 
 TEST(test_arbitrator, FirstSendReceiveInt)
 {
@@ -71,6 +72,8 @@ TEST(test_arbitrator, FirstSendReceiveInt2)
 
 TEST(test_arbitrator, NestedCallTest)
 {
+    stopSecondSide();
+    while(!enabled){};
     EXPECT_TRUE(nestedCallTest() == nestedCallsCount *2 - 1);
 }
 
@@ -103,6 +106,11 @@ int32_t callFirstSide()
     {
         return 0;
     }
+}
+
+void enableFirstSide()
+{
+    enabled = true;
 }
 
 void add_services(erpc::SimpleServer *server)

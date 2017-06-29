@@ -56,11 +56,10 @@ class Transport(object):
 class FramedTransport(Transport):
     HEADER_LEN = 4
 
-    def __init__(self, crcStart=0):
+    def __init__(self):
         super(FramedTransport, self).__init__()
         self._sendLock = threading.Lock()
         self._receiveLock = threading.Lock()
-        self._Crc16 = crcStart
 
     @property
     def crc_16(self):

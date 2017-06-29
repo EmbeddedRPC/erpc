@@ -32,7 +32,9 @@
 #define _EMBEDDED_RPC__MU_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
+#if ERPC_THREADS
 #include "erpc_threading.h"
+#endif
 #include "fsl_device_registers.h"
 #include "fsl_mu.h"
 #include "message_buffer.h"
