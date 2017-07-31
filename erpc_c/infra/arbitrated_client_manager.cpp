@@ -78,8 +78,18 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
         }
     }
 
+    erpc_status_t err;
+
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(request.getCodec()->getBuffer());
+    if (err)
+    {
+        return err;
+    }
+#endif
+
     // Send the request.
-    erpc_status_t err = m_arbitrator->send(request.getCodec()->getBuffer());
+    err = m_arbitrator->send(request.getCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -93,6 +103,14 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
         {
             return err;
         }
+
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(request.getCodec()->getBuffer());
+        if (err)
+        {
+            return err;
+        }
+#endif
 
         // Check the reply.
         err = verifyReply(request);

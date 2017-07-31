@@ -50,8 +50,6 @@ namespace erpcgen {
 class StructType : public DataType
 {
 public:
-    typedef std::vector<_param_direction> struct_direction_types_t;
-
     typedef std::vector<StructMember *> member_vector_t;
 
     /*!

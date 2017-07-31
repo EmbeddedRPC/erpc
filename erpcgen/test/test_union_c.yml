@@ -40,7 +40,7 @@ name: basic non-encapsulated union
 desc: Verify "in" direction usage of non-encapsulated unions.
 idl: |
 
-  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi, returnVal }
 
   struct foobar
   {
@@ -48,7 +48,7 @@ idl: |
       binary rawString
   }
 
-  const int32 returnVal = 10;
+  //  const int32 returnVal = 10;
 
   union unionType
   {

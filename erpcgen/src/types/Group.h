@@ -141,7 +141,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
     */
-    virtual std::string getDescription() const;
+    std::string getDescription() const;
 
 private:
     interface_list_t m_interfaces;              /*!< Vector of interface functions. */

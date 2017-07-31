@@ -109,7 +109,7 @@ public:
      *
      * @return Union case value.
      */
-    uint32_t getCaseValue() const { return m_caseValue; }
+    int32_t getCaseValue() const { return m_caseValue; }
 
     /*!
      * @brief This function returns union case name.

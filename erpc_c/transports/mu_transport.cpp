@@ -46,33 +46,21 @@ static MUTransport *s_mu_instance = NULL;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-
-// MU irq callback
-void MUTransport::mu_irq_callback()
+void MUTransport::mu_tx_empty_irq_callback()
 {
     MUTransport *transport = s_mu_instance;
-
-    uint32_t flags;
-    flags = MU_GetStatusFlags(transport->m_muBase);
-
-    // parse flags of full rx registers
-    uint32_t rxFlags = ((flags & MU_SR_RFn_MASK) >> MU_SR_RFn_SHIFT);
-    rxFlags = (rxFlags >> (MU_RR_COUNT - MU_REG_COUNT));
-
-    // parse flags of empty tx registers
-    uint32_t txFlags = ((flags & MU_SR_TEn_MASK) >> MU_SR_TEn_SHIFT);
-    txFlags = (txFlags >> (MU_TR_COUNT - MU_REG_COUNT));
-
-    // RECEIVING - rx full flag and rx full irq enabled
-    if ((rxFlags & 0x1) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
-    {
-        transport->rx_cb();
-    }
-
-    // TRANSMITTING - tx empty flag and tx empty irq enabled
-    if ((txFlags & 0x1) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
+    if ((transport) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
     {
         transport->tx_cb();
+    }
+}
+
+void MUTransport::mu_rx_full_irq_callback()
+{
+    MUTransport *transport = s_mu_instance;
+    if ((transport) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
+    {
+        transport->rx_cb();
     }
 }
 
@@ -103,7 +91,6 @@ MUTransport::~MUTransport()
 erpc_status_t MUTransport::init(MU_Type *muBase)
 {
     m_muBase = muBase;
-    MU_Init(muBase);
 
 #if !ERPC_THREADS
     // enabling the MU rx full irq is necessary only for BM app
@@ -271,9 +258,24 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
 }
 
 extern "C" {
-int MU_IRQ_HANDLER()
+
+/*!
+ * @brief Messaging Unit TxEmptyFlag ISR handler
+ *
+ * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table 
+ */
+void MU_TxEmptyFlagISRCallback()
 {
-    MUTransport::mu_irq_callback();
-    return 0;
+    MUTransport::mu_tx_empty_irq_callback();
+}
+
+/*!
+ * @brief Messaging Unit RxFullFlag ISR handler
+ *
+ * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table 
+ */
+void MU_RxFullFlagISRCallback()
+{
+    MUTransport::mu_rx_full_irq_callback();
 }
 }

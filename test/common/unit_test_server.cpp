@@ -41,6 +41,7 @@
 extern "C" {
 #include "app_core1.h"
 #if defined(RPMSG)
+#define APP_ERPC_READY_EVENT_DATA  (1)
 #include "mcmgr.h"
 #include "rpmsg_lite.h"
 #endif
@@ -59,8 +60,8 @@ int MyAlloc::allocated_ = 0;
 #if defined(RPMSG)
 static void SignalReady(void)
 {
-    /* Signal the other core we are ready */
-    MCMGR_SignalReady(kMCMGR_Core1);
+    /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
+    MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
 #endif
 
@@ -68,10 +69,19 @@ int main(int argc, const char *argv[])
 {
 #if defined(RPMSG)
     uint32_t startupData;
+    mcmgr_status_t status;
+
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
     /* Get the startup data */
-    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
+    do{
+        status = MCMGR_GetStartupData(&startupData);
+    }while(status != kStatus_MCMGR_Success);
 #endif
 
     erpc_transport_t transport;

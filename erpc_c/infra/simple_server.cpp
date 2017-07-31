@@ -105,6 +105,19 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
         return err;
     }
 
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(&buff);
+    if (err)
+    {
+        // Dispose of buffers.
+        if (!buff.get())
+        {
+            m_messageFactory->dispose(&buff);
+        }
+        return err;
+    }
+#endif
+
     *codec = m_codecFactory->create();
     if (!*codec)
     {
@@ -136,6 +149,16 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
 
     if (msgType != kOnewayMessage)
     {
+
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(codec->getBuffer());
+        if (err)
+        {
+            // Dispose of buffers and codecs.
+            disposeBufferAndCodec(codec);
+            return err;
+        }
+#endif
         err = m_transport->send(codec->getBuffer());
     }
 

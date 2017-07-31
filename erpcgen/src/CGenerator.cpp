@@ -223,8 +223,9 @@ DataType *CGenerator::findChildDataType(std::vector<DataType *> *dataTypes, Data
             assert(funcType);
 
             // handle return value
-            DataType *transformedDataType = findChildDataType(dataTypes, funcType->getReturnType());
-            funcType->setReturnType(transformedDataType);
+            StructMember *returnType = funcType->getReturnStructMemberType();
+            DataType *transformedDataType = findChildDataType(NULL, funcType->getReturnType());
+            returnType->setDataType(transformedDataType);
 
             // handle function parameters
             auto params = funcType->getParameters().getMembers();
@@ -232,7 +233,7 @@ DataType *CGenerator::findChildDataType(std::vector<DataType *> *dataTypes, Data
             {
                 setBinaryList(mit);
 
-                mit->setDataType(findChildDataType(dataTypes, mit->getDataType()));
+                mit->setDataType(findChildDataType(NULL, mit->getDataType()));
             }
             break;
         }
@@ -355,11 +356,11 @@ DataType *CGenerator::findChildDataType(std::vector<DataType *> *dataTypes, Data
             UnionType *currentUnion = dynamic_cast<UnionType *>(dataType);
             assert(currentUnion);
 
-            for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
+            for (auto unionMember : currentUnion->getUnionMembers().getMembers())
             {
-                setBinaryList(&unionMember);
-                setNoSharedAnn(currentUnion, &unionMember);
-                unionMember.setDataType(findChildDataType(dataTypes, unionMember.getDataType()));
+                setBinaryList(unionMember);
+                setNoSharedAnn(currentUnion, unionMember);
+                unionMember->setDataType(findChildDataType(dataTypes, unionMember->getDataType()));
             }
             break;
         }
@@ -456,15 +457,13 @@ void CGenerator::generate()
     makeSymbolsDeclarationTemplateData();
 
     // check if types header annotation is used
-    m_templateData["commonTypesFile"] = "";
     if (m_def->hasProgramSymbol())
     {
-        Annotation *anno = m_def->getProgramSymbol()->findAnnotation(TYPES_HEADER_ANNOTATION);
-        if (nullptr != anno)
-        {
-            // get name of types header file from annotation
-            m_templateData["commonTypesFile"] = anno->getValueObject()->toString();
-        }
+        m_templateData["commonTypesFile"] = m_def->getProgramSymbol()->getAnnStringValue(TYPES_HEADER_ANNOTATION);
+    }
+    else
+    {
+        m_templateData["commonTypesFile"] = "";
     }
 
     for (Group *group : m_groups)
@@ -875,79 +874,83 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
     {
         data_map info;
         const std::set<_param_direction> dirs = group->getSymbolDirections(symbol);
-
-        switch (symbol->getSymbolType())
+        if (dirs.size())
         {
-            case DataType::kStructTypeSymbol:
+            switch (symbol->getSymbolType())
             {
-                StructType *structType = dynamic_cast<StructType *>(symbol);
-                assert(structType);
-
-                Log::info("%s\n", structType->getDescription().c_str());
-
-                std::string name = (structType->getName() != "") ? structType->getOutputName() : getAliasName(structType);
-
-                // check if template for this structure has not already been generated
-                if (names.find(name) == names.end())
+                case DataType::kStructTypeSymbol:
                 {
-                    // get struct declaration info
-                    info = getSymbolTemplateByName(name);
-                    if (info.empty())
+                    StructType *structType = dynamic_cast<StructType *>(symbol);
+                    assert(structType);
+
+                    Log::info("%s\n", structType->getDescription().c_str());
+
+                    std::string name = (structType->getName() != "") ? structType->getOutputName() : getAliasName(structType);
+
+                    // check if template for this structure has not already been generated
+                    if (names.find(name) == names.end())
                     {
-                        break;
+                        // get struct declaration info
+                        info = getSymbolTemplateByName(name);
+                        if (info.empty())
+                        {
+                            break;
+                        }
+
+                        // get struct definition info
+                        info = getStructDefinitionTemplateData(group, structType, info);
+
+                        // set symbol data to client or server according to its directions
+                        setSymbolDataToSide(structType, dirs, symbolsToClient, symbolsToServer, info);
+
+                        // struct needs to be freed?
+                        if (structType->containStringMember() || structType->containListMember() || containsByrefParamToFree(structType))
+                        {
+                            symbolsServerFree.push_back(info);
+                        }
+
+                        names.insert(name);
                     }
-
-                    // get struct definition info
-                    info = getStructDefinitionTemplateData(group, structType, info);
-
-                    // set symbol data to client or server according to its directions
-                    setSymbolDataToSide(structType, dirs, symbolsToClient, symbolsToServer, info);
-
-                    // struct needs to be freed?
-                    if (structType->containStringMember() || structType->containListMember() || containsByrefParamToFree(structType))
-                    {
-                        symbolsServerFree.push_back(info);
-                    }
-
-                    names.insert(name);
+                    break;
                 }
-                break;
-            }
-            case DataType::kUnionTypeSymbol:
-            {
-                UnionType *unionType = dynamic_cast<UnionType *>(symbol);
-                assert(unionType);
-
-                Log::info("%s\n", unionType->getDescription().c_str());
-
-                std::string name = unionType->getOutputName();
-
-                // check if template for this union has not already been generated
-                if (names.find(name) == names.end())
+                case DataType::kUnionTypeSymbol:
                 {
-                    info = getSymbolTemplateByName(name);
-                    if (info.empty())
+                    UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                    assert(unionType);
+
+                    Log::info("%s\n", unionType->getDescription().c_str());
+
+                    std::string name = unionType->getOutputName();
+
+                    // check if template for this union has not already been generated
+                    if (names.find(name) == names.end())
                     {
-                        break;
+                        info = getSymbolTemplateByName(name);
+                        if (info.empty())
+                        {
+                            break;
+                        }
+
+                        // get union info
+                        data_map unionBaseInfo = getUnionDeclarationTemplateData(unionType);
+                        bool needUnionsServerFree = false;
+                        info = getUnionDefinitionTemplateData(group, unionType, unionBaseInfo, needUnionsServerFree);
+
+                        // set symbol data to client or server according to its directions
+                        setSymbolDataToSide(unionType, dirs, symbolsToClient, symbolsToServer, info);
+
+                        // free unions on server side.
+                        if (needUnionsServerFree)
+                        {
+                            symbolsServerFree.push_back(info);
+                        }
+
+                        names.insert(name);
                     }
-
-                    // get union info
-                    data_map unionBaseInfo = getUnionDeclarationTemplateData(unionType);
-                    bool needUnionsServerFree = false;
-                    info = getUnionDefinitionTemplateData(group, unionType, unionBaseInfo, needUnionsServerFree);
-
-                    // set symbol data to client or server according to its directions
-                    setSymbolDataToSide(unionType, dirs, symbolsToClient, symbolsToServer, info);
-
-                    // free unions on server side.
-                    if (needUnionsServerFree)
-                    {
-                        symbolsServerFree.push_back(info);
-                    }
-
-                    names.insert(name);
+                    break;
                 }
-                break;
+                default:
+                    break;
             }
         }
     }
@@ -1294,27 +1297,41 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
     // Get return value info
     data_map returnInfo;
     returnInfo["type"] = getTypeInfo(fn->getReturnType(), true);
+    StructMember *structMember = fn->getReturnStructMemberType();
     DataType *dataType = fn->getReturnType();
     DataType *trueDataType = dataType->getTrueDataType();
     if (!trueDataType->isVoid())
     {
         std::string result = "result";
         bool needTempVariable = false;
-        returnInfo["firstAlloc"] = firstAllocOnReturnWhenIsNeed(result, dataType);
-        setCallingFreeFunctions(dataType, returnInfo);
+        setCallingFreeFunctions(structMember, returnInfo, true);
         std::string extraPointer = getExtraPointerInReturn(dataType);
         std::string resultVariable = extraPointer + returnSpaceWhenNotEmpty(extraPointer) + result;
-        bool isShared = (dataType->findAnnotation(SHARED_ANNOTATION) != nullptr);
+        if (structMember->findAnnotation(NULLABLE_ANNOTATION) == nullptr)
+        {
+            returnInfo["isNullable"] = false;
+            returnInfo["nullableName"] = "";
+        }
+        else
+        {
+            returnInfo["isNullable"] = true;
+            returnInfo["nullableName"] = result;
+        }
+        bool isShared = (structMember->findAnnotation(SHARED_ANNOTATION) != nullptr);
         if (!isShared)
         {
+            returnInfo["firstAlloc"] = firstAllocOnReturnWhenIsNeed(result, dataType);
             result = extraPointer + result;
         }
-        returnInfo["coderCall"] = getEncodeDecodeCall(result, group, dataType, nullptr, false, nullptr, needTempVariable, true);
+        else
+        {
+            returnInfo["firstAlloc"] = "";
+        }
+        returnInfo["coderCall"] = getEncodeDecodeCall(result, group, dataType, nullptr, false, structMember, needTempVariable, true);
         returnInfo["shared"] = isShared;
         resultVariable = getTypenameName(dataType, resultVariable);
         info["needTempVariableClient"] = needTempVariable;
         returnInfo["resultVariable"] = resultVariable;
-        returnInfo["isNeedFreeingCall"] = (!isShared && isNeedCallFree(dataType));
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
         returnInfo["isNullReturnType"] =
             (!trueDataType->isScalar() && !trueDataType->isEnum());
@@ -1349,6 +1366,9 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
             paramInfo["serializedBothDirection"] = false;
         }
 
+        // due to compatibility with return data.
+        paramInfo["firstAlloc"] = "";
+
         // Init parameters to NULL on server side
         bool isNullParam = (!paramTrueType->isScalar() && !paramTrueType->isEnum() && !paramTrueType->isArray());
         paramInfo["isNullParam"] = isNullParam;
@@ -1372,7 +1392,6 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         // Handle nullable annotation.
         bool isNullable = (param->findAnnotation(NULLABLE_ANNOTATION) && ((isPointer && nullableParam->getDirection() != kOutDirection) || ((paramTrueType->isScalar() || paramTrueType->isEnum()) && nullableParam->getDirection() == kInoutDirection)));
         paramInfo["isNullable"] = isNullable;
-        Log::info("isNullable %d \n", (isNullable)?1:0);
 
         if (isNullable)
         {
@@ -1432,7 +1451,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
 
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
         paramInfo["mallocServerOut"] = firtAllocOutParamOnServerWhenIsNeed(name, param);
-        setCallingFreeFunctions(param, paramInfo);
+        setCallingFreeFunctions(param, paramInfo, false);
 
         // Use shared memory feature instead of serializing/deserializing data.
         bool isShared = (isPointer && param->findAnnotation(SHARED_ANNOTATION) != nullptr);
@@ -1441,7 +1460,10 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         if (isShared)
         {
             encodeDecodeName = name;
-            name = "*" + name;
+            if (!paramTrueType->isList())
+            {
+                name = "*" + name;
+            }
         }
         else
         {
@@ -1454,7 +1476,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         paramInfo["type"] = getTypeInfo(paramType, false);
 
         Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(), paramType->getName().c_str());
-    	paramInfo["coderCall"] = getEncodeDecodeCall(encodeDecodeName, group, paramType, &fn->getParameters(), false, param, needTempVariable, true);
+        paramInfo["coderCall"] = getEncodeDecodeCall(encodeDecodeName, group, paramType, &fn->getParameters(), false, param, needTempVariable, true);
 
         setSymbolDataToSide(param, group->getSymbolDirections(param), paramsToClient, paramsToServer, paramInfo);
 
@@ -1590,7 +1612,7 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const std::set<_p
             toClient.push_back(dataMap);
             break;
         }
-        case 5: // ToDo: shared pointer
+        case kNone: // ToDo: shared pointer
         {
             break;
         }
@@ -1980,7 +2002,7 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group,
         }
         else
         {
-            if (!structMember)
+            if (!structType)
             {
                 templateData["stringAllocSize"] = "return_len";
                 templateData["stringLocalName"] = "return";
@@ -2043,9 +2065,9 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
     templateData["freeName"] = localName;
 
     /* Check if member should be serialized as shared. */
-    if ((structMember && structMember->findAnnotation(SHARED_ANNOTATION)) || (structType && structType->findAnnotation(SHARED_ANNOTATION)) || t->findAnnotation(SHARED_ANNOTATION))
+    if ((structMember && structMember->findAnnotation(SHARED_ANNOTATION)) || (structType && structType->findAnnotation(SHARED_ANNOTATION)))
     {
-        templateData["funcParam"] = (structMember) ? true : false;
+        templateData["funcParam"] = (structType) ? true : false;
         templateData["InoutOutDirection"] = (structMember && (structMember->getDirection() == kOutDirection || structMember->getDirection() == kInoutDirection)) ? true : false;
         templateData["encode"] = m_templateData["encodeSharedType"];
         templateData["decode"] = m_templateData["decodeSharedType"];
@@ -2075,9 +2097,9 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 assert(u);
                 if (u)
                 {
-                    for (StructMember m : u->getUnionMemberDeclarations())
+                    for (StructMember *m : u->getUnionMembers().getMembers())
                     {
-                        if (m.findAnnotation(NO_SHARED_ANNOTATION))
+                        if (m->findAnnotation(NO_SHARED_ANNOTATION))
                         {
                             templateData["sharedType"] = "union";
                             if (setDiscriminatorTemp(u, structType, structMember, isFunctionParam, templateData))
@@ -2532,7 +2554,7 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     }
     else
     {
-        if (trueDataType->isStruct() || trueDataType->isUnion())
+        if ((trueDataType->isStruct() || trueDataType->isUnion()) || (trueDataType->isScalar() && structMember->findAnnotation(SHARED_ANNOTATION)))
         {
             result = "*";
         }
@@ -2663,9 +2685,11 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
     }
 }
 
-void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info)
+void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info, bool returnType)
 {
     StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+    assert(structMember);
+    DataType *trueDataType = structMember->getDataType()->getTrueDataType();
     data_map firstFreeingCall1;
     firstFreeingCall1["firstFreeingCall"] = "";
     firstFreeingCall1["freeName"] = "";
@@ -2675,9 +2699,8 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
     // When true then function parameter, else return type
     if (!symbol->findAnnotation(SHARED_ANNOTATION))
     {
-        if (structMember)
+        if (!returnType)
         {
-            DataType *trueDataType = structMember->getDataType()->getTrueDataType();
             switch (trueDataType->getDataType())
             {
                 case DataType::kBuiltinType:
@@ -2709,9 +2732,7 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
         }
         else
         {
-            DataType *dataType = dynamic_cast<DataType *>(symbol);
-            assert(dataType);
-            if (dataType->getTrueDataType()->isArray() || dataType->getTrueDataType()->isStruct() || dataType->getTrueDataType()->isUnion())
+            if (trueDataType->isArray() || trueDataType->isStruct() || trueDataType->isUnion())
             {
                 firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
                 firstFreeingCall1["freeName"] = "result";
@@ -2904,9 +2925,9 @@ bool CGenerator::containsByrefParamToFree(DataType *dataTypte)
         UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
         assert(unionType != nullptr);
 
-        for (StructMember &structMember : unionType->getUnionMemberDeclarations())
+        for (StructMember *structMember : unionType->getUnionMembers().getMembers())
         {
-            if ((structMember.isByref() && !structMember.findAnnotation(SHARED_ANNOTATION)) || containsByrefParamToFree(structMember.getDataType()))
+            if ((structMember->isByref() && !structMember->findAnnotation(SHARED_ANNOTATION)) || containsByrefParamToFree(structMember->getDataType()))
             {
                 return true;
             }

@@ -50,7 +50,6 @@ class UnionType : public DataType
 {
 public:
     typedef std::vector<UnionCase *> case_vector_t;
-    typedef std::vector<StructMember> memberDecl_vector_t;
 
     /*!
      * @brief Constructor.
@@ -64,6 +63,7 @@ public:
     UnionType(const std::string &name, const std::string &discriminatorName)
     : DataType(name, kUnionType, kUnionTypeSymbol)
     , m_discriminator(discriminatorName)
+    , m_members("(union)")
     , m_parentStruct(nullptr)
     {
     }
@@ -138,11 +138,11 @@ public:
     bool addUnionMemberDeclaration(const std::string &name, DataType *dataType);
 
     /*!
-     * @brief This function returns vector of union member declarations.
+     * @brief This function returns struct of union members.
      *
-     * @return Vector of union member declarations.
+     * @return Struct of union members.
      */
-    memberDecl_vector_t &getUnionMemberDeclarations() { return m_caseMembers; }
+    StructType &getUnionMembers() { return m_members; }
 
     /*!
      * @brief This function returns union member declaration.
@@ -176,10 +176,10 @@ public:
     bool declarationExists(const std::string &name);
 
 private:
-    std::string m_discriminator;       /*!< Name of union discriminator. */
-    case_vector_t m_unionCases;        /*!< Contains union cases */
-    memberDecl_vector_t m_caseMembers; /*!< Contains union case members */
-    StructType *m_parentStruct;        /*!< Struct containing this union */
+    std::string m_discriminator; /*!< Name of union discriminator. */
+    case_vector_t m_unionCases;  /*!< Contains union cases */
+    StructType m_members;        /*!< Contains union members */
+    StructType *m_parentStruct;  /*!< Struct containing this union */
 
     /*!
      * @brief This function is comparing two union cases.

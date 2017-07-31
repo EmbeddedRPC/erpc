@@ -32,12 +32,6 @@
 #ifndef _ERPC_CONFIG_H_
 #define _ERPC_CONFIG_H_
 
-/*!
- * @addtogroup config
- * @{
- * @file
- */
-
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +73,7 @@
 //!
 //! Uncomment to change the size of buffers allocated by BasicMessageBufferFactory in the client
 //! and server setup functions (@ref client_setup and @ref server_setup). The default size is 256.
-//#define ERPC_DEFAULT_BUFFER_SIZE (256)
+#define ERPC_DEFAULT_BUFFER_SIZE (1024)
 
 //! @def ERPC_DEFAULT_BUFFERS_COUNT
 //!

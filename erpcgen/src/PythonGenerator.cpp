@@ -489,6 +489,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 }
                 break;
             }
+            default:
+                break;
         }
     }
 

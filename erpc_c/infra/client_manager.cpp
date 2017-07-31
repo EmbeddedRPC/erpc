@@ -69,8 +69,18 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
     }
 #endif
 
+    erpc_status_t err;
+
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(request.getCodec()->getBuffer());
+    if (err)
+    {
+        return err;
+    }
+#endif
+
     // Send invocation request to server.
-    erpc_status_t err = m_transport->send(request.getCodec()->getBuffer());
+    err = m_transport->send(request.getCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -85,6 +95,14 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
         {
             return err;
         }
+
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(request.getCodec()->getBuffer());
+        if (err)
+        {
+            return err;
+        }
+#endif
 
         // Check the reply.
         err = verifyReply(request);
@@ -102,8 +120,18 @@ erpc_status_t ClientManager::performNestedRequest(RequestContext &request)
 {
     assert(m_transport && "transport/arbitrator not set");
 
+    erpc_status_t err;
+
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(request.getCodec()->getBuffer());
+    if (err)
+    {
+        return err;
+    }
+#endif
+
     // Send invocation request to server.
-    erpc_status_t err = m_transport->send(request.getCodec()->getBuffer());
+    err = m_transport->send(request.getCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -119,6 +147,14 @@ erpc_status_t ClientManager::performNestedRequest(RequestContext &request)
         {
             return err;
         }
+
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(request.getCodec()->getBuffer());
+        if (err)
+        {
+            return err;
+        }
+#endif
 
         // Check the reply.
         err = verifyReply(request);

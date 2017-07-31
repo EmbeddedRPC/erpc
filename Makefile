@@ -26,22 +26,31 @@ include mk/erpc_common.mk
 # a little bit, but greatly improves the readability of the log output.
 #.NOTPARALLEL:
 
+ifeq "$(is_linux)" "1"
+ERPCSNIFFER = erpcsniffer
+endif
+
 # Subdirectories to run make on.
 TESTDIR = test
-SUBDIRS = erpcgen $(TESTDIR)
+SUBDIRS = erpcgen $(ERPCSNIFFER) $(TESTDIR)
 
 # Default target.
 .PHONY: default
-default: erpcgen erpc
+default: erpc $(ERPCSNIFFER) erpcgen
+
+erpcsniffer: erpc
 
 .PHONY: erpc
 erpc:
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c
 
 .PHONY: install
-install: erpc erpc_c erpcgen
+install: erpc erpc_c erpcgen $(ERPCSNIFFER)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c install
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcgen install
+	ifeq "$(is_linux)" "1"
+	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcsniffer install
+	endif
 
 #make all target
 .PHONY: all
@@ -75,5 +84,3 @@ include $(ERPC_ROOT)/mk/subdirs.mk
 .PHONY: os_name
 os_name:
 	@echo $(os_name)
-
-

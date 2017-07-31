@@ -105,3 +105,10 @@ void erpc_server_stop()
 {
     g_server->stop();
 }
+
+#if ERPC_MESSAGE_LOGGING
+void erpc_server_add_message_logger(erpc_transport_t transport)
+{
+    g_server->addMessageLogger(reinterpret_cast<Transport *>(transport));
+}
+#endif

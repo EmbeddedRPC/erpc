@@ -119,7 +119,14 @@ erpc_status_t BasicCodec::write(double value)
 
 erpc_status_t BasicCodec::writePtr(uintptr_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    uint8_t ptrSize = sizeof(value);
+    erpc_status_t err = m_cursor.write(&ptrSize, 1);
+    if (err)
+    {
+        return err;
+    }
+
+    return m_cursor.write(&value, ptrSize);
 }
 
 erpc_status_t BasicCodec::writeString(uint32_t length, const char *value)
@@ -266,7 +273,19 @@ erpc_status_t BasicCodec::read(double *value)
 
 erpc_status_t BasicCodec::readPtr(uintptr_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    uint8_t ptrSize;
+    erpc_status_t err = m_cursor.read(&ptrSize, 1);
+    if (err)
+    {
+        return err;
+    }
+
+    if (ptrSize > sizeof(*value))
+    {
+        return kErpcStatus_BadAddressScale;
+    }
+
+    return m_cursor.read(value, ptrSize);
 }
 
 erpc_status_t BasicCodec::readString(uint32_t *length, char **value)

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,16 +28,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_transport_setup.h"
 #include "erpc_version.h"
-#include "CGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
 #include "Logging.h"
-#include "PythonGenerator.h"
 #include "SearchPath.h"
+#include "Sniffer.h"
 #include "UniqueIdChecker.h"
+#include "crc16.h"
 #include "options.h"
-#include "types/Program.h"
+#include "tcp_transport.h"
+#include "transport.h"
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
@@ -49,23 +50,26 @@
  */
 int main(int argc, char *argv[], char *envp[]);
 
-namespace erpcgen {
+using namespace erpc;
+using namespace erpcgen;
+namespace erpcsniffer {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
 /*! The tool's name. */
-const char k_toolName[] = "erpcgen";
+const char k_toolName[] = "erpcsniffer";
 
 /*! Current version number for the tool. */
 const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright 2016-2017 NXP. All rights reserved.";
+const char k_copyright[] = "Copyright 2017 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = {
-    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", NULL
+    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "t:transport <transport>",
+    "q:quantity <quantity>", "b:baudrate <baudrate>", "p:port <port>", "h:host <host>", NULL
 };
 
 /*! Help string. */
@@ -73,14 +77,18 @@ const char k_usageText[] =
     "\nOptions:\n\
   -?/--help                    Show this help\n\
   -V/--version                 Display tool version\n\
-  -o/--output <filePath>       Set output directory path prefix\n\
+  -o/--output <filePath>       Set path to output file (file name included)\n\
   -v/--verbose                 Print extra detailed log information\n\
   -I/--path <filePath>         Add search path for imports\n\
-  -g/--generate <language>     Select the output language (default is C)\n\
+  -t/--transport <transport>   Type of transport.\n\
+  -q/--quantity <quantity>     Record messages count (0 - infinity).\n\
+  -b/--baudrate <baudrate>     Baud rate.\n\
+  -p/--port <port>             Port name or port number.\n\
+  -h/--host <host>             Host definition.\n\
 \n\
-Available languages (use with -g option):\n\
-  c    C/C++\n\
-  py   Python\n\
+Available transports (use with -t option):\n\
+  tcp      Tcp transport type (host, port number).\n\
+  serial   Serial transport type (port name, baud rate).\n\
 \n";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,13 +96,13 @@ Available languages (use with -g option):\n\
 ////////////////////////////////////////////////////////////////////////////////
 
 /*!
- * @brief Class that encapsulates the erpcgen tool.
+ * @brief Class that encapsulates the erpcsniffer tool.
  *
  * A single global logger instance is created during object construction. It is
  * never freed because we need it up to the last possible minute, when an
  * exception could be thrown.
  */
-class erpcgenTool
+class erpcsnifferTool
 {
 protected:
     enum verbose_type_t
@@ -103,13 +111,14 @@ protected:
         kInfo,
         kDebug,
         kExtraDebug
-    }; /*!< Types of verbose outputs from erpcgen application. */
+    }; /*!< Types of verbose outputs from erpcsniffer application. */
 
-    enum languages_t
+    enum transports_t
     {
-        kCLanguage,
-        kPythonLanguage,
-    }; /*!< Generated outputs format. */
+        kNoneTransport,
+        kTcpTransport,
+        kSerialTransport
+    }; /*!< Type of transport to use. */
 
     typedef vector<string> string_vector_t;
 
@@ -120,7 +129,11 @@ protected:
     const char *m_outputFilePath; /*!< Path to the output file. */
     const char *m_ErpcFile;       /*!< ERPC file. */
     string_vector_t m_positionalArgs;
-    languages_t m_outputLanguage; /*!< Output language we're generating. */
+    transports_t m_transport; /*!< Transport used for receiving messages. */
+    uint64_t m_quantity;      /*!< Quantity of logs to store. */
+    uint32_t m_baudrate;      /*!< Baudrate rate speed. */
+    const char *m_port;       /*!< Name or number of port. Based on used transport. */
+    const char *m_host;       /*!< Host name */
 
 public:
     /*!
@@ -131,14 +144,18 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcgenTool(int argc, char *argv[])
+    erpcsnifferTool(int argc, char *argv[])
     : m_argc(argc)
     , m_argv(argv)
     , m_logger(0)
     , m_verboseType(kWarning)
     , m_outputFilePath(NULL)
     , m_ErpcFile(NULL)
-    , m_outputLanguage(kCLanguage)
+    , m_transport(kNoneTransport)
+    , m_quantity(10)
+    , m_baudrate(115200)
+    , m_port(NULL)
+    , m_host(NULL)
     {
         // create logger instance
         m_logger = new StdoutLogger();
@@ -149,7 +166,7 @@ public:
     /*!
      * @brief Destructor.
      */
-    ~erpcgenTool() {}
+    ~erpcsnifferTool() {}
 
     /*!
      * @brief Reads the command line options passed into the constructor.
@@ -180,51 +197,87 @@ public:
             switch (optchar)
             {
                 case '?':
+                {
                     printUsage(options);
                     return 0;
+                }
 
                 case 'V':
+                {
                     printf("%s %s\n%s\n", k_toolName, k_version, k_copyright);
                     return 0;
+                }
 
                 case 'o':
+                {
                     m_outputFilePath = optarg;
                     break;
+                }
 
                 case 'v':
+                {
                     if (m_verboseType != kExtraDebug)
                     {
                         m_verboseType = (verbose_type_t)(((int)m_verboseType) + 1);
                     }
                     break;
+                }
 
                 case 'I':
+                {
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
+                }
 
-                case 'g':
+                case 't':
                 {
-                    string lang = optarg;
-                    if (lang == "c")
+                    string transport = optarg;
+                    if (transport == "tcp")
                     {
-                        m_outputLanguage = kCLanguage;
+                        m_transport = kTcpTransport;
                     }
-                    else if (lang == "py")
+                    else if (transport == "serial")
                     {
-                        m_outputLanguage = kPythonLanguage;
+                        m_transport = kSerialTransport;
                     }
                     else
                     {
-                        Log::error(format_string("error: unknown language %s", lang.c_str()).c_str());
+                        Log::error(format_string("error: unknown transport type %s", transport.c_str()).c_str());
                         return 1;
                     }
                     break;
                 }
 
+                case 'q':
+                {
+                    m_quantity = strtoul(optarg, NULL, 10);
+                    break;
+                }
+
+                case 'b':
+                {
+                    m_baudrate = strtoul(optarg, NULL, 10);
+                    break;
+                }
+
+                case 'p':
+                {
+                    m_port = optarg;
+                    break;
+                }
+
+                case 'h':
+                {
+                    m_host = optarg;
+                    break;
+                }
+
                 default:
+                {
                     Log::error("error: unrecognized option\n\n");
                     printUsage(options);
                     return 0;
+                }
             }
         }
 
@@ -298,23 +351,45 @@ public:
             // Parse and build definition model.
             InterfaceDefinition def;
             uint16_t idlCrc16 = def.parse(m_ErpcFile);
+            Log::info("CRC%d\n", idlCrc16);
 
             // Check for duplicate function IDs
             UniqueIdChecker uniqueIdCheck;
             uniqueIdCheck.makeIdsUnique(def);
 
-            boost::filesystem::path filePath(m_ErpcFile);
-            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath);
-
-            switch (m_outputLanguage)
+            Transport *_transport;
+            switch (m_transport)
             {
-                case kCLanguage:
-                    CGenerator(&def, idlCrc16).generate();
+                case kTcpTransport:
+                {
+                    uint16_t portNumber = strtoul(m_port, NULL, 10);
+                    TCPTransport *tcpTransport = new TCPTransport(m_host, portNumber, true);
+                    if (erpc_status_t err = tcpTransport->open())
+                    {
+                        return err;
+                    }
+                    _transport = tcpTransport;
                     break;
-                case kPythonLanguage:
-                    PythonGenerator(&def, idlCrc16).generate();
+                }
+
+                case kSerialTransport:
+                {
+                    erpc_transport_t transport = erpc_transport_serial_init(m_port, m_baudrate);
+                    _transport = reinterpret_cast<Transport *>(transport);
+                    assert(_transport);
                     break;
+                }
+
+                default:
+                {
+                    break;
+                }
             }
+
+            Crc16 crc(idlCrc16);
+            _transport->setCrc16(&crc);
+            Sniffer s(_transport, &def, m_outputFilePath, m_quantity);
+            return s.run();
         }
         catch (exception &e)
         {
@@ -368,7 +443,7 @@ public:
     }
 };
 
-} // namespace erpcgen
+} // namespace erpcsniffer
 
 /*!
  * @brief Main application entry point.
@@ -379,7 +454,7 @@ int main(int argc, char *argv[], char *envp[])
 {
     try
     {
-        return erpcgen::erpcgenTool(argc, argv).run();
+        return erpcsniffer::erpcsnifferTool(argc, argv).run();
     }
     catch (...)
     {

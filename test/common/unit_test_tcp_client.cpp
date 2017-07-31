@@ -61,6 +61,9 @@ public:
 
 MyMessageBufferFactory g_msgFactory;
 TCPTransport g_transport("localhost", 12345, false);
+#if USE_MESSAGE_LOGGING
+TCPTransport g_messageLogger("localhost", 54321, false);
+#endif //USE_MESSAGE_LOGGING
 BasicCodecFactory g_basicCodecFactory;
 ClientManager *g_client;
 
@@ -86,16 +89,30 @@ int main(int argc, char **argv)
     Log::info("Starting ERPC client...\n");
 
     g_client = new ClientManager();
-    erpc_status_t result = g_transport.open();
-    if (result)
+    erpc_status_t err = g_transport.open();
+    if (err)
     {
         Log::error("Failed to open connection\n");
-        return 1;
+        return err;
     }
+
+#if USE_MESSAGE_LOGGING
+    g_messageLogger.setCrc16(&g_crc16);
+    err = g_messageLogger.open();
+    if (err)
+    {
+        Log::error("Failed to open connection in ERPC first (client) app\n");
+        return err;
+    }
+#endif //USE_MESSAGE_LOGGING
+
     g_transport.setCrc16(&g_crc16);
     g_client->setMessageBufferFactory(&g_msgFactory);
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);
+#if USE_MESSAGE_LOGGING
+    g_client->addMessageLogger(&g_messageLogger);
+#endif //USE_MESSAGE_LOGGING
 
     int i = RUN_ALL_TESTS();
     quit();

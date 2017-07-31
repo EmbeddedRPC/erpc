@@ -35,6 +35,9 @@
 #ifdef __cplusplus
 #include "erpc_config_internal.h"
 #include "codec.h"
+#if ERPC_MESSAGE_LOGGING
+#include "message_loggers.h"
+#endif
 #if ERPC_NESTED_CALLS
 #include "server.h"
 #endif
@@ -68,7 +71,11 @@ class Server;
  *
  * @ingroup infra_client
  */
+#if ERPC_MESSAGE_LOGGING
+class ClientManager : public MessageLoggers
+#else
 class ClientManager
+#endif
 {
 public:
     /*!
@@ -84,6 +91,9 @@ public:
     , m_errorHandler(NULL)
 #if ERPC_NESTED_CALLS
     , m_server(NULL)
+#endif
+#if ERPC_MESSAGE_LOGGING
+    , MessageLoggers()
 #endif
     {
     }

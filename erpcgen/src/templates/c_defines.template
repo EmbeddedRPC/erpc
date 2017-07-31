@@ -66,8 +66,12 @@
 {# need empty line for this case #}
 
 {%     endif %}
+{%     if fn.returnValue.isNullable %}
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(fn.returnValue))}
+{%     else -- isNullable %}
 {$> addIndent("    ", fn.returnValue.firstAlloc)}
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
+{%     endif -- isNullable %}
 {%    endif -- isNotVoid %}
 
 {$addInfraErrorChecks("    ", s_endReadMessage)}
@@ -102,6 +106,7 @@ if (!isNull)
 {$> addIndent("    ", param.mallocServer)}
 {%  endif -- allocateToServer %}
 {% endif %}
+{$> addIndent("    ", param.firstAlloc)}
 {$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}
 }
 else

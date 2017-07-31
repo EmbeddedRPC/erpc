@@ -87,6 +87,15 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler);
 void erpc_client_set_server(erpc_server_t server);
 #endif
 
+#if ERPC_MESSAGE_LOGGING
+/*!
+ * @brief This function adds transport object for logging send/receive messages.
+ *
+ * @param[in] transport Initiated transport.
+ */
+void erpc_server_add_message_logger(erpc_transport_t transport);
+#endif
+
 /*!
  * @brief This function de-initializes client.
  *

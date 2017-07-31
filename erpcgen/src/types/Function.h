@@ -79,14 +79,21 @@ public:
      *
      * @return Return data type of function return value.
      */
-    DataType *getReturnType() { return m_returnType; }
+    DataType *getReturnType() { return m_returnType->getDataType(); }
+
+    /*!
+     * @brief This function returns data type of function return value.
+     *
+     * @return Return data type of function return value.
+     */
+    StructMember *getReturnStructMemberType() { return m_returnType; }
 
     /*!
      * @brief This function set data type of function return value.
      *
      * @param[in] returnType Function return value data type.
      */
-    void setReturnType(DataType *returnType) { m_returnType = returnType; }
+    void setReturnStructMemberType(StructMember *returnType) { m_returnType = returnType; }
 
     /*!
      * @brief This function returns true/false, when function return type is/isn't oneway.
@@ -120,9 +127,9 @@ public:
     virtual std::string getDescription() const = 0;
 
 protected:
-    StructType m_parameters; /*!< Function parameters are saved as structure members. */
-    DataType *m_returnType;  /*!< Function return data type. */
-    bool m_isOneway;         /*!< If false then communication is bidirectional. */
+    StructType m_parameters;    /*!< Function parameters are saved as structure members. */
+    StructMember *m_returnType; /*!< Function return data type. */
+    bool m_isOneway;            /*!< If false then communication is bidirectional. */
 };
 
 /*!

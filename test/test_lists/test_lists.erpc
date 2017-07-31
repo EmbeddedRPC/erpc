@@ -73,7 +73,7 @@ interface PointersService {
     sendReceivedString(list<string> listNumbers) -> list<string>
     sendReceived2String(list< list<string> > listNumbers) -> list< list<string> >
     test_list_allDirection(list<uint32> a, in list<uint32> b, inout list<uint32> e) -> void
-    testLengthAnnotation(list<int32> myList @length(len), int32 len) -> int32
+    testLengthAnnotation(list<int32> myList @length(len), uint32 len) -> int32
     testLengthAnnotationInStruct(listStruct s) -> int32
     returnSentStructLengthAnnotation(listStruct s) -> listStruct
     sendGapAdvertisingData(gapAdvertisingData_t ad) -> int32

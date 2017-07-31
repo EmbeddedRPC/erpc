@@ -38,6 +38,7 @@ import sys,os
 folders = []
 folders.append("erpc_c");
 folders.append("erpcgen/src");
+folders.append("erpcsniffer/src");
 folders.append("test");
 
 #Files which will be not formatted

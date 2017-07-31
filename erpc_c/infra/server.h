@@ -37,6 +37,9 @@
 #if ERPC_NESTED_CALLS
 #include "client_manager.h"
 #endif
+#if ERPC_MESSAGE_LOGGING
+#include "message_loggers.h"
+#endif
 
 /*!
  * @addtogroup infra_server
@@ -119,7 +122,11 @@ protected:
  *
  * @ingroup infra_server
  */
+#if ERPC_MESSAGE_LOGGING
+class Server : public MessageLoggers
+#else
 class Server
+#endif
 {
 public:
     /*!
@@ -132,6 +139,9 @@ public:
     , m_codecFactory()
     , m_transport()
     , m_firstService()
+#if ERPC_MESSAGE_LOGGING
+    , MessageLoggers()
+#endif
     {
     }
 

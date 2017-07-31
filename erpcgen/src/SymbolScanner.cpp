@@ -866,8 +866,9 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
                 DataType *declType = lookupDataType(unionDecl->getChild(1));
                 m_currentUnion->addUnionMemberDeclaration(name, declType);
 
-                addAnnotations(unionDecl->getChild(3), &m_currentUnion->getUnionMemberDeclarations().back());
-                addDoxygenComments(&m_currentUnion->getUnionMemberDeclarations().back(), unionDecl->getChild(4), unionDecl->getChild(5));
+                StructMember *unionMember = m_currentUnion->getUnionMembers().getMembers().back();
+                addAnnotations(unionDecl->getChild(3), unionMember);
+                addDoxygenComments(unionMember, unionDecl->getChild(4), unionDecl->getChild(5));
 
                 declNames.push_back(name);
             }
@@ -960,22 +961,22 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
             {
                 case TOK_ONEWAY:
                     func->setIsOneway(true);
-                    func->setReturnType(new VoidType);
+                    func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
                     break;
 
                 case TOK_VOID:
-                    func->setReturnType(new VoidType);
+                    func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
                     break;
 
                 default:
                     DataType *dataType = lookupDataType(returnTypeNode);
-                    func->setReturnType(dataType);
+                    func->setReturnStructMemberType(new StructMember("(return)", dataType));
                     break;
             }
             if (returnTypeToken.getToken() != TOK_ONEWAY)
             {
                 //TODO: Return dataType covered with something like StructMember. To do not mess annotations for dataType.
-                addAnnotations(returnNode->getChild(1), func->getReturnType());
+                addAnnotations(returnNode->getChild(1), func->getReturnStructMemberType());
             }
         }
         else
@@ -1006,7 +1007,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
         funcDef->setIsOneway(callbackFunctionType->isOneway());
 
         /* Add function return type*/
-        funcDef->setReturnType(callbackFunctionType->getReturnType());
+        funcDef->setReturnStructMemberType(callbackFunctionType->getReturnStructMemberType());
 
         /* Add functions annotations. */
         /*for (const Annotation &ann : callbackFunctionType->getAnnotations())

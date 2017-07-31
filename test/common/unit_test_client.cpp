@@ -92,12 +92,23 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 int MyAlloc::allocated_ = 0;
 
 #if defined(RPMSG)
+#define APP_ERPC_READY_EVENT_DATA  (1)
 extern char rpmsg_lite_base[];
+volatile uint16_t eRPCReadyEventData = 0;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+#if defined(RPMSG)
+/*!
+ * @brief eRPC server side ready event handler
+ */
+static void eRPCReadyEventHandler(uint16_t eventData, void *context)
+{
+    eRPCReadyEventData = eventData;
+}
+#endif
 
 int main(int argc, char **argv)
 {
@@ -132,15 +143,22 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(RPMSG)
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
+
+    /* Register the application event before starting the secondary core */
+    MCMGR_RegisterEvent(kMCMGR_RemoteApplicationEvent, eRPCReadyEventHandler, NULL);
 
     /* Boot Secondary core application */
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
-    /* Wait for remote side to come up. This delay is arbitrary and may
-       need adjustment for different configuration of remote systems */
-    env_sleep_msec(1000);
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
+    while(APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData) {};
 #endif
 
     erpc_transport_t transport;

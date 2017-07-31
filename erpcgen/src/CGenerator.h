@@ -597,8 +597,9 @@ private:
      *
      * @param[in] symbol StructMember when function parameter or DataType when return type.
      * @param[in] info DataMap which contains information about data type for output.
+     * @param[in] returnType To recognize param type and return type.
      */
-    void setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info);
+    void setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info, bool returnType);
 
     /*!
      * @brief This function return space if given string is not empty.

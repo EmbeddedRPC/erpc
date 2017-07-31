@@ -63,14 +63,25 @@ extern "C" {
 
 using namespace erpc;
 
+#define APP_ERPC_READY_EVENT_DATA  (1)
+
 SemaphoreHandle_t g_waitQuitMutex;
 TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
 int waitQuit = 0;
+volatile uint16_t eRPCReadyEventData = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+/*!
+ * @brief eRPC server side ready event handler
+ */
+static void eRPCReadyEventHandler(uint16_t eventData, void *context)
+{
+    eRPCReadyEventData = eventData;
+}
+
 void increaseWaitQuit()
 {
     xSemaphoreTake(g_waitQuitMutex, portMAX_DELAY);
@@ -122,8 +133,16 @@ void runClient(void *arg)
 
 void runInit(void *arg)
 {
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     // Initialize MCMGR before calling its API
     MCMGR_Init();
+
+    /* Register the application event before starting the secondary core */
+    MCMGR_RegisterEvent(kMCMGR_RemoteApplicationEvent, eRPCReadyEventHandler, NULL);
 
     // Boot source for Core 1
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
@@ -141,7 +160,8 @@ void runInit(void *arg)
         }
     }
 
-    vTaskDelay(1000);
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
+    while(APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData) {};
 
     // MessageBufferFactory initialization
     erpc_mbf_t message_buffer_factory;
@@ -151,7 +171,10 @@ void runInit(void *arg)
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);
 
     // eRPC server side initialization
-    erpc_server_init(transportServer, message_buffer_factory);
+    erpc_server_t server = erpc_server_init(transportServer, message_buffer_factory);
+
+    // adding server to client for nested calls.
+    erpc_client_set_server(server);
 
     // adding the service to the server
     erpc_add_service_to_server(create_SecondInterface_service());

@@ -49,7 +49,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
-#define MU_REG_COUNT (MU_RR_COUNT) /*!< Count of MU tx/rx registers to be used by this transport layer */
+/*!< Count of MU tx/rx registers to be used by this transport layer. 
+     Keep one MU channel for MCMGR operations. */
+#define MU_REG_COUNT (MU_RR_COUNT - 1U) 
+#define MU_LAST_REG_IDX 2 
+
+#define MU_RX_Interrupt_Handler(x) MU_RX_Interrupt(x)
+#define MU_RX_Interrupt(number) MU_Rx##number##FullFlagISR
+#define MU_RxFullFlagISRCallback MU_RX_Interrupt_Handler(MU_LAST_REG_IDX)
+
+#define MU_TX_Interrupt_Handler(x) MU_TX_Interrupt(x)
+#define MU_TX_Interrupt(number) MU_Tx##number##EmptyFlagISR
+#define MU_TxEmptyFlagISRCallback MU_TX_Interrupt_Handler(MU_LAST_REG_IDX)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -132,13 +143,22 @@ public:
     virtual bool hasMessage() { return m_newMessage; }
 
     /*!
-     * @brief Callback function called from MU IRQ
+     * @brief Callback function called from MU IRQ when TxEmptyFlag is set
      *
-     * This function reads status flags of MU and base on the evnet which cause the irq
-     * calls function rx_cb() to handle rx full irq or tx_cb() to handle tx empty irq
-     * for the particular instance of the MUTransport
+     * This function calls tx_cb() to handle tx empty irq for the particular instance of the MUTransport.
+     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler 
+     * defined in MCMGR MU ISR table.
      */
-    static void mu_irq_callback();
+
+    static void mu_tx_empty_irq_callback();
+    /*!
+     * @brief Callback function called from MU IRQ when RxFullFlag is set
+     *
+     * This function calls rx_cb() to handle rx full irq for the particular instance of the MUTransport.
+     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler 
+     * defined in MCMGR MU ISR table.
+     */
+    static void mu_rx_full_irq_callback();
 
 protected:
     /*!

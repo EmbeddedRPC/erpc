@@ -266,12 +266,12 @@ void test_list_allDirection(const list_8_t *a, const list_8_t *b, list_8_t *e)
     }
 }
 
-int32_t testLengthAnnotation(int32_t *myList, int32_t len)
+int32_t testLengthAnnotation(int32_t *myList, uint32_t len)
 {
     int32_t *itr = myList;
-    for (int i = 0; i < len; ++i)
+    for (uint32_t i = 0; i < len; ++i)
     {
-        if (*itr != (i + 1))
+        if (*itr != (int32_t)(i + 1))
         {
             return 0;
         }
@@ -282,9 +282,9 @@ int32_t testLengthAnnotation(int32_t *myList, int32_t len)
 
 int32_t testLengthAnnotationInStruct(const listStruct *s)
 {
-    for (int32_t i = 0; i < s->len; ++i)
+    for (uint32_t i = 0; i < s->len; ++i)
     {
-        if ((i + 1) != s->myList[i])
+        if ((int32_t)(i + 1) != s->myList[i])
         {
             return 0;
         }

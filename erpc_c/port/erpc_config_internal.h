@@ -110,11 +110,16 @@
 
 // Enabling nesting calls detection as default for debug.
 #if !defined(ERPC_NESTED_CALLS_DETECTION)
-    #if defined(NDEBUG)
+    #if defined(NDEBUG) || (ERPC_NESTED_CALLS == ERPC_NESTED_CALLS_ENABLED)
         #define ERPC_NESTED_CALLS_DETECTION (ERPC_NESTED_CALLS_DETECTION_DISABLED)
     #else
         #define ERPC_NESTED_CALLS_DETECTION (ERPC_NESTED_CALLS_DETECTION_ENABLED)
     #endif
+#endif
+
+// Disabling tracing the eRPC.
+#if !defined(ERPC_MESSAGE_LOGGING)
+    #define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_DISABLED)
 #endif
 
 #if defined(__CC_ARM) /* Keil MDK */

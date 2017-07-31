@@ -338,9 +338,9 @@ DataType *Generator::findChildDataType(std::vector<DataType *> *dataTypes, DataT
             UnionType *unionType = dynamic_cast<UnionType *>(dataType);
             if (unionType != nullptr)
             {
-                for (auto &unionMember : unionType->getUnionMemberDeclarations())
+                for (auto unionMember : unionType->getUnionMembers().getMembers())
                 {
-                    findChildDataType(dataTypes, unionMember.getDataType());
+                    findChildDataType(dataTypes, unionMember->getDataType());
                 }
             }
             break;
@@ -366,8 +366,9 @@ void Generator::findGroupDataTypes()
             {
                 // handle return value
                 std::vector<DataType *> dataTypes;
+                StructMember *structMember = fn->getReturnStructMemberType();
                 DataType *transformedDataType = findChildDataType(&dataTypes, fn->getReturnType());
-                fn->setReturnType(transformedDataType);
+                structMember->setDataType(transformedDataType);
 
                 // save all transformed data types directions into data type map
                 if (!fn->getReturnType()->findAnnotation(SHARED_ANNOTATION))

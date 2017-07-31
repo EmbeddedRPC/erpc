@@ -675,16 +675,16 @@ bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dat
     {
         throw semantic_error(format_string("Redefinition of union member: '%s'\n", name.c_str()));
     }
-    StructMember newMember = StructMember(name, dataType);
-    m_caseMembers.push_back(newMember);
+    StructMember *newMember = new StructMember(name, dataType);
+    m_members.addMember(newMember);
     return true;
 }
 
 bool UnionType::declarationExists(const std::string &name)
 {
-    for (auto member : m_caseMembers)
+    for (auto member : m_members.getMembers())
     {
-        if (name == member.getName())
+        if (name == member->getName())
         {
             return true;
         }
@@ -694,11 +694,11 @@ bool UnionType::declarationExists(const std::string &name)
 
 StructMember *UnionType::getUnionMemberDeclaration(const std::string &name)
 {
-    for (auto &caseMember : m_caseMembers)
+    for (auto caseMember : m_members.getMembers())
     {
-        if (name == caseMember.getName())
+        if (name == caseMember->getName())
         {
-            return &caseMember;
+            return caseMember;
         }
     }
     throw semantic_error(format_string("Union member not found: '%s'\n", name.c_str()));
@@ -706,8 +706,8 @@ StructMember *UnionType::getUnionMemberDeclaration(const std::string &name)
 
 void UnionType::printUnionMembers()
 {
-    for (auto member : m_caseMembers)
+    for (auto member : m_members.getMembers())
     {
-        Log::debug("Member declaration:%s %s\n", member.getDataType()->getName().c_str(), member.getName().c_str());
+        Log::debug("Member declaration:%s %s\n", member->getDataType()->getName().c_str(), member->getName().c_str());
     }
 }

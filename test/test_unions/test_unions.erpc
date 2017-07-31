@@ -37,8 +37,8 @@ program test;
 import "../common/unit_test_common.erpc"
 
 enum caseValues { bar, baz }
-enum fruit { apple, orange, banana, coconut, grape, papaya, kiwi }
-const int32 returnVal = 10;
+enum fruit { apple, orange, banana, coconut, grape, papaya, kiwi, returnVal }
+//const int32 returnVal = 10;
 
 type floatList = list<float>
 
@@ -156,13 +156,13 @@ struct gapGenericEvent_t
     } eventData
 }
 
-struct Foop {
+/*struct Foop {
     gapGenericEventType_t eventType;
     union(eventType){
        default:
           void
     } value
-}
+}*/
 
 interface ArithmeticService {
     testGenericCallback(gapGenericEvent_t event) -> gapGenericEvent_t

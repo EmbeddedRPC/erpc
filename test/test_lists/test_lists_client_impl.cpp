@@ -464,7 +464,7 @@ TEST(test_list, test_list_allDirection)
 
 TEST(test_list, testLengthAnnotation)
 {
-    int32_t length = 5;
+    uint32_t length = 5;
     int32_t *list = (int32_t *)erpc_malloc(length * sizeof(int32_t));
     int32_t *list_ptr = list;
     for (int i = 0; i < length; ++i)
@@ -521,7 +521,7 @@ TEST(test_list, sendGapAdvertisingData)
     ad1.length = 3;
     ad1.adType = 5;
     ad1.aData = (uint8_t *)erpc_malloc(ad1.length * sizeof(uint8_t));
-    for (int i = 0; i < ad1.length; ++i)
+    for (uint32_t i = 0; i < ad1.length; ++i)
     {
         ad1.aData[i] = (i + 1) * 5;
     }

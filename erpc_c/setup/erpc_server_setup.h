@@ -116,6 +116,15 @@ erpc_status_t erpc_server_poll(void);
  */
 void erpc_server_stop(void);
 
+#if ERPC_MESSAGE_LOGGING
+/*!
+ * @brief This function adds transport object for logging send/receive messages.
+ *
+ * @param[in] transport Initiated transport.
+ */
+void erpc_server_add_message_logger(erpc_transport_t transport);
+#endif
+
 //@}
 
 #ifdef __cplusplus

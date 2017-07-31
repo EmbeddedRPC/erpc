@@ -15,8 +15,6 @@
 # OF SUCH DAMAGE.
 #-------------------------------------------------------------------------------
 
-CXXFLAGS += -DERPC_NESTED_CALLS=1
-
 SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_client.cpp \
             $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \

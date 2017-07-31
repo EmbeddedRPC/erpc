@@ -56,6 +56,7 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/crc16.cpp \
 			$(ERPC_C_ROOT)/infra/framed_transport.cpp \
 			$(ERPC_C_ROOT)/infra/message_buffer.cpp \
+			$(ERPC_C_ROOT)/infra/message_loggers.cpp \
 			$(ERPC_C_ROOT)/infra/server.cpp \
 			$(ERPC_C_ROOT)/infra/simple_server.cpp \
 			$(ERPC_C_ROOT)/infra/transport_arbitrator.cpp \
@@ -81,6 +82,7 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/infra/framed_transport.h \
 			$(ERPC_C_ROOT)/infra/manually_constructed.h \
 			$(ERPC_C_ROOT)/infra/message_buffer.h \
+			$(ERPC_C_ROOT)/infra/message_loggers.h \
 			$(ERPC_C_ROOT)/infra/server.h \
 			$(ERPC_C_ROOT)/infra/static_queue.h \
 			$(ERPC_C_ROOT)/infra/transport_arbitrator.h \

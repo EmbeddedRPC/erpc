@@ -57,6 +57,8 @@ using namespace erpc;
 
 int testClient();
 
+#define APP_ERPC_READY_EVENT_DATA  (1)
+
 SemaphoreHandle_t g_waitQuitMutex;
 TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
@@ -65,6 +67,7 @@ int waitQuit = 0;
 int waitClient = 0;
 int isTestPassing = 0;
 uint32_t startupData;
+mcmgr_status_t status;
 int stopTest = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,17 +138,24 @@ void runClient(void *arg)
 
 static void SignalReady(void)
 {
-    // Signal the other core we are ready */
-    MCMGR_SignalReady(kMCMGR_Core1);
+    /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
+    MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
 
 void runInit(void *arg)
 {
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     // Initialize MCMGR before calling its API
     MCMGR_Init();
 
     // Get the startup data
-    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
+    do{
+        status = MCMGR_GetStartupData(&startupData);
+    }while(status != kStatus_MCMGR_Success);
 
     // RPMsg-Lite transport layer initialization
     erpc_transport_t transportClient;
@@ -161,7 +171,10 @@ void runInit(void *arg)
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);
 
     // eRPC server side initialization
-    erpc_server_init(transportServer, message_buffer_factory);
+    erpc_server_t server = erpc_server_init(transportServer, message_buffer_factory);
+
+    // adding server to client for nested calls.
+    erpc_client_set_server(server);
 
     // adding the service to the server
     erpc_add_service_to_server(create_FirstInterface_service());

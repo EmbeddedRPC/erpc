@@ -442,7 +442,10 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {% if info.inDataContainer %}
 free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.dataLiteral}{$info.name});
 {% else -- not inDataContainer %}
-free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
+if ({$info.name})
+{
+    free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
+}
 {% endif -- inDataContainer %}
 {% enddef ------------------------------- freeUnionType %}
 

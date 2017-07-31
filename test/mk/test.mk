@@ -51,6 +51,9 @@ TARGET_OUTPUT_ROOT = $(RPC_OBJS_ROOT)
 
 UT_COMMON_SRC = $(ERPC_ROOT)/test/common
 
+USE_MESSAGE_LOGGING?= 0
+CXXFLAGS += -DUSE_MESSAGE_LOGGING=$(USE_MESSAGE_LOGGING)
+
 #-----------------------------------------------
 # Include path. Add the include paths like this:
 # INCLUDES += ./include/
@@ -59,12 +62,12 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
             $(ERPC_OUT_DIR) \
             $(UNIT_OUT_DIR) \
             $(UT_COMMON_SRC) \
-            $(ERPC_ROOT)/erpc_c/config \
             $(ERPC_ROOT)/erpc_c/infra \
             $(ERPC_ROOT)/erpc_c/port \
             $(ERPC_ROOT)/erpc_c/setup \
             $(ERPC_ROOT)/erpc_c/transports \
             $(ERPC_ROOT)/erpcgen/src \
+            $(ERPC_ROOT)/test/common \
             $(OBJS_ROOT)
 
 #-------------------------------

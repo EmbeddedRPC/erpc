@@ -98,7 +98,7 @@
 //! Default set to ERPC_NESTED_CALLS_DISABLED. Uncomment when callbacks, or other eRPC
 //! functions are called from server implementation of another eRPC call. Nested functions
 //! need to be marked as @nested in IDL.
-//#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
+#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
 
 //! @def ERPC_NESTED_CALLS_DETECTION
 //!
@@ -114,8 +114,7 @@
 //! or sending data to another system for data analysis. Default set to ERPC_MESSAGE_LOGGING_DISABLED.
 //!
 //! Uncomment for using logging feature.
-//#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
-
+#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
 //@}
 
 /*! @} */

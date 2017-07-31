@@ -63,6 +63,9 @@ public:
 };
 
 TCPTransport g_transport("localhost", 12345, false);
+#if USE_MESSAGE_LOGGING
+TCPTransport g_messageLogger("localhost", 54321, false);
+#endif //USE_MESSAGE_LOGGING
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 ArbitratedClientManager *g_client;
@@ -136,6 +139,16 @@ int main(int argc, char **argv)
         return err;
     }
 
+#if USE_MESSAGE_LOGGING
+    g_messageLogger.setCrc16(&g_crc16);
+    err = g_messageLogger.open();
+    if (err)
+    {
+        Log::error("Failed to open connection in ERPC first (client) app\n");
+        return err;
+    }
+#endif //USE_MESSAGE_LOGGING
+
     g_arbitrator.setSharedTransport(&g_transport);
     g_arbitrator.setCodec(g_basicCodecFactory.create());
 
@@ -143,12 +156,19 @@ int main(int argc, char **argv)
     g_client->setArbitrator(&g_arbitrator);
     g_client->setCodecFactory(&g_basicCodecFactory);
     g_client->setMessageBufferFactory(&g_msgFactory);
+#if USE_MESSAGE_LOGGING
+    g_client->addMessageLogger(&g_messageLogger);
+#endif //USE_MESSAGE_LOGGING
 
     g_arbitrator.setCrc16(&g_crc16);
 
     g_server.setTransport(&g_arbitrator);
     g_server.setCodecFactory(&g_basicCodecFactory);
     g_server.setMessageBufferFactory(&g_msgFactory);
+#if USE_MESSAGE_LOGGING
+    g_server.addMessageLogger(&g_messageLogger);
+#endif //USE_MESSAGE_LOGGING
+
     add_services(&g_server);
     g_client->setServer(&g_server);
 

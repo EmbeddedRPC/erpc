@@ -118,11 +118,11 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType && generateInfraErrorChecks %} = NULL{%endif%};
 {%   endif %}
 #if ERPC_NESTED_CALLS_DETECTION
-nestingDetection = true;
+    nestingDetection = true;
 #endif
 {$addInfraErrorChecks("    ", fn.serverPrototype)}
 #if ERPC_NESTED_CALLS_DETECTION
-nestingDetection = false;
+    nestingDetection = false;
 #endif
 
 {%   if fn.isReturnValue %}
@@ -150,7 +150,11 @@ nestingDetection = false;
 {# need empty line for this case #}
 
 {%     endif %}
+{%     if fn.returnValue.isNullable %}
+{$addIndent("    ", f_paramIsNullableEncode(fn.returnValue))}
+{%     else -- isNullable %}
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.encode(fn.returnValue.coderCall))}
+{%     endif -- isNullable %}
 {%    endif -- notVoid %}
 
 {$addInfraErrorChecks("    ", s_endWriteMessage)}

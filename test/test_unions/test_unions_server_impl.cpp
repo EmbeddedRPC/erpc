@@ -148,7 +148,7 @@ foo *sendMyFoo(const foo *f)
             for (uint32_t i = 1; i <= f->bing.a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
-                if (i != f->bing.a.elements[i])
+                if ((int32_t)i != f->bing.a.elements[i])
                 {
                     newFoo->discriminator = returnVal;
                     newFoo->bing.ret = 0x55;
