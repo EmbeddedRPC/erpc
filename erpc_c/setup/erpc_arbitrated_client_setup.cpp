@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,13 +33,10 @@
 #include "arbitrated_client_manager.h"
 #include "basic_codec.h"
 #include "manually_constructed.h"
+#include "message_buffer.h"
 #include "transport_arbitrator.h"
-#include <assert.h>
+#include <cassert>
 #include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 
@@ -61,6 +58,8 @@ static ManuallyConstructed<BasicCodec> s_codec;
 
 erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
+    assert(transport);
+
     // Init factories.
     s_codecFactory.construct();
 
@@ -98,9 +97,9 @@ void erpc_client_set_server(erpc_server_t server)
 #endif
 
 #if ERPC_MESSAGE_LOGGING
-void erpc_server_add_message_logger(erpc_transport_t transport)
+bool erpc_server_add_message_logger(erpc_transport_t transport)
 {
-    g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
 }
 #endif
 

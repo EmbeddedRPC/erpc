@@ -114,8 +114,11 @@ public:
      * @brief This function add given transport to newly created MessageLogger object.
      *
      * @param[in] transport Transport used for logging messages
+     *
+     * @retval True When transport was succesfully added.
+     * @retval False When transport wasn't added.
      */
-    void addMessageLogger(Transport *transport);
+    bool addMessageLogger(Transport *transport);
 
 protected:
     MessageLogger *m_logger; /*!< Pointer to first logger. */

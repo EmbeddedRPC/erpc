@@ -53,6 +53,7 @@ INCLUDES += $(UT_COMMON_SRC) \
             $(ERPC_ROOT)/erpc_c/transports \
             $(ERPC_ROOT)/erpcgen/src \
             $(ERPC_ROOT)/test/common \
+            $(ERPC_ROOT)/test/common/config \
             $(RPC_OBJS_ROOT) \
             $(UT_COMMON_SRC)/gtest
 

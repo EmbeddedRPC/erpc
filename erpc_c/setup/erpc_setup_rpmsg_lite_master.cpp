@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -65,6 +65,9 @@ erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
                                                        int rpmsg_link_id)
 {
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id);
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    if (s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) == kErpcStatus_Success)
+    {
+        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    }
+    return NULL;
 }

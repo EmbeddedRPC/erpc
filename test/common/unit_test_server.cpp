@@ -41,7 +41,7 @@
 extern "C" {
 #include "app_core1.h"
 #if defined(RPMSG)
-#define APP_ERPC_READY_EVENT_DATA  (1)
+#define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
 #include "rpmsg_lite.h"
 #endif
@@ -79,9 +79,10 @@ int main(int argc, const char *argv[])
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
     /* Get the startup data */
-    do{
+    do
+    {
         status = MCMGR_GetStartupData(&startupData);
-    }while(status != kStatus_MCMGR_Success);
+    } while (status != kStatus_MCMGR_Success);
 #endif
 
     erpc_transport_t transport;

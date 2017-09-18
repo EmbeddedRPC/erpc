@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,10 +32,6 @@
 #include "arbitrated_client_manager.h"
 #include "assert.h"
 #include "transport_arbitrator.h"
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 

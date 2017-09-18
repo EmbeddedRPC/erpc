@@ -40,7 +40,6 @@
 #endif
 #include "erpc_transport_setup.h"
 #include "client_manager.h"
-#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -55,6 +54,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
 
 //! @name Client setup
 //@{
@@ -92,8 +93,11 @@ void erpc_client_set_server(erpc_server_t server);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was succesfully added.
+ * @retval False When transport wasn't added.
  */
-void erpc_server_add_message_logger(erpc_transport_t transport);
+bool erpc_server_add_message_logger(erpc_transport_t transport);
 #endif
 
 /*!

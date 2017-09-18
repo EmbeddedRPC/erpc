@@ -52,6 +52,8 @@ extern "C" {
 #include "corn_g_test.h"
 #endif
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +94,7 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 int MyAlloc::allocated_ = 0;
 
 #if defined(RPMSG)
-#define APP_ERPC_READY_EVENT_DATA  (1)
+#define APP_ERPC_READY_EVENT_DATA (1)
 extern char rpmsg_lite_base[];
 volatile uint16_t eRPCReadyEventData = 0;
 #endif
@@ -158,7 +160,9 @@ int main(int argc, char **argv)
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
     /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
-    while(APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData) {};
+    while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
+    {
+    };
 #endif
 
     erpc_transport_t transport;

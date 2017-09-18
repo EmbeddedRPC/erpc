@@ -679,17 +679,17 @@ private:
     bool isListStruct(StructType *structType);
 
     /*!
-     * @brief This function returns true when "retain" annotation was set for function parameter.
+     * @brief This function returns true when "retain" annotation wasn't set.
      *
      * This annotation have effect for server side of generated files. Allocated space will be not freed by server shim
      * code.
      *
      * @param[in] structMember Function parameter.
      *
-     * @retval true When "retain" annotation wasn't set to the function parameter.
-     * @retval false When "retain" annotation was set to the function parameter.
+     * @retval true When "retain" annotation wasn't set.
+     * @retval false When "retain" annotation was set.
      */
-    bool generateServerFunctionParamFreeFunctions(StructMember *structMember);
+    bool generateServerFreeFunctions(StructMember *structMember);
 
     /*!
      * @brief Set no_shared annotation to struct/union type.

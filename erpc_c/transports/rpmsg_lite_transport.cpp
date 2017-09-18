@@ -30,12 +30,6 @@
  */
 #include "rpmsg_lite_transport.h"
 #include "erpc_config_internal.h"
-#include <cassert>
-#include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 
@@ -65,6 +59,8 @@ int RPMsgTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned long 
 RPMsgTransport::RPMsgTransport()
 : RPMsgBaseTransport()
 , m_dst_addr(0)
+, m_rpmsg_ept_context()
+, m_rpmsg_ept(NULL)
 {
 }
 

@@ -34,11 +34,8 @@
 #include "framed_transport.h"
 #include <cassert>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 using namespace erpc;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables

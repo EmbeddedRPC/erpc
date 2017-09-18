@@ -29,7 +29,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "tcp_transport.h"
-#include <cassert>
 #include <cstdio>
 #include <err.h>
 #include <errno.h>
@@ -40,10 +39,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 

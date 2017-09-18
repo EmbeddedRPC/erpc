@@ -77,6 +77,12 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
             return ret;
         }
 
+        // received size can't be larger then buffer length.
+        if (h.m_messageSize > message->getLength())
+        {
+            return kErpcStatus_ReceiveFailed;
+        }
+
         // Receive rest of the message now we know its size.
         ret = underlyingReceive(message->get(), h.m_messageSize);
         if (ret != kErpcStatus_Success)

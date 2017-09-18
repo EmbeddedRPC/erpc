@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -39,7 +39,6 @@
 #include "erpc_server_setup.h"
 #endif
 #include "erpc_transport_setup.h"
-#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -54,6 +53,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
 
 typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handler function type. */
 
@@ -103,8 +104,11 @@ void erpc_client_set_server(erpc_server_t server);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was succesfully added.
+ * @retval False When transport wasn't added.
  */
-void erpc_server_add_message_logger(erpc_transport_t transport);
+bool erpc_server_add_message_logger(erpc_transport_t transport);
 #endif
 
 /*!

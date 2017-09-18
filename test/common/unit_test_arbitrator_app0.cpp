@@ -62,13 +62,14 @@ extern "C" {
 #endif
 
 using namespace erpc;
+using namespace std;
 
-#define APP_ERPC_READY_EVENT_DATA  (1)
+#define APP_ERPC_READY_EVENT_DATA (1)
 
 SemaphoreHandle_t g_waitQuitMutex;
 TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
-int waitQuit = 0;
+volatile int waitQuit = 0;
 volatile uint16_t eRPCReadyEventData = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +162,9 @@ void runInit(void *arg)
     }
 
     /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
-    while(APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData) {};
+    while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
+    {
+    };
 
     // MessageBufferFactory initialization
     erpc_mbf_t message_buffer_factory;
@@ -248,8 +251,8 @@ int main(int argc, char **argv)
 
     g_waitQuitMutex = xSemaphoreCreateMutex();
     xTaskCreate(runInit, "runInit", 256, NULL, 1, NULL);
-    xTaskCreate(runServer, "runServer", 512, NULL, 2, &g_serverTask);
-    xTaskCreate(runClient, "runClient", 512, NULL, 1, &g_clientTask);
+    xTaskCreate(runServer, "runServer", 1536, NULL, 2, &g_serverTask);
+    xTaskCreate(runClient, "runClient", 1536, NULL, 1, &g_clientTask);
 
     vTaskStartScheduler();
 

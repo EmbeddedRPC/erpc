@@ -30,13 +30,13 @@
  */
 
 #include "erpc_port.h"
-#include "FreeRTOS.h"
 #include <new>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
+extern "C" {
+#include "FreeRTOS.h"
+};
 
+using namespace std;
 void *operator new(std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);

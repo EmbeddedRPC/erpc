@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -77,13 +77,15 @@
 
 //! @def ERPC_DEFAULT_BUFFER_SIZE
 //!
-//! Uncomment to change the size of buffers allocated by BasicMessageBufferFactory in the client
-//! and server setup functions (@ref client_setup and @ref server_setup). The default size is 256.
+//! Uncomment to change the size of buffers allocated by one of MessageBufferFactory.
+//! (@ref client_setup and @ref server_setup). The default size is set to 256.
+//! For RPMsg transport layer, ERPC_DEFAULT_BUFFER_SIZE must be 2^n - 16.
 //#define ERPC_DEFAULT_BUFFER_SIZE (256)
 
 //! @def ERPC_DEFAULT_BUFFERS_COUNT
 //!
-//! Uncomment to change the count of buffers allocated by StaticMessageBufferFactory
+//! Uncomment to change the count of buffers allocated by one of staticly allocated messages.
+//! Default value is set to 2.
 //#define ERPC_DEFAULT_BUFFERS_COUNT (2)
 
 //! @def ERPC_NOEXCEPT

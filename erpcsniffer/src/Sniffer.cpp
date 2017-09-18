@@ -591,7 +591,7 @@ erpc_status_t Sniffer::parseMemberType(StructType *structType, StructMember *str
                     referencedName = val->toString();
                 }
             }
-            DataType * referencedDataType = referenced->getDataType()->getTrueDataType();
+            DataType *referencedDataType = referenced->getDataType()->getTrueDataType();
             if (referencedName.empty() && referencedDataType->isUnion())
             {
                 UnionType *unionType = dynamic_cast<UnionType *>(referencedDataType);

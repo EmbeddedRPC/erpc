@@ -51,8 +51,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 /*!< Count of MU tx/rx registers to be used by this transport layer. 
      Keep one MU channel for MCMGR operations. */
-#define MU_REG_COUNT (MU_RR_COUNT - 1U) 
-#define MU_LAST_REG_IDX 2 
+#define MU_REG_COUNT (MU_RR_COUNT - 1U)
+#define MU_LAST_REG_IDX 2
 
 #define MU_RX_Interrupt_Handler(x) MU_RX_Interrupt(x)
 #define MU_RX_Interrupt(number) MU_Rx##number##FullFlagISR

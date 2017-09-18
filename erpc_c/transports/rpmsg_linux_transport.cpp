@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,28 +28,65 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "uart_cmsis_transport.h"
+#include "rpmsg_linux_transport.h"
+#include <cassert>
+#include <new>
+#include <unistd.h>
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
-
-static ManuallyConstructed<UartTransport> s_transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv)
+RPMsgLinuxTransport::RPMsgLinuxTransport(RPMsgEndpoint *endPoint, int16_t remote)
+: Transport()
+, m_endPoint(endPoint)
+, m_remote(remote)
 {
-    s_transport.construct((ARM_DRIVER_USART *)uartDrv);
-    if (s_transport->init() == kErpcStatus_Success)
+}
+
+RPMsgLinuxTransport::~RPMsgLinuxTransport()
+{
+}
+
+erpc_status_t RPMsgLinuxTransport::init()
+{
+    assert(m_endPoint != NULL);
+
+    if (!m_endPoint->init())
     {
-        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+        return kErpcStatus_Success;
     }
-    return NULL;
+    else
+    {
+        return kErpcStatus_Fail;
+    }
+}
+
+erpc_status_t RPMsgLinuxTransport::send(MessageBuffer *message)
+{
+
+    int retval;
+    retval = m_endPoint->send(message->get(), m_remote, message->getUsed());
+    if (retval > 0)
+        return kErpcStatus_Success;
+    else
+        return kErpcStatus_Fail;
+}
+erpc_status_t RPMsgLinuxTransport::receive(MessageBuffer *message)
+{
+    int32_t ret;
+
+    while (true)
+    {
+        ret = m_endPoint->receive(message->get(), message->getLength());
+
+        if (ret > 0)
+            return kErpcStatus_Success;
+        if (ret < 0)
+            return kErpcStatus_Fail;
+        else
+            usleep(1); //1us sleep
+    }
 }

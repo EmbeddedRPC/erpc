@@ -100,7 +100,7 @@ protected:
      *
      * @retval kErpcStatus_Success when reading passed.
      */
-    erpc_status_t readNullFlag(erpcgen::StructMember *structMember, string &nullFlag);
+    erpc_status_t readNullFlag(erpcgen::StructMember *structMember, std::string &nullFlag);
 
     /*!
      * @brief This function reads shared memory address when structMember need.
@@ -112,7 +112,7 @@ protected:
      *
      * @retval kErpcStatus_Success when reading passed.
      */
-    erpc_status_t readSharedAddress(erpcgen::StructMember *structMember, string &address);
+    erpc_status_t readSharedAddress(erpcgen::StructMember *structMember, std::string &address);
 
     /*!
      * @brief This function counts spaces for special indent.
@@ -180,7 +180,7 @@ protected:
      *
      * @retval Data type name.
      */
-    string getDataTypeName(erpcgen::DataType *dataType);
+    std::string getDataTypeName(erpcgen::DataType *dataType);
 
     /*!
      * @brief This function returns function prototype.
@@ -189,7 +189,7 @@ protected:
      *
      * @retval Function prototype.
      */
-    string getPrototype(erpcgen::Function *function);
+    std::string getPrototype(erpcgen::Function *function);
 
     /*!
      * @brief This function parse received message based.

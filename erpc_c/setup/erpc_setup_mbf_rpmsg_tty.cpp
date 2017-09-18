@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -37,10 +37,6 @@
 #include "rpmsg_lite.h"
 #include "rpmsg_lite_base_transport.h"
 #include <assert.h>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 

@@ -42,7 +42,7 @@
 #define nestedCallsCount 10
 int i = 0;
 int numbers[number];
-bool enabled = false;
+volatile bool enabled = false;
 
 TEST(test_arbitrator, FirstSendReceiveInt)
 {

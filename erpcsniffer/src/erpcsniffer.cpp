@@ -52,6 +52,7 @@ int main(int argc, char *argv[], char *envp[]);
 
 using namespace erpc;
 using namespace erpcgen;
+using namespace std;
 namespace erpcsniffer {
 
 ////////////////////////////////////////////////////////////////////////////////

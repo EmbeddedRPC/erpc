@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -51,8 +51,10 @@
 #endif
 
 // Safely detect FreeRTOSConfig.h.
+#define ERPC_HAS_FREERTOSCONFIG_H (0)
 #if defined(__has_include)
     #if __has_include("FreeRTOSConfig.h")
+        #undef ERPC_HAS_FREERTOSCONFIG_H
         #define ERPC_HAS_FREERTOSCONFIG_H (1)
     #endif
 #endif
@@ -97,7 +99,7 @@
 #endif
 
 //NOEXCEPT support
-#if __cplusplus >= 201103 && ERPC_NOEXCEPT
+#if defined(__cplusplus) && __cplusplus >= 201103 && ERPC_NOEXCEPT
 #define NOEXCEPT noexcept
 #else
 #define NOEXCEPT

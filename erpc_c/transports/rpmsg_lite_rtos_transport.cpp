@@ -33,10 +33,6 @@
 #include "erpc_config_internal.h"
 #include <cassert>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +47,11 @@ struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
 
 RPMsgRTOSTransport::RPMsgRTOSTransport()
 : RPMsgBaseTransport()
+, m_rdev(NULL)
+, m_app_rp_chnl(NULL)
 , m_dst_addr(0)
+, m_rpmsg_queue(NULL)
+, m_rpmsg_ept(NULL)
 {
 }
 

@@ -1,0 +1,35 @@
+---
+name: testing in out retain annotation
+desc:
+idl: |
+  struct A {
+    list<int32> x
+  }
+
+  interface I {
+    testR1(in A inA @retain, out A outA @retain) -> @retain A
+  }
+
+test_server.cpp:
+  - not: free_A_struct(inA)
+  - not: erpc_free(inA)
+  - not: free_A_struct(outA)
+  - not: erpc_free(outA)
+  - not: free_A_struct(result)
+  - not: erpc_free(result)
+
+---
+name: testing inout retain annotation
+desc:
+idl: |
+  struct A {
+    list<int32> x
+  }
+
+  interface I {
+    testR2(inout A inoutA @retain) -> void
+  }
+
+test_server.cpp:
+  - not: free_A_struct(inoutA)
+  - not: erpc_free(inoutA)

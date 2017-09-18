@@ -999,6 +999,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
         FunctionType *callbackFunctionType = dynamic_cast<FunctionType *>(callbackDataType);
         assert(callbackFunctionType);
         Function *funcDef = dynamic_cast<Function *>(func);
+        assert(funcDef);
 
         /* Connect function type with callbacks. */
         callbackFunctionType->getCallbackFuns().push_back(funcDef);
@@ -1487,6 +1488,7 @@ void SymbolScanner::scanStructForAnnotations()
         if (memberType->isUnion())
         {
             UnionType *unionType = dynamic_cast<UnionType *>(structMember->getDataType());
+            assert(unionType);
             Symbol *disSymbol;
             if (unionType->isNonEncapsulatedUnion())
             {

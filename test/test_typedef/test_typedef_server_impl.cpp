@@ -34,6 +34,7 @@
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
+#include <string.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Implementation of function code

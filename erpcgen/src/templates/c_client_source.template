@@ -27,9 +27,7 @@ extern "C"
 {% endif %}
 
 using namespace erpc;
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 extern ClientManager *g_client;
 {$generateCrcVariable()}

@@ -34,14 +34,9 @@
 #include "manually_constructed.h"
 #include "message_buffer.h"
 #include <assert.h>
-#include <new>
 
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 #include "erpc_threading.h"
-#endif
-
-#if !(__embedded_cplusplus)
-using namespace std;
 #endif
 
 using namespace erpc;

@@ -32,8 +32,6 @@
 #ifndef _ERPC_TRANSPORT_SETUP_H_
 #define _ERPC_TRANSPORT_SETUP_H_
 
-#include <stdint.h>
-
 /*!
  * @addtogroup transport_setup
  * @{
@@ -56,6 +54,8 @@ typedef void (*rpmsg_ready_cb)(void);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
 
 //! @name Transport setup
 //@{
@@ -160,9 +160,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr,
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr,
-                                                            unsigned long dst_addr,
-                                                            int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(
+    unsigned long src_addr, unsigned long dst_addr, int rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -207,7 +206,26 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(
     unsigned long src_addr, unsigned long dst_addr, void *start_address,
     int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name);
 
+/*!
+ * @brief Create an linux RPMSG endpoind transport.
+ *
+ * This function is using RPMSG endpoints based on this implementation:
+ * https://github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ *
+ * When local/remote address is set to '-1', then default addresses will be used.
+ * When type is set to '0', then Datagram model will be used, else Stream.
+ *
+ * @param[in] local_addr Local endpoint addres.
+ * @param[in] type Datagram or Stream.
+ * @param[in] remote_addr Remote endpoint addres.
+ */
+erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
 //@}
+
+/*!
+ * @brief Deinitialize an linux RPMSG endpoind transport.
+ */
+void erpc_transport_rpmsg_linux_deinit();
 
 #ifdef __cplusplus
 }

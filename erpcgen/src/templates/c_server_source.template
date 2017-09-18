@@ -21,9 +21,7 @@ extern "C"
 {$checkCrc()}
 
 using namespace erpc;
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;

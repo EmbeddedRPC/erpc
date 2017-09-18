@@ -57,18 +57,18 @@ using namespace erpc;
 
 int testClient();
 
-#define APP_ERPC_READY_EVENT_DATA  (1)
+#define APP_ERPC_READY_EVENT_DATA (1)
 
 SemaphoreHandle_t g_waitQuitMutex;
 TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
 
-int waitQuit = 0;
-int waitClient = 0;
-int isTestPassing = 0;
+volatile int waitQuit = 0;
+volatile int waitClient = 0;
+volatile int isTestPassing = 0;
 uint32_t startupData;
 mcmgr_status_t status;
-int stopTest = 0;
+volatile int stopTest = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -153,9 +153,10 @@ void runInit(void *arg)
     MCMGR_Init();
 
     // Get the startup data
-    do{
+    do
+    {
         status = MCMGR_GetStartupData(&startupData);
-    }while(status != kStatus_MCMGR_Success);
+    } while (status != kStatus_MCMGR_Success);
 
     // RPMsg-Lite transport layer initialization
     erpc_transport_t transportClient;
@@ -202,8 +203,8 @@ int main(int argc, char **argv)
 
     g_waitQuitMutex = xSemaphoreCreateMutex();
     xTaskCreate(runInit, "runInit", 256, NULL, 1, NULL);
-    xTaskCreate(runServer, "runServer", 512, NULL, 3, &g_serverTask);
-    xTaskCreate(runClient, "runClient", 512, NULL, 2, &g_clientTask);
+    xTaskCreate(runServer, "runServer", 1536, NULL, 3, &g_serverTask);
+    xTaskCreate(runClient, "runClient", 1536, NULL, 2, &g_clientTask);
 
     vTaskStartScheduler();
 

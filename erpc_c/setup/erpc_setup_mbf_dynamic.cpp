@@ -36,10 +36,7 @@
 #include <assert.h>
 #include <new>
 
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////

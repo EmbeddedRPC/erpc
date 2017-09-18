@@ -40,6 +40,7 @@
 
 using namespace erpcgen;
 using namespace cpptempl;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -653,6 +654,7 @@ void CGenerator::makeAliasesTemplateData()
     for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
     {
         FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
+        assert(functionType);
         data_map functionInfo;
 
         // aware of external function definitions
@@ -1027,6 +1029,7 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
 
     // set struct members template data
     data_list members;
+    assert(dynamic_cast<DataList *>(structInfo["members"].get().get()));
     data_list baseMembers = dynamic_cast<DataList *>(structInfo["members"].get().get())->getlist();
     data_list membersToFree;
 
@@ -1242,8 +1245,8 @@ std::string CGenerator::getUnionMembersData(UnionType *unionType, std::string id
                 StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
                 returnCase += caseIdent;
                 std::string unionMemberName = unionMember->getOutputName();
-                DataType *unionType = unionMember->getDataType()->getTrueDataType();
-                if (unionMember->isByref() && (unionType->isStruct() || unionType->isUnion() || unionType->isScalar() || unionType->isEnum()))
+                DataType *unionMemberType = unionMember->getDataType()->getTrueDataType();
+                if (unionMember->isByref() && (unionMemberType->isStruct() || unionMemberType->isUnion() || unionMemberType->isScalar() || unionMemberType->isEnum()))
                 {
                     unionMemberName = "*" + unionMemberName;
                 }
@@ -1491,10 +1494,9 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         params.push_back(paramInfo);
 
         // Generating top of freeing functions in generated output.
-        bool l_generateServerFunctionParamFreeFunctions = (!isShared && generateServerFunctionParamFreeFunctions(param));
-        bool isNeedFreeingCall = (l_generateServerFunctionParamFreeFunctions && isNeedCallFree(paramType));
+        bool l_generateServerFunctionParamFreeFunctions = (!isShared && generateServerFreeFunctions(param));
         if (l_generateServerFunctionParamFreeFunctions &&
-            (isNeedFreeingCall || paramInfo["firstFreeingCall1"]->getmap()["freeName"]->getvalue() != "" ||
+            (isNeedCallFree(paramType) || paramInfo["firstFreeingCall1"]->getmap()["freeName"]->getvalue() != "" ||
              paramInfo["firstFreeingCall2"]->getmap()["freeName"]->getvalue() != ""))
         {
             paramsToFree.push_back(paramInfo);
@@ -1988,10 +1990,11 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group,
 {
     templateData["decode"] = m_templateData["decodeBuiltinType"];
     templateData["encode"] = m_templateData["encodeBuiltinType"];
+
     if (t->isString())
     {
         templateData["checkStringNull"] = false;
-        templateData["withoutAlloc"] = ((structMember && structMember->getDirection() == kInoutDirection) ||
+        templateData["withoutAlloc"] = ((structMember->getDirection() == kInoutDirection) ||
                                         (structType && group->getSymbolDirections(structType).count(kInoutDirection))) ?
                                            true :
                                            false;
@@ -2169,7 +2172,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["size"] = format_string("%d", arrayType->getElementCount());
             templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
             templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
-            if (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t))
+            if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
             {
                 templateData["freeingCall"] = m_templateData["freeArray"];
             }
@@ -2227,18 +2230,18 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             ListType *listType = dynamic_cast<ListType *>(t);
             assert(listType);
 
-            bool isInOut = ((structMember && structMember->getDirection() == kInoutDirection) ||
+            bool isInOut = ((structMember->getDirection() == kInoutDirection) ||
                             (!isFunctionParam && group->getSymbolDirections(structType).count(kInoutDirection)));
 
-            bool isTopDataType = (isFunctionParam && structMember && structMember->getDataType()->getTrueDataType() == t);
+            bool isTopDataType = (isFunctionParam && structMember->getDataType()->getTrueDataType() == t);
             templateData["useMallocOnClientSide"] = (!isInOut && !isTopDataType); // Because cpptempl don't know do
                                                                                   // correct complicated conditions like
                                                                                   // if(a || (b && c))
 
             templateData["mallocSizeType"] = getTypenameName(listType->getElementType(), "");
             templateData["mallocType"] = getTypenameName(listType->getElementType(), "*");
-            templateData["needFreeingCall"] = (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(listType->getElementType()));
-            if (generateServerFunctionParamFreeFunctions(structMember))
+            templateData["needFreeingCall"] = (generateServerFreeFunctions(structMember) && isNeedCallFree(listType->getElementType()));
+            if (generateServerFreeFunctions(structMember))
             {
                 templateData["freeingCall"] = m_templateData["freeList"];
             }
@@ -2378,7 +2381,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["decode"] = m_templateData["decodeStructType"];
             templateData["encode"] = m_templateData["encodeStructType"];
 
-            if (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t))
+            if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
             {
                 templateData["freeingCall"] = m_templateData["freeStruct"];
             }
@@ -2387,6 +2390,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
         case DataType::kUnionType:
         {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
+            assert(unionType);
 
             // need casting discriminator variable?
             // set discriminator name
@@ -2403,7 +2407,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 templateData["typeName"] = t->getOutputName();
                 templateData["decode"] = m_templateData["decodeUnionParamType"];
                 templateData["encode"] = m_templateData["encodeUnionParamType"];
-                if (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t))
+                if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
                 {
                     templateData["freeingCall"] = m_templateData["freeUnionType"];
                 }
@@ -2466,7 +2470,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                             std::string unionCaseName = name + disriminatorSeparator + memberDeclaration->getOutputName();
                             memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, group, memberDeclaration->getDataType(),
                                                                           structType, true, structMember, casesNeedTempVariable, isFunctionParam);
-                            if (generateServerFunctionParamFreeFunctions(structMember) &&
+                            if (generateServerFreeFunctions(structMember) &&
                                 isNeedCallFree(memberDeclaration->getDataType()))
                             {
                                 // set freeing function for current union
@@ -2697,7 +2701,7 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &inf
     firstFreeingCall2["firstFreeingCall"] = "";
     firstFreeingCall2["freeName"] = "";
     // When true then function parameter, else return type
-    if (!symbol->findAnnotation(SHARED_ANNOTATION))
+    if (!symbol->findAnnotation(SHARED_ANNOTATION) && generateServerFreeFunctions(structMember))
     {
         if (!returnType)
         {
@@ -2980,7 +2984,7 @@ bool CGenerator::isBinaryList(ListType *listType)
     return false;
 }
 
-bool CGenerator::generateServerFunctionParamFreeFunctions(StructMember *structMember)
+bool CGenerator::generateServerFreeFunctions(StructMember *structMember)
 {
     return (structMember == nullptr || structMember->findAnnotation(RETAIN_ANNOTATION) == nullptr);
 }

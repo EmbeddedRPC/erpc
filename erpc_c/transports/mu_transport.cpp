@@ -32,10 +32,6 @@
 #include "erpc_config_internal.h"
 #include "board.h"
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +258,7 @@ extern "C" {
 /*!
  * @brief Messaging Unit TxEmptyFlag ISR handler
  *
- * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table 
+ * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table
  */
 void MU_TxEmptyFlagISRCallback()
 {
@@ -272,7 +268,7 @@ void MU_TxEmptyFlagISRCallback()
 /*!
  * @brief Messaging Unit RxFullFlag ISR handler
  *
- * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table 
+ * This function overloads the weak handler defined in MCMGR MU_interrupts[] MU ISR table
  */
 void MU_RxFullFlagISRCallback()
 {

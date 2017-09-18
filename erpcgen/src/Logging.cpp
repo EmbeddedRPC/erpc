@@ -34,6 +34,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+using namespace std;
+
 // init global logger to null
 Logger *Log::s_logger = NULL;
 

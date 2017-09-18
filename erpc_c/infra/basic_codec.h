@@ -35,10 +35,6 @@
 #include "codec.h"
 #include <new>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 /*!
  * @addtogroup infra_codec
  * @{
@@ -500,7 +496,7 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
+    virtual BasicCodec *create() { return new (std::nothrow) BasicCodec; }
 
     /*!
      * @brief Dispose codec.

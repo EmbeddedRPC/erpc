@@ -79,7 +79,8 @@
 //!
 //! Uncomment to change the size of buffers allocated by BasicMessageBufferFactory in the client
 //! and server setup functions (@ref client_setup and @ref server_setup). The default size is 256.
-//#define ERPC_DEFAULT_BUFFER_SIZE (256)
+//! For RPMsg transport layer, ERPC_DEFAULT_BUFFER_SIZE must be 2^n - 16.
+#define ERPC_DEFAULT_BUFFER_SIZE (512)
 
 //! @def ERPC_DEFAULT_BUFFERS_COUNT
 //!

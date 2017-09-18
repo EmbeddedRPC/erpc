@@ -30,12 +30,10 @@
  */
 
 #include "erpc_port.h"
+#include <cstdlib>
 #include <new>
-#include <stdlib.h>
 
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 void *operator new(size_t count) THROW_BADALLOC
 {

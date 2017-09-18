@@ -68,6 +68,7 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
             $(ERPC_ROOT)/erpc_c/transports \
             $(ERPC_ROOT)/erpcgen/src \
             $(ERPC_ROOT)/test/common \
+            $(ERPC_ROOT)/test/common/config \
             $(OBJS_ROOT)
 
 #-------------------------------
