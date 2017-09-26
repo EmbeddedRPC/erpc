@@ -36,6 +36,7 @@
 #include "rpmsg_lite.h"
 #include "rpmsg_lite_base_transport.h"
 #include "rpmsg_queue.h"
+#include "rpmsg_ns.h"
 
 /*!
  * @addtogroup rpmsg_lite_rtos_transport
@@ -95,12 +96,14 @@ public:
      * @param[in] base_address RPMsg base address in the shared memory.
      * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
      * @param[in] ready_cb Callback called after RPMsg init is done and the core is ready.
+     * @param[in] nameservice_name Name of the nameservice channel to be announced
+     *                             to the other core.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
     virtual erpc_status_t init(
-        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
+        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name);
 
     /*!
      * @brief Store incoming message to message buffer.

@@ -87,7 +87,7 @@ erpc_status_t RPMsgRTOSTransport::init(
 }
 
 erpc_status_t RPMsgRTOSTransport::init(
-    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
+    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -116,6 +116,15 @@ erpc_status_t RPMsgRTOSTransport::init(
         return kErpcStatus_InitFailed;
     }
     m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
+
+    if(nameservice_name)
+    {
+        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name,
+                                            RL_NS_CREATE))
+        {
+            return kErpcStatus_InitFailed;
+        }
+    }
 
     m_dst_addr = dst_addr;
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;

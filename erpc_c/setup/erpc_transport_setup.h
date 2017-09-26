@@ -176,12 +176,13 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(
  *                          rpmsg_platform.h.
  * @param[in] ready Callback function, which gets called, when RPMsg is
  *                  initialized and master core can be notified.
+ * @param[in] nameservice_name Name of the nameservice channel to be announced
+ *                             to the other core.
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address,
-    int rpmsg_link_id, rpmsg_ready_cb ready);
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name);
 
 /*!
  * @brief Create an RPMsg-Lite TTY transport.
