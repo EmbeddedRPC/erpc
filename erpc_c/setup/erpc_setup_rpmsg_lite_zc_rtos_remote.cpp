@@ -46,9 +46,9 @@ static ManuallyConstructed<RPMsgZCRTOSTransport> s_transport;
 ////////////////////////////////////////////////////////////////////////////////
 
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready)
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name)
 {
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready);
+    s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready, nameservice_name);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

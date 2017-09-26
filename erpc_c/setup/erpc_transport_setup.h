@@ -133,7 +133,7 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_ad
  * @brief Create an RPMsg-Lite RTOS transport.
  */
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready);
+    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name);
 
 //@}
 
