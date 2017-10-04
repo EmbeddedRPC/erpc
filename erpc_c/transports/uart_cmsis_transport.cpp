@@ -30,7 +30,6 @@
  */
 
 #include "uart_cmsis_transport.h"
-#include "board.h"
 #include <cstdio>
 
 using namespace erpc;
@@ -41,6 +40,7 @@ using namespace erpc;
 
 static volatile bool s_isTransferReceiveCompleted = false;
 static volatile bool s_isTransferSendCompleted = false;
+constexpr auto kStatus_Success = ARM_DRIVER_OK;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

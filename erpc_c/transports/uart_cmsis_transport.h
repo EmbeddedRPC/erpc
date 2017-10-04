@@ -34,7 +34,6 @@
 
 #include "Driver_USART.h"
 #include "framed_transport.h"
-#include "fsl_common.h"
 #include <stdlib.h>
 
 /*!

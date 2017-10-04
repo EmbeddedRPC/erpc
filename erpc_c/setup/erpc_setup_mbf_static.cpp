@@ -55,7 +55,9 @@ public:
      * @brief Constructor.
      */
     StaticMessageBufferFactory()
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
     : m_semaphore(0)
+#endif
     {
         uint32_t i;
         for (i = 0; i <= (ERPC_DEFAULT_BUFFERS_COUNT >> 3); i++)
