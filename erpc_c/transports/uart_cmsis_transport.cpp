@@ -74,6 +74,13 @@ erpc_status_t UartTransport::init()
 {
     erpc_status_t status = (*m_uartDrv).Initialize(TransferCallback);
     (*m_uartDrv).PowerControl(ARM_POWER_FULL);
+	
+	/*Configure the USART to 9600 Bits/sec */
+    m_uartDrv->Control(ARM_USART_MODE_ASYNCHRONOUS | ARM_USART_DATA_BITS_8 | ARM_USART_PARITY_NONE | ARM_USART_STOP_BITS_1 | ARM_USART_FLOW_CONTROL_NONE, 9600);
+
+    /* Enable Receiver and Transmitter lines */
+    m_uartDrv->Control(ARM_USART_CONTROL_TX, 1);
+    m_uartDrv->Control(ARM_USART_CONTROL_RX, 1);
 
     return status != kStatus_Success ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
