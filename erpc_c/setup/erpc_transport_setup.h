@@ -139,6 +139,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
  *                          rpmsg_platform.h.
  * @param[in] ready Callback function, which gets called, when RPMsg is
  *                  initialized and master core can be notified.
+ * @param[in] nameservice_name Name of the nameservice channel to be announced
+ *                             to the other core.
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
@@ -146,7 +148,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr,
                                                        unsigned long dst_addr,
                                                        void *start_address,
                                                        int rpmsg_link_id,
-                                                       rpmsg_ready_cb ready);
+                                                       rpmsg_ready_cb ready,
+                                                       char *nameservice_name);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -160,8 +163,9 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr,
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(
-    unsigned long src_addr, unsigned long dst_addr, int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr,
+                                                            unsigned long dst_addr,
+                                                            int rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -181,8 +185,12 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_addr,
+                                                            unsigned long dst_addr,
+                                                            void *start_address,
+                                                            int rpmsg_link_id,
+                                                            rpmsg_ready_cb ready,
+                                                            char *nameservice_name);
 
 /*!
  * @brief Create an RPMsg-Lite TTY transport.
@@ -203,9 +211,12 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(
-    unsigned long src_addr, unsigned long dst_addr, void *start_address,
-    int rpmsg_link_id, rpmsg_ready_cb ready, char *nameservice_name);
+erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(unsigned long src_addr,
+                                                                unsigned long dst_addr,
+                                                                void *start_address,
+                                                                int rpmsg_link_id,
+                                                                rpmsg_ready_cb ready,
+                                                                char *nameservice_name);
 
 /*!
  * @brief Create an linux RPMSG endpoind transport.
@@ -220,13 +231,15 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(
  * @param[in] type Datagram or Stream.
  * @param[in] remote_addr Remote endpoint addres.
  */
-erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
+erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr,
+                                                 int8_t type,
+                                                 int16_t remote_addr);
 //@}
 
 /*!
  * @brief Deinitialize an linux RPMSG endpoind transport.
  */
-void erpc_transport_rpmsg_linux_deinit();
+void erpc_transport_rpmsg_linux_deinit(void);
 
 #ifdef __cplusplus
 }

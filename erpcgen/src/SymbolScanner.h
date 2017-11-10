@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -101,15 +101,25 @@ public:
 
 protected:
     SymbolScope
-        *m_globals;                             /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
-    Interface *m_currentInterface;              /*!< Contains pointer to interface when interface is handled. */
-    StructType *m_currentStruct;                /*!< Contains pointer to structure when structure is handled. */
-    Program *m_currentProgram;                  /*!< Contains pointer to program when program was set in parsed file. */
-    EnumType *m_currentEnum;                    /*!< Contains pointer to enumeration when enumeration is handled. */
-    AliasType *m_currentAlias;                  /*!< Contains pointer to alias when alias is handled. */
-    UnionType *m_currentUnion;                  /*!< Contains pointer to union when union is handled. */
-    std::vector<UnionCase *> m_emptyUnionCases; /*!< Vector of union cases. */
-    bool m_isNewInterface;                      /*!< When next interface is handled. */
+        *m_globals;                                          /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
+    Interface *m_currentInterface;                           /*!< Contains pointer to interface when interface is handled. */
+    StructType *m_currentStruct;                             /*!< Contains pointer to structure when structure is handled. */
+    Program *m_currentProgram;                               /*!< Contains pointer to program when program was set in parsed file. */
+    EnumType *m_currentEnum;                                 /*!< Contains pointer to enumeration when enumeration is handled. */
+    AliasType *m_currentAlias;                               /*!< Contains pointer to alias when alias is handled. */
+    UnionType *m_currentUnion;                               /*!< Contains pointer to union when union is handled. */
+    std::vector<UnionCase *> m_emptyUnionCases;              /*!< Vector of union cases. */
+    bool m_isNewInterface;                                   /*!< When next interface is handled. */
+    std::map<std::string, DataType *> m_forwardDeclarations; /*!< To keep forward declarations. */
+
+    /*!
+     * @brief This function is called at the end of scanning.
+     *
+     * @param[in] node Root node.
+     *
+     * @see rest of AstNode handle functions
+     */
+    virtual void handleRoot(AstNode *node, bottom_up);
 
     /*!
      * @brief This function start handle program.
@@ -664,6 +674,27 @@ protected:
      * @return new function (callback) parameter.
      */
     StructMember *createCallbackParam(StructMember *structMember, const std::string &name);
+
+    /*!
+     * @brief This function registratate forward union/structure declarations.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void addForwardDeclaration(DataType *dataType);
+
+    /*!
+     * @brief This function unregister union/structure declarations.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void removeForwardDeclaration(DataType *dataType);
+
+    /*!
+     * @brief This function add symbol into global symbol scope.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void addGlobalSymbol(Symbol *symbol);
 };
 
 } // namespace erpcgen

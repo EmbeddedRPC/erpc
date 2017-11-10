@@ -208,3 +208,26 @@ test_server.cpp:
       - codec->writeNullFlag(false);
       - if (data->a)
       - codec->writeString(strlen(data->a), data->a);
+
+---
+name: return struct
+desc:
+idl: |
+  struct pair {
+    string a
+  }
+
+  interface foo {
+    bar() -> @nullable pair
+  }
+
+test_client.cpp:
+  - pair * result;
+  - bool isNull;
+  - err = codec->readNullFlag(&isNull);
+  - if (!isNull)
+
+test_server.cpp:
+  - if (result == NULL)
+  - codec->writeNullFlag(true);
+  - codec->writeNullFlag(false);

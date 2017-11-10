@@ -740,6 +740,11 @@ struct_def      :   "struct"[struct] name_opt[name] '{' struct_member_list[membe
                             $$->appendChild($name);
                             $$->appendChild($members);
                         }
+                |   "struct"[struct] ident[name]
+                        {
+                            $$ = new AstNode(*$struct);
+                            $$->appendChild($name);
+                        }
                 ;
 
 /*
@@ -814,12 +819,18 @@ union_def       :   "union"[union] '(' ident[discriminator] ')' '{' union_case_l
                             $$->appendChild($cases);
                         }
 
-union_type_def       :   "union"[union] ident[name] '{' union_case_list[cases] '}'
+union_type_def  :   "union"[union] ident[name] '{' union_case_list[cases] '}'
                         {
                             $$ = new AstNode(*$union);
                             $$->appendChild($name);
                             $$->appendChild(NULL);
                             $$->appendChild($cases);
+                        }
+                |   "union"[union] ident[name]
+                        {
+                            $$ = new AstNode(*$union);
+                            $$->appendChild($name);
+                            $$->appendChild(NULL);
                         }
 
 union_case_list

@@ -32,7 +32,9 @@ endif
 
 # Subdirectories to run make on.
 TESTDIR = test
-SUBDIRS = erpcgen $(ERPCSNIFFER) $(TESTDIR)
+SUBDIRS_LIST = erpcgen $(ERPCSNIFFER) $(TESTDIR)
+# test if all exists
+SUBDIRS = $(foreach f,$(SUBDIRS_LIST), $(if $(wildcard $(f)), $(f)))
 
 # Default target.
 .PHONY: default

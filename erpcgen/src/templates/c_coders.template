@@ -169,12 +169,12 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp};
 {% def decodeUnionParamType(info) --------------- UnionParamType %}
 {% if info.inDataContainer %}
 {%  if info.castDiscriminator %}
-{$infraErrVar}read_{$info.typeName}_union(codec, &_tmp_local, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}read_{$info.typeName}_union(codec, &_tmp_local, &{$info.name});
 {%   if !info.isConstant %}
 {$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%   endif %}
 {%  else %}
-{$infraErrVar}read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%  endif -- castDiscriminator%}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
@@ -203,8 +203,8 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {%  endif -- default or case %}
     {
 {%  for member in case.members %}
-{% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
-{$mem.coderCall.memberAllocation}
+{% if source == "server" && !empty(member.coderCall.memberAllocation) %}
+{$addIndent("        ", member.coderCall.memberAllocation)}
 {% endif %}
 {$addInfraErrorChecks("        ", member.coderCall.decode(member.coderCall))}
 {%  endfor -- members %}
@@ -250,10 +250,10 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {%  else %}
 {%   if info.inDataContainer %}
 {%    if info.castDiscriminator %}
-{$infraErrVar}read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.name});
 {$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%    else %}
-{$infraErrVar}read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%    endif -- castDiscriminator%}
 {%   else -- not inDataContainer %}
 {%    if info.castDiscriminator %}
@@ -362,7 +362,7 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {% if source == "
 
 {% def encodeUnionParamType(info) --------------- UnionParamType %}
 {% if info.inDataContainer %}
-{$infraErrVar}write_{$info.typeName}_union(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}write_{$info.typeName}_union(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.name});
 {% else -- not inDataContainer %}
 {$infraErrVar}write_{$info.typeName}_union(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
 {% endif -- inDataContainer %}
@@ -436,7 +436,7 @@ else
 {%   endif -- inDataContainer %}
 {%  else %}
 {%   if info.inDataContainer %}
-{$infraErrVar}write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.dataLiteral}{$info.name});
+{$infraErrVar}write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.name});
 {%   else -- not inDataContainer %}
 {$infraErrVar}write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
 {%   endif -- inDataContainer %}

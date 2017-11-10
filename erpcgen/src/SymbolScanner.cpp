@@ -48,6 +48,22 @@ using namespace erpcgen;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+void SymbolScanner::handleRoot(AstNode *node, bottom_up)
+{
+    if (m_forwardDeclarations.size() != 0)
+    {
+        std::string forwardTypes;
+        for (auto it = m_forwardDeclarations.begin(); it != m_forwardDeclarations.end(); ++it)
+        {
+            if (it != m_forwardDeclarations.begin())
+            {
+                forwardTypes += ", ";
+            }
+            forwardTypes += format_string("type name %s: line %d", it->first.c_str(), it->second->getFirstLine());
+        }
+        throw syntax_error(format_string("Missing type definitions for one or more forward type declarations: %s", forwardTypes.c_str()).c_str());
+    }
+}
 
 AstNode *SymbolScanner::handleConst(AstNode *node, bottom_up)
 {
@@ -59,7 +75,7 @@ AstNode *SymbolScanner::handleConst(AstNode *node, bottom_up)
     // doxygen comment
     addDoxygenComments(constType, node->getChild(4), node->getChild(5));
 
-    m_globals->addSymbol(constType);
+    addGlobalSymbol(constType);
     return nullptr;
 }
 
@@ -175,7 +191,7 @@ AstNode *SymbolScanner::handleType(AstNode *node, bottom_up)
     if (m_currentAlias)
     {
         addAnnotations(node->getChild(2), m_currentAlias);
-        m_globals->addSymbol(m_currentAlias);
+        addGlobalSymbol(m_currentAlias);
         m_currentAlias = nullptr;
     }
     return nullptr;
@@ -235,7 +251,7 @@ AstNode *SymbolScanner::handleEnum(AstNode *node, bottom_up)
         addAnnotations(node->getChild(2), m_currentEnum);
     }
 
-    m_globals->addSymbol(m_currentEnum);
+    addGlobalSymbol(m_currentEnum);
 
     // Clear current enum pointer.
     m_currentEnum = nullptr;
@@ -270,7 +286,7 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     Log::debug("enum member: %s\n", name.c_str());
 
     m_currentEnum->addMember(member);
-    m_globals->addSymbol(member);
+    addGlobalSymbol(member);
 
     //add annotations
     addAnnotations(node->getChild(2), member);
@@ -581,7 +597,7 @@ AstNode *SymbolScanner::handleProgram(AstNode *node, top_down)
     Program *prog = new Program(tok);
     m_currentProgram = prog;
 
-    m_globals->addSymbol(prog);
+    addGlobalSymbol(prog);
 
     return nullptr;
 }
@@ -600,19 +616,36 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
     if (!structNameNode && m_currentAlias == nullptr)
     {
         throw semantic_error(format_string("line %d: illegal anonymous struct definition at file level",
-                                           node->getToken().getFirstLine()));
+                                           node->getToken().getFirstLine())
+                                 .c_str());
     }
 
-    // Get the struct's name. A struct may be anonymous if it is in a type alias declaration.
-    const std::string *name = nullptr;
     // Create the struct symbol.
     StructType *newStruct;
     if (structNameNode)
     {
         const Token &tok = structNameNode->getToken();
-        name = &(tok.getStringValue());
-        Log::debug("struct: %s\n", name->c_str());
-        newStruct = new StructType(tok);
+        std::string name = tok.getStringValue();
+        Log::debug("struct: %s\n", name.c_str());
+
+        /* match forward declaration with definition */
+        auto forwardDecl = m_forwardDeclarations.find(name);
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            newStruct = dynamic_cast<StructType *>(forwardDecl->second);
+            if (newStruct != nullptr)
+            {
+                new (newStruct) StructType(tok);
+            }
+            else
+            {
+                throw syntax_error(format_string("line %d: Structure definition type name didn't match data type of forward declaration from line %d.", tok.getFirstLine(), forwardDecl->second->getFirstLine()).c_str());
+            }
+        }
+        else
+        {
+            newStruct = new StructType(tok);
+        }
     }
     else
     {
@@ -621,9 +654,6 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
             check_null(check_null(check_null(node->getParent())->getChild(0))->getTokenValue())->toString().c_str());
         newStruct = new StructType("");
     }
-
-    // Get comment if exist.
-    addDoxygenComments(newStruct, node->getChild(3), node->getChild(4));
 
     m_currentStruct = newStruct;
 
@@ -647,13 +677,30 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, bottom_up)
     }
     else
     {
-        addAnnotations(node->getChild(2), m_currentStruct);
+        // Forward declaration have 4 nodes.
+        if (node->childCount() > 4)
+        {
+            // Get comment if exist.
+            addDoxygenComments(m_currentStruct, node->getChild(3), node->getChild(4));
+
+            addAnnotations(node->getChild(2), m_currentStruct);
+        }
     }
 
-    m_globals->addSymbol(m_currentStruct);
+    // Forward declaration have 4 nodes.
+    if (node->childCount() == 4)
+    {
+        addForwardDeclaration(m_currentStruct);
+    }
+    else
+    {
+        removeForwardDeclaration(m_currentStruct);
 
-    // Handle annotations for function params
-    scanStructForAnnotations();
+        addGlobalSymbol(m_currentStruct);
+
+        // Handle annotations for function params
+        scanStructForAnnotations();
+    }
 
     /* Clear current struct pointer. */
     m_currentStruct = nullptr;
@@ -699,7 +746,7 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
 {
-    std::string unionName;
+    Token *tok;
     AstNode *astUnionName = node->getChild(0);
     AstNode *astUnionDiscriminator = node->getChild(1);
 
@@ -713,16 +760,16 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
         /* Create a new node in the AST for the union's name, and assign it */
         node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_$union"))));
 
-        /* union name for disriminated unions. */
-        unionName = node->getChild(3)->getToken().getStringValue();
+        /* union token. */
+        tok = &node->getChild(3)->getToken();
     }
     else
     {
-        /* union name for non-encapsulated disriminated unions. */
-        unionName = astUnionName->getToken().getStringValue();
+        /* union token for non-encapsulated disriminated unions. */
+        tok = &astUnionName->getToken();
     };
 
-    Log::debug("union: %s\n", unionName.c_str());
+    Log::debug("union: %s\n", tok->getStringValue().c_str());
 
     UnionType *newUnion;
     /* get union type object */
@@ -730,16 +777,29 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
     {
         /* disriminated unions. */
         const std::string &discriminatorName = astUnionDiscriminator->getToken().getStringValue();
-        newUnion = new UnionType(unionName, discriminatorName);
+        newUnion = new UnionType(*tok, discriminatorName);
     }
     else
     {
-        /* non-encapsulated disriminated unions. */
-        newUnion = new UnionType(unionName, "");
-        addAnnotations(node->getChild(3), newUnion);
-
-        /* doxygen comment */
-        addDoxygenComments(newUnion, node->getChild(4), node->getChild(5));
+        /* match forward declaration with definition */
+        auto forwardDecl = m_forwardDeclarations.find(tok->getStringValue());
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            newUnion = dynamic_cast<UnionType *>(forwardDecl->second);
+            if (newUnion != nullptr)
+            {
+                new (newUnion) UnionType(*tok, "");
+            }
+            else
+            {
+                throw syntax_error(format_string("line %d: Union definition type name didn't match data type of forward declaration from line %d.", tok->getFirstLine(), forwardDecl->second->getFirstLine()).c_str());
+            }
+        }
+        else
+        {
+            /* non-encapsulated disriminated unions. */
+            newUnion = new UnionType(*tok, "");
+        }
     }
 
     m_currentUnion = newUnion;
@@ -752,7 +812,22 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, bottom_up)
     /* add union to global symbol list */
     if (m_currentUnion->isNonEncapsulatedUnion())
     {
-        m_globals->addSymbol(m_currentUnion);
+        // Forward declaration have 5 nodes.
+        if (node->childCount() == 5)
+        {
+            addForwardDeclaration(m_currentUnion);
+        }
+        else
+        {
+            addAnnotations(node->getChild(3), m_currentUnion);
+
+            /* doxygen comment */
+            addDoxygenComments(m_currentUnion, node->getChild(4), node->getChild(5));
+
+            removeForwardDeclaration(m_currentUnion);
+
+            addGlobalSymbol(m_currentUnion);
+        }
     }
     else /* add union to structure */
     {
@@ -897,7 +972,7 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, top_down)
     Interface *iface = new Interface(tok);
     iface->getScope().setParent(m_globals);
     m_currentInterface = iface;
-    m_globals->addSymbol(iface);
+    addGlobalSymbol(iface);
     m_isNewInterface = true;
 
     // Get comment if exist.
@@ -943,7 +1018,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
     else /* function type */
     {
         func = new FunctionType(tok);
-        m_globals->addSymbol(dynamic_cast<FunctionType *>(func));
+        addGlobalSymbol(dynamic_cast<FunctionType *>(func));
     }
 
     m_currentStruct = &(func->getParameters());
@@ -1217,7 +1292,15 @@ DataType *SymbolScanner::lookupDataTypeByName(const Token &tok, SymbolScope *sco
     Symbol *dataTypeSym = scope->getSymbol(typeName, recursive);
     if (!dataTypeSym)
     {
-        throw semantic_error(format_string("line %d: undefined name '%s'", tok.getFirstLine(), typeName.c_str()));
+        auto forwardDecl = m_forwardDeclarations.find(typeName);
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            dataTypeSym = forwardDecl->second;
+        }
+        else
+        {
+            throw semantic_error(format_string("line %d: undefined name '%s'", tok.getFirstLine(), typeName.c_str()));
+        }
     }
     DataType *dataType = dynamic_cast<DataType *>(dataTypeSym);
     if (!dataType)
@@ -1719,4 +1802,49 @@ StructMember *SymbolScanner::createCallbackParam(StructMember *structMember, con
     param->setContainString(structMember->getContainString());
     param->setDirection(structMember->getDirection());
     return param;
+}
+
+void SymbolScanner::addForwardDeclaration(DataType *dataType)
+{
+    if (Symbol *symbol = m_globals->getSymbol(dataType->getName()))
+    {
+        throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'", dataType->getFirstLine(), dataType->getName().c_str(), symbol->getFirstLine()).c_str());
+    }
+
+    auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        if (findDataTypeIT->second->getDataType() != dataType->getDataType())
+        {
+            throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'", dataType->getFirstLine(), dataType->getName().c_str(), findDataTypeIT->second->getFirstLine()).c_str());
+        }
+        else
+        {
+            return;
+        }
+    }
+    m_forwardDeclarations[dataType->getName()] = dataType;
+}
+
+void SymbolScanner::removeForwardDeclaration(DataType *dataType)
+{
+    auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        if (findDataTypeIT->second->getDataType() != dataType->getDataType())
+        {
+            throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'", dataType->getFirstLine(), dataType->getName().c_str(), findDataTypeIT->second->getFirstLine()).c_str());
+        }
+        m_forwardDeclarations.erase(findDataTypeIT);
+    }
+}
+
+void SymbolScanner::addGlobalSymbol(Symbol *symbol)
+{
+    auto findDataTypeIT = m_forwardDeclarations.find(symbol->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        throw semantic_error(format_string("line %d: Declaring symbol '%s' already declared here '%d'", symbol->getFirstLine(), symbol->getName().c_str(), findDataTypeIT->second->getFirstLine()).c_str());
+    }
+    m_globals->addSymbol(symbol);
 }

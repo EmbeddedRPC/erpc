@@ -379,7 +379,7 @@ std::string StructType::getDescription() const
 std::string StructMember::getDescription() const
 {
     return format_string("<member %s:%s>", m_name.c_str(),
-                         (m_dataType ? m_dataType->getDescription().c_str() : "(no type)"));
+                         (m_dataType ? m_dataType->getName().c_str() : "(no type)"));
 }
 
 EnumMember *EnumType::getMember(std::string name)

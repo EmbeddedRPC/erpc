@@ -52,7 +52,7 @@ bool MessageLoggers::addMessageLogger(Transport *transport)
 {
     if (transport != NULL)
     {
-      MessageLogger *logger = new (nothrow) MessageLogger(transport);
+        MessageLogger *logger = new (nothrow) MessageLogger(transport);
         if (logger)
         {
             if (m_logger == NULL)

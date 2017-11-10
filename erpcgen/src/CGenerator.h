@@ -177,7 +177,7 @@ private:
      *
      * @return Pointer to given or new DataType.
      */
-    DataType *findChildDataType(std::vector<DataType *> *dataTypes, DataType *dataType);
+    DataType *findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType);
 
     /*!
      * @brief This function transform binary data type to list and set annotation to it.
@@ -637,12 +637,13 @@ private:
     /*!
      * @brief This function check, if data type is struct which contains byref parameter and not contains shared annotation.
      *
-     * @param[in] dataTypte Given data type.
+     * @param[in] dataType Given data type.
+     * @param[in] dataTypes For loops from forward declaration detection.
      *
      * @retval True if data type is structure and contains byref parameter and not contains shared annotation, else false.
      *
      */
-    bool containsByrefParamToFree(DataType *dataTypte);
+    bool containsByrefParamToFree(DataType *dataType, std::set<DataType *> &dataTypes);
 
     /*!
      * @brief This function returns true when structure is used as a wrapper for binary type.

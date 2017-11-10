@@ -36,7 +36,6 @@
 #include "rpmsg_lite.h"
 #include "rpmsg_lite_base_transport.h"
 #include "rpmsg_queue.h"
-#include "rpmsg_ns.h"
 
 /*!
  * @addtogroup rpmsg_lite_rtos_transport

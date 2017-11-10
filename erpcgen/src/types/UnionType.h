@@ -69,6 +69,23 @@ public:
     }
 
     /*!
+     * @brief Constructor.
+     *
+     * This function set data type to union data type and symbol token to given token.
+     * It will also set discriminator name.
+     *
+     * @param[in] tok Given token..
+     * @param[in] discriminatorName Discriminator name.
+     */
+    UnionType(const Token &tok, const std::string &discriminatorName)
+    : DataType(tok, kUnionType, kUnionTypeSymbol)
+    , m_discriminator(discriminatorName)
+    , m_members("(union)")
+    , m_parentStruct(nullptr)
+    {
+    }
+
+    /*!
      * @brief Returns the struct owning this union.
      */
     StructType *getParentStruct() { return m_parentStruct; }

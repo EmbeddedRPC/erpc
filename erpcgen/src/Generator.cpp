@@ -277,8 +277,15 @@ std::string Generator::getTime()
     return nowString;
 }
 
-DataType *Generator::findChildDataType(std::vector<DataType *> *dataTypes, DataType *dataType)
+DataType *Generator::findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType)
 {
+    // Detecting loops from forward declarations.
+    // Insert data type into set
+    if (!dataTypes.insert(dataType).second)
+    {
+        return dataType;
+    }
+
     switch (dataType->getDataType())
     {
         case DataType::kAliasType:
@@ -296,18 +303,6 @@ DataType *Generator::findChildDataType(std::vector<DataType *> *dataTypes, DataT
             if (arrayType != nullptr)
             {
                 findChildDataType(dataTypes, arrayType->getElementType());
-            }
-            break;
-        }
-        case DataType::kBuiltinType:
-        {
-            if (dataType->isBinary())
-            {
-                DataType *binaryDataType = dynamic_cast<DataType *>(m_globals->getSymbol("binary_t"));
-                if (binaryDataType != nullptr)
-                {
-                    dataType = binaryDataType;
-                }
             }
             break;
         }
@@ -352,8 +347,6 @@ DataType *Generator::findChildDataType(std::vector<DataType *> *dataTypes, DataT
         }
     }
 
-    dataTypes->push_back(dataType);
-
     return dataType;
 }
 
@@ -366,9 +359,9 @@ void Generator::findGroupDataTypes()
             for (Function *fn : iface->getFunctions())
             {
                 // handle return value
-                std::vector<DataType *> dataTypes;
+                std::set<DataType *> dataTypes;
                 StructMember *structMember = fn->getReturnStructMemberType();
-                DataType *transformedDataType = findChildDataType(&dataTypes, fn->getReturnType());
+                DataType *transformedDataType = findChildDataType(dataTypes, fn->getReturnType());
                 structMember->setDataType(transformedDataType);
 
                 // save all transformed data types directions into data type map
@@ -388,7 +381,7 @@ void Generator::findGroupDataTypes()
 
                     setBinaryList(mit);
 
-                    mit->setDataType(findChildDataType(&dataTypes, mit->getDataType()));
+                    mit->setDataType(findChildDataType(dataTypes, mit->getDataType()));
 
                     // save all transformed data types directions into data type map
                     if (!mit->findAnnotation(SHARED_ANNOTATION))
@@ -532,4 +525,9 @@ data_list Generator::makeGroupIncludesTemplateData(Group *group)
     }
 
     return includes;
+}
+
+bool Generator::isMemberDataTypeUsingForwardDeclaration(Symbol *topSymbol, Symbol *memberSymbol)
+{
+    return (m_globals->getSymbolPos(topSymbol) < m_globals->getSymbolPos(memberSymbol));
 }

@@ -30,6 +30,7 @@
  */
 
 #include "rpmsg_lite_rtos_transport.h"
+#include "rpmsg_ns.h"
 #include "erpc_config_internal.h"
 #include <cassert>
 

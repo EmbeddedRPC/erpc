@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -88,14 +88,12 @@ public:
     /*!
      * @brief This function walk the AstNode depth-first and invoke handler methods.
      *
-     * This function call for dispatch given node before and after calling walk
-     * function for node children.
-     *
      * @param[in] node The root node of the tree to walk.
      *
      * @see void AstWalker::dispatch(AstNode * node)
+     * @see void AstWalker::walk(AstNode * node)
      */
-    virtual void walk(AstNode *node);
+    virtual void startWalk(AstNode *node);
 
 protected:
     std::string m_fileName; /*!< @brief Stores name of file from which AST was built. */
@@ -105,6 +103,18 @@ protected:
     struct bottom_up
     {
     }; /*!< @brief Specifier type to select bottom-up handler using ADL. */
+
+    /*!
+     * @brief This function walk the AstNode depth-first and invoke handler methods.
+     *
+     * This function call for dispatch given node before and after calling walk
+     * function for node children.
+     *
+     * @param[in] node The root node of the tree to walk.
+     *
+     * @see void AstWalker::dispatch(AstNode * node)
+     */
+    virtual void walk(AstNode *node);
 
     /*!
      * @brief This function invoke the appropriate handler method for the node's token type..
@@ -129,6 +139,7 @@ protected:
      * @brief Top-down handlers types, which can be called.
      */
     //@{
+    virtual void handleRoot(AstNode *node, top_down){};
     virtual AstNode *handleProgram(AstNode *node, top_down) { return nullptr; }
     virtual AstNode *handleConst(AstNode *node, top_down) { return nullptr; }
     virtual AstNode *handleChildren(AstNode *node, top_down) { return nullptr; }
@@ -154,6 +165,7 @@ protected:
      * @brief Bottom-up handlers types, which can be called.
      */
     //@{
+    virtual void handleRoot(AstNode *node, bottom_up){};
     virtual AstNode *handleProgram(AstNode *node, bottom_up) { return nullptr; }
     virtual AstNode *handleConst(AstNode *node, bottom_up) { return nullptr; }
     virtual AstNode *handleChildren(AstNode *node, bottom_up) { return nullptr; }

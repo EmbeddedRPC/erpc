@@ -158,7 +158,7 @@ static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * 
 {$infraErrIndents}    if (!isNull)
 {$infraErrIndents}    {
 {% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
-{$mem.coderCall.memberAllocation}
+{$addIndent(infraErrIndents & "        ", mem.coderCall.memberAllocation)}
 {% endif %}
 {$addInfraErrorChecks(infraErrIndents & "        ", mem.coderCall.decode(mem.coderCall))}
 {$infraErrIndents}    }
@@ -170,7 +170,7 @@ static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * 
 {$> addInfraErrorChecksEnd("    ") }{$loop.addNewLineIfNotLast}
 {%    else -- notNullable %}
 {% if source == "server" && !empty(mem.coderCall.memberAllocation) %}
-{$mem.coderCall.memberAllocation}
+{$addIndent("    ", mem.coderCall.memberAllocation)}
 {% endif %}
 {$addInfraErrorChecks("    ", mem.coderCall.decode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
@@ -427,8 +427,8 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {%    if member.isNeedFreeingCall %}
 {$addIndent("        ", member.coderCall.freeingCall(member.coderCall))}
 {%    endif %}
-{%    if !empty(mem.coderCall.memberAllocation) %}
-{$addIndent("    ", mem.coderCall.freeingCall2(mem.coderCall))}
+{%    if !empty(member.coderCall.memberAllocation) %}
+{$addIndent("        ", member.coderCall.freeingCall2(member.coderCall))}
 {%    endif%}
 {%   endfor -- members %}
 {$addIndent("        ", "break;")}
@@ -440,7 +440,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 
 {% def freeUnionType(info) %}
 {% if info.inDataContainer %}
-free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.dataLiteral}{$info.name});
+free_{$info.typeName}_union({% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{$info.dataLiteral}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, &{$info.name});
 {% else -- not inDataContainer %}
 if ({$info.name})
 {

@@ -67,6 +67,7 @@
 
 {%     endif %}
 {%     if fn.returnValue.isNullable %}
+    bool isNull;
 {$addInfraErrorChecks("    ", f_paramIsNullableDecode(fn.returnValue))}
 {%     else -- isNullable %}
 {$> addIndent("    ", fn.returnValue.firstAlloc)}

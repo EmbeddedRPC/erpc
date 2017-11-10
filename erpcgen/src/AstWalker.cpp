@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -38,6 +38,15 @@ using namespace erpcgen;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+
+void AstWalker::startWalk(AstNode *node)
+{
+    top_down dirTopDown;
+    handleRoot(node, dirTopDown);
+    walk(node);
+    bottom_up dirBottomUp;
+    handleRoot(node, dirBottomUp);
+}
 
 void AstWalker::walk(AstNode *node)
 {

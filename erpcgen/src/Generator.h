@@ -193,7 +193,7 @@ protected:
      *
      * @return Pointer to given or new DataType.
      */
-    virtual DataType *findChildDataType(std::vector<DataType *> *dataTypes, DataType *dataType);
+    virtual DataType *findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType);
 
     /*!
      * @brief This function transform binary data type to list and set annotation to it.
@@ -288,6 +288,17 @@ protected:
      * @return Pointer to a group with specified name.
      */
     Group *getGroupByName(std::string name);
+
+    /*!
+     * @brief This function returns information if member data type symbol is using forward declared type.
+     *
+     * @param[in] topSymbol Symbol data type which is using as a member memberSymbol data type.
+     * @param[in] memberSymbol Member symbol data type of topSymbol.
+     *
+     * @retval True when memberSymbol is using forward declarad type.
+     * @retval False when memberSymbol is not using forward declarad type.
+     */
+    bool isMemberDataTypeUsingForwardDeclaration(Symbol *topSymbol, Symbol *memberSymbol);
 
 private:
     /*!
