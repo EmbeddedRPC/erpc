@@ -40,9 +40,9 @@
 //    - Added PARSE_POS control flag and POSITIONAL return value.
 // ^^**************************************************************************
 
+#include <cctype>
 #include <cstdlib>
-#include <ctype.h>
-#include <string.h>
+#include <cstring>
 
 #include "options.h"
 

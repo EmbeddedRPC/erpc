@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -62,7 +62,7 @@ void InterfaceDefinition::init()
     createBuiltinTypes();
 }
 
-void InterfaceDefinition::parse(const char *inputFile)
+uint16_t InterfaceDefinition::parse(const char *inputFile)
 {
     // create lexer instance
     ErpcLexer lexer(inputFile);
@@ -82,9 +82,11 @@ void InterfaceDefinition::parse(const char *inputFile)
 
     // Build table of symbols.
     SymbolScanner scanner(&m_globals, std::string(inputFile));
-    scanner.walk(m_ast);
+    scanner.startWalk(m_ast);
 
     m_globals.dump();
+
+    return lexer.getIdlCrc16();
 }
 
 void InterfaceDefinition::createBuiltinTypes()
@@ -116,9 +118,9 @@ bool InterfaceDefinition::hasProgramSymbol()
     return 1 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size();
 }
 
-Program *InterfaceDefinition::programSymbol()
+Program *InterfaceDefinition::getProgramSymbol()
 {
-    if (0 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
+    if (1 != m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
     {
         return nullptr;
     }
@@ -135,10 +137,10 @@ void InterfaceDefinition::setOutputDirectory(const std::string &outputDir)
 
     if (hasProgramSymbol())
     {
-        Annotation *an = programSymbol()->findAnnotation(OUTPUT_DIR_ANNOTATION);
-        if (an)
+        std::string outputDir = getProgramSymbol()->getAnnStringValue(OUTPUT_DIR_ANNOTATION);
+        if (!outputDir.empty())
         {
-            m_outputDirectory /= an->getValueObject()->toString();
+            m_outputDirectory /= outputDir;
         }
     }
 }
@@ -147,7 +149,7 @@ void InterfaceDefinition::setOutputFilename(const std::string &filename)
 {
     if (hasProgramSymbol())
     {
-        m_outputFilename = programSymbol()->getName();
+        m_outputFilename = getProgramSymbol()->getName();
     }
     else
     {
@@ -159,11 +161,11 @@ void InterfaceDefinition::setErrorHandlingChecksType()
 {
     if (hasProgramSymbol())
     {
-        if (programSymbol()->findAnnotation(NO_ALLOC_ERRORS))
+        if (getProgramSymbol()->findAnnotation(NO_ALLOC_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 1);
         }
-        if (programSymbol()->findAnnotation(NO_INFRA_ERRORS))
+        if (getProgramSymbol()->findAnnotation(NO_INFRA_ERRORS_ANNOTATION))
         {
             m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 2);
         }

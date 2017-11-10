@@ -21,6 +21,7 @@
 
 {# Code #}
 {%   set s_performRequest = infraErrVar & "g_client->performRequest(request);" %}
+{%   set s_performNestedRequest = infraErrVar & "g_client->performNestedRequest(request);" %}
 {%   set s_endWriteMessage = infraErrVar & "codec->endWriteMessage();" %}
 {%   set s_startReadStruct = infraErrVar & "codec->startReadStruct();" %}
 {%   set s_endReadStruct = infraErrVar & "codec->endReadStruct();" %}
@@ -30,40 +31,48 @@
 {% def f_clientEncode(iface, fn) %}
 {$addInfraErrorChecks("    ", f_clientStartWriteMessage(fn.isReturnValue, iface.name, fn.name))}
 {%   if fn.isSendValue %}
-{%    for param in fn.parametersTo2Core if not param.lengthForMember %}
+{%    for param in fn.parametersToServer if !param.serializedBothDirection %}
 {%     if param.isNullable %}
-{$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param))}{$loop.addNewLineIfNotLast}
 {%     else -- isNullable %}
 {$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
-{%    endfor -- fn parametersTo2Core %}
+{%    endfor -- fn parametersToServer %}
 {%   endif -- isSendValue %}
 
 {$addInfraErrorChecks("    ", s_endWriteMessage)}
 
     // Send message to server
+{% if fn.nestedCall %}
+{$addInfraErrorChecks("    ", s_performNestedRequest)}
+{% else  -- fn.nestedCall %}
 {$addInfraErrorChecks("    ", s_performRequest)}
+{% endif  -- fn.nestedCall %}
 {% enddef %}
 
 {% def f_clientDecode(iface, fn) %}
-{%    if fn.needNullVariableOnClient %}
-    bool isNull;
-{%    endif -- needNullVariableOnClient %}
-{%    for param in fn.parametersTo1Core if not param.lengthForMember %}
+{%    for param in fn.parametersToClient if not param.serializedViaMember %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param, ""))}{$loop.addNewLineIfNotLast}
+    if ({$param.nullableName} != NULL)
+    {
+{$addInfraErrorChecks("        ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
+    }
 {%     else -- notNullable %}
-{$> addIndent("    ", param.mallocClient)}
 {$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
-{%    endfor -- fn parametersTo1Core %}
+{%    endfor -- fn parametersToClient %}
 {%    if fn.returnValue.type.isNotVoid %}
-{%     if count(fn.parametersTo1Core) > 0 %}
+{%     if count(fn.parametersToClient) > 0 %}
 {# need empty line for this case #}
 
 {%     endif %}
+{%     if fn.returnValue.isNullable %}
+    bool isNull;
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(fn.returnValue))}
+{%     else -- isNullable %}
 {$> addIndent("    ", fn.returnValue.firstAlloc)}
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
+{%     endif -- isNullable %}
 {%    endif -- isNotVoid %}
 
 {$addInfraErrorChecks("    ", s_endReadMessage)}
@@ -77,34 +86,33 @@
 {$infraErrVar}codec->startWriteMessage(kReplyMessage, k{$interfaceName}_service_id, k{$interfaceName}_{$functionName}_id, sequence);
 {% enddef %}
 
-{% def f_paramIsNullableEncode(coderCall) %}
-if ({$coderCall.name} == NULL)
+{% def f_paramIsNullableEncode(param) %}
+if ({$param.nullableName} == NULL)
 {
     {$infraErrVar}codec->writeNullFlag(true);
 }
 else
 {
     {$infraErrVar}codec->writeNullFlag(false);
-{$addInfraErrorChecks("    ", coderCall.encode(coderCall))}
+{$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}
 }
 {% enddef %}
 
-{% def f_paramIsNullableDecode(param, isServer) %}
+{% def f_paramIsNullableDecode(param) %}
 {$infraErrVar}codec->readNullFlag(&isNull);
 if (!isNull)
 {
-{% if isServer == "" %}
-{$> addIndent("    ", param.mallocClient)}
-{% else %}
+{% if source == "server" %}
 {%  if param.allocateToServer %}
 {$> addIndent("    ", param.mallocServer)}
 {%  endif -- allocateToServer %}
 {% endif %}
+{$> addIndent("    ", param.firstAlloc)}
 {$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}
 }
 else
 {
-{$param.coderCall.name} = NULL;
+    {$param.nullableName} = NULL;
 }
 {% enddef %}
 

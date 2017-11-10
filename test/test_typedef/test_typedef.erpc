@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -30,8 +30,11 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
-program test_typedef;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
+
 struct A
 {
     int32 m

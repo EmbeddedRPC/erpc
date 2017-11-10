@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -48,6 +48,9 @@ static ManuallyConstructed<UartTransport> s_transport;
 erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv)
 {
     s_transport.construct((ARM_DRIVER_USART *)uartDrv);
-    s_transport->init();
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    if (s_transport->init() == kErpcStatus_Success)
+    {
+        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    }
+    return NULL;
 }

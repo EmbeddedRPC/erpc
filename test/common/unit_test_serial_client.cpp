@@ -34,8 +34,9 @@
 #include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
+#include "myAlloc.h"
 #include "serial_transport.h"
-#include "unit_test_common/unit_test_common.h"
+#include "test_unit_test_common.h"
 
 using namespace erpc;
 

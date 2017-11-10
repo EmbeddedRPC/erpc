@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -92,7 +92,16 @@ enum _erpc_status
     kErpcStatus_ReceiveFailed,
 
     //! Failed to send data.
-    kErpcStatus_SendFailed
+    kErpcStatus_SendFailed,
+
+    //! Sending/Receiving callback function which is not defined in IDL.
+    kErpcStatus_UnknownCallback,
+
+    //! Calling eRPC function from another eRPC function. For more information see erpc_common.h.
+    kErpcStatus_NestedCallFailure,
+
+    //! When sending address from bigger architecture to smaller.
+    kErpcStatus_BadAddressScale
 };
 
 /*! @brief Type used for all status and error return values. */

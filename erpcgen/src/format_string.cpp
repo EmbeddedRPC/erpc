@@ -31,10 +31,10 @@
 
 #include "format_string.h"
 #include "smart_ptr.h"
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
-#include <stdio.h>
-#include <stdlib.h>
 
 //! Size of the temporary buffer to hold the formatted output string.
 #define WIN32_FMT_BUF_LEN (2048)

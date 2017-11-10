@@ -34,9 +34,7 @@
 #include <cstring>
 
 using namespace erpc;
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -96,13 +94,15 @@ void MessageBuffer::swap(MessageBuffer *other)
 void MessageBuffer::Cursor::set(MessageBuffer *buffer)
 {
     m_buffer = buffer;
-    assert(buffer->get() && "Data buffer wasn't set to MessageBuffer."); // receive function should return err if it couldn't set data buffer.
+    //RPMSG when nested calls are enabled can set NULL buffer.
+    //assert(buffer->get() && "Data buffer wasn't set to MessageBuffer."); // receive function should return err if it couldn't set data buffer.
     m_pos = buffer->get();
     m_remaining = buffer->getLength();
 }
 
 erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 {
+    assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
     if (m_remaining < length)
     {
         return kErpcStatus_BufferOverrun;
@@ -117,6 +117,7 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 
 erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
+    assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
     if (length > m_remaining)
     {
         return kErpcStatus_BufferOverrun;

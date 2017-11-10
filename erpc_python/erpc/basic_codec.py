@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2017 NXP
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
@@ -103,6 +103,12 @@ class BasicCodec(Codec):
     def end_write_struct(self):
         pass
 
+    def start_write_union(self, discriminator):
+        self.write_uint32(discriminator)
+
+    def end_write_union(self):
+        pass
+
     def write_null_flag(self, flag):
         self.write_uint8(1 if flag else 0)
 
@@ -181,6 +187,14 @@ class BasicCodec(Codec):
         pass
 
     def end_read_struct(self):
+        pass
+
+    ##
+    # @return Int of union discriminator.
+    def start_read_union(self):
+        return self.read_int32()
+
+    def end_read_union(self):
         pass
 
     def read_null_flag(self):

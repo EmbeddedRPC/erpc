@@ -36,6 +36,8 @@
 #include "EnumMember.h"
 #include "EnumType.h"
 #include "Function.h"
+#include "FunctionType.h"
+#include "Group.h"
 #include "Interface.h"
 #include "ListType.h"
 #include "Logging.h"
@@ -46,7 +48,8 @@
 #include "SymbolScope.h"
 #include "UnionCase.h"
 #include "UnionType.h"
-#include <string.h>
+#include "annotations.h"
+#include <cstring>
 
 using namespace erpcgen;
 
@@ -72,6 +75,26 @@ Value *Annotation::getValueObject()
     {
         throw semantic_error(format_string("Missing value for annotation named '%s' on line '%d'", m_name.c_str(),
                                            m_location.m_firstLine));
+    }
+}
+
+std::string Symbol::getOutputName()
+{
+    Annotation *ann = findAnnotation(NAME_ANNOTATION);
+    if (ann)
+    {
+        std::string annName = ann->getValueObject()->toString();
+        if (annName.empty())
+        {
+            throw semantic_error(format_string("Missing value for annotation named @%s on line '%d'", NAME_ANNOTATION,
+                                               ann->getLocation().m_firstLine));
+        }
+        Log::warning("line %d: Be careful when @%s annotation is used. This can cause compile issue. See documentation.\n", ann->getLocation().m_firstLine, NAME_ANNOTATION);
+        return annName;
+    }
+    else
+    {
+        return m_name;
     }
 }
 
@@ -119,6 +142,18 @@ std::vector<Annotation *> Symbol::getAnnotations(std::string name)
         }
     }
     return anList;
+}
+
+Value *Symbol::getAnnValue(const std::string annName)
+{
+    Annotation *ann = findAnnotation(annName);
+    return (ann) ? ann->getValueObject() : nullptr;
+}
+
+std::string Symbol::getAnnStringValue(const std::string annName)
+{
+    Value *annVallue = getAnnValue(annName);
+    return (annVallue) ? annVallue->toString() : "";
 }
 
 SymbolScope::typed_iterator::typed_iterator(const vit &bv, const vit &ev, Symbol::symbol_type_t predicateType)
@@ -196,8 +231,7 @@ void SymbolScope::addSymbol(Symbol *sym, int32_t pos)
 {
     assert(sym);
 
-    // Check for existing symbol with same name except structs. Structs are already added as typedef and it always call
-    // semantic error.
+    // Check for existing symbol with same name.
     // sym->getName() == "" for anonymous struct and enums
     if (hasSymbol(sym->getName()) && sym->getName() != "")
     {
@@ -281,6 +315,18 @@ std::string ArrayType::getDescription() const
                          m_elementType ? m_elementType->getDescription().c_str() : "(null)");
 }
 
+bool StructType::containListMember()
+{
+    for (StructMember *s : getMembers())
+    {
+        if (s->getContainList())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool StructType::containStringMember()
 {
     for (StructMember *s : getMembers())
@@ -293,11 +339,11 @@ bool StructType::containStringMember()
     return false;
 }
 
-bool StructType::containListMember()
+bool StructType::containByrefMember()
 {
     for (StructMember *s : getMembers())
     {
-        if (s->getContainList())
+        if (s->isByref())
         {
             return true;
         }
@@ -330,76 +376,10 @@ std::string StructType::getDescription() const
     return format_string("<struct %s [%s]>", m_name.c_str(), members.c_str());
 }
 
-void StructType::addStructDirectionType(_param_direction structDirectionType)
-{
-    if (!hasStructDirectionType(structDirectionType))
-    {
-        m_structDirectionTypes.push_back(structDirectionType);
-        for (auto it : m_members)
-        {
-            DataType *dataType = it->getDataType()->getTrueContainerDataType();
-            if (dataType->isStruct())
-            {
-                StructType *a = dynamic_cast<StructType *>(dataType);
-                assert(a);
-                if (!a->hasStructDirectionType(structDirectionType))
-                {
-                    a->addStructDirectionType(structDirectionType);
-                }
-            }
-            // TODO:
-            /*if (dataType->isUnion())
-            {
-                UnionType *u = dynamic_cast<UnionType *>(dataType);
-                for (auto it : u->getCases())
-                {
-                    // TODO: Must check for nullptr because the case could be the "void" case,
-                    //   which does not point to a union member declaration
-                    if (nullptr != it->getCaseMember())
-                    {
-                        DataType *caseDataType = it->getCaseMember()->getDataType()->getTrueContainerDataType();
-                        if (caseDataType->isStruct())
-                        {
-                            StructType *b = dynamic_cast<StructType *>(caseDataType);
-                            if (!b->hasStructDirectionType(structDirectionType))
-                            {
-                                b->addStructDirectionType(structDirectionType);
-                            }
-                        }
-                    }
-                }
-            }*/
-        }
-    }
-}
-
-bool StructType::hasStructDirectionType(_param_direction structDirectionType)
-{
-    for (auto in : m_structDirectionTypes)
-    {
-        if (in == structDirectionType)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool StructType::structIsUsed()
-{
-    bool in = hasStructDirectionType(kInDirection);
-    bool out = hasStructDirectionType(kOutDirection);
-    bool outByref = hasStructDirectionType(kOutDirectionByref);
-    bool inOut = hasStructDirectionType(kInoutDirection);
-    bool ret = hasStructDirectionType(kReturn);
-
-    return in || out || outByref || inOut || ret;
-}
-
 std::string StructMember::getDescription() const
 {
     return format_string("<member %s:%s>", m_name.c_str(),
-                         (m_dataType ? m_dataType->getDescription().c_str() : "(no type)"));
+                         (m_dataType ? m_dataType->getName().c_str() : "(no type)"));
 }
 
 EnumMember *EnumType::getMember(std::string name)
@@ -450,6 +430,67 @@ std::string EnumMember::getDescription() const
     }
 }
 
+void Group::addInterface(Interface *iface)
+{
+    assert(iface);
+    m_interfaces.push_back(iface);
+}
+
+void Group::addDirToSymbolsMap(Symbol *symbol, _param_direction dir)
+{
+    Log::info("Adding direction %d for symbol \"%s\"\n", dir, symbol->getName().c_str());
+    auto it = m_symbolDirections.find(symbol);
+    if (it == m_symbolDirections.end())
+    {
+        std::set<_param_direction> directions;
+        directions.insert(dir);
+        m_symbolDirections[symbol] = directions;
+
+        // add symbol into list of symbols
+        if (std::find(m_symbols.begin(), m_symbols.end(), symbol) == m_symbols.end())
+        {
+            m_symbols.push_back(symbol);
+        }
+        return;
+    }
+
+    it->second.insert(dir);
+}
+
+void Group::setTemplate(cpptempl::data_map groupTemplate)
+{
+    m_template = groupTemplate;
+}
+
+const std::set<_param_direction> Group::getSymbolDirections(Symbol *symbol) const
+{
+    std::set<_param_direction> directions;
+    auto it = m_symbolDirections.find(symbol);
+    if (it != m_symbolDirections.end())
+    {
+        directions = it->second;
+    }
+
+    return directions;
+}
+
+std::string Group::getDescription() const
+{
+    std::string ifaces;
+    int n = 0;
+    for (auto it : m_interfaces)
+    {
+        ifaces += format_string("%d:", n);
+        ifaces += it->getDescription();
+        if (n < m_interfaces.size() - 1)
+        {
+            ifaces += ", ";
+        }
+        ++n;
+    }
+    return format_string("<group \"%s\" [%s]>", m_name.c_str(), ifaces.c_str());
+}
+
 std::string AliasType::getDescription() const
 {
     return format_string("<type %s [%s]>", m_name.c_str(), m_elementType->getDescription().c_str());
@@ -489,6 +530,13 @@ DataType *DataType::getTrueContainerDataType()
         default:
             return trueDataType;
     }
+}
+
+std::string FunctionType::getDescription() const
+{
+    return format_string("<function %s->%s [%s]>", m_name.c_str(),
+                         (m_returnType ? m_returnType->getDescription().c_str() : "(oneway)"),
+                         m_parameters.getDescription().c_str());
 }
 
 std::string Function::getDescription() const
@@ -573,14 +621,12 @@ void UnionType::addCase(UnionCase *unionCase)
 
 std::string UnionType::getDescription() const
 {
-    std::string description = "Union:" + m_name;
-    description += "[";
+    std::string description;
     for (auto caseMember : m_unionCases)
     {
         description += caseMember->getDescription();
     }
-    description += "]";
-    return description;
+    return format_string("<union %s [%s]>", m_name.c_str(), description.c_str());
 }
 
 UnionType::case_vector_t UnionType::getUniqueCases()
@@ -629,16 +675,16 @@ bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dat
     {
         throw semantic_error(format_string("Redefinition of union member: '%s'\n", name.c_str()));
     }
-    StructMember newMember = StructMember(name, dataType);
-    m_caseMembers.push_back(newMember);
+    StructMember *newMember = new StructMember(name, dataType);
+    m_members.addMember(newMember);
     return true;
 }
 
 bool UnionType::declarationExists(const std::string &name)
 {
-    for (auto member : m_caseMembers)
+    for (auto member : m_members.getMembers())
     {
-        if (name == member.getName())
+        if (name == member->getName())
         {
             return true;
         }
@@ -648,11 +694,11 @@ bool UnionType::declarationExists(const std::string &name)
 
 StructMember *UnionType::getUnionMemberDeclaration(const std::string &name)
 {
-    for (auto &caseMember : m_caseMembers)
+    for (auto caseMember : m_members.getMembers())
     {
-        if (name == caseMember.getName())
+        if (name == caseMember->getName())
         {
-            return &caseMember;
+            return caseMember;
         }
     }
     throw semantic_error(format_string("Union member not found: '%s'\n", name.c_str()));
@@ -660,8 +706,8 @@ StructMember *UnionType::getUnionMemberDeclaration(const std::string &name)
 
 void UnionType::printUnionMembers()
 {
-    for (auto member : m_caseMembers)
+    for (auto member : m_members.getMembers())
     {
-        Log::debug("Member declaration:%s %s\n", member.getDataType()->getName().c_str(), member.getName().c_str());
+        Log::debug("Member declaration:%s %s\n", member->getDataType()->getName().c_str(), member->getName().c_str());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -30,7 +30,7 @@
  */
 
 #include "gtest.h"
-#include "test_unions.h"
+#include "test.h"
 #include <string.h>
 
 using namespace std;
@@ -113,5 +113,34 @@ TEST(test_unions, testNestedStructs)
     EXPECT_TRUE(returnFoo->discriminator == returnVal);
     EXPECT_TRUE(returnFoo->bing.ret == 0xAA);
     erpc_free((void *)myFoo.bing.myFoobar.rawString.data);
+    erpc_free((void *)returnFoo);
+}
+
+TEST(test_unions, testUnionAnn)
+{
+    unionType myFoo;
+    fruit discriminator;
+    discriminator = orange;
+    myFoo.a.elements = (int32_t *)erpc_malloc(5 * sizeof(int32_t));
+    myFoo.a.elementsCount = 5;
+    for (int i = 0; i < 5; ++i)
+    {
+        myFoo.a.elements[i] = i + 1;
+    }
+    foo *returnFoo = sendMyUnion(discriminator, &myFoo);
+    EXPECT_TRUE(returnFoo->discriminator == returnVal);
+    EXPECT_TRUE(returnFoo->bing.ret == 0xAA);
+    erpc_free((void *)myFoo.a.elements);
+    erpc_free((void *)returnFoo);
+
+    discriminator = banana;
+    myFoo.x = 3;
+    myFoo.y = 4.0;
+    returnFoo = sendMyUnion(discriminator, &myFoo);
+
+    EXPECT_TRUE(returnFoo->discriminator == papaya);
+    EXPECT_TRUE(returnFoo->bing.x == 4);
+    EXPECT_TRUE(returnFoo->bing.y == 3);
+
     erpc_free((void *)returnFoo);
 }

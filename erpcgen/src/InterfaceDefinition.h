@@ -85,9 +85,11 @@ public:
      *
      * @param[in] inputFile File, which is parsed.
      *
+     * @return Crc16 of all used IDL files.
+     *
      * @exception std::runtime_error Thrown if is bad return result for parse function or no ast node three is created.
      */
-    void parse(const char *inputFile);
+    uint16_t parse(const char *inputFile);
 
     /*!
      * @brief This function returns node belong to this object.
@@ -126,7 +128,7 @@ public:
      *
      * @return Return name of program.
      */
-    const std::string getProgramName() { return programSymbol()->getName(); }
+    const std::string getProgramName() { return getProgramSymbol()->getName(); }
 
     /*!
      * @brief This function returns output directory path.
@@ -162,7 +164,7 @@ public:
      *
      * @return Pointer to program symbol.
      */
-    Program *programSymbol();
+    Program *getProgramSymbol();
 
     /*!
      * @brief This functions sets type of checks which should be present in generated file.

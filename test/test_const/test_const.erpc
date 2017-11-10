@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -32,8 +32,10 @@
 //Add data structures and function prototypes here
 //using Freescale's eRPC IDL language
 
-@outputDir("erpc_outputs")
-program test_const;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
 
 enum numbers {one = 1, two, three, four}
 
@@ -66,6 +68,10 @@ const string nowAString = "hello"
 //const float itsAFloat = "string"
 const int32 castIt = 5000000000
 const string fromAnotherString = c
+
+interface EmptyInterface{
+
+}
 
 //const MyInt foo = "hello"
 

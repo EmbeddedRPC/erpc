@@ -6,7 +6,7 @@ params:
     - "in"
     - "out"
     - "inout"
-idl: |  
+idl: |
   interface foo {
     bar({dir} string a @nullable @max_length(8)) -> void
   }
@@ -18,30 +18,32 @@ test_client.cpp:
       - codec->writeNullFlag(true)
       - if (a)
       - codec->writeString(strlen(a), a);
-  - if: dir in ('out', 'inout')
+  - if: dir == 'out'
     then:
-      - bool isNull;
-      - codec->readNullFlag(&isNull);
-      - if (!isNull)
+      - not: if (a != NULL)
+      - codec->readString(&a_len, &a_local);
+  - if: dir == 'inout'
+    then:
+      - if (a != NULL)
       - codec->readString(&a_len, &a_local);
 test_server.cpp:
   - ::bar_shim
   - char * a = NULL;
   - if: dir in ('in', 'inout')
-    then:      
+    then:
       - bool isNull;
       - codec->readNullFlag(&isNull)
       - if (!isNull)
       - err = codec->readString(&a_len, &a_local)
       - else
       - a = NULL;
-  - if: dir in ('out', 'inout')
+  - if: dir == 'out'
     then:
-      - if (a == NULL)
-      - codec->writeNullFlag(true);
-      - else
-      - codec->writeNullFlag(false);      
-      - if (a)
+      - not: if (a != NULL)
+      - codec->writeString(strlen(a), a);
+  - if: dir =='inout'
+    then:
+      - if (a != NULL)
       - codec->writeString(strlen(a), a);
 ---
 name: in param struct
@@ -153,7 +155,7 @@ params:
   dir:
     - "in"
     - "out"
-    - "inout" 
+    - "inout"
 idl: |
   struct pair {
     string a @nullable
@@ -206,3 +208,26 @@ test_server.cpp:
       - codec->writeNullFlag(false);
       - if (data->a)
       - codec->writeString(strlen(data->a), data->a);
+
+---
+name: return struct
+desc:
+idl: |
+  struct pair {
+    string a
+  }
+
+  interface foo {
+    bar() -> @nullable pair
+  }
+
+test_client.cpp:
+  - pair * result;
+  - bool isNull;
+  - err = codec->readNullFlag(&isNull);
+  - if (!isNull)
+
+test_server.cpp:
+  - if (result == NULL)
+  - codec->writeNullFlag(true);
+  - codec->writeNullFlag(false);

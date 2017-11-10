@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,10 +34,6 @@
 
 #include "codec.h"
 #include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 /*!
  * @addtogroup infra_codec
@@ -196,6 +192,15 @@ public:
     virtual erpc_status_t write(double value);
 
     /*!
+     * @brief Prototype for write uintptr value.
+     *
+     * @param[in] value uintptr typed value to write.
+     *
+     * @return depends on cursor write function.
+     */
+    virtual erpc_status_t writePtr(uintptr_t value);
+
+    /*!
      * @brief Prototype for write string value.
      *
      * @param[in] length of string.
@@ -244,6 +249,22 @@ public:
      * @retval kErpcStatus_Success.
      */
     virtual erpc_status_t endWriteStruct();
+
+    /*!
+     * @brief Prototype for start write union.
+     *
+     * @param[in] discriminator Discriminator of union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t startWriteUnion(int32_t discriminator);
+
+    /*!
+     * @brief Prototype for end write union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t endWriteUnion();
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
@@ -379,6 +400,15 @@ public:
     virtual erpc_status_t read(double *value);
 
     /*!
+     * @brief Prototype for read uintptr value.
+     *
+     * @param[out] value uintptr typed value to read.
+     *
+     * @return Based on cursor read function.
+     */
+    virtual erpc_status_t readPtr(uintptr_t *value);
+
+    /*!
      * @brief Prototype for read string value.
      *
      * @param[out] length of string.
@@ -429,6 +459,22 @@ public:
     virtual erpc_status_t endReadStruct();
 
     /*!
+     * @brief Prototype for start read union.
+     *
+     * @param[in] discriminator Discriminator of union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t startReadUnion(int32_t *discriminator);
+
+    /*!
+     * @brief Prototype for end read Union.
+     *
+     * @return Based on implementation.
+     */
+    virtual erpc_status_t endReadUnion();
+
+    /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
      * @retval kErpcStatus_Success
@@ -450,7 +496,7 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
+    virtual BasicCodec *create() { return new (std::nothrow) BasicCodec; }
 
     /*!
      * @brief Dispose codec.

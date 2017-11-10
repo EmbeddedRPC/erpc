@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -93,6 +93,13 @@ public:
 
     //! @brief Shared client/server send method.
     virtual erpc_status_t send(MessageBuffer *message);
+
+    /*!
+     * @brief This functions sets thre CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl);
 
 protected:
     Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.

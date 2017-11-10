@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -50,7 +50,6 @@ class UnionType : public DataType
 {
 public:
     typedef std::vector<UnionCase *> case_vector_t;
-    typedef std::vector<StructMember> memberDecl_vector_t;
 
     /*!
      * @brief Constructor.
@@ -64,6 +63,24 @@ public:
     UnionType(const std::string &name, const std::string &discriminatorName)
     : DataType(name, kUnionType, kUnionTypeSymbol)
     , m_discriminator(discriminatorName)
+    , m_members("(union)")
+    , m_parentStruct(nullptr)
+    {
+    }
+
+    /*!
+     * @brief Constructor.
+     *
+     * This function set data type to union data type and symbol token to given token.
+     * It will also set discriminator name.
+     *
+     * @param[in] tok Given token..
+     * @param[in] discriminatorName Discriminator name.
+     */
+    UnionType(const Token &tok, const std::string &discriminatorName)
+    : DataType(tok, kUnionType, kUnionTypeSymbol)
+    , m_discriminator(discriminatorName)
+    , m_members("(union)")
     , m_parentStruct(nullptr)
     {
     }
@@ -108,6 +125,14 @@ public:
     virtual bool isUnion() const { return true; }
 
     /*!
+     * @brief This function return "true" value for identify non-encapsulated discriminated union
+     * type.
+     *
+     * @retval true True when m_discriminator is not set.
+     */
+    bool isNonEncapsulatedUnion() const { return m_discriminator.compare("") == 0; }
+
+    /*!
      * @brief This function returns union cases vector.
      *
      * @return Vector of union cases vector.
@@ -130,11 +155,11 @@ public:
     bool addUnionMemberDeclaration(const std::string &name, DataType *dataType);
 
     /*!
-     * @brief This function returns vector of union member declarations.
+     * @brief This function returns struct of union members.
      *
-     * @return Vector of union member declarations.
+     * @return Struct of union members.
      */
-    memberDecl_vector_t &getUnionMemberDeclarations() { return m_caseMembers; }
+    StructType &getUnionMembers() { return m_members; }
 
     /*!
      * @brief This function returns union member declaration.
@@ -168,10 +193,10 @@ public:
     bool declarationExists(const std::string &name);
 
 private:
-    std::string m_discriminator;       /*!< Name of union discriminator. */
-    case_vector_t m_unionCases;        /*!< Contains union cases */
-    memberDecl_vector_t m_caseMembers; /*!< Contains union case members */
-    StructType *m_parentStruct;        /*!< Struct containing this union */
+    std::string m_discriminator; /*!< Name of union discriminator. */
+    case_vector_t m_unionCases;  /*!< Contains union cases */
+    StructType m_members;        /*!< Contains union members */
+    StructType *m_parentStruct;  /*!< Struct containing this union */
 
     /*!
      * @brief This function is comparing two union cases.

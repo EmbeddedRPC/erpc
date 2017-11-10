@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -41,8 +41,9 @@
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-//! @brief Version 1.4.0.
-#define ERPC_VERSION (0x00010400)
+//! @brief Version 1.5.0.
+#define ERPC_VERSION "1.5.0"
+#define ERPC_VERSION_NUMBER 10500
 
 /*! @} */
 

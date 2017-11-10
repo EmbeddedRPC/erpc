@@ -31,7 +31,7 @@
 #if !defined(_smart_ptr_h_)
 #define _smart_ptr_h_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 //! @brief Delete policy for regular objects.
 template <typename T>
@@ -98,7 +98,7 @@ public:
 
     //! Destructor. If an object (pointer) has been set, it will be deleted.
     //! Deletes the object using safe_delete().
-    ~smart_ptr() { safe_delete(); }
+    virtual ~smart_ptr() { safe_delete(); }
 
     //! Return the current pointer value.
     ptr_type get() { return _p; }

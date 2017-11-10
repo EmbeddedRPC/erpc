@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,9 +32,6 @@
 #include "simple_server.h"
 
 using namespace erpc;
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -65,7 +62,25 @@ void SimpleServer::disposeBufferAndCodec(Codec *codec)
 erpc_status_t SimpleServer::runInternal()
 {
     MessageBuffer buff;
+    Codec *codec = NULL;
 
+    // Handle the request.
+    message_type_t msgType;
+    uint32_t serviceId;
+    uint32_t methodId;
+    uint32_t sequence;
+
+    erpc_status_t err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
+    if (err)
+    {
+        return err;
+    }
+
+    return runInternalEnd(codec, msgType, serviceId, methodId, sequence);
+}
+
+erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence)
+{
     if (m_messageFactory->createServerBuffer())
     {
         buff = m_messageFactory->create();
@@ -87,17 +102,41 @@ erpc_status_t SimpleServer::runInternal()
         return err;
     }
 
-    Codec *codec = m_codecFactory->create();
-    if (!codec)
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(&buff);
+    if (err)
+    {
+        // Dispose of buffers.
+        if (!buff.get())
+        {
+            m_messageFactory->dispose(&buff);
+        }
+        return err;
+    }
+#endif
+
+    *codec = m_codecFactory->create();
+    if (!*codec)
     {
         m_messageFactory->dispose(&buff);
         return kErpcStatus_MemoryError;
     }
 
-    codec->setBuffer(buff);
-    // Handle the request.
-    message_type_t msgType;
-    err = processMessage(codec, msgType);
+    (*codec)->setBuffer(buff);
+
+    err = readHeadOfMessage(*codec, msgType, serviceId, methodId, sequence);
+    if (err)
+    {
+        // Dispose of buffers and codecs.
+        disposeBufferAndCodec(*codec);
+    }
+    return err;
+}
+
+erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId, uint32_t sequence)
+{
+    erpc_status_t err = processMessage(codec, msgType, serviceId, methodId, sequence);
+
     if (err)
     {
         // Dispose of buffers and codecs.
@@ -107,6 +146,16 @@ erpc_status_t SimpleServer::runInternal()
 
     if (msgType != kOnewayMessage)
     {
+
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(codec->getBuffer());
+        if (err)
+        {
+            // Dispose of buffers and codecs.
+            disposeBufferAndCodec(codec);
+            return err;
+        }
+#endif
         err = m_transport->send(codec->getBuffer());
     }
 
@@ -125,6 +174,57 @@ erpc_status_t SimpleServer::run()
     }
     return err;
 }
+
+#if ERPC_NESTED_CALLS
+erpc_status_t SimpleServer::run(RequestContext &request)
+{
+    erpc_status_t err = kErpcStatus_Success;
+    while (!err && m_isServerOn)
+    {
+        MessageBuffer buff;
+        Codec *codec = NULL;
+
+        // Handle the request.
+        message_type_t msgType;
+        uint32_t serviceId;
+        uint32_t methodId;
+        uint32_t sequence;
+
+        erpc_status_t err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
+
+        if (err)
+        {
+            return err;
+        }
+
+        if (msgType == kReplyMessage)
+        {
+            if (sequence == request.getSequence())
+            {
+                // Swap the received message buffer with the client's message buffer.
+                request.getCodec()->getBuffer()->swap(&buff);
+                codec->setBuffer(buff);
+            }
+
+            // Dispose of buffers and codecs.
+            disposeBufferAndCodec(codec);
+
+            if (sequence != request.getSequence())
+            {
+                // Ignore message
+                continue;
+            }
+
+            return kErpcStatus_Success;
+        }
+        else
+        {
+            err = runInternalEnd(codec, msgType, serviceId, methodId, sequence);
+        }
+    }
+    return err;
+}
+#endif
 
 erpc_status_t SimpleServer::poll()
 {

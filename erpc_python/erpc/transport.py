@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2017 NXP
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
@@ -33,9 +33,14 @@ import struct
 import serial
 import socket
 import threading
-from .crc16 import crc16
+from .crc16 import Crc16
 from .client import RequestError
-
+try:
+    from rpmsg.sysfs import RpmsgEndpoint
+    RpmsgEndpointReady = True
+except ImportError:
+    RpmsgEndpointReady = False
+    
 ##
 # @brief Base transport class.
 class Transport(object):
@@ -56,10 +61,22 @@ class FramedTransport(Transport):
         self._sendLock = threading.Lock()
         self._receiveLock = threading.Lock()
 
+    @property
+    def crc_16(self):
+        return self._Crc16
+
+    @crc_16.setter
+    def crc_16(self, crcStart):
+        if type(crcStart) is not int:
+            raise RequestError("invalid CRC, not a number")
+        self._Crc16 = Crc16(crcStart)
+
     def send(self, message):
         try:
             self._sendLock.acquire()
-            crc = crc16(message)
+
+            crc = self._Crc16.computeCRC16(message)
+
             header = bytearray(struct.pack('<HH', len(message), crc))
             assert len(header) == self.HEADER_LEN
             self._base_send(header + message)
@@ -76,7 +93,8 @@ class FramedTransport(Transport):
 
             # Now we know the length, read the rest of the message.
             data = self._base_receive(messageLength)
-            computedCrc = crc16(data)
+            computedCrc = self._Crc16.computeCRC16(data)
+
             if computedCrc != crc:
                 raise RequestError("invalid message CRC")
             return data
@@ -160,4 +178,36 @@ class TCPTransport(FramedTransport):
                 remaining -= len(data)
             return result
 
+
+class RpmsgTransport(Transport):
+    def __init__(self, ept_addr_local = None, ept_addr_remote = None, channel_name = None):
+        if not RpmsgEndpointReady:
+            print("Please, install RPMsg from: https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-python")
+            raise ImportError
+
+        if ept_addr_local is None:
+            ept_addr_local = RpmsgEndpoint.LOCAL_DEFAULT_ADDRESS
+        if ept_addr_remote is None:
+            ept_addr_remote = RpmsgEndpoint.REMOTE_DEFAULT_ADDRESS
+        if channel_name is None:
+            channel_name = RpmsgEndpoint.rpmsg_openamp_channel
+
+        self.ept_addr_remote = ept_addr_remote
+        self.ept = RpmsgEndpoint(
+            channel_name,
+            ept_addr_local,
+            RpmsgEndpoint.Types.DATAGRAM)
+
+
+    def send(self, message):
+        self.ept.send(message, self.ept_addr_remote)
+
+    def receive(self):
+        while True:
+            ret = self.ept.recv(-1)
+            if len(ret[1]) != 0:
+                return ret[1]
+            else:
+                time.sleep(0.001)
+        return ret[1] 
 

@@ -32,7 +32,7 @@
 #define _Value_h_
 
 #include "format_string.h"
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 //#include "Blob.h"
 

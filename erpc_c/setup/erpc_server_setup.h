@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,10 +33,9 @@
 #define _EMBEDDED_RPC__SERVER_SETUP_H_
 
 #include "erpc_common.h"
+#include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 /*!
  * @addtogroup server_setup
@@ -52,6 +51,12 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
+
+//! @brief Opaque server object type.
+typedef struct ServerType *erpc_server_t;
+
 //! @name Server setup
 //@{
 
@@ -59,8 +64,10 @@ extern "C" {
  * @brief This function initializes server.
  *
  * This function initializes server with all components necessary for running server.
+ *
+ * @return Server object type.
  */
-void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
+erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
 
 /*!
  * @brief This function de-initializes server.
@@ -109,6 +116,18 @@ erpc_status_t erpc_server_poll(void);
  * erpc_server_deinit() function should be called.
  */
 void erpc_server_stop(void);
+
+#if ERPC_MESSAGE_LOGGING
+/*!
+ * @brief This function adds transport object for logging send/receive messages.
+ *
+ * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was succesfully added.
+ * @retval False When transport wasn't added.
+ */
+bool erpc_server_add_message_logger(erpc_transport_t transport);
+#endif
 
 //@}
 

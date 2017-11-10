@@ -34,18 +34,25 @@
 #include "erpc_transport_setup.h"
 #include "gtest.h"
 #include "gtestListener.h"
-#include "unit_test_common/unit_test_common.h"
+#include "myAlloc.h"
+#include "test_unit_test_common.h"
 
-#if RPMSG || UART || LPUART
+#if (defined(RPMSG) || defined(UART) || defined(LPUART))
 extern "C" {
 #include "app_core0.h"
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "mcmgr.h"
-#if RPMSG
+#if defined(RPMSG)
 #include "rpmsg_lite.h"
 #endif
 }
+
+#ifdef UNITY_DUMP_RESULTS
+#include "corn_g_test.h"
+#endif
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -86,13 +93,24 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 
 int MyAlloc::allocated_ = 0;
 
-#if RPMSG
+#if defined(RPMSG)
+#define APP_ERPC_READY_EVENT_DATA (1)
 extern char rpmsg_lite_base[];
+volatile uint16_t eRPCReadyEventData = 0;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+#if defined(RPMSG)
+/*!
+ * @brief eRPC server side ready event handler
+ */
+static void eRPCReadyEventHandler(uint16_t eventData, void *context)
+{
+    eRPCReadyEventData = eventData;
+}
+#endif
 
 int main(int argc, char **argv)
 {
@@ -101,9 +119,12 @@ int main(int argc, char **argv)
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     listeners.Append(new LeakChecker);
 
-#if RPMSG || UART || LPUART
+#if (defined(RPMSG) || defined(UART) || defined(LPUART))
     delete listeners.Release(listeners.default_result_printer());
     listeners.Append(new MinimalistPrinter);
+#ifdef UNITY_DUMP_RESULTS
+    listeners.Append(new CornTestingFrameworkPrint());
+#endif
 
     /* Initialize GIC */
     BOARD_InitHardware();
@@ -118,35 +139,42 @@ int main(int argc, char **argv)
     memcpy(CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
 #endif
 
-#if RPMSG
+#if defined(RPMSG)
     env_init();
 #endif
 #endif
 
-#if RPMSG
-    // MU_Init(MU0_A);
+#if defined(RPMSG)
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
 
-    /* start the second core */
-    // MU_BootCoreB(MU0_A, kMU_CoreBootFromImem);
-    /* Boot source for Core 1 */
-    // MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS);
+    /* Initialize MCMGR before calling its API */
+    MCMGR_Init();
+
+    /* Register the application event before starting the secondary core */
+    MCMGR_RegisterEvent(kMCMGR_RemoteApplicationEvent, eRPCReadyEventHandler, NULL);
+
+    /* Boot Secondary core application */
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
-    /* Wait for remote side to come up. This delay is arbitrary and may
-       need adjustment for different configuration of remote systems */
-    env_sleep_msec(1000);
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
+    while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
+    {
+    };
 #endif
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
-#if RPMSG
+#if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transport);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transport);
 #else
-#if UART
+#if defined(UART)
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif LPUART
+#elif defined(LPUART)
     transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #endif
@@ -157,7 +185,7 @@ int main(int argc, char **argv)
 
     int i = RUN_ALL_TESTS();
     quit();
-#if RPMSG
+#if defined(RPMSG)
     /* wait a while to allow the erpc server side to finalize shutdown,
        otherwise an IPC interrupt can be triggered on the client side at the
        time the rpmsg is deinitilaized yet => hardfault */

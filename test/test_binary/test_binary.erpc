@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -32,8 +32,10 @@
 //Add data structures and function prototypes here
 //using Freescale's eRPC IDL language
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
-program test_binary;
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
 
 interface Binary {
     //sendReceiveBinary(binary a) -> binary

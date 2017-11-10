@@ -32,14 +32,16 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
+#include "myAlloc.h"
 #include "simple_server.h"
-#include "unit_test_common/unit_test_common_server.h"
+#include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
-#if RPMSG || UART || LPUART
+#if (defined(RPMSG) || defined(UART) || defined(LPUART))
 extern "C" {
 #include "app_core1.h"
-#if RPMSG
+#if defined(RPMSG)
+#define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
 #include "rpmsg_lite.h"
 #endif
@@ -55,36 +57,45 @@ int MyAlloc::allocated_ = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+#if defined(RPMSG)
 static void SignalReady(void)
 {
-    /* Signal the other core we are ready */
-    MCMGR_SignalReady(kMCMGR_Core1);
+    /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
+    MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
+#endif
 
 int main(int argc, const char *argv[])
 {
-#if RPMSG
+#if defined(RPMSG)
     uint32_t startupData;
-    // MU_Init(MU0_B);
-    /* Initialize GIC */
-    // env_init();
+    mcmgr_status_t status;
+
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
     /* Get the startup data */
-    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
+    do
+    {
+        status = MCMGR_GetStartupData(&startupData);
+    } while (status != kStatus_MCMGR_Success);
 #endif
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
-#if RPMSG
+#if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_remote_init(101, 100, (void *)startupData, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID,
                                                       SignalReady);
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transport);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transport);
 #else
-#if UART
+#if defined(UART)
     transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif LPUART
+#elif defined(LPUART)
     transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
                           CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
 #endif

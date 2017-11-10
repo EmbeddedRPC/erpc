@@ -239,6 +239,13 @@ public:
     symbol_vector_t getSymbolsOfType(Symbol::symbol_type_t predicateType);
 
     /*!
+     * @brief This function returns symbol vector.
+     *
+     * @return Symbol vector with all symbols.
+     */
+    symbol_vector_t getSymbolVector() { return m_symbolVector; }
+
+    /*!
      * @brief This function show debug description about the all symbols.
      *
      * @see std::string Interface::getDescription() const

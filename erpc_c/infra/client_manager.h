@@ -33,7 +33,14 @@
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
 #ifdef __cplusplus
+#include "erpc_config_internal.h"
 #include "codec.h"
+#if ERPC_MESSAGE_LOGGING
+#include "message_loggers.h"
+#endif
+#if ERPC_NESTED_CALLS
+#include "server.h"
+#endif
 
 /*!
  * @addtogroup infra_client
@@ -55,13 +62,20 @@ typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handl
 
 namespace erpc {
 class RequestContext;
+#if ERPC_NESTED_CALLS
+class Server;
+#endif
 
 /*!
  * @brief Base client implementation.
  *
  * @ingroup infra_client
  */
+#if ERPC_MESSAGE_LOGGING
+class ClientManager : public MessageLoggers
+#else
 class ClientManager
+#endif
 {
 public:
     /*!
@@ -75,6 +89,12 @@ public:
     , m_transport(NULL)
     , m_sequence(0)
     , m_errorHandler(NULL)
+#if ERPC_NESTED_CALLS
+    , m_server(NULL)
+#endif
+#if ERPC_MESSAGE_LOGGING
+    , MessageLoggers()
+#endif
     {
     }
 
@@ -141,12 +161,33 @@ public:
      */
     client_error_handler_t getErrorHandler() { return m_errorHandler; }
 
+#if ERPC_NESTED_CALLS
+    /*!
+     * @brief This function performs nested request.
+     *
+     * Used when from eRPC function server implementation context is called new eRPC function.
+     *
+     * @param[in] request Request context to perform.
+     */
+    virtual erpc_status_t performNestedRequest(RequestContext &request);
+
+    /*!
+     * @brief This function sets server used for nested calls.
+     *
+     * @param[in] server Server used for nested calls.
+     */
+    void setServer(Server *server) { m_server = server; }
+#endif
+
 protected:
     MessageBufferFactory *m_messageFactory; //!< Message buffer factory to use.
     CodecFactory *m_codecFactory;           //!< Codec to use.
     Transport *m_transport;                 //!< Transport layer to use.
     uint32_t m_sequence;                    //!< Sequence number.
     client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
+#if ERPC_NESTED_CALLS
+    Server *m_server; //!< Server used for nested calls.
+#endif
 
     //! @brief Validate that an incoming message is a reply.
     virtual erpc_status_t verifyReply(RequestContext &request);

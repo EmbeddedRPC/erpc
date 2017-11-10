@@ -29,8 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Logging.h"
-#include "test_const_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>

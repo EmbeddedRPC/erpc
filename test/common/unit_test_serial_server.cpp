@@ -31,10 +31,11 @@
 
 #include "Logging.h"
 #include "basic_codec.h"
+#include "myAlloc.h"
 #include "serial_transport.h"
 #include "simple_server.h"
+#include "test_unit_test_common_server.h"
 #include "unit_test.h"
-#include "unit_test_common/unit_test_common_server.h"
 #include <stdlib.h>
 
 using namespace erpc;

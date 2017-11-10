@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "transport_arbitrator.h"
+#include "erpc_config_internal.h"
 #include <cassert>
 #include <cstdio>
 #include <string>
@@ -54,6 +55,13 @@ TransportArbitrator::~TransportArbitrator()
     // Dispose of client info objects.
     freeClientList(m_clientList);
     freeClientList(m_clientFreeList);
+}
+
+void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+{
+    assert(crcImpl);
+    assert(m_sharedTransport);
+    m_sharedTransport->setCrc16(crcImpl);
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
@@ -108,6 +116,14 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
                 break;
             }
         }
+
+#if ERPC_NESTED_CALLS
+        // If received answer is not for postponed client, it can be for nested server call.
+        if (client == NULL)
+        {
+            return kErpcStatus_Success;
+        }
+#endif
     }
 }
 
@@ -122,7 +138,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
     PendingClientInfo *info = addPendingClient();
     if (!info)
     {
-        return 0;
+        return kErpcStatus_Fail;
     }
     info->m_request = &request;
     info->m_isValid = true;

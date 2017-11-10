@@ -30,7 +30,7 @@
  */
 
 #include "gtest.h"
-#include "test_annotations.h"
+#include "test.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

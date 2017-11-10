@@ -72,4 +72,4 @@ inline ostream &operator<<(ostream &out, const wstring &value)
     out << wide_to_utf8(value);
     return out;
 }
-}
+} // namespace std

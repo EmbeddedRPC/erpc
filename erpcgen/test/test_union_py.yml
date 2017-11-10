@@ -1,0 +1,193 @@
+---
+name: basic non-encapsulated union
+desc: Verify "in" direction usage of non-encapsulated unions.
+idl: |
+
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+
+  struct foobar
+  {
+      float a
+      binary rawString
+  }
+
+  const int32 returnVal = 10;
+
+  union unionType
+  {
+    case apple:
+        foobar myFoobar
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+    case orange:
+        list<int32> a
+    case coconut:
+        uint32 cx;
+        list<int32> cc @length(cx)
+    case returnVal:
+        int32 ret
+    default:
+        bool c
+        int32 blah
+  }
+
+  interface foo {
+    myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
+  }
+lang: py
+test/common.py:
+  - class unionType(object)
+  - myFoobar = None # foobar
+  - x = None # int32
+  - y = None # float
+  - x = None # int32
+  - y = None # float
+  - a = None # list<int32>
+  - cx = None # uint32
+  - cc = None # list<int32>
+  - ret = None # int32
+  - c = None # bool
+  - blah = None # int32
+  - def _read(self, codec)
+  - discriminator = codec.start_read_union()
+  - if discriminator == 0
+  - self.myFoobar = foobar()._read(codec)
+  - elif discriminator == 2
+  - self.x = codec.read_int32()
+  - self.y = codec.read_float()
+  - elif discriminator == 5
+  - self.x = codec.read_int32()
+  - self.y = codec.read_float()
+  - elif discriminator == 1
+  - _n1 = codec.start_read_list()
+  - self.a = []
+  - for _i1 in range(_n1)
+  - _v1 = codec.read_int32()
+  - self.a.append(_v1)
+  - codec.end_read_list()
+  - elif discriminator == 3
+  - self.cx = codec.read_uint32()
+  - _n1 = codec.start_read_list()
+  - self.cc = []
+  - for _i1 in range(_n1)
+  - _v1 = codec.read_int32()
+  - self.cc.append(_v1)
+  - codec.end_read_list()
+  - elif discriminator == 10
+  - self.ret = codec.read_int32()
+  - else # default case
+  - self.c = codec.read_bool()
+  - self.blah = codec.read_int32()
+  - codec.end_read_union()
+  - return self, discriminator
+  - def _write(self, codec, discriminator)
+  - codec.start_write_union(discriminator)
+  - if discriminator == 0
+  - if self.myFoobar is None
+  - raise ValueError("self.myFoobar is None")
+  - self.myFoobar._write(codec)
+  - elif discriminator == 2
+  - if self.x is None
+  - raise ValueError("self.x is None")
+  - codec.write_int32(self.x)
+  - if self.y is None
+  - raise ValueError("self.y is None")
+  - codec.write_float(self.y)
+  - elif discriminator == 5
+  - if self.x is None
+  - raise ValueError("self.x is None")
+  - codec.write_int32(self.x)
+  - if self.y is None
+  - raise ValueError("self.y is None")
+  - codec.write_float(self.y)
+  - elif discriminator == 1
+  - if self.a is None
+  - raise ValueError("self.a is None")
+  - codec.start_write_list(self.length)
+  - for _i1 in self.a
+  - codec.write_int32(_i1)
+  - codec.end_write_list()
+  - elif discriminator == 3
+  - if self.cx is None
+  - raise ValueError("self.cx is None")
+  - codec.write_uint32(self.cx)
+  - if self.cc is None
+  - raise ValueError("self.cc is None")
+  - codec.start_write_list(self.length)
+  - for _i1 in self.cc
+  - codec.write_int32(_i1)
+  - codec.end_write_list()
+  - elif discriminator == 10
+  - if self.ret is None
+  - raise ValueError("self.ret is None")
+  - codec.write_int32(self.ret)
+  - else # default case
+  - codec.write_bool(self.c)
+  - codec.write_int32(self.blah)
+
+test/client.py:
+  - def myUnion(self, discriminator, unionVariable)
+  - request = self._clientManager.create_request()
+  - codec = request.codec
+  - codec.start_write_message(erpc.codec.MessageInfo(
+  - type=erpc.codec.MessageType.kInvocationMessage,
+  - service=self.SERVICE_ID,
+  - request=self.MYUNION_ID,
+  - sequence=request.sequence))
+  - if unionVariable is None
+  - raise ValueError("unionVariable is None")
+  - unionVariable._write(codec, discriminator)
+  - codec.end_write_message()
+
+test/server.py:
+  - "def _handle_myUnion(self, sequence, codec):"
+  - unionVariable, discriminator = common.unionType()._read(codec)
+  - codec.end_read_message()
+  - self._handler.myUnion(discriminator, unionVariable)
+
+---
+name: basic non-encapsulated union inside struct
+desc: Verify non-encapsulated unions usage in structures.
+idl: |
+
+  enum fruitType { apple, orange, banana, coconut, grape, papaya, kiwi }
+
+  union unionType
+  {
+    case banana:
+    case papaya:
+        int32 x;
+        float y;
+  }
+
+  struct structType
+  {
+    fruitType discriminator
+    unionType unionVariable @discriminator(discriminator)
+  }
+
+  interface foo {
+    myUnion(structType structVariable) -> void
+  }
+lang: py
+test/common.py:
+  - not: class unionVariable_union(object)
+  - "class structType(object):"
+  - def __init__(self, discriminator=None, unionVariable=None)
+  - self.discriminator = discriminator # fruitType
+  - self.unionVariable = unionVariable # unionType
+  - self.unionVariable, self.discriminator = common.unionType()._read(codec)
+  - unionVariable._write(codec, self.discriminator)
+  - "class unionType(object):"
+  - discriminator = codec.start_read_union()
+  - if discriminator
+  - self.x
+  - self.y
+  - codec.start_write_union(discriminator)
+  - if discriminator
+  - self.x
+  - codec.write_int32(self.x)
+  - self.y
+  - codec.write_float(self.y)

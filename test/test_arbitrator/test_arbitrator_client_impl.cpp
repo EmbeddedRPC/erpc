@@ -31,16 +31,18 @@
 
 #include "gtest.h"
 #include "simple_server.h"
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface_server.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface_server.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
 
 #define number 15
+#define nestedCallsCount 10
 int i = 0;
 int numbers[number];
+volatile bool enabled = false;
 
 TEST(test_arbitrator, FirstSendReceiveInt)
 {
@@ -68,6 +70,13 @@ TEST(test_arbitrator, FirstSendReceiveInt2)
     }
 }
 
+TEST(test_arbitrator, NestedCallTest)
+{
+    stopSecondSide();
+    while(!enabled){};
+    EXPECT_TRUE(nestedCallTest() == nestedCallsCount *2 - 1);
+}
+
 TEST(test_arbitrator, GetResultFromSecondSide)
 {
     EXPECT_TRUE(getResultFromSecondSide() == 0);
@@ -83,6 +92,25 @@ int32_t secondReceiveInt()
 {
     i--;
     return numbers[i];
+}
+
+int32_t callFirstSide()
+{
+    static int _nestedCallsCount= 0;
+    ++_nestedCallsCount;
+    if (_nestedCallsCount < nestedCallsCount)
+    {
+        return callSecondSide() + 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void enableFirstSide()
+{
+    enabled = true;
 }
 
 void add_services(erpc::SimpleServer *server)

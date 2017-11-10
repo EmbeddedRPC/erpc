@@ -1,0 +1,238 @@
+name: struct py
+lang: py
+idl: |
+  program test
+  struct Vector {
+    int8 i
+  }
+
+  struct Wector {
+    int8 j
+  }
+
+  interface foo {
+    bar(in Vector vector_x, out Wector vector_y) -> void
+  }
+test/common.py:
+  - class Vector
+  - self.i = codec.read_int8()
+  - class Wector
+  - self.j = codec.read_int8()
+test/client.py:
+  - bar(self, vector_x, vector_y)
+  - vector_x._write(codec)
+  - vector_y.value = common.Wector()._read(codec)
+test/server.py:
+  - vector_y = erpc.Reference()
+  - vector_x = common.Vector()._read(codec)
+---
+name: struct c
+idl: |
+  program test
+  struct Vector {
+    int8 i
+  }
+
+  struct Wector {
+    int8 j
+  }
+
+  interface foo {
+    bar(in Vector vector_x, out Wector vector_y) -> void
+  }
+test.h:
+  - typedef struct Vector Vector
+  - typedef struct Wector Wector
+  - struct Vector
+  - struct Wector
+test_server.cpp:
+  - not: write_Vector_struct
+  - read_Vector_struct
+  - not: read_Wector_struct
+  - write_Wector_struct
+test_client.cpp:  
+  - write_Vector_struct
+  - not: read_Vector_struct
+  - read_Wector_struct
+  - not: write_Wector_struct
+---
+name: struct py with group
+lang: py
+idl: |
+  program test
+  struct Vector {
+    int8 i
+  }
+
+  struct Wector {
+    int8 j
+  }
+
+  struct NoGroup {
+    int8 k
+  }
+
+  interface foo {
+    bar(in NoGroup noGroup_z) -> void
+  }
+
+  @group("A")
+  interface fooA {
+    barA(in Vector vector_x, out Wector vector_y) -> void
+  }
+test_A/common.py:
+  - class Vector
+  - self.i = codec.read_int8()
+  - class Wector
+  - self.j = codec.read_int8()
+test_A/client.py:
+  - barA(self, vector_x, vector_y)
+  - vector_x._write(codec)
+  - vector_y.value = common.Wector()._read(codec)
+test_A/server.py:
+  - vector_y = erpc.Reference()
+  - vector_x = common.Vector()._read(codec)
+test/common.py:
+  - class NoGroup
+  - self.k = codec.read_int8()
+test/client.py:
+  - bar(self, noGroup_z)
+  - noGroup_z._write(codec)
+test/server.py:
+  - noGroup_z = common.NoGroup()._read(codec)
+---
+name: struct c with group
+idl: |
+  program test
+  struct Vector {
+    int8 i
+  }
+
+  struct Wector {
+    int8 j
+  }
+
+  struct NoGroup {
+    int8 k
+  }
+
+  interface foo {
+    bar(in NoGroup noGroup_z) -> void
+  }
+
+  @group("A")
+  interface fooA {
+    barA(out Vector vector_x, in Wector vector_y) -> void
+  }
+test.h:
+  - typedef struct Vector Vector
+  - typedef struct Wector Wector
+  - typedef struct NoGroup NoGroup;
+  - struct Vector
+  - struct Wector
+  - struct NoGroup
+  - enum _foo_ids
+  - void bar(const NoGroup * noGroup_z)
+test_server.cpp:
+  - read_NoGroup_struct
+  - not: write_NoGroup_struct
+  - not: Vector_struct  
+  - not: Wector_struct
+  - foo_service::bar_shim
+test_client.cpp:  
+  - not: read_NoGroup_struct
+  - write_NoGroup_struct
+  - not: Vector_struct  
+  - not: Wector_struct
+  - bar(const NoGroup * noGroup_z)
+test_A.h:
+  - typedef struct Vector Vector
+  - typedef struct Wector Wector
+  - typedef struct NoGroup NoGroup;
+  - struct Vector
+  - struct Wector
+  - struct NoGroup
+  - enum _fooA_ids
+  - void barA(Vector * vector_x, const Wector * vector_y)
+test_A_server.cpp: 
+  - read_Wector_struct
+  - not: write_Wector_struct
+  - write_Vector_struct
+  - not: read_Vector_struct
+  - not: NoGroup_struct
+  - fooA_service::barA_shim
+test_A_client.cpp:  
+  - write_Wector_struct
+  - not: read_Wector_struct
+  - read_Vector_struct
+  - not: write_Vector_struct
+  - barA(Vector * vector_x, const Wector * vector_y)
+---
+name: struct c with two groups and type header
+desc:
+idl: |
+  @types_header("test.h")
+  program test
+
+  struct VectorA {
+    int8 i
+    int16 j
+    int32 k
+  }
+
+  struct VectorB {
+    int8 x
+    int16 y
+    int32 z
+  }
+
+  @group("A")
+  interface foo_A {
+    bar_A(in VectorA a) -> void
+  }
+
+  @group("A")
+  interface foo_AA {
+    bar_AA(in VectorA aa, out VectorB bb) -> void
+  }
+
+  @group("B")
+  interface foo_B {
+    bar_B(out VectorB b) -> void
+  }
+test.h:
+  - typedef struct VectorA VectorA
+  - typedef struct VectorB VectorB
+  - struct VectorA
+  - struct VectorB
+  - not: bar_A(const VectorA * a)
+  - not: bar_AA(const VectorA * aa, VectorB * bb)
+test_A.h:
+  - not: typedef
+  - bar_A(const VectorA * a)
+  - bar_AA(const VectorA * aa, VectorB * bb)
+test_A_server.cpp:
+  - read_VectorA_struct
+  - write_VectorB_struct
+  - not: write_VectorA_struct
+  - not: read_VectorB_struct
+test_B.h:
+  - not: typedef
+  - bar_B(VectorB * b)
+test_B_server.cpp:  
+  - write_VectorB_struct
+  - not: read_VectorB_struct
+  - not: VectorA_struct
+
+# ---
+# name: union
+# idl: |
+#   enum zz { z }
+#   union Scalar {
+#     case z:
+#       int8 j
+#   }
+
+#   interface foo {
+#     bar(zz discriminator, Scalar scalar_y @discriminator(discriminator)) -> void
+#   }

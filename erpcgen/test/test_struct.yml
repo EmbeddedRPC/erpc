@@ -16,6 +16,10 @@ idl: |
   struct A {
     {type} x
   }
+
+  interface B {
+    testF(inout A b) ->void
+  }
 test.h:
   - typedef struct A A;
   - struct A
@@ -28,3 +32,61 @@ test_client.cpp:
   - static int32_t write_A_struct(erpc::Codec * codec, const A * data)
 test_server.cpp:
   - static int32_t read_A_struct(erpc::Codec * codec, A * data)
+---
+name: return list struct
+idl: |
+  type ListType = list<int32>
+
+  interface foo {
+    bar(ListType x) -> ListType
+  }
+test.h:
+  - typedef struct list_0_t list_0_t;
+  - typedef list_0_t ListType;
+  - struct list_0_t
+test_client.cpp:
+  - write_list_0_t_struct
+  - read_list_0_t_struct
+  - ListType * bar(const ListType * x)
+test_server.cpp:
+  - read_list_0_t_struct
+  - write_list_0_t_struct
+  - free_list_0_t_struct
+---
+name: binary struct c
+idl: |
+  struct Vector {
+    binary i
+  }
+
+  interface foo {
+    bar(Vector x, binary y) -> void
+  }
+test.h:
+  - typedef struct binary_t binary_t;
+  - typedef struct Vector Vector;
+  - struct binary_t
+  - struct Vector
+test_server.cpp:
+  - read_binary_t_struct
+  - read_Vector_struct
+  - not: write
+test_client.cpp:
+  - write_binary_t_struct
+  - write_Vector_struct
+  - not: read
+---
+name: binary struct py
+lang: py
+idl: |
+  struct Vector {
+    binary i
+  }
+
+  interface foo {
+    bar(Vector x, binary y) -> void
+  }
+test/common.py:
+  - class Vector
+  - def _read
+  - def _write

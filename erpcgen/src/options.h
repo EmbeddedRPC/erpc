@@ -44,7 +44,7 @@
 #define _options_h
 
 #ifdef USE_STDIO
-#include <stdio.h>
+#include <cstdio>
 #else
 #include <iostream>
 #endif

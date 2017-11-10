@@ -61,7 +61,6 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [OpenAMP RPMsg](https://github.com/OpenAMP/open-amp)
 * [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
@@ -72,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](docs/README.md) is in the `docs/` folder.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 888b2c2046049e670a7668f4975886bd4da2d4b8.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -169,3 +168,4 @@ Repository on Github contains two main branches. __Master__ and __develop__. Cod
 
 ---
 Copyright © 2014-2016 Freescale Semiconductor, Inc.
+Copyright © 2016-2017 NXP

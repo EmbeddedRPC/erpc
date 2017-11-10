@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -117,6 +117,18 @@ erpc_status_t BasicCodec::write(double value)
     return m_cursor.write(&value, sizeof(value));
 }
 
+erpc_status_t BasicCodec::writePtr(uintptr_t value)
+{
+    uint8_t ptrSize = sizeof(value);
+    erpc_status_t err = m_cursor.write(&ptrSize, 1);
+    if (err)
+    {
+        return err;
+    }
+
+    return m_cursor.write(&value, ptrSize);
+}
+
 erpc_status_t BasicCodec::writeString(uint32_t length, const char *value)
 {
     // Just treat the string as binary.
@@ -152,6 +164,17 @@ erpc_status_t BasicCodec::startWriteStruct()
 }
 
 erpc_status_t BasicCodec::endWriteStruct()
+{
+    return kErpcStatus_Success;
+}
+
+erpc_status_t BasicCodec::startWriteUnion(int32_t discriminator)
+{
+    // Write the union discriminator as a u32.
+    return write(discriminator);
+}
+
+erpc_status_t BasicCodec::endWriteUnion()
 {
     return kErpcStatus_Success;
 }
@@ -248,6 +271,23 @@ erpc_status_t BasicCodec::read(double *value)
     return m_cursor.read(value, sizeof(*value));
 }
 
+erpc_status_t BasicCodec::readPtr(uintptr_t *value)
+{
+    uint8_t ptrSize;
+    erpc_status_t err = m_cursor.read(&ptrSize, 1);
+    if (err)
+    {
+        return err;
+    }
+
+    if (ptrSize > sizeof(*value))
+    {
+        return kErpcStatus_BadAddressScale;
+    }
+
+    return m_cursor.read(value, ptrSize);
+}
+
 erpc_status_t BasicCodec::readString(uint32_t *length, char **value)
 {
     return readBinary(length, reinterpret_cast<uint8_t **>(value));
@@ -292,11 +332,22 @@ erpc_status_t BasicCodec::endReadStruct()
     return kErpcStatus_Success;
 }
 
+erpc_status_t BasicCodec::startReadUnion(int32_t *discriminator)
+{
+    // Read union discriminator as u32.
+    return read(discriminator);
+}
+
+erpc_status_t BasicCodec::endReadUnion()
+{
+    return kErpcStatus_Success;
+}
+
 erpc_status_t BasicCodec::readNullFlag(bool *isNull)
 {
     uint8_t flag;
     erpc_status_t status = read(&flag);
-    if (!status)
+    if (status)
     {
         return status;
     }

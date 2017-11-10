@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_enums_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -62,11 +62,6 @@ void test_enumColor_out(enumColor *c)
     *c = saveVariables1.enumColorA;
 }
 
-void test_enumColor_outbyref(enumColor *d)
-{
-    *d = saveVariables1.enumColorB;
-}
-
 void test_enumColor_inout(enumColor *e)
 {
     *e = (enumColor)((int32_t)*e - 9);
@@ -74,28 +69,21 @@ void test_enumColor_inout(enumColor *e)
 
 enumColor test_enumColor_return()
 {
-    return (enumColor)((int32_t)saveVariables1.enumColorB + 9);
+    return (enumColor)((int32_t)saveVariables1.enumColorA + 9);
 }
 
-enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor *c, enumColor *d, enumColor *e)
+enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor *c, enumColor *e)
 {
     *c = a;
-    *d = b;
     *e = b;
     return a;
 }
 
-enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 *c, enumColor2 *d, enumColor2 *e)
+enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 *c, enumColor2 *e)
 {
     *c = a;
-    *d = b;
     *e = b;
     return a;
-}
-
-AnonymousEnum getAnonymousEnum(AnonymousEnum a)
-{
-    return (AnonymousEnum)((int32_t)a + 7);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

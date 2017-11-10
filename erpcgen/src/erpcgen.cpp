@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_version.h"
 #include "CGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
@@ -36,12 +37,11 @@
 #include "PythonGenerator.h"
 #include "SearchPath.h"
 #include "UniqueIdChecker.h"
-#include "erpcgen_version.h"
 #include "options.h"
 #include "types/Program.h"
 #include <cstdint>
+#include <cstdlib>
 #include <stdexcept>
-#include <stdlib.h>
 #include <vector>
 
 /*!
@@ -59,10 +59,10 @@ namespace erpcgen {
 const char k_toolName[] = "erpcgen";
 
 /*! Current version number for the tool. */
-const char k_version[] = ERPCGEN_VERSION;
+const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright 2016 NXP. All rights reserved.";
+const char k_copyright[] = "Copyright 2016-2017 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = {
     "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", NULL
@@ -297,7 +297,7 @@ public:
 
             // Parse and build definition model.
             InterfaceDefinition def;
-            def.parse(m_ErpcFile);
+            uint16_t idlCrc16 = def.parse(m_ErpcFile);
 
             // Check for duplicate function IDs
             UniqueIdChecker uniqueIdCheck;
@@ -309,10 +309,10 @@ public:
             switch (m_outputLanguage)
             {
                 case kCLanguage:
-                    CGenerator(&def).generate();
+                    CGenerator(&def, idlCrc16).generate();
                     break;
                 case kPythonLanguage:
-                    PythonGenerator(&def).generate();
+                    PythonGenerator(&def, idlCrc16).generate();
                     break;
             }
         }

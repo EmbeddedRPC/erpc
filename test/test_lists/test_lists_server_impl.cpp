@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_lists_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -266,35 +266,12 @@ void test_list_allDirection(const list_8_t *a, const list_8_t *b, list_8_t *e)
     }
 }
 
-/*void test_list_allDirection(const list_0_t *a, const list_0_t *b, list_0_t *c, list_0_t **d, list_0_t *e)
-{
-    (*d)->elements = (int32_t *)erpc_malloc((a)->elementsCount * sizeof(int32_t));
-    c->elements = (int32_t *)erpc_malloc((a)->elementsCount * sizeof(int32_t));
-    (*d)->elementsCount = (c)->elementsCount = (a)->elementsCount;
-    int32_t *s_list_c = (c)->elements;
-    int32_t *s_list_d = (*d)->elements;
-    int32_t *s_list_e = (e)->elements;
-    for (uint32_t i = 0; i < (a)->elementsCount; ++i)
-    {
-        *s_list_c = (int32_t)i * 4;
-        *s_list_d = (int32_t)i * 5;
-        *s_list_e = 2 * (*s_list_e);
-        ++s_list_c;
-        ++s_list_d;
-        ++s_list_e;
-    }
-    free((void *)a->elements);
-    free((void *)b->elements);
-    free((void *)a);
-    free((void *)b);
-}*/
-
-int32_t testLengthAnnotation(int32_t *myList, int32_t len)
+int32_t testLengthAnnotation(int32_t *myList, uint32_t len)
 {
     int32_t *itr = myList;
-    for (int i = 0; i < len; ++i)
+    for (uint32_t i = 0; i < len; ++i)
     {
-        if (*itr != (i + 1))
+        if (*itr != (int32_t)(i + 1))
         {
             return 0;
         }
@@ -305,9 +282,9 @@ int32_t testLengthAnnotation(int32_t *myList, int32_t len)
 
 int32_t testLengthAnnotationInStruct(const listStruct *s)
 {
-    for (int32_t i = 0; i < s->len; ++i)
+    for (uint32_t i = 0; i < s->len; ++i)
     {
-        if ((i + 1) != s->myList[i])
+        if ((int32_t)(i + 1) != s->myList[i])
         {
             return 0;
         }

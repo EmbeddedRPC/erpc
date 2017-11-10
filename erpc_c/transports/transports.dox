@@ -61,3 +61,15 @@
 @ingroup transports
 @brief Simple TCP/IP transport.
 */
+
+/*!
+@defgroup mu_transport Messaging Unit
+@ingroup transports
+@brief Messaging Unit transport.
+*/
+
+/*!
+@defgroup rpmsg_linux_transport RPMsg Endpoints
+@ingroup transports
+@brief RPMsg endpoints linux transport.
+*/

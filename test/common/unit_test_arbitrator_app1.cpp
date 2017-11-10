@@ -36,8 +36,8 @@
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "test_arbitrator_firstInterface_server.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface_server.h"
+#include "test_secondInterface.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -57,14 +57,18 @@ using namespace erpc;
 
 int testClient();
 
+#define APP_ERPC_READY_EVENT_DATA (1)
+
 SemaphoreHandle_t g_waitQuitMutex;
 TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
 
-int waitQuit = 0;
-int waitClient = 0;
-int isTestPassing = 0;
+volatile int waitQuit = 0;
+volatile int waitClient = 0;
+volatile int isTestPassing = 0;
 uint32_t startupData;
+mcmgr_status_t status;
+volatile int stopTest = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -109,8 +113,9 @@ void runClient(void *arg)
     {
         isTestPassing = testClient();
 
-        if (waitQuit != 0 || isTestPassing != 0)
+        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
+            enableFirstSide();
             break;
         }
         vTaskDelay(10);
@@ -133,17 +138,25 @@ void runClient(void *arg)
 
 static void SignalReady(void)
 {
-    // Signal the other core we are ready */
-    MCMGR_SignalReady(kMCMGR_Core1);
+    /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
+    MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
 
 void runInit(void *arg)
 {
+    /* Initialize MCMGR - low level multicore management library.
+       Call this function as close to the reset entry as possible,
+       (into the startup sequence) to allow CoreUp event trigerring. */
+    MCMGR_EarlyInit();
+
     // Initialize MCMGR before calling its API
     MCMGR_Init();
 
     // Get the startup data
-    MCMGR_GetStartupData(kMCMGR_Core1, &startupData);
+    do
+    {
+        status = MCMGR_GetStartupData(&startupData);
+    } while (status != kStatus_MCMGR_Success);
 
     // RPMsg-Lite transport layer initialization
     erpc_transport_t transportClient;
@@ -153,13 +166,16 @@ void runInit(void *arg)
 
     // MessageBufferFactory initialization
     erpc_mbf_t message_buffer_factory;
-    message_buffer_factory = erpc_mbf_rpmsg_zc_init(transportClient);
+    message_buffer_factory = erpc_mbf_rpmsg_init(transportClient);
 
     // eRPC client side initialization
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);
 
     // eRPC server side initialization
-    erpc_server_init(transportServer, message_buffer_factory);
+    erpc_server_t server = erpc_server_init(transportServer, message_buffer_factory);
+
+    // adding server to client for nested calls.
+    erpc_client_set_server(server);
 
     // adding the service to the server
     erpc_add_service_to_server(create_FirstInterface_service());
@@ -187,14 +203,19 @@ int main(int argc, char **argv)
 
     g_waitQuitMutex = xSemaphoreCreateMutex();
     xTaskCreate(runInit, "runInit", 256, NULL, 1, NULL);
-    xTaskCreate(runServer, "runServer", 512, NULL, 3, &g_serverTask);
-    xTaskCreate(runClient, "runClient", 512, NULL, 2, &g_clientTask);
+    xTaskCreate(runServer, "runServer", 1536, NULL, 3, &g_serverTask);
+    xTaskCreate(runClient, "runClient", 1536, NULL, 2, &g_clientTask);
 
     vTaskStartScheduler();
 
     while (1)
     {
     }
+}
+
+void stopSecondSide()
+{
+    ++stopTest;
 }
 
 int32_t getResultFromSecondSide()

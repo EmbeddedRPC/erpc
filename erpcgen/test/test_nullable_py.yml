@@ -35,16 +35,10 @@ idl: |
 lang: py
 test/client.py:
   - assert type(v) is erpc.Reference
-  - read_null_flag
   - Vector()._read
-  - else
-  - v.value = None
 test/server.py:
   - v = erpc.Reference
-  - re: if v.value is None
-  - write_null_flag(True
-  - else
-  - write_null_flag(False
+  - 'if v.value != None:'
   - v.value._write
 
 ---

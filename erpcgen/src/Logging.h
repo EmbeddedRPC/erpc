@@ -31,13 +31,9 @@
 #if !defined(_Logging_h_)
 #define _Logging_h_
 
-#include <assert.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdarg>
 #include <string>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 /*!
  * \brief Base logger class.
@@ -117,13 +113,13 @@ public:
     virtual void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    virtual void log(const string &msg) { log(msg.c_str()); }
+    virtual void log(const std::string &msg) { log(msg.c_str()); }
 
     //! \brief Log with format at a specific output level.
     virtual void log(log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    virtual void log(log_level_t level, const string &msg) { log(level, msg.c_str()); }
+    virtual void log(log_level_t level, const std::string &msg) { log(level, msg.c_str()); }
     //! \brief Log with format using an argument list.
     virtual void log(const char *fmt, va_list args);
 
@@ -171,13 +167,13 @@ public:
     static void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    static void log(const string &msg);
+    static void log(const std::string &msg);
 
     //! \brief Log with format at a specific output level.
     static void log(Logger::log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    static void log(Logger::log_level_t level, const string &msg);
+    static void log(Logger::log_level_t level, const std::string &msg);
     //@}
 
     //! @name Logging level helpers

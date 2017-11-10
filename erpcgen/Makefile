@@ -36,6 +36,7 @@ INCLUDES += $(ERPC_ROOT) \
 			$(ERPC_ROOT)/erpcgen/src \
 			$(ERPC_ROOT)/erpcgen/src/cpptemplate \
 			$(ERPC_ROOT)/erpcgen/src/types \
+			$(ERPC_ROOT)/erpc_c/infra \
 			$(OBJS_ROOT) \
 			$(BOOST_ROOT)/include
 
@@ -65,7 +66,8 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SymbolScanner.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Token.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ParseErrors.cpp \
-			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp
+			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp \
+			$(ERPC_ROOT)/erpc_c/infra/crc16.cpp
 
 # Prevent make from deleting these temp files.
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
@@ -77,12 +79,14 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 
 ifeq "$(is_mingw)" "1"
 SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
@@ -91,7 +95,8 @@ SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_source.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_coders.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_defines.cpp
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_defines.cpp \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
@@ -100,12 +105,14 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 endif
 
 OBJECT_DEP := $(OBJS_ROOT)/erpcgen_lexer.cpp

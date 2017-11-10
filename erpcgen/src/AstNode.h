@@ -151,7 +151,7 @@ public:
      *
      * @return Node token.
      *
-     * @see const Token * getToken()
+     * @see const Token & getToken()
      */
     Token &getToken() { return m_token; }
 
@@ -160,7 +160,7 @@ public:
      *
      * @return Node constant token pointer.
      *
-     * @see Token * getToken()
+     * @see Token & getToken()
      */
     const Token &getToken() const { return m_token; }
 

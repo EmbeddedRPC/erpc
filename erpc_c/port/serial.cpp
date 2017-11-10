@@ -30,10 +30,11 @@
 /*included this here for cygwin. need to figure out proper include handling for cygwin */
 //#include <termios.h>
 
-#define LINUX 1
-#ifdef LINUX
-#include <termios.h>
-#endif
+//#define LINUX 1
+//#ifdef LINUX
+//#include <termios.h>
+//#endif
+//included from serial.h
 
 #include "serial.h"
 

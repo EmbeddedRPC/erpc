@@ -33,7 +33,6 @@
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
-#include "erpcgen_version.h"
 #include "format_string.h"
 #include <algorithm>
 #include <set>
@@ -41,6 +40,7 @@
 
 using namespace erpcgen;
 using namespace cpptempl;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -57,61 +57,60 @@ extern const char *const kCServerSource;
 extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
 extern const char *const kCDefines;
+extern const char *const kCCrc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-
-void CGenerator::generateOutputFiles(const std::string &fileNameExtension)
+CGenerator::CGenerator(InterfaceDefinition *def, uint16_t idlCrc16)
+: Generator(def, idlCrc16)
 {
-    std::string fileName = stripExtension(m_def->getOutputFilename());
-    if (fileNameExtension != "")
+    /* Set copyright rules. */
+    if (m_def->hasProgramSymbol())
     {
-        fileName += "_" + fileNameExtension;
+        Program *program = m_def->getProgramSymbol();
+        std::string copyright = program->getMlComment();
+        if (copyright.size() >= 3 && (copyright[2] == '*' || copyright[2] == '!'))
+        {
+            copyright = copyright.substr(0, 2) + copyright.substr(3, copyright.size() - 3);
+            program->setMlComment(copyright);
+        }
+        setTemplateComments(program, m_templateData);
     }
-
-    generateCommonHeaderFile(fileName);
-
-    if (m_generateClientOutput)
+    else
     {
-        generateClientSourceFile(fileName);
-    }
-
-    if (m_generateServerOutput)
-    {
-        generateServerHeaderFile(fileName);
-
-        generateServerSourceFile(fileName);
+        m_templateData["mlComment"] = "";
+        m_templateData["ilComment"] = "";
     }
 }
 
-void CGenerator::generateCommonHeaderFile(std::string fileName)
+void CGenerator::generateOutputFiles(const std::string &fileName)
 {
-    // generate common types header file
+    generateClientSourceFile(fileName);
+
+    generateServerHeaderFile(fileName);
+    generateServerSourceFile(fileName);
+
+    generateCommonHeaderFiles(fileName);
+}
+
+void CGenerator::generateTypesHeaderFile()
+{
+    std::string typesHeaderFileName = m_templateData["commonTypesFile"]->getvalue();
+
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(typesHeaderFileName);
+    m_templateData["genCommonTypesFile"] = true;
     m_templateData["commonTypesFile"] = "";
-    if (m_def->hasProgramSymbol())
-    {
-        Annotation *anno = m_def->programSymbol()->findAnnotation(TYPES_HEADER_ANNOTATION);
-        if (nullptr != anno)
-        {
-            // get name of types header file from annotation
-            std::string commonTypesHeaderFileName = anno->getValueObject()->toString();
 
-            m_templateData["commonGuardMacro"] = generateIncludeGuardName(commonTypesHeaderFileName);
-            m_templateData["genCommonTypesFile"] = true;
-            generateOutputFile(commonTypesHeaderFileName, "c_common_header", m_templateData, kCCommonHeader);
+    generateOutputFile(typesHeaderFileName, "c_common_header", m_templateData, kCCommonHeader);
+}
 
-            // set name of types header file, which is used in common header file
-            m_templateData["commonTypesFile"] = commonTypesHeaderFileName;
-        }
-    }
-
-    // generate common header file
-    fileName += ".h";
-    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonHeaderName"] = fileName;
+void CGenerator::generateCommonHeaderFiles(const std::string &fileName)
+{
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName + ".h");
     m_templateData["genCommonTypesFile"] = false;
-    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
+
+    generateOutputFile(fileName + ".h", "c_common_header", m_templateData, kCCommonHeader);
 }
 
 void CGenerator::generateClientSourceFile(std::string fileName)
@@ -119,6 +118,10 @@ void CGenerator::generateClientSourceFile(std::string fileName)
     m_templateData["source"] = "client";
     fileName += "_client.cpp";
     m_templateData["clientSourceName"] = fileName;
+
+    //TODO: temporary workaround for tests
+    m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_client.cpp") == 0 ? false : true);
+
     generateOutputFile(fileName, "c_client_source", m_templateData, kCClientSource);
 }
 
@@ -135,7 +138,18 @@ void CGenerator::generateServerSourceFile(std::string fileName)
     m_templateData["source"] = "server";
     fileName += "_server.cpp";
     m_templateData["serverSourceName"] = fileName;
+
+    //TODO: temporary workaround for tests
+    m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_server.cpp") == 0 ? false : true);
+
     generateOutputFile(fileName, "c_server_source", m_templateData, kCServerSource);
+}
+
+void CGenerator::generateCrcFile()
+{
+    std::string filename = "erpc_crc16.h";
+    m_templateData["crcGuardMacro"] = generateIncludeGuardName(filename);
+    generateOutputFile(filename, "c_crc", m_templateData, kCCrc);
 }
 
 void CGenerator::parseSubtemplates()
@@ -155,30 +169,34 @@ void CGenerator::parseSubtemplates()
     }
 }
 
-void CGenerator::transformBinaryDataType()
+DataType *CGenerator::findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType)
 {
-    // Replace binary with list<uint8>
-    BuiltinType *builtinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("uint8"));
-    assert(builtinType);
-    ListType *listType = new ListType(builtinType);
-    BuiltinType *replacedBuiltinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("binary"));
-    assert(replacedBuiltinType);
+    // Detecting loops from forward declarations.
+    // Insert data type into set
+    if (!(dataType->isBinary() || dataType->isList()))
+    {
+        if (!dataTypes.insert(dataType).second)
+        {
+            return dataType;
+        }
+    }
 
-    StructType *newStruct = new StructType("binary_t");
-    StructMember *elements = new StructMember("data", listType);
-    elements->setContainList(true);
-    elements->setContainString(false);
-    newStruct->addMember(elements);
-    newStruct->getScope().setParent(m_globals);
-
-    m_globals->replaceSymbol(replacedBuiltinType, newStruct);
-    m_listBinaryTypes.insert(m_listBinaryTypes.begin(), listType);
-}
-
-DataType *CGenerator::transformDataType(DataType *dataType, _param_direction direction)
-{
     switch (dataType->getDataType())
     {
+        case DataType::kAliasType:
+        {
+            AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
+            assert(aliasType);
+            aliasType->setElementType(findChildDataType(dataTypes, aliasType->getElementType()));
+            break;
+        }
+        case DataType::kArrayType:
+        {
+            ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
+            assert(arrayType);
+            arrayType->setElementType(findChildDataType(dataTypes, arrayType->getElementType()));
+            break;
+        }
         case DataType::kBuiltinType:
         {
             if (dataType->isBinary())
@@ -187,16 +205,51 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                 dataType = dynamic_cast<DataType *>(m_globals->getSymbol("binary_t"));
                 if (!dataType)
                 {
-                    transformBinaryDataType();
+                    // Replace binary with list<uint8>
+                    BuiltinType *builtinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("uint8"));
+                    assert(builtinType);
+                    ListType *listType = new ListType(builtinType);
+                    BuiltinType *replacedBuiltinType = dynamic_cast<BuiltinType *>(m_globals->getSymbol("binary"));
+                    assert(replacedBuiltinType);
+
+                    StructType *newStruct = new StructType("binary_t");
+                    StructMember *elements = new StructMember("data", listType);
+                    elements->setContainList(true);
+                    elements->setContainString(false);
+                    newStruct->addMember(elements);
+                    newStruct->getScope().setParent(m_globals);
+
+                    m_globals->replaceSymbol(replacedBuiltinType, newStruct);
+                    m_listBinaryTypes.insert(m_listBinaryTypes.begin(), listType);
+
                     dataType = dynamic_cast<DataType *>(m_globals->getSymbol("binary_t"));
                     assert(dataType);
                 }
-                StructType *structType = dynamic_cast<StructType *>(dataType);
-                assert(structType);
-                if (direction != kNone)
-                {
-                    structType->addStructDirectionType(direction);
-                }
+            }
+            dataTypes.insert(dataType);
+            break;
+        }
+        case DataType::kFunctionType:
+        {
+            FunctionType *funcType = dynamic_cast<FunctionType *>(dataType);
+            assert(funcType);
+
+            // Only for detecting loop from forward declaration.
+            std::set<DataType *> localDataTypes;
+            localDataTypes.insert(dataTypes.begin(), dataTypes.end());
+
+            // handle return value
+            StructMember *returnType = funcType->getReturnStructMemberType();
+            DataType *transformedDataType = findChildDataType(localDataTypes, funcType->getReturnType());
+            returnType->setDataType(transformedDataType);
+
+            // handle function parameters
+            auto params = funcType->getParameters().getMembers();
+            for (auto mit : params)
+            {
+                setBinaryList(mit);
+
+                mit->setDataType(findChildDataType(localDataTypes, mit->getDataType()));
             }
             break;
         }
@@ -205,7 +258,7 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             // The only child node of a list node is the element type.
             ListType *listType = dynamic_cast<ListType *>(dataType);
             assert(listType);
-            DataType *elementType = transformDataType(listType->getElementType(), direction);
+            DataType *elementType = findChildDataType(dataTypes, listType->getElementType());
             listType->setElementType(elementType);
 
             // If the list has a length variable, we do need to create a list struct.
@@ -244,12 +297,9 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                             if (oldlistType->getElementType()->getTrueDataType()->getName() ==
                                 elementType->getTrueDataType()->getName())
                             {
-                                if (direction != kNone)
-                                {
-                                    structType->addStructDirectionType(direction);
-                                }
-
-                                return symDataType;
+                                dataType = symDataType;
+                                dataTypes.insert(dataType);
+                                return dataType;
                             }
                         }
                     }
@@ -267,10 +317,6 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                 elements->setContainString(containsString(elementType));
                 newStruct->addMember(elements);
                 newStruct->getScope().setParent(m_globals);
-                if (direction != kNone)
-                {
-                    newStruct->addStructDirectionType(direction);
-                }
 
                 m_structListTypes.push_back(newStruct);
 
@@ -292,35 +338,17 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
                 // put new structure definition in globals before this structure
                 m_globals->addSymbol(newStruct, symbolPos);
 
-                return newStruct;
+                dataType = newStruct;
+                dataTypes.insert(dataType);
+                break;
             }
-        }
-        case DataType::kArrayType:
-        {
-            ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
-            assert(arrayType);
-            arrayType->setElementType(transformDataType(arrayType->getElementType(), direction));
-            break;
         }
         case DataType::kStructType:
         {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             assert(structType);
-            if (direction != kNone)
-            {
-                structType->addStructDirectionType(direction);
-            }
 
-            StructMember *structMember = structType->getMembers()[0];
-            if (isListStruct(structType))
-            {
-                /* Not necessary catch return value. Should be same (already transformed). This is only because of
-                 adding direction type. */
-                transformDataType(structMember->getDataType()->getTrueContainerDataType(), direction);
-                break;
-            }
-
-            if (isBinaryStruct(structType))
+            if (isBinaryStruct(structType) || isListStruct(structType))
             {
                 break;
             }
@@ -328,29 +356,26 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             for (StructMember *structMember : structType->getMembers())
             {
                 setBinaryList(structMember);
-                if (DataType::kUnionType == structMember->getDataType()->getDataType())
-                {
-                    // Keil need extra pragma option when unions are used.
-                    m_templateData["usedUnionType"] = true;
-                    UnionType *currentUnion = dynamic_cast<UnionType *>(structMember->getDataType());
-                    assert(currentUnion);
-                    for (auto &unionMember : currentUnion->getUnionMemberDeclarations())
-                    {
-                        setBinaryList(&unionMember);
-                        unionMember.setDataType(transformDataType(unionMember.getDataType(), direction));
-                    }
-                }
-                structMember->setDataType(transformDataType(structMember->getDataType(), direction));
+                setNoSharedAnn(structType, structMember);
+                structMember->setDataType(findChildDataType(dataTypes, structMember->getDataType()));
                 structMember->setContainList(containsList(structMember->getDataType()));
                 structMember->setContainString(containsString(structMember->getDataType()));
             }
             break;
         }
-        case DataType::kAliasType:
+        case DataType::kUnionType:
         {
-            AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
-            assert(aliasType);
-            aliasType->setElementType(transformDataType(aliasType->getElementType(), direction));
+            // Keil need extra pragma option when unions are used.
+            m_templateData["usedUnionType"] = true;
+            UnionType *currentUnion = dynamic_cast<UnionType *>(dataType);
+            assert(currentUnion);
+
+            for (auto unionMember : currentUnion->getUnionMembers().getMembers())
+            {
+                setBinaryList(unionMember);
+                setNoSharedAnn(currentUnion, unionMember);
+                unionMember->setDataType(findChildDataType(dataTypes, unionMember->getDataType()));
+            }
             break;
         }
         default:
@@ -358,39 +383,19 @@ DataType *CGenerator::transformDataType(DataType *dataType, _param_direction dir
             break;
         }
     }
+
     return dataType;
 }
 
-void CGenerator::transformDataTypes()
+void CGenerator::transformAliases()
 {
-
-    for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
-    {
-        StructType *structType = dynamic_cast<StructType *>(it);
-        assert(structType);
-        transformDataType(structType, kNone);
-    }
-
     for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
-        transformDataType(aliasType, kNone);
-    }
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
-    {
-        Interface *iface = dynamic_cast<Interface *>(it);
-        assert(iface);
-        for (Function *fn : iface->getFunctions())
-        {
-            fn->setReturnType(transformDataType(fn->getReturnType(), kReturn));
-            auto params = fn->getParameters().getMembers();
-            for (auto mit : params)
-            {
-                setBinaryList(mit);
-                mit->setDataType(transformDataType(mit->getDataType(), mit->getDirection()));
-            }
-        }
+
+        std::set<DataType *> dataTypesNew;
+        findChildDataType(dataTypesNew, aliasType);
     }
 }
 
@@ -411,8 +416,12 @@ void CGenerator::setBinaryList(StructMember *structMember)
         }
     }
 }
+
 void CGenerator::generate()
 {
+    /* Generate file with shim code version. */
+    m_templateData["versionGuardMacro"] = generateIncludeGuardName(format_string("erpc_generated_shim_code_crc_%d", m_idlCrc16).c_str());
+
     m_templateData["generateInfraErrorChecks"] =
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kInfraErrors);
@@ -420,42 +429,70 @@ void CGenerator::generate()
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAllocErrors);
 
+    /* Need handle nested calls. */
+    m_templateData["nestedCall"] = false;
+
     data_list empty;
     m_templateData["enums"] = empty;
     m_templateData["aliases"] = empty;
     m_templateData["structs"] = empty;
+    m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
+    m_templateData["functions"] = empty;
 
-    m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
-
-    m_templateData["todaysDate"] = getTime();
+    m_templateData["nonExternalStructUnion"] = false;
 
     // Keil need extra pragma option when unions are used.
     m_templateData["usedUnionType"] = false;
 
     parseSubtemplates();
 
-    if (m_def->hasProgramSymbol())
-    {
-        Log::info("program: ");
-        Log::info("%s\n", m_def->getOutputFilename().c_str());
-    }
+    /* Generate file containing crc of IDL files. */
+    generateCrcFile();
 
-    transformDataTypes();
+    transformAliases();
 
-    makeIncludesTemplateData(m_templateData);
+    // transform data types and populate groups symbol map with all symbol directions
+    findGroupDataTypes();
 
-    interfaceLists_t interfaceLists = makeInterfacesTemplateData();
+    makeIncludesTemplateData();
+
+    makeAliasesTemplateData();
 
     makeConstTemplateData();
 
     makeEnumsTemplateData();
 
-    makeAliasesTemplateData();
+    // for common header, only C specific
+    makeSymbolsDeclarationTemplateData();
 
-    makeStructsTemplateData();
+    // check if types header annotation is used
+    if (m_def->hasProgramSymbol())
+    {
+        m_templateData["commonTypesFile"] = m_def->getProgramSymbol()->getAnnStringValue(TYPES_HEADER_ANNOTATION);
+    }
+    else
+    {
+        m_templateData["commonTypesFile"] = "";
+    }
 
-    generateInterfaceOutputFiles(m_templateData, interfaceLists);
+    for (Group *group : m_groups)
+    {
+        data_map groupTemplate;
+        groupTemplate["name"] = group->getName();
+        groupTemplate["includes"] = makeGroupIncludesTemplateData(group);
+        groupTemplate["symbolsMap"] = makeGroupSymbolsTemplateData(group);
+        groupTemplate["interfaces"] = makeGroupInterfacesTemplateData(group);
+        group->setTemplate(groupTemplate);
+
+        generateGroupOutputFiles(group);
+    }
+
+    // generate types header if used
+    if (!m_templateData["commonTypesFile"]->getvalue().empty())
+    {
+        generateTypesHeaderFile();
+    }
 }
 
 void CGenerator::makeConstTemplateData()
@@ -467,27 +504,66 @@ void CGenerator::makeConstTemplateData()
         ConstType *constVar = dynamic_cast<ConstType *>(it);
         assert(constVar);
         data_map constInfo;
-        Annotation *externAnnotation = constVar->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!constVar->findAnnotation(EXTERNAL_ANNOTATION))
         {
-            constInfo["typeAndName"] = getTypenameName(constVar->getDataType(), constVar->getName());
-            // throw nullptr exception
-            if (NULL == constVar->getValue())
+            DataType *constVarType = dynamic_cast<DataType *>(constVar->getDataType());
+            assert(constVarType);
+            Value *constVarValue = constVar->getValue();
+
+            if (nullptr == constVarValue)
             {
-                Log::info("const pointing to null Value object\n");
+                throw semantic_error(format_string("line %d: Const pointing to null Value object.", constVar->getLastLine()).c_str());
             }
-            if (kStringValue == constVar->getValue()->getType())
+
+            /* Use char[] for constants. */
+            if (constVarType->getTrueDataType()->isString())
             {
-                constInfo["value"] = "\"" + constVar->getValue()->toString() + "\"";
+                constInfo["typeAndName"] = format_string("char %s [%d]", constVar->getOutputName().c_str(), constVarValue->toString().size() + 1);
             }
             else
             {
-                constInfo["value"] = constVar->getValue()->toString();
+                constInfo["typeAndName"] = getTypenameName(constVarType, constVar->getOutputName());
             }
-            constInfo["mlComment"] = constVar->getMlComment();
-            constInfo["ilComment"] = constVar->getIlComment();
+            constInfo["name"] = constVar->getOutputName();
+
+            std::string value;
+            if (constVarType->isEnum())
+            {
+                if (constVarValue->getType() != kIntegerValue)
+                {
+                    throw semantic_error(format_string("line %d: Const enum pointing to non-integer Value object.", constVar->getLastLine()).c_str());
+                }
+
+                EnumType *constEnum = dynamic_cast<EnumType *>(constVarType);
+                assert(constEnum);
+                for (EnumMember *enumMember : constEnum->getMembers())
+                {
+                    assert(dynamic_cast<IntegerValue *>(constVarValue));
+                    if (enumMember->getValue() == dynamic_cast<IntegerValue *>(constVarValue)->getValue())
+                    {
+                        value = enumMember->getName();
+                        break;
+                    }
+                }
+                if (value.compare("") == 0)
+                {
+                    value = "(" + constVarType->getName() + ") " + constVarValue->toString();
+                    Log::warning(format_string("Enum value '%s' is not poiting to any '%s' variable \n", constVarValue->toString().c_str(), constVarType->getName().c_str()).c_str());
+                }
+            }
+            else
+            {
+                value = constVarValue->toString();
+                if (kStringValue == constVarValue->getType())
+                {
+                    value = "\"" + value + "\"";
+                }
+            }
+            constInfo["value"] = value;
+
+            setTemplateComments(constVar, constInfo);
             Log::info("Name=%s\tType=%s\tValue=%s\n", constVar->getName().c_str(),
-                      constVar->getDataType()->getName().c_str(), constVar->getValue()->toString().c_str());
+                      constVarType->getName().c_str(), constVar->getValue()->toString().c_str());
             consts.push_back(constInfo);
         }
     }
@@ -503,8 +579,7 @@ void CGenerator::makeEnumsTemplateData()
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
-        Annotation *externAnnotation = enumType->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!enumType->findAnnotation(EXTERNAL_ANNOTATION))
         {
             Log::info("%d: %s\n", n, enumType->getName().c_str());
             enums.push_back(getEnumTemplateData(enumType));
@@ -517,10 +592,9 @@ void CGenerator::makeEnumsTemplateData()
 data_map CGenerator::getEnumTemplateData(EnumType *enumType)
 {
     data_map enumInfo;
-    enumInfo["name"] = enumType->getName();
+    enumInfo["name"] = enumType->getOutputName();
     enumInfo["members"] = getEnumMembersTemplateData(enumType);
-    enumInfo["mlComment"] = enumType->getMlComment();
-    enumInfo["ilComment"] = enumType->getIlComment();
+    setTemplateComments(enumType, enumInfo);
     return enumInfo;
 }
 
@@ -532,7 +606,7 @@ data_list CGenerator::getEnumMembersTemplateData(EnumType *enumType)
     {
         assert(member->hasValue());
         data_map enumMember;
-        string memberDeclaration = member->getName();
+        string memberDeclaration = member->getOutputName();
         if (member->hasValue())
         {
             memberDeclaration = format_string("%s = %d", memberDeclaration.c_str(), member->getValue());
@@ -543,8 +617,7 @@ data_list CGenerator::getEnumMembersTemplateData(EnumType *enumType)
         }
         enumMember["memberDeclaration"] = memberDeclaration;
         Log::info("    %d: %s = %d\n", j, member->getName().c_str(), member->getValue());
-        enumMember["mlComment"] = member->getMlComment();
-        enumMember["ilComment"] = member->getIlComment();
+        setTemplateComments(member, enumMember);
         enumMembersList.push_back(enumMember);
         ++j;
     }
@@ -560,7 +633,7 @@ void CGenerator::makeAliasesTemplateData()
     // All existing type declarations
     SymbolScope::symbol_vector_t aliasTypeVector = m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol);
 
-    // Structures in C has to be defined with typedef
+    /* type definions of structures */
     int i = 0;
     for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
     {
@@ -568,31 +641,120 @@ void CGenerator::makeAliasesTemplateData()
         assert(structType);
         if (structType->getName().compare("") != 0 && !structType->findAnnotation(EXTERNAL_ANNOTATION))
         {
-            AliasType *a = new AliasType(structType->getName(), structType);
+            AliasType *a = new AliasType(structType->getOutputName(), structType);
             aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
         }
     }
+
+    /* type definions of non-encapsulated unions */
+    for (auto it : m_globals->getSymbolsOfType(DataType::kUnionTypeSymbol))
+    {
+        UnionType *unionType = dynamic_cast<UnionType *>(it);
+        assert(unionType);
+        if (!unionType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            AliasType *a = new AliasType(unionType->getOutputName(), unionType);
+            aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
+        }
+    }
+
+    /* type definitions of functions and table of functions */
+    data_list functions;
+    for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    {
+        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
+        assert(functionType);
+        data_map functionInfo;
+
+        // aware of external function definitions
+        if (!functionType->findAnnotation(EXTERNAL_ANNOTATION))
+        {
+            AliasType *a = new AliasType(getFunctionPrototype(nullptr, functionType), functionType);
+            a->setMlComment(functionType->getMlComment());
+            a->setIlComment(functionType->getIlComment());
+
+            /* Function type definition need be inserted after all parameters types definitions. */
+            DataType *callbackParamType = nullptr;
+            for (StructMember *callbackParam : functionType->getParameters().getMembers())
+            {
+                DataType *callbackParamDataType = callbackParam->getDataType();
+                if (!callbackParamType || callbackParamDataType->getFirstLine() > callbackParamType->getFirstLine())
+                {
+                    callbackParamType = callbackParamDataType;
+                }
+            }
+            if (!callbackParamType || !callbackParamType->isAlias())
+            {
+                /* order isn't important */
+                aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
+            }
+            else
+            {
+                /* skip structure, unions and functions type definitions */
+                for (int aliasTypesIt = i; aliasTypesIt < aliasTypeVector.size(); ++aliasTypesIt)
+                {
+                    if (callbackParamType == aliasTypeVector[i])
+                    {
+                        aliasTypeVector.insert(aliasTypeVector.begin() + aliasTypesIt + 1, a);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /* Table template data. */
+        data_list callbacks;
+        for (Function *fun : functionType->getCallbackFuns())
+        {
+            data_map callbacksInfo;
+            callbacksInfo["name"] = fun->getName();
+            callbacks.push_back(callbacksInfo);
+        }
+        functionInfo["callbacks"] = callbacks;
+        /* Function type name. */
+        functionInfo["name"] = functionType->getName();
+        functions.push_back(functionInfo);
+    }
+    m_templateData["functions"] = functions;
 
     for (auto it : aliasTypeVector)
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
-        Annotation *externAnnotation = aliasType->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!aliasType->findAnnotation(EXTERNAL_ANNOTATION))
         {
             Log::info("%d: ", n);
             data_map aliasInfo;
             DataType *elementDataType = aliasType->getElementType();
+            setTemplateComments(aliasType, aliasInfo);
 
             if (elementDataType->getName() != "")
             {
-                std::string realType = getTypenameName(elementDataType, aliasType->getName());
+                std::string realType;
+                if (elementDataType->isFunction())
+                {
+                    realType = aliasType->getOutputName();
+                    aliasInfo["name"] = elementDataType->getName();
+                }
+                else
+                {
+                    realType = getTypenameName(elementDataType, aliasType->getOutputName());
+                    aliasInfo["name"] = aliasType->getOutputName();
+                }
+
                 Log::info("%s\n", realType.c_str());
 
-                /* For case typedef struct */
-                if (elementDataType->getName() == aliasType->getName())
+                /* For case typedef struct/union */
+                if (elementDataType->getName() == aliasType->getName() || elementDataType->getOutputName() == aliasType->getName())
                 {
-                    realType = "struct " + realType;
+                    if (elementDataType->isStruct())
+                    {
+                        realType = "struct " + realType;
+                    }
+                    else
+                    {
+                        realType = "union " + realType;
+                    }
                 }
 
                 aliasInfo["typenameName"] = realType;
@@ -600,14 +762,14 @@ void CGenerator::makeAliasesTemplateData()
             else
             {
                 aliasInfo["typenameName"] = "";
-                aliasInfo["unnamedName"] = aliasType->getName();
+                aliasInfo["unnamedName"] = aliasType->getOutputName();
                 switch (elementDataType->getDataType())
                 {
                     case DataType::kStructType:
                     {
                         StructType *structType = dynamic_cast<StructType *>(elementDataType);
                         assert(structType);
-                        aliasInfo["unnamed"] = getStructTemplateData(structType);
+                        aliasInfo["unnamed"] = getStructDefinitionTemplateData(nullptr, structType, getStructDeclarationTemplateData(structType));
                         aliasInfo["unnamedType"] = "struct";
                         break;
                     }
@@ -623,8 +785,6 @@ void CGenerator::makeAliasesTemplateData()
                         throw internal_error("Only structs or enums are allowed as unnamed types.");
                 }
             }
-            aliasInfo["mlComment"] = aliasType->getMlComment();
-            aliasInfo["ilComment"] = aliasType->getIlComment();
             aliases.push_back(aliasInfo);
             ++n;
         }
@@ -650,119 +810,206 @@ AliasType *CGenerator::getAliasType(DataType *dataType)
 string CGenerator::getAliasName(DataType *dataType)
 {
     AliasType *aliasType = getAliasType(dataType);
-    return (aliasType != nullptr) ? aliasType->getName() : "";
+    return (aliasType != nullptr) ? aliasType->getOutputName() : "";
 }
 
-void CGenerator::makeStructsTemplateData()
+void CGenerator::makeSymbolsDeclarationTemplateData()
 {
-    Log::info("Structs:\n");
-    data_list structs;
-    data_list structsTo1Core;
-    data_list structsTo2Core;
-    data_list structsServerFree;
-    m_templateData["nonExternalStruct"] = false;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol))
-    {
-        StructType *structType = dynamic_cast<StructType *>(it);
-        assert(structType);
-        Log::info("%s\n", structType->getDescription().c_str());
-        data_map structInfo = getStructTemplateData(structType);
-        if (structType->getName() == "")
-        {
-            structInfo["name"] = getAliasName(structType);
-        }
+    Log::info("Symbols templates:\n");
 
-        setToCore(structType, structsTo1Core, structsTo2Core, structInfo);
-        structs.push_back(make_data(structInfo));
-        if (structType->containStringMember() || structType->containListMember())
+    for (auto it = m_globals->begin(); it != m_globals->end(); ++it)
+    {
+        data_map info;
+
+        switch ((*it)->getSymbolType())
         {
-            structsServerFree.push_back(structInfo);
+            case DataType::kStructTypeSymbol:
+            {
+                StructType *structType = dynamic_cast<StructType *>(*it);
+                assert(structType);
+
+                info = getStructDeclarationTemplateData(structType);
+
+                Log::info("%s\n", structType->getDescription().c_str());
+                m_symbolsTemplate.push_back(info);
+                break;
+            }
+
+            case DataType::kUnionTypeSymbol:
+            {
+                UnionType *unionType = dynamic_cast<UnionType *>(*it);
+                assert(unionType);
+
+                info = getUnionDeclarationTemplateData(unionType);
+
+                Log::info("%s\n", unionType->getDescription().c_str());
+                m_symbolsTemplate.push_back(info);
+                break;
+            }
+
+            default:
+                break;
         }
     }
-    m_templateData["structs"] = structs;
-    m_templateData["structsTo1Core"] = structsTo1Core;
-    m_templateData["structsTo2Core"] = structsTo2Core;
-    m_templateData["structsServerFree"] = structsServerFree;
+
+    // header should have all data type defines
+    m_templateData["symbols"] = m_symbolsTemplate;
 }
 
-data_map CGenerator::getStructTemplateData(StructType *structType)
+data_map CGenerator::getSymbolTemplateByName(const std::string &name)
 {
-    data_map structInfo;
+    for (data_ptr symbol : m_symbolsTemplate)
+    {
+        if (symbol->getmap()["name"]->getvalue() == name)
+        {
+            return symbol->getmap();
+        }
+    }
+
+    data_map empty;
+    return empty;
+}
+
+data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
+{
+    data_map symbolsTemplate;
+    std::set<std::string> names;
+
+    data_list symbolsToClient;
+    data_list symbolsToServer;
+    data_list symbolsServerFree;
+
+    Log::info("Group symbols:\n");
+
+    for (Symbol *symbol : group->getSymbols())
+    {
+        data_map info;
+        const std::set<_param_direction> dirs = group->getSymbolDirections(symbol);
+        if (dirs.size())
+        {
+            switch (symbol->getSymbolType())
+            {
+                case DataType::kStructTypeSymbol:
+                {
+                    StructType *structType = dynamic_cast<StructType *>(symbol);
+                    assert(structType);
+
+                    Log::info("%s\n", structType->getDescription().c_str());
+
+                    std::string name = (structType->getName() != "") ? structType->getOutputName() : getAliasName(structType);
+
+                    // check if template for this structure has not already been generated
+                    if (names.find(name) == names.end())
+                    {
+                        // get struct declaration info
+                        info = getSymbolTemplateByName(name);
+                        if (info.empty())
+                        {
+                            break;
+                        }
+
+                        // get struct definition info
+                        info = getStructDefinitionTemplateData(group, structType, info);
+
+                        // set symbol data to client or server according to its directions
+                        setSymbolDataToSide(structType, dirs, symbolsToClient, symbolsToServer, info);
+
+                        // struct needs to be freed?
+                        set<DataType *> loopDetection;
+                        if (structType->containStringMember() || structType->containListMember() || containsByrefParamToFree(structType, loopDetection))
+                        {
+                            symbolsServerFree.push_back(info);
+                        }
+
+                        names.insert(name);
+                    }
+                    break;
+                }
+                case DataType::kUnionTypeSymbol:
+                {
+                    UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                    assert(unionType);
+
+                    Log::info("%s\n", unionType->getDescription().c_str());
+
+                    std::string name = unionType->getOutputName();
+
+                    // check if template for this union has not already been generated
+                    if (names.find(name) == names.end())
+                    {
+                        info = getSymbolTemplateByName(name);
+                        if (info.empty())
+                        {
+                            break;
+                        }
+
+                        // get union info
+                        data_map unionBaseInfo = getUnionDeclarationTemplateData(unionType);
+                        bool needUnionsServerFree = false;
+                        info = getUnionDefinitionTemplateData(group, unionType, unionBaseInfo, needUnionsServerFree);
+
+                        // set symbol data to client or server according to its directions
+                        setSymbolDataToSide(unionType, dirs, symbolsToClient, symbolsToServer, info);
+
+                        // free unions on server side.
+                        if (needUnionsServerFree)
+                        {
+                            symbolsServerFree.push_back(info);
+                        }
+
+                        names.insert(name);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+
+    symbolsTemplate["symbolsToClient"] = symbolsToClient;
+    symbolsTemplate["symbolsToServer"] = symbolsToServer;
+    symbolsTemplate["symbolsServerFree"] = symbolsServerFree;
+
+    return symbolsTemplate;
+}
+
+data_map CGenerator::getStructDeclarationTemplateData(StructType *structType)
+{
+    data_map info;
+    info["name"] = (structType->getName() != "" ? structType->getOutputName() : getAliasName(structType));
+    info["type"] = "struct";
+
+    setTemplateComments(structType, info);
+
+    // external annotation
     if (structType->findAnnotation(EXTERNAL_ANNOTATION))
     {
-        structInfo["isExternal"] = true;
+        info["isExternal"] = true;
     }
     else
     {
-        m_templateData["nonExternalStruct"] = true;
-        structInfo["isExternal"] = false;
+        info["isExternal"] = false;
+        m_templateData["nonExternalStructUnion"] = true;
     }
-    structInfo["name"] = make_data(structType->getName());
-    structInfo["needEnumTmp"] = false;
-    setStructMembersTemplateData(structType, structInfo);
-    structInfo["mlComment"] = structType->getMlComment();
-    structInfo["ilComment"] = structType->getIlComment();
-    bool isNeedIfDealloc = false;
-    if (structType->hasStructDirectionType(kInDirection) && structType->hasStructDirectionType(kInoutDirection))
-    {
-        isNeedIfDealloc = (structType->containListMember() || structType->containStringMember());
-    }
-    structInfo["isNeedIfDealloc"] = isNeedIfDealloc;
-    structInfo["genStructWrapperF"] = !isBinaryStruct(structType);
-    return structInfo;
-}
 
-void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::data_map &structInfo)
-{
     data_list members;
-    data_list membersToFree;
-    structInfo["hasNullableMember"] = false;
-    uint32_t j = 0;
     for (auto member : structType->getMembers())
     {
-        bool containsEnum;
         data_map member_info;
-        DataType *dataType = member->getDataType();
-        std::string memberName = member->getName();
 
-        // Handle nullable annotation
-        bool memberHasNullableAnn = member->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
-        member_info["isNullable"] = memberHasNullableAnn;
-        member_info["structElements"] = "";
-        member_info["structElementsCount"] = "";
-
-        // hasNullableMember must be true if there at least one struct member with nullable annotation
-        if ("false" == structInfo["hasNullableMember"]->getvalue())
-        {
-            structInfo["hasNullableMember"] = memberHasNullableAnn;
-        }
-
-        if (dataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(dataType)) ||
-                                     isBinaryStruct(dynamic_cast<StructType *>(dataType))))
-        {
-            // Set a flag on the struct indicating there are nullable members, but only
-            // set it to true
-            if (memberHasNullableAnn)
-            {
-                if (isListStruct(dynamic_cast<StructType *>(dataType)))
-                {
-                    member_info["structElements"] = ".elements";
-                    member_info["structElementsCount"] = ".elementsCount";
-                }
-                else
-                {
-                    member_info["structElements"] = ".data";
-                    member_info["structElementsCount"] = ".dataLength";
-                }
-            }
-        }
-
-        std::string name = "data->" + memberName;
-        // Subtemplate setup for read/write struct calls
-        member_info["coderCall"] = getEncodeDecodeCall(name, dataType, structType, true, member, containsEnum, false);
-        // Info for declaring struct in common header
+        std::string memberName = member->getOutputName();
         member_info["name"] = memberName;
-        member_info["memberDeclaration"] = getTypenameName(dataType, memberName) + ";";
+
+        DataType *trueDataType = member->getDataType()->getTrueDataType();
+        //Check if member is byRef type. Add "*" for type and allocate space for data on server side.
+        if (member->isByref() && (trueDataType->isStruct() || trueDataType->isUnion() || trueDataType->isScalar() || trueDataType->isEnum()))
+        {
+            memberName = "*" + memberName;
+        }
+        member_info["memberDeclaration"] = getTypenameName(member->getDataType(), memberName) + ";";
+
+        member_info["elementsCount"] = "";
         if (isBinaryStruct(structType))
         {
             member_info["elementsCount"] = "uint32_t dataLength;";
@@ -771,120 +1018,426 @@ void CGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::
         {
             member_info["elementsCount"] = "uint32_t elementsCount;";
         }
-        else
+
+        setTemplateComments(member, member_info);
+
+        members.push_back(member_info);
+    }
+    info["members"] = members;
+
+    return info;
+}
+
+data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *structType, data_map structInfo)
+{
+    structInfo["hasNullableMember"] = false;
+    structInfo["needTempVariable"] = false;
+    structInfo["genStructWrapperF"] = !isBinaryStruct(structType);
+    structInfo["noSharedMem"] = (structType->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
+
+    setTemplateComments(structType, structInfo);
+
+    // set struct members template data
+    data_list members;
+    assert(dynamic_cast<DataList *>(structInfo["members"].get().get()));
+    data_list baseMembers = dynamic_cast<DataList *>(structInfo["members"].get().get())->getlist();
+    data_list membersToFree;
+
+    for (StructMember *member : structType->getMembers())
+    {
+        data_map member_info;
+
+        // find base member template
+        for (data_ptr mt : baseMembers)
         {
-            member_info["elementsCount"] = "";
+            if (mt->getmap()["name"]->getvalue() == member->getOutputName())
+            {
+                member_info = mt->getmap();
+                break;
+            }
         }
-        member_info["mlComment"] = member->getMlComment();
-        member_info["ilComment"] = member->getIlComment();
-        if (containsEnum)
+        if (member_info.empty())
         {
-            structInfo["needEnumTmp"] = true;
+            Log::info("Could not find base member template for member '%s'\n", member->getName().c_str());
+            continue;
+        }
+
+        // member data type
+        DataType *dataType = member->getDataType();
+        DataType *trueDataType = member->getDataType()->getTrueDataType();
+        std::string memberName = member->getOutputName();
+
+        bool isPtrType = (member->isByref() || trueDataType->isBinary() || trueDataType->isString() || trueDataType->isList() || trueDataType->isFunction());
+        // When forward declaration is used member should be present as pointer to data.
+        if (!isPtrType && isMemberDataTypeUsingForwardDeclaration(structType, dataType))
+        {
+            throw syntax_error(format_string("line %d: Struct member shall use byref option. Member is using forward declared type.", member->getFirstLine()).c_str());
+        }
+        // Handle nullable annotation
+        bool isNullable = ((member->findAnnotation(NULLABLE_ANNOTATION) != nullptr) && (isPtrType || (trueDataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(trueDataType)) || (isBinaryStruct(dynamic_cast<StructType *>(trueDataType)))))));
+        member_info["isNullable"] = isNullable;
+        member_info["structElements"] = "";
+        member_info["structElementsCount"] = "";
+        member_info["noSharedMem"] = (member->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
+
+        if (isNullable)
+        {
+            // hasNullableMember must be true if there at least one struct member with nullable annotation
+            structInfo["hasNullableMember"] = true;
+
+            // Set a flag on the struct indicating there are nullable members, but only
+            // set it to true
+            if (dataType->isStruct() && (isListStruct(dynamic_cast<StructType *>(dataType)) ||
+                                         isBinaryStruct(dynamic_cast<StructType *>(dataType))))
+            {
+                if (isListStruct(dynamic_cast<StructType *>(dataType)))
+                {
+                    member_info["structElements"] = ".elements";
+                    member_info["structElementsCount"] = ".elementsCount";
+                }
+                else if (isBinaryStruct(dynamic_cast<StructType *>(dataType)))
+                {
+                    member_info["structElements"] = ".data";
+                    member_info["structElementsCount"] = ".dataLength";
+                }
+            }
         }
 
         // Skip data serialization for variables placed as @length value for lists.
+        // Skip data serialization for variables used as discriminator for unions.
         // These prevent to serialized data twice.
-        StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), memberName, LENGTH_ANNOTATION);
-        member_info["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+        StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), member->getName());
+        member_info["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
+
+        if (referencedFrom && !member->findAnnotation(SHARED_ANNOTATION))
+        {
+            Log::debug("Skipping EncodeDecode member '%s' with paramType '%s' (it's serialized with member '%s').\n", memberName.c_str(), dataType->getName().c_str(), referencedFrom->getName().c_str());
+            member_info["coderCall"] = "";
+        }
+        else
+        {
+            Log::debug("Calling EncodeDecode member '%s' with paramType '%s'.\n", memberName.c_str(), dataType->getName().c_str());
+
+            // Subtemplate setup for read/write struct calls
+            bool needTempVariable = false;
+            member_info["coderCall"] = getEncodeDecodeCall("data->" + memberName, group, dataType, structType, true, member, needTempVariable, false);
+
+            if (needTempVariable)
+            {
+                structInfo["needTempVariable"] = true;
+            }
+        }
 
         members.push_back(member_info);
-        if (isNeedCallFree(dataType))
+        if (member->isByref() || isNeedCallFree(dataType))
         {
             membersToFree.push_back(member_info);
         }
-        j++;
     }
-    structInfo["members"] = members;
+
+    structInfo["members"] = members; // overwrite member's declaration with whole definition
     structInfo["membersToFree"] = membersToFree;
+
+    return structInfo;
 }
 
-void CGenerator::getInterfaceComments(Interface *iface, data_map &ifaceInfo)
-{
-    ifaceInfo["mlComment"] = iface->getMlComment();
-    ifaceInfo["ilComment"] = iface->getIlComment();
-}
-
-data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
+data_map CGenerator::getUnionDeclarationTemplateData(UnionType *unionType)
 {
     data_map info;
-    std::string proto = getFunctionPrototype(fn);
+    info["name"] = unionType->getOutputName();
+    info["type"] = "union";
+
+    setTemplateComments(unionType, info);
+    // external annotation
+    if (unionType->findAnnotation(EXTERNAL_ANNOTATION))
+    {
+        info["isExternal"] = true;
+    }
+    else
+    {
+        info["isExternal"] = false;
+        m_templateData["nonExternalStructUnion"] = true;
+    }
+
+    setUnionMembersTemplateData(unionType, info);
+
+    return info;
+}
+
+data_map CGenerator::getUnionDefinitionTemplateData(Group *group, UnionType *unionType, cpptempl::data_map &unionInfo, bool &needUnionsServerFree)
+{
+    bool needTempVariable = false;
+    unionInfo["coderCall"] = getEncodeDecodeCall("data->", nullptr, unionType, nullptr, true, nullptr, needTempVariable, false);
+    unionInfo["needTempVariable"] = needTempVariable;
+
+    unionInfo["noSharedMem"] = (unionType->findAnnotation(NO_SHARED_ANNOTATION) != nullptr);
+
+    unionInfo["membersData"] = getUnionMembersData(unionType, "");
+    // free unions on server side.
+    for (auto unionCase : unionType->getUniqueCases())
+    {
+        if (!unionCase->caseMemberIsVoid())
+        {
+            for (auto memberName : unionCase->getMemberDeclarationNames())
+            {
+                StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
+                DataType *trueMemberDataType = unionMember->getDataType()->getTrueDataType();
+                if (unionMember->isByref() || trueMemberDataType->isList() || trueMemberDataType->isBinary() || trueMemberDataType->isString())
+                {
+                    needUnionsServerFree = true;
+                    break;
+                }
+                else if (trueMemberDataType->isStruct())
+                {
+                    StructType *structType = dynamic_cast<StructType *>(trueMemberDataType);
+                    assert(structType);
+                    set<DataType *> loopDetection;
+                    if (structType->containStringMember() || structType->containListMember() || containsByrefParamToFree(structType, loopDetection))
+                    {
+                        needUnionsServerFree = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (needUnionsServerFree)
+        {
+            break;
+        }
+    }
+    return unionInfo;
+}
+
+void CGenerator::setUnionMembersTemplateData(UnionType *unionType, cpptempl::data_map &unionInfo)
+{
+    data_list unionCasesList;
+    for (auto unionCase : unionType->getUniqueCases())
+    {
+        if (!unionCase->caseMemberIsVoid())
+        {
+            data_list unionCaseList;
+            for (auto memberName : unionCase->getMemberDeclarationNames())
+            {
+                data_map unionMemberMap;
+                StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
+                std::string unionMemberName = unionMember->getOutputName();
+                DataType *unionMemberType = unionMember->getDataType()->getTrueDataType();
+
+                //Check if member is byRef type. Add "*" for type and allocate space for data on server side.
+                if (unionMember->isByref() && (unionMemberType->isStruct() || unionMemberType->isUnion() || unionMemberType->isScalar() || unionMemberType->isEnum()))
+                {
+                    unionMemberName = "*" + unionMemberName;
+                }
+
+                unionMemberMap["typenameName"] = getTypenameName(unionMember->getDataType(), unionMemberName);
+                unionCaseList.push_back(unionMemberMap);
+            }
+            unionCasesList.push_back(unionCaseList);
+        }
+    }
+    unionInfo["unionCases"] = unionCasesList;
+}
+
+std::string CGenerator::getUnionMembersData(UnionType *unionType, std::string ident)
+{
+    std::string returnName;
+    /* Get union cases declaration description. */
+    for (auto unionCase : unionType->getUniqueCases())
+    {
+        if (!unionCase->caseMemberIsVoid())
+        {
+            std::string caseBegin;
+            std::string caseEnd;
+            std::string caseIdent = ident + "    ";
+            if (1 < unionCase->getMemberDeclarationNames().size())
+            {
+                caseBegin = ident + std::string("    ") + std::string("struct\n") + ident + std::string("    {\n");
+                caseEnd = ident + std::string("    ") + std::string("};\n");
+                caseIdent += "    ";
+            }
+            std::string returnCase;
+            for (auto memberName : unionCase->getMemberDeclarationNames())
+            {
+                StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
+                returnCase += caseIdent;
+                std::string unionMemberName = unionMember->getOutputName();
+                DataType *unionMemberType = unionMember->getDataType()->getTrueDataType();
+                if (unionMember->isByref() && (unionMemberType->isStruct() || unionMemberType->isUnion() || unionMemberType->isScalar() || unionMemberType->isEnum()))
+                {
+                    unionMemberName = "*" + unionMemberName;
+                }
+                returnCase += getTypenameName(unionMember->getDataType(), unionMember->getOutputName());
+                returnCase += ";\n";
+            }
+            returnName += caseBegin + returnCase + caseEnd;
+        }
+    }
+    return returnName;
+}
+
+void CGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo)
+{
+    symbolInfo["mlComment"] = symbol->getMlComment();
+    symbolInfo["ilComment"] = symbol->getIlComment();
+}
+
+data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnIndex)
+{
+    data_map info;
+    std::string proto = getFunctionPrototype(group, fn);
     std::string serverProto = getFunctionServerCall(fn);
 
-    info["name"] = fn->getName();
+    info["name"] = fn->getOutputName();
     info["prototype"] = proto;
     info["serverPrototype"] = serverProto;
     info["id"] = fn->getUniqueId();
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
     info["isSendValue"] = false;
-    info["mlComment"] = fn->getMlComment();
-    info["ilComment"] = fn->getIlComment();
-    info["needEnumTmpServer"] = false;
-    info["needEnumTmpClient"] = false;
-    info["needNullVariableOnClient"] = false;
+    setTemplateComments(fn, info);
+    info["needTempVariableServer"] = false;
+    info["needTempVariableClient"] = false;
     info["needNullVariableOnServer"] = false;
+
+    /* Is function declared as external? */
+    info["isNonExternalFunction"] = !fn->findAnnotation(EXTERNAL_ANNOTATION);
+
+    if ((fn->findAnnotation(NESTED_CALL) != nullptr))
+    {
+        info["nestedCall"] = true;
+        m_templateData["nestedCall"] = true;
+    }
+    else
+    {
+        info["nestedCall"] = false;
+    }
 
     // Get return value info
     data_map returnInfo;
     returnInfo["type"] = getTypeInfo(fn->getReturnType(), true);
+    StructMember *structMember = fn->getReturnStructMemberType();
     DataType *dataType = fn->getReturnType();
     DataType *trueDataType = dataType->getTrueDataType();
     if (!trueDataType->isVoid())
     {
         std::string result = "result";
-        bool containsEnum;
-        returnInfo["firstAlloc"] = firstAllocOnReturnWhenIsNeed(result, dataType);
-        setCallingFreeFunctions(dataType, returnInfo);
-        std::string extraPointer = getExtraPointerInReturn(trueDataType);
+        bool needTempVariable = false;
+        setCallingFreeFunctions(structMember, returnInfo, true);
+        std::string extraPointer = getExtraPointerInReturn(dataType);
         std::string resultVariable = extraPointer + returnSpaceWhenNotEmpty(extraPointer) + result;
-        result = extraPointer + result;
-        returnInfo["coderCall"] = getEncodeDecodeCall(result, dataType, nullptr, false, nullptr, containsEnum, true);
+        if (structMember->findAnnotation(NULLABLE_ANNOTATION) == nullptr)
+        {
+            returnInfo["isNullable"] = false;
+            returnInfo["nullableName"] = "";
+        }
+        else
+        {
+            returnInfo["isNullable"] = true;
+            returnInfo["nullableName"] = result;
+        }
+        bool isShared = (structMember->findAnnotation(SHARED_ANNOTATION) != nullptr);
+        if (!isShared)
+        {
+            returnInfo["firstAlloc"] = firstAllocOnReturnWhenIsNeed(result, dataType);
+            result = extraPointer + result;
+        }
+        else
+        {
+            returnInfo["firstAlloc"] = "";
+        }
+        returnInfo["coderCall"] = getEncodeDecodeCall(result, group, dataType, nullptr, false, structMember, needTempVariable, true);
+        returnInfo["shared"] = isShared;
         resultVariable = getTypenameName(dataType, resultVariable);
-        info["needEnumTmpClient"] = containsEnum;
+        info["needTempVariableClient"] = needTempVariable;
         returnInfo["resultVariable"] = resultVariable;
-        returnInfo["isNeedFreeingCall"] = isNeedCallFree(dataType);
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
         returnInfo["isNullReturnType"] =
-            ((!trueDataType->isBuiltin() && !trueDataType->isEnum()) || trueDataType->isString());
+            (!trueDataType->isScalar() && !trueDataType->isEnum());
     }
     info["returnValue"] = returnInfo;
+
     // get function parameter info
     auto fnParams = fn->getParameters().getMembers();
     data_list params;
     data_list paramsToFree;
-    data_list paramsTo1Core;
-    data_list paramsTo2Core;
+    data_list paramsToClient;
+    data_list paramsToServer;
     for (StructMember *param : fnParams)
     {
         data_map paramInfo;
-        bool containsEnum;
+        bool needTempVariable = false;
         DataType *paramType = param->getDataType();
         DataType *paramTrueType = paramType->getTrueDataType();
-        std::string name = param->getName();
+        std::string name = param->getOutputName();
 
-        // Handle nullable annotation.
-        bool memberHasNullableAnn = param->findAnnotation(NULLABLE_ANNOTATION) != nullptr;
-        paramInfo["isNullable"] = memberHasNullableAnn;
-
-        // Set flags to indicate whether a local isNull variable is needed on the
-        // server and client sides.
-        //
-        // If needNullVariableX is true, we don't want to overwrite it to false
-        // if a later parameter is not nullable. So, we will only try to set it
-        // if it is not true. Once the variable's value is true, we know we need
-        // a null variable at least once.
-        if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
+        // Skip data serialization for variables placed as @length value for lists.
+        // Skip data serialization for variables used as discriminator for unions.
+        // These prevent to serialized data twice.
+        if (StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName()))
         {
-            if ("false" == info["needNullVariableOnServer"]->getvalue())
+            paramInfo["serializedBothDirection"] = referencedFrom->getDirection() == param->getDirection();
+            paramInfo["serializedViaMember"] = referencedFrom->getOutputName();
+        }
+        else
+        {
+            paramInfo["serializedViaMember"] = "";
+            paramInfo["serializedBothDirection"] = false;
+        }
+
+        // due to compatibility with return data.
+        paramInfo["firstAlloc"] = "";
+
+        // Init parameters to NULL on server side
+        bool isNullParam = (!paramTrueType->isScalar() && !paramTrueType->isEnum() && !paramTrueType->isArray());
+        paramInfo["isNullParam"] = isNullParam;
+
+        bool isPointer = (isNullParam || ((paramTrueType->isScalar() || paramTrueType->isEnum()) && param->getDirection() != kInDirection));
+
+        // If param is list then length variable can be NULL and it should be check with higher priority.
+        // When length variable is NULL then list is not sent.
+        StructMember *nullableParam = param;
+        if (paramTrueType->isList())
+        {
+            ListType *listType = dynamic_cast<ListType *>(paramTrueType);
+            // Find length member for current list param.
+            StructMember *referenceForLength = dynamic_cast<StructMember *>(fn->getParameters().getScope().getSymbol(listType->getLengthVariableName(), false));
+            if (referenceForLength && referenceForLength->getDirection() == kInoutDirection && referenceForLength->findAnnotation(NULLABLE_ANNOTATION))
             {
-                info["needNullVariableOnServer"] = memberHasNullableAnn;
+                paramInfo["nullableName"] = referenceForLength->getName();
+                nullableParam = referenceForLength;
             }
         }
-        if (param->getDirection() == kOutDirection || param->getDirection() == kInoutDirection)
+        // Handle nullable annotation.
+        bool isNullable = (param->findAnnotation(NULLABLE_ANNOTATION) && ((isPointer && nullableParam->getDirection() != kOutDirection) || ((paramTrueType->isScalar() || paramTrueType->isEnum()) && nullableParam->getDirection() == kInoutDirection)));
+        paramInfo["isNullable"] = isNullable;
+
+        if (isNullable)
         {
-            if ("false" == info["needNullVariableOnClient"]->getvalue())
+            paramInfo["nullableName"] = name;
+            // If param is list then length variable can be NULL and it should be check with higher priority.
+            // When length variable is NULL then list is not sent.
+            if (paramTrueType->isList())
             {
-                info["needNullVariableOnClient"] = memberHasNullableAnn;
+                ListType *listType = dynamic_cast<ListType *>(paramTrueType);
+                // Find length member for current list param.
+                StructMember *referenceForLength = dynamic_cast<StructMember *>(fn->getParameters().getScope().getSymbol(listType->getLengthVariableName(), false));
+                if (referenceForLength && referenceForLength->getDirection() == kInoutDirection && referenceForLength->findAnnotation(NULLABLE_ANNOTATION))
+                {
+                    paramInfo["nullableName"] = referenceForLength->getName();
+                }
+            }
+
+            // Set flags to indicate whether a local isNull variable is needed on the
+            // server and client sides.
+            //
+            // If needNullVariableX is true, we don't want to overwrite it to false
+            // if a later parameter is not nullable. So, we will only try to set it
+            // if it is not true. Once the variable's value is true, we know we need
+            // a null variable at least once.
+            if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
+            {
+                info["needNullVariableOnServer"] = true;
             }
         }
 
@@ -892,10 +1445,9 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
         // TODO: Should be global, also for PythonGenerator
         if (paramTrueType->isList() || paramTrueType->isString())
         {
-            Annotation *ann = param->findAnnotation(MAX_LENGTH_ANNOTATION);
-            if (ann)
+            std::string maxLengthName = param->getAnnStringValue(MAX_LENGTH_ANNOTATION);
+            if (!maxLengthName.empty())
             {
-                std::string maxLengthName = ann->getValueObject()->toString();
                 Symbol *symbol = fn->getParameters().getScope().getSymbol(maxLengthName, false);
                 if (symbol)
                 {
@@ -906,95 +1458,176 @@ data_map CGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
                         throw semantic_error(
                             format_string("line %d, ref %d: The parameter named by a max_length annotation must be "
                                           "'in' direction type.",
-                                          ann->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
+                                          param->getLocation().m_firstLine, structMember->getLocation().m_firstLine));
                     }
                 }
             }
         }
 
-        paramInfo["isNullParam"] =
-            ((!paramTrueType->isBuiltin() && !paramTrueType->isEnum()) || paramTrueType->isString());
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
         paramInfo["mallocServerOut"] = firtAllocOutParamOnServerWhenIsNeed(name, param);
-        paramInfo["mallocClient"] = firstAllocOnClientWhenIsNeed(name, param);
-        setCallingFreeFunctions(param, paramInfo);
-        name = getExtraDirectionPointer(param) + name;
+        setCallingFreeFunctions(param, paramInfo, false);
+
+        // Use shared memory feature instead of serializing/deserializing data.
+        bool isShared = (isPointer && param->findAnnotation(SHARED_ANNOTATION) != nullptr);
+        paramInfo["shared"] = isShared;
+        std::string encodeDecodeName;
+        if (isShared)
+        {
+            encodeDecodeName = name;
+            if (!paramTrueType->isList())
+            {
+                name = "*" + name;
+            }
+        }
+        else
+        {
+            encodeDecodeName = name = getExtraDirectionPointer(param) + name;
+        }
+
         std::string variable = getTypenameName(paramType, name);
+        paramInfo["variable"] = variable;
         paramInfo["name"] = name;
         paramInfo["type"] = getTypeInfo(paramType, false);
-        Log::debug("calling EncodeDecode with %s as paramType\n", paramType->getName().c_str());
-        paramInfo["coderCall"] = getEncodeDecodeCall(name, paramType, &fn->getParameters(), false, param, containsEnum, true);
-        paramInfo["variable"] = variable;
 
-        // Skip data serialization for variables placed as @length value for lists.
-        // These prevent to serialized data twice.
-        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName(), LENGTH_ANNOTATION);
-        paramInfo["lengthForMember"] = (referencedFrom) ? referencedFrom->getName() : "";
+        Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(), paramType->getName().c_str());
+        paramInfo["coderCall"] = getEncodeDecodeCall(encodeDecodeName, group, paramType, &fn->getParameters(), false, param, needTempVariable, true);
 
-        setToCore(param, paramsTo1Core, paramsTo2Core, paramInfo);
-        if (containsEnum && param->getDirection() != kInDirection)
+        setSymbolDataToSide(param, group->getSymbolDirections(param), paramsToClient, paramsToServer, paramInfo);
+
+        if (needTempVariable && param->getDirection() != kInDirection)
         {
-            info["needEnumTmpClient"] = true;
+            info["needTempVariableClient"] = true;
         }
-        if (containsEnum && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
+        if (needTempVariable && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
         {
-            info["needEnumTmpServer"] = true;
+            info["needTempVariableServer"] = true;
         }
         params.push_back(paramInfo);
 
         // Generating top of freeing functions in generated output.
-        bool l_generateServerFunctionParamFreeFunctions = generateServerFunctionParamFreeFunctions(param);
-        bool isNeedFreeingCall = (l_generateServerFunctionParamFreeFunctions && isNeedCallFree(paramType));
-        paramInfo["isNeedFreeingCall"] = isNeedFreeingCall;
+        bool l_generateServerFunctionParamFreeFunctions = (!isShared && generateServerFreeFunctions(param));
         if (l_generateServerFunctionParamFreeFunctions &&
-            (isNeedFreeingCall || paramInfo["firstFreeingCall1"]->getmap()["name"]->getvalue() != "" ||
-             paramInfo["firstFreeingCall2"]->getmap()["name"]->getvalue() != ""))
+            (isNeedCallFree(paramType) || paramInfo["firstFreeingCall1"]->getmap()["freeName"]->getvalue() != "" ||
+             paramInfo["firstFreeingCall2"]->getmap()["freeName"]->getvalue() != ""))
         {
             paramsToFree.push_back(paramInfo);
         }
     }
-    if (paramsTo1Core.size() > 0)
+    if (paramsToClient.size() > 0)
     {
         info["isReturnValue"] = true;
     }
-    if (paramsTo2Core.size() > 0)
+    if (paramsToServer.size() > 0)
     {
         info["isSendValue"] = true;
     }
     info["parameters"] = make_data(params);
     info["paramsToFree"] = paramsToFree;
-    info["parametersTo1Core"] = paramsTo1Core;
-    info["parametersTo2Core"] = paramsTo2Core;
+    info["parametersToClient"] = paramsToClient;
+    info["parametersToServer"] = paramsToServer;
 
     Log::info("    %d: (%d) %s\n", fnIndex, fn->getUniqueId(), info["prototype"]->getvalue().c_str());
 
     return info;
 }
 
-void CGenerator::setToCore(Symbol *symbolType, data_list &to1Core, data_list &to2Core, data_map &dataMap)
+void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> directions, data_list &toClient, data_list &toServer, data_map &dataMap)
 {
     dataMap["allocateToServer"] = false;
     dataMap["allocateToClient"] = false;
     dataMap["allocateToClientAndServer"] = false;
-    switch (getDirection(symbolType))
+
+    _direction direction = kIn;
+    switch (symbolType->getSymbolType())
     {
-        case 1: // in
+        case Symbol::kStructTypeSymbol:
+        case Symbol::kUnionTypeSymbol:
+        case Symbol::kFunctionTypeSymbol:
+        {
+            bool in = directions.count(kInDirection);
+            bool out = directions.count(kOutDirection);
+            bool outByref = directions.count(kOutDirectionByref);
+            bool inOut = directions.count(kInoutDirection);
+            bool ret = directions.count(kReturn);
+
+            Log::info("Symbol %s has directions: in:%d, out:%d, outByRef:%d, inOut:%d, ret:%d\n", symbolType->getName().c_str(), in, out, outByref, inOut, ret);
+
+            if (inOut || (in && (outByref || ret || out)))
+            {
+                direction = kInOut;
+            }
+            else if (outByref || ret || out)
+            {
+                direction = kOut;
+            }
+            else if (!in && !out && !ret && !inOut)
+            {
+                // ToDo: shared pointer.
+                direction = kNone;
+            }
+
+            break;
+        }
+        case Symbol::kStructMemberSymbol:
+        {
+            const StructMember *structMember = dynamic_cast<const StructMember *>(symbolType);
+            assert(structMember);
+            switch (structMember->getDirection())
+            {
+                case kOutDirection:
+                case kOutDirectionByref:
+                {
+                    direction = kOut;
+                    break;
+                }
+                case kInoutDirection:
+                {
+                    direction = kInOut;
+                    break;
+                }
+                case kInDirection:
+                {
+                    direction = kIn;
+                    break;
+                }
+                default:
+                {
+                    throw internal_error("Unsupported direction type of structure member.");
+                }
+            }
+            break;
+        }
+        default:
+        {
+            throw internal_error(
+                format_string("Symbol: %s is not structure or function parameter.", symbolType->getDescription().c_str()));
+        }
+    }
+
+    switch (direction)
+    {
+        case kIn:
         {
             dataMap["allocateToServer"] = true;
-            to2Core.push_back(dataMap);
+            toServer.push_back(dataMap);
             break;
         }
-        case 2: // out
+        case kOut:
         {
             dataMap["allocateToClient"] = true;
-            to1Core.push_back(dataMap);
+            toClient.push_back(dataMap);
             break;
         }
-        case 3: // inout
+        case kInOut:
         {
             dataMap["allocateToClientAndServer"] = true;
-            to2Core.push_back(dataMap);
-            to1Core.push_back(dataMap);
+            toServer.push_back(dataMap);
+            toClient.push_back(dataMap);
+            break;
+        }
+        case kNone: // ToDo: shared pointer
+        {
             break;
         }
         default:
@@ -1011,46 +1644,42 @@ data_map CGenerator::getTypeInfo(DataType *t, bool isFunction)
 
 std::string CGenerator::getErrorReturnValue(Function *fn)
 {
-    Annotation *ann = fn->findAnnotation(ERROR_RETURN_ANNOTATION);
+    Value *returnVal = fn->getAnnValue(ERROR_RETURN_ANNOTATION);
     DataType *dataType = fn->getReturnType()->getTrueDataType();
-    if (ann)
+    if (returnVal)
     {
-        if (!ann->hasValue() || ann->getValueObject()->toString() == "")
+        if (returnVal->toString().empty())
         {
-            throw semantic_error(format_string("Expected value for @%s annotation on line %d", ERROR_RETURN_ANNOTATION,
-                                               ann->getLocation().m_firstLine));
+            throw semantic_error(format_string("Expected value for @%s annotation for function on line %d", ERROR_RETURN_ANNOTATION,
+                                               fn->getLocation().m_firstLine));
         }
-        else
+        else if (dataType->isString())
         {
-            Value *returnVal = ann->getValueObject();
-            if (dataType->isString())
+            return "(char *) " + returnVal->toString();
+        }
+        else if (dataType->isScalar())
+        {
+            BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
+            assert(builtinType);
+            switch (builtinType->getBuiltinType())
             {
-                return "(char *) " + returnVal->toString();
-            }
-            else if (dataType->isBuiltin())
-            {
-                BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
-                assert(builtinType);
-                switch (builtinType->getBuiltinType())
+                case BuiltinType::kUInt8Type:
+                case BuiltinType::kUInt16Type:
+                case BuiltinType::kUInt32Type:
+                case BuiltinType::kUInt64Type:
                 {
-                    case BuiltinType::kUInt8Type:
-                    case BuiltinType::kUInt16Type:
-                    case BuiltinType::kUInt32Type:
-                    case BuiltinType::kUInt64Type:
-                    {
-                        IntegerValue *integerValue = dynamic_cast<IntegerValue *>(returnVal);
-                        return format_string("%lu", integerValue->getValue());
-                    }
-                    default:
-                        return returnVal->toString();
+                    IntegerValue *integerValue = dynamic_cast<IntegerValue *>(returnVal);
+                    return format_string("%lu", integerValue->getValue());
                 }
+                default:
+                    return returnVal->toString();
             }
-            return returnVal->toString();
         }
+        return returnVal->toString();
     }
     else
     {
-        if (dataType->isBuiltin() && !dataType->isString())
+        if (dataType->isScalar())
         {
             BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
             assert(builtinType);
@@ -1084,7 +1713,7 @@ std::string CGenerator::getErrorReturnValue(Function *fn)
         }
         else if (dataType->isEnum())
         {
-            return "(" + fn->getReturnType()->getName() + ") -1";
+            return "(" + fn->getReturnType()->getOutputName() + ") -1";
         }
         else
         {
@@ -1100,7 +1729,7 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
     {
         proto += "result = ";
     }
-    proto += fn->getName();
+    proto += fn->getOutputName();
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
@@ -1111,19 +1740,16 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
-            DataType *dataType = it->getDataType();
             DataType *trueDataType = it->getDataType()->getTrueDataType();
-            if (dataType->isArray() && it->getDirection() == kInDirection)
-            {
-                std::string newDataType = getTypenameName(dataType, "*");
-                proto += "(const " + newDataType + ") ";
-            }
-            else if ((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
-                     (it->getDirection() != kInDirection && !trueDataType->isString()))
+
+            /* Builtin types and function types. */
+            if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum()) ||
+                                                         (it->findAnnotation(SHARED_ANNOTATION))))
+
             {
                 proto += "&";
             }
-            proto += it->getName();
+            proto += it->getOutputName();
 
             if (!isLast)
             {
@@ -1135,7 +1761,7 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
     return proto + ");";
 }
 
-std::string CGenerator::getFunctionPrototype(Function *fn)
+std::string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     std::string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -1143,7 +1769,21 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
     {
         proto += " ";
     }
-    proto += fn->getName();
+
+    Symbol *symbol = dynamic_cast<Symbol *>(fn);
+    assert(symbol);
+    std::string functionName = symbol->getOutputName();
+
+    FunctionType *funType = dynamic_cast<FunctionType *>(fn);
+    if (funType) /* Need add '(*name)' for function type definition. */
+    {
+        proto += "(*" + functionName + ")";
+    }
+    else /* Use function name only. */
+    {
+        proto += functionName;
+    }
+
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
@@ -1153,11 +1793,14 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
-            std::string paramSignature = it->getName();
+            std::string paramSignature = it->getOutputName();
             DataType *dataType = it->getDataType();
             DataType *trueDataType = dataType->getTrueDataType();
-            if ((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
-                (it->getDirection() != kInDirection && !trueDataType->isString()))
+
+            /* Add '*' to data types. */
+            if (((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
+                 (it->getDirection() != kInDirection && !trueDataType->isString())) ||
+                (trueDataType->isFunction() && (it->getDirection() == kOutDirection || it->getDirection() == kInoutDirection)))
             {
                 paramSignature = "* " + paramSignature;
             }
@@ -1167,10 +1810,13 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
                 paramSignature = directionPointer + returnSpaceWhenNotEmpty(directionPointer) + paramSignature;
             }
             paramSignature = getTypenameName(dataType, paramSignature);
-            if ((dataType->isString() || trueDataType->isStruct() || trueDataType->isArray()) &&
-                it->getDirection() == kInDirection)
+
+            if (!(m_def->hasProgramSymbol() && m_def->getProgramSymbol()->findAnnotation(NO_CONST_PARAM)))
             {
-                proto += "const ";
+                if ((dataType->isString() || dataType->isFunction() || trueDataType->isStruct() || trueDataType->isUnion()) && it->getDirection() == kInDirection)
+                {
+                    proto += "const ";
+                }
             }
 
             DataType *trueContainerDataType = dataType->getTrueContainerDataType();
@@ -1178,15 +1824,20 @@ std::string CGenerator::getFunctionPrototype(Function *fn)
             {
                 StructType *structType = dynamic_cast<StructType *>(trueContainerDataType);
                 assert(structType);
-                if (structType->hasStructDirectionType(kInoutDirection) &&
-                    (structType->hasStructDirectionType(kOutDirection) ||
-                     structType->hasStructDirectionType(kOutDirectionByref) ||
-                     structType->hasStructDirectionType(kReturn)))
+                //Todo: Need check if members are/aren't shared.
+                if (group != nullptr)
                 {
-                    throw syntax_error(
-                        format_string("line %d: structs, lists, and binary cannot be used as both "
-                                      "inout and out parameters in the same application",
-                                      it->getLocation().m_firstLine));
+                    const std::set<_param_direction> directions = group->getSymbolDirections(structType);
+                    if (!it->findAnnotation(SHARED_ANNOTATION) && (directions.count(kInoutDirection) &&
+                                                                   (directions.count(kOutDirection) ||
+                                                                    directions.count(kOutDirectionByref) ||
+                                                                    directions.count(kReturn))))
+                    {
+                        throw syntax_error(
+                            format_string("line %d: structs, lists, and binary cannot be used as both "
+                                          "inout and out parameters in the same application",
+                                          it->getLocation().m_firstLine));
+                    }
                 }
             }
 
@@ -1238,10 +1889,15 @@ std::string CGenerator::getTypenameName(DataType *t, const std::string &name)
     std::string returnName;
     switch (t->getDataType())
     {
-        case DataType::kVoidType:
+        case DataType::kArrayType:
         {
-            returnName = "void";
-            returnName += returnSpaceWhenNotEmpty(name) + name;
+            // Array type requires the array element count to come after the variable/member name.
+            returnName = name;
+            ArrayType *a = dynamic_cast<ArrayType *>(t);
+            assert(a);
+            giveBracesToArrays(returnName);
+            returnName = format_string("%s[%d]", returnName.c_str(), a->getElementCount());
+            returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
         case DataType::kBuiltinType:
@@ -1263,66 +1919,36 @@ std::string CGenerator::getTypenameName(DataType *t, const std::string &name)
             returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
-        case DataType::kArrayType:
+        case DataType::kUnionType:
         {
-            // Array type requires the array element count to come after the variable/member name.
-            returnName = name;
-            ArrayType *a = dynamic_cast<ArrayType *>(t);
-            assert(a);
-            giveBracesToArrays(returnName);
-            returnName = format_string("%s[%d]", returnName.c_str(), a->getElementCount());
-            returnName = getTypenameName(a->getElementType(), returnName);
+            UnionType *unionType = dynamic_cast<UnionType *>(t);
+            assert(unionType);
+            if (unionType->isNonEncapsulatedUnion())
+            {
+                returnName = t->getOutputName();
+                returnName += returnSpaceWhenNotEmpty(name) + name;
+            }
+            else
+            {
+                returnName += "union\n    {\n";
+                returnName += getUnionMembersData(unionType, "    ");
+                returnName += "    } " + name;
+            }
             break;
         }
-        case DataType::kEnumType:
+        case DataType::kVoidType:
         {
-            returnName = t->getName();
-            returnName += returnSpaceWhenNotEmpty(name) + name;
-            break;
-        }
-        case DataType::kStructType:
-        {
-            returnName = t->getName();
+            returnName = "void";
             returnName += returnSpaceWhenNotEmpty(name) + name;
             break;
         }
         case DataType::kAliasType:
+        case DataType::kEnumType:
+        case DataType::kFunctionType:
+        case DataType::kStructType:
         {
-            returnName = t->getName();
+            returnName = t->getOutputName();
             returnName += returnSpaceWhenNotEmpty(name) + name;
-            break;
-        }
-        case DataType::kUnionType:
-        {
-            returnName += "union\n    {\n";
-            assert(dynamic_cast<UnionType *>(t));
-            for (auto unionCase : dynamic_cast<UnionType *>(t)->getUniqueCases())
-            {
-                if (!unionCase->caseMemberIsVoid())
-                {
-                    if (1 == unionCase->getMemberDeclarationNames().size())
-                    {
-                        std::string memberName = unionCase->getMemberDeclarationNames()[0];
-                        StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
-                        returnName += "        ";
-                        returnName += getTypenameName(unionMember->getDataType(), unionMember->getName());
-                        returnName += ";\n";
-                    }
-                    else
-                    {
-                        returnName += std::string("        ") + std::string("struct {\n");
-                        for (auto memberName : unionCase->getMemberDeclarationNames())
-                        {
-                            StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
-                            returnName += "            ";
-                            returnName += getTypenameName(unionMember->getDataType(), unionMember->getName());
-                            returnName += ";\n";
-                        }
-                        returnName += std::string("        ") + std::string("};\n");
-                    }
-                }
-            }
-            returnName += "    } " + name;
             break;
         }
         default:
@@ -1367,7 +1993,8 @@ std::string CGenerator::getBuiltinTypename(const BuiltinType *t)
     }
 }
 
-void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
+void CGenerator::getEncodeDecodeBuiltin(Group *group,
+                                        BuiltinType *t,
                                         data_map &templateData,
                                         StructType *structType,
                                         StructMember *structMember,
@@ -1375,22 +2002,22 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
 {
     templateData["decode"] = m_templateData["decodeBuiltinType"];
     templateData["encode"] = m_templateData["encodeBuiltinType"];
+
     if (t->isString())
     {
         templateData["checkStringNull"] = false;
-        // templateData["withoutAlloc"] = false;
-        templateData["withoutAlloc"] = ((structMember && structMember->getDirection() == kInoutDirection) ||
-                                        (structType && structType->hasStructDirectionType(kInoutDirection))) ?
+        templateData["withoutAlloc"] = ((structMember->getDirection() == kInoutDirection) ||
+                                        (structType && group->getSymbolDirections(structType).count(kInoutDirection))) ?
                                            true :
                                            false;
         if (!isFunctionParam)
         {
-            templateData["stringAllocSize"] = structMember->getName() + "_len";
-            templateData["stringLocalName"] = structMember->getName();
+            templateData["stringAllocSize"] = structMember->getOutputName() + "_len";
+            templateData["stringLocalName"] = structMember->getOutputName();
         }
         else
         {
-            if (!structMember)
+            if (!structType)
             {
                 templateData["stringAllocSize"] = "return_len";
                 templateData["stringLocalName"] = "return";
@@ -1398,8 +2025,8 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
             else
             {
                 templateData["checkStringNull"] = true;
-                templateData["stringLocalName"] = structMember->getName();
-                templateData["stringAllocSize"] = getMaxLength(structMember);
+                templateData["stringLocalName"] = structMember->getOutputName();
+                templateData["stringAllocSize"] = structMember->getAnnStringValue(MAX_LENGTH_ANNOTATION);
                 if (structMember->getDirection() == kInoutDirection || structMember->getDirection() == kOutDirection)
                 {
                     templateData["withoutAlloc"] = true;
@@ -1421,65 +2048,161 @@ void CGenerator::getEncodeDecodeBuiltin(BuiltinType *t,
     }
 }
 
-// TODO: Return error if maxSize < receivied size
-std::string CGenerator::getMaxLength(StructMember *structMember)
-{
-    Annotation *an = structMember->findAnnotation(MAX_LENGTH_ANNOTATION);
-    return (an) ? an->getValueObject()->toString() : "";
-}
-
 data_map CGenerator::getEncodeDecodeCall(const std::string &name,
+                                         Group *group,
                                          DataType *t,
                                          StructType *structType,
                                          bool inDataContainer,
                                          StructMember *structMember,
-                                         bool &containsEnum,
+                                         bool &needTempVariable,
                                          bool isFunctionParam)
 {
     // prepare data for template
     data_map templateData;
     string_vector params = string_vector(1, "");
     templateData["freeingCall"] = make_template("", &params);
+    templateData["inDataContainer"] = inDataContainer;
     templateData["isElementArrayType"] = false;
+    templateData["memberAllocation"] = "";
+    // name used for serializing/deserializing current data type.
+    std::string localName;
 
     int pos = name.rfind("*");
-    if ((pos == 0 || pos == 1) && t->getTrueDataType()->isStruct() && inDataContainer == false)
+    if ((pos == 0 || pos == 1) && (t->getTrueDataType()->isStruct() || t->getTrueDataType()->isUnion()) && inDataContainer == false)
     {
-        templateData["name"] = name.substr(1, name.length());
+        localName = name.substr(1, name.length());
     }
     else
     {
-        templateData["name"] = name;
+        localName = name;
     }
 
-    if ((t->isBuiltin() || t->isEnum()) && !t->isString() && !t->isBinary())
+    templateData["freeName"] = localName;
+
+    /* Check if member should be serialized as shared. */
+    if ((structMember && structMember->findAnnotation(SHARED_ANNOTATION)) || (structType && structType->findAnnotation(SHARED_ANNOTATION)))
+    {
+        templateData["funcParam"] = (structType) ? true : false;
+        templateData["InoutOutDirection"] = (structMember && (structMember->getDirection() == kOutDirection || structMember->getDirection() == kInoutDirection)) ? true : false;
+        templateData["encode"] = m_templateData["encodeSharedType"];
+        templateData["decode"] = m_templateData["decodeSharedType"];
+        templateData["name"] = name;
+        templateData["sharedTypeName"] = t->getName();
+
+        /* If shared member contains non-shared member, it has to be serialized. */
+        templateData["sharedType"] = "";
+        if (t->isStruct() || t->isUnion())
+        {
+            StructType *s = dynamic_cast<StructType *>(t);
+            if (s)
+            {
+                for (StructMember *m : s->getMembers())
+                {
+                    if (m->findAnnotation(NO_SHARED_ANNOTATION))
+                    {
+                        templateData["sharedType"] = "struct";
+                        templateData["dataLiteral"] = (inDataContainer) ? "data->" : "";
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                UnionType *u = dynamic_cast<UnionType *>(t);
+                assert(u);
+                if (u)
+                {
+                    for (StructMember *m : u->getUnionMembers().getMembers())
+                    {
+                        if (m->findAnnotation(NO_SHARED_ANNOTATION))
+                        {
+                            templateData["sharedType"] = "union";
+                            if (setDiscriminatorTemp(u, structType, structMember, isFunctionParam, templateData))
+                            {
+                                needTempVariable = true;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return templateData;
+    }
+
+    //Check if member is byRef type. Add "*" for type and allocate space for data on server side.
+    if (structMember && structMember->isByref() && !isFunctionParam && (t->isStruct() || t->isUnion() || t->isScalar() || t->isEnum()))
+    {
+        templateData["freeingCall2"] = m_templateData["freeData"];
+        templateData["memberAllocation"] = allocateCall(false, name, t);
+        localName = "*" + localName;
+    }
+    else
+    {
+        templateData["freeingCall2"] = make_template("", &params);
+    }
+
+    templateData["name"] = localName;
+
+    if (t->isScalar() || t->isEnum())
     {
         templateData["pointerScalarTypes"] = false;
         if (!inDataContainer && structMember && structMember->getDirection() != kInDirection)
         {
             DataType *trueDataType = t->getTrueDataType();
-            if ((trueDataType->isBuiltin() || trueDataType->isEnum()) && !trueDataType->isString())
+            if (trueDataType->isScalar() || trueDataType->isEnum())
             {
                 templateData["pointerScalarTypes"] = true;
             }
         }
     }
 
-    containsEnum = t->isEnum();
-
     switch (t->getDataType())
     {
+        case DataType::kAliasType:
+        {
+            AliasType *aliasType = dynamic_cast<AliasType *>(t);
+            assert(aliasType);
+            return getEncodeDecodeCall(name, group, aliasType->getElementType(), structType, inDataContainer, structMember,
+                                       needTempVariable, isFunctionParam);
+        }
+        case DataType::kArrayType:
+        {
+            static uint32_t arrayCounter;
+            ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
+            assert(arrayType);
+            std::string arrayName = name;
+            ++arrayCounter;
+            templateData["decode"] = m_templateData["decodeArrayType"];
+            templateData["encode"] = m_templateData["encodeArrayType"];
+            giveBracesToArrays(arrayName);
+            templateData["protoNext"] =
+                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
+                                    group, arrayType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
+            templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
+            templateData["size"] = format_string("%d", arrayType->getElementCount());
+            templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
+            templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
+            if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
+            {
+                templateData["freeingCall"] = m_templateData["freeArray"];
+            }
+            templateData["pointerScalarTypes"] = false; // List is using array codec functions
+            --arrayCounter;
+            break;
+        }
         case DataType::kBuiltinType:
         {
-            getEncodeDecodeBuiltin((BuiltinType *)t, templateData, structType, structMember, isFunctionParam);
+            getEncodeDecodeBuiltin(group, (BuiltinType *)t, templateData, structType, structMember, isFunctionParam);
             break;
         }
         case DataType::kEnumType:
         {
-            containsEnum = true;
+            needTempVariable = true;
             templateData["decode"] = m_templateData["decodeEnumType"];
             templateData["encode"] = m_templateData["encodeEnumType"];
-            std::string typeName = t->getName();
+            std::string typeName = t->getOutputName();
             if (typeName != "")
             {
                 templateData["enumName"] = typeName;
@@ -1490,25 +2213,50 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             }
             break;
         }
+        case DataType::kFunctionType:
+        {
+            FunctionType *funType = dynamic_cast<FunctionType *>(t);
+            assert(funType);
+            const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+            if (callbacks.size() > 1)
+            {
+                templateData["tableName"] = "_" + funType->getName();
+                templateData["tableSize"] = callbacks.size();
+                needTempVariable = true;
+            }
+            else if (callbacks.size() == 1)
+            {
+                templateData["tableName"] = "";
+                templateData["callbackName"] = callbacks[0]->getName();
+            }
+            else
+            {
+                throw semantic_error(format_string("line %d: Function has function type parameter (callback parameter), but in IDL is missing function definition, which can be passed there.", structMember->getFirstLine()).c_str());
+            }
+            templateData["encode"] = m_templateData["encodeFunctionType"];
+            templateData["decode"] = m_templateData["decodeFunctionType"];
+            break;
+        }
         case DataType::kListType:
         {
             ListType *listType = dynamic_cast<ListType *>(t);
             assert(listType);
 
-            bool isInOut = ((structMember && structMember->getDirection() == kInoutDirection) ||
-                            (!isFunctionParam && structType->hasStructDirectionType(kInoutDirection)));
-            bool isTopDataType = (isFunctionParam && structMember && structMember->getDataType()->getTrueDataType() == t);
+            bool isInOut = ((structMember->getDirection() == kInoutDirection) ||
+                            (!isFunctionParam && group->getSymbolDirections(structType).count(kInoutDirection)));
+
+            bool isTopDataType = (isFunctionParam && structMember->getDataType()->getTrueDataType() == t);
             templateData["useMallocOnClientSide"] = (!isInOut && !isTopDataType); // Because cpptempl don't know do
                                                                                   // correct complicated conditions like
                                                                                   // if(a || (b && c))
 
             templateData["mallocSizeType"] = getTypenameName(listType->getElementType(), "");
             templateData["mallocType"] = getTypenameName(listType->getElementType(), "*");
-            templateData["needFreeingCall"] =
-                (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(listType->getElementType()));
-            templateData["freeingCall"] = (generateServerFunctionParamFreeFunctions(structMember)) ?
-                                              m_templateData["freeList"] :
-                                              make_template("", &params);
+            templateData["needFreeingCall"] = (generateServerFreeFunctions(structMember) && isNeedCallFree(listType->getElementType()));
+            if (generateServerFreeFunctions(structMember))
+            {
+                templateData["freeingCall"] = m_templateData["freeList"];
+            }
             templateData["decode"] = m_templateData["decodeListType"];
             templateData["encode"] = m_templateData["encodeListType"];
             std::string nextName;
@@ -1526,10 +2274,18 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             }
             templateData["pointerScalarTypes"] = false;
             templateData["constantVariable"] = false;
+            templateData["isNullable"] = false;
 
             if (listType->hasLengthVariable())
             {
                 templateData["hasLengthVariable"] = true;
+
+                // This will apply when size is not null and list can be null.
+                if (structMember->getDataType()->getTrueDataType() == t && structMember->getDirection() != kOutDirection && structMember->findAnnotation(NULLABLE_ANNOTATION))
+                {
+                    templateData["isNullable"] = true;
+                }
+
                 static uint32_t listCounter;
                 ++listCounter;
                 nextName = format_string("%s[listCount%d]", name.c_str(), listCounter);
@@ -1569,9 +2325,18 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                 }
                 templateData["sizeTemp"] = std::string("lengthTemp_") + std::to_string(listCounter);
                 templateData["dataTemp"] = std::string("dataTemp_") + std::to_string(listCounter);
-                std::string maxSize = getMaxLength(structMember);
+                std::string maxSize = structMember->getAnnStringValue(MAX_LENGTH_ANNOTATION);
                 if (maxSize != "")
                 {
+                    // preppend "data->" when maxSize is struct member
+                    if (!isFunctionParam && structType)
+                    {
+                        Symbol *symbolMax = structType->getScope().getSymbol(maxSize, false);
+                        if (symbolMax)
+                        {
+                            maxSize = "data->" + maxSize;
+                        }
+                    }
                     templateData["maxSize"] = maxSize;
                 }
                 else
@@ -1610,39 +2375,13 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["size"] = size;
             templateData["useBinaryCoder"] = isBinaryList(listType);
             templateData["protoNext"] =
-                getEncodeDecodeCall(nextName, listType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
-            break;
-        }
-        case DataType::kArrayType:
-        {
-            static uint32_t arrayCounter;
-            ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
-            assert(arrayType);
-            std::string arrayName = name;
-            ++arrayCounter;
-            templateData["decode"] = m_templateData["decodeArrayType"];
-            templateData["encode"] = m_templateData["encodeArrayType"];
-            giveBracesToArrays(arrayName);
-            templateData["protoNext"] =
-                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
-                                    arrayType->getElementType(), structType, true, structMember, containsEnum, isFunctionParam);
-            templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
-            templateData["size"] = format_string("%d", arrayType->getElementCount());
-            templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
-            templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
-            --arrayCounter;
-            templateData["freeingCall"] =
-                (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
-                    m_templateData["freeArray"] :
-                    make_template("", &params);
-            templateData["pointerScalarTypes"] = false; // List is using array codec functions
+                getEncodeDecodeCall(nextName, group, listType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
             break;
         }
         case DataType::kStructType:
         {
-            templateData["inDataContainer"] = inDataContainer;
             // needDealloc(templateData, t, structType, structMember);
-            std::string typeName = t->getName();
+            std::string typeName = t->getOutputName();
             if (typeName != "")
             {
                 templateData["typeName"] = typeName;
@@ -1653,83 +2392,125 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             }
             templateData["decode"] = m_templateData["decodeStructType"];
             templateData["encode"] = m_templateData["encodeStructType"];
-            templateData["freeingCall"] =
-                (generateServerFunctionParamFreeFunctions(structMember) && isNeedCallFree(t)) ?
-                    m_templateData["freeStruct"] :
-                    make_template("", &params);
+
+            if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
+            {
+                templateData["freeingCall"] = m_templateData["freeStruct"];
+            }
             break;
-        }
-        case DataType::kAliasType:
-        {
-            AliasType *aliasType = dynamic_cast<AliasType *>(t);
-            assert(aliasType);
-            return getEncodeDecodeCall(name, aliasType->getElementType(), structType, inDataContainer, structMember,
-                                       containsEnum, isFunctionParam);
         }
         case DataType::kUnionType:
         {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
-            templateData["dataLiteral"] = "data";
-            templateData["discriminatorName"] = unionType->getDiscriminatorName();
-            data_list unionCases;
-            data_list unionCasesToFree;
-            // call free function for this union, default not call any free function
-            templateData["freeingCall"] = make_template("", &params);
-            for (auto unionCase : unionType->getCases())
-            {
-                data_map caseData;
-                caseData["name"] = unionCase->getCaseName();
-                caseData["value"] = unionCase->getCaseValue();
-                // if current case need call free function, default false
-                caseData["needCaseFreeingCall"] = false;
-                data_list caseMembers;
-                data_map memberData;
-                data_map caseMembersFree;
-                if (unionCase->caseMemberIsVoid())
-                {
-                    // Create phony enocde/decode values for void function,
-                    // since we don't want to generate anything.
-                    data_map coderCalls;
-                    coderCalls["encode"] = make_template("", &params);
-                    coderCalls["decode"] = make_template("", &params);
-                    memberData["coderCall"] = coderCalls;
 
-                    caseMembers.push_back(memberData);
-                }
-                else
+            // need casting discriminator variable?
+            // set discriminator name
+            if (setDiscriminatorTemp(unionType, structType, structMember, isFunctionParam, templateData))
+            {
+                needTempVariable = true;
+            }
+
+            /* NonEncapsulated unions as a function/structure param/member. */
+            if (isFunctionParam || (structType && unionType->isNonEncapsulatedUnion()))
+            {
+                templateData["inDataContainer"] = inDataContainer;
+                templateData["typeName"] = t->getOutputName();
+                templateData["decode"] = m_templateData["decodeUnionParamType"];
+                templateData["encode"] = m_templateData["encodeUnionParamType"];
+                if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
                 {
-                    // For each case member declaration, get its encode and decode data
-                    for (auto caseMemberName : unionCase->getMemberDeclarationNames())
+                    templateData["freeingCall"] = m_templateData["freeUnionType"];
+                }
+
+                // inout/out discriminator
+                templateData["discrimPtr"] = false;
+                if (isFunctionParam)
+                {
+                    if (structMember->getDirection() != kInDirection)
                     {
-                        StructMember *memberDeclaration = unionCase->getUnionMemberDeclaration(caseMemberName);
-                        std::string unionCaseName = name + "." + memberDeclaration->getName();
-                        memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, memberDeclaration->getDataType(),
-                                                                      structType, true, structMember, containsEnum, isFunctionParam);
-                        if (generateServerFunctionParamFreeFunctions(structMember) &&
-                            isNeedCallFree(memberDeclaration->getDataType()))
-                        {
-                            // set freeing function for current union
-                            templateData["freeingCall"] = m_templateData["freeUnion"];
-                            // current case need free memory
-                            caseData["needCaseFreeingCall"] = true;
-                            // current member need free memory
-                            memberData["isNeedFreeingCall"] = true;
-                        }
-                        else
-                        {
-                            // current member don't need free memory
-                            memberData["isNeedFreeingCall"] = false;
-                        }
-                        caseMembers.push_back(memberData);
+                        templateData["discrimPtr"] = true;
                     }
                 }
-                caseData["members"] = caseMembers;
-                unionCases.push_back(caseData);
             }
-            templateData["cases"] = unionCases;
-            templateData["encode"] = m_templateData["encodeUnionType"];
-            templateData["decode"] = m_templateData["decodeUnionType"];
+            else
+            {
+                /* Serialize/deserialize encapsulated and non-encapsulated unions is almost same. */
+                assert(unionType);
+
+                std::string disriminatorSeparator = "";
+
+                /* Get disriminator separator for encapsulated unions. data->variable_name.case */
+                if (!unionType->isNonEncapsulatedUnion())
+                {
+                    disriminatorSeparator = ".";
+                }
+
+                data_list unionCases;
+                data_list unionCasesToFree;
+                // call free function for this union, default not call any free function
+                templateData["freeingCall"] = make_template("", &params);
+                for (auto unionCase : unionType->getCases())
+                {
+                    data_map caseData;
+                    caseData["name"] = unionCase->getCaseName();
+                    caseData["value"] = unionCase->getCaseValue();
+                    // if current case need call free function, default false
+                    caseData["needCaseFreeingCall"] = false;
+                    data_list caseMembers;
+                    data_map memberData;
+                    data_map caseMembersFree;
+                    if (unionCase->caseMemberIsVoid())
+                    {
+                        // Create phony enocde/decode values for void function,
+                        // since we don't want to generate anything.
+                        data_map coderCalls;
+                        coderCalls["encode"] = make_template("", &params);
+                        coderCalls["decode"] = make_template("", &params);
+                        coderCalls["memberAllocation"] = "";
+                        memberData["coderCall"] = coderCalls;
+
+                        caseMembers.push_back(memberData);
+                    }
+                    else
+                    {
+                        bool casesNeedTempVariable = false;
+                        // For each case member declaration, get its encode and decode data
+                        for (auto caseMemberName : unionCase->getMemberDeclarationNames())
+                        {
+                            StructMember *memberDeclaration = unionCase->getUnionMemberDeclaration(caseMemberName);
+                            std::string unionCaseName = name + disriminatorSeparator + memberDeclaration->getOutputName();
+                            memberData["coderCall"] = getEncodeDecodeCall(unionCaseName, group, memberDeclaration->getDataType(),
+                                                                          structType, true, structMember, casesNeedTempVariable, isFunctionParam);
+                            if (generateServerFreeFunctions(structMember) &&
+                                isNeedCallFree(memberDeclaration->getDataType()))
+                            {
+                                // set freeing function for current union
+                                templateData["freeingCall"] = m_templateData["freeUnion"];
+                                // current case need free memory
+                                caseData["needCaseFreeingCall"] = true;
+                                // current member need free memory
+                                memberData["isNeedFreeingCall"] = true;
+                            }
+                            else
+                            {
+                                // current member don't need free memory
+                                memberData["isNeedFreeingCall"] = false;
+                            }
+                            caseMembers.push_back(memberData);
+                            if (casesNeedTempVariable)
+                            {
+                                needTempVariable = true;
+                            }
+                        }
+                    }
+                    caseData["members"] = caseMembers;
+                    unionCases.push_back(caseData);
+                }
+                templateData["cases"] = unionCases;
+                templateData["encode"] = m_templateData["encodeUnionType"];
+                templateData["decode"] = m_templateData["decodeUnionType"];
+            }
             break;
         }
         default:
@@ -1751,7 +2532,7 @@ void CGenerator::giveBracesToArrays(std::string &name)
 std::string CGenerator::getExtraPointerInReturn(DataType *dataType)
 {
     DataType *trueDataType = dataType->getTrueDataType();
-    if (trueDataType->isStruct() || trueDataType->isArray())
+    if (trueDataType->isStruct() || trueDataType->isArray() || trueDataType->isUnion())
     {
         return "*";
     }
@@ -1767,32 +2548,32 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     std::string result;
     if (structMemberDir == kOutDirection) // between out and inout can be diferences in future. Maybe not.
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
         {
             result = "*";
+        }
+        if (structMember->findAnnotation(SHARED_ANNOTATION))
+        {
+            result += "*";
         }
     }
     else if (structMemberDir == kInoutDirection)
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
         {
             result = "*";
         }
+        if (structMember->findAnnotation(SHARED_ANNOTATION))
+        {
+            result += "*";
+        }
     }
-    else if (structMemberDir == kOutDirectionByref)
+    else
     {
-        if (trueDataType->isString())
+        if ((trueDataType->isStruct() || trueDataType->isUnion()) || (trueDataType->isScalar() && structMember->findAnnotation(SHARED_ANNOTATION)))
         {
             result = "*";
         }
-        else if (!trueDataType->isBuiltin() && !trueDataType->isEnum())
-        {
-            result = "**";
-        }
-    }
-    else //! Last else is for InDirection, which has same principle as return;
-    {
-        result = getExtraPointerInReturn(dataType);
     }
 
     return result;
@@ -1801,7 +2582,7 @@ std::string CGenerator::getExtraDirectionPointer(StructMember *structMember)
 std::string CGenerator::firstAllocOnReturnWhenIsNeed(std::string name, DataType *dataType)
 {
     DataType *trueDataType = dataType->getTrueDataType();
-    if (trueDataType->isArray() || trueDataType->isStruct())
+    if ((trueDataType->isArray() || trueDataType->isStruct() || trueDataType->isUnion()) && !dataType->findAnnotation(SHARED_ANNOTATION))
     {
         return allocateCall(false, name, dataType);
     }
@@ -1814,34 +2595,20 @@ std::string CGenerator::firstAllocOnServerWhenIsNeed(std::string name, StructMem
     DataType *dataType = structMember->getDataType();
     DataType *trueDataType = dataType->getTrueDataType();
     _param_direction structMemberDir = structMember->getDirection();
-    if (structMemberDir == kInoutDirection)
+    if (!structMember->findAnnotation(SHARED_ANNOTATION))
     {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
+        if (structMemberDir == kInoutDirection)
         {
-            return allocateCall(false, name, structMember);
-        }
-    }
-    else if (structMemberDir == kInDirection)
-    {
-        if (trueDataType->isArray() || trueDataType->isStruct())
-        {
-            return allocateCall(false, name, structMember);
-        }
-    }
-    else if (structMemberDir == kOutDirectionByref)
-    {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum())
-        {
-            std::string result = allocateCall(true, name, structMember);
-            name = "*" + name;
-            return result + "\n" + allocateCall(false, name, structMember);
-        }
-        else
-        {
-            if (trueDataType->isString())
+            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() && !trueDataType->isArray())
             {
-                std::string result = allocateCall(true, name, structMember);
-                return result += "\n" + format_string("*%s = NULL;", name.c_str());
+                return allocateCall(false, name, structMember);
+            }
+        }
+        else if (structMemberDir == kInDirection)
+        {
+            if (trueDataType->isStruct() || trueDataType->isUnion())
+            {
+                return allocateCall(false, name, structMember);
             }
         }
     }
@@ -1850,10 +2617,10 @@ std::string CGenerator::firstAllocOnServerWhenIsNeed(std::string name, StructMem
 
 std::string CGenerator::firtAllocOutParamOnServerWhenIsNeed(std::string name, StructMember *structMember)
 {
-    if (structMember->getDirection() == kOutDirection)
+    if (structMember->getDirection() == kOutDirection && !structMember->findAnnotation(SHARED_ANNOTATION))
     {
         DataType *trueDataType = structMember->getDataType()->getTrueDataType();
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum())
+        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray())
         {
             return allocateCall(false, name, structMember);
         }
@@ -1867,22 +2634,16 @@ std::string CGenerator::firtAllocOutParamOnServerWhenIsNeed(std::string name, St
                     format_string("For out string variable '%s' on line '%d' max_length annotation has to be set.",
                                   symbol->getName().c_str(), symbol->getLocation().m_firstLine));
             }
-            return allocateCall(false, name, structMember) + format_string("\n%s[0]=\'\\0\';", name.c_str());
-        }
-    }
-    return "";
-}
-
-std::string CGenerator::firstAllocOnClientWhenIsNeed(std::string name, StructMember *structMember)
-{
-    DataType *dataType = structMember->getDataType();
-    DataType *trueDataType = dataType->getTrueDataType();
-    if (structMember->getDirection() == kOutDirectionByref)
-    {
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList())
-        {
-            name = "* " + name;
-            return allocateCall(false, name, structMember);
+            std::string returnValue = allocateCall(false, name, structMember);
+            if (m_templateData["generateAllocErrorChecks"]->getvalue() == "true")
+            {
+                returnValue += format_string("\nelse\n{\n    %s[0]=\'\\0\';\n}", name.c_str());
+            }
+            else
+            {
+                returnValue += format_string("\n%s[0]=\'\\0\';", name.c_str());
+            }
+            return returnValue;
         }
     }
     return "";
@@ -1893,12 +2654,6 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
     DataType *trueDataType = dataType->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::kStructType:
-        {
-            StructType *structType = dynamic_cast<StructType *>(trueDataType);
-            assert(structType);
-            return structType->containListMember() || structType->containStringMember();
-        }
         case DataType::kArrayType:
         {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(trueDataType);
@@ -1914,6 +2669,13 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
         case DataType::kListType:
         {
             return true;
+        }
+        case DataType::kStructType:
+        {
+            StructType *structType = dynamic_cast<StructType *>(trueDataType);
+            assert(structType);
+            set<DataType *> loopDetection;
+            return structType->containListMember() || structType->containStringMember() || containsByrefParamToFree(structType, loopDetection);
         }
         case DataType::kUnionType:
         {
@@ -1940,62 +2702,65 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
     }
 }
 
-void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info)
+void CGenerator::setCallingFreeFunctions(Symbol *symbol, cpptempl::data_map &info, bool returnType)
 {
     StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+    assert(structMember);
+    DataType *trueDataType = structMember->getDataType()->getTrueDataType();
     data_map firstFreeingCall1;
     firstFreeingCall1["firstFreeingCall"] = "";
-    firstFreeingCall1["name"] = "";
+    firstFreeingCall1["freeName"] = "";
     data_map firstFreeingCall2;
     firstFreeingCall2["firstFreeingCall"] = "";
-    firstFreeingCall2["name"] = "";
+    firstFreeingCall2["freeName"] = "";
     // When true then function parameter, else return type
-    if (structMember)
+    if (!symbol->findAnnotation(SHARED_ANNOTATION) && generateServerFreeFunctions(structMember))
     {
-        DataType *trueDataType = structMember->getDataType()->getTrueDataType();
-        switch (trueDataType->getDataType())
+        if (!returnType)
         {
-            case DataType::kBuiltinType:
-            case DataType::kArrayType:
-            case DataType::kStructType:
+            switch (trueDataType->getDataType())
             {
-                BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
-                if (!builtinType || builtinType->isString())
+                case DataType::kBuiltinType:
+                case DataType::kStructType:
+                case DataType::kUnionType:
                 {
-                    _param_direction structMemberDir = structMember->getDirection();
-                    std::string name = structMember->getName();
-                    if (!((trueDataType->isString()) && structMemberDir != kOutDirectionByref))
+                    BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
+                    if (!builtinType || builtinType->isString())
                     {
-                        firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
-                        firstFreeingCall1["name"] = name;
+                        _param_direction structMemberDir = structMember->getDirection();
+                        std::string name = structMember->getOutputName();
+                        if (!((trueDataType->isString()) && structMemberDir != kOutDirectionByref))
+                        {
+                            firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
+                            firstFreeingCall1["freeName"] = name;
+                        }
+                        if (!trueDataType->isString() && structMemberDir == kOutDirectionByref)
+                        {
+                            name = "*" + name;
+                            firstFreeingCall2["firstFreeingCall"] = m_templateData["freeData"];
+                            firstFreeingCall2["freeName"] = name;
+                        }
                     }
-                    if (!trueDataType->isString() && structMemberDir == kOutDirectionByref)
-                    {
-                        name = "*" + name;
-                        firstFreeingCall2["firstFreeingCall"] = m_templateData["freeData"];
-                        firstFreeingCall2["name"] = name;
-                    }
+                    break;
                 }
+                default:
+                    break;
             }
-            default:
-                break;
         }
-    }
-    else
-    {
-        DataType *dataType = dynamic_cast<DataType *>(symbol);
-        assert(dataType);
-        if (dataType->getTrueDataType()->isArray() || dataType->getTrueDataType()->isStruct())
+        else
         {
-            firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
-            firstFreeingCall1["name"] = "result";
+            if (trueDataType->isArray() || trueDataType->isStruct() || trueDataType->isUnion())
+            {
+                firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
+                firstFreeingCall1["freeName"] = "result";
+            }
         }
     }
     info["firstFreeingCall1"] = firstFreeingCall1;
     info["firstFreeingCall2"] = firstFreeingCall2;
 }
 
-std::string CGenerator::allocateCall(bool pointer, std::string &name, Symbol *symbol)
+std::string CGenerator::allocateCall(bool pointer, const std::string &name, Symbol *symbol)
 {
     StructMember *structMember = dynamic_cast<StructMember *>(symbol);
     DataType *dataType;
@@ -2017,7 +2782,7 @@ std::string CGenerator::allocateCall(bool pointer, std::string &name, Symbol *sy
     }
     if ((trueDataType->isList() || trueDataType->isString()) && structMember)
     {
-        size = getMaxLength(structMember);
+        size = structMember->getAnnStringValue(MAX_LENGTH_ANNOTATION);
         if (size != "")
         {
             if (dataType->isString() && pointers != "*")
@@ -2064,61 +2829,6 @@ std::string CGenerator::allocateCall(bool pointer, std::string &name, Symbol *sy
 std::string CGenerator::returnSpaceWhenNotEmpty(const std::string &param)
 {
     return (param == "") ? "" : " ";
-}
-
-uint8_t CGenerator::getDirection(Symbol *symbolType)
-{
-    if (symbolType->getSymbolType() == Symbol::kStructTypeSymbol)
-    {
-        StructType *structType = dynamic_cast<StructType *>(symbolType);
-        assert(structType);
-        bool in = structType->hasStructDirectionType(kInDirection);
-        bool out = structType->hasStructDirectionType(kOutDirection);
-        bool outByref = structType->hasStructDirectionType(kOutDirectionByref);
-        bool inOut = structType->hasStructDirectionType(kInoutDirection);
-        bool ret = structType->hasStructDirectionType(kReturn);
-
-        if (inOut || (in && (outByref || ret || out)))
-        {
-            return 3;
-        }
-        else if (outByref || ret || out)
-        {
-            return 2;
-        }
-    }
-    else if (symbolType->getSymbolType() == Symbol::kStructMemberSymbol)
-    {
-        StructMember *structMember = dynamic_cast<StructMember *>(symbolType);
-        assert(structMember);
-        switch (structMember->getDirection())
-        {
-            case kOutDirection:
-            case kOutDirectionByref:
-            {
-                return 2;
-            }
-            case kInoutDirection:
-            {
-                return 3;
-            }
-            case kInDirection:
-            case kReturn:
-            {
-                break;
-            }
-            default:
-            {
-                throw internal_error("Unsupported direction type of structure member.");
-            }
-        }
-    }
-    else
-    {
-        throw internal_error(
-            format_string("Symbol: %s is not structure or function parameter.", symbolType->getDescription().c_str()));
-    }
-    return 1;
 }
 
 bool CGenerator::containsString(DataType *dataType)
@@ -2211,6 +2921,42 @@ bool CGenerator::containsList(DataType *dataType)
     }
 }
 
+bool CGenerator::containsByrefParamToFree(DataType *dataType, set<DataType *> &dataTypes)
+{
+    // For loops from forward declaration detection.
+    if (dataTypes.insert(dataType).second)
+    {
+        DataType *trueDataType = dataType->getTrueContainerDataType();
+        if (trueDataType->isStruct())
+        {
+            StructType *structType = dynamic_cast<StructType *>(trueDataType);
+            assert(structType != nullptr);
+
+            for (StructMember *structMember : structType->getMembers())
+            {
+                if ((structMember->isByref() && !structMember->findAnnotation(SHARED_ANNOTATION)) || containsByrefParamToFree(structMember->getDataType(), dataTypes))
+                {
+                    return true;
+                }
+            }
+        }
+        else if (trueDataType->isUnion())
+        {
+            UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
+            assert(unionType != nullptr);
+
+            for (StructMember *structMember : unionType->getUnionMembers().getMembers())
+            {
+                if ((structMember->isByref() && !structMember->findAnnotation(SHARED_ANNOTATION)) || containsByrefParamToFree(structMember->getDataType(), dataTypes))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool CGenerator::isListStruct(StructType *structType)
 {
     // if structure is transformed list<> to struct{list<>}
@@ -2255,9 +3001,85 @@ bool CGenerator::isBinaryList(ListType *listType)
     return false;
 }
 
-bool CGenerator::generateServerFunctionParamFreeFunctions(StructMember *structMember)
+bool CGenerator::generateServerFreeFunctions(StructMember *structMember)
 {
     return (structMember == nullptr || structMember->findAnnotation(RETAIN_ANNOTATION) == nullptr);
+}
+
+void CGenerator::setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol)
+{
+    if (Annotation *ann = childSymbol->findAnnotation(NO_SHARED_ANNOTATION))
+    {
+        parentSymbol->addAnnotation(*ann);
+    }
+}
+
+bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData)
+{
+    bool needTempVariable = false;
+    if (structType)
+    {
+        std::string discriminatorName;
+        Symbol *disSymbol;
+
+        if (unionType->isNonEncapsulatedUnion())
+        {
+            discriminatorName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+            disSymbol = m_globals->getSymbol(discriminatorName, false);
+            if (isFunctionParam || disSymbol)
+            {
+                templateData["dataLiteral"] = "";
+            }
+            else
+            {
+                templateData["dataLiteral"] = "data->";
+            }
+        }
+        else
+        {
+            disSymbol = nullptr;
+            templateData["dataLiteral"] = "data->";
+            discriminatorName = unionType->getDiscriminatorName();
+        }
+
+        DataType *disType;
+        if (disSymbol)
+        {
+            templateData["isConstant"] = true;
+            ConstType *constType = dynamic_cast<ConstType *>(disSymbol);
+            assert(constType);
+            disType = constType->getDataType();
+        }
+        else
+        {
+            templateData["isConstant"] = false;
+            disSymbol = structType->getScope().getSymbol(discriminatorName);
+            assert(disSymbol);
+            StructMember *disMember = dynamic_cast<StructMember *>(disSymbol);
+            assert(disMember);
+            disType = disMember->getDataType();
+        }
+
+        BuiltinType *disBuiltin = dynamic_cast<BuiltinType *>(disType->getTrueDataType());
+        if (disBuiltin && disBuiltin->getBuiltinType() == BuiltinType::kInt32Type)
+        {
+            templateData["castDiscriminator"] = false;
+        }
+        else
+        {
+            needTempVariable = true;
+            templateData["castDiscriminator"] = true;
+            templateData["discriminatorType"] = disType->getName();
+        }
+        templateData["discriminatorName"] = discriminatorName;
+    }
+    else
+    {
+        templateData["discriminatorName"] = "discriminator";
+        templateData["dataLiteral"] = "";
+        templateData["castDiscriminator"] = false;
+    }
+    return needTempVariable;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

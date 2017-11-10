@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_unions_server.h"
+#include "test_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -148,7 +148,7 @@ foo *sendMyFoo(const foo *f)
             for (uint32_t i = 1; i <= f->bing.a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
-                if (i != f->bing.a.elements[i])
+                if ((int32_t)i != f->bing.a.elements[i])
                 {
                     newFoo->discriminator = returnVal;
                     newFoo->bing.ret = 0x55;
@@ -167,6 +167,67 @@ foo *sendMyFoo(const foo *f)
         }
     }
     erpc_free((void *)f);
+    return newFoo;
+}
+
+foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
+{
+    foo *newFoo = (foo *)erpc_malloc(sizeof(foo));
+    switch (discriminator)
+    {
+        case apple:
+        {
+            for (uint32_t i = 0; i < unionVariable->myFoobar.rawString.dataLength; ++i)
+            {
+                if ((i + 1) != unionVariable->myFoobar.rawString.data[i])
+                {
+                    newFoo->discriminator = returnVal;
+                    newFoo->bing.ret = 0x55;
+                    break;
+                }
+            }
+            newFoo->discriminator = returnVal;
+            newFoo->bing.ret = 0xAA;
+            break;
+        }
+        case banana:
+        {
+            if ((unionVariable->x == 3) && (unionVariable->y == 4.0))
+            {
+                newFoo->discriminator = papaya;
+                newFoo->bing.x = 4;
+                newFoo->bing.y = 3;
+            }
+            else
+            {
+                newFoo->discriminator = papaya;
+                newFoo->bing.x = 1;
+                newFoo->bing.x = 1;
+            }
+            break;
+        }
+        case orange:
+        {
+            for (uint32_t i = 1; i <= unionVariable->a.elementsCount; ++i)
+            {
+                // If data sent across is incorrect, return 0x55
+                if (i != unionVariable->a.elements[i])
+                {
+                    newFoo->discriminator = returnVal;
+                    newFoo->bing.ret = 0x55;
+                    break;
+                }
+            }
+            // Else, data was sent properly, return 0xAA
+            newFoo->discriminator = returnVal;
+            newFoo->bing.ret = 0xAA;
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
     return newFoo;
 }
 

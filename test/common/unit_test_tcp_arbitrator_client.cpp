@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -35,8 +35,8 @@
 #include "gtest.h"
 #include "simple_server.h"
 #include "tcp_transport.h"
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface.h"
 #include "transport_arbitrator.h"
 #include "unit_test.h"
 #include <unistd.h>
@@ -63,12 +63,18 @@ public:
 };
 
 TCPTransport g_transport("localhost", 12345, false);
+#if USE_MESSAGE_LOGGING
+TCPTransport g_messageLogger("localhost", 54321, false);
+#endif //USE_MESSAGE_LOGGING
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 ArbitratedClientManager *g_client;
 TransportArbitrator g_arbitrator;
 SimpleServer g_server;
 Mutex waitQuitMutex;
+
+extern const uint32_t erpc_generated_crc;
+Crc16 g_crc16(erpc_generated_crc);
 
 int waitQuit = 0;
 
@@ -133,6 +139,16 @@ int main(int argc, char **argv)
         return err;
     }
 
+#if USE_MESSAGE_LOGGING
+    g_messageLogger.setCrc16(&g_crc16);
+    err = g_messageLogger.open();
+    if (err)
+    {
+        Log::error("Failed to open connection in ERPC first (client) app\n");
+        return err;
+    }
+#endif //USE_MESSAGE_LOGGING
+
     g_arbitrator.setSharedTransport(&g_transport);
     g_arbitrator.setCodec(g_basicCodecFactory.create());
 
@@ -140,11 +156,21 @@ int main(int argc, char **argv)
     g_client->setArbitrator(&g_arbitrator);
     g_client->setCodecFactory(&g_basicCodecFactory);
     g_client->setMessageBufferFactory(&g_msgFactory);
+#if USE_MESSAGE_LOGGING
+    g_client->addMessageLogger(&g_messageLogger);
+#endif //USE_MESSAGE_LOGGING
+
+    g_arbitrator.setCrc16(&g_crc16);
 
     g_server.setTransport(&g_arbitrator);
     g_server.setCodecFactory(&g_basicCodecFactory);
     g_server.setMessageBufferFactory(&g_msgFactory);
+#if USE_MESSAGE_LOGGING
+    g_server.addMessageLogger(&g_messageLogger);
+#endif //USE_MESSAGE_LOGGING
+
     add_services(&g_server);
+    g_client->setServer(&g_server);
 
     int i = -1;
     err = (erpc_status_t)-1;

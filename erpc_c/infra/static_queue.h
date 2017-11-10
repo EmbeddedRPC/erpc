@@ -34,10 +34,6 @@
 
 #include <cstring>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 /*!
  * @addtogroup infra_utility
  * @{
@@ -88,7 +84,7 @@ public:
     {
         if ((m_head + 1) % m_capacity != m_tail)
         {
-            memcpy(m_storage[m_head], &element, sizeof(T));
+            std::memcpy(m_storage[m_head], &element, sizeof(T));
             m_head = (m_head + 1) % m_capacity;
             return true;
         }
@@ -107,7 +103,7 @@ public:
     {
         if (m_tail != m_head)
         {
-            memcpy(element, m_storage[m_tail], sizeof(T));
+            std::memcpy(element, m_storage[m_tail], sizeof(T));
             m_tail = (m_tail + 1) % m_capacity;
             return true;
         }

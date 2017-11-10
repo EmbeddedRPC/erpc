@@ -31,8 +31,8 @@
 #if !defined(_HexValues_h_)
 #define _HexValues_h_
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <cstdbool>
+#include <cstdint>
 
 //! \brief Determines whether \a c is a hex digit character.
 bool isHexDigit(char c);

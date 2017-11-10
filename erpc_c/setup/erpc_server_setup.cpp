@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -31,14 +31,12 @@
 
 #include "erpc_server_setup.h"
 #include "basic_codec.h"
+#include "crc16.h"
 #include "manually_constructed.h"
+#include "message_buffer.h"
 #include "simple_server.h"
-#include <assert.h>
-#include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
+#include "transport.h"
+#include <cassert>
 
 using namespace erpc;
 
@@ -49,28 +47,37 @@ using namespace erpc;
 // global server variables
 static ManuallyConstructed<SimpleServer> s_server;
 SimpleServer *g_server;
-
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
+static ManuallyConstructed<Crc16> s_crc16;
+
+extern const uint32_t erpc_generated_crc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
+erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
+    assert(transport);
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init server with the provided transport.
     s_server.construct();
-    s_server->setTransport(reinterpret_cast<Transport *>(transport));
+    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    s_crc16.construct(erpc_generated_crc);
+    castedTransport->setCrc16(s_crc16.get());
+    s_server->setTransport(castedTransport);
     s_server->setCodecFactory(s_codecFactory);
     s_server->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
     g_server = s_server;
+    return reinterpret_cast<erpc_server_t>(g_server);
 }
 
 void erpc_server_deinit()
 {
+    s_crc16.destroy();
     s_codecFactory.destroy();
     s_server.destroy();
 }
@@ -97,3 +104,10 @@ void erpc_server_stop()
 {
     g_server->stop();
 }
+
+#if ERPC_MESSAGE_LOGGING
+bool erpc_server_add_message_logger(erpc_transport_t transport)
+{
+    return g_server->addMessageLogger(reinterpret_cast<Transport *>(transport));
+}
+#endif

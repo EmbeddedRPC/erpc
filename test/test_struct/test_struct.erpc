@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -30,10 +30,13 @@
  */
 
 @include("myAlloc.h")
-@outputDir("erpc_outputs")
+@output_dir("erpc_outputs")
 //@clientOutputFormat(C)
 //@serverOutputFormat(C)
-program test_struct;
+program test;
+
+import "../common/unit_test_common.erpc"
+
 // Hello world!
 
 struct C
@@ -133,9 +136,15 @@ struct structOfAllTypes
 
 type TypeOfAllTypes = AllTypes
 
+struct StructWithByrefMembers
+{
+    byref A a @shared;
+    byref int32 b;
+}
+
 @group("group")
 interface GroupService {
-	oneway groupFunction()
+    oneway groupFunction()
 }
 
 @group("ArithmeticService")
@@ -160,7 +169,6 @@ interface ArithmeticService2 {
     createStudent(string name, float[3] test_scores, school_year_t year, int32 age) -> student
 
     test_struct_allDirection(AllTypes a, in AllTypes b, inout AllTypes e) -> void
-    //test_struct_allDirection(AllTypes a, in AllTypes b, out AllTypes c, out byref AllTypes d, inout AllTypes e) -> void
 
-//    getAnonymousStruct(AnonymousStruct a) -> AnonymousStruct
+    testSendingByrefMembers(StructWithByrefMembers s) -> bool
 }

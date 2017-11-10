@@ -52,12 +52,13 @@ public:
      */
     enum _data_type
     {
-        kBuiltinType,
-        kListType,
-        kArrayType,
-        kEnumType,
-        kStructType,
         kAliasType,
+        kArrayType,
+        kBuiltinType,
+        kEnumType,
+        kFunctionType,
+        kListType,
+        kStructType,
         kUnionType,
         kVoidType
     };
@@ -146,32 +147,11 @@ public:
     DataType *getTrueContainerDataType();
 
     /*!
-     * @brief This function return "false" value as default for identify string type.
+     * @brief This function return "false" value as default for identify alias type.
      *
      * @retval false Always return false.
      */
-    virtual bool isBuiltin() const { return false; }
-
-    /*!
-     * @brief This function return "false" value as default for identify string type.
-     *
-     * @retval false Always return false.
-     */
-    virtual bool isString() const { return false; }
-
-    /*!
-     * @brief This function return "false" value as default for identify binary type.
-     *
-     * @retval false Always return false.
-     */
-    virtual bool isBinary() const { return false; }
-
-    /*!
-     * @brief This function return "false" value as default for identify list type.
-     *
-     * @retval false Always return false.
-     */
-    virtual bool isList() const { return false; }
+    virtual bool isAlias() const { return false; }
 
     /*!
      * @brief This function return "false" value as default for identify array type.
@@ -181,11 +161,18 @@ public:
     virtual bool isArray() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify struct type.
+     * @brief This function return "false" value as default for identify binary type.
      *
      * @retval false Always return false.
      */
-    virtual bool isStruct() const { return false; }
+    virtual bool isBinary() const { return false; }
+
+    /*!
+     * @brief This function return "false" value as default for identify string type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isBuiltin() const { return false; }
 
     /*!
      * @brief This function return "false" value as default for identify enum type.
@@ -195,18 +182,37 @@ public:
     virtual bool isEnum() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify void type.
+     * @brief This function return "false" value as default for identify function type.
      *
      * @retval false Always return false.
      */
-    virtual bool isVoid() const { return false; }
+    virtual bool isFunction() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify alias type.
+     * @brief This function return "false" value as default for identify list type.
      *
      * @retval false Always return false.
      */
-    virtual bool isAlias() const { return false; }
+    virtual bool isList() const { return false; }
+
+    /*!
+     * @brief Returns whether the type is a scalar builtin type.
+     */
+    virtual bool isScalar() const { return false; }
+
+    /*!
+     * @brief This function return "false" value as default for identify string type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isString() const { return false; }
+
+    /*!
+     * @brief This function return "false" value as default for identify struct type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isStruct() const { return false; }
 
     /*!
      * @brief This function return "false" value as default for identify union type.
@@ -214,6 +220,13 @@ public:
      * @retval false Always return false.
      */
     virtual bool isUnion() const { return false; }
+
+    /*!
+     * @brief This function return "false" value as default for identify void type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isVoid() const { return false; }
 
 protected:
     _data_type m_dataType; /*!< Data type of current object */

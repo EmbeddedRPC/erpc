@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
@@ -30,7 +30,10 @@
  */
 
 @include("myAlloc.h")
-program test_arrays;
+program test;
+
+import "../common/unit_test_common.erpc"
+
 enum enumColor{red, green, blue}
 enum numbers {one = 1, two, three, four}
 
@@ -86,7 +89,7 @@ interface PointersService {
     sendReceived2Enum(enumColor[3][3] arrayEnums) -> enumColor[3][3]
 
     sendReceivedList(list<int32>[2] arrayLists) -> list<int32>[2]
-    sendReceived2List(list<int32>[2][2] arrayLists @retain) -> list<int32>[2][2]
+    sendReceived2List(list<int32>[2][2] arrayLists) -> list<int32>[2][2]
 
     sendReceivedInt32Type(ArrayIntType arrayNumbers) -> ArrayIntType
     sendReceived2Int32Type(Array2IntType arrayNumbers) -> Array2IntType
@@ -106,7 +109,7 @@ interface PointersService {
     sendReceiveStruct(AllTypes[2] arrayStructs) -> AllTypes[2]
     sendReceive2Struct(AllTypes[1][1] arrayStructs) -> AllTypes[1][1]
 
-    test_array_allDirection(int32[5] a, in int32[5] b, out int32[5] c, out byref int32[5] d, inout int32[5] e) -> void
+    test_array_allDirection(int32[5] a, in int32[5] b, out int32[5] c, inout int32[5] d) -> void
 }
 
 interface TestSecondInterfaceService {

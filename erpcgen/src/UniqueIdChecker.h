@@ -31,8 +31,8 @@
 
 #ifndef _EMBEDDED_RPC__UNIQUEIDCHECKER_H_
 #define _EMBEDDED_RPC__UNIQUEIDCHECKER_H_
+#include <cstdio>
 #include <set>
-#include <stdio.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -115,6 +115,6 @@ private:
     std::vector<idAndName_t> m_usedFunctionIds;  /*!< contains used function ids */
     std::vector<idAndName_t> m_usedInterfaceIds; /*!< contains used interface ids */
 };
-}
+} // namespace erpcgen
 
 #endif // _EMBEDDED_RPC__UNIQUEIDCHECKER_H_

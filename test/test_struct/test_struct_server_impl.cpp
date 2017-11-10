@@ -30,7 +30,7 @@
  */
 
 #include "erpc_server_setup.h"
-#include "test_struct_ArithmeticService_server.h"
+#include "test_ArithmeticService_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 #include <stdlib.h>
@@ -141,14 +141,14 @@ int32_t getStudentAge(const student *stud)
     return studAge;
 }
 
-student *createStudent(const char *name, const float (*test_scores)[3], school_year_t year, int32_t age)
+student *createStudent(const char *name, float test_scores[3], school_year_t year, int32_t age)
 {
     // Log::info("returning from createStudent()\n");
     student *newStudent = (student *)erpc_malloc(sizeof(student));
     newStudent->name = (char *)erpc_malloc((strlen(name) + 1) * sizeof(char));
     strcpy(newStudent->name, name);
     for (uint8_t i = 0; i < 3; ++i)
-        newStudent->test_grades[i] = (*test_scores)[i];
+        newStudent->test_grades[i] = test_scores[i];
     newStudent->school_year = year;
     newStudent->age = age;
     // Log::info("returning from createStudent()\n");
@@ -187,108 +187,14 @@ void test_struct_allDirection(const AllTypes *a, const AllTypes *b, AllTypes *e)
     }
 }
 
-/*void test_struct_allDirection(const AllTypes *a, const AllTypes *b, AllTypes *c, AllTypes **d, AllTypes *e)
+bool testSendingByrefMembers(const StructWithByrefMembers *s)
 {
-    char text2[] = "World";
-
-    c->number = a->number;
-    (*d)->number = b->number;
-    e->number = 2 * e->number;
-
-    int lenText = strlen(a->text);
-    c->text = (char *)malloc(lenText + 1);
-    strcpy(c->text, a->text);
-    lenText = strlen(b->text);
-    (*d)->text = (char *)malloc(lenText + 1);
-    strcpy((*d)->text, b->text);
-    strcpy(e->text, text2);
-    free(a->text);
-    free(b->text);
-
-    c->color = a->color;
-    (*d)->color = b->color;
-    e->color = green;
-
-    c->c.m = a->c.m;
-    c->c.n = a->c.n;
-    (*d)->c.m = b->c.m;
-    (*d)->c.n = b->c.n;
-    e->c.m = 2 * e->c.m;
-    e->c.n = 2 * e->c.n;
-
-    uint32_t elementsCount = a->list_numbers.elementsCount;
-    c->list_numbers.elementsCount = c->list_text.elementsCount = elementsCount;
-    (*d)->list_numbers.elementsCount = (*d)->list_text.elementsCount = elementsCount;
-    c->list_numbers.elements = (int32_t *)malloc(elementsCount * sizeof(int32_t));
-    c->list_text.elements = (char **)malloc(elementsCount * sizeof(char *));
-    (*d)->list_numbers.elements = (int32_t *)malloc(elementsCount * sizeof(int32_t));
-    (*d)->list_text.elements = (char **)malloc(elementsCount * sizeof(char *));
-    for (uint32_t i = 0; i < elementsCount; ++i)
+    if (s->a == (A*)0xED && *s->b == 4)
     {
-        c->list_numbers.elements[i] = a->list_numbers.elements[i];
-        lenText = strlen(a->list_text.elements[i]);
-        c->list_text.elements[i] = (char *)malloc(lenText + 1);
-        strcpy(c->list_text.elements[i], a->list_text.elements[i]);
-
-        (*d)->list_numbers.elements[i] = b->list_numbers.elements[i];
-        lenText = strlen(b->list_text.elements[i]);
-        (*d)->list_text.elements[i] = (char *)malloc(lenText + 1);
-        strcpy((*d)->list_text.elements[i], b->list_text.elements[i]);
-
-        e->list_numbers.elements[i] = 2 * e->list_numbers.elements[i];
-        strcpy(e->list_text.elements[i], text2);
-
-        free(a->list_text.elements[i]);
-        free(b->list_text.elements[i]);
+        return true;
     }
-    free(a->list_numbers.elements);
-    free(b->list_numbers.elements);
-    free(a->list_text.elements);
-    free(b->list_text.elements);
-
-    for (uint32_t i = 0; i < elementsCount; ++i)
-    {
-        c->array_numbers[i] = a->array_numbers[i];
-        lenText = strlen(a->array_text[i]);
-        c->array_text[i] = (char *)malloc(lenText + 1);
-        strcpy(c->array_text[i], a->array_text[i]);
-
-        (*d)->array_numbers[i] = b->array_numbers[i];
-        lenText = strlen(b->array_text[i]);
-        (*d)->array_text[i] = (char *)malloc(lenText + 1);
-        strcpy((*d)->array_text[i], b->array_text[i]);
-
-        e->array_numbers[i] = 2 * e->array_numbers[i];
-        strcpy(e->array_text[i], text2);
-
-        free(a->array_text[i]);
-        free(b->array_text[i]);
-    }
-
-    c->binary_numbers.elementsCount = (*d)->binary_numbers.elementsCount = a->binary_numbers.elementsCount;
-    c->binary_numbers.elements = (uint8_t *)malloc(c->binary_numbers.elementsCount * sizeof(uint8_t));
-    (*d)->binary_numbers.elements = (uint8_t *)malloc((*d)->binary_numbers.elementsCount * sizeof(uint8_t));
-    for (uint32_t i = 0; i < a->binary_numbers.elementsCount; ++i)
-    {
-        c->binary_numbers.elements[i] = a->binary_numbers.elements[i];
-        (*d)->binary_numbers.elements[i] = b->binary_numbers.elements[i];
-        e->binary_numbers.elements[i] = 2 * e->binary_numbers.elements[i];
-    }
-    free(a->binary_numbers.elements);
-    free(b->binary_numbers.elements);
-
-    free((void *)a);
-    free((void *)b);
-}*/
-
-/*AnonymousStruct *getAnonymousStruct(const AnonymousStruct *a)
-{
-    AnonymousStruct *anonymousStruct = (AnonymousStruct *)malloc(sizeof(AnonymousStruct));
-    anonymousStruct->a = a->a + 2;
-    anonymousStruct->b = a->b + 2;
-    free((void *)a);
-    return anonymousStruct;
-}*/
+    return false;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code

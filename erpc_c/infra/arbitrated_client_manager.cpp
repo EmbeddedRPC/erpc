@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,15 +33,17 @@
 #include "assert.h"
 #include "transport_arbitrator.h"
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+
+#if ERPC_NESTED_CALLS_DETECTION
+extern bool nestingDetection;
+#pragma weak nestingDetection
+bool nestingDetection = false;
+#endif
 
 void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)
 {
@@ -59,6 +61,12 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
     // before we get to the clientReceive() call below the arbitrator already has the buffer.
     if (!request.isOneway())
     {
+#if ERPC_NESTED_CALLS_DETECTION
+        if (nestingDetection)
+        {
+            return kErpcStatus_NestedCallFailure;
+        }
+#endif
         token = m_arbitrator->prepareClientReceive(request);
         if (!token)
         {
@@ -66,8 +74,18 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
         }
     }
 
+    erpc_status_t err;
+
+#if ERPC_MESSAGE_LOGGING
+    err = logMessage(request.getCodec()->getBuffer());
+    if (err)
+    {
+        return err;
+    }
+#endif
+
     // Send the request.
-    erpc_status_t err = m_arbitrator->send(request.getCodec()->getBuffer());
+    err = m_arbitrator->send(request.getCodec()->getBuffer());
     if (err)
     {
         return err;
@@ -82,6 +100,15 @@ erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
             return err;
         }
 
+#if ERPC_MESSAGE_LOGGING
+        err = logMessage(request.getCodec()->getBuffer());
+        if (err)
+        {
+            return err;
+        }
+#endif
+
+        // Check the reply.
         err = verifyReply(request);
         if (err)
         {

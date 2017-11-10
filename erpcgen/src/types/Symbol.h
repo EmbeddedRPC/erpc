@@ -54,22 +54,23 @@ public:
      */
     enum symbol_type_t
     {
-        kProgramSymbol,
-        kTypenameSymbol,
-        kEnumMemberSymbol,
-        kStructMemberSymbol,
         kConstSymbol,
-        kInterfaceSymbol,
+        kEnumMemberSymbol,
         kFunctionSymbol,
+        kInterfaceSymbol,
+        kProgramSymbol,
+        kStructMemberSymbol,
+        kTypenameSymbol,
+        kUnionCaseMemberSymbol,
 
-        kBuiltinTypeSymbol,
-        kListTypeSymbol,
-        kArrayTypeSymbol,
-        kEnumTypeSymbol,
-        kStructTypeSymbol,
         kAliasTypeSymbol,
-        kUnionTypeSymbol,
-        kUnionCaseTypeSymbol
+        kArrayTypeSymbol,
+        kBuiltinTypeSymbol,
+        kEnumTypeSymbol,
+        kFunctionTypeSymbol,
+        kListTypeSymbol,
+        kStructTypeSymbol,
+        kUnionTypeSymbol
     };
 
     /*!
@@ -143,6 +144,14 @@ public:
      * @returns Return symbol name.
      */
     const std::string &getName() const { return m_name; }
+
+    /*!
+     * @brief This function returns symbol output name.
+     * Can be different to getName() when @name is used.
+     *
+     * @returns Return symbol output name.
+     */
+    std::string getOutputName();
 
     /*!
      * @brief This function set symbol name.
@@ -220,6 +229,31 @@ public:
      * @return A vector of matching annotations
      */
     std::vector<Annotation *> getAnnotations(std::string name);
+
+    /*!
+     * @brief Find annotations matching name in the annotation list
+     *
+     * @return A vector of matching annotations
+     */
+    const std::vector<Annotation> &getAnnotations() const { return m_annotations; };
+
+    /*!
+     * @brief This function search and returns Value object for given annotation name.
+     *
+     * @param[in] annName Given annotation name.
+     *
+     * @return NULL if annotation is not found else value object.
+     */
+    Value *getAnnValue(const std::string annName);
+
+    /*!
+     * @brief This function search and returns string for given annotation name.
+     *
+     * @param[in] ann Given annotation name.
+     *
+     * @return empty string if annotation is not found else string value.
+     */
+    std::string getAnnStringValue(const std::string annName);
 
     /*!
      * @brief This function returns multiline comment for this symbol declared in IDL file.

@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,6 +141,18 @@
     <ClInclude Include="..\src\types\UnionType.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\erpc_c\infra\erpc_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\erpc_c\infra\crc16.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\types\FunctionType.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\annotations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -254,11 +263,23 @@
     <ClCompile Include="c_defines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="py_global_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\erpc_c\infra\crc16.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_crc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Flex Include="..\src\erpcgen_lexer.l" />
   </ItemGroup>
   <ItemGroup>
     <Bison Include="..\src\erpcgen_parser.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme_erpcgen.txt" />
   </ItemGroup>
 </Project>

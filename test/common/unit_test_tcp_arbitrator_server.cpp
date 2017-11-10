@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,10 +32,11 @@
 #include "Logging.h"
 #include "arbitrated_client_manager.h"
 #include "basic_codec.h"
+#include "myAlloc.h"
 #include "simple_server.h"
 #include "tcp_transport.h"
-#include "test_arbitrator_firstInterface.h"
-#include "test_arbitrator_secondInterface.h"
+#include "test_firstInterface.h"
+#include "test_secondInterface.h"
 #include "transport_arbitrator.h"
 #include "unit_test.h"
 #include <unistd.h>
@@ -71,9 +72,13 @@ TransportArbitrator g_arbitrator;
 SimpleServer g_server;
 Mutex waitQuitMutex;
 
+extern const uint32_t erpc_generated_crc;
+Crc16 g_crc16(erpc_generated_crc);
+
 int waitQuit = 0;
 int waitClient = 0;
 int isTestPassing = 0;
+int stopTest = 0;
 
 void increaseWaitQuit()
 {
@@ -101,8 +106,10 @@ void runClient(void *arg)
     {
         isTestPassing = testClient();
         Mutex::Guard lock(waitQuitMutex);
-        if (waitQuit != 0 || isTestPassing != 0)
+        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
+            enableFirstSide();
+            Mutex::Guard unlock(waitQuitMutex);
             break;
         }
         Mutex::Guard unlock(waitQuitMutex);
@@ -153,10 +160,13 @@ int main(int argc, char **argv)
     g_client->setCodecFactory(&g_basicCodecFactory);
     g_client->setMessageBufferFactory(&g_msgFactory);
 
+    g_arbitrator.setCrc16(&g_crc16);
+
     g_server.setTransport(&g_arbitrator);
     g_server.setCodecFactory(&g_basicCodecFactory);
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
+    g_client->setServer(&g_server);
 
     err = (erpc_status_t)-1;
 
@@ -189,6 +199,11 @@ int main(int argc, char **argv)
     }
 
     return isTestPassing;
+}
+
+void stopSecondSide()
+{
+    ++stopTest;
 }
 
 int32_t getResultFromSecondSide()
