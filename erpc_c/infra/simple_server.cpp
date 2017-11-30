@@ -95,7 +95,7 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
     if (err)
     {
         // Dispose of buffers.
-        if (!buff.get())
+        if (buff.get())
         {
             m_messageFactory->dispose(&buff);
         }
@@ -107,7 +107,7 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
     if (err)
     {
         // Dispose of buffers.
-        if (!buff.get())
+        if (buff.get())
         {
             m_messageFactory->dispose(&buff);
         }
