@@ -33,6 +33,7 @@
 #include "board.h"
 #include "fsl_dspi.h"
 #include "fsl_gpio.h"
+#include <cassert>
 #include <cstdio>
 
 using namespace erpc;
@@ -50,7 +51,7 @@ static volatile bool s_isTransferCompleted = false;
 
 void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, erpc_status_t status, void *userData)
 {
-    GPIO_PortSet(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
+    GPIO_SetPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
     s_isTransferCompleted = true;
 }
 
@@ -66,7 +67,7 @@ DspiSlaveTransport::~DspiSlaveTransport()
 {
     if (m_isInited)
     {
-        GPIO_PortClear(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
+        GPIO_ClearPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
     }
     DSPI_Deinit(m_spiBaseAddr);
 }
@@ -103,7 +104,7 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 
     status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &g_s_handle, &slaveXfer);
 
-    GPIO_PortClear(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
+    GPIO_ClearPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
     while (!s_isTransferCompleted)
     {
     }
@@ -124,7 +125,7 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
 
     status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &g_s_handle, &slaveXfer);
 
-    GPIO_PortClear(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
+    GPIO_ClearPinsOutput(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
     while (!s_isTransferCompleted)
     {
     }

@@ -34,7 +34,9 @@
 #include <cstring>
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

@@ -172,8 +172,9 @@ int main(int argc, char **argv)
 
     // One thread for client and one for server app of application
     Thread serverThread(&runServer, 0, 0, "server");
-    Thread clientThread(&runClient, 0, 0, "client");
     serverThread.start(&err);
+    g_client->setServerThreadId(serverThread.getThreadId());
+    Thread clientThread(&runClient, 0, 0, "client");
     clientThread.start(&clientThread);
 
     // Wait until client side will stop.

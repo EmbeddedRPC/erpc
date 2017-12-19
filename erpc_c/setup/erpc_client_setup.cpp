@@ -34,9 +34,15 @@
 #include "client_manager.h"
 #include "crc16.h"
 #include "manually_constructed.h"
-#include "message_buffer.h"
-#include "transport.h"
-#include <cassert>
+#include <assert.h>
+#include <new>
+#if ERPC_NESTED_CALLS
+#include "erpc_threading.h"
+#endif
+
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
 
 using namespace erpc;
 
@@ -58,8 +64,6 @@ extern const uint32_t erpc_generated_crc;
 
 void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
-    assert(transport);
-
     // Init factories.
     s_codecFactory.construct();
 
@@ -87,12 +91,17 @@ void erpc_client_set_server(erpc_server_t server)
 {
     g_client->setServer(reinterpret_cast<Server *>(server));
 }
+
+void erpc_client_set_server_thread_id(void *serverThreadId)
+{
+    g_client->setServerThreadId(reinterpret_cast<Thread::thread_id_t *>(serverThreadId));
+}
 #endif
 
 #if ERPC_MESSAGE_LOGGING
-bool erpc_server_add_message_logger(erpc_transport_t transport)
+void erpc_server_add_message_logger(erpc_transport_t transport)
 {
-    return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
 }
 #endif
 

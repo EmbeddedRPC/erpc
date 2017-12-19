@@ -34,6 +34,7 @@
 #include "fsl_gpio.h"
 #include "fsl_port.h"
 #include "fsl_spi.h"
+#include <cassert>
 #include <cstdio>
 
 using namespace erpc;
@@ -75,7 +76,7 @@ erpc_status_t SpiMasterTransport::init()
     EnableIRQ(ERPC_BOARD_SPI_INT_PIN_IRQ);
 
     GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
-    if (!GPIO_PinRead(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN))
+    if (!GPIO_ReadPinInput(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN))
     {
         s_isSlaveReady = true;
     }
@@ -125,7 +126,7 @@ extern "C" {
 void ERPC_BOARD_SPI_INT_PIN_IRQ_HANDLER(void)
 {
     /* Clear external interrupt flag. */
-    GPIO_PortClearInterruptFlags(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    GPIO_ClearPinsInterruptFlags(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
     s_isSlaveReady = true;
 }
 }

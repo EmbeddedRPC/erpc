@@ -65,7 +65,7 @@ const char k_version[] = ERPC_VERSION;
 const char k_copyright[] = "Copyright 2016-2017 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = {
-    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", NULL
+    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", "c:codec <codecType>", NULL
 };
 
 /*! Help string. */
@@ -77,10 +77,14 @@ const char k_usageText[] =
   -v/--verbose                 Print extra detailed log information\n\
   -I/--path <filePath>         Add search path for imports\n\
   -g/--generate <language>     Select the output language (default is C)\n\
+  -c/--codec <codecType>       Specify used codec type\n\
 \n\
 Available languages (use with -g option):\n\
   c    C/C++\n\
   py   Python\n\
+\n\
+Available codecs (use with --c option):\n\
+  basic   BasicCodec\n\
 \n";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +124,8 @@ protected:
     const char *m_outputFilePath; /*!< Path to the output file. */
     const char *m_ErpcFile;       /*!< ERPC file. */
     string_vector_t m_positionalArgs;
-    languages_t m_outputLanguage; /*!< Output language we're generating. */
+    languages_t m_outputLanguage;         /*!< Output language we're generating. */
+    InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
 
 public:
     /*!
@@ -139,6 +144,7 @@ public:
     , m_outputFilePath(NULL)
     , m_ErpcFile(NULL)
     , m_outputLanguage(kCLanguage)
+    , m_codec(InterfaceDefinition::kNotSpecified)
     {
         // create logger instance
         m_logger = new StdoutLogger();
@@ -216,6 +222,21 @@ public:
                     else
                     {
                         Log::error(format_string("error: unknown language %s", lang.c_str()).c_str());
+                        return 1;
+                    }
+                    break;
+                }
+
+                case 'c':
+                {
+                    string codec = optarg;
+                    if (codec.compare("basic") == 0)
+                    {
+                        m_codec = InterfaceDefinition::kBasicCodec;
+                    }
+                    else
+                    {
+                        Log::error(format_string("error: unknown codec type %s", codec.c_str()).c_str());
                         return 1;
                     }
                     break;
@@ -304,7 +325,7 @@ public:
             uniqueIdCheck.makeIdsUnique(def);
 
             boost::filesystem::path filePath(m_ErpcFile);
-            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath);
+            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath, m_codec);
 
             switch (m_outputLanguage)
             {

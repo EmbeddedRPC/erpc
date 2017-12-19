@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -36,6 +36,8 @@
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * @addtogroup server_setup
@@ -50,9 +52,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdbool.h>
-#include <stdint.h>
 
 //! @brief Opaque server object type.
 typedef struct ServerType *erpc_server_t;
@@ -122,11 +121,8 @@ void erpc_server_stop(void);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
- *
- * @retval True When transport was succesfully added.
- * @retval False When transport wasn't added.
  */
-bool erpc_server_add_message_logger(erpc_transport_t transport);
+void erpc_server_add_message_logger(erpc_transport_t transport);
 #endif
 
 //@}

@@ -21,7 +21,9 @@ extern "C"
 {$checkCrc()}
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;
@@ -70,13 +72,12 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 
 {% endif %}
 {%   for param in fn.parameters %}
-    {$param.variable}{% if param.isNullParam && errVar != "" %} = NULL{%endif%};
+    {$param.variable}{% if param.isNullParam %} = NULL{%endif%};
+{%    if !empty(param.nullVariable) %}
+    {$param.nullVariable} = NULL;
+{%    endif %}
 {%    if !param.shared %}
-{%     if param.isNullable %}
-{%      if param.allocateToClientAndServer || param.allocateToClient %}
-{$> addIndent("    ", param.mallocServer)}
-{%      endif -- allocate %}
-{%     else -- notNullable %}
+{%     if !param.isNullable %}
 {$> addIndent("    ", param.mallocServer)}
 {%     endif -- isNullable %}
 {%    endif -- shared %}
@@ -87,29 +88,25 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {%   if fn.needTempVariableServer %}
     int32_t _tmp_local;
 {%   endif %}
-{%   if count(fn.parameters) > 0 or !empty(fn.needTempVariableServer) %}
+{%   if count(fn.parameters) > 0 or empty(fn.needTempVariableServer) == false or empty(fn.needNullVariableOnServer) == false %}
 {# need empty line for this case #}
 
 {%   endif %}
     // startReadMessage() was already called before this shim was invoked.
-{%   if fn.isSendValue %}
 
-{%    for param in fn.parametersToServer if !param.serializedBothDirection %}
+{%   if fn.isSendValue %}
+{%    for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
 {%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}{$loop.addNewLineIfNotLast}
+{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}
+
 {%     else -- notNullable %}
-{$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{%      if param.direction != OutDirection %}
+{$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}
+
+{%      endif -- param != OutDirection %}
 {%     endif -- isNullable %}
 {%    endfor -- parametersToServer %}
 {%   endif -- isSendValue %}
-
-{$addInfraErrorChecks("    ", s_endReadMessage)}
-{%   for param in fn.parametersToClient %}
-{%    if param.mallocServerOut != "" %}
-
-{$> addIndent("    ", param.mallocServerOut)}
-{%    endif %}
-{%   endfor -- parametersToClient %}
 
     // Invoke the actual served function.
 {%   if fn.returnValue.type.isNotVoid %}
@@ -133,9 +130,9 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
     // Build response message.
 {$addInfraErrorChecks("    ", f_serverStartWriteMessage(iface.name, fn.name))}
 
-{%    for param in fn.parametersToClient if not param.serializedViaMember %}
+{%    for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 {%     if param.isNullable %}
-    if ({$param.name} != NULL)
+    if ({% if source == "server" && empty(param.nullVariable) == false %}_{% endif %}{$param.name} != NULL)
     {
 {$addInfraErrorChecks("        ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
     }
@@ -155,7 +152,6 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {%     endif -- isNullable %}
 {%    endif -- notVoid %}
 
-{$addInfraErrorChecks("    ", s_endWriteMessage)}
 {%   endif -- isReturnValue %}
 {%   if fn.isReturnValue %}
 {# need empty line for this case #}

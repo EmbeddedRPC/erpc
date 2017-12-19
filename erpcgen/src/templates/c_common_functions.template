@@ -141,15 +141,11 @@ static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * 
 {%   if struct.hasNullableMember %}
     bool isNull;
 {%   endif -- hasNullableMember %}
-{%   if struct.genStructWrapperF %}
-{%    if struct.needTempVariable %}
+{%   if struct.needTempVariable %}
     int32_t _tmp_local;
-{%    endif %}
-    {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startReadStruct();
-{%   else %}
-{%    if errVar != "" %}
+{%   endif %}
+{%   if errVar != "" %}
     erpc_status_t {$errVar}kErpcStatus_Success;
-{%    endif %}
 {%   endif %}
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
@@ -175,12 +171,6 @@ static int32_t read_{$struct.name}_struct(erpc::Codec * codec, {$struct.name} * 
 {$addInfraErrorChecks("    ", mem.coderCall.decode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
 {%   endfor -- struct.members %}
-{%   if struct.genStructWrapperF %}
-
-{$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$infraErrVar}codec->endReadStruct();
-{$> addInfraErrorChecksEnd("    ") }
-{%   endif %}
 {%   if errVar != ""  %}
     return err;
 {%   else %}
@@ -199,12 +189,8 @@ static int32_t write_{$struct.name}_struct_shared(erpc::Codec * codec, const {$s
 static int32_t write_{$struct.name}_struct(erpc::Codec * codec, const {$struct.name} * data)
 {%   endif %}
 {
-{%   if struct.genStructWrapperF %}
-    {%    if errVar != ""  %}erpc_status_t {$errVar}{%    endif %}codec->startWriteStruct();
-{%   else %}
-{%    if errVar != "" %}
+{%   if errVar != "" %}
     erpc_status_t {$errVar}kErpcStatus_Success;
-{%    endif %}
 {%   endif %}
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
@@ -223,12 +209,6 @@ static int32_t write_{$struct.name}_struct(erpc::Codec * codec, const {$struct.n
 {$addInfraErrorChecks("    ", mem.coderCall.encode(mem.coderCall))}{$loop.addNewLineIfNotLast}
 {%    endif -- notNullable %}
 {%   endfor -- struct.members %}
-{%   if struct.genStructWrapperF %}
-
-{$> addInfraErrorChecksBegin("    ") }
-{$infraErrIndents}    {$infraErrVar}codec->endWriteStruct();
-{$> addInfraErrorChecksEnd("    ") }
-{%   endif %}
 {%   if errVar != ""  %}
     return err;
 {%   else %}

@@ -21,42 +21,35 @@
 
 {# Code #}
 {%   set s_performRequest = infraErrVar & "g_client->performRequest(request);" %}
-{%   set s_performNestedRequest = infraErrVar & "g_client->performNestedRequest(request);" %}
-{%   set s_endWriteMessage = infraErrVar & "codec->endWriteMessage();" %}
-{%   set s_startReadStruct = infraErrVar & "codec->startReadStruct();" %}
-{%   set s_endReadStruct = infraErrVar & "codec->endReadStruct();" %}
-{%   set s_endReadMessage = infraErrVar & "codec->endReadMessage();" %}
 {%   set s_prepareServerBufferForSend = infraErrVar & "messageFactory->prepareServerBufferForSend(codec->getBuffer());" %}
 
 {% def f_clientEncode(iface, fn) %}
 {$addInfraErrorChecks("    ", f_clientStartWriteMessage(fn.isReturnValue, iface.name, fn.name))}
+
 {%   if fn.isSendValue %}
-{%    for param in fn.parametersToServer if !param.serializedBothDirection %}
+{%    for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
 {%     if param.isNullable %}
-{$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param))}{$loop.addNewLineIfNotLast}
+{$ addInfraErrorChecks("    ", f_paramIsNullableEncode(param))}
+
 {%     else -- isNullable %}
-{$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
+{%      if param.direction != OutDirection %}
+{$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}
+
+{%      endif -- param != OutDirection %}
 {%     endif -- isNullable %}
-{%    endfor -- fn parametersToServer %}
+{%    endfor -- fn parameters %}
 {%   endif -- isSendValue %}
-
-{$addInfraErrorChecks("    ", s_endWriteMessage)}
-
     // Send message to server
-{% if fn.nestedCall %}
-{$addInfraErrorChecks("    ", s_performNestedRequest)}
-{% else  -- fn.nestedCall %}
 {$addInfraErrorChecks("    ", s_performRequest)}
-{% endif  -- fn.nestedCall %}
 {% enddef %}
 
 {% def f_clientDecode(iface, fn) %}
-{%    for param in fn.parametersToClient if not param.serializedViaMember %}
+{%    for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 {%     if param.isNullable %}
-    if ({$param.nullableName} != NULL)
+    if ({$param.nullableName} != NULL{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %} && {$param.lengthName} != NULL{% endif %})
     {
-{$addInfraErrorChecks("        ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
-    }
+{$addInfraErrorChecks("        ", param.coderCall.decode(param.coderCall))}
+    }{$loop.addNewLineIfNotLast}
 {%     else -- notNullable %}
 {$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}{$loop.addNewLineIfNotLast}
 {%     endif -- isNullable %}
@@ -74,8 +67,6 @@
 {$addInfraErrorChecks("    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
 {%     endif -- isNullable %}
 {%    endif -- isNotVoid %}
-
-{$addInfraErrorChecks("    ", s_endReadMessage)}
 {% enddef %}
 
 {% def f_clientStartWriteMessage(isReturnValue, interfaceName, functionName) %}
@@ -87,14 +78,17 @@
 {% enddef %}
 
 {% def f_paramIsNullableEncode(param) %}
-if ({$param.nullableName} == NULL)
+if ({$param.nullableName} == NULL{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %} || {$param.lengthName} == NULL{% endif %})
 {
     {$infraErrVar}codec->writeNullFlag(true);
 }
 else
 {
     {$infraErrVar}codec->writeNullFlag(false);
+{# Out will send only null information from client to server that it is not null #}
+{% if param.direction != OutDirection %}
 {$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}
+{% endif -- param.direction != OutDirection %}
 }
 {% enddef %}
 
@@ -103,16 +97,20 @@ else
 if (!isNull)
 {
 {% if source == "server" %}
-{%  if param.allocateToServer %}
 {$> addIndent("    ", param.mallocServer)}
-{%  endif -- allocateToServer %}
 {% endif %}
 {$> addIndent("    ", param.firstAlloc)}
-{$addInfraErrorChecks("    ",param.coderCall.decode(param.coderCall))}
+{# Out will receive only null information from client to server that it is not null #}
+{% if param.direction != OutDirection %}
+{$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}
+{% endif -- param.direction != OutDirection %}
+{% if source == "server" && empty(param.nullVariable) == false %}
+    _{$param.nullableName} = &{$param.nullableName};
+{% endif %}
 }
 else
 {
-    {$param.nullableName} = NULL;
+    {% if source == "server" && !empty(param.nullVariable) %}_{% endif %}{$param.nullableName} = NULL;
 }
 {% enddef %}
 

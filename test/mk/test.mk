@@ -68,7 +68,6 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
             $(ERPC_ROOT)/erpc_c/transports \
             $(ERPC_ROOT)/erpcgen/src \
             $(ERPC_ROOT)/test/common \
-            $(ERPC_ROOT)/test/common/config \
             $(OBJS_ROOT)
 
 #-------------------------------
@@ -77,6 +76,9 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
 IDL_FILE = $(CUR_DIR).erpc
 
 ifneq "$(TEST_NAME)" "test_arbitrator"
+
+INCLUDES += $(ERPC_ROOT)/test/common/config
+
 SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
             $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
@@ -100,7 +102,19 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(IDL_FILE)
 $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
 	@$(call printmessage,orange,Running erpcgen-py $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
+
+# Add libtest.a to build.
+LIBRARIES += -ltest
+LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+
 else
+
+ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
+
+include $(ERPC_ROOT)/test/mk/erpc_src.mk
+
+INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
+
     ifeq "$(TYPE)" "CLIENT"
 include $(TEST_ROOT)/$(TEST_NAME)/client.mk
     else
@@ -111,10 +125,6 @@ endif
 ifeq "$(is_linux)" "1"
 LIBRARIES += -lpthread -lrt
 endif
-
-# Add libtest.a to build.
-LIBRARIES += -ltest
-LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
 
 include $(ERPC_ROOT)/mk/targets.mk
 

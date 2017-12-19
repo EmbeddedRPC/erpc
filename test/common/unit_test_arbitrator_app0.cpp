@@ -62,7 +62,6 @@ extern "C" {
 #endif
 
 using namespace erpc;
-using namespace std;
 
 #define APP_ERPC_READY_EVENT_DATA (1)
 
@@ -178,6 +177,7 @@ void runInit(void *arg)
 
     // adding server to client for nested calls.
     erpc_client_set_server(server);
+    erpc_client_set_server_thread_id((void *)g_serverTask);
 
     // adding the service to the server
     erpc_add_service_to_server(create_SecondInterface_service());

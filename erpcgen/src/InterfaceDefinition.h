@@ -60,6 +60,12 @@ public:
         kNone
     };
 
+    enum codec_t
+    {
+        kNotSpecified,
+        kBasicCodec,
+    }; /*!< Used codec type. */
+
     /*!
      * @brief Default constructor.
      */
@@ -113,8 +119,9 @@ public:
      *
      * @param[in] fileName Necessary for output files names.
      * @param[in] outputFilePath Path to directory, where files will be generated.
+     * @param[in] codec Used codec type in eRPC application.
      */
-    void setProgramInfo(const std::string &fileName, const std::string &outputFilePath);
+    void setProgramInfo(const std::string &fileName, const std::string &outputFilePath, codec_t codec);
 
     /*!
      * @brief This function sets program name.
@@ -176,6 +183,16 @@ public:
      */
     _error_handling_checks getErrorHandlingChecksType() { return m_error_handling_check; }
 
+    /*!
+     * @brief This function returns used codec type in eRPC application.
+     *
+     * This information can bring more optimized code into generated output files.
+     *
+     * @retval kNotSpecified No optimization.
+     * @retval kBasicCodec BasicCodec type optimization.
+     */
+    codec_t getCodecType() { return m_codec; }
+
 private:
     /* Instance Variables */
     AstNode *m_ast;                                /*!< Root of AstNode tree. */
@@ -184,6 +201,7 @@ private:
     std::string m_outputFilename;                  /*!< Output file name. */
     boost::filesystem::path m_outputDirectory;     /*!< Output file path. */
     _error_handling_checks m_error_handling_check; /*!< Type of generated error checks */
+    codec_t m_codec;                               /*!< Used codec type. */
 
     /* Private Functions */
     /*!

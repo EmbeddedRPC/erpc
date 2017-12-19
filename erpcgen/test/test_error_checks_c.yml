@@ -27,26 +27,18 @@ test_client.cpp:
   - if (!err)
   - err = codec->startWriteMessage
   - if (!err)
-  - err = codec->endWriteMessage
-  - if (!err)
   - err = g_client->performRequest
   - if (!err)
   - err =
-  - if (!err)
-  - err = codec->endReadMessage
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - if (!err)
-  - err = codec->endReadMessage
   - if (!err)
   - f();
   - if (!err)
   - err = codec->startWriteMessage
   - if (!err)
   - err =
-  - if (!err)
-  - err = codec->endWriteMessage
   - return err;
 
 ---
@@ -115,26 +107,18 @@ test_client.cpp:
   - if (!err)
   - err = codec->startWriteMessage
   - if (!err)
-  - err = codec->endWriteMessage
-  - if (!err)
   - err = g_client->performRequest
   - if (!err)
   - err =
-  - if (!err)
-  - err = codec->endReadMessage
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - if (!err)
-  - err = codec->endReadMessage
   - if (!err)
   - f();
   - if (!err)
   - err = codec->startWriteMessage
   - if (!err)
   - err =
-  - if (!err)
-  - err = codec->endWriteMessage
   - return err;
 
 ---
@@ -214,16 +198,12 @@ test_client.cpp:
       - err = codec->startWriteMessage
       - if (!err)
       - err =
-      - if (!err)
-      - err = codec->endWriteMessage
   - if (!err)
   - err = g_client->performRequest
   - if: dir in ('out', 'inout')
     then:
       - if (!err)
       - err =
-  - if (!err)
-  - err = codec->endReadMessage
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
@@ -231,16 +211,12 @@ test_server.cpp:
     then:
       - if (!err)
   - if (!err)
-  - err = codec->endReadMessage
-  - if (!err)
   - if: dir in ('out', 'inout')
     then:
       - if (!err)
       - err = codec->startWriteMessage
       - if (!err)
       - err =
-      - if (!err)
-      - err = codec->endWriteMessage
   - return err;
 
 ---
@@ -320,16 +296,12 @@ test_client.cpp:
       - err = codec->startWriteMessage
       - if (!err)
       - err =
-      - if (!err)
-      - err = codec->endWriteMessage
   - if (!err)
   - err = g_client->performRequest
   - if: dir in ('out', 'inout')
     then:
       - if (!err)
       - err =
-  - if (!err)
-  - err = codec->endReadMessage
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
@@ -338,16 +310,12 @@ test_server.cpp:
       - if (!err)
       - err =
   - if (!err)
-  - err = codec->endReadMessage
-  - if (!err)
   - if: dir in ('out', 'inout')
     then:
       - if (!err)
       - err = codec->startWriteMessage
       - if (!err)
       - err =
-      - if (!err)
-      - err = codec->endWriteMessage
   - return err;
 
 ---
@@ -456,11 +424,7 @@ idl: |
 test_client.cpp:
   - if (err)
   - '{'
-  - client_error_handler_t errorHandler = g_client->getErrorHandler();
-  - if (errorHandler != NULL)
-  - '{'
-  - (*errorHandler)(err);
-  - '}'
+  - g_client->callErrorHandler(err);
   - return {type[1]};
   - '}'
 
@@ -500,10 +464,6 @@ idl: |
 test_client.cpp:
   - if (err)
   - '{'
-  - client_error_handler_t errorHandler = g_client->getErrorHandler();
-  - if (errorHandler != NULL)
-  - '{'
-  - (*errorHandler)(err);
-  - '}'
+  - g_client->callErrorHandler(err);
   - not: return
   - '}'

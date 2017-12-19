@@ -37,6 +37,10 @@
 #include "rpmsg_lite_base_transport.h"
 #include <assert.h>
 
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
+
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////

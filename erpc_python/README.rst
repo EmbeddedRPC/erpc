@@ -19,6 +19,6 @@
 |    Once installed, you can access the infrastructure via a standard import statement.
 |
 |        import erpc
-|        xport = erpc.transport.SerialTransport("/dev/ttyS1", 115200)
+|        port = erpc.transport.SerialTransport("/dev/ttyS1", 115200)
 |        client = erpc.client.ClientManager(xport, erpc.basic_codec.BasicCodec)
 

@@ -71,7 +71,6 @@ class {$s.name}(object):
 
 {% endfor -- s.members %}
     def _read(self, codec):
-        codec.start_read_struct()
 {% for m in s.members if not m.serializedViaMember %}
 {%   set self_m_name = "self." & m.name %}
 {%   if m.isNullable %}
@@ -87,11 +86,9 @@ class {$s.name}(object):
 {%    endif -- isNonEncapsulatedUnion %}
 {%   endif -- isNullable %}
 {% endfor -- members %}
-        codec.end_read_struct()
         return self
 
     def _write(self, codec):
-        codec.start_write_struct()
 {% for m in s.members if not m.serializedViaMember %}
 {%  set self_m_name = "self." & m.name %}
 {%  if m.isNullable %}
@@ -110,7 +107,6 @@ class {$s.name}(object):
 {%    endif -- isNonEncapsulatedUnion %}
 {%   endif -- isNullable %}
 {% endfor -- members %}
-        codec.end_write_struct()
 
     def __str__(self):
         return "<%s@%x{% for m in s.members if not m.lengthForMember %} {$m.name}=%s{% endfor %}>" % (self.__class__.__name__, id(self){% for m in s.members if not m.lengthForMember %}, self.{$m.name}{% endfor %})

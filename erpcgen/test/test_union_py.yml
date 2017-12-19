@@ -66,7 +66,6 @@ test/common.py:
   - for _i1 in range(_n1)
   - _v1 = codec.read_int32()
   - self.a.append(_v1)
-  - codec.end_read_list()
   - elif discriminator == 3
   - self.cx = codec.read_uint32()
   - _n1 = codec.start_read_list()
@@ -74,13 +73,11 @@ test/common.py:
   - for _i1 in range(_n1)
   - _v1 = codec.read_int32()
   - self.cc.append(_v1)
-  - codec.end_read_list()
   - elif discriminator == 10
   - self.ret = codec.read_int32()
   - else # default case
   - self.c = codec.read_bool()
   - self.blah = codec.read_int32()
-  - codec.end_read_union()
   - return self, discriminator
   - def _write(self, codec, discriminator)
   - codec.start_write_union(discriminator)
@@ -108,7 +105,6 @@ test/common.py:
   - codec.start_write_list(self.length)
   - for _i1 in self.a
   - codec.write_int32(_i1)
-  - codec.end_write_list()
   - elif discriminator == 3
   - if self.cx is None
   - raise ValueError("self.cx is None")
@@ -118,7 +114,6 @@ test/common.py:
   - codec.start_write_list(self.length)
   - for _i1 in self.cc
   - codec.write_int32(_i1)
-  - codec.end_write_list()
   - elif discriminator == 10
   - if self.ret is None
   - raise ValueError("self.ret is None")
@@ -139,12 +134,10 @@ test/client.py:
   - if unionVariable is None
   - raise ValueError("unionVariable is None")
   - unionVariable._write(codec, discriminator)
-  - codec.end_write_message()
 
 test/server.py:
   - "def _handle_myUnion(self, sequence, codec):"
   - unionVariable, discriminator = common.unionType()._read(codec)
-  - codec.end_read_message()
   - self._handler.myUnion(discriminator, unionVariable)
 
 ---

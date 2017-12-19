@@ -31,6 +31,7 @@
 
 #include "uart_cmsis_transport.h"
 #include "board.h"
+#include <cassert>
 #include <cstdio>
 
 using namespace erpc;

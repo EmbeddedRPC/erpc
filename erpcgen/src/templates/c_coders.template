@@ -58,7 +58,7 @@ uint8_t * {$info.dataTemp};
 {$> addInfraErrorChecksBegin("") }
 {$infraErrIndents}if ({$info.sizeTemp} > 0 {% if info.maxSize != info.sizeTemp %}&& {$info.sizeTemp} <= {$info.maxSize}{% endif %})
 {$infraErrIndents}{
-{% if source == "server" || info.useMallocOnClientSide %}
+{% if source == "server" || info.useMallocOnClientSide == true %}
 {$infraErrIndents}    {$info.name} = (uint8_t *) erpc_malloc({$info.maxSize} * sizeof(uint8_t));
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}    if ({$info.name} == NULL)
@@ -69,8 +69,8 @@ uint8_t * {$info.dataTemp};
 {$infraErrIndents}    {
 {% endif %}
 {% endif %}
-{$infraErrIndents}    {% if source == "server" || info.useMallocOnClientSide %}{$allocErrIndents}{% endif %}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
-{% if source == "server" || info.useMallocOnClientSide %}
+{$infraErrIndents}    {% if source == "server" || info.useMallocOnClientSide == true %}{$allocErrIndents}{% endif %}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{% if source == "server" || info.useMallocOnClientSide == true %}
 {% if generateAllocErrorChecks %}
 {$infraErrIndents}    }
 {% endif %}
@@ -106,13 +106,9 @@ uint32_t {$info.sizeTemp};
 {%   if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {%  endif %}
 {$> addInfraErrorChecksBegin("") }
-{%  if info.isNullable %}
-{$infraErrIndents}{$infraErrVar}codec->readNullFlag(&isNull);
-{$> addInfraErrorChecksBegin("") }
-{%  endif --info.isNullable %}
-{$infraErrIndents}if ({$info.sizeTemp} > 0{%  if info.isNullable %} && !isNull{%  endif --info.isNullable %})
+{$infraErrIndents}if ({$info.sizeTemp} > 0)
 {$infraErrIndents}{
-{%   if source == "server" || info.useMallocOnClientSide %}
+{%   if source == "server" || info.useMallocOnClientSide == true %}
 {$infraErrIndents}    {$info.name} = ({$info.mallocType}) erpc_malloc({$info.maxSize} * sizeof({$info.mallocSizeType}));
 {%    if generateAllocErrorChecks %}
 {$infraErrIndents}    if ({$info.name} == NULL)
@@ -134,17 +130,14 @@ uint32_t {$info.sizeTemp};
 {$infraErrIndents}{
 {$infraErrIndents}    {$info.name} = NULL;
 {$infraErrIndents}}
-{%  if info.isNullable %}
-{$> addInfraErrorChecksEnd("") }
-{%  endif --info.isNullable %}
-{$> addInfraErrorChecksEnd("") }
-{$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}{$infraErrVar}codec->endReadList();
 {$> addInfraErrorChecksEnd("") }
 {% endif %}
 {% enddef ------------------------------------- ListType %}
 
 {% def decodeArrayType(info) -------------- ArrayType %}
+{% if !empty(info.builtinTypeName) %}
+{$decodeData(info)}
+{%else%}
 for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp}; ++{$info.forLoopCount})
 {
 {% if info.isElementArrayType %}
@@ -156,6 +149,7 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp};
 {$>addIndent("    ", addInfraErrorChecksElse())}
 {% endif %}
 }
+{% endif %}
 {% enddef ----------------------------------- ArrayType %}
 
 {% def decodeStructType(info) --------------- StructType %}
@@ -212,7 +206,6 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
     }
 {% endfor -- cases %}
 }
-{$infraErrVar}codec->endReadUnion();
 {% enddef -------------------------- UnionType %}
 
 {% def decodeFunctionType(info) %}
@@ -266,13 +259,19 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}
 {%  endif%}
 {% endif%}
 {% enddef -------------------------- SharedType %}
+
+{% def decodeData(info) -------------------%}
+{$> addInfraErrorChecksBegin("") }
+{$infraErrIndents}{$infraErrVar}codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName}));
+{$> addInfraErrorChecksEnd("") }
+{% enddef --------------------------------------- decodeData %}
 {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#}
 
 
 {# Encode sending data #}
 {% def encodeBuiltinType(info) -----------------  %}
 {% if info.builtinType == "kStringType" %}
-{% if source == "client" || info.inDataContainer %}
+{% if source == "client" || info.inDataContainer == true %}
 if ({$info.name})
 {
     {$infraErrVar}codec->writeString(strlen({$info.name}), {$info.name});
@@ -311,34 +310,15 @@ else
 {% if info.useBinaryCoder %}
 {$encodeBinaryType(info)}
 {% else %}
-if ({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} > 0)
-{
-    {$infraErrVar}codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size});
-{%  if info.isNullable %}
-    if ({$info.name} == NULL)
-    {
-        {$infraErrVar}codec->writeNullFlag(true);
-    }
-    else
-    {
-        {$infraErrVar}codec->writeNullFlag(false);
-{$addIndent("        ", encodeArrayType(info))}
-    }
-{%  else %}
-{$addIndent("    ", encodeArrayType(info))}
-{%  endif --info.isNullable %}
-}
-else
-{
-    {$infraErrVar}codec->startWriteList(0);
-}
-{$> addInfraErrorChecksBegin("") }
-{$infraErrIndents}{$infraErrVar}codec->endWriteList();
-{$> addInfraErrorChecksEnd("") }
+{$infraErrVar}codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size});
+{$encodeArrayType(info))}
 {% endif %}
 {% enddef ------------------------------------ ListType %}
 
 {% def encodeArrayType(info) --------------------- %}
+{% if !empty(info.builtinTypeName) %}
+{$encodeData(info)}
+{%else%}
 for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}; ++{$info.forLoopCount})
 {
 {% if info.isElementArrayType %}
@@ -350,6 +330,7 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {% if source == "
 {$>addIndent("    ", addInfraErrorChecksElse())}
 {% endif %}
 }
+{% endif %}
 {% enddef --------------------------------------- ArrayType %}
 
 {% def encodeStructType(info) -------------------%}
@@ -384,7 +365,6 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
     }
 {% endfor -- cases %}
 }
-{$infraErrVar}codec->endWriteUnion();
 {% enddef -------------------------- UnionType %}
 
 {% def encodeFunctionType(info) %}
@@ -444,3 +424,8 @@ else
 {% endif%}
 {% enddef -------------------------- SharedType %}
 
+{% def encodeData(info) -------------------%}
+{$> addInfraErrorChecksBegin("") }
+{$infraErrIndents}{$infraErrVar}codec->writeData({$info.name}, {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} * sizeof({$info.builtinTypeName}));
+{$> addInfraErrorChecksEnd("") }
+{% enddef --------------------------------------- encodeData %}

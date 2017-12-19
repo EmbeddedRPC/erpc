@@ -55,9 +55,9 @@ erpc_status_t BasicCodec::startWriteMessage(message_type_t type, uint32_t servic
     return kErpcStatus_Success;
 }
 
-erpc_status_t BasicCodec::endWriteMessage()
+erpc_status_t BasicCodec::writeData(const void *value, uint32_t length)
 {
-    return kErpcStatus_Success;
+    return m_cursor.write(value, length);
 }
 
 erpc_status_t BasicCodec::write(bool value)
@@ -153,30 +153,10 @@ erpc_status_t BasicCodec::startWriteList(uint32_t length)
     return write(length);
 }
 
-erpc_status_t BasicCodec::endWriteList()
-{
-    return kErpcStatus_Success;
-}
-
-erpc_status_t BasicCodec::startWriteStruct()
-{
-    return kErpcStatus_Success;
-}
-
-erpc_status_t BasicCodec::endWriteStruct()
-{
-    return kErpcStatus_Success;
-}
-
 erpc_status_t BasicCodec::startWriteUnion(int32_t discriminator)
 {
     // Write the union discriminator as a u32.
     return write(discriminator);
-}
-
-erpc_status_t BasicCodec::endWriteUnion()
-{
-    return kErpcStatus_Success;
 }
 
 erpc_status_t BasicCodec::writeNullFlag(bool isNull)
@@ -208,9 +188,9 @@ erpc_status_t BasicCodec::startReadMessage(message_type_t *type,
     return read(sequence);
 }
 
-erpc_status_t BasicCodec::endReadMessage()
+erpc_status_t BasicCodec::readData(void *value, uint32_t length)
 {
-    return kErpcStatus_Success;
+    return m_cursor.read(value, length);
 }
 
 erpc_status_t BasicCodec::read(bool *value)
@@ -317,30 +297,10 @@ erpc_status_t BasicCodec::startReadList(uint32_t *length)
     return read(length);
 }
 
-erpc_status_t BasicCodec::endReadList()
-{
-    return kErpcStatus_Success;
-}
-
-erpc_status_t BasicCodec::startReadStruct()
-{
-    return kErpcStatus_Success;
-}
-
-erpc_status_t BasicCodec::endReadStruct()
-{
-    return kErpcStatus_Success;
-}
-
 erpc_status_t BasicCodec::startReadUnion(int32_t *discriminator)
 {
     // Read union discriminator as u32.
     return read(discriminator);
-}
-
-erpc_status_t BasicCodec::endReadUnion()
-{
-    return kErpcStatus_Success;
 }
 
 erpc_status_t BasicCodec::readNullFlag(bool *isNull)

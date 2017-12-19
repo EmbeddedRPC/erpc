@@ -1074,7 +1074,6 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
         FunctionType *callbackFunctionType = dynamic_cast<FunctionType *>(callbackDataType);
         assert(callbackFunctionType);
         Function *funcDef = dynamic_cast<Function *>(func);
-        assert(funcDef);
 
         /* Connect function type with callbacks. */
         callbackFunctionType->getCallbackFuns().push_back(funcDef);
@@ -1113,10 +1112,6 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
         AstNode *callbackTypeNode = (*node)[2];
         if (callbackTypeNode)
         {
-            if (!func->findAnnotation(NESTED_CALL))
-            {
-                Log::info("This function should be marked as @nested and in erpc_config.h should be presented #ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED).\n");
-            }
             DataType *callbackDataType = lookupDataType(callbackTypeNode);
             FunctionType *callbackFunctionType = dynamic_cast<FunctionType *>(callbackDataType);
             assert(callbackFunctionType);
@@ -1571,7 +1566,6 @@ void SymbolScanner::scanStructForAnnotations()
         if (memberType->isUnion())
         {
             UnionType *unionType = dynamic_cast<UnionType *>(structMember->getDataType());
-            assert(unionType);
             Symbol *disSymbol;
             if (unionType->isNonEncapsulatedUnion())
             {

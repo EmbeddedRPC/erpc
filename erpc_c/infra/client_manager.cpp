@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,6 +33,9 @@
 #include "assert.h"
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -58,6 +61,18 @@ RequestContext ClientManager::createRequest(bool isOneway)
 }
 
 erpc_status_t ClientManager::performRequest(RequestContext &request)
+{
+#if ERPC_NESTED_CALLS
+    assert(m_serverThreadId && "server thread id was not set");
+    if (Thread::getCurrentThreadId() == m_serverThreadId)
+    {
+        return performNestedClientRequest(request);
+    }
+#endif
+    return performClientRequest(request);
+}
+
+erpc_status_t ClientManager::performClientRequest(RequestContext &request)
 {
 #if ERPC_NESTED_CALLS_DETECTION
     if (!request.isOneway() && nestingDetection)
@@ -113,7 +128,7 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
 }
 
 #if ERPC_NESTED_CALLS
-erpc_status_t ClientManager::performNestedRequest(RequestContext &request)
+erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
 {
     assert(m_transport && "transport/arbitrator not set");
 
@@ -216,4 +231,12 @@ void ClientManager::releaseRequest(RequestContext &request)
 {
     m_messageFactory->dispose(request.getCodec()->getBuffer());
     m_codecFactory->dispose(request.getCodec());
+}
+
+void ClientManager::callErrorHandler(erpc_status_t err)
+{
+    if (m_errorHandler != NULL)
+    {
+        m_errorHandler(err);
+    }
 }

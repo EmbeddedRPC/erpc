@@ -80,15 +80,18 @@ public:
      */
     void setArbitrator(TransportArbitrator *arbitrator);
 
+protected:
+    TransportArbitrator *m_arbitrator; //!< Optional transport arbitrator. May be NULL.
+
     /*!
      * @brief This function performs request.
      *
+     * Should be called in non server context (do not call another eRPC function in server
+     * remote call implementation).
+     *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performRequest(RequestContext &request);
-
-protected:
-    TransportArbitrator *m_arbitrator; //!< Optional transport arbitrator. May be NULL.
+    virtual erpc_status_t performClientRequest(RequestContext &request);
 
     //! @brief This method is not used with this class.
     void setTransport(Transport *transport) {}

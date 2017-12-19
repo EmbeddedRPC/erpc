@@ -168,7 +168,14 @@ public:
     virtual bool isBinary() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify string type.
+     * @brief This function return "false" value as default for identify bool type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isBool() const { return false; }
+
+    /*!
+     * @brief This function return "false" value as default for identify builtin type.
      *
      * @retval false Always return false.
      */
@@ -196,7 +203,9 @@ public:
     virtual bool isList() const { return false; }
 
     /*!
-     * @brief Returns whether the type is a scalar builtin type.
+     * @brief This function return "false" value as default for identify scalar builtin type.
+     *
+     * @retval false Always return false;
      */
     virtual bool isScalar() const { return false; }
 

@@ -530,16 +530,6 @@ private:
     std::string firstAllocOnServerWhenIsNeed(std::string name, StructMember *structMember);
 
     /*!
-     * @brief This function call first erpc_alloc on server side for parameters if it is need (only out param).
-     *
-     * @param[in] name Parameter name.
-     * @param[in] structMember Contains direction type and data type.
-     *
-     * @return Erpc_alloc function or empty.
-     */
-    std::string firtAllocOutParamOnServerWhenIsNeed(std::string name, StructMember *structMember);
-
-    /*!
      * @brief This function call first erpc_alloc on client side return statement if it is need.
      *
      * It is need by rules of taking data types from return type.
@@ -703,6 +693,56 @@ private:
     void setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol);
 
     bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData);
+
+    /*!
+     * @brief This function returns data type name for scalar data type.
+     *
+     * @param[in] dataType Data type to inspect.
+     *
+     * @retval Empty string when data type is not scalar.
+     * @retval Alias data name when dataType is AliasType.
+     * @retval Otherwise output from getBuiltinTypename.
+     */
+    std::string getScalarTypename(DataType *dataType);
+
+    /*!
+     * @brief This function returns string representations of function parameter direction.
+     *
+     * @param[in] direction Enum direction.
+     *
+     * @return String representation for given direction.
+     */
+    std::string getDirection(_param_direction direction);
+
+    /*!
+     * @brief This function returns information if function parameter on server side need be initialized to NULL.
+     *
+     * @param[in] structMember Function parameter.
+     *
+     * @retval true When Function parameter need to be initialized to NULL.
+     * @retval false When Function parameter don't need to be initialized to NULL.
+     */
+    bool isServerNullParam(StructMember *structMember);
+
+    /*!
+     * @brief This function returns information if function parameter is passed by pointer.
+     *
+     * @param[in] structMember Function parameter.
+     *
+     * @retval true When Function parameter is passed by pointer.
+     * @retval false When Function parameter isn't passed by pointer.
+     */
+    bool isPointerParam(StructMember *structMember);
+
+    /*!
+     * @brief This function returns information if function parameter is null-able.
+     *
+     * @param[in] structMember Function parameter.
+     *
+     * @retval true When Function parameter is null-able.
+     * @retval false When Function parameter isn't null-able.
+     */
+    bool isNullableParam(StructMember *structMember);
 };
 } // namespace erpcgen
 

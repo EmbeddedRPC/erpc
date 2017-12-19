@@ -1,5 +1,5 @@
 ---
-name: param buildin
+name: param string
 desc:
 params:
   dir:
@@ -12,36 +12,33 @@ idl: |
   }
 test_client.cpp:
   - re: void bar\(\w*\s*char \* a\)
+  - if (a == NULL)
+  - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
     then:
-      - if (a == NULL)
-      - codec->writeNullFlag(true)
-      - if (a)
       - codec->writeString(strlen(a), a);
   - if: dir == 'out'
     then:
-      - not: if (a != NULL)
-      - codec->readString(&a_len, &a_local);
-  - if: dir == 'inout'
+      - not: codec->writeString(strlen(a), a);
+  - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
       - codec->readString(&a_len, &a_local);
 test_server.cpp:
   - ::bar_shim
   - char * a = NULL;
+  - bool isNull;
+  - codec->readNullFlag(&isNull)
+  - if (!isNull)
   - if: dir in ('in', 'inout')
     then:
-      - bool isNull;
-      - codec->readNullFlag(&isNull)
-      - if (!isNull)
       - err = codec->readString(&a_len, &a_local)
-      - else
-      - a = NULL;
   - if: dir == 'out'
     then:
-      - not: if (a != NULL)
-      - codec->writeString(strlen(a), a);
-  - if: dir =='inout'
+      - not: codec->readString(&a_len, &a_local)
+  - else
+  - a = NULL;
+  - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
       - codec->writeString(strlen(a), a);
@@ -85,7 +82,6 @@ test_server.cpp:
   - read_Vector_struct
   - else
   - v = NULL
-  - endReadMessage
 
 ---
 name: struct list field
@@ -117,7 +113,6 @@ test_server.cpp:
   - else
   - data->b.elements = NULL
   - data->b.elementsCount = 0
-  - endReadStruct
 
 name: struct binary field
 desc:
@@ -168,7 +163,6 @@ test_client.cpp:
   - if: dir in ('in', 'inout')
     then:
       - int32_t write_pair_struct
-      - codec->startWriteStruct();
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
@@ -179,7 +173,6 @@ test_client.cpp:
     then:
       - int32_t read_pair_struct
       - bool isNull;
-      - codec->startReadStruct();
       - codec->readNullFlag(&isNull);
       - if (!isNull)
       - codec->readString(&a_len, &a_local);
@@ -191,7 +184,6 @@ test_server.cpp:
     then:
       - int32_t read_pair_struct
       - bool isNull;
-      - codec->startReadStruct();
       - codec->readNullFlag(&isNull);
       - if (!isNull)
       - codec->readString(&a_len, &a_local);
@@ -201,7 +193,6 @@ test_server.cpp:
   - if: dir in ('out', 'inout')
     then:
       - int32_t write_pair_struct
-      - codec->startWriteStruct();
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
@@ -231,3 +222,177 @@ test_server.cpp:
   - if (result == NULL)
   - codec->writeNullFlag(true);
   - codec->writeNullFlag(false);
+
+---
+name: inout scalar type
+desc:
+idl: |
+
+  interface foo {
+    bar(inout uint32 param1 @nullable, out uint32 param2 @nullable) -> void
+  }
+
+test_client.cpp:
+  - not: _var
+  - not: _listLen
+
+  - if (param1 == NULL)
+  - codec->writeNullFlag
+  - err = codec->write(*param1);
+  - if (param2 == NULL)
+  - codec->writeNullFlag
+  - not: err = codec->write(*param2);
+  - if (param1 != NULL)
+  - err = codec->read(param1);
+  - if (param2 != NULL)
+  - err = codec->read(param2);
+
+test_server.cpp:
+  - uint32_t param1;
+  - uint32_t *_param1 = NULL;
+  - uint32_t param2;
+  - uint32_t *_param2 = NULL;
+  - bool isNull;
+
+  - codec->readNullFlag(&isNull);
+  - codec->read(&param1);
+  - _param1 = &param1;
+  - _param1 = NULL;
+  - codec->readNullFlag(&isNull);
+  - not: codec->read(
+  - _param2 = &param2;
+  - _param2 = NULL;
+
+  - bar(_param1, _param2);
+
+  - if (_param1 != NULL)
+  - codec->write(param1)
+  - if (_param2 != NULL)
+  - codec->write(param2)
+
+---
+name: in list param
+desc: verify in list params with @length
+params:
+  dir:
+    - "in"
+    - "inout"
+  ann:
+    - ""
+    - "@nullable"
+idl: |
+  interface foo {
+    bar(list<bool> l @length(c) @nullable, {dir} uint32 c {ann}) -> void
+  }
+
+test_client.cpp:
+  - if: dir == 'inout'
+    then:
+      - void bar(bool * l, uint32_t * c)
+    else:
+      - void bar(bool * l, uint32_t c)
+  - if: dir == 'inout' and ann == '@nullable'
+    then:
+      - if (l == NULL || c == NULL)
+    else:
+      - if (l == NULL)
+  - codec->writeNullFlag
+  - if: dir == 'inout'
+    then:
+      - codec->startWriteList(*c);
+    else:
+      - codec->startWriteList(c);
+  - codec->write(l[listCount1])
+  - if: ann == '@nullable' and dir == 'inout'
+    then:
+      - if (c == NULL)
+      - codec->writeNullFlag
+  - codec->write
+  - if: dir == 'inout'
+    then:
+      - if: ann == '@nullable'
+        then:
+          - if (c != NULL)
+      - codec->read
+    else:
+      - not: if (c != NULL)
+      - not: codec->read
+test_server.cpp:
+  - codec->readNullFlag
+  - uint32_t lengthTemp_1;
+  - codec->startReadList(&lengthTemp_1);
+  - c = lengthTemp_1;
+  - codec->read(&l[listCount1])
+  - if: ann == '@nullable' and dir == 'inout'
+    then:
+      - codec->readNullFlag
+  - codec->read
+  - if: dir == 'inout'
+    then:
+      - if: ann == '@nullable'
+        then:
+          - if (_c != NULL)
+      - codec->write
+    else:
+      - not: if (_c != NULL)
+      - not: codec->write
+
+---
+name: out list param
+desc: verify in list params with @length
+params:
+  dir:
+    - "out"
+    - "inout"
+  ann:
+    - ""
+    - "@nullable"
+idl: |
+  interface foo {
+    bar(out list<bool> l @length(c) @nullable @max_length(20), {dir} uint32 c {ann}) -> void
+  }
+
+test_client.cpp:
+  - void bar(bool * l, uint32_t * c)
+  - if: ann == '@nullable'
+    then:
+      - if (l == NULL || c == NULL)
+    else:
+      - if (l == NULL)
+  - codec->writeNullFlag
+  - not: codec->startWriteList
+  - if: ann == '@nullable'
+    then:
+      - if (c == NULL)
+      - codec->writeNullFlag
+  - if: dir == 'inout'
+    then:
+      - codec->write
+  - if: ann == '@nullable'
+    then:
+      - if (l != NULL && c != NULL)
+    else:
+      - if (l != NULL)
+  - codec->startReadList
+  - codec->read(&l[listCount1])
+  - if: ann == '@nullable'
+    then:
+      - if (c != NULL)
+  - codec->read
+
+test_server.cpp:
+  - codec->readNullFlag
+  - not: codec->startReadList
+  - if: ann == '@nullable'
+    then:
+      - codec->readNullFlag
+  - if: dir == 'inout'
+    then:
+      - codec->read
+  - if (l != NULL)
+  - codec->startWriteList
+  - codec->write(l[listCount1])
+  - if: ann == '@nullable'
+    then:
+      - if (_c != NULL)
+  - codec->write

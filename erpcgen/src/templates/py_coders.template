@@ -61,7 +61,6 @@ codec.start_write_union({$self}discriminator)
 {$indent}else:
 {$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- defaultCase/hasNonVoidCase %}
-{$indent}codec.end_write_union()
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
 {$codec}.write_uint32({$name}){%>%}
@@ -78,9 +77,6 @@ codec.start_write_union({$self}discriminator)
 {%  endif %}
 {%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
 {$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}
-{%  if info.type == "list" %}
-{$indent}{$codec}.end_write_list()
-{%  endif %}
 {#--------------- function ---------------#}
 {% elif info.type == "function" %}
 {%  if info.tableName != "" %}
@@ -154,7 +150,6 @@ codec.start_write_union({$self}discriminator)
 {$indent}else:
 {$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- default/hasNonVoidCase %}
-{$indent}codec.end_read_union()
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
 {$name} = {$codec}.read_uint32(){%>%}
@@ -173,9 +168,6 @@ _n{$depth} = {$codec}.start_read_list()
 {$indent}for _i{$depth} in range({% if info.type == "list" %}_n{$depth}{% else %}{$info.elementCount}{% endif %}):
 {$indent}    {$decodeValue(info.elementType, "_v" & depth, commonPrefix, codec, indent & "    ", depth + 1)}
 {$indent}    {$name}.append(_v{$depth})
-{%   if info.type == "list" %}
-{$indent}{$codec}.end_read_list()
-{%   endif %}
 {#--------------- function ---------------#}
 {% elif info.type == "function" %}
 {%  if info.tableName != "" %}
