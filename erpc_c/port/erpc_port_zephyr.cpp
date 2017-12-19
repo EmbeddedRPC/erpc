@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * The Clear BSD License
+ * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,36 +32,65 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Value.h"
+#include "erpc_port.h"
+#include <new>
 
-//! Returns a varying size depending on the word size attribute.
-//!
-size_t SizedIntegerValue::getSize() const
+extern "C" {
+#include "kernel.h"
+};
+
+using namespace std;
+void *operator new(std::size_t count) THROW_BADALLOC
 {
-    switch (m_size)
-    {
-        case kWordSize:
-            return sizeof(uint32_t);
-        case kHalfWordSize:
-            return sizeof(uint16_t);
-        case kByteSize:
-            return sizeof(uint8_t);
-    }
-    return kWordSize;
+    void *p = erpc_malloc(count);
+    return p;
 }
 
-//! The resulting mask can be used to truncate the integer value to be
-//! certain it doesn't extend beyond the associated word size.
-uint32_t SizedIntegerValue::getWordSizeMask() const
+void *operator new(std::size_t count, const std::nothrow_t &tag) THROW
 {
-    switch (m_size)
-    {
-        case kWordSize:
-            return 0xffffffff;
-        case kHalfWordSize:
-            return 0x0000ffff;
-        case kByteSize:
-            return 0x000000ff;
-    }
-    return 0;
+    void *p = erpc_malloc(count);
+    return p;
 }
+
+void *operator new[](std::size_t count) THROW_BADALLOC
+{
+    void *p = erpc_malloc(count);
+    return p;
+}
+
+void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW
+
+{
+    void *p = erpc_malloc(count);
+    return p;
+}
+
+void operator delete(void *ptr) THROW
+{
+    erpc_free(ptr);
+}
+
+void operator delete[](void *ptr) THROW
+{
+    erpc_free(ptr);
+}
+
+void *erpc_malloc(size_t size)
+{
+    void *p = k_malloc(size);
+    return p;
+}
+
+void erpc_free(void *ptr)
+{
+    k_free(ptr);
+}
+
+/* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
+#if ((defined(__GNUC__)) && (defined(__arm__)))
+extern "C" void __cxa_pure_virtual()
+{
+    while (1)
+        ;
+}
+#endif

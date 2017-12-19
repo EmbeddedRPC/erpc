@@ -58,7 +58,6 @@ SOURCES += $(ERPC_ROOT)/erpc_c/infra/crc16.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Logging.cpp \
 			$(ERPC_ROOT)/erpcgen/src/options.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SearchPath.cpp \
-			$(ERPC_ROOT)/erpcgen/src/Value.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstNode.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstWalker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \

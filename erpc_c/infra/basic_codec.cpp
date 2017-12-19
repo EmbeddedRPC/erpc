@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,6 +34,7 @@
  */
 
 #include "basic_codec.h"
+#include <cassert>
 
 using namespace erpc;
 
@@ -37,280 +42,341 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_status_t BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
+void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
 {
     uint32_t header = (kBasicCodecVersion << 24) | ((service & 0xff) << 16) | ((request & 0xff) << 8) | (type & 0xff);
-    erpc_status_t err = write(header);
-    if (err)
-    {
-        return err;
-    }
 
-    err = write(sequence); /* TODO: just return write(sequence);? same is used in startReadMessage */
-    if (err)
-    {
-        return err;
-    }
+    write(header);
 
-    return kErpcStatus_Success;
+    write(sequence);
 }
 
-erpc_status_t BasicCodec::writeData(const void *value, uint32_t length)
+void BasicCodec::writeData(const void *value, uint32_t length)
 {
-    return m_cursor.write(value, length);
+    if (!m_status)
+    {
+        if (value != NULL)
+        {
+            m_status = m_cursor.write(value, length);
+        }
+        else
+        {
+            m_status = kErpcStatus_MemoryError;
+        }
+    }
 }
 
-erpc_status_t BasicCodec::write(bool value)
+void BasicCodec::write(bool value)
 {
     // Make sure the bool is a single byte.
     uint8_t v = value;
-    return m_cursor.write(&v, sizeof(v));
+    writeData(&v, sizeof(v));
 }
 
-erpc_status_t BasicCodec::write(int8_t value)
+void BasicCodec::write(int8_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(int16_t value)
+void BasicCodec::write(int16_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(int32_t value)
+void BasicCodec::write(int32_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(int64_t value)
+void BasicCodec::write(int64_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(uint8_t value)
+void BasicCodec::write(uint8_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(uint16_t value)
+void BasicCodec::write(uint16_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(uint32_t value)
+void BasicCodec::write(uint32_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(uint64_t value)
+void BasicCodec::write(uint64_t value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(float value)
+void BasicCodec::write(float value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::write(double value)
+void BasicCodec::write(double value)
 {
-    return m_cursor.write(&value, sizeof(value));
+    writeData(&value, sizeof(value));
 }
 
-erpc_status_t BasicCodec::writePtr(uintptr_t value)
+void BasicCodec::writePtr(uintptr_t value)
 {
     uint8_t ptrSize = sizeof(value);
-    erpc_status_t err = m_cursor.write(&ptrSize, 1);
-    if (err)
-    {
-        return err;
-    }
+    write(ptrSize);
 
-    return m_cursor.write(&value, ptrSize);
+    writeData(&value, ptrSize);
 }
 
-erpc_status_t BasicCodec::writeString(uint32_t length, const char *value)
+void BasicCodec::writeString(uint32_t length, const char *value)
 {
     // Just treat the string as binary.
-    return writeBinary(length, reinterpret_cast<const uint8_t *>(value));
+    writeBinary(length, reinterpret_cast<const uint8_t *>(value));
 }
 
-erpc_status_t BasicCodec::writeBinary(uint32_t length, const uint8_t *value)
+void BasicCodec::writeBinary(uint32_t length, const uint8_t *value)
 {
     // Write the blob length as a u32.
-    erpc_status_t err = write(length);
-    if (err)
-    {
-        return err;
-    }
+    write(length);
 
-    return m_cursor.write(value, length);
+    writeData(value, length);
 }
 
-erpc_status_t BasicCodec::startWriteList(uint32_t length)
+void BasicCodec::startWriteList(uint32_t length)
 {
     // Write the list length as a u32.
-    return write(length);
+    write(length);
 }
 
-erpc_status_t BasicCodec::startWriteUnion(int32_t discriminator)
+void BasicCodec::startWriteUnion(int32_t discriminator)
 {
     // Write the union discriminator as a u32.
-    return write(discriminator);
+    write(discriminator);
 }
 
-erpc_status_t BasicCodec::writeNullFlag(bool isNull)
+void BasicCodec::writeNullFlag(bool isNull)
 {
-    return write(static_cast<uint8_t>(isNull ? kIsNull : kNotNull));
+    write(static_cast<uint8_t>(isNull ? kIsNull : kNotNull));
 }
 
-erpc_status_t BasicCodec::startReadMessage(message_type_t *type,
-                                           uint32_t *service,
-                                           uint32_t *request,
-                                           uint32_t *sequence)
+void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback)
+{
+    assert(callbacksCount > 1);
+    // callbacks = callbacks table
+    for (uint8_t i = 0; i < callbacksCount; i++)
+    {
+        if (callbacks[i] == callback)
+        {
+            write(i);
+            break;
+        }
+        if (i + 1 == callbacksCount)
+        {
+            updateStatus(kErpcStatus_UnknownCallback);
+        }
+    }
+}
+
+void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
+{
+    // callbacks = callback directly
+    // When declared only one callback function no serialization is needed.
+    if (callback1 != callback2)
+    {
+        updateStatus(kErpcStatus_UnknownCallback);
+    }
+}
+
+void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
 {
     uint32_t header;
-    erpc_status_t err = read(&header);
-    if (err)
-    {
-        return err;
-    }
+    read(&header);
 
     if (((header >> 24) & 0xff) != kBasicCodecVersion)
     {
-        return kErpcStatus_InvalidMessageVersion;
+        updateStatus(kErpcStatus_InvalidMessageVersion);
     }
 
-    *service = ((header >> 16) & 0xff);
-    *request = ((header >> 8) & 0xff);
-    *type = static_cast<message_type_t>(header & 0xff);
+    if (!m_status)
+    {
+        *service = ((header >> 16) & 0xff);
+        *request = ((header >> 8) & 0xff);
+        *type = static_cast<message_type_t>(header & 0xff);
 
-    return read(sequence);
+        read(sequence);
+    }
 }
 
-erpc_status_t BasicCodec::readData(void *value, uint32_t length)
+void BasicCodec::readData(void *value, uint32_t length)
 {
-    return m_cursor.read(value, length);
+    if (!m_status)
+    {
+        if (value != NULL)
+        {
+            m_status = m_cursor.read(value, length);
+        }
+        else
+        {
+            m_status = kErpcStatus_MemoryError;
+        }
+    }
 }
 
-erpc_status_t BasicCodec::read(bool *value)
+void BasicCodec::read(bool *value)
 {
     uint8_t v = 0;
-    erpc_status_t err = m_cursor.read(&v, sizeof(v));
-    *value = v;
-    return err;
+    readData(&v, sizeof(v));
+    if (!m_status)
+    {
+        *value = v;
+    }
 }
 
-erpc_status_t BasicCodec::read(int8_t *value)
+void BasicCodec::read(int8_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(int16_t *value)
+void BasicCodec::read(int16_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(int32_t *value)
+void BasicCodec::read(int32_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(int64_t *value)
+void BasicCodec::read(int64_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(uint8_t *value)
+void BasicCodec::read(uint8_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(uint16_t *value)
+void BasicCodec::read(uint16_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(uint32_t *value)
+void BasicCodec::read(uint32_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(uint64_t *value)
+void BasicCodec::read(uint64_t *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(float *value)
+void BasicCodec::read(float *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::read(double *value)
+void BasicCodec::read(double *value)
 {
-    return m_cursor.read(value, sizeof(*value));
+    readData(value, sizeof(*value));
 }
 
-erpc_status_t BasicCodec::readPtr(uintptr_t *value)
+void BasicCodec::readPtr(uintptr_t *value)
 {
     uint8_t ptrSize;
-    erpc_status_t err = m_cursor.read(&ptrSize, 1);
-    if (err)
-    {
-        return err;
-    }
+    read(&ptrSize);
 
     if (ptrSize > sizeof(*value))
     {
-        return kErpcStatus_BadAddressScale;
+        updateStatus(kErpcStatus_BadAddressScale);
     }
 
-    return m_cursor.read(value, ptrSize);
+    readData(value, ptrSize);
 }
 
-erpc_status_t BasicCodec::readString(uint32_t *length, char **value)
+void BasicCodec::readString(uint32_t *length, char **value)
 {
-    return readBinary(length, reinterpret_cast<uint8_t **>(value));
+    readBinary(length, reinterpret_cast<uint8_t **>(value));
 }
 
-erpc_status_t BasicCodec::readBinary(uint32_t *length, uint8_t **value)
+void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
 {
     // Read length first as u32.
-    erpc_status_t err = read(length);
-    if (err)
+    read(length);
+
+    if (!m_status)
     {
-        return err;
+        if (m_cursor.getRemaining() >= *length)
+        {
+            // Return current pointer into buffer.
+            *value = m_cursor.get();
+
+            // Skip over data.
+            m_cursor += *length;
+        }
+        else
+        {
+            *length = 0;
+            m_status = kErpcStatus_BufferOverrun;
+        }
     }
-
-    // Return current pointer into buffer.
-    *value = m_cursor.get();
-
-    // Skip over data.
-    m_cursor += *length;
-
-    return kErpcStatus_Success;
+    else
+    {
+        *length = 0;
+    }
 }
 
-erpc_status_t BasicCodec::startReadList(uint32_t *length)
+void BasicCodec::startReadList(uint32_t *length)
 {
     // Read list length as u32.
-    return read(length);
+    read(length);
+    if (m_status)
+    {
+        *length = 0;
+    }
 }
 
-erpc_status_t BasicCodec::startReadUnion(int32_t *discriminator)
+void BasicCodec::startReadUnion(int32_t *discriminator)
 {
     // Read union discriminator as u32.
-    return read(discriminator);
+    read(discriminator);
 }
 
-erpc_status_t BasicCodec::readNullFlag(bool *isNull)
+void BasicCodec::readNullFlag(bool *isNull)
 {
     uint8_t flag;
-    erpc_status_t status = read(&flag);
-    if (status)
+    read(&flag);
+    if (!m_status)
     {
-        return status;
+        *isNull = (flag == kIsNull);
     }
-    *isNull = (flag == kIsNull);
-    return kErpcStatus_Success;
+}
+
+void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback)
+{
+    assert(callbacksCount > 1);
+    // callbacks = callbacks table
+    uint8_t _tmp_local;
+    read(&_tmp_local);
+    if (!m_status)
+    {
+        if (_tmp_local < callbacksCount)
+        {
+            *callback = callbacks[_tmp_local];
+        }
+        else
+        {
+            m_status = kErpcStatus_UnknownCallback;
+        }
+    }
+}
+
+void BasicCodec::readCallback(funPtr callbacks1, funPtr *callback2)
+{
+    // callbacks = callback directly
+    *callback2 = callbacks1;
 }

@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -40,6 +44,7 @@
 
 using namespace erpcgen;
 using namespace cpptempl;
+using namespace std;
 
 // Templates strings converted from text files by txt_to_c.py.
 extern const char *const kPyCoders;
@@ -54,25 +59,25 @@ extern const char *const kPyGlobalInit;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-PythonGenerator::PythonGenerator(InterfaceDefinition *def, uint16_t idlCrc16)
-: Generator(def, idlCrc16)
+PythonGenerator::PythonGenerator(InterfaceDefinition *def)
+: Generator(def, kPython)
 , m_suffixStrip("")
 , m_suffixStripSize(0)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
     {
-        Symbol *program = m_globals->getSymbolsOfType(Symbol::kProgramSymbol)[0];
+        Symbol *program = m_def->getProgramSymbol();
         assert(program);
         setTemplateComments(program, m_templateData);
     }
 }
 
-void PythonGenerator::generateOutputFiles(const std::string &fileName)
+void PythonGenerator::generateOutputFiles(const string &fileName)
 {
     // Make sure the package folder is created.
     boost::filesystem::path dir(fileName);
-    dir = m_def->getOutputDirectory() / dir;
+    dir = m_outputDirectory / dir;
     boost::filesystem::create_directories(dir);
 
     generateInitFile(fileName);
@@ -82,37 +87,37 @@ void PythonGenerator::generateOutputFiles(const std::string &fileName)
     generateInterfaceFile(fileName);
 }
 
-void PythonGenerator::generateInitFile(std::string fileName)
+void PythonGenerator::generateInitFile(string fileName)
 {
     fileName += "/__init__.py";
     generateOutputFile(fileName, "py_init", m_templateData, kPyInit);
 };
 
-void PythonGenerator::generateCommonFile(std::string fileName)
+void PythonGenerator::generateCommonFile(string fileName)
 {
     fileName += "/common.py";
     generateOutputFile(fileName, "py_common", m_templateData, kPyCommon);
 }
 
-void PythonGenerator::generateClientFile(std::string fileName)
+void PythonGenerator::generateClientFile(string fileName)
 {
     fileName += "/client.py";
     generateOutputFile(fileName, "py_client", m_templateData, kPyClient);
 }
 
-void PythonGenerator::generateServerFile(std::string fileName)
+void PythonGenerator::generateServerFile(string fileName)
 {
     fileName += "/server.py";
     generateOutputFile(fileName, "py_server", m_templateData, kPyServer);
 }
 
-void PythonGenerator::generateInterfaceFile(std::string fileName)
+void PythonGenerator::generateInterfaceFile(string fileName)
 {
     fileName += "/interface.py";
     generateOutputFile(fileName, "py_interface", m_templateData, kPyInterface);
 }
 
-void PythonGenerator::generateCrcFile()
+void PythonGenerator::generateGlobalInitFile()
 {
     /* Generate file with shim code version. */
     generateOutputFile("__init__.py", "py_global_init", m_templateData, kPyGlobalInit);
@@ -142,12 +147,11 @@ void PythonGenerator::generate()
 
     parseSubtemplates();
 
-    // Generate file containing crc of IDL files
-    generateCrcFile();
+    generateGlobalInitFile();
 
     if (m_def->hasProgramSymbol())
     {
-        for (auto anno : m_def->getProgramSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
+        for (Annotation *anno : getAnnotations(m_def->getProgramSymbol(), PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
         {
             m_suffixStrip = anno->getValueObject()->toString();
             m_suffixStripSize = m_suffixStrip.size();
@@ -177,20 +181,22 @@ void PythonGenerator::generate()
 
         generateGroupOutputFiles(group);
     }
+
+    initPythonReservedWords();
 }
 
-void PythonGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo)
+void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 {
     symbolInfo["mlComment"] = convertComment(symbol->getMlComment(), kMultilineComment);
     symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
 }
 
-data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnIndex)
+data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
     data_map info;
-    std::string proto = getFunctionPrototype(fn);
+    string proto = getFunctionPrototype(fn);
 
-    info["name"] = fn->getOutputName();
+    info["name"] = getOutputName(fn);
     info["prototype"] = proto;
     info["id"] = fn->getUniqueId();
     info["isOneway"] = fn->isOneway();
@@ -198,7 +204,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, in
     setTemplateComments(fn, info);
 
     /* Is function declared as external? */
-    info["isNonExternalFunction"] = fn->findAnnotation(EXTERNAL_ANNOTATION) == nullptr;
+    info["isNonExternalFunction"] = findAnnotation(fn, EXTERNAL_ANNOTATION) == nullptr;
 
     // Get return value info
     data_map returnInfo;
@@ -217,11 +223,12 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, in
         data_map paramInfo;
         DataType *paramType = param->getDataType();
         DataType *trueDataType = paramType->getTrueDataType();
-        std::string name = param->getOutputName();
+        string name = getOutputName(param);
         paramInfo["name"] = name;
         paramInfo["type"] = getTypeInfo(paramType);
 
-        bool isNullable = ((param->findAnnotation(NULLABLE_ANNOTATION) != nullptr) && (trueDataType->isString() || (!trueDataType->isBuiltin() && !trueDataType->isEnum())));
+        bool isNullable = ((findAnnotation(param, NULLABLE_ANNOTATION) != nullptr) &&
+                           (trueDataType->isString() || (!trueDataType->isBuiltin() && !trueDataType->isEnum())));
         paramInfo["isNullable"] = isNullable;
 
         // Skip data serialization for variables placed as @length value for lists.
@@ -231,7 +238,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, in
 
         if (referencedFrom)
         {
-            paramInfo["lengthForMember"] = referencedFrom->getOutputName();
+            paramInfo["lengthForMember"] = getOutputName(referencedFrom);
         }
         else
         {
@@ -241,14 +248,14 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, in
             referencedFrom = findParamReferencedFromUnion(fnParams, name);
             if (referencedFrom)
             {
-                paramInfo["discriminatorForMember"] = referencedFrom->getOutputName();
+                paramInfo["discriminatorForMember"] = getOutputName(referencedFrom);
             }
         }
 
-        paramInfo["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
+        paramInfo["serializedViaMember"] = (referencedFrom) ? getOutputName(referencedFrom) : "";
 
-        /* Necassary for handling non-discriminated unions */
-        paramInfo["discriminator"] = param->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+        /* Necessary for handling non-discriminated unions */
+        paramInfo["discriminator"] = getAnnStringValue(param, DISCRIMINATOR_ANNOTATION);
 
         _param_direction dir = param->getDirection();
         switch (dir)
@@ -277,14 +284,12 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, in
     info["inParameters"] = inParams;
     info["outParameters"] = outParams;
 
-    Log::info("    %d: (%d) %s\n", fnIndex, fn->getUniqueId(), info["prototype"]->getvalue().c_str());
-
     return info;
 }
 
-std::string PythonGenerator::getFunctionPrototype(Function *fn)
+string PythonGenerator::getFunctionPrototype(Function *fn)
 {
-    std::string proto = fn->getOutputName();
+    string proto = getOutputName(fn);
     proto += "(self";
 
     auto params = fn->getParameters().getMembers();
@@ -293,13 +298,13 @@ std::string PythonGenerator::getFunctionPrototype(Function *fn)
         for (auto it : params)
         {
             // Skip data serialization for variables placed as @length value for lists.
-            if (findParamReferencedFromAnn(params, it->getOutputName(), LENGTH_ANNOTATION))
+            if (findParamReferencedFromAnn(params, getOutputName(it), LENGTH_ANNOTATION))
             {
                 continue;
             }
 
             proto += ", ";
-            proto += it->getOutputName();
+            proto += getOutputName(it);
         }
     }
     proto += ")";
@@ -315,9 +320,9 @@ void PythonGenerator::makeConstTemplateData()
         ConstType *constVar = dynamic_cast<ConstType *>(it);
         assert(constVar);
         data_map constInfo;
-        if (!constVar->findAnnotation(EXTERNAL_ANNOTATION))
+        if (!findAnnotation(constVar, EXTERNAL_ANNOTATION))
         {
-            constInfo["name"] = constVar->getOutputName();
+            constInfo["name"] = getOutputName(constVar);
 
             // throw nullptr exception
             if (NULL == constVar->getValue())
@@ -350,11 +355,11 @@ void PythonGenerator::makeEnumsTemplateData()
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
-        if (!enumType->findAnnotation(EXTERNAL_ANNOTATION))
+        if (!findAnnotation(enumType, EXTERNAL_ANNOTATION))
         {
             Log::info("%d: %s\n", n, enumType->getName().c_str());
             data_map enumInfo;
-            enumInfo["name"] = filterName(enumType->getOutputName());
+            enumInfo["name"] = filterName(getOutputName(enumType));
             enumInfo["members"] = getEnumMembersTemplateData(enumType);
             setTemplateComments(enumType, enumInfo);
             enums.push_back(enumInfo);
@@ -372,7 +377,7 @@ data_list PythonGenerator::getEnumMembersTemplateData(EnumType *enumType)
     {
         assert(member->hasValue());
         data_map enumMember;
-        enumMember["name"] = member->getOutputName();
+        enumMember["name"] = getOutputName(member);
         enumMember["value"] = member->getValue();
         Log::info("    %d: %s = %d\n", j, member->getName().c_str(), member->getValue());
         setTemplateComments(member, enumMember);
@@ -405,7 +410,7 @@ void PythonGenerator::makeAliasesTemplateData()
             continue;
         }
 
-        std::string realType = aliasType->getOutputName();
+        string realType = getOutputName(aliasType);
         Log::info("%s\n", realType.c_str());
 
         aliasInfo["name"] = filterName(realType);
@@ -424,7 +429,7 @@ void PythonGenerator::makeAliasesTemplateData()
 data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 {
     data_map symbolsTemplate;
-    std::set<std::string> names;
+    set<string> names;
 
     data_list structs;
     data_list unions;
@@ -448,7 +453,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
                 Log::info("%s\n", structType->getDescription().c_str());
 
-                std::string name = filterName(structType->getOutputName());
+                string name = filterName(getOutputName(structType));
 
                 // check if template for this structure has not already been generated
                 if (names.find(name) == names.end())
@@ -473,7 +478,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
                 Log::info("%s\n", unionType->getDescription().c_str());
 
-                std::string name = filterName(unionType->getOutputName());
+                string name = filterName(getOutputName(unionType));
 
                 // check if template for this structure has not already been generated
                 if (names.find(name) == names.end())
@@ -482,7 +487,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     info["type"] = getTypeInfo(unionType);
 
                     setTemplateComments(unionType, info);
-                    //setUnionMembersTemplateData(unionType, info);
+                    // setUnionMembersTemplateData(unionType, info);
 
                     names.insert(name);
                     unions.push_back(info);
@@ -500,7 +505,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
     return symbolsTemplate;
 }
 
-void PythonGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::data_map &structInfo)
+void PythonGenerator::setStructMembersTemplateData(StructType *structType, data_map &structInfo)
 {
     data_list members;
     for (auto member : structType->getMembers())
@@ -509,12 +514,13 @@ void PythonGenerator::setStructMembersTemplateData(StructType *structType, cppte
 
         // Skip data serialization for variables placed as @length value for lists.
         // These prevent to serialized data twice.
-        StructMember *referencedFrom = findParamReferencedFromAnn(structType->getMembers(), member->getName(), LENGTH_ANNOTATION);
+        StructMember *referencedFrom =
+            findParamReferencedFromAnn(structType->getMembers(), member->getName(), LENGTH_ANNOTATION);
 
         member_info["discriminatorForMember"] = "";
         if (referencedFrom)
         {
-            member_info["lengthForMember"] = referencedFrom->getOutputName();
+            member_info["lengthForMember"] = getOutputName(referencedFrom);
         }
         else
         {
@@ -524,30 +530,31 @@ void PythonGenerator::setStructMembersTemplateData(StructType *structType, cppte
             referencedFrom = findParamReferencedFromUnion(structType->getMembers(), member->getName());
             if (referencedFrom)
             {
-                member_info["discriminatorForMember"] = referencedFrom->getOutputName();
+                member_info["discriminatorForMember"] = getOutputName(referencedFrom);
             }
         }
 
-        member_info["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
+        member_info["serializedViaMember"] = (referencedFrom) ? getOutputName(referencedFrom) : "";
         setOneStructMemberTemplateData(member, member_info);
         members.push_back(member_info);
     }
     structInfo["members"] = members;
 }
 
-void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, cpptempl::data_map &member_info)
+void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, data_map &member_info)
 {
-    std::string memberName = member->getOutputName();
+    string memberName = getOutputName(member);
 
     DataType *trueDataType = member->getDataType()->getTrueDataType();
 
     // Info for declaring struct in common header
     member_info["name"] = memberName;
-    bool isNullable = ((member->findAnnotation(NULLABLE_ANNOTATION) != nullptr) && (trueDataType->isBinary() || trueDataType->isString() || trueDataType->isList()));
+    bool isNullable = ((findAnnotation(member, NULLABLE_ANNOTATION) != nullptr) &&
+                       (trueDataType->isBinary() || trueDataType->isString() || trueDataType->isList()));
     member_info["isNullable"] = isNullable;
     member_info["type"] = getTypeInfo(member->getDataType());
-    /* Necassary for handling non-discriminated unions */
-    member_info["discriminator"] = member->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+    /* Necessary for handling non-discriminated unions */
+    member_info["discriminator"] = getAnnStringValue(member, DISCRIMINATOR_ANNOTATION);
 
     setTemplateComments(member, member_info);
 }
@@ -578,10 +585,10 @@ void PythonGenerator::makeFunctionsTemplateData()
     m_templateData["functions"] = functions;
 }
 
-cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
+data_map PythonGenerator::getTypeInfo(DataType *t)
 {
     data_map info;
-    info["name"] = filterName(t->getOutputName());
+    info["name"] = filterName(getOutputName(t, false));
     info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
@@ -628,7 +635,9 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             else
             {
-                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in IDL is missing function definition, which can be passed there.").c_str());
+                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in "
+                                                   "IDL is missing function definition, which can be passed there.")
+                                         .c_str());
             }
             break;
         }
@@ -660,7 +669,7 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
             else
             {
                 // Set discriminator field name.
-                std::string discriminatorName = unionType->getDiscriminatorName();
+                string discriminatorName = unionType->getDiscriminatorName();
                 info["discriminatorName"] = discriminatorName;
 
                 // Fill in discriminator type info.
@@ -725,7 +734,7 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
     return info;
 }
 
-std::string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
+string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
 {
     switch (t->getBuiltinType())
     {
@@ -760,9 +769,9 @@ std::string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
     }
 }
 
-std::string PythonGenerator::filterName(const std::string &name)
+string PythonGenerator::filterName(const string &name)
 {
-    std::string result = name;
+    string result = name;
     if (result.size() >= m_suffixStripSize)
     {
         size_t pos = result.size() - m_suffixStripSize;
@@ -774,13 +783,13 @@ std::string PythonGenerator::filterName(const std::string &name)
     return result;
 }
 
-std::string PythonGenerator::convertComment(const std::string &comment, comment_type commentType)
+string PythonGenerator::convertComment(const string &comment, comment_type commentType)
 {
     // Longer patterns are ordered earlier than similar shorter patterns.
     static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
 
-    std::string result = stripWhitespace(comment);
+    string result = stripWhitespace(comment);
     int32_t i;
     uint32_t n;
 
@@ -793,7 +802,7 @@ std::string PythonGenerator::convertComment(const std::string &comment, comment_
     for (i = 0; kCommentBegins[i] != 0; ++i)
     {
         size_t p = result.find(kCommentBegins[i]);
-        if (p != std::string::npos)
+        if (p != string::npos)
         {
             // Remove the comment begin from the result.
             size_t l = strlen(kCommentBegins[i]);
@@ -812,7 +821,7 @@ std::string PythonGenerator::convertComment(const std::string &comment, comment_
     for (i = 0; kCommentEnds[i] != 0; ++i)
     {
         size_t p = result.rfind(kCommentEnds[i]);
-        if (p != std::string::npos)
+        if (p != string::npos)
         {
             // Remove the comment end from the result.
             result = result.substr(0, p);
@@ -864,7 +873,7 @@ std::string PythonGenerator::convertComment(const std::string &comment, comment_
 
         // Find the next newline.
         p = result.find('\n', p + 1);
-        if (p == std::string::npos)
+        if (p == string::npos)
         {
             break;
         }
@@ -885,9 +894,9 @@ bool PythonGenerator::checkWhitspaceChar(char c)
     return false;
 }
 
-std::string PythonGenerator::stripWhitespace(const std::string &s)
+string PythonGenerator::stripWhitespace(const string &s)
 {
-    std::string result = s;
+    string result = s;
     int32_t i;
     uint32_t n;
 
@@ -921,4 +930,37 @@ std::string PythonGenerator::stripWhitespace(const std::string &s)
     }
 
     return result;
+}
+
+void PythonGenerator::initPythonReservedWords()
+{
+    // Python reserved words
+    reserverdWords.insert("and");
+    reserverdWords.insert("assert");
+    reserverdWords.insert("break");
+    reserverdWords.insert("class");
+    reserverdWords.insert("continue");
+    reserverdWords.insert("def");
+    reserverdWords.insert("del");
+    reserverdWords.insert("elif");
+    reserverdWords.insert("else");
+    reserverdWords.insert("except");
+    reserverdWords.insert("exec");
+    reserverdWords.insert("finally");
+    reserverdWords.insert("for");
+    reserverdWords.insert("from");
+    reserverdWords.insert("global");
+    reserverdWords.insert("if");
+    reserverdWords.insert("import");
+    reserverdWords.insert("in");
+    reserverdWords.insert("is");
+    reserverdWords.insert("lambda");
+    reserverdWords.insert("not");
+    reserverdWords.insert("or");
+    reserverdWords.insert("pass");
+    reserverdWords.insert("print");
+    reserverdWords.insert("raise");
+    reserverdWords.insert("return");
+    reserverdWords.insert("try");
+    reserverdWords.insert("while");
 }

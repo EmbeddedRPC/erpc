@@ -32,7 +32,7 @@ test_server.cpp:
   - if (!isNull)
   - if: dir in ('in', 'inout')
     then:
-      - err = codec->readString(&a_len, &a_local)
+      - codec->readString(&a_len, &a_local)
   - if: dir == 'out'
     then:
       - not: codec->readString(&a_len, &a_local)
@@ -95,7 +95,7 @@ idl: |
     bar(pair s) -> void
   }
 test_client.cpp:
-  - int32_t write_pair_struct
+  - void write_pair_struct
   - if (data->b.elements == NULL)
   - writeNullFlag(true)
   - '{'
@@ -105,7 +105,7 @@ test_client.cpp:
   - void bar(const pair * s)
   - write_pair_struct
 test_server.cpp:
-  - int32_t read_pair_struct
+  - void read_pair_struct
   - bool isNull
   - readNullFlag
   - if (!isNull)
@@ -124,7 +124,7 @@ idl: |
     bar(pair s) -> void
   }
 test_client.cpp:
-  - int32_t write_pair_struct
+  - void write_pair_struct
   - if (data->b.data == NULL)
   - writeNullFlag(true)
   - '{'
@@ -134,7 +134,7 @@ test_client.cpp:
   - void bar(const pair * s)
   - write_pair_struct
 test_server.cpp:
-  - int32_t read_pair_struct
+  - void read_pair_struct
   - bool isNull
   - readNullFlag
   - if (!isNull)
@@ -162,16 +162,15 @@ idl: |
 test_client.cpp:
   - if: dir in ('in', 'inout')
     then:
-      - int32_t write_pair_struct
+      - void write_pair_struct
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - if (data->a)
       - codec->writeString(strlen(data->a), data->a);
   - if: dir in ('out', 'inout')
     then:
-      - int32_t read_pair_struct
+      - void read_pair_struct
       - bool isNull;
       - codec->readNullFlag(&isNull);
       - if (!isNull)
@@ -182,7 +181,7 @@ test_client.cpp:
 test_server.cpp:
   - if: dir in ('in', 'inout')
     then:
-      - int32_t read_pair_struct
+      - void read_pair_struct
       - bool isNull;
       - codec->readNullFlag(&isNull);
       - if (!isNull)
@@ -192,12 +191,11 @@ test_server.cpp:
       - data->a = 0;
   - if: dir in ('out', 'inout')
     then:
-      - int32_t write_pair_struct
+      - void write_pair_struct
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - if (data->a)
       - codec->writeString(strlen(data->a), data->a);
 
 ---
@@ -215,7 +213,7 @@ idl: |
 test_client.cpp:
   - pair * result;
   - bool isNull;
-  - err = codec->readNullFlag(&isNull);
+  - codec->readNullFlag(&isNull);
   - if (!isNull)
 
 test_server.cpp:
@@ -238,14 +236,14 @@ test_client.cpp:
 
   - if (param1 == NULL)
   - codec->writeNullFlag
-  - err = codec->write(*param1);
+  - codec->write(*param1);
   - if (param2 == NULL)
   - codec->writeNullFlag
-  - not: err = codec->write(*param2);
+  - not: codec->write(*param2);
   - if (param1 != NULL)
-  - err = codec->read(param1);
+  - codec->read(param1);
   - if (param2 != NULL)
-  - err = codec->read(param2);
+  - codec->read(param2);
 
 test_server.cpp:
   - uint32_t param1;

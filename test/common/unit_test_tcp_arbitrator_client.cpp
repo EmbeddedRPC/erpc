@@ -1,10 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -65,7 +68,7 @@ public:
 TCPTransport g_transport("localhost", 12345, false);
 #if USE_MESSAGE_LOGGING
 TCPTransport g_messageLogger("localhost", 54321, false);
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 ArbitratedClientManager *g_client;
@@ -147,7 +150,7 @@ int main(int argc, char **argv)
         Log::error("Failed to open connection in ERPC first (client) app\n");
         return err;
     }
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 
     g_arbitrator.setSharedTransport(&g_transport);
     g_arbitrator.setCodec(g_basicCodecFactory.create());
@@ -158,7 +161,7 @@ int main(int argc, char **argv)
     g_client->setMessageBufferFactory(&g_msgFactory);
 #if USE_MESSAGE_LOGGING
     g_client->addMessageLogger(&g_messageLogger);
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 
     g_arbitrator.setCrc16(&g_crc16);
 
@@ -167,7 +170,7 @@ int main(int argc, char **argv)
     g_server.setMessageBufferFactory(&g_msgFactory);
 #if USE_MESSAGE_LOGGING
     g_server.addMessageLogger(&g_messageLogger);
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 
     add_services(&g_server);
     g_client->setServer(&g_server);

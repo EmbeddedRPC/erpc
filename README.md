@@ -71,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 03d53dce9244bfddfc424c886a3f3f586053b298.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 5c1cd41e34622ad5612a6ca26f6a85c10a615c30.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -115,19 +115,22 @@ Steps are described in [`erpcgen/VisualStudio_v12/readme_erpcgen.txt`](erpcgen/V
 #### Linux and Cygwin
 
 Install these packages:
-* bison: GNU yacc-complatible parser generator
+* bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
 * libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.58.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter (either 2.7 or 3.5+ work)
 * gcc-core: GNU Compiler Collection (C, OpenMP)
 * gcc-g++: GNU Compiler Collection (C++)
-* gcc-multilib, g++-multilib (mandatory for case, when build for different architecture is needed)
+
+Mandatory for case, when build for different architecture is needed
+* gcc-multilib, g++-multilib
+* boost libraries: for target architecture like libboost-filesystem-dev:i386 libboost-system-dev:i386
 
 #### Mac OS X
 
 Install these packages with [homebrew](http://brew.sh/):
-* bison: GNU yacc-complatible parser generator
+* bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
 * boost: Boost C++ libraries
 

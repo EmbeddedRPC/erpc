@@ -1,10 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -115,11 +118,11 @@ enumColor (*sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
     return sendArrays;
 }
 
-list_0_t (*sendReceivedList(list_0_t arrayLists[2]))[2]
+list_int32_1_t (*sendReceivedList(list_int32_1_t arrayLists[2]))[2]
 {
     uint32_t array_count = 2;
 
-    list_0_t(*sendArrays)[2] = (list_0_t(*)[2])erpc_malloc(sizeof(list_0_t[2]));
+    list_int32_1_t(*sendArrays)[2] = (list_int32_1_t(*)[2])erpc_malloc(sizeof(list_int32_1_t[2]));
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -134,9 +137,9 @@ list_0_t (*sendReceivedList(list_0_t arrayLists[2]))[2]
     return sendArrays;
 }
 
-list_0_t (*sendReceived2List(list_0_t arrayLists[2][2]))[2][2]
+list_int32_1_t (*sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
 {
-    list_0_t(*sendArrays)[2][2] = (list_0_t(*)[2][2])erpc_malloc(sizeof(list_0_t[2][2]));
+    list_int32_1_t(*sendArrays)[2][2] = (list_int32_1_t(*)[2][2])erpc_malloc(sizeof(list_int32_1_t[2][2]));
 
     for (uint32_t k = 0; k < 2; ++k)
     {
@@ -381,8 +384,7 @@ AllTypes (*sendReceive2Struct(AllTypes all_types[1][1]))[1][1]
     return send_struct;
 }
 
-void test_array_allDirection(
-    int32_t a[5], int32_t b[5], int32_t c[5], int32_t d[5])
+void test_array_allDirection(int32_t a[5], int32_t b[5], int32_t c[5], int32_t d[5])
 {
     for (uint32_t i = 0; i < 5; ++i)
     {

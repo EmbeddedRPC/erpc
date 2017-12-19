@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,26 +45,31 @@
 
 using namespace erpcgen;
 using namespace cpptempl;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
+Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
 : m_def(def)
-, m_globals(&(m_def->getGlobals()))
-, m_idlCrc16(idlCrc16)
+, m_globals(&(def->getGlobals()))
+, m_idlCrc16(def->getIdlCrc16())
+, m_generatorType(generatorType)
 {
     m_templateData["erpcVersion"] = ERPC_VERSION;
     m_templateData["erpcVersionNumber"] = ERPC_VERSION_NUMBER;
 
     // crc of erpcgen version and idl files.
-    m_templateData["crc16"] = m_idlCrc16;
+    m_templateData["crc16"] = "";
 
     m_templateData["todaysDate"] = getTime();
 
     m_templateData["sharedMemBeginAddr"] = "";
     m_templateData["sharedMemEndAddr"] = "";
+    m_templateData["dynamicServices"] = false;
+
+    m_outputDirectory = m_def->getOutputDirectory();
 
     if (m_def->hasProgramSymbol())
     {
@@ -70,8 +79,8 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
         Program *program = m_def->getProgramSymbol();
 
         /* Shared memory area. */
-        Value *sharedMemBValue = program->getAnnValue(SHARED_MEMORY_BEGIN_ANNOTATION);
-        Value *sharedMemEValue = program->getAnnValue(SHARED_MEMORY_END_ANNOTATION);
+        Value *sharedMemBValue = getAnnValue(program, SHARED_MEMORY_BEGIN_ANNOTATION);
+        Value *sharedMemEValue = getAnnValue(program, SHARED_MEMORY_END_ANNOTATION);
         if (sharedMemBValue && sharedMemEValue)
         {
             m_templateData["sharedMemBeginAddr"] = sharedMemBValue->toString();
@@ -80,8 +89,22 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
         }
         else if (sharedMemBValue || sharedMemEValue)
         {
-            throw semantic_error("Annotations @shared_memory_begin and @shared_memory_end both (or no one) need exists and contains addresses.");
+            throw semantic_error(
+                "Annotations @shared_memory_begin and @shared_memory_end both (or no one) need exists and contains "
+                "addresses.");
         }
+
+        if (findAnnotation(program, CRC_ANNOTATION) != nullptr)
+        {
+            m_templateData["crc16"] = m_idlCrc16;
+        }
+
+        if (findAnnotation(program, DYNAMIC_SERVICES_ANNOTATION) != nullptr)
+        {
+            m_templateData["dynamicServices"] = true;
+        }
+
+        m_outputDirectory /= getAnnStringValue(m_def->getProgramSymbol(), OUTPUT_DIR_ANNOTATION);
     }
 
     // get group annotation with vector of theirs interfaces
@@ -95,12 +118,12 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
         assert(iface);
 
         // interface has group annotation
-        std::vector<Annotation *> groupAnns = iface->getAnnotations(GROUP_ANNOTATION);
+        vector<Annotation *> groupAnns = getAnnotations(iface, GROUP_ANNOTATION);
         if (!groupAnns.empty())
         {
             for (auto groupAnnIt : groupAnns)
             {
-                std::string name = (groupAnnIt->hasValue()) ? groupAnnIt->getValueObject()->toString() : "";
+                string name = (groupAnnIt->hasValue()) ? groupAnnIt->getValueObject()->toString() : "";
                 Group *group = getGroupByName(name);
                 if (group == nullptr)
                 {
@@ -133,9 +156,26 @@ Generator::Generator(InterfaceDefinition *def, uint16_t idlCrc16)
 
     // list of group names (used for including group header files for callbacks)
     m_templateData["groupNames"] = groupNames;
+
+    // set codec information
+    switch (m_def->getCodecType())
+    {
+        case InterfaceDefinition::kBasicCodec:
+        {
+            m_templateData["codecClass"] = "BasicCodec";
+            m_templateData["codecHeader"] = "basic_codec.h";
+            break;
+        }
+        default:
+        {
+            m_templateData["codecClass"] = "Codec";
+            m_templateData["codecHeader"] = "codec.h";
+            break;
+        }
+    }
 }
 
-Group *Generator::getGroupByName(std::string name)
+Group *Generator::getGroupByName(string name)
 {
     for (Group *group : m_groups)
     {
@@ -148,13 +188,12 @@ Group *Generator::getGroupByName(std::string name)
     return nullptr;
 }
 
-void Generator::openFile(std::ofstream &fileOutputStream, const std::string &fileName)
+void Generator::openFile(ofstream &fileOutputStream, const string &fileName)
 {
-    boost::filesystem::path outputDir = m_def->getOutputDirectory();
-    if (!outputDir.empty())
+    if (!m_outputDirectory.empty())
     {
         // TODO: do we have to create a copy of the outputDir here? Doesn't make sense...
-        boost::filesystem::path dir(outputDir);
+        boost::filesystem::path dir(m_outputDirectory);
         if (!boost::filesystem::is_directory(dir))
         {
             // Create_directories function return false also when it create new directory.
@@ -163,25 +202,23 @@ void Generator::openFile(std::ofstream &fileOutputStream, const std::string &fil
             boost::filesystem::create_directories(dir);
             if (!boost::filesystem::is_directory(dir))
             {
-                throw std::runtime_error(format_string("could not create directory path '%s'", outputDir.c_str()));
+                throw runtime_error(format_string("could not create directory path '%s'", m_outputDirectory.c_str()));
             }
         }
     }
-    std::string filePathWithName = (outputDir / fileName).string();
+    string filePathWithName = (m_outputDirectory / fileName).string();
     // Open file.
-    fileOutputStream.open(filePathWithName, std::ios::out | std::ios::binary);
+    fileOutputStream.open(filePathWithName, ios::out | ios::binary);
     if (!fileOutputStream.is_open())
     {
-        throw std::runtime_error(format_string("could not open output file '%s'", filePathWithName.c_str()));
+        throw runtime_error(format_string("could not open output file '%s'", filePathWithName.c_str()));
     }
 }
 
-void Generator::generateOutputFile(const std::string &fileName,
-                                   const std::string &templateName,
-                                   data_map &templateData,
+void Generator::generateOutputFile(const string &fileName, const string &templateName, data_map &templateData,
                                    const char *const kParseFile)
 {
-    std::ofstream fileOutputStream;
+    ofstream fileOutputStream;
     openFile(fileOutputStream, fileName);
 
     // Run template and write output to output files. Catch and rethrow template exceptions
@@ -197,10 +234,10 @@ void Generator::generateOutputFile(const std::string &fileName,
     }
 }
 
-std::string Generator::stripExtension(const std::string &filename)
+string Generator::stripExtension(const string &filename)
 {
     auto result = filename.rfind('.');
-    if (result != std::string::npos)
+    if (result != string::npos)
     {
         return filename.substr(0, result);
     }
@@ -211,12 +248,11 @@ std::string Generator::stripExtension(const std::string &filename)
 }
 
 StructMember *Generator::findParamReferencedFromAnn(const StructType::member_vector_t &members,
-                                                    const std::string &referenceName,
-                                                    const std::string &annName)
+                                                    const string &referenceName, const string &annName)
 {
     for (StructMember *structMember : members)
     {
-        std::string lengthName = structMember->getAnnStringValue(annName);
+        string lengthName = getAnnStringValue(structMember, annName);
         if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
         {
             return structMember;
@@ -226,7 +262,7 @@ StructMember *Generator::findParamReferencedFromAnn(const StructType::member_vec
 }
 
 StructMember *Generator::findParamReferencedFromUnion(const StructType::member_vector_t &members,
-                                                      const std::string &referenceName)
+                                                      const string &referenceName)
 {
     for (StructMember *structMember : members)
     {
@@ -234,9 +270,10 @@ StructMember *Generator::findParamReferencedFromUnion(const StructType::member_v
         if (trueDataType->isUnion())
         {
             UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
+            assert(unionType);
             if (unionType->isNonEncapsulatedUnion())
             {
-                std::string lengthName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
+                string lengthName = getAnnStringValue(structMember, DISCRIMINATOR_ANNOTATION);
                 if (strcmp(lengthName.c_str(), referenceName.c_str()) == 0)
                 {
                     return structMember;
@@ -255,7 +292,7 @@ StructMember *Generator::findParamReferencedFromUnion(const StructType::member_v
 }
 
 StructMember *Generator::findParamReferencedFrom(const StructType::member_vector_t &members,
-                                                 const std::string &referenceName)
+                                                 const string &referenceName)
 {
     StructMember *referencedFrom = findParamReferencedFromAnn(members, referenceName, LENGTH_ANNOTATION);
     if (referencedFrom)
@@ -268,15 +305,15 @@ StructMember *Generator::findParamReferencedFrom(const StructType::member_vector
     }
 }
 
-std::string Generator::getTime()
+string Generator::getTime()
 {
-    std::time_t now = std::time(nullptr);
-    std::string nowString = std::ctime(&now);
+    time_t now = time(nullptr);
+    string nowString = ctime(&now);
     nowString.pop_back(); // Remove trailing newline.
     return nowString;
 }
 
-DataType *Generator::findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType)
+DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dataType)
 {
     // Detecting loops from forward declarations.
     // Insert data type into set
@@ -358,13 +395,13 @@ void Generator::findGroupDataTypes()
             for (Function *fn : iface->getFunctions())
             {
                 // handle return value
-                std::set<DataType *> dataTypes;
+                set<DataType *> dataTypes;
                 StructMember *structMember = fn->getReturnStructMemberType();
                 DataType *transformedDataType = findChildDataType(dataTypes, fn->getReturnType());
                 structMember->setDataType(transformedDataType);
 
                 // save all transformed data types directions into data type map
-                if (!fn->getReturnType()->findAnnotation(SHARED_ANNOTATION))
+                if (!findAnnotation(fn->getReturnType(), SHARED_ANNOTATION))
                 {
                     for (DataType *dataType : dataTypes)
                     {
@@ -383,7 +420,7 @@ void Generator::findGroupDataTypes()
                     mit->setDataType(findChildDataType(dataTypes, mit->getDataType()));
 
                     // save all transformed data types directions into data type map
-                    if (!mit->findAnnotation(SHARED_ANNOTATION))
+                    if (!findAnnotation(mit, SHARED_ANNOTATION))
                     {
                         for (DataType *dataType : dataTypes)
                         {
@@ -405,13 +442,13 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
     for (Interface *iface : group->getInterfaces())
     {
         data_map ifaceInfo;
-        ifaceInfo["name"] = make_data(iface->getOutputName());
+        ifaceInfo["name"] = make_data(getOutputName(iface));
         ifaceInfo["id"] = data_ptr(iface->getUniqueId());
 
         setTemplateComments(iface, ifaceInfo);
 
         // TODO: for C only?
-        ifaceInfo["serviceClassName"] = iface->getOutputName() + "_service";
+        ifaceInfo["serviceClassName"] = getOutputName(iface) + "_service";
 
         Log::info("%d: (%d) %s\n", n++, iface->getUniqueId(), iface->getName().c_str());
 
@@ -421,7 +458,9 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         ifaceInfo["isNonExternalInterface"] = false;
         for (int i = 0; i < functions.size(); ++i)
         {
-            std::string isNonExternalFunction = dynamic_cast<DataMap *>(functions[i].get().get())->getmap()["isNonExternalFunction"]->getvalue();
+            assert(dynamic_cast<DataMap *>(functions[i].get().get()));
+            string isNonExternalFunction =
+                dynamic_cast<DataMap *>(functions[i].get().get())->getmap()["isNonExternalFunction"]->getvalue();
             if (isNonExternalFunction.compare("true") == 0)
             {
                 ifaceInfo["isNonExternalInterface"] = true;
@@ -435,25 +474,13 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
     return interfaces;
 }
 
-data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
-{
-    data_list fns;
-
-    int j = 0;
-    for (auto fit : iface->getFunctions())
-    {
-        fns.push_back(make_data(getFunctionTemplateData(group, fit, j++)));
-    }
-    return fns;
-}
-
 void Generator::generateGroupOutputFiles(Group *group)
 {
     // generate output files only for groups with interfaces or for IDLs with no interfaces at all
     if (!group->getInterfaces().empty() || (m_groups.size() == 1 && group->getName() == ""))
     {
-        std::string groupName = group->getName();
-        std::string fileName = stripExtension(m_def->getOutputFilename());
+        string groupName = group->getName();
+        string fileName = stripExtension(m_def->getOutputFilename());
         m_templateData["outputFilename"] = fileName;
         if (groupName != "")
         {
@@ -480,7 +507,7 @@ void Generator::makeIncludesTemplateData()
     data_list includeData;
     if (m_def->hasProgramSymbol())
     {
-        for (auto include : m_def->getProgramSymbol()->getAnnotations(INCLUDE_ANNOTATION))
+        for (auto include : getAnnotations(m_def->getProgramSymbol(), INCLUDE_ANNOTATION))
         {
             includeData.push_back(make_data(include->getValueObject()->toString()));
             Log::info("include %s\n", include->getValueObject()->toString().c_str());
@@ -492,14 +519,14 @@ void Generator::makeIncludesTemplateData()
 data_list Generator::makeGroupIncludesTemplateData(Group *group)
 {
     data_list includes;
-    std::set<std::string> tempSet;
+    set<string> tempSet;
 
     for (Interface *iface : group->getInterfaces())
     {
-        Annotation *includeAnn = iface->findAnnotation(INCLUDE_ANNOTATION);
+        Annotation *includeAnn = findAnnotation(iface, INCLUDE_ANNOTATION);
         if (includeAnn)
         {
-            std::string include = includeAnn->getValueObject()->toString();
+            string include = includeAnn->getValueObject()->toString();
             if (tempSet.find(include) == tempSet.end())
             {
                 includes.push_back(include);
@@ -509,10 +536,10 @@ data_list Generator::makeGroupIncludesTemplateData(Group *group)
 
         for (Function *func : iface->getFunctions())
         {
-            Annotation *funcAnn = func->findAnnotation(INCLUDE_ANNOTATION);
+            Annotation *funcAnn = findAnnotation(func, INCLUDE_ANNOTATION);
             if (funcAnn)
             {
-                std::string include = funcAnn->getValueObject()->toString();
+                string include = funcAnn->getValueObject()->toString();
                 if (tempSet.find(include) == tempSet.end())
                 {
                     includes.push_back(include);
@@ -528,4 +555,92 @@ data_list Generator::makeGroupIncludesTemplateData(Group *group)
 bool Generator::isMemberDataTypeUsingForwardDeclaration(Symbol *topSymbol, Symbol *memberSymbol)
 {
     return (m_globals->getSymbolPos(topSymbol) < m_globals->getSymbolPos(memberSymbol));
+}
+
+string Generator::getOutputName(Symbol *symbol, bool check)
+{
+    string annName;
+    uint32_t line;
+    Annotation *ann = findAnnotation(symbol, NAME_ANNOTATION);
+    if (ann)
+    {
+        annName = ann->getValueObject()->toString();
+        if (annName.empty())
+        {
+            throw semantic_error(format_string("Missing value for annotation named @%s on line '%d'", NAME_ANNOTATION,
+                                               ann->getLocation().m_firstLine));
+        }
+        Log::warning(
+            "line %d: Be careful when @%s annotation is used. This can cause compile issue. See documentation.\n",
+            ann->getLocation().m_firstLine, NAME_ANNOTATION);
+        line = ann->getLocation().m_firstLine;
+    }
+    else
+    {
+        annName = symbol->getName();
+        line = symbol->getFirstLine();
+    }
+
+    if (check)
+    {
+        auto it = reserverdWords.find(annName);
+        if (it != reserverdWords.end())
+        {
+            throw semantic_error(
+                format_string("line %d: Wrong symbol name '%s'. Cannot use program language reserved words.", line,
+                              annName.c_str())
+                    .c_str());
+        }
+    }
+
+    return annName;
+}
+
+Annotation::program_lang_t Generator::getAnnotationLang()
+{
+    if (m_generatorType == kC)
+    {
+        return Annotation::kC;
+    }
+    else if (m_generatorType == kPython)
+    {
+        return Annotation::kPython;
+    }
+
+    throw internal_error("Unsupported generator type specified for annotation.");
+}
+
+Annotation *Generator::findAnnotation(Symbol *symbol, string name)
+{
+    return symbol->findAnnotation(name, getAnnotationLang());
+}
+
+vector<Annotation *> Generator::getAnnotations(Symbol *symbol, string name)
+{
+    return symbol->getAnnotations(name, getAnnotationLang());
+}
+
+Value *Generator::getAnnValue(Symbol *symbol, string name)
+{
+    return symbol->getAnnValue(name, getAnnotationLang());
+}
+
+string Generator::getAnnStringValue(Symbol *symbol, string name)
+{
+    return symbol->getAnnStringValue(name, getAnnotationLang());
+}
+
+data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
+{
+    data_list fns;
+
+    int j = 0;
+    for (auto fit : iface->getFunctions())
+    {
+        data_map function = getFunctionTemplateData(group, fit);
+        fns.push_back(function);
+
+        Log::info("    %d: (%d) %s\n", j, fit->getUniqueId(), function["prototype"]->getvalue().c_str());
+    }
+    return fns;
 }

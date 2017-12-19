@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -84,8 +88,8 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(
-        unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id);
+    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length,
+                               int rpmsg_link_id);
 
     /*!
      * @brief This function call RPMsg rtos init function - as RPMsg remote
@@ -95,12 +99,14 @@ public:
      * @param[in] base_address RPMsg base address in the shared memory.
      * @param[in] rpmsg_link_id Selection between what cores the communication will occur.
      * @param[in] ready_cb Callback called after RPMsg init is done and the core is ready.
+     * @param[in] nameservice_name Name of the nameservice channel to be announced
+     *                             to the other core.
      *
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(
-        unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void));
+    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id,
+                               void (*ready_cb)(void), char *nameservice_name);
 
     /*!
      * @brief Store incoming message to message buffer.

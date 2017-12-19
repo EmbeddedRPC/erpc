@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,13 +36,11 @@
 #include "rpmsg_tty_rtos_transport.h"
 #include "erpc_config_internal.h"
 #include "framed_transport.h"
+#include "rpmsg_ns.h"
 #include <cassert>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 using namespace erpc;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -71,16 +73,12 @@ void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
     m_crcImpl = crcImpl;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr,
-                                          unsigned long dst_addr,
-                                          void *base_address,
-                                          unsigned long length,
-                                          int rpmsg_link_id)
+erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
+                                          unsigned long length, int rpmsg_link_id)
 {
     if (!s_initialized)
     {
-        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id,
-                                         RL_NO_FLAGS);
+        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS);
         if (!s_rpmsg)
         {
             return kErpcStatus_InitFailed;
@@ -94,19 +92,14 @@ erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr,
         return kErpcStatus_InitFailed;
     }
 
-    m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb,
-                                        m_rpmsg_queue);
+    m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
 
     m_dst_addr = dst_addr;
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr,
-                                          unsigned long dst_addr,
-                                          void *base_address,
-                                          int rpmsg_link_id,
-                                          void (*ready_cb)(void),
-                                          char *nameservice_name)
+erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
+                                          int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -134,13 +127,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr,
     {
         return kErpcStatus_InitFailed;
     }
-    m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb,
-                                        m_rpmsg_queue);
+    m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
 
     if (nameservice_name)
     {
-        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name,
-                                            RL_NS_CREATE))
+        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name, RL_NS_CREATE))
         {
             return kErpcStatus_InitFailed;
         }
@@ -157,8 +148,7 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
     char *buf = NULL;
     int length = 0;
 
-    int ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr,
-                                          &buf, &length, RL_BLOCK);
+    int ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     assert(buf);
 
     memcpy((uint8_t *)&h, buf, sizeof(h));
@@ -166,8 +156,7 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
     message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
 
     // Verify CRC.
-    uint16_t computedCrc = m_crcImpl->computeCRC16(
-        &((uint8_t *)buf)[sizeof(h)], h.m_messageSize);
+    uint16_t computedCrc = m_crcImpl->computeCRC16(&((uint8_t *)buf)[sizeof(h)], h.m_messageSize);
     if (computedCrc != h.m_crc)
     {
         return kErpcStatus_CrcCheckFailed;
@@ -191,8 +180,7 @@ erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
 
     memcpy(buf - sizeof(h), (uint8_t *)&h, sizeof(h));
 
-    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr,
-                                         buf - sizeof(h), used + sizeof(h));
+    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf - sizeof(h), used + sizeof(h));
     if (ret_val == RL_SUCCESS)
     {
         return kErpcStatus_Success;

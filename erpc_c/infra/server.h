@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -110,7 +114,8 @@ public:
      *
      * @return Based on handleInvocation implementation.
      */
-    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec, MessageBufferFactory *messageFactory) = 0;
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec,
+                                           MessageBufferFactory *messageFactory) = 0;
 
 protected:
     uint32_t m_serviceId; /*!< Service unique id. */
@@ -132,7 +137,7 @@ public:
     /*!
      * @brief Constructor.
      *
-     * This function initializes object atributes.
+     * This function initializes object attributes.
      */
     Server()
     : m_messageFactory()
@@ -207,7 +212,8 @@ protected:
      *
      * @returns #kErpcStatus_Success or based on codec startReadMessage.
      */
-    virtual erpc_status_t processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId, uint32_t sequence);
+    virtual erpc_status_t processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId,
+                                         uint32_t sequence);
 
     /*!
      * @brief Read head of message to identify type of message.
@@ -220,7 +226,8 @@ protected:
      *
      * @returns #kErpcStatus_Success or based on service handleInvocation.
      */
-    virtual erpc_status_t readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence);
+    virtual erpc_status_t readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId,
+                                            uint32_t &methodId, uint32_t &sequence);
 
     /*!
      * @brief This function finds service base on service ID.

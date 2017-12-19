@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -49,16 +53,15 @@ namespace erpcgen {
 class Group
 {
 public:
-    typedef std::vector<Interface *> interface_list_t;
-    typedef std::vector<Symbol *> symbols_list_t;
-    typedef std::map<Symbol *, std::set<_param_direction> > symbol_directions_map_t;
+    typedef std::vector<Interface *> interface_list_t; /*!< Vector of interfaces belongs to group. */
+    typedef std::vector<Symbol *> symbols_list_t;      /*!< Vector of symbols belongs to group. */
+    typedef std::map<Symbol *, std::set<_param_direction> >
+        symbol_directions_map_t; /*!< Map symbol with direction in which is used in current group. */
 
     /*!
      * @brief Constructor.
      *
-     * This function set symbol token to given token.
-     *
-     * @param[in] tok Given token.
+     * @param[in] name Group name.
      */
     Group(const std::string name)
     : m_name(name)
@@ -140,7 +143,7 @@ public:
      * @see std::string VoidType::getDescription() const
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
-    */
+     */
     std::string getDescription() const;
 
 private:

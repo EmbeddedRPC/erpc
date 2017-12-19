@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -40,6 +44,7 @@
 #include <string>
 
 using namespace erpcgen;
+using namespace std;
 
 #if __WIN32__
 #define PATH_SEP_CHAR '\\'
@@ -176,7 +181,7 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     return count;
 }
 
-void ErpcLexer::pushFile(const std::string &fileName)
+void ErpcLexer::pushFile(const string &fileName)
 {
     CurrentFileInfo *newSavedFileInfo = openFile(fileName);
 
@@ -206,16 +211,16 @@ void ErpcLexer::popFile()
     yypop_buffer_state();
 }
 
-CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
+CurrentFileInfo *ErpcLexer::openFile(const string &fileName)
 {
     // search file in path
-    std::string foundFile, currentFolderPath;
+    string foundFile, currentFolderPath;
     if (!PathSearcher::getGlobalSearcher().search(fileName, PathSearcher::target_type_t::kFindFile, true, foundFile))
     {
         throw runtime_error(format_string("could not find input file %s in defined directories", fileName.c_str()));
     }
 
-    if (fileName.rfind(PATH_SEP_CHAR) != std::string::npos)
+    if (fileName.rfind(PATH_SEP_CHAR) != string::npos)
     {
         int fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
         currentFolderPath = foundFile.substr(0, fileSepPos);
@@ -233,7 +238,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
         }
     }
     // open file
-    std::ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
+    ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
     if (inputFile)
     {
         if (!inputFile->is_open())
@@ -248,7 +253,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
     }
 
     /* Counting CRC16 for Generator. */
-    std::string str((std::istreambuf_iterator<char>(*inputFile)), std::istreambuf_iterator<char>());
+    string str((istreambuf_iterator<char>(*inputFile)), istreambuf_iterator<char>());
     erpc::Crc16 crc16 = erpc::Crc16(ERPC_VERSION_NUMBER);
     m_idlCrc16 += crc16.computeCRC16((const uint8_t *)str.c_str(), str.size());
 

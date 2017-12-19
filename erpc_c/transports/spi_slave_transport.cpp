@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,7 +37,6 @@
 #include "board.h"
 #include "fsl_gpio.h"
 #include "fsl_spi.h"
-#include <cassert>
 #include <cstdio>
 
 using namespace erpc;
@@ -51,7 +54,7 @@ static volatile bool s_isTransferCompleted = false;
 
 void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, erpc_status_t status, void *userData)
 {
-    GPIO_SetPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    GPIO_PortSet(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
     s_isTransferCompleted = true;
 }
 
@@ -67,7 +70,7 @@ SpiSlaveTransport::~SpiSlaveTransport()
 {
     if (m_isInited)
     {
-        GPIO_ClearPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+        GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
     }
     SPI_Deinit(m_spiBaseAddr);
 }
@@ -102,7 +105,7 @@ erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 
     status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
 
-    GPIO_ClearPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
     while (!s_isTransferCompleted)
     {
     }
@@ -122,7 +125,7 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
 
     status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
 
-    GPIO_ClearPinsOutput(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+    GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
     while (!s_isTransferCompleted)
     {
     }

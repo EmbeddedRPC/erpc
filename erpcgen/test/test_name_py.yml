@@ -23,9 +23,11 @@ idl: |
   @name(I)
   interface K
   {
-
-    @name(function)
+    @py:name(function)
     oneway functionName(S a @name(m))
+
+    @c:name(function2)
+    oneway functionName2(S a @name(m))
   }
 lang: py
 
@@ -45,11 +47,15 @@ test/client.py:
   - def function(self, m)
   - if m is None
   - m._write(codec)
+  - def functionName2(self, m)
 
 test/server.py:
   - _handle_function
   - m = common.StructName()._read(codec)
   - self._handler.function(m)
+  - self._handler.functionName2(m)
 
 test/interface.py:
+  - class II(
   - def function(self, m)
+  - def functionName2(self, m)

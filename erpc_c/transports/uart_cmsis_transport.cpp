@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,8 +34,6 @@
  */
 
 #include "uart_cmsis_transport.h"
-#include "board.h"
-#include <cassert>
 #include <cstdio>
 
 using namespace erpc;
@@ -73,32 +75,55 @@ void TransferCallback(uint32_t event)
 
 erpc_status_t UartTransport::init()
 {
-    erpc_status_t status = (*m_uartDrv).Initialize(TransferCallback);
-    (*m_uartDrv).PowerControl(ARM_POWER_FULL);
+    int32_t status = (*m_uartDrv).Initialize(TransferCallback);
+    if (status == ARM_DRIVER_OK)
+    {
+        status = (*m_uartDrv).PowerControl(ARM_POWER_FULL); /* Enable Receiver and Transmitter lines */
+        if (status == ARM_DRIVER_OK)
+        {
+            status = m_uartDrv->Control(ARM_USART_CONTROL_TX, 1);
+            if (status == ARM_DRIVER_OK)
+            {
+                status = m_uartDrv->Control(ARM_USART_CONTROL_RX, 1);
+                if (status == ARM_DRIVER_OK)
+                {
+                    return kErpcStatus_Success;
+                }
+            }
+        }
+    }
 
-    return status != kStatus_Success ? kErpcStatus_InitFailed : kErpcStatus_Success;
+    return kErpcStatus_InitFailed;
 }
 
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     s_isTransferReceiveCompleted = false;
 
-    erpc_status_t status = (*m_uartDrv).Receive(data, size);
-    while (!s_isTransferReceiveCompleted)
+    int32_t status = (*m_uartDrv).Receive(data, size);
+    if (status == ARM_DRIVER_OK)
     {
+        while (!s_isTransferReceiveCompleted)
+        {
+        }
+        return kErpcStatus_Success;
     }
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return kErpcStatus_ReceiveFailed;
 }
 
 erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     s_isTransferSendCompleted = false;
 
-    (*m_uartDrv).Send(data, size);
-    while (!s_isTransferSendCompleted)
+    int32_t status = (*m_uartDrv).Send(data, size);
+    if (status == ARM_DRIVER_OK)
     {
+        while (!s_isTransferSendCompleted)
+        {
+        }
+        return kErpcStatus_Success;
     }
 
-    return kErpcStatus_Success;
+    return kErpcStatus_SendFailed;
 }

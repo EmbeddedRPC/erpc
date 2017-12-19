@@ -7,6 +7,9 @@
 #include "{$serverHeaderName}"
 #include <new>
 #include "erpc_port.h"
+{% if dynamicServices == false %}
+#include "manually_constructed.h"
+{% endif --dynamicServices == false %}
 {% if empty(group.includes) == false %}
 extern "C"
 {
@@ -17,18 +20,18 @@ extern "C"
 {% endif -- empty(group.includes) %}
 
 {$checkVersion()}
-
-{$checkCrc()}
-
+{$>checkCrc()}
 using namespace erpc;
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;
 #endif
 
+{% for iface in group.interfaces if dynamicServices == false %}
+static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName};
+
+{% endfor -- iface %}
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {% if unitTest %}
@@ -47,15 +50,170 @@ extern bool nestingDetection;
 {$> symbolSource(group.symbolsMap.symbolsToClient, "serial", "noSharedMem")}
 {$> symbolFreeSpaceHeader(group.symbolsMap.symbolsServerFree, "noSharedMem")}
 {$> symbolFreeSpaceSource(group.symbolsMap.symbolsServerFree, "noSharedMem")}
+{% def serverShimCode(fn, serverIDName, functionIDName) ------------------------- serverShimCode(fn, serverIDName, functionIDName) %}
+{% set serverIndent = "" >%}
+{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
+    erpc_status_t err = kErpcStatus_Success;
+
+{% endif -- isReturnValue || isSendValue %}
+{% for param in fn.parameters %}
+    {$param.variable}{% if param.isNullParam %} = NULL{%endif%};
+{%  if !empty(param.nullVariable) %}
+    {$param.nullVariable} = NULL;
+{%  endif %}
+{%  if !param.shared %}
+{%   if param.isNullable == false && param.direction != OutDirection %}
+{$> addIndent("    ", allocMem(param.mallocServer))}
+{%   endif -- !param.isNullable && param.direction != OutDirection %}
+{%  endif -- shared %}
+{% endfor -- param %}
+{% if fn.needNullVariableOnServer %}
+    bool isNull;
+{% endif -- needNullVariableOnServer %}
+{% if fn.needTempVariableServer %}
+    int32_t _tmp_local;
+{% endif %}
+{% if fn.returnValue.type.isNotVoid %}
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
+{% endif %}
+{% if fn.isReturnValue || fn.isSendValue  %}
+
+{% endif %}
+    // startReadMessage() was already called before this shim was invoked.
+
+{% if fn.isSendValue %}
+{%  for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
+{%   if param.isNullable %}
+{$addIndent("    ", f_paramIsNullableDecode(param))}
+
+{%   else -- notNullable %}
+{%    if param.direction != OutDirection %}
+{$addIndent("    ", param.coderCall.decode(param.coderCall))}
+
+{%    endif -- param != OutDirection %}
+{%   endif -- isNullable %}
+{%  endfor -- parametersToServer %}
+{% endif -- isSendValue %}
+{% for param in fn.parametersToClient %}
+{%  if !param.shared %}
+{%   if param.isNullable == false && param.direction == OutDirection && empty(param.mallocServer) == false %}
+{$> addIndent("    ", allocMem(param.mallocServer))}
+
+{%   endif -- !param.isNullable && param.direction == OutDirection %}
+{%  endif -- shared %}
+{% endfor -- param %}
+{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
+{%  set serverIndent = "    " >%}
+    err = codec->getStatus();
+    if (!err)
+    {
+{% endif -- generateErrorChecks %}
+{$serverIndent}    // Invoke the actual served function.
+#if ERPC_NESTED_CALLS_DETECTION
+{$serverIndent}    nestingDetection = true;
+#endif
+{% if serverIDName == "serviceID" %}
+{%  for callbackFunction in callbackType.functions %}
+{$serverIndent}    {% if loop.first == false %}else {% endif %}if ({$serverIDName} == {$callbackFunction.serviceId} && {$functionIDName} == {$callbackFunction.id})
+{$serverIndent}    {
+{$serverIndent}        {$callbackFunction.serverPrototype}
+{$serverIndent}    }
+{%  endfor -- callbackFunction in callbackType.functions %}
+{% else -- serverIDName == "serviceID" %}
+{$serverIndent}    {$fn.serverPrototype}
+{% endif --serverIDName == "serviceID" %}
+#if ERPC_NESTED_CALLS_DETECTION
+{$serverIndent}    nestingDetection = false;
+#endif
+{% if fn.isReturnValue %}
+
+{$serverIndent}    // preparing MessageBuffer for serializing data
+{$serverIndent}    {% if generateErrorChecks %}err = {% endif %}messageFactory->prepareServerBufferForSend(codec->getBuffer());
+{%  if generateErrorChecks %}
+    }
+
+    if (!err)
+    {
+{%  endif -- generateErrorChecks %}
+{$serverIndent}    // preparing codec for serializing data
+{$serverIndent}    codec->reset();
+
+{$serverIndent}    // Build response message.
+{$serverIndent}    codec->startWriteMessage(kReplyMessage, {$serverIDName}, {$functionIDName}, sequence);
+{%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
+
+{%   if param.isNullable %}
+{$serverIndent}    if ({% if source == "server" && empty(param.nullVariable) == false %}_{% endif %}{$param.name} != NULL)
+{$serverIndent}    {
+{$addIndent(serverIndent & "        ", param.coderCall.encode(param.coderCall))}
+{$serverIndent}    }
+{%   else -- isNullable %}
+{$addIndent(serverIndent & "    ", param.coderCall.encode(param.coderCall))}
+{%   endif -- isNullable %}
+{%  endfor -- parametersToClient %}
+{%  if fn.returnValue.type.isNotVoid %}
+
+{%   if fn.returnValue.isNullable %}
+{$addIndent(serverIndent & "    ", f_paramIsNullableEncode(fn.returnValue))}
+{%   else -- isNullable %}
+{$addIndent(serverIndent & "    ", fn.returnValue.coderCall.encode(fn.returnValue.coderCall))}
+{%   endif -- isNullable %}
+{%  endif -- notVoid %}
+{%  if generateErrorChecks %}
+
+        err = codec->getStatus();
+{%  endif generateErrorChecks %}
+{% endif -- isReturnValue %}
+{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
+    }
+
+{% endif -- fn.isReturnValue || fn.isSendValue %}
+{% for param in fn.paramsToFree %}
+{$> addIndent("    ", param.coderCall.freeingCall(param.coderCall))}
+{$> addIndent("    ", param.firstFreeingCall1.firstFreeingCall(param.firstFreeingCall1))}
+
+{% endfor -- parameters %}
+{% if fn.returnValue.type.isNotVoid %}
+{%  set needFreeingCall = fn.returnValue.coderCall.freeingCall(fn.returnValue.coderCall) %}
+{%  set needFirstFreeingCall = fn.returnValue.firstFreeingCall1.firstFreeingCall(fn.returnValue.firstFreeingCall1) %}
+{%  if empty(needFreeingCall) == false || empty(needFirstFreeingCall) == false %}
+{$> addIndent("    ", needFreeingCall)}
+{$> addIndent("    ", needFirstFreeingCall)}
+
+{%  endif -- !empty(needFreeingCall) || !empty(needFirstFreeingCall) %}
+{% endif -- notVoid %}
+{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
+    return err;
+{% else %}
+    return codec->getStatus();
+{% endif %}
+{% enddef --------------------------------------------------------------------------------- serverShimCode(fn, serverIDName, functionIDName) %}
+{% for callbackType in group.callbacks %}
+
+// Common function for serializing and deserializing callback functions of same type.
+static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);
+{% endfor %}
+{% for callbackType in group.callbacks %}
+
+// Common function for serializing and deserializing callback functions of same type.
+static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
+{
+{$ serverShimCode(callbackType, "serviceID", "functionID") >}
+}
+{% endfor %}
 {% for iface in group.interfaces -- service subclass method impl %}
+
 // Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
+{%  if codecClass != "Codec" %}
+    {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
+{%   endif %}
     switch (methodId)
     {
 {%  for fn in iface.functions %}
         case k{$iface.name}_{$fn.name}_id:
-            return {$fn.name}_shim(codec, messageFactory, sequence);
+            return {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
 
 {%  endfor -- fn %}
         default:
@@ -65,122 +223,28 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
 {%  for fn in iface.functions %}
 
 // Server shim for {$fn.name} of {$iface.name} interface.
-erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
+erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
 {
-{% if errVar != "" %}
-    erpc_status_t {$errVar}kErpcStatus_Success;
-
-{% endif %}
-{%   for param in fn.parameters %}
-    {$param.variable}{% if param.isNullParam %} = NULL{%endif%};
-{%    if !empty(param.nullVariable) %}
-    {$param.nullVariable} = NULL;
-{%    endif %}
-{%    if !param.shared %}
-{%     if !param.isNullable %}
-{$> addIndent("    ", param.mallocServer)}
-{%     endif -- isNullable %}
-{%    endif -- shared %}
-{%   endfor -- param %}
-{%   if fn.needNullVariableOnServer %}
-    bool isNull;
-{%   endif -- needNullVariableOnServer %}
-{%   if fn.needTempVariableServer %}
-    int32_t _tmp_local;
-{%   endif %}
-{%   if count(fn.parameters) > 0 or empty(fn.needTempVariableServer) == false or empty(fn.needNullVariableOnServer) == false %}
-{# need empty line for this case #}
-
-{%   endif %}
-    // startReadMessage() was already called before this shim was invoked.
-
-{%   if fn.isSendValue %}
-{%    for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
-{%     if param.isNullable %}
-{$addInfraErrorChecks("    ", f_paramIsNullableDecode(param))}
-
-{%     else -- notNullable %}
-{%      if param.direction != OutDirection %}
-{$addInfraErrorChecks("    ", param.coderCall.decode(param.coderCall))}
-
-{%      endif -- param != OutDirection %}
-{%     endif -- isNullable %}
-{%    endfor -- parametersToServer %}
-{%   endif -- isSendValue %}
-
-    // Invoke the actual served function.
-{%   if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType && generateInfraErrorChecks %} = NULL{%endif%};
-{%   endif %}
-#if ERPC_NESTED_CALLS_DETECTION
-    nestingDetection = true;
-#endif
-{$addInfraErrorChecks("    ", fn.serverPrototype)}
-#if ERPC_NESTED_CALLS_DETECTION
-    nestingDetection = false;
-#endif
-
-{%   if fn.isReturnValue %}
-    // preparing MessageBuffer for serializing data
-{$addInfraErrorChecks("    ", s_prepareServerBufferForSend)}
-
-    // preparing codec for serializing data
-    codec->reset();
-
-    // Build response message.
-{$addInfraErrorChecks("    ", f_serverStartWriteMessage(iface.name, fn.name))}
-
-{%    for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
-{%     if param.isNullable %}
-    if ({% if source == "server" && empty(param.nullVariable) == false %}_{% endif %}{$param.name} != NULL)
-    {
-{$addInfraErrorChecks("        ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
-    }
-{%     else -- isNullable %}
-{$addInfraErrorChecks("    ", param.coderCall.encode(param.coderCall))}{$loop.addNewLineIfNotLast}
-{%     endif -- isNullable %}
-{%    endfor -- parametersToClient %}
-{%    if fn.returnValue.type.isNotVoid %}
-{%     if count(fn.parametersToClient) > 0 %}
-{# need empty line for this case #}
-
-{%     endif %}
-{%     if fn.returnValue.isNullable %}
-{$addIndent("    ", f_paramIsNullableEncode(fn.returnValue))}
-{%     else -- isNullable %}
-{$addInfraErrorChecks("    ", fn.returnValue.coderCall.encode(fn.returnValue.coderCall))}
-{%     endif -- isNullable %}
-{%    endif -- notVoid %}
-
-{%   endif -- isReturnValue %}
-{%   if fn.isReturnValue %}
-{# need empty line for this case #}
-
-{%   endif %}
-{%   for param in fn.paramsToFree %}
-{$> addIndent("    ", param.coderCall.freeingCall(param.coderCall))}
-{$> addIndent("    ", param.firstFreeingCall2.firstFreeingCall(param.firstFreeingCall2))}
-{$> addIndent("    ", param.firstFreeingCall1.firstFreeingCall(param.firstFreeingCall1))}{$loop.addNewLineIfNotLast}
-{%   endfor -- parameters %}
-{%   if fn.returnValue.type.isNotVoid %}
-{%    if count(fn.paramsToFree) > 0 %}
-{# need empty line for this case #}
-
-{%    endif %}
-{$> addIndent("    ", fn.returnValue.coderCall.freeingCall(fn.returnValue.coderCall))}
-{$> addIndent("    ", fn.returnValue.firstFreeingCall1.firstFreeingCall(fn.returnValue.firstFreeingCall1))}
-{%   endif -- notVoid %}
-{% if errVar != ""  %}
-    return err;
-{% else %}
-    return kErpcStatus_Success;
-{% endif %}
+{% if fn.isCallback %}
+    return {$fn.callbackFName}_shim(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, codec, messageFactory, sequence);
+{% else -- fn.isCallback >%}
+{$ serverShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
+{% endif -- fn.isCallback >%}
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
+
+{% if dynamicServices == true %}
 erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();
 }
+{% else --dynamicServices == true %}
+erpc_service_t create_{$iface.serviceClassName}()
+{
+    s_{$iface.serviceClassName}.construct();
+    return s_{$iface.serviceClassName}.get();
+}
+{% endif --dynamicServices == true %}
 {% endfor -- iface %}

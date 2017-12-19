@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -65,10 +69,28 @@ public:
     //! @brief Represents a single client's receive request.
     typedef uintptr_t client_token_t;
 
+    /*!
+     * @brief Constructor.
+     */
     TransportArbitrator();
+
+    /*!
+     * @brief Destructor.
+     */
     virtual ~TransportArbitrator();
 
+    /*!
+     * @brief This function set shared client/server transport.
+     *
+     * @param[in] shared Shared client/server transport.
+     */
     void setSharedTransport(Transport *shared) { m_sharedTransport = shared; }
+
+    /*!
+     * @brief This function set codec.
+     *
+     * @param[in] codec Codec.
+     */
     void setCodec(Codec *codec) { m_codec = codec; }
 
     //! @brief Receive method for the server.
@@ -95,7 +117,7 @@ public:
     virtual erpc_status_t send(MessageBuffer *message);
 
     /*!
-     * @brief This functions sets thre CRC-16 implementation.
+     * @brief This functions sets the CRC-16 implementation.
      *
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
@@ -110,12 +132,19 @@ protected:
      */
     struct PendingClientInfo
     {
-        RequestContext *m_request;
-        Semaphore m_sem;
-        bool m_isValid;
-        PendingClientInfo *m_next;
+        RequestContext *m_request; /*!< Client request context. */
+        Semaphore m_sem;           /*!< Client semaphore. */
+        bool m_isValid;            /*!< This struct validation. */
+        PendingClientInfo *m_next; /*!< Next client pending information. */
 
+        /*!
+         * @brief Constructor.
+         */
         PendingClientInfo();
+
+        /*!
+         * @brief Destructor.
+         */
         ~PendingClientInfo();
     };
 
@@ -123,8 +152,25 @@ protected:
     PendingClientInfo *m_clientFreeList; //!< Unused client receive info structs.
     Mutex m_clientListMutex;             //!< Mutex guarding the client active and free lists.
 
+    /*!
+     * @brief This function adds pending client.
+     *
+     * @return Pending client information.
+     */
     PendingClientInfo *addPendingClient();
+
+    /*!
+     * @brief This function removes pending client.
+     *
+     * @param[in] info Pending client info to remove.
+     */
     void removePendingClient(PendingClientInfo *info);
+
+    /*!
+     * @brief This function removes pending client list.
+     *
+     * @param[in] list Pending client list to remove.
+     */
     void freeClientList(PendingClientInfo *list);
 };
 

@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,6 +38,7 @@
 #include "ParseErrors.h"
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -85,7 +90,7 @@ void Token::setLocation(const token_loc_t &first, const token_loc_t &last)
     m_location.m_lastLine = last.m_lastLine;
 }
 
-const std::string &Token::getStringValue() const
+const string &Token::getStringValue() const
 {
     const StringValue *s;
     if (m_value && (s = dynamic_cast<const StringValue *>(m_value.get())))
@@ -99,7 +104,7 @@ const std::string &Token::getStringValue() const
     }
 }
 
-uint32_t Token::getIntValue() const
+uint64_t Token::getIntValue() const
 {
     const IntegerValue *s;
     if (m_value && (s = dynamic_cast<const IntegerValue *>(m_value.get())))

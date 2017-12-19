@@ -1,10 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -186,8 +189,8 @@ TEST(test_arrays, sendReceivedList)
 {
     uint32_t array_count = 2;
     uint32_t elements_count = 2;
-    list_0_t send_array[2];
-    list_0_t(*received_array)[2];
+    list_int32_1_t send_array[2];
+    list_int32_1_t(*received_array)[2];
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -220,8 +223,8 @@ TEST(test_arrays, sendReceivedList)
 TEST(test_arrays, sendReceived2List)
 {
     uint32_t elements_count = 2;
-    list_0_t send_array[2][2];
-    list_0_t(*received_array)[2][2];
+    list_int32_1_t send_array[2][2];
+    list_int32_1_t(*received_array)[2][2];
 
     for (uint32_t k = 0; k < 2; ++k)
     {

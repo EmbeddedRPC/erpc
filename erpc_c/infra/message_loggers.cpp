@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * The Clear BSD License
+ * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -30,11 +32,10 @@
  */
 
 #include "message_loggers.h"
+#include <new>
 
 using namespace erpc;
-#if !(__embedded_cplusplus)
 using namespace std;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -50,26 +51,30 @@ MessageLoggers::~MessageLoggers()
     }
 }
 
-void MessageLoggers::addMessageLogger(Transport *transport)
+bool MessageLoggers::addMessageLogger(Transport *transport)
 {
     if (transport != NULL)
     {
-        MessageLogger *logger = new MessageLogger(transport);
-
-        if (m_logger == NULL)
+        MessageLogger *logger = new (nothrow) MessageLogger(transport);
+        if (logger)
         {
-            m_logger = logger;
-            return;
-        }
+            if (m_logger == NULL)
+            {
+                m_logger = logger;
+                return true;
+            }
 
-        MessageLogger *_logger = m_logger;
-        while (_logger->getNext() != NULL)
-        {
-            _logger = _logger->getNext();
-        }
+            MessageLogger *_logger = m_logger;
+            while (_logger->getNext() != NULL)
+            {
+                _logger = _logger->getNext();
+            }
 
-        _logger->setNext(logger);
+            _logger->setNext(logger);
+            return true;
+        }
     }
+    return false;
 }
 
 erpc_status_t MessageLoggers::logMessage(MessageBuffer *msg)

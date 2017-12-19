@@ -9,6 +9,7 @@
 
 #ifdef __cplusplus
 #include "server.h"
+#include "{$codecHeader}"
 extern "C"
 {
 #include "{$commonHeaderName}.h"
@@ -17,9 +18,7 @@ extern "C"
 }
 
 {$checkVersion()}
-
-{$checkCrc()}
-
+{$>checkCrc()}
 {% for iface in group.interfaces %}
 
 /*!
@@ -36,7 +35,7 @@ public:
 private:
 {%  for fn in iface.functions %}
     /*! @brief Server shim for {$fn.name} of {$iface.name} interface. */
-    erpc_status_t {$fn.name}_shim(erpc::Codec * codec, erpc::MessageBufferFactory *messageFactory, uint32_t sequence);{$loop.addNewLineIfNotLast}
+    erpc_status_t {$fn.name}_shim(erpc::{$codecClass} * codec, erpc::MessageBufferFactory *messageFactory, uint32_t sequence);{$loop.addNewLineIfNotLast}
 {%  endfor -- fn %}
 };
 {% endfor -- iface %}
@@ -50,6 +49,7 @@ typedef void * erpc_service_t;
 
 {% for iface in group.interfaces %}
 erpc_service_t create_{$iface.serviceClassName}(void);
+
 {% endfor -- iface %}
 #ifdef __cplusplus
 }

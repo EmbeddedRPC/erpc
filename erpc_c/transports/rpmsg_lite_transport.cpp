@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,12 +34,7 @@
  */
 #include "rpmsg_lite_transport.h"
 #include "erpc_config_internal.h"
-#include <cassert>
-#include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
+#include "rpmsg_ns.h"
 
 using namespace erpc;
 
@@ -65,15 +64,15 @@ int RPMsgTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned long 
 RPMsgTransport::RPMsgTransport()
 : RPMsgBaseTransport()
 , m_dst_addr(0)
+, m_rpmsg_ept_context()
+, m_rpmsg_ept(NULL)
 {
 }
 
-RPMsgTransport::~RPMsgTransport()
-{
-}
+RPMsgTransport::~RPMsgTransport() {}
 
-erpc_status_t RPMsgTransport::init(
-    unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length, int rpmsg_link_id)
+erpc_status_t RPMsgTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
+                                   unsigned long length, int rpmsg_link_id)
 {
     if (!s_initialized)
     {
@@ -88,8 +87,8 @@ erpc_status_t RPMsgTransport::init(
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgTransport::init(
-    unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id, void (*ready_cb)(void))
+erpc_status_t RPMsgTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
+                                   int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -110,6 +109,14 @@ erpc_status_t RPMsgTransport::init(
 
     m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_rpmsg_ept_context);
 
+    if (nameservice_name)
+    {
+        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name, RL_NS_CREATE))
+        {
+            return kErpcStatus_InitFailed;
+        }
+    }
+
     m_dst_addr = dst_addr;
 
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
@@ -126,8 +133,7 @@ erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
 
 erpc_status_t RPMsgTransport::send(MessageBuffer *message)
 {
-    int ret_val =
-        rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());
+    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());
     message->set(NULL, 0);
     return ret_val != RL_SUCCESS ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }

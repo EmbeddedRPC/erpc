@@ -53,7 +53,6 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Logging.cpp \
 			$(ERPC_ROOT)/erpcgen/src/options.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SearchPath.cpp \
-			$(ERPC_ROOT)/erpcgen/src/Value.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstNode.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstWalker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \
@@ -78,7 +77,6 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
@@ -94,8 +92,7 @@ SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_header.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_source.cpp \
             $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_coders.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_defines.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
@@ -104,7 +101,6 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_defines.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \

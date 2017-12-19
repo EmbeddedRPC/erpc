@@ -8,10 +8,10 @@ params:
     - [int16, "-1"]
     - [int32, "-1"]
     - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [uint8, "0xFFU"]
+    - [uint16, "0xFFFFU"]
+    - [uint32, "0xFFFFFFFFU"]
+    - [uint64, "0xFFFFFFFFFFFFFFFFU"]
     - [float, "-1"]
     - [double, "-1"]
     - [string, "NULL"]
@@ -29,28 +29,30 @@ idl: |
     }
 test_client.cpp:
   - g_client->releaseRequest(request);
-  - if (err)
-  - '{'
-  - return {type[1]};
-  - '}'
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
+      - '{'
+      - return {type[1]};
+      - '}'
 
 ---
 name: error_return c set errors
 desc: set default return value when errors occure in client shim
 params:
   type:
-    - [bool, "true", "1"]
-    - [bool, "false", "0"]
+    - [bool, "true", "true"]
+    - [bool, "false", "false"]
     - [int8, "-3", "-3" ]
     - [int16, "-5", "-5"]
     - [int32, "10", "10"]
     - [int64, "-1", "-1"]
-    - [uint8, "0xF", "15"]
-    - [uint16, "0xFFEF", "65519"]
-#    - [uint32, "0xFFF44FFF", "4294201343"]
-    - [uint64, "0x1", "1"]
-    - [float, "25", "25"]
-    - [double, "-32", "-32"]
+    - [uint8, "0xFU", "15U"]
+    - [uint16, "0xFFEFU", "65519U"]
+    - [uint32, "0xFFF44FFFU", "4294201343U"]
+    - [uint64, "0xFFF44FFFFFF44FFFUL", "18443454334918479871U"]
+    - [float, "25.6", "25.6"]
+    - [double, "-32.1", "-32.1"]
     - [string, "errVal", "(char *) errVal"]
     - [A, "\"NULL\"", "NULL"]
     - [B, "one", "one"]
@@ -69,7 +71,9 @@ idl: |
     }
 test_client.cpp:
   - g_client->releaseRequest(request);
-  - if (err)
-  - '{'
-  - return {type[2]};
-  - '}'
+  - if: type[0] != 'A' and type[0] != 'string'
+    then:
+      - if (err)
+      - '{'
+      - return {type[2]};
+      - '}'

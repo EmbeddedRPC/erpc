@@ -24,8 +24,11 @@ idl: |
   interface K
   {
 
-    @name(function)
+    @c:name(function)
     oneway functionName(S a @name(m))
+
+    @py:name(function2)
+    oneway functionName2(S a @name(m))
   }
 
 test.h:
@@ -43,6 +46,7 @@ test_client.cpp:
   - data->d
   - void function(const StructName * m)
   - write_StructName_struct(codec, m)
+  - void functionName2(const StructName * m)
 
 test_server.cpp:
   - read_StructName_struct
@@ -53,3 +57,6 @@ test_server.cpp:
   - read_StructName_struct(codec, m)
   - function(m);
   - erpc_free(m);
+  - functionName2(m);
+  - create_I_service
+  - s_I_service

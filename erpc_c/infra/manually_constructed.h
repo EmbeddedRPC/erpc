@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -56,7 +60,7 @@ namespace erpc {
  *
  * Objects of this class will act as a pointer to the template argument class
  * type. Of course, if the object has not yet been constructed then the
- * behaviour is undefined if the pointer to it is used.
+ * behavior is undefined if the pointer to it is used.
  *
  * Note that there is not a constructor or deconstructor. This is because
  * members of unions cannot have constructors or deconstructors.
@@ -118,7 +122,7 @@ public:
     /*!
      * @brief Invoke the object's destructor.
      *
-     * Behaviour is undefined if the objected was not previously initialized.
+     * Behavior is undefined if the objected was not previously initialized.
      */
     void destroy() { get()->~T(); }
 

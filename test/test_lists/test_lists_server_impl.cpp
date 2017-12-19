@@ -1,10 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -40,9 +43,9 @@
 // Implementation of function code
 ////////////////////////////////////////////////////////////////////////////////
 
-list_0_t *sendReceivedInt32(const list_0_t *received_list)
+list_int32_1_t *sendReceivedInt32(const list_int32_1_t *received_list)
 {
-    list_0_t *send_list = (list_0_t *)erpc_malloc(sizeof(list_0_t));
+    list_int32_1_t *send_list = (list_int32_1_t *)erpc_malloc(sizeof(list_int32_1_t));
     send_list->elementsCount = received_list->elementsCount;
     int32_t *list_s = send_list->elements = (int32_t *)erpc_malloc(send_list->elementsCount * sizeof(int32_t));
     int32_t *list_r = received_list->elements;
@@ -56,29 +59,29 @@ list_0_t *sendReceivedInt32(const list_0_t *received_list)
     return send_list;
 }
 
-list_1_t *sendReceived2Int32(const list_1_t *received_list)
+list_int32_2_t *sendReceived2Int32(const list_int32_2_t *received_list)
 {
-    list_1_t *send_list;
-    send_list = (list_1_t *)erpc_malloc(sizeof(list_1_t));
-    list_0_t *list_0_t_r = received_list->elements;
+    list_int32_2_t *send_list;
+    send_list = (list_int32_2_t *)erpc_malloc(sizeof(list_int32_2_t));
+    list_int32_1_t *list_int32_1_t_r = received_list->elements;
     send_list->elementsCount = received_list->elementsCount;
-    send_list->elements = (list_0_t *)erpc_malloc(send_list->elementsCount * sizeof(list_0_t));
-    list_0_t *list_0_t_s = send_list->elements;
+    send_list->elements = (list_int32_1_t *)erpc_malloc(send_list->elementsCount * sizeof(list_int32_1_t));
+    list_int32_1_t *list_int32_1_t_s = send_list->elements;
     for (uint32_t i = 0; i < send_list->elementsCount; ++i)
     {
         int32_t *list_s, *list_r;
-        list_r = list_0_t_r->elements;
-        list_0_t_s->elementsCount = list_0_t_r->elementsCount;
-        list_0_t_s->elements = (int32_t *)erpc_malloc(list_0_t_s->elementsCount * sizeof(int32_t));
-        list_s = list_0_t_s->elements;
-        for (uint32_t j = 0; j < list_0_t_s->elementsCount; ++j)
+        list_r = list_int32_1_t_r->elements;
+        list_int32_1_t_s->elementsCount = list_int32_1_t_r->elementsCount;
+        list_int32_1_t_s->elements = (int32_t *)erpc_malloc(list_int32_1_t_s->elementsCount * sizeof(int32_t));
+        list_s = list_int32_1_t_s->elements;
+        for (uint32_t j = 0; j < list_int32_1_t_s->elementsCount; ++j)
         {
             *list_s = 2 * (*list_r);
             ++list_r;
             ++list_s;
         }
-        ++list_0_t_r;
-        ++list_0_t_s;
+        ++list_int32_1_t_r;
+        ++list_int32_1_t_s;
     }
 
     return send_list;
@@ -110,9 +113,9 @@ list_1_t *sendReceived2Int32(const list_1_t *received_list)
 //     }
 // }
 
-list_2_t *sendReceivedEnum(const list_2_t *received_list)
+list_enumColor_1_t *sendReceivedEnum(const list_enumColor_1_t *received_list)
 {
-    list_2_t *send_list = (list_2_t *)erpc_malloc(sizeof(list_2_t));
+    list_enumColor_1_t *send_list = (list_enumColor_1_t *)erpc_malloc(sizeof(list_enumColor_1_t));
     send_list->elementsCount = received_list->elementsCount;
     enumColor *list_s = send_list->elements = (enumColor *)erpc_malloc(send_list->elementsCount * sizeof(enumColor));
     enumColor *list_r = received_list->elements;
@@ -127,37 +130,38 @@ list_2_t *sendReceivedEnum(const list_2_t *received_list)
     return send_list;
 }
 
-list_3_t *sendReceived2Enum(const list_3_t *received_list)
+list_enumColor_2_t *sendReceived2Enum(const list_enumColor_2_t *received_list)
 {
-    list_3_t *send_list;
-    send_list = (list_3_t *)erpc_malloc(sizeof(list_3_t));
-    list_2_t *list_2_t_r = received_list->elements;
+    list_enumColor_2_t *send_list;
+    send_list = (list_enumColor_2_t *)erpc_malloc(sizeof(list_enumColor_2_t));
+    list_enumColor_1_t *list_enumColor_1_t_r = received_list->elements;
     send_list->elementsCount = received_list->elementsCount;
-    send_list->elements = (list_2_t *)erpc_malloc(send_list->elementsCount * sizeof(list_2_t));
-    list_2_t *list_2_t_s = send_list->elements;
+    send_list->elements = (list_enumColor_1_t *)erpc_malloc(send_list->elementsCount * sizeof(list_enumColor_1_t));
+    list_enumColor_1_t *list_enumColor_1_t_s = send_list->elements;
     for (uint32_t i = 0; i < send_list->elementsCount; ++i)
     {
         enumColor *list_s, *list_r;
-        list_r = list_2_t_r->elements;
-        list_2_t_s->elementsCount = list_2_t_r->elementsCount;
-        list_2_t_s->elements = (enumColor *)erpc_malloc(list_2_t_s->elementsCount * sizeof(enumColor));
-        list_s = list_2_t_s->elements;
-        for (uint32_t j = 0; j < list_2_t_s->elementsCount; ++j)
+        list_r = list_enumColor_1_t_r->elements;
+        list_enumColor_1_t_s->elementsCount = list_enumColor_1_t_r->elementsCount;
+        list_enumColor_1_t_s->elements =
+            (enumColor *)erpc_malloc(list_enumColor_1_t_s->elementsCount * sizeof(enumColor));
+        list_s = list_enumColor_1_t_s->elements;
+        for (uint32_t j = 0; j < list_enumColor_1_t_s->elementsCount; ++j)
         {
             *list_s = *list_r;
             ++list_r;
             ++list_s;
         }
-        ++list_2_t_r;
-        ++list_2_t_s;
+        ++list_enumColor_1_t_r;
+        ++list_enumColor_1_t_s;
     }
 
     return send_list;
 }
 
-list_4_t *sendReceivedStruct(const list_4_t *received_list)
+list_C_1_t *sendReceivedStruct(const list_C_1_t *received_list)
 {
-    list_4_t *send_list = (list_4_t *)erpc_malloc(sizeof(list_4_t));
+    list_C_1_t *send_list = (list_C_1_t *)erpc_malloc(sizeof(list_C_1_t));
     send_list->elementsCount = received_list->elementsCount;
     C *list_s = send_list->elements = (C *)erpc_malloc(send_list->elementsCount * sizeof(C));
     C *list_r = received_list->elements;
@@ -173,31 +177,31 @@ list_4_t *sendReceivedStruct(const list_4_t *received_list)
     return send_list;
 }
 
-list_5_t *sendReceived2Struct(const list_5_t *received_list)
+list_C_2_t *sendReceived2Struct(const list_C_2_t *received_list)
 {
-    list_5_t *send_list;
-    send_list = (list_5_t *)erpc_malloc(sizeof(list_5_t));
-    list_4_t *list_0_t_r = received_list->elements;
+    list_C_2_t *send_list;
+    send_list = (list_C_2_t *)erpc_malloc(sizeof(list_C_2_t));
+    list_C_1_t *list_int32_1_t_r = received_list->elements;
     send_list->elementsCount = received_list->elementsCount;
-    send_list->elements = (list_4_t *)erpc_malloc(send_list->elementsCount * sizeof(list_4_t));
-    list_4_t *list_0_t_s = send_list->elements;
+    send_list->elements = (list_C_1_t *)erpc_malloc(send_list->elementsCount * sizeof(list_C_1_t));
+    list_C_1_t *list_int32_1_t_s = send_list->elements;
     for (uint32_t i = 0; i < send_list->elementsCount; ++i)
     {
         C *list_s, *list_r;
-        list_r = list_0_t_r->elements;
-        list_0_t_s->elementsCount = list_0_t_r->elementsCount;
-        list_0_t_s->elements = (C *)erpc_malloc(list_0_t_s->elementsCount * sizeof(C));
-        list_s = list_0_t_s->elements;
-        for (uint32_t j = 0; j < list_0_t_s->elementsCount; ++j)
+        list_r = list_int32_1_t_r->elements;
+        list_int32_1_t_s->elementsCount = list_int32_1_t_r->elementsCount;
+        list_int32_1_t_s->elements = (C *)erpc_malloc(list_int32_1_t_s->elementsCount * sizeof(C));
+        list_s = list_int32_1_t_s->elements;
+        for (uint32_t j = 0; j < list_int32_1_t_s->elementsCount; ++j)
         {
             list_s->m = 2 * list_r->m;
             list_s->n = 2 * list_r->n;
             ++list_r;
             ++list_s;
         }
-        erpc_free(list_0_t_r->elements);
-        ++list_0_t_r;
-        ++list_0_t_s;
+        erpc_free(list_int32_1_t_r->elements);
+        ++list_int32_1_t_r;
+        ++list_int32_1_t_s;
     }
     erpc_free(received_list->elements);
     erpc_free((void *)received_list);
@@ -205,9 +209,9 @@ list_5_t *sendReceived2Struct(const list_5_t *received_list)
     return send_list;
 }
 
-list_6_t *sendReceivedString(const list_6_t *received_list)
+list_string_1_t *sendReceivedString(const list_string_1_t *received_list)
 {
-    list_6_t *send_list = (list_6_t *)erpc_malloc(sizeof(list_6_t));
+    list_string_1_t *send_list = (list_string_1_t *)erpc_malloc(sizeof(list_string_1_t));
     char *stringValue = (char *)" World!";
     send_list->elementsCount = received_list->elementsCount;
     char **list_s = send_list->elements = (char **)erpc_malloc(send_list->elementsCount * sizeof(char *));
@@ -225,23 +229,23 @@ list_6_t *sendReceivedString(const list_6_t *received_list)
     return send_list;
 }
 
-list_7_t *sendReceived2String(const list_7_t *received_list)
+list_string_2_t *sendReceived2String(const list_string_2_t *received_list)
 {
-    list_7_t *send_list;
+    list_string_2_t *send_list;
     char *stringValue = (char *)" World!";
-    send_list = (list_7_t *)erpc_malloc(sizeof(list_7_t));
-    list_6_t *list_0_t_r = received_list->elements;
+    send_list = (list_string_2_t *)erpc_malloc(sizeof(list_string_2_t));
+    list_string_1_t *list_int32_1_t_r = received_list->elements;
     send_list->elementsCount = received_list->elementsCount;
-    send_list->elements = (list_6_t *)erpc_malloc(send_list->elementsCount * sizeof(list_6_t));
-    list_6_t *list_0_t_s = send_list->elements;
+    send_list->elements = (list_string_1_t *)erpc_malloc(send_list->elementsCount * sizeof(list_string_1_t));
+    list_string_1_t *list_int32_1_t_s = send_list->elements;
     for (uint32_t i = 0; i < send_list->elementsCount; ++i)
     {
         char **list_s, **list_r;
-        list_r = list_0_t_r->elements;
-        list_0_t_s->elementsCount = list_0_t_r->elementsCount;
-        list_0_t_s->elements = (char **)erpc_malloc(list_0_t_s->elementsCount * sizeof(char *));
-        list_s = list_0_t_s->elements;
-        for (uint32_t j = 0; j < list_0_t_s->elementsCount; ++j)
+        list_r = list_int32_1_t_r->elements;
+        list_int32_1_t_s->elementsCount = list_int32_1_t_r->elementsCount;
+        list_int32_1_t_s->elements = (char **)erpc_malloc(list_int32_1_t_s->elementsCount * sizeof(char *));
+        list_s = list_int32_1_t_s->elements;
+        for (uint32_t j = 0; j < list_int32_1_t_s->elementsCount; ++j)
         {
             *list_s = (char *)erpc_malloc((strlen(*list_r) + strlen(stringValue) + 1) * sizeof(char));
             strcpy(*list_s, *list_r);
@@ -249,14 +253,14 @@ list_7_t *sendReceived2String(const list_7_t *received_list)
             ++list_r;
             ++list_s;
         }
-        ++list_0_t_r;
-        ++list_0_t_s;
+        ++list_int32_1_t_r;
+        ++list_int32_1_t_s;
     }
 
     return send_list;
 }
 
-void test_list_allDirection(const list_8_t *a, const list_8_t *b, list_8_t *e)
+void test_list_allDirection(const list_uint32_1_t *a, const list_uint32_1_t *b, list_uint32_1_t *e)
 {
     uint32_t *s_list_e = (e)->elements;
     for (uint32_t i = 0; i < (a)->elementsCount; ++i)

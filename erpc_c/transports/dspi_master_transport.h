@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -55,7 +59,18 @@ namespace erpc {
 class DspiMasterTransport : public FramedTransport
 {
 public:
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] spiBaseAddr Spi driver.
+     * @param[in] baudRate Baudrate.
+     * @param[in] srcClock_Hz Source clock.
+     */
     DspiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+    /*!
+     * @brief Destructor.
+     */
     virtual ~DspiMasterTransport();
 
     /*!
@@ -75,7 +90,7 @@ private:
      * @brief Receive data from DSPI peripheral.
      *
      * @param[inout] data Preallocated buffer for receiving data.
-     * @param[in] data Size of data to read.
+     * @param[in] size Size of data to read.
      *
      * @retval kErpcStatus_ReceiveFailed DSPI failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
@@ -86,7 +101,7 @@ private:
      * @brief Write data to DSPI peripheral.
      *
      * @param[in] data Buffer to send.
-     * @param[in] data Size of data to send.
+     * @param[in] size Size of data to send.
      *
      * @retval kErpcStatus_SendFailed DSPI failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.

@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -57,14 +61,14 @@ erpc_status_t Sniffer::run()
 {
     Log::info("receiving messages\n");
     uint64_t n = 0;
-    std::ofstream outputFileStream;
+    ofstream outputFileStream;
 
     if (m_outputFilePath)
     {
         openFile(outputFileStream);
     }
 
-    std::chrono::_V2::system_clock::time_point previousTime(std::chrono::nanoseconds(0));
+    chrono::_V2::system_clock::time_point previousTime(chrono::nanoseconds(0));
 
     while (m_quantity == 0 || m_quantity > n)
     {
@@ -85,14 +89,17 @@ erpc_status_t Sniffer::run()
         m_codec->setBuffer(message);
 
         // Save time when message was received.
-        time_t now = std::chrono::system_clock::to_time_t(currentTime);
+        time_t now = chrono::system_clock::to_time_t(currentTime);
         char buffer[80];
         struct tm *timeinfo;
         timeinfo = localtime(&now);
         strftime(buffer, 80, "%T %D", timeinfo);
 
         // Time difference between current and previous received message.
-        string timeDifference = format_string("%d", (previousTime.time_since_epoch() == std::chrono::nanoseconds(0)) ? 0 : chrono::duration_cast<std::chrono::nanoseconds>(currentTime - previousTime).count());
+        string timeDifference =
+            format_string("%d", (previousTime.time_since_epoch() == chrono::nanoseconds(0)) ?
+                                    0 :
+                                    chrono::duration_cast<chrono::nanoseconds>(currentTime - previousTime).count());
         uint32_t timeDifferenceSize = timeDifference.size();
         uint32_t countSpaces = floor((timeDifferenceSize - 1) / 3);
         for (uint32_t i = 1; i <= countSpaces; ++i)
@@ -129,7 +136,7 @@ erpc_status_t Sniffer::run()
     return kErpcStatus_Success;
 }
 
-void Sniffer::openFile(std::ofstream &outputFileStream)
+void Sniffer::openFile(ofstream &outputFileStream)
 {
     boost::filesystem::path outputFilePath = m_outputFilePath;
     boost::filesystem::path outputPath = outputFilePath.parent_path();
@@ -146,7 +153,7 @@ void Sniffer::openFile(std::ofstream &outputFileStream)
             boost::filesystem::create_directories(dir);
             if (!boost::filesystem::is_directory(dir))
             {
-                throw std::runtime_error(format_string("could not create directory path '%s'", outputPath.c_str()));
+                throw runtime_error(format_string("could not create directory path '%s'", outputPath.c_str()));
             }
         }
     }
@@ -155,32 +162,32 @@ void Sniffer::openFile(std::ofstream &outputFileStream)
     outputFileStream.open(m_outputFilePath, ofstream::out | ofstream::binary);
     if (!outputFileStream.is_open())
     {
-        throw std::runtime_error(format_string("could not open output file '%s'", m_outputFilePath));
+        throw runtime_error(format_string("could not open output file '%s'", m_outputFilePath));
     }
 }
 
 erpc_status_t Sniffer::readNullFlag(StructMember *structMember, string &nullFlag)
 {
-    erpc_status_t err = kErpcStatus_Success;
-    if (structMember && structMember->findAnnotation(NULLABLE_ANNOTATION) != nullptr)
+    if (structMember && structMember->findAnnotation(NULLABLE_ANNOTATION, Annotation::kC) != nullptr)
     {
         bool nullF;
-        err = m_codec->readNullFlag(&nullF);
+        m_codec->readNullFlag(&nullF);
         if (nullF)
         {
             nullFlag = "NULL";
         }
     }
-    return err;
+    return m_codec->getStatus();
 }
 
 erpc_status_t Sniffer::readSharedAddress(StructMember *structMember, string &address)
 {
     erpc_status_t err = kErpcStatus_Success;
-    if (structMember->findAnnotation(SHARED_ANNOTATION) != nullptr)
+    if (structMember->findAnnotation(SHARED_ANNOTATION, Annotation::kC) != nullptr)
     {
         uintptr_t ptr;
-        err = m_codec->readPtr(&ptr);
+        m_codec->readPtr(&ptr);
+        err = m_codec->getStatus();
         stringstream sstream;
         sstream << hex << ptr;
         address = "0x" + sstream.str();
@@ -234,7 +241,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 {
                     return err;
                 }
-                parseDataInfo = format_string("[%u]:", i).append(countSpaces(arraySize) - countSpaces(i + 1), ' ') + parseDataInfo;
+                parseDataInfo =
+                    format_string("[%u]:", i).append(countSpaces(arraySize) - countSpaces(i + 1), ' ') + parseDataInfo;
                 addSpaces(parseDataInfo, countSpaces(arraySize) + 3);
                 if (i > 0)
                 {
@@ -254,8 +262,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kBoolType:
                 {
                     bool value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -265,8 +273,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kInt8Type:
                 {
                     int8_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -276,8 +284,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kInt16Type:
                 {
                     int16_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -287,8 +295,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kInt32Type:
                 {
                     int32_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -298,8 +306,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kInt64Type:
                 {
                     int64_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -309,8 +317,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kUInt8Type:
                 {
                     uint8_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -320,8 +328,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kUInt16Type:
                 {
                     uint16_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -331,8 +339,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kUInt32Type:
                 {
                     uint32_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -342,8 +350,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kUInt64Type:
                 {
                     uint64_t value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -353,8 +361,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kFloatType:
                 {
                     float value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -364,8 +372,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 case BuiltinType::_builtin_type::kDoubleType:
                 {
                     double value;
-                    err = m_codec->read(&value);
-                    if (err)
+                    m_codec->read(&value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -376,8 +384,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 {
                     char *value;
                     uint32_t length;
-                    err = m_codec->readString(&length, &value);
-                    if (err)
+                    m_codec->readString(&length, &value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -388,8 +396,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                 {
                     uint8_t *value;
                     uint32_t length;
-                    err = m_codec->readBinary(&length, &value);
-                    if (err)
+                    m_codec->readBinary(&length, &value);
+                    if ((err = m_codec->getStatus()))
                     {
                         return err;
                     }
@@ -413,8 +421,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             EnumType *e = dynamic_cast<EnumType *>(dataType);
             assert(e);
             int32_t value;
-            err = m_codec->read(&value);
-            if (err)
+            m_codec->read(&value);
+            if ((err = m_codec->getStatus()))
             {
                 return err;
             }
@@ -439,8 +447,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             FunctionType *f = dynamic_cast<FunctionType *>(dataType);
             assert(f);
             int32_t value;
-            err = m_codec->read(&value);
-            if (err)
+            m_codec->read(&value);
+            if ((err = m_codec->getStatus()))
             {
                 return err;
             }
@@ -461,6 +469,10 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             assert(listType);
             uint32_t listSize;
             m_codec->startReadList(&listSize);
+            if ((err = m_codec->getStatus()))
+            {
+                return err;
+            }
             for (int i = 0; i < listSize; i++)
             {
                 string parseDataInfo;
@@ -470,7 +482,8 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                     return err;
                 }
 
-                parseDataInfo = format_string("{%d}:", i).append(countSpaces(listSize) - countSpaces(i + 1), ' ') + parseDataInfo;
+                parseDataInfo =
+                    format_string("{%d}:", i).append(countSpaces(listSize) - countSpaces(i + 1), ' ') + parseDataInfo;
                 addSpaces(parseDataInfo, countSpaces(listSize) + 3);
 
                 if (i > 0)
@@ -575,7 +588,7 @@ erpc_status_t Sniffer::parseMemberType(StructType *structType, StructMember *str
 {
     erpc_status_t err;
     DataType *currentDataType = structMember->getDataType();
-    //DataType *currentTrueDataType = currentDataType->getTrueDataType();
+    // DataType *currentTrueDataType = currentDataType->getTrueDataType();
 
     if (structType)
     {
@@ -584,7 +597,8 @@ erpc_status_t Sniffer::parseMemberType(StructType *structType, StructMember *str
         {
             Annotation *ann;
             string referencedName;
-            if ((ann = referenced->findAnnotation(LENGTH_ANNOTATION)) || (ann = referenced->findAnnotation(DISCRIMINATOR_ANNOTATION)))
+            if ((ann = referenced->findAnnotation(LENGTH_ANNOTATION, Annotation::kC)) ||
+                (ann = referenced->findAnnotation(DISCRIMINATOR_ANNOTATION, Annotation::kC)))
             {
                 if (Value *val = ann->getValueObject())
                 {
@@ -607,11 +621,13 @@ erpc_status_t Sniffer::parseMemberType(StructType *structType, StructMember *str
 
         // check if reference is null-able
         Annotation *ann;
-        if ((ann = structMember->findAnnotation(LENGTH_ANNOTATION)) || (ann = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION)))
+        if ((ann = structMember->findAnnotation(LENGTH_ANNOTATION, Annotation::kC)) ||
+            (ann = structMember->findAnnotation(DISCRIMINATOR_ANNOTATION, Annotation::kC)))
         {
             if (Value *val = ann->getValueObject())
             {
-                StructMember *reference = dynamic_cast<StructMember *>(structType->getScope().getSymbol(val->toString(), false));
+                StructMember *reference =
+                    dynamic_cast<StructMember *>(structType->getScope().getSymbol(val->toString(), false));
                 err = readNullFlag(reference, parsedMemberInfo);
                 if (err)
                 {
@@ -731,14 +747,15 @@ string Sniffer::getPrototype(erpcgen::Function *function)
     return prototype;
 }
 
-erpc_status_t Sniffer::analyzeMessage(std::string &message, const char *timeDiffernce, const char *currentTime)
+erpc_status_t Sniffer::analyzeMessage(string &message, const char *timeDiffernce, const char *currentTime)
 {
     // Read header of received message.
     message_type_t messageType;
     uint32_t serviceId;
     uint32_t methodId;
     uint32_t sequence;
-    erpc_status_t err = m_codec->startReadMessage(&messageType, &serviceId, &methodId, &sequence);
+    m_codec->startReadMessage(&messageType, &serviceId, &methodId, &sequence);
+    erpc_status_t err = m_codec->getStatus();
     if (err)
     {
         return err;
@@ -746,8 +763,8 @@ erpc_status_t Sniffer::analyzeMessage(std::string &message, const char *timeDiff
 
     enum msg_t
     {
-        msg_request, //client serialization/server deserialization
-        msg_answer   //client deserialization/server serialization
+        msg_request, // client serialization/server deserialization
+        msg_answer   // client deserialization/server serialization
     };
 
     // Set message type.
@@ -765,27 +782,29 @@ erpc_status_t Sniffer::analyzeMessage(std::string &message, const char *timeDiff
 
     // Record analyzed message header
     message += format_string(" message (id: %d) at %s. Sequence number %d. Time from last message %s ns.\n",
-                             (int32_t)messageType,
-                             currentTime,
-                             sequence,
-                             timeDiffernce);
+                             (int32_t)messageType, currentTime, sequence, timeDiffernce);
 
     // Find and record interface information.
     if (Interface *interface = getInterface(serviceId))
     {
-        string groupName = interface->getAnnStringValue(GROUP_ANNOTATION);
-        message += format_string("Group name:%s\nInterface name:%s id:%d\n", groupName.c_str(), interface->getName().c_str(), serviceId);
+        string groupName = interface->getAnnStringValue(GROUP_ANNOTATION, Annotation::kC);
+        message += format_string("Group name:%s\nInterface name:%s id:%d\n", groupName.c_str(),
+                                 interface->getName().c_str(), serviceId);
 
         // Find and record function information.
         if (Function *function = getFunction(methodId, interface))
         {
-            message += format_string("Function name:%s id:%d prototype: %s\n", function->getName().c_str(), methodId, getPrototype(function).c_str());
+            message += format_string("Function name:%s id:%d prototype: %s\n", function->getName().c_str(), methodId,
+                                     getPrototype(function).c_str());
 
             // Record function's params information.
             StructType params = function->getParameters();
             for (StructMember *param : params.getMembers())
             {
-                if ((msgType == msg_request && (param->getDirection() == _param_direction::kInDirection || param->getDirection() == _param_direction::kInoutDirection)) || (msgType == msg_answer && (param->getDirection() == _param_direction::kOutDirection || param->getDirection() == _param_direction::kInoutDirection)))
+                if ((msgType == msg_request && (param->getDirection() == _param_direction::kInDirection ||
+                                                param->getDirection() == _param_direction::kInoutDirection)) ||
+                    (msgType == msg_answer && (param->getDirection() == _param_direction::kOutDirection ||
+                                               param->getDirection() == _param_direction::kInoutDirection)))
                 {
                     string output;
                     err = parseMemberType(&params, param, output);

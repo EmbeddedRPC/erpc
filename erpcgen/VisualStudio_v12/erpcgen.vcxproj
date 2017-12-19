@@ -101,7 +101,6 @@ python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
-python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
@@ -141,7 +140,6 @@ python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
-python.exe ..\bin\txt_to_c.py --output .\c_defines.cpp ..\src\templates\c_defines.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
@@ -212,9 +210,6 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="..\src\Logging.cpp" />
     <ClCompile Include="..\src\options.cpp" />
     <ClCompile Include="..\src\SearchPath.cpp" />
-    <ClCompile Include="..\src\Value.cpp">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="..\src\cpptemplate\cpptempl.cpp" />
     <ClCompile Include="..\src\AstNode.cpp" />
     <ClCompile Include="..\src\AstWalker.cpp" />
@@ -236,7 +231,6 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="c_server_header.cpp" />
     <ClCompile Include="c_server_source.cpp" />
     <ClCompile Include="c_common_functions.cpp" />
-    <ClCompile Include="c_defines.cpp" />
     <ClCompile Include="erpcgen_lexer.flex.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4005;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>

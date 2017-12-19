@@ -1,10 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -62,6 +65,7 @@ extern "C" {
 #endif
 
 using namespace erpc;
+using namespace std;
 
 #define APP_ERPC_READY_EVENT_DATA (1)
 
@@ -70,6 +74,7 @@ TaskHandle_t g_serverTask;
 TaskHandle_t g_clientTask;
 volatile int waitQuit = 0;
 volatile uint16_t eRPCReadyEventData = 0;
+extern const uint32_t erpc_generated_crc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -160,7 +165,8 @@ void runInit(void *arg)
         }
     }
 
-    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to
+     * communicate. */
     while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
     {
     };
@@ -175,9 +181,11 @@ void runInit(void *arg)
     // eRPC server side initialization
     erpc_server_t server = erpc_server_init(transportServer, message_buffer_factory);
 
+    erpc_arbitrated_client_set_crc(erpc_generated_crc);
+
     // adding server to client for nested calls.
-    erpc_client_set_server(server);
-    erpc_client_set_server_thread_id((void *)g_serverTask);
+    erpc_arbitrated_client_set_server(server);
+    erpc_arbitrated_client_set_server_thread_id((void *)g_serverTask);
 
     // adding the service to the server
     erpc_add_service_to_server(create_SecondInterface_service());

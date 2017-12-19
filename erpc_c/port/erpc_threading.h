@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -44,6 +48,8 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#elif ERPC_THREADS_IS(ZEPHYR)
+#include "kernel.h"
 #endif // ERPC_THREADS_IS
 
 /*!
@@ -100,64 +106,172 @@ public:
      * @param name Optional name for the thread.
      */
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
+
+    /*!
+     * @brief Destructor.
+     */
     virtual ~Thread();
 
+    /*!
+     * @brief This function sets name for thread.
+     *
+     * @param[in] name Name for thread.
+     */
     void setName(const char *name) { m_name = name; }
+
+    /*!
+     * @brief This function returns name of thread.
+     *
+     * @return Name of thread.
+     */
     const char *getName() const { return m_name; }
+
+    /*!
+     * @brief This function initializes thread.
+     *
+     * @param[in] entry Entry function.
+     * @param[in] priority Task priority.
+     * @param[in] stackSize Stack size.
+     */
     void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0);
 
+    /*!
+     * @brief This function starts thread execution.
+     *
+     * @param[in] arg Function argument.
+     */
     void start(void *arg = 0);
 
+    /*!
+     * @brief This function puts thread to sleep.
+     *
+     * @param[in] usecs Time for sleeping.
+     */
     static void sleep(uint32_t usecs);
 
+    /*!
+     * @brief This function returns current thread id.
+     *
+     * @return Thread id.
+     */
     thread_id_t getThreadId() const
     {
 #if ERPC_THREADS_IS(PTHREADS)
         return reinterpret_cast<thread_id_t>(m_thread);
 #elif ERPC_THREADS_IS(FREERTOS)
         return reinterpret_cast<thread_id_t>(m_task);
+#elif ERPC_THREADS_IS(ZEPHYR)
+        return reinterpret_cast<thread_id_t>(m_thread);
 #endif
     }
 
+    /*!
+     * @brief This function returns thread id where function is called.
+     *
+     * @return Thread id.
+     */
     static thread_id_t getCurrentThreadId()
     {
 #if ERPC_THREADS_IS(PTHREADS)
         return reinterpret_cast<thread_id_t>(pthread_self());
 #elif ERPC_THREADS_IS(FREERTOS)
         return reinterpret_cast<thread_id_t>(xTaskGetCurrentTaskHandle());
+#elif ERPC_THREADS_IS(ZEPHYR)
+        return reinterpret_cast<thread_id_t>(k_current_get());
 #endif
     }
 
+#if ERPC_THREADS_IS(ZEPHYR)
+    /*!
+     * @brief This function sets stack pointer for Zephyr task.
+     *
+     * @param[in] stack Stack pointer.
+     */
+    void setStackPointer(k_thread_stack_t *stack) { m_stack = stack; }
+#endif
+
+    /*!
+     * @brief This function returns Thread instance where functions is called.
+     *
+     * @return Thread instance.
+     */
     static Thread *getCurrentThread();
 
+    /*!
+     * @brief Compare operator compares two threads.
+     *
+     * @param[in] o Thread instance.
+     *
+     * @retval true When threads are same.
+     * @retval false When threads aren't same.
+     */
     bool operator==(Thread &o);
 
 protected:
+    /*!
+     * @brief This function execute entry function.
+     */
     virtual void threadEntryPoint();
 
 private:
-    const char *m_name;
-    thread_entry_t m_entry;
-    void *m_arg;
-    uint32_t m_stackSize;
-    uint32_t m_priority;
+    const char *m_name;     /*!< Thread name. */
+    thread_entry_t m_entry; /*!< Thread entry function. */
+    void *m_arg;            /*!< Entry parameter. */
+    uint32_t m_stackSize;   /*!< Stack size. */
+    uint32_t m_priority;    /*!< Task priority. */
 #if ERPC_THREADS_IS(PTHREADS)
-    static pthread_key_t s_threadObjectKey;
-    pthread_t m_thread;
+    static pthread_key_t s_threadObjectKey; /*!< Thread key. */
+    pthread_t m_thread;                     /*!< Current thread. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    TaskHandle_t m_task;
-    Thread *m_next;
-    static Thread *s_first;
+    TaskHandle_t m_task;    /*!< Current task. */
+    Thread *m_next;         /*!< Pointer to next Thread. */
+    static Thread *s_first; /*!< Pointer to first Thread. */
+#elif ERPC_THREADS_IS(ZEPHYR)
+    struct k_thread m_thread;  /*!< Current thread. */
+    k_thread_stack_t *m_stack; /*!< Pointer to stack. */
 #endif
 
 #if ERPC_THREADS_IS(PTHREADS)
+
+    /*!
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
     static void *threadEntryPointStub(void *arg);
 #elif ERPC_THREADS_IS(FREERTOS)
+
+    /*!
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
     static void threadEntryPointStub(void *arg);
+#elif ERPC_THREADS_IS(ZEPHYR)
+
+    /*!
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg1 Thread to execute.
+     * @param[in] arg2
+     * @param[in] arg3
+     */
+    static void *threadEntryPointStub(void *arg1, void *arg2, void *arg3);
 #endif
 
 private:
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] o Thread to copy.
+     */
     Thread(const Thread &o);
+
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] o Thread to assign.
+     */
     Thread &operator=(const Thread &o);
 };
 
@@ -177,40 +291,89 @@ public:
     class Guard
     {
     public:
+        /*!
+         * @brief Constructor.
+         *
+         * @param[in] mutex to lock.
+         */
         Guard(Mutex &mutex)
         : m_mutex(mutex)
         {
             m_mutex.lock();
         }
+        /*!
+         * @brief Destructor.
+         */
         ~Guard() { m_mutex.unlock(); }
 
     private:
-        Mutex &m_mutex;
+        Mutex &m_mutex; /*!< Mutex to lock. */
     };
 
+    /*!
+     * @brief Constructor.
+     */
     Mutex();
+
+    /*!
+     * @brief Destructor.
+     */
     ~Mutex();
 
+    /*!
+     * @brief This function try lock mutex.
+     *
+     * @retval true When mutex locked successfully.
+     * @retval false When mutex didn't locked.
+     */
     bool tryLock();
+
+    /*!
+     * @brief This function lock mutex.
+     *
+     * @retval true When mutex locked successfully.
+     * @retval false When mutex didn't locked.
+     */
     bool lock();
+
+    /*!
+     * @brief This function unlock mutex.
+     *
+     * @retval true When mutex unlocked successfully.
+     * @retval false When mutex didn't unlocked.
+     */
     bool unlock();
 
 #if ERPC_THREADS_IS(PTHREADS)
-    pthread_mutex_t *getPtr()
-    {
-        return &m_mutex;
-    }
+    /*!
+     * @brief This function returns pointer to mutex.
+     *
+     * @return Pointer to mutex.
+     */
+    pthread_mutex_t *getPtr() { return &m_mutex; }
 #endif
 
 private:
 #if ERPC_THREADS_IS(PTHREADS)
-    pthread_mutex_t m_mutex;
+    pthread_mutex_t m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(FREERTOS)
-    SemaphoreHandle_t m_mutex;
+    SemaphoreHandle_t m_mutex; /*!< Mutex.*/
+#elif ERPC_THREADS_IS(ZEPHYR)
+    struct k_mutex m_mutex; /*!< Mutex.*/
 #endif
 
 private:
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] o Mutex to copy.
+     */
     Mutex(const Mutex &o);
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] o Mutex to copy.
+     */
     Mutex &operator=(const Mutex &o);
 };
 
@@ -222,27 +385,76 @@ private:
 class Semaphore
 {
 public:
+    /*!
+     * @brief Variable for semaphore to wait forever.
+     */
     static const uint32_t kWaitForever = 0xffffffff;
 
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] count Semaphore number.
+     */
     Semaphore(int count = 0);
+
+    /*!
+     * @brief Destructor.
+     */
     ~Semaphore();
 
+    /*!
+     * @brief This function puts semaphore.
+     */
     void put();
+
+#if ERPC_THREADS_IS(FREERTOS)
+    /*!
+     * @brief This function puts semaphore from interrupt.
+     */
     void putFromISR();
+#endif // ERPC_HAS_FREERTOS
+
+    /*!
+     * @brief This function get semaphore.
+     *
+     * @param[in] timeout Time how long can wait for getting semaphore.
+     *
+     * @retval true When semaphore got successfully.
+     * @retval false When mutex didn't get.
+     */
     bool get(uint32_t timeout = kWaitForever);
+
+    /*!
+     * @brief This function returns semaphore count number.
+     *
+     * @return Semaphore count number.
+     */
     int getCount() const;
 
 private:
 #if ERPC_THREADS_IS(PTHREADS)
-    int m_count;
-    pthread_cond_t m_cond;
-    Mutex m_mutex;
+    int m_count;           /*!< Semaphore count number. */
+    pthread_cond_t m_cond; /*!< Condition variable. Allows threads to suspend execution and relinquish the processors
+                              until some predicate on shared data is satisfied. */
+    Mutex m_mutex;         /*!< Mutext. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    SemaphoreHandle_t m_sem;
-#endif // ERPC_HAS_PTHREADS
+    SemaphoreHandle_t m_sem;   /*!< Semaphore. */
+#elif ERPC_THREADS_IS(ZEPHYR)
+    struct k_sem m_sem;     /*!< Semaphore. */
+#endif
 
 private:
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] o Semaphore to copy.
+     */
     Semaphore(const Semaphore &o);
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] o Semaphore to copy.
+     */
     Semaphore &operator=(const Semaphore &o);
 };
 

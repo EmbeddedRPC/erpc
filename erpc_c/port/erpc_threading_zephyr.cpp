@@ -1,7 +1,6 @@
 /*
  * The Clear BSD License
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  *
@@ -34,20 +33,11 @@
  */
 
 #include "erpc_threading.h"
-#include <errno.h>
-#include <sys/time.h>
-#include <time.h>
+#include <cassert>
+
+#if ERPC_THREADS_IS(ZEPHYR)
 
 using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
-
-/*!
- * Thread object key.
- */
-pthread_key_t Thread::s_threadObjectKey = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -60,6 +50,7 @@ Thread::Thread(const char *name)
 , m_stackSize(0)
 , m_priority(0)
 , m_thread(0)
+, m_stack(0)
 {
 }
 
@@ -70,6 +61,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 , m_stackSize(stackSize)
 , m_priority(priority)
 , m_thread(0)
+, m_stack(0)
 {
 }
 
@@ -84,45 +76,25 @@ void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 
 void Thread::start(void *arg)
 {
-    if (s_threadObjectKey == 0)
-    {
-        pthread_key_create(&s_threadObjectKey, NULL);
-    }
-
     m_arg = arg;
-    pthread_create(&m_thread, NULL, threadEntryPointStub, this);
-    pthread_setspecific(s_threadObjectKey, reinterpret_cast<void *>(this));
-    pthread_detach(m_thread);
+
+    assert(m_stack && "Set stack address");
+    k_thread_create(&m_thread, m_stack, m_stackSize, threadEntryPointStub, this, NULL, NULL, m_priority, 0, K_NO_WAIT);
 }
 
 bool Thread::operator==(Thread &o)
 {
-    return pthread_equal(m_thread, o.m_thread);
+    return m_thread == o.m_thread;
 }
 
 Thread *Thread::getCurrentThread()
 {
-    void *value = pthread_getspecific(s_threadObjectKey);
-    return reinterpret_cast<Thread *>(value);
+    return reinterpret_cast<Thread *>(k_thread_custom_data_get());
 }
 
 void Thread::sleep(uint32_t usecs)
 {
-    // Sleep for the requested number of microseconds.
-    struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
-    struct timespec actual = { 0 };
-
-    // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
-    while (nanosleep(&rq, &actual) == EINTR)
-    {
-        rq.tv_sec -= actual.tv_sec;
-        rq.tv_nsec -= actual.tv_nsec;
-        if (rq.tv_nsec < 0)
-        {
-            --rq.tv_sec;
-            rq.tv_nsec += 1000000000;
-        }
-    }
+    k_sleep(usecs / 1000);
 }
 
 void Thread::threadEntryPoint()
@@ -133,106 +105,65 @@ void Thread::threadEntryPoint()
     }
 }
 
-void *Thread::threadEntryPointStub(void *arg)
+void *Thread::threadEntryPointStub(void *arg1, void *arg2, void *arg3)
 {
-    Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
-    {
-        _this->threadEntryPoint();
-    }
+    Thread *_this = reinterpret_cast<Thread *>(arg1);
+    assert(_this && "Reinterpreting 'void *arg1' to 'Thread *' failed.");
+    k_thread_custom_data_set(arg1);
+    _this->threadEntryPoint();
 
-    return 0;
+    // Handle a task returning from its function.
+    k_thread_abort(k_current_get());
 }
 
 Mutex::Mutex()
+: m_mutex(0)
 {
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-
-    pthread_mutex_init(&m_mutex, &attr);
-
-    pthread_mutexattr_destroy(&attr);
+    k_mutex_init(&m_mutex);
 }
 
-Mutex::~Mutex()
-{
-    pthread_mutex_destroy(&m_mutex);
-}
+Mutex::~Mutex() {}
 
 bool Mutex::tryLock()
 {
-    return pthread_mutex_trylock(&m_mutex) == 0;
+    return (k_mutex_lock(&m_mutex, K_NO_WAIT) == 0);
 }
 
 bool Mutex::lock()
 {
-    return pthread_mutex_lock(&m_mutex) == 0;
+    return (k_mutex_lock(&m_mutex, K_FOREVER) == 0);
 }
 
 bool Mutex::unlock()
 {
-    return pthread_mutex_unlock(&m_mutex) == 0;
+    k_mutex_unlock(&m_mutex);
+    return true;
 }
 
 Semaphore::Semaphore(int count)
-: m_count(count)
-, m_mutex()
+: m_sem(0)
 {
-    pthread_cond_init(&m_cond, NULL);
+    // Set max count to highest signed int.
+    k_sem_init(&m_sem, count, 0x7fffffff);
 }
 
-Semaphore::~Semaphore()
-{
-    pthread_cond_destroy(&m_cond);
-}
+Semaphore::~Semaphore() {}
 
 void Semaphore::put()
 {
-    Mutex::Guard guard(m_mutex);
-    if (m_count == 0)
-    {
-        pthread_cond_signal(&m_cond);
-    }
-    ++m_count;
+    k_sem_give(&m_sem);
 }
 
 bool Semaphore::get(uint32_t timeout)
 {
-    Mutex::Guard guard(m_mutex);
-    int err;
-    while (m_count == 0)
-    {
-        if (timeout == kWaitForever)
-        {
-            err = pthread_cond_wait(&m_cond, m_mutex.getPtr());
-            if (err)
-            {
-                return false;
-            }
-        }
-        else if (timeout > 0)
-        {
-            // Create an absolute timeout time.
-            struct timeval tv;
-            gettimeofday(&tv, NULL);
-            struct timespec wait = { .tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
-            err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
-            if (err)
-            {
-                return false;
-            }
-        }
-    }
-    --m_count;
-
-    return true;
+    return (k_sem_take(&m_sem, timeout / 1000) == 0);
 }
 
 int Semaphore::getCount() const
 {
-    return m_count;
+    return k_sem_count_get(m_sem));
 }
+#endif /* ERPC_THREADS_IS(FREERTOS) */
 
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

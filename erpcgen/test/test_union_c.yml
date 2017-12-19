@@ -28,12 +28,12 @@ test.h:
  - not: float y;
 
 test_client.cpp:
-    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
-    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+    - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+    - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
 
 test_server.cpp:
-  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
-  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
+  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
 
 ---
 name: basic non-encapsulated union
@@ -84,11 +84,11 @@ test.h:
   - int32_t x;
   - float y;
   - "};"
-  - list_0_t a;
+  - list_int32_1_t a;
   - struct
   - "{"
   - int32_t cx;
-  - list_0_t cc;
+  - list_int32_1_t cc;
   - "};"
   - int32_t ret;
   - struct
@@ -100,178 +100,103 @@ test.h:
   - void myUnion(fruitType discriminator, const unionType * unionVariable);
 
 test_client.cpp:
-  - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
-  - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+  - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+  - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
   - "{"
-  - erpc_status_t err = kErpcStatus_Success;
   - codec->startWriteUnion(discriminator);
   - switch (discriminator)
   - "{"
   - "case apple:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = write_foobar_struct(codec, &(data->myFoobar));
-  - "}"
+  - write_foobar_struct(codec, &(data->myFoobar));
   - break;
   - "}"
   - "case banana:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->x);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->y);
-  - "}"
+  - codec->write(data->x);
+  - codec->write(data->y);
   - break;
   - "}"
   - "case papaya:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->x);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->y);
-  - "}"
+  - codec->write(data->x);
+  - codec->write(data->y);
   - break;
   - "}"
   - "case orange:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = write_list_0_t_struct(codec, &(data->a));
-  - "}"
+  - write_list_int32_1_t_struct(codec, &(data->a));
   - break;
   - "}"
   - "case coconut:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->cx);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = write_list_0_t_struct(codec, &(data->cc));
-  - "}"
+  - codec->write(data->cx);
+  - write_list_int32_1_t_struct(codec, &(data->cc));
   - break;
   - "}"
   - "case returnVal:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->ret);
-  - "}"
+  - codec->write(data->ret);
   - break;
   - "}"
   - "default:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->c);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->write(data->blah);
-  - "}"
+  - codec->write(data->c);
+  - codec->write(data->blah);
   - break;
   - "}"
   - "}"
-  - return err;
-  - "}"
   - void myUnion(fruitType discriminator, const unionType * unionVariable)
-  - not: err = codec->write(static_cast<int32_t>(discriminator));
-  - if (!err)
-  - "{"
-  - err = write_unionType_union(codec, static_cast<int32_t>(discriminator), unionVariable)
-  - "}"
+  - not: codec->read(static_cast<int32_t>(discriminator));
+  - write_unionType_union(codec, static_cast<int32_t>(discriminator), unionVariable)
 
 
 test_server.cpp:
-  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
-  - static int32_t read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
+  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
   - "{"
-  - erpc_status_t err = kErpcStatus_Success;
   - codec->startReadUnion(discriminator);
   - switch (*discriminator)
   - "{"
   - "case apple:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = read_foobar_struct(codec, &(data->myFoobar));
-  - "}"
+  - read_foobar_struct(codec, &(data->myFoobar));
   - break;
   - "}"
   - "case banana:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->x);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->y);
-  - "}"
+  - codec->read(&data->x);
+  - codec->read(&data->y);
   - break;
   - "}"
   - "case papaya:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->x);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->y);
-  - "}"
+  - codec->read(&data->x);
+  - codec->read(&data->y);
   - break;
   - "}"
   - "case orange:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = read_list_0_t_struct(codec, &(data->a));
-  - "}"
+  - read_list_int32_1_t_struct(codec, &(data->a));
   - break;
   - "}"
   - "case coconut:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->cx);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = read_list_0_t_struct(codec, &(data->cc));
-  - "}"
+  - codec->read(&data->cx);
+  - read_list_int32_1_t_struct(codec, &(data->cc));
   - break;
   - "}"
   - "case returnVal:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->ret);
-  - "}"
+  - codec->read(&data->ret);
   - break;
   - "}"
   - "default:"
   - "{"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->c);
-  - "}"
-  - if (!err)
-  - "{"
-  - err = codec->read(&data->blah);
-  - "}"
+  - codec->read(&data->c);
+  - codec->read(&data->blah);
   - break;
   - "}"
-  - "}"
-  - return err;
   - "}"
   - static void free_unionType_union(int32_t discriminator, unionType * data);
   - static void free_unionType_union(int32_t discriminator, unionType * data)
@@ -285,14 +210,13 @@ test_server.cpp:
   - "}"
   - "case orange:"
   - "{"
-  - free_list_0_t_struct(&data->a);
+  - free_list_int32_1_t_struct(&data->a);
   - break;
   - "}"
   - "case coconut:"
   - "{"
-  - free_list_0_t_struct(&data->cc);
+  - free_list_int32_1_t_struct(&data->cc);
   - break;
-  - "}"
   - "}"
   - "}"
   - fruitType discriminator;
@@ -300,20 +224,14 @@ test_server.cpp:
   - unionVariable = (unionType *) erpc_malloc(sizeof(unionType));
   - if (unionVariable == NULL)
   - "{"
-  - err = kErpcStatus_MemoryError;
+  - codec->updateStatus(kErpcStatus_MemoryError);
   - "}"
   - int32_t _tmp_local;
-  - not: err = codec->read(&_tmp_local);
+  - not: codec->read(&_tmp_local);
   - not: discriminator = static_cast<fruitType>(_tmp_local);
-  - if (!err)
-  - "{"
-  - err = read_unionType_union(codec, &_tmp_local, unionVariable);
+  - read_unionType_union(codec, &_tmp_local, unionVariable);
   - discriminator = static_cast<fruitType>(_tmp_local);
-  - "}"
-  - if (!err)
-  - "{"
   - myUnion(discriminator, unionVariable);
-  - "}"
 
 ---
 name: basic non-encapsulated union inside struct

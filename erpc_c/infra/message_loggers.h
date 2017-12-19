@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,13 +47,13 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
+namespace erpc {
+
 /*!
  * @brief Logging messages objects used for logging sent/received messages.
  *
  * @ingroup infra_utility
  */
-namespace erpc {
-
 class MessageLogger
 {
 public:
@@ -114,8 +118,11 @@ public:
      * @brief This function add given transport to newly created MessageLogger object.
      *
      * @param[in] transport Transport used for logging messages
+     *
+     * @retval True When transport was successfully added.
+     * @retval False When transport wasn't added.
      */
-    void addMessageLogger(Transport *transport);
+    bool addMessageLogger(Transport *transport);
 
 protected:
     MessageLogger *m_logger; /*!< Pointer to first logger. */
@@ -123,7 +130,7 @@ protected:
     /*!
      * @brief This function add given transport to newly created MessageLogger object.
      *
-     * @param[in] MessageBuffer Buffer which will be logged.
+     * @param[in] msg Buffer which will be logged.
      *
      * @return The eRPC status based on transport type.
      */

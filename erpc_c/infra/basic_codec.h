@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,10 +38,6 @@
 
 #include "codec.h"
 #include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 /*!
  * @addtogroup infra_codec
@@ -83,174 +83,155 @@ public:
      * @param[in] service Which interface is requested.
      * @param[in] request Which function need be called.
      * @param[in] sequence Send sequence number to be sure that
-     *                    received message is reply for current request.
-     *
-     * @retval kErpcStatus_Success or write function.
+     *                    received message is reply for current request. or write function.
      */
-    virtual erpc_status_t startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
+    virtual void startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
 
     /*!
      * @brief Prototype for write data stream.
      *
      * @param[in] value Pointer to data stream.
      * @param[in] length Size of data stream in bytes.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t writeData(const void *value, uint32_t length);
+    virtual void writeData(const void *value, uint32_t length);
 
     /*!
      * @brief Prototype for write boolean value.
      *
      * @param[in] value Boolean typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(bool value);
+    virtual void write(bool value);
 
     /*!
      * @brief Prototype for write int8_t value.
      *
      * @param[in] value int8_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(int8_t value);
+    virtual void write(int8_t value);
 
     /*!
      * @brief Prototype for write int16_t value.
      *
      * @param[in] value int16_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(int16_t value);
+    virtual void write(int16_t value);
 
     /*!
      * @brief Prototype for write int32_t value.
      *
      * @param[in] value int32_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(int32_t value);
+    virtual void write(int32_t value);
 
     /*!
      * @brief Prototype for write int64_t value.
      *
      * @param[in] value int64_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(int64_t value);
+    virtual void write(int64_t value);
 
     /*!
      * @brief Prototype for write uint8_t value.
      *
      * @param[in] value uint8_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(uint8_t value);
+    virtual void write(uint8_t value);
 
     /*!
      * @brief Prototype for write uint16_t value.
      *
      * @param[in] value uint16_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(uint16_t value);
+    virtual void write(uint16_t value);
 
     /*!
      * @brief Prototype for write uint32_t value.
      *
      * @param[in] value uint32_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(uint32_t value);
+    virtual void write(uint32_t value);
 
     /*!
      * @brief Prototype for write uint64_t value.
      *
      * @param[in] value uint64_t typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(uint64_t value);
+    virtual void write(uint64_t value);
 
     /*!
      * @brief Prototype for write float value.
      *
      * @param[in] value float typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(float value);
+    virtual void write(float value);
 
     /*!
      * @brief Prototype for write double value.
      *
      * @param[in] value double typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t write(double value);
+    virtual void write(double value);
 
     /*!
      * @brief Prototype for write uintptr value.
      *
      * @param[in] value uintptr typed value to write.
-     *
-     * @return depends on cursor write function.
      */
-    virtual erpc_status_t writePtr(uintptr_t value);
+    virtual void writePtr(uintptr_t value);
 
     /*!
      * @brief Prototype for write string value.
      *
      * @param[in] length of string.
      * @param[in] value string value to write.
-     *
-     * @return depends on writeBinary function.
      */
-    virtual erpc_status_t writeString(uint32_t length, const char *value);
+    virtual void writeString(uint32_t length, const char *value);
 
     /*!
      * @brief Prototype for write binary value.
      *
      * @param[in] length of binary.
      * @param[in] value Binary value to write.
-     *
-     * @return depends on write function and cursor write function.
      */
-    virtual erpc_status_t writeBinary(uint32_t length, const uint8_t *value);
+    virtual void writeBinary(uint32_t length, const uint8_t *value);
 
     /*!
      * @brief Prototype for start write list.
      *
      * @param[in] length Length of list.
-     *
-     * @return depends on write function.
      */
-    virtual erpc_status_t startWriteList(uint32_t length);
+    virtual void startWriteList(uint32_t length);
 
     /*!
      * @brief Prototype for start write union.
      *
      * @param[in] discriminator Discriminator of union.
-     *
-     * @return Based on implementation.
      */
-    virtual erpc_status_t startWriteUnion(int32_t discriminator);
+    virtual void startWriteUnion(int32_t discriminator);
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
      *
-     * @retval kErpcStatus_Success
+     * @param[in] isNull Null flag to send.
      */
-    virtual erpc_status_t writeNullFlag(bool isNull);
+    virtual void writeNullFlag(bool isNull);
+
+    /*!
+     * @brief Writes an order ID of callback function.
+     *
+     * @param[in] callbacks Pointer to array of callbacks.
+     * @param[in] callbacksCount Size of array of callbacks.
+     * @param[in] callback Callback which ID should be serialized.
+     */
+    virtual void writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback);
+
+    /*!
+     * @brief Writes an order ID of callback function.
+     *
+     * @param[in] callback1 Pointer to existing callback.
+     * @param[out] callback2 Callback which ID should be serialized.
+     */
+    virtual void writeCallback(funPtr callback1, funPtr callback2);
     //@}
 
     //! @name Decoding
@@ -263,177 +244,154 @@ public:
      * @param[out] request Which function was called.
      * @param[out] sequence Returned sequence number to be sure that
      *                     received message is reply for current request.
-     *
-     * @retval kErpcStatus_Success
-     * @retval kErpcStatus_InvalidMessageVersion
      */
-    virtual erpc_status_t startReadMessage(message_type_t *type,
-                                           uint32_t *service,
-                                           uint32_t *request,
-                                           uint32_t *sequence);
+    virtual void startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence);
 
     /*!
      * @brief Prototype for read data stream.
      *
      * @param[in] value Pointer to data stream to be read.
      * @param[in] length Size of data stream in bytes to be read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t readData(void *value, uint32_t length);
+    virtual void readData(void *value, uint32_t length);
 
     /*!
      * @brief Prototype for read boolean value.
      *
      * @param[out] value Boolean typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(bool *value);
+    virtual void read(bool *value);
 
     /*!
      * @brief Prototype for read int8_t value.
      *
      * @param[out] value int8_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(int8_t *value);
+    virtual void read(int8_t *value);
 
     /*!
      * @brief Prototype for read int16_t value.
      *
      * @param[out] value int16_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(int16_t *value);
+    virtual void read(int16_t *value);
 
     /*!
      * @brief Prototype for read int32_t value.
      *
      * @param[out] value int32_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(int32_t *value);
+    virtual void read(int32_t *value);
 
     /*!
      * @brief Prototype for read int64_t value.
      *
      * @param[out] value int64_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(int64_t *value);
+    virtual void read(int64_t *value);
 
     /*!
      * @brief Prototype for read uint8_t value.
      *
      * @param[out] value uint8_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(uint8_t *value);
+    virtual void read(uint8_t *value);
 
     /*!
      * @brief Prototype for read uint16_t value.
      *
      * @param[out] value uint16_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(uint16_t *value);
+    virtual void read(uint16_t *value);
 
     /*!
      * @brief Prototype for read uint32_t value.
      *
      * @param[out] value uint32_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(uint32_t *value);
+    virtual void read(uint32_t *value);
 
     /*!
      * @brief Prototype for read uint64_t value.
      *
      * @param[out] value uint64_t typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(uint64_t *value);
+    virtual void read(uint64_t *value);
 
     /*!
      * @brief Prototype for read float value.
      *
      * @param[out] value float typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(float *value);
+    virtual void read(float *value);
 
     /*!
      * @brief Prototype for read double value.
      *
      * @param[out] value double typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t read(double *value);
+    virtual void read(double *value);
 
     /*!
      * @brief Prototype for read uintptr value.
      *
      * @param[out] value uintptr typed value to read.
-     *
-     * @return Based on cursor read function.
      */
-    virtual erpc_status_t readPtr(uintptr_t *value);
+    virtual void readPtr(uintptr_t *value);
 
     /*!
      * @brief Prototype for read string value.
      *
      * @param[out] length of string.
      * @param[out] value String value to read.
-     *
-     * @return Based on readBinary function.
      */
-    virtual erpc_status_t readString(uint32_t *length, char **value);
+    virtual void readString(uint32_t *length, char **value);
 
     /*!
      * @brief Prototype for read binary value.
      *
      * @param[out] length of binary.
      * @param[out] value Binary value to read.
-     *
-     * @retval kErpcStatus_Success or depends on read function.
      */
-    virtual erpc_status_t readBinary(uint32_t *length, uint8_t **value);
+    virtual void readBinary(uint32_t *length, uint8_t **value);
 
     /*!
      * @brief Prototype for start read list.
      *
      * @param[out] length Length of list.
-     *
-     * @return depends on read function.
      */
-    virtual erpc_status_t startReadList(uint32_t *length);
+    virtual void startReadList(uint32_t *length);
 
     /*!
      * @brief Prototype for start read union.
      *
      * @param[in] discriminator Discriminator of union.
-     *
-     * @return Based on implementation.
      */
-    virtual erpc_status_t startReadUnion(int32_t *discriminator);
+    virtual void startReadUnion(int32_t *discriminator);
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
-     * @retval kErpcStatus_Success
+     * @param[in] isNull Null flag to read.
      */
-    virtual erpc_status_t readNullFlag(bool *isNull);
+    virtual void readNullFlag(bool *isNull);
+
+    /*!
+     * @brief Read an callback function id and return address of callback function.
+     *
+     * @param[in] callbacks Pointer to array of callbacks.
+     * @param[in] callbacksCount Size of array of callbacks.
+     * @param[out] callback Callback which is deserialized.
+     */
+    virtual void readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback);
+
+    /*!
+     * @brief Read an callback function id and return address of callback function.
+     *
+     * @param[in] callback1 Pointer to existing callback.
+     * @param[out] callback2 Callback which is deserialized.
+     */
+    virtual void readCallback(funPtr callbacks1, funPtr *callback2);
     //@}
 };
 
@@ -450,7 +408,7 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
+    virtual BasicCodec *create() { return new (std::nothrow) BasicCodec; }
 
     /*!
      * @brief Dispose codec.

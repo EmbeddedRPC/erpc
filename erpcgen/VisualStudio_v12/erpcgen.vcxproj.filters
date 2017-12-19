@@ -212,9 +212,6 @@
     <ClCompile Include="..\src\SearchPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Value.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\AstNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -258,9 +255,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="py_interface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_defines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="py_global_init.cpp">

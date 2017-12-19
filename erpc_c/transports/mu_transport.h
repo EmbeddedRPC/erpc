@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -49,7 +53,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
-/*!< Count of MU tx/rx registers to be used by this transport layer. 
+/*!< Count of MU tx/rx registers to be used by this transport layer.
      Keep one MU channel for MCMGR operations. */
 #define MU_REG_COUNT (MU_RR_COUNT - 1U)
 #define MU_LAST_REG_IDX 2
@@ -146,7 +150,7 @@ public:
      * @brief Callback function called from MU IRQ when TxEmptyFlag is set
      *
      * This function calls tx_cb() to handle tx empty irq for the particular instance of the MUTransport.
-     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler 
+     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler
      * defined in MCMGR MU ISR table.
      */
 
@@ -155,7 +159,7 @@ public:
      * @brief Callback function called from MU IRQ when RxFullFlag is set
      *
      * This function calls rx_cb() to handle rx full irq for the particular instance of the MUTransport.
-     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler 
+     * MU interrupts are managed by the MCMGR component and the mu_transport overloads the weak handler
      * defined in MCMGR MU ISR table.
      */
     static void mu_rx_full_irq_callback();
@@ -180,14 +184,15 @@ protected:
      */
     void tx_cb();
 
-    volatile bool m_newMessage; /*!< Flag used in function hasMessage() to inform server by polling function that message is ready for receiving */
-
-    uint32_t m_rxMsgSize;          /*!< Size of received message - count of bytes to must be received to compltete currently received message */
-    uint32_t m_rxCntBytes;         /*!< Count of currently received bytes of message */
+    volatile bool m_newMessage; /*!< Flag used in function hasMessage() to inform server by polling function that
+                                   message is ready for receiving */
+    uint32_t m_rxMsgSize;       /*!< Size of received message - count of bytes to must be received to complete currently
+                                   received message */
+    uint32_t m_rxCntBytes;      /*!< Count of currently received bytes of message */
     uint32_t *volatile m_rxBuffer; /*!< Pointer to buffer to which is copied data from MU registers during receiving */
-
-    uint32_t m_txMsgSize;          /*!< Size of transmitted message - count of bytes to must be transmitted to send compltete message */
-    uint32_t m_txCntBytes;         /*!< Count of currently received bytes of message */
+    uint32_t m_txMsgSize;  /*!< Size of transmitted message - count of bytes to must be transmitted to send complete
+                              message */
+    uint32_t m_txCntBytes; /*!< Count of currently received bytes of message */
     uint32_t *volatile m_txBuffer; /*!< Pointer to buffer from which is copied data to MU registers during sending */
 
 #if ERPC_THREADS

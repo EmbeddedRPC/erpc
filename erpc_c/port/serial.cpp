@@ -1,25 +1,25 @@
 /*
-* This file is part of the Bus Pirate project (http://code.google.com/p/the-bus-pirate/).
-*
-* Written and maintained by the Bus Pirate project and http://dangerousprototypes.com
-*
-* To the extent possible under law, the project has
-* waived all copyright and related or neighboring rights to Bus Pirate. This
-* work is published from United States.
-*
-* For details see: http://creativecommons.org/publicdomain/zero/1.0/.
-*
-*    This program is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-*/
+ * This file is part of the Bus Pirate project (http://code.google.com/p/the-bus-pirate/).
+ *
+ * Written and maintained by the Bus Pirate project and http://dangerousprototypes.com
+ *
+ * To the extent possible under law, the project has
+ * waived all copyright and related or neighboring rights to Bus Pirate. This
+ * work is published from United States.
+ *
+ * For details see: http://creativecommons.org/publicdomain/zero/1.0/.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 /*
-* OS independent serial interface
-*
-* Heavily based on Pirate-Loader:
-* http://the-bus-pirate.googlecode.com/svn/trunk/bootloader-v4/pirate-loader/source/pirate-loader.c
-*
-*/
+ * OS independent serial interface
+ *
+ * Heavily based on Pirate-Loader:
+ * http://the-bus-pirate.googlecode.com/svn/trunk/bootloader-v4/pirate-loader/source/pirate-loader.c
+ *
+ */
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -34,7 +34,7 @@
 //#ifdef LINUX
 //#include <termios.h>
 //#endif
-//included from serial.h
+// included from serial.h
 
 #include "serial.h"
 
@@ -152,7 +152,7 @@ int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
     }
     else
     {
-        // Need a seperate case for timeoutMs == 0
+        // Need a separate case for timeoutMs == 0
         // setting all these values to 0 results in no timeout
         // so set them to a minimum value, this will return immediately
         // if there is no data available

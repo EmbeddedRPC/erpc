@@ -21,14 +21,15 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "erpc_version.h"
+{% if empty(crc16) == false %}
 #include "erpc_crc16.h"
+{% endif  -- empty(crc16) == false %}
 {% for inc in includes %}
 #include "{$inc}"
 {% endfor -- includes %}
 
 {$checkVersion()}
-
-{$checkCrc()}
+{$>checkCrc()}
 {% endif -- not commonTypesFile %}
 {% if commonTypesFile == "" %}
 #if !defined(ERPC_TYPE_DEFINITIONS)

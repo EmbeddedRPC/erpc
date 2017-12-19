@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,7 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Download "rpmsg_linux_endpoint.h/.cpp" from https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-cpp */
+/* Download "rpmsg_linux_endpoint.h/.cpp" from
+ * https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-cpp */
 #include "rpmsg_linux_endpoint.h"
 #include "transport.h"
 
@@ -39,7 +44,7 @@
 namespace erpc {
 
 /*!
- * @brief RPMSG linux transport to send/receive messages through RPMSG endpoints
+ * @brief RPMSG Linux transport to send/receive messages through RPMSG endpoints
  * based on https://github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171
  * implementation.
  * @ingroup rpmsg_linux_transport
@@ -55,10 +60,10 @@ public:
     virtual ~RPMsgLinuxTransport();
 
     /*!
-     * @brief This function initializes Linux enviroment for sending and receving messages.
+     * @brief This function initializes Linux environment for sending and receiving messages.
      *
-     * @retval kErpcStatus_Success When enviroment was set successfuly.
-     * @retval kErpcStatus_Fail When enviroment wasn't set successfuly.
+     * @retval kErpcStatus_Success When environment was set successfully.
+     * @retval kErpcStatus_Fail When environment wasn't set successfully.
      */
     erpc_status_t init();
 
@@ -67,8 +72,8 @@ public:
      *
      * @param[in] message Message to receive.
      *
-     * @retval kErpcStatus_Success When message was received successfuly.
-     * @retval kErpcStatus_Fail When message wasn't received successfuly.
+     * @retval kErpcStatus_Success When message was received successfully.
+     * @retval kErpcStatus_Fail When message wasn't received successfully.
      */
     virtual erpc_status_t receive(MessageBuffer *message);
 
@@ -77,8 +82,8 @@ public:
      *
      * @param[in] message Message to send.
      *
-     * @retval kErpcStatus_Success When message was sent successfuly.
-     * @retval kErpcStatus_Fail When message wasn't sent successfuly.
+     * @retval kErpcStatus_Success When message was sent successfully.
+     * @retval kErpcStatus_Fail When message wasn't sent successfully.
      */
     virtual erpc_status_t send(MessageBuffer *message);
 
