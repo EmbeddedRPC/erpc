@@ -1187,10 +1187,11 @@ class GTEST_API_ UnitTestImpl {
   friend class ReplaceDeathTestFactory;
 #endif  // GTEST_HAS_DEATH_TEST
 
-  // Initializes the event listener performing XML output as specified by
+#if !GTEST_OS_BARE_METAL
+	// Initializes the event listener performing XML output as specified by
   // UnitTestOptions. Must not be called before InitGoogleTest.
   void ConfigureXmlOutput();
-
+#endif
 #if GTEST_CAN_STREAM_RESULTS_
   // Initializes the event listener for streaming test results to a socket.
   // Must not be called before InitGoogleTest.
@@ -4771,7 +4772,7 @@ void TestEventRepeater::OnTestIterationEnd(const UnitTest& unit_test,
 }
 
 // End TestEventRepeater
-
+#if !GTEST_OS_BARE_METAL
 // This class generates an XML output file.
 class XmlUnitTestResultPrinter : public EmptyTestEventListener {
  public:
@@ -5191,7 +5192,7 @@ std::string XmlUnitTestResultPrinter::TestPropertiesAsXmlAttributes(
 }
 
 // End XmlUnitTestResultPrinter
-
+#endif
 // Class DefaultStoredResultEventListener is copyable.
 //
 // This class implements the TestPartResultEventListener interface
@@ -5201,19 +5202,22 @@ class DefaultStoredResultEventListener : public StoredResultEventListener{
 
   // The following methods override what's in the TestPartResultEventListener class.
   virtual const BaseTestPartResult* TransformTestPartResult(const TestPartResult& test_part_result);
-  virtual void OutputXmlTestPartResult(::std::ostream* stream ,
+#if !GTEST_OS_BARE_METAL
+		virtual void OutputXmlTestPartResult(::std::ostream* stream ,
                                        const BaseTestPartResult* base_test_part_result);
+#endif
 };
 
 const BaseTestPartResult* DefaultStoredResultEventListener::TransformTestPartResult(const TestPartResult& test_part_result) {
   return new TestPartResult(test_part_result.type(),test_part_result.file_name(), test_part_result.line_number(), test_part_result.message());
 };
 
+#if !GTEST_OS_BARE_METAL
 void DefaultStoredResultEventListener::OutputXmlTestPartResult(::std::ostream* stream,
                                                                const BaseTestPartResult* base_test_part_result) {
   XmlUnitTestResultPrinter::OutputXmlTestPartResult(stream, base_test_part_result);
 };
-
+#endif
 // End DefaultStoredResultEventListener
 
 // Class BaseStoredResultEventListener is copyable.
@@ -5225,21 +5229,24 @@ class BaseStoredResultEventListener : public StoredResultEventListener{
 
   // The following methods override what's in the StoredResultEventListener class.
   virtual const BaseTestPartResult* TransformTestPartResult(const TestPartResult& test_part_result);
-  virtual void OutputXmlTestPartResult(::std::ostream* stream ,
+#if !GTEST_OS_BARE_METAL
+		virtual void OutputXmlTestPartResult(::std::ostream* stream ,
                                        const BaseTestPartResult* base_test_part_result);
+#endif
 };
 
 const BaseTestPartResult* BaseStoredResultEventListener::TransformTestPartResult(const TestPartResult& test_part_result) {
   return new BaseTestPartResult(test_part_result.type());
 };
 
+#if !GTEST_OS_BARE_METAL
 void BaseStoredResultEventListener::OutputXmlTestPartResult(::std::ostream* stream,
                                                             const BaseTestPartResult* base_test_part_result) {
   *stream << "      <failure type=\""
           << ((base_test_part_result->type() == BaseTestPartResult::kFatalFailure) ? "fatal_failure" : "non_fatal_failure")
           << "\"></failure>\n";
 };
-
+#endif
 // End BaseStoredResultEventListener
 
 #if GTEST_CAN_STREAM_RESULTS_
@@ -5929,7 +5936,7 @@ void UnitTestImpl::SuppressTestEventsIfInSubprocess() {
     listeners()->SuppressEventForwarding();
 }
 #endif  // GTEST_HAS_DEATH_TEST
-
+#if !GTEST_OS_BARE_METAL
 // Initializes event listeners performing XML output as specified by
 // UnitTestOptions. Must not be called before InitGoogleTest.
 void UnitTestImpl::ConfigureXmlOutput() {
@@ -5943,7 +5950,7 @@ void UnitTestImpl::ConfigureXmlOutput() {
     fflush(stdout);
   }
 }
-
+#endif
 #if GTEST_CAN_STREAM_RESULTS_
 // Initializes event listeners for streaming test results in string form.
 // Must not be called before InitGoogleTest.
@@ -5983,10 +5990,11 @@ void UnitTestImpl::PostFlagParsingInit() {
     // RUN_ALL_TESTS.
     RegisterParameterizedTests();
 
+#if !GTEST_OS_BARE_METAL
     // Configures listeners for XML output. This makes it possible for users
     // to shut down the default XML output before invoking RUN_ALL_TESTS.
     ConfigureXmlOutput();
-
+#endif
 #if GTEST_CAN_STREAM_RESULTS_
     // Configures listeners for streaming test results to the specified server.
     ConfigureStreamingOutput();

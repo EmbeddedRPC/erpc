@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2017 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,50 +28,68 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "erpc_config_internal.h"
-#include "erpc_mbf_setup.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
-#include <assert.h>
+#include "erpc_port.h"
+#include "FreeRTOS.h"
 #include <new>
+
+extern "C" {
+#include "MemManager.h"
+}
 
 #if !(__embedded_cplusplus)
 using namespace std;
 #endif
 
-using namespace erpc;
-
-////////////////////////////////////////////////////////////////////////////////
-// Classes
-////////////////////////////////////////////////////////////////////////////////
-
-class DynamicMessageBufferFactory : public MessageBufferFactory
+void *operator new(std::size_t count) _THROWS(_XSTD bad_alloc)
 {
-public:
-    virtual MessageBuffer create()
-    {
-        uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
-        return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
-    }
-
-    virtual void dispose(MessageBuffer *buf)
-    {
-        assert(buf);
-        if (buf->get())
-        {
-            delete[] buf->get();
-        }
-    }
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-////////////////////////////////////////////////////////////////////////////////
-
-static ManuallyConstructed<DynamicMessageBufferFactory> s_msgFactory;
-
-erpc_mbf_t erpc_mbf_dynamic_init()
-{
-    s_msgFactory.construct();
-    return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());
+    void *p = erpc_malloc(count);
+    return p;
 }
+
+void *operator new(std::size_t count, const std::nothrow_t &tag) _THROW0()
+{
+    void *p = erpc_malloc(count);
+    return p;
+}
+
+void *operator new[](std::size_t count) _THROWS(_XSTD bad_alloc)
+{
+    void *p = erpc_malloc(count);
+    return p;
+}
+
+void *operator new[](std::size_t count, const std::nothrow_t &tag) _THROW0()
+{
+    void *p = erpc_malloc(count);
+    return p;
+}
+
+void operator delete(void *ptr) _THROW0()
+{
+    erpc_free(ptr);
+}
+
+void operator delete[](void *ptr) _THROW0()
+{
+    erpc_free(ptr);
+}
+
+void *erpc_malloc(size_t size)
+{
+    void *p = MEM_BufferAllocForever(size, 0);
+    return p;
+}
+
+void erpc_free(void *ptr)
+{
+    MEM_BufferFree(ptr);
+}
+
+/* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
+#if ((defined(__GNUC__)) && (defined(__arm__)))
+extern "C" void __cxa_pure_virtual()
+{
+    while (1)
+        ;
+}
+#endif

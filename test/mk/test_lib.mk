@@ -46,36 +46,9 @@ UNIT_OUT_DIR = $(RPC_OBJS_ROOT)/unit_test_common
 # Include path. Add the include paths like this:
 # INCLUDES += ./include/
 #-----------------------------------------------
-INCLUDES += $(UT_COMMON_SRC) \
-            $(ERPC_ROOT)/erpc_c/infra \
-            $(ERPC_ROOT)/erpc_c/port \
-            $(ERPC_ROOT)/erpc_c/setup \
-            $(ERPC_ROOT)/erpc_c/transports \
-            $(ERPC_ROOT)/erpcgen/src \
-            $(ERPC_ROOT)/test/common \
-            $(ERPC_ROOT)/test/common/config \
-            $(RPC_OBJS_ROOT) \
-            $(UT_COMMON_SRC)/gtest
+include $(ERPC_ROOT)/test/mk/erpc_src.mk
 
-SOURCES +=  $(UT_COMMON_SRC)/addOne.cpp \
-            $(UT_COMMON_SRC)/gtest/gtest.cpp \
-            $(ERPC_ROOT)/erpcgen/src/format_string.cpp \
-            $(ERPC_ROOT)/erpcgen/src/Logging.cpp \
-            $(ERPC_C_ROOT)/infra/arbitrated_client_manager.cpp \
-            $(ERPC_C_ROOT)/infra/basic_codec.cpp \
-            $(ERPC_C_ROOT)/infra/client_manager.cpp \
-            $(ERPC_C_ROOT)/infra/crc16.cpp \
-            $(ERPC_C_ROOT)/infra/server.cpp \
-            $(ERPC_C_ROOT)/infra/simple_server.cpp \
-            $(ERPC_C_ROOT)/infra/framed_transport.cpp \
-            $(ERPC_C_ROOT)/infra/message_buffer.cpp \
-            $(ERPC_C_ROOT)/infra/message_loggers.cpp \
-            $(ERPC_C_ROOT)/infra/transport_arbitrator.cpp \
-            $(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
-            $(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
-            $(ERPC_C_ROOT)/port/serial.cpp \
-            $(ERPC_C_ROOT)/transports/serial_transport.cpp \
-            $(ERPC_C_ROOT)/transports/tcp_transport.cpp
+INCLUDES += $(ERPC_ROOT)/test/common/config
 
 MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 

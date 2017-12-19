@@ -20,14 +20,11 @@ extern "C"
 {$checkVersion()}
 
 {$checkCrc()}
-{% if nestedCall %}
-#if !ERPC_NESTED_CALLS
-#error "When @nested annotation is used, then ERPC_NESTED_CALLS macro need be enabled and server need be set."
-#endif
-{% endif %}
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
 
 extern ClientManager *g_client;
 {$generateCrcVariable()}
@@ -75,8 +72,8 @@ extern ClientManager *g_client;
     }
 {%    endif -- not generateInfraErrorChecks %}
 {%   endif -- generateAllocErrorChecks%}
-{%   if generateInfraErrorChecks or not generateAllocErrorChecks %}
 
+{%   if generateInfraErrorChecks or not generateAllocErrorChecks %}
 {$f_clientEncode(iface, fn)}
 {%   endif %}
 {%   if fn.isReturnValue %}
@@ -85,15 +82,17 @@ extern ClientManager *g_client;
 {%    endif %}
 {%    if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable};
-{% endif %}
+{%    endif %}
 {%    if generateAllocErrorChecks && not generateInfraErrorChecks %}
     if (!err)
     {
 {$addIndent("    ", f_clientDecode(iface, fn))}
     }
-{% else %}
+
+{%    else %}
 {$f_clientDecode(iface, fn)}
-{% endif %}
+
+{%    endif %}
 {%   endif -- isReturnValue %}
     // Dispose of the request.
     g_client->releaseRequest(request);
@@ -102,11 +101,7 @@ extern ClientManager *g_client;
 
     if (err)
     {
-        client_error_handler_t errorHandler = g_client->getErrorHandler();
-        if (errorHandler != NULL)
-        {
-            (*errorHandler)(err);
-        }
+        g_client->callErrorHandler(err);
         {% if fn.returnValue.type.isNotVoid %}return {$fn.returnValue.errorReturnValue};{% endif -- isNotVoid %}
     }
 {%   endif %}

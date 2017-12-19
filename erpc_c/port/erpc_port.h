@@ -33,6 +33,7 @@
 #define _EMBEDDED_RPC__PORT_H_
 
 #include "erpc_config_internal.h"
+#include <stddef.h>
 
 /*!
  * @addtogroup port_mem
@@ -47,8 +48,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stddef.h>
 
 /*!
  * @brief This function is used for allocating space.

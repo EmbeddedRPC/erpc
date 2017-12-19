@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,6 +33,10 @@
 #include "assert.h"
 #include "transport_arbitrator.h"
 
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
+
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +55,7 @@ void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)
     m_transport = arbitrator;
 }
 
-erpc_status_t ArbitratedClientManager::performRequest(RequestContext &request)
+erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &request)
 {
     assert(m_arbitrator && "arbitrator not set");
 

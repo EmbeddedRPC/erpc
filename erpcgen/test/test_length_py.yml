@@ -13,7 +13,6 @@ test/client.py:
   - start_write_list(self.length)
 test/server.py:
   - start_read_list
-  - end_read_list
   - not: codec.read_int32()
 
 ---
@@ -30,7 +29,6 @@ test/client.py:
   - def bar(self, l)
   - perform_request
   - start_read_list
-  - end_read_list
   - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
@@ -53,12 +51,10 @@ test/client.py:
   - start_write_list(self.length)
   - perform_request
   - start_read_list
-  - end_read_list
   - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
   - start_read_list
-  - end_read_list
   - not: codec.read_int32()
   - self._handler.bar(l)
   - codec.start_write_message

@@ -53,6 +53,7 @@ InterfaceDefinition::InterfaceDefinition()
 , m_programName("")
 , m_outputFilename("")
 , m_error_handling_check(kAll)
+, m_codec(kNotSpecified)
 {
     init();
 }
@@ -106,11 +107,12 @@ void InterfaceDefinition::createBuiltinTypes()
     m_globals.addSymbol(new BuiltinType("binary", BuiltinType::_builtin_type::kBinaryType));
 }
 
-void InterfaceDefinition::setProgramInfo(const std::string &filename, const std::string &outputDir)
+void InterfaceDefinition::setProgramInfo(const std::string &filename, const std::string &outputDir, codec_t codec)
 {
     setOutputFilename(filename);
     setOutputDirectory(outputDir);
     setErrorHandlingChecksType();
+    m_codec = codec;
 }
 
 bool InterfaceDefinition::hasProgramSymbol()

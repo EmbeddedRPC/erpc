@@ -40,7 +40,6 @@
 
 using namespace erpcgen;
 using namespace cpptempl;
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -429,9 +428,6 @@ void CGenerator::generate()
         (m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAll ||
          m_def->getErrorHandlingChecksType() == InterfaceDefinition::kAllocErrors);
 
-    /* Need handle nested calls. */
-    m_templateData["nestedCall"] = false;
-
     data_list empty;
     m_templateData["enums"] = empty;
     m_templateData["aliases"] = empty;
@@ -444,6 +440,12 @@ void CGenerator::generate()
 
     // Keil need extra pragma option when unions are used.
     m_templateData["usedUnionType"] = false;
+
+    /* Set directions constants*/
+    m_templateData["InDirection"] = getDirection(kInDirection);
+    m_templateData["OutDirection"] = getDirection(kOutDirection);
+    m_templateData["InoutDirection"] = getDirection(kInoutDirection);
+    m_templateData["ReturnDirection"] = getDirection(kReturn);
 
     parseSubtemplates();
 
@@ -663,7 +665,6 @@ void CGenerator::makeAliasesTemplateData()
     for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
     {
         FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        assert(functionType);
         data_map functionInfo;
 
         // aware of external function definitions
@@ -1039,7 +1040,6 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
 
     // set struct members template data
     data_list members;
-    assert(dynamic_cast<DataList *>(structInfo["members"].get().get()));
     data_list baseMembers = dynamic_cast<DataList *>(structInfo["members"].get().get())->getlist();
     data_list membersToFree;
 
@@ -1107,12 +1107,11 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
         // Skip data serialization for variables used as discriminator for unions.
         // These prevent to serialized data twice.
         StructMember *referencedFrom = findParamReferencedFrom(structType->getMembers(), member->getName());
-        member_info["serializedViaMember"] = (referencedFrom) ? referencedFrom->getOutputName() : "";
-
         if (referencedFrom && !member->findAnnotation(SHARED_ANNOTATION))
         {
             Log::debug("Skipping EncodeDecode member '%s' with paramType '%s' (it's serialized with member '%s').\n", memberName.c_str(), dataType->getName().c_str(), referencedFrom->getName().c_str());
             member_info["coderCall"] = "";
+            member_info["serializedViaMember"] = referencedFrom->getOutputName();
         }
         else
         {
@@ -1126,6 +1125,8 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
             {
                 structInfo["needTempVariable"] = true;
             }
+
+            member_info["serializedViaMember"] = "";
         }
 
         members.push_back(member_info);
@@ -1262,8 +1263,8 @@ std::string CGenerator::getUnionMembersData(UnionType *unionType, std::string id
                 StructMember *unionMember = unionCase->getUnionMemberDeclaration(memberName);
                 returnCase += caseIdent;
                 std::string unionMemberName = unionMember->getOutputName();
-                DataType *unionMemberType = unionMember->getDataType()->getTrueDataType();
-                if (unionMember->isByref() && (unionMemberType->isStruct() || unionMemberType->isUnion() || unionMemberType->isScalar() || unionMemberType->isEnum()))
+                DataType *unionType = unionMember->getDataType()->getTrueDataType();
+                if (unionMember->isByref() && (unionType->isStruct() || unionType->isUnion() || unionType->isScalar() || unionType->isEnum()))
                 {
                     unionMemberName = "*" + unionMemberName;
                 }
@@ -1280,6 +1281,22 @@ void CGenerator::setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolI
 {
     symbolInfo["mlComment"] = symbol->getMlComment();
     symbolInfo["ilComment"] = symbol->getIlComment();
+}
+bool CGenerator::isServerNullParam(StructMember *param)
+{
+    DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
+    return (!paramTrueDataType->isScalar() && !paramTrueDataType->isEnum() && !paramTrueDataType->isArray());
+}
+
+bool CGenerator::isPointerParam(StructMember *param)
+{
+    DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
+    return (isServerNullParam(param) || ((paramTrueDataType->isScalar() || paramTrueDataType->isEnum()) && param->getDirection() != kInDirection));
+}
+
+bool CGenerator::isNullableParam(StructMember *param)
+{
+    return (param->findAnnotation(NULLABLE_ANNOTATION) && isPointerParam(param));
 }
 
 data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnIndex)
@@ -1302,16 +1319,6 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
 
     /* Is function declared as external? */
     info["isNonExternalFunction"] = !fn->findAnnotation(EXTERNAL_ANNOTATION);
-
-    if ((fn->findAnnotation(NESTED_CALL) != nullptr))
-    {
-        info["nestedCall"] = true;
-        m_templateData["nestedCall"] = true;
-    }
-    else
-    {
-        info["nestedCall"] = false;
-    }
 
     // Get return value info
     data_map returnInfo;
@@ -1346,6 +1353,12 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         {
             returnInfo["firstAlloc"] = "";
         }
+
+        // due to compatibility with function parameters.
+        returnInfo["lengthName"] = "";
+        returnInfo["nullVariable"] = "";
+
+        returnInfo["direction"] = getDirection(kReturn);
         returnInfo["coderCall"] = getEncodeDecodeCall(result, group, dataType, nullptr, false, structMember, needTempVariable, true);
         returnInfo["shared"] = isShared;
         resultVariable = getTypenameName(dataType, resultVariable);
@@ -1371,61 +1384,90 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         DataType *paramTrueType = paramType->getTrueDataType();
         std::string name = param->getOutputName();
 
+        // Init parameters to NULL on server side
+        bool isServerNull = isServerNullParam(param);
+        paramInfo["isNullParam"] = isServerNull;
+
+        // Handle nullable annotation.
+        bool isNullable = isNullableParam(param);
+        paramInfo["isNullable"] = isNullable;
+
+        // Serialize when list/union is nullable
+        paramInfo["referencedName"] = "";
+
         // Skip data serialization for variables placed as @length value for lists.
         // Skip data serialization for variables used as discriminator for unions.
         // These prevent to serialized data twice.
-        if (StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName()))
+        StructMember *referencedFrom = findParamReferencedFrom(fnParams, param->getName());
+        if (referencedFrom != nullptr && referencedFrom->findAnnotation(SHARED_ANNOTATION) == nullptr)
         {
-            paramInfo["serializedBothDirection"] = referencedFrom->getDirection() == param->getDirection();
-            paramInfo["serializedViaMember"] = referencedFrom->getOutputName();
+            bool isNullableReferenced = isNullableParam(referencedFrom);
+            if (isNullable && !isNullableReferenced)
+            {
+                Log::error(
+                    "line %d: Param1 '%s' is serialized through param2 '%s'. Annotation @nullable can be applied for "
+                    "param1 only when same annotation is applied for param2.\n",
+                    param->getFirstLine(), param->getName().c_str(), referencedFrom->getName().c_str());
+                paramInfo["isNullable"] = false;
+            }
+
+            // Serialize when list/union is nullable
+            if (isNullableReferenced)
+            {
+                paramInfo["referencedName"] = referencedFrom->getOutputName();
+            }
+
+            // Directions in which list/union is serializing reference
+            if (referencedFrom->getDirection() == param->getDirection())
+            {
+                paramInfo["serializedDirection"] = getDirection(kInoutDirection);
+            }
+            else
+            {
+                paramInfo["serializedDirection"] = getDirection(referencedFrom->getDirection());
+            }
         }
         else
         {
-            paramInfo["serializedViaMember"] = "";
-            paramInfo["serializedBothDirection"] = false;
+            paramInfo["serializedDirection"] = "";
         }
+
+        // data == NULL also when length variable == NULL
+        paramInfo["lengthName"] = "";
 
         // due to compatibility with return data.
         paramInfo["firstAlloc"] = "";
 
-        // Init parameters to NULL on server side
-        bool isNullParam = (!paramTrueType->isScalar() && !paramTrueType->isEnum() && !paramTrueType->isArray());
-        paramInfo["isNullParam"] = isNullParam;
-
-        bool isPointer = (isNullParam || ((paramTrueType->isScalar() || paramTrueType->isEnum()) && param->getDirection() != kInDirection));
-
-        // If param is list then length variable can be NULL and it should be check with higher priority.
-        // When length variable is NULL then list is not sent.
-        StructMember *nullableParam = param;
-        if (paramTrueType->isList())
-        {
-            ListType *listType = dynamic_cast<ListType *>(paramTrueType);
-            // Find length member for current list param.
-            StructMember *referenceForLength = dynamic_cast<StructMember *>(fn->getParameters().getScope().getSymbol(listType->getLengthVariableName(), false));
-            if (referenceForLength && referenceForLength->getDirection() == kInoutDirection && referenceForLength->findAnnotation(NULLABLE_ANNOTATION))
-            {
-                paramInfo["nullableName"] = referenceForLength->getName();
-                nullableParam = referenceForLength;
-            }
-        }
-        // Handle nullable annotation.
-        bool isNullable = (param->findAnnotation(NULLABLE_ANNOTATION) && ((isPointer && nullableParam->getDirection() != kOutDirection) || ((paramTrueType->isScalar() || paramTrueType->isEnum()) && nullableParam->getDirection() == kInoutDirection)));
-        paramInfo["isNullable"] = isNullable;
-
+        // Need extra variable to handle nullable for enums and scalar types on server side.
+        paramInfo["nullVariable"] = "";
         if (isNullable)
         {
-            paramInfo["nullableName"] = name;
-            // If param is list then length variable can be NULL and it should be check with higher priority.
-            // When length variable is NULL then list is not sent.
-            if (paramTrueType->isList())
+            // Out @nullable param need send @nullable information
+            info["isSendValue"] = true;
+
+            // data == NULL also when length variable == NULL
+            string lengthParam = param->getAnnStringValue(LENGTH_ANNOTATION);
+            if (!lengthParam.empty())
             {
-                ListType *listType = dynamic_cast<ListType *>(paramTrueType);
-                // Find length member for current list param.
-                StructMember *referenceForLength = dynamic_cast<StructMember *>(fn->getParameters().getScope().getSymbol(listType->getLengthVariableName(), false));
-                if (referenceForLength && referenceForLength->getDirection() == kInoutDirection && referenceForLength->findAnnotation(NULLABLE_ANNOTATION))
+                Symbol *symbol = fn->getParameters().getScope().getSymbol(lengthParam, false);
+                if (symbol != nullptr)
                 {
-                    paramInfo["nullableName"] = referenceForLength->getName();
+                    StructMember *st = dynamic_cast<StructMember *>(symbol);
+                    assert(st);
+                    if (isNullableParam(st))
+                    {
+                        paramInfo["lengthName"] = symbol->getOutputName();
+                    }
                 }
+            }
+
+            // Special case when scalar variables are @nullable
+            std::string nullableName = param->getOutputName();
+            paramInfo["nullableName"] = nullableName;
+            if (paramTrueType->isScalar() || paramTrueType->isEnum())
+            {
+                std::string nullVariable = "_" + nullableName;
+                paramInfo["nullVariable"] = getTypenameName(paramTrueType, "*_" + nullableName);
             }
 
             // Set flags to indicate whether a local isNull variable is needed on the
@@ -1435,10 +1477,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
             // if a later parameter is not nullable. So, we will only try to set it
             // if it is not true. Once the variable's value is true, we know we need
             // a null variable at least once.
-            if (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection)
-            {
-                info["needNullVariableOnServer"] = true;
-            }
+            info["needNullVariableOnServer"] = true;
         }
 
         // Check if max_length annotation belongs to "in" param
@@ -1465,11 +1504,10 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
         }
 
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
-        paramInfo["mallocServerOut"] = firtAllocOutParamOnServerWhenIsNeed(name, param);
         setCallingFreeFunctions(param, paramInfo, false);
 
         // Use shared memory feature instead of serializing/deserializing data.
-        bool isShared = (isPointer && param->findAnnotation(SHARED_ANNOTATION) != nullptr);
+        bool isShared = (isPointerParam(param) && param->findAnnotation(SHARED_ANNOTATION) != nullptr);
         paramInfo["shared"] = isShared;
         std::string encodeDecodeName;
         if (isShared)
@@ -1492,6 +1530,9 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
 
         Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(), paramType->getName().c_str());
         paramInfo["coderCall"] = getEncodeDecodeCall(encodeDecodeName, group, paramType, &fn->getParameters(), false, param, needTempVariable, true);
+
+        // set parameter direction
+        paramInfo["direction"] = getDirection(param->getDirection());
 
         setSymbolDataToSide(param, group->getSymbolDirections(param), paramsToClient, paramsToServer, paramInfo);
 
@@ -1534,10 +1575,6 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, int fnI
 
 void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> directions, data_list &toClient, data_list &toServer, data_map &dataMap)
 {
-    dataMap["allocateToServer"] = false;
-    dataMap["allocateToClient"] = false;
-    dataMap["allocateToClientAndServer"] = false;
-
     _direction direction = kIn;
     switch (symbolType->getSymbolType())
     {
@@ -1609,19 +1646,16 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const std::set<_p
     {
         case kIn:
         {
-            dataMap["allocateToServer"] = true;
             toServer.push_back(dataMap);
             break;
         }
         case kOut:
         {
-            dataMap["allocateToClient"] = true;
             toClient.push_back(dataMap);
             break;
         }
         case kInOut:
         {
-            dataMap["allocateToClientAndServer"] = true;
             toServer.push_back(dataMap);
             toClient.push_back(dataMap);
             break;
@@ -1743,8 +1777,13 @@ std::string CGenerator::getFunctionServerCall(Function *fn)
             DataType *trueDataType = it->getDataType()->getTrueDataType();
 
             /* Builtin types and function types. */
-            if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum()) ||
-                                                         (it->findAnnotation(SHARED_ANNOTATION))))
+            if (((trueDataType->isScalar()) || trueDataType->isEnum()) && it->getDirection() != kInDirection && it->findAnnotation(NULLABLE_ANNOTATION))
+            {
+                //On server side is created new variable for handle null : "_" + name
+                proto += "_";
+            }
+            else if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum()) ||
+                                                              (it->findAnnotation(SHARED_ANNOTATION))))
 
             {
                 proto += "&";
@@ -2002,11 +2041,10 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group,
 {
     templateData["decode"] = m_templateData["decodeBuiltinType"];
     templateData["encode"] = m_templateData["encodeBuiltinType"];
-
     if (t->isString())
     {
         templateData["checkStringNull"] = false;
-        templateData["withoutAlloc"] = ((structMember->getDirection() == kInoutDirection) ||
+        templateData["withoutAlloc"] = ((structMember && structMember->getDirection() == kInoutDirection) ||
                                         (structType && group->getSymbolDirections(structType).count(kInoutDirection))) ?
                                            true :
                                            false;
@@ -2172,18 +2210,25 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             static uint32_t arrayCounter;
             ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
             assert(arrayType);
+            DataType *elementType = arrayType->getElementType();
+            DataType *trueElementType = elementType->getTrueDataType();
+
             std::string arrayName = name;
             ++arrayCounter;
             templateData["decode"] = m_templateData["decodeArrayType"];
             templateData["encode"] = m_templateData["encodeArrayType"];
+
+            // To improve code serialization/deserialization for scalar types.
+            templateData["builtinTypeName"] = ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) || trueElementType->isBool()) ? "" : getScalarTypename(elementType);
+
             giveBracesToArrays(arrayName);
             templateData["protoNext"] =
                 getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter),
-                                    group, arrayType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
+                                    group, elementType, structType, true, structMember, needTempVariable, isFunctionParam);
             templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
             templateData["size"] = format_string("%d", arrayType->getElementCount());
             templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
-            templateData["isElementArrayType"] = arrayType->getElementType()->getTrueDataType()->isArray();
+            templateData["isElementArrayType"] = trueElementType->isArray();
             if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
             {
                 templateData["freeingCall"] = m_templateData["freeArray"];
@@ -2241,18 +2286,24 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
         {
             ListType *listType = dynamic_cast<ListType *>(t);
             assert(listType);
+            DataType *elementType = listType->getElementType();
+            DataType *trueElementType = elementType->getTrueDataType();
 
-            bool isInOut = ((structMember->getDirection() == kInoutDirection) ||
+            bool isInOut = ((structMember && structMember->getDirection() == kInoutDirection) ||
                             (!isFunctionParam && group->getSymbolDirections(structType).count(kInoutDirection)));
 
-            bool isTopDataType = (isFunctionParam && structMember->getDataType()->getTrueDataType() == t);
+            bool isTopDataType = (isFunctionParam && structMember && structMember->getDataType()->getTrueDataType() == t);
             templateData["useMallocOnClientSide"] = (!isInOut && !isTopDataType); // Because cpptempl don't know do
                                                                                   // correct complicated conditions like
                                                                                   // if(a || (b && c))
 
-            templateData["mallocSizeType"] = getTypenameName(listType->getElementType(), "");
-            templateData["mallocType"] = getTypenameName(listType->getElementType(), "*");
-            templateData["needFreeingCall"] = (generateServerFreeFunctions(structMember) && isNeedCallFree(listType->getElementType()));
+            templateData["mallocSizeType"] = getTypenameName(elementType, "");
+            templateData["mallocType"] = getTypenameName(elementType, "*");
+            templateData["needFreeingCall"] = (generateServerFreeFunctions(structMember) && isNeedCallFree(elementType));
+
+            // To improve code serialization/deserialization for scalar types.
+            templateData["builtinTypeName"] = ((m_def->getCodecType() != InterfaceDefinition::kBasicCodec) || trueElementType->isBool()) ? "" : getScalarTypename(elementType);
+
             if (generateServerFreeFunctions(structMember))
             {
                 templateData["freeingCall"] = m_templateData["freeList"];
@@ -2274,17 +2325,10 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             }
             templateData["pointerScalarTypes"] = false;
             templateData["constantVariable"] = false;
-            templateData["isNullable"] = false;
 
             if (listType->hasLengthVariable())
             {
                 templateData["hasLengthVariable"] = true;
-
-                // This will apply when size is not null and list can be null.
-                if (structMember->getDataType()->getTrueDataType() == t && structMember->getDirection() != kOutDirection && structMember->findAnnotation(NULLABLE_ANNOTATION))
-                {
-                    templateData["isNullable"] = true;
-                }
 
                 static uint32_t listCounter;
                 ++listCounter;
@@ -2344,7 +2388,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
                     templateData["maxSize"] = templateData["sizeTemp"]->getvalue();
                 }
                 templateData["forLoopCount"] = std::string("listCount") + std::to_string(listCounter);
-                templateData["isElementArrayType"] = listType->getElementType()->getTrueDataType()->isArray();
+                templateData["isElementArrayType"] = trueElementType->isArray();
             }
             else
             {
@@ -2375,7 +2419,7 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
             templateData["size"] = size;
             templateData["useBinaryCoder"] = isBinaryList(listType);
             templateData["protoNext"] =
-                getEncodeDecodeCall(nextName, group, listType->getElementType(), structType, true, structMember, needTempVariable, isFunctionParam);
+                getEncodeDecodeCall(nextName, group, elementType, structType, true, structMember, needTempVariable, isFunctionParam);
             break;
         }
         case DataType::kStructType:
@@ -2402,7 +2446,6 @@ data_map CGenerator::getEncodeDecodeCall(const std::string &name,
         case DataType::kUnionType:
         {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
-            assert(unionType);
 
             // need casting discriminator variable?
             // set discriminator name
@@ -2611,39 +2654,33 @@ std::string CGenerator::firstAllocOnServerWhenIsNeed(std::string name, StructMem
                 return allocateCall(false, name, structMember);
             }
         }
-    }
-    return "";
-}
-
-std::string CGenerator::firtAllocOutParamOnServerWhenIsNeed(std::string name, StructMember *structMember)
-{
-    if (structMember->getDirection() == kOutDirection && !structMember->findAnnotation(SHARED_ANNOTATION))
-    {
-        DataType *trueDataType = structMember->getDataType()->getTrueDataType();
-        if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray())
+        else if (structMember->getDirection() == kOutDirection)
         {
-            return allocateCall(false, name, structMember);
-        }
-        else if (trueDataType->isString())
-        {
-            if (!structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray())
             {
-                Symbol *symbol = structMember;
-                assert(symbol);
-                throw semantic_error(
-                    format_string("For out string variable '%s' on line '%d' max_length annotation has to be set.",
-                                  symbol->getName().c_str(), symbol->getLocation().m_firstLine));
+                return allocateCall(false, name, structMember);
             }
-            std::string returnValue = allocateCall(false, name, structMember);
-            if (m_templateData["generateAllocErrorChecks"]->getvalue() == "true")
+            else if (trueDataType->isString())
             {
-                returnValue += format_string("\nelse\n{\n    %s[0]=\'\\0\';\n}", name.c_str());
+                if (!structMember->findAnnotation(MAX_LENGTH_ANNOTATION))
+                {
+                    Symbol *symbol = structMember;
+                    assert(symbol);
+                    throw semantic_error(
+                        format_string("For out string variable '%s' on line '%d' max_length annotation has to be set.",
+                                      symbol->getName().c_str(), symbol->getLocation().m_firstLine));
+                }
+                std::string returnValue = allocateCall(false, name, structMember);
+                if (m_templateData["generateAllocErrorChecks"]->getvalue() == "true")
+                {
+                    returnValue += format_string("\nelse\n{\n    %s[0]=\'\\0\';\n}", name.c_str());
+                }
+                else
+                {
+                    returnValue += format_string("\n%s[0]=\'\\0\';", name.c_str());
+                }
+                return returnValue;
             }
-            else
-            {
-                returnValue += format_string("\n%s[0]=\'\\0\';", name.c_str());
-            }
-            return returnValue;
         }
     }
     return "";
@@ -3080,6 +3117,44 @@ bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structTy
         templateData["castDiscriminator"] = false;
     }
     return needTempVariable;
+}
+
+std::string CGenerator::getScalarTypename(DataType *dataType)
+{
+    if (dataType->getTrueDataType()->isScalar())
+    {
+        if (dataType->isAlias())
+        {
+            return dataType->getName();
+        }
+        else
+        {
+            BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
+            assert(builtinType);
+            return getBuiltinTypename(builtinType);
+        }
+    }
+    else
+    {
+        return "";
+    }
+}
+
+std::string CGenerator::getDirection(_param_direction direction)
+{
+    switch (direction)
+    {
+        case kInDirection:
+            return "kInDirection";
+        case kOutDirection:
+            return "kOutDirection";
+        case kInoutDirection:
+            return "kInoutDirection";
+        case kReturn:
+            return "kReturn";
+        default:
+            throw semantic_error("Unsupported direction type");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

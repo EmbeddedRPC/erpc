@@ -1,5 +1,6 @@
 /*
- * Copyright 2017 NXP
+ * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,10 +30,11 @@
  */
 
 #include "message_loggers.h"
-#include <new>
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -48,30 +50,26 @@ MessageLoggers::~MessageLoggers()
     }
 }
 
-bool MessageLoggers::addMessageLogger(Transport *transport)
+void MessageLoggers::addMessageLogger(Transport *transport)
 {
     if (transport != NULL)
     {
-        MessageLogger *logger = new (nothrow) MessageLogger(transport);
-        if (logger)
+        MessageLogger *logger = new MessageLogger(transport);
+
+        if (m_logger == NULL)
         {
-            if (m_logger == NULL)
-            {
-                m_logger = logger;
-                return true;
-            }
-
-            MessageLogger *_logger = m_logger;
-            while (_logger->getNext() != NULL)
-            {
-                _logger = _logger->getNext();
-            }
-
-            _logger->setNext(logger);
-            return true;
+            m_logger = logger;
+            return;
         }
+
+        MessageLogger *_logger = m_logger;
+        while (_logger->getNext() != NULL)
+        {
+            _logger = _logger->getNext();
+        }
+
+        _logger->setNext(logger);
     }
-    return false;
 }
 
 erpc_status_t MessageLoggers::logMessage(MessageBuffer *msg)

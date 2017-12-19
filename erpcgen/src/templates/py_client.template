@@ -65,7 +65,6 @@ class {$iface.name}Client(interface.I{$iface.name}):
 {%   endif -- isUnion %}
 {%  endif -- isNullable %}
 {% endfor -- inParams %}
-        codec.end_write_message()
 
         # Send request{% if not fn.isOneway %} and process reply{% endif %}.
         self._clientManager.perform_request(request)
@@ -85,7 +84,6 @@ class {$iface.name}Client(interface.I{$iface.name}):
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
         {$decodeValue(fn.returnValue.type, "_result", "common.", "codec", "        ", 0)}
 {% endif %}
-        codec.end_read_message()
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
         return _result
 {% endif %}

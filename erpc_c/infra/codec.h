@@ -125,11 +125,14 @@ public:
                                             uint32_t sequence) = 0;
 
     /*!
-     * @brief Prototype for write end of message.
+     * @brief Prototype for write data stream.
+     *
+     * @param[in] value Pointer to data stream.
+     * @param[in] length Size of data stream in bytes.
      *
      * @return Based on implementation.
      */
-    virtual erpc_status_t endWriteMessage() = 0;
+    virtual erpc_status_t writeData(const void *value, uint32_t length) = 0;
 
     /*!
      * @brief Prototype for write boolean value.
@@ -269,27 +272,6 @@ public:
     virtual erpc_status_t startWriteList(uint32_t length) = 0;
 
     /*!
-     * @brief Prototype for end write list.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endWriteList() = 0;
-
-    /*!
-     * @brief Prototype for start write structure.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t startWriteStruct() = 0;
-
-    /*!
-     * @brief Prototype for end write structure.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endWriteStruct() = 0;
-
-    /*!
      * @brief Prototype for start write union.
      *
      * @param[in] discriminator Discriminator of union.
@@ -297,13 +279,6 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t startWriteUnion(int32_t discriminator) = 0;
-
-    /*!
-     * @brief Prototype for end write union.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endWriteUnion() = 0;
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
@@ -332,11 +307,14 @@ public:
                                            uint32_t *sequence) = 0;
 
     /*!
-     * @brief Prototype for read end of message.
+     * @brief Prototype for read data stream.
+     *
+     * @param[in] value Pointer to data stream to be read.
+     * @param[in] length Size of data stream in bytes to be read.
      *
      * @return Based on implementation.
      */
-    virtual erpc_status_t endReadMessage() = 0;
+    virtual erpc_status_t readData(void *value, uint32_t length) = 0;
 
     /*!
      * @brief Prototype for read boolean value.
@@ -476,27 +454,6 @@ public:
     virtual erpc_status_t startReadList(uint32_t *length) = 0;
 
     /*!
-     * @brief Prototype for end read list.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endReadList() = 0;
-
-    /*!
-     * @brief Prototype for start read structure.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t startReadStruct() = 0;
-
-    /*!
-     * @brief Prototype for end read structure.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endReadStruct() = 0;
-
-    /*!
      * @brief Prototype for start read union.
      *
      * @param[in] discriminator Discriminator of union.
@@ -504,13 +461,6 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t startReadUnion(int32_t *discriminator) = 0;
-
-    /*!
-     * @brief Prototype for end read Union.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endReadUnion() = 0;
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.

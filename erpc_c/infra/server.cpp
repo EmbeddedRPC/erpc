@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -33,6 +33,9 @@
 #include "assert.h"
 
 using namespace erpc;
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

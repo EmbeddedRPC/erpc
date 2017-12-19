@@ -96,7 +96,10 @@ public:
     virtual bool isBuiltin() const { return true; }
 
     /*!
-     * @brief Returns whether the type is a scalar builtin type.
+     * @brief This function return "true" value for identify scalar type.
+     *
+     * @retval true When builtin type is integer, float or boolean.
+     * @retval false When builtin type isn't integer, float or boolean.
      */
     virtual bool isScalar() const { return (isInt() || isFloat() || isBool()) && !(isString() || isBinary()); }
 

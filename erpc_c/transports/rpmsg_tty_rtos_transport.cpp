@@ -30,13 +30,15 @@
  */
 
 #include "rpmsg_tty_rtos_transport.h"
-#include "rpmsg_ns.h"
 #include "erpc_config_internal.h"
 #include "framed_transport.h"
 #include <cassert>
 
-using namespace erpc;
+#if !(__embedded_cplusplus)
 using namespace std;
+#endif
+
+using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables

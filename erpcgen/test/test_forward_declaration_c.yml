@@ -1,0 +1,109 @@
+---
+name: struct before function
+desc: forward declaration of structure before function which is using type.
+idl:
+  struct forwardStruct;
+
+  oneway forwardCallback_t(forwardStruct s);
+
+  struct forwardStruct
+  {
+    forwardCallback_t pCallback;           /*!< Pointer to callback function */
+  }
+
+  interface foo
+  {
+    myFun(in forwardCallback_t pCallback1_t) -> void
+
+    forwardCallback_t forwardCallback;
+  }
+
+test.h:
+  - typedef struct forwardStruct forwardStruct;
+  - typedef void (*forwardCallback_t)(const forwardStruct * s);
+
+  - struct forwardStruct
+  - "{"
+  - forwardCallback_t pCallback;
+  - "};"
+
+---
+name: struct before struct
+desc: forward declaration of structure before structure which is using type.
+idl:
+  struct forwardStruct;
+
+  struct struct2
+  {
+    byref forwardStruct a;
+  }
+
+  struct forwardStruct
+  {
+    struct2 a
+  }
+
+  interface foo
+  {
+    myFun(in forwardStruct s) -> void
+  }
+
+test.h:
+  - typedef struct struct2 struct2;
+  - typedef struct forwardStruct forwardStruct;
+
+  - struct struct2
+  - "{"
+  - forwardStruct *a;
+  - "};"
+
+  - struct forwardStruct
+  - "{"
+  - struct2 a;
+  - "};"
+---
+name: union before struct
+desc: forward declaration of union before structure which is using type.
+idl: |
+
+  enum unionCases
+  {
+    one,
+    two,
+    three
+  }
+
+  union forwardUnion;
+  struct structure
+  {
+    byref forwardUnion a @discriminator(discriminator)
+    unionCases discriminator
+  }
+
+  union forwardUnion
+  {
+    case one:
+      structure a
+    case two:
+      int32 x
+  }
+
+  interface foo
+  {
+    myFun(in forwardUnion u @discriminator(discriminator), unionCases discriminator) -> void
+  }
+test.h:
+  - typedef struct structure structure;
+  - typedef union forwardUnion forwardUnion;
+
+  - struct structure
+  - "{"
+  - forwardUnion *a;
+  - unionCases discriminator;
+  - "};"
+
+  - union forwardUnion
+  - "{"
+  - structure a;
+  - int32_t x;
+  - "};"

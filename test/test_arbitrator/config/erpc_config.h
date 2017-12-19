@@ -99,7 +99,7 @@
 //! Default set to ERPC_NESTED_CALLS_DISABLED. Uncomment when callbacks, or other eRPC
 //! functions are called from server implementation of another eRPC call. Do not forget
 //! set server instance to client and set server thread identifier to client.
-//#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
+#define ERPC_NESTED_CALLS (ERPC_NESTED_CALLS_ENABLED)
 
 //! @def ERPC_NESTED_CALLS_DETECTION
 //!
@@ -116,6 +116,7 @@
 //!
 //! Uncomment for using logging feature.
 #define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
+
 //@}
 
 /*! @} */

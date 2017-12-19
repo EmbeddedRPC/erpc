@@ -35,6 +35,10 @@
 #include "codec.h"
 #include <new>
 
+#if !(__embedded_cplusplus)
+using namespace std;
+#endif
+
 /*!
  * @addtogroup infra_codec
  * @{
@@ -86,11 +90,14 @@ public:
     virtual erpc_status_t startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence);
 
     /*!
-     * @brief Prototype for write end of message.
+     * @brief Prototype for write data stream.
      *
-     * @retval kErpcStatus_Success.
+     * @param[in] value Pointer to data stream.
+     * @param[in] length Size of data stream in bytes.
+     *
+     * @return depends on cursor write function.
      */
-    virtual erpc_status_t endWriteMessage();
+    virtual erpc_status_t writeData(const void *value, uint32_t length);
 
     /*!
      * @brief Prototype for write boolean value.
@@ -230,27 +237,6 @@ public:
     virtual erpc_status_t startWriteList(uint32_t length);
 
     /*!
-     * @brief Prototype for end write list.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t endWriteList();
-
-    /*!
-     * @brief Prototype for start write structure.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t startWriteStruct();
-
-    /*!
-     * @brief Prototype for end write structure.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t endWriteStruct();
-
-    /*!
      * @brief Prototype for start write union.
      *
      * @param[in] discriminator Discriminator of union.
@@ -258,13 +244,6 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t startWriteUnion(int32_t discriminator);
-
-    /*!
-     * @brief Prototype for end write union.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endWriteUnion();
 
     /*!
      * @brief Writes a flag indicating whether the next value is null.
@@ -294,11 +273,14 @@ public:
                                            uint32_t *sequence);
 
     /*!
-     * @brief Prototype for read end of message.
+     * @brief Prototype for read data stream.
      *
-     * @retval kErpcStatus_Success.
+     * @param[in] value Pointer to data stream to be read.
+     * @param[in] length Size of data stream in bytes to be read.
+     *
+     * @return Based on cursor read function.
      */
-    virtual erpc_status_t endReadMessage();
+    virtual erpc_status_t readData(void *value, uint32_t length);
 
     /*!
      * @brief Prototype for read boolean value.
@@ -438,27 +420,6 @@ public:
     virtual erpc_status_t startReadList(uint32_t *length);
 
     /*!
-     * @brief Prototype for end read list.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t endReadList();
-
-    /*!
-     * @brief Prototype for start read structure.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t startReadStruct();
-
-    /*!
-     * @brief Prototype for end read structure.
-     *
-     * @retval kErpcStatus_Success.
-     */
-    virtual erpc_status_t endReadStruct();
-
-    /*!
      * @brief Prototype for start read union.
      *
      * @param[in] discriminator Discriminator of union.
@@ -466,13 +427,6 @@ public:
      * @return Based on implementation.
      */
     virtual erpc_status_t startReadUnion(int32_t *discriminator);
-
-    /*!
-     * @brief Prototype for end read Union.
-     *
-     * @return Based on implementation.
-     */
-    virtual erpc_status_t endReadUnion();
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
@@ -496,7 +450,7 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual BasicCodec *create() { return new (std::nothrow) BasicCodec; }
+    virtual BasicCodec *create() { return new (nothrow) BasicCodec; }
 
     /*!
      * @brief Dispose codec.

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016 NXP
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -39,6 +39,7 @@
 #include "erpc_server_setup.h"
 #endif
 #include "erpc_transport_setup.h"
+#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -53,8 +54,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h>
 
 typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handler function type. */
 
@@ -82,7 +81,7 @@ typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handl
 erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
 
 /*!
- * @brief This function set error handler function.
+ * @brief This function sets error handler function.
  *
  * Given error_handler function is called when error occur inside eRPC infrastructure.
  *
@@ -92,11 +91,18 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler);
 
 #if ERPC_NESTED_CALLS
 /*!
- * @brief This function set server object for handling nested eRPC calls.
+ * @brief This function sets server object for handling nested eRPC calls.
  *
  * @param[in] server Initiated server.
  */
 void erpc_client_set_server(erpc_server_t server);
+
+/*!
+ * @brief This function sets server thread id.
+ *
+ * @param[in] serverThreadId Id of thread where server run function is executed.
+ */
+void erpc_client_set_server_thread_id(void *serverThreadId);
 #endif
 
 #if ERPC_MESSAGE_LOGGING
@@ -104,11 +110,8 @@ void erpc_client_set_server(erpc_server_t server);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
- *
- * @retval True When transport was succesfully added.
- * @retval False When transport wasn't added.
  */
-bool erpc_server_add_message_logger(erpc_transport_t transport);
+void erpc_server_add_message_logger(erpc_transport_t transport);
 #endif
 
 /*!

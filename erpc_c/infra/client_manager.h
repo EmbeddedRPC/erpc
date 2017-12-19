@@ -39,6 +39,7 @@
 #include "message_loggers.h"
 #endif
 #if ERPC_NESTED_CALLS
+#include "erpc_threading.h"
 #include "server.h"
 #endif
 
@@ -91,6 +92,7 @@ public:
     , m_errorHandler(NULL)
 #if ERPC_NESTED_CALLS
     , m_server(NULL)
+    , m_serverThreadId(NULL)
 #endif
 #if ERPC_MESSAGE_LOGGING
     , MessageLoggers()
@@ -148,35 +150,35 @@ public:
     virtual void releaseRequest(RequestContext &request);
 
     /*!
-     * @brief This functions sets error handler function for infrastructure errors.
+     * @brief This function sets error handler function for infrastructure errors.
      *
      * @param[in] error_handler Pointer to error handler function.
      */
     void setErrorHandler(client_error_handler_t error_handler) { m_errorHandler = error_handler; }
 
     /*!
-     * @brief This functions returns error handler function for infrastructure errors.
+     * @brief This function calls error handler callback function with given status.
      *
-     * @return Pointer to error handler function.
+     * Function is called in client shim code at the end of function when error occurred.
+     *
+     * @param[in] err Specify error which occurred during eRPC call.
      */
-    client_error_handler_t getErrorHandler() { return m_errorHandler; }
+    void callErrorHandler(erpc_status_t err);
 
 #if ERPC_NESTED_CALLS
-    /*!
-     * @brief This function performs nested request.
-     *
-     * Used when from eRPC function server implementation context is called new eRPC function.
-     *
-     * @param[in] request Request context to perform.
-     */
-    virtual erpc_status_t performNestedRequest(RequestContext &request);
-
     /*!
      * @brief This function sets server used for nested calls.
      *
      * @param[in] server Server used for nested calls.
      */
     void setServer(Server *server) { m_server = server; }
+
+    /*!
+     * @brief This function sets server thread id.
+     *
+     * @param[in] serverThreadId Id of thread where server run function is executed.
+     */
+    void setServerThreadId(Thread::thread_id_t serverThreadId) { m_serverThreadId = serverThreadId; }
 #endif
 
 protected:
@@ -186,7 +188,29 @@ protected:
     uint32_t m_sequence;                    //!< Sequence number.
     client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
 #if ERPC_NESTED_CALLS
-    Server *m_server; //!< Server used for nested calls.
+    Server *m_server;                     //!< Server used for nested calls.
+    Thread::thread_id_t m_serverThreadId; //!< Thread in which server run function is called.
+#endif
+
+    /*!
+     * @brief This function performs request.
+     *
+     * Should be called in non server context (do not call another eRPC function in server
+     * remote call implementation).
+     *
+     * @param[in] request Request context to perform.
+     */
+    virtual erpc_status_t performClientRequest(RequestContext &request);
+
+#if ERPC_NESTED_CALLS
+    /*!
+     * @brief This function performs nested request.
+     *
+     * Used when from eRPC function server implementation context is called new eRPC function.
+     *
+     * @param[in] request Request context to perform.
+     */
+    virtual erpc_status_t performNestedClientRequest(RequestContext &request);
 #endif
 
     //! @brief Validate that an incoming message is a reply.

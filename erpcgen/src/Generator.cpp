@@ -234,7 +234,6 @@ StructMember *Generator::findParamReferencedFromUnion(const StructType::member_v
         if (trueDataType->isUnion())
         {
             UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
-            assert(unionType);
             if (unionType->isNonEncapsulatedUnion())
             {
                 std::string lengthName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION);
@@ -422,7 +421,6 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         ifaceInfo["isNonExternalInterface"] = false;
         for (int i = 0; i < functions.size(); ++i)
         {
-            assert(dynamic_cast<DataMap *>(functions[i].get().get()));
             std::string isNonExternalFunction = dynamic_cast<DataMap *>(functions[i].get().get())->getmap()["isNonExternalFunction"]->getvalue();
             if (isNonExternalFunction.compare("true") == 0)
             {

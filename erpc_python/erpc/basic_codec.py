@@ -44,9 +44,6 @@ class BasicCodec(Codec):
         self.write_uint32(header)
         self.write_uint32(msgInfo.sequence)
 
-    def end_write_message(self):
-        pass
-
     def _write(self, fmt, value):
         self._buffer += struct.pack(fmt, value)
         self._cursor += struct.calcsize(fmt)
@@ -94,20 +91,8 @@ class BasicCodec(Codec):
     def start_write_list(self, length):
         self.write_uint32(length)
 
-    def end_write_list(self):
-        pass
-
-    def start_write_struct(self):
-        pass
-
-    def end_write_struct(self):
-        pass
-
     def start_write_union(self, discriminator):
         self.write_uint32(discriminator)
-
-    def end_write_union(self):
-        pass
 
     def write_null_flag(self, flag):
         self.write_uint8(1 if flag else 0)
@@ -124,9 +109,6 @@ class BasicCodec(Codec):
         request = (header >> 8) & 0xff
         msgType = MessageType(header & 0xff)
         return MessageInfo(type=msgType, service=service, request=request, sequence=sequence)
-
-    def end_read_message(self):
-        pass
 
     def _read(self, fmt):
         result = struct.unpack_from(fmt, self._buffer, self._cursor)
@@ -180,22 +162,10 @@ class BasicCodec(Codec):
     def start_read_list(self):
         return self.read_uint32()
 
-    def end_read_list(self):
-        pass
-
-    def start_read_struct(self):
-        pass
-
-    def end_read_struct(self):
-        pass
-
     ##
     # @return Int of union discriminator.
     def start_read_union(self):
         return self.read_int32()
-
-    def end_read_union(self):
-        pass
 
     def read_null_flag(self):
         return self.read_uint8()

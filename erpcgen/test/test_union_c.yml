@@ -180,7 +180,6 @@ test_client.cpp:
   - break;
   - "}"
   - "}"
-  - codec->endWriteUnion();
   - return err;
   - "}"
   - void myUnion(fruitType discriminator, const unionType * unionVariable)
@@ -272,7 +271,6 @@ test_server.cpp:
   - break;
   - "}"
   - "}"
-  - codec->endReadUnion()
   - return err;
   - "}"
   - static void free_unionType_union(int32_t discriminator, unionType * data);

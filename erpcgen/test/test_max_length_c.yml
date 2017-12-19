@@ -6,9 +6,9 @@ idl:
     listBar(list<bool> a @length(len) @max_length(5), out list<bool> b @length(len) @max_length(5), inout list<bool> c @length(len) @max_length(5), uint32 len) -> void
   }
 test_server.cpp:
+  - b = (bool *) erpc_malloc(5 * sizeof(bool));
   - a = (bool *) erpc_malloc(5 * sizeof(bool));
   - c = (bool *) erpc_malloc(5 * sizeof(bool));
-  - b = (bool *) erpc_malloc(5 * sizeof(bool));
 
 ---
 name: max length 2
@@ -18,9 +18,9 @@ idl:
     listString(string a @max_length(5), out string b @max_length(5), inout string c @max_length(5)) -> void
   }
 test_server.cpp:
+  - b = (char *) erpc_malloc((5 + 1) * sizeof(char));
   - a = (char *) erpc_malloc((5 + 1) * sizeof(char));
   - c = (char *) erpc_malloc((5 + 1) * sizeof(char));
-  - b = (char *) erpc_malloc((5 + 1) * sizeof(char));
 
 ---
 name: const
