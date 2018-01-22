@@ -42,8 +42,8 @@
 #if ERPC_NESTED_CALLS
 #include "erpc_server_setup.h"
 #endif
+#include "erpc_client_manager.h"
 #include "erpc_transport_setup.h"
-#include "client_manager.h"
 
 /*!
  * @addtogroup client_setup

@@ -66,7 +66,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Token.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ParseErrors.cpp \
 			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp \
-			$(ERPC_ROOT)/erpc_c/infra/crc16.cpp
+			$(ERPC_ROOT)/erpc_c/infra/erpc_crc16.cpp
 
 # Prevent make from deleting these temp files.
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \

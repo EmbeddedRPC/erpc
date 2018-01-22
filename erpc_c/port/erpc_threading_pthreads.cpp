@@ -73,7 +73,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread() {}
+Thread::~Thread(void) {}
 
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
@@ -100,7 +100,7 @@ bool Thread::operator==(Thread &o)
     return pthread_equal(m_thread, o.m_thread);
 }
 
-Thread *Thread::getCurrentThread()
+Thread *Thread::getCurrentThread(void)
 {
     void *value = pthread_getspecific(s_threadObjectKey);
     return reinterpret_cast<Thread *>(value);
@@ -125,7 +125,7 @@ void Thread::sleep(uint32_t usecs)
     }
 }
 
-void Thread::threadEntryPoint()
+void Thread::threadEntryPoint(void)
 {
     if (m_entry)
     {
@@ -144,7 +144,7 @@ void *Thread::threadEntryPointStub(void *arg)
     return 0;
 }
 
-Mutex::Mutex()
+Mutex::Mutex(void)
 {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -155,22 +155,22 @@ Mutex::Mutex()
     pthread_mutexattr_destroy(&attr);
 }
 
-Mutex::~Mutex()
+Mutex::~Mutex(void)
 {
     pthread_mutex_destroy(&m_mutex);
 }
 
-bool Mutex::tryLock()
+bool Mutex::tryLock(void)
 {
     return pthread_mutex_trylock(&m_mutex) == 0;
 }
 
-bool Mutex::lock()
+bool Mutex::lock(void)
 {
     return pthread_mutex_lock(&m_mutex) == 0;
 }
 
-bool Mutex::unlock()
+bool Mutex::unlock(void)
 {
     return pthread_mutex_unlock(&m_mutex) == 0;
 }
@@ -182,12 +182,12 @@ Semaphore::Semaphore(int count)
     pthread_cond_init(&m_cond, NULL);
 }
 
-Semaphore::~Semaphore()
+Semaphore::~Semaphore(void)
 {
     pthread_cond_destroy(&m_cond);
 }
 
-void Semaphore::put()
+void Semaphore::put(void)
 {
     Mutex::Guard guard(m_mutex);
     if (m_count == 0)
@@ -229,7 +229,7 @@ bool Semaphore::get(uint32_t timeout)
     return true;
 }
 
-int Semaphore::getCount() const
+int Semaphore::getCount(void) const
 {
     return m_count;
 }

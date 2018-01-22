@@ -211,7 +211,7 @@ idl: |
   }
 
 test_client.cpp:
-  - pair * result;
+  - pair * result = NULL;
   - bool isNull;
   - codec->readNullFlag(&isNull);
   - if (!isNull)
@@ -300,7 +300,7 @@ test_client.cpp:
       - codec->startWriteList(*c);
     else:
       - codec->startWriteList(c);
-  - codec->write(l[listCount1])
+  - codec->write(l[listCount0])
   - if: ann == '@nullable' and dir == 'inout'
     then:
       - if (c == NULL)
@@ -317,10 +317,10 @@ test_client.cpp:
       - not: codec->read
 test_server.cpp:
   - codec->readNullFlag
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - c = lengthTemp_1;
-  - codec->read(&l[listCount1])
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - c = lengthTemp_0;
+  - codec->read(&l[listCount0])
   - if: ann == '@nullable' and dir == 'inout'
     then:
       - codec->readNullFlag
@@ -372,7 +372,7 @@ test_client.cpp:
     else:
       - if (l != NULL)
   - codec->startReadList
-  - codec->read(&l[listCount1])
+  - codec->read(&l[listCount0])
   - if: ann == '@nullable'
     then:
       - if (c != NULL)
@@ -389,7 +389,7 @@ test_server.cpp:
       - codec->read
   - if (l != NULL)
   - codec->startWriteList
-  - codec->write(l[listCount1])
+  - codec->write(l[listCount0])
   - if: ann == '@nullable'
     then:
       - if (_c != NULL)

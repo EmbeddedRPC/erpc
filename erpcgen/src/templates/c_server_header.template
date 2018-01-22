@@ -8,7 +8,7 @@
 #define {$serverGuardMacro}
 
 #ifdef __cplusplus
-#include "server.h"
+#include "erpc_server.h"
 #include "{$codecHeader}"
 extern "C"
 {

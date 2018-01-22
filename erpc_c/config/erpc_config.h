@@ -64,6 +64,9 @@
 
 #define ERPC_MESSAGE_LOGGING_DISABLED (0) //!< Trace functions disabled.
 #define ERPC_MESSAGE_LOGGING_ENABLED (1)  //!< Trace functions enabled.
+
+#define ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED (0) //!< Do not use MCMGR for MU ISR management.
+#define ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED (1)  //!< Use MCMGR for MU ISR management.
 //@}
 
 //! @name Configuration options
@@ -123,6 +126,20 @@
 //! Uncomment for using logging feature.
 //#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
 
+//! @def ERPC_TRANSPORT_MU_USE_MCMGR
+//!
+//! @brief MU transport layer configuration.
+//!
+//! Set to one of the @c ERPC_TRANSPORT_MU_USE_MCMGR_x macros to configure the MCMGR usage in MU transport layer.
+//!
+//! MU transport layer could leverage the Multicore Manager (MCMGR) component for Inter-Core
+//! interrupts / MU interrupts management or the Inter-Core interrupts can be managed by itself (MUX_IRQHandler
+//! overloading). By default, ERPC_TRANSPORT_MU_USE_MCMGR is set to ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED when mcmgr.h
+//! is part of the project, otherwise the ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED option is used. This settings can be
+//! overwritten from the erpc_config.h by uncommenting the ERPC_TRANSPORT_MU_USE_MCMGR macro definition. Do not forget
+//! to add the MCMGR library into your project when ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED option is used! See the
+//! mu_transport.h for additional MU settings.
+//#define ERPC_TRANSPORT_MU_USE_MCMGR ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED
 //@}
 
 /*! @} */

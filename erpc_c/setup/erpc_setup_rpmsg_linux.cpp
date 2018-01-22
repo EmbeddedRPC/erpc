@@ -32,9 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_manually_constructed.h"
+#include "erpc_rpmsg_linux_transport.h"
 #include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "rpmsg_linux_transport.h"
 
 using namespace erpc;
 
@@ -70,7 +70,7 @@ erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type
     return NULL;
 }
 
-void erpc_transport_rpmsg_linux_deinit()
+void erpc_transport_rpmsg_linux_deinit(void)
 {
     s_endpoint.destroy();
     s_transport.destroy();

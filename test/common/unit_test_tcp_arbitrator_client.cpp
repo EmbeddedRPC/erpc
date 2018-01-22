@@ -32,15 +32,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_arbitrated_client_manager.h"
+#include "erpc_basic_codec.h"
+#include "erpc_simple_server.h"
+#include "erpc_tcp_transport.h"
+#include "erpc_transport_arbitrator.h"
 #include "Logging.h"
-#include "arbitrated_client_manager.h"
-#include "basic_codec.h"
 #include "gtest.h"
-#include "simple_server.h"
-#include "tcp_transport.h"
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
-#include "transport_arbitrator.h"
 #include "unit_test.h"
 #include <unistd.h>
 

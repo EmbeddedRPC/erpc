@@ -256,6 +256,11 @@ AstNode *SymbolScanner::handleEnum(AstNode *node, bottom_up)
     else
     {
         addAnnotations(node->getChild(2), m_currentEnum);
+        if (m_currentEnum->getMembers().size() == 0 &&
+            m_currentEnum->findAnnotation(EXTERNAL_ANNOTATION, Annotation::program_lang_t::kAll) == nullptr)
+        {
+            throw semantic_error("Enum may have 0 members only when is defined with external annotation.");
+        }
     }
 
     addGlobalSymbol(m_currentEnum);

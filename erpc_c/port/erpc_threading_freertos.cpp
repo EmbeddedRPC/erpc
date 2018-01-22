@@ -73,7 +73,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread() {}
+Thread::~Thread(void) {}
 
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
@@ -137,7 +137,7 @@ void Thread::sleep(uint32_t usecs)
 #endif
 }
 
-void Thread::threadEntryPoint()
+void Thread::threadEntryPoint(void)
 {
     if (m_entry)
     {
@@ -197,29 +197,29 @@ void Thread::threadEntryPointStub(void *arg)
 #endif // INCLUDE_vTaskDelete
 }
 
-Mutex::Mutex()
+Mutex::Mutex(void)
 : m_mutex(0)
 {
     m_mutex = xSemaphoreCreateMutex();
 }
 
-Mutex::~Mutex()
+Mutex::~Mutex(void)
 {
     vSemaphoreDelete(m_mutex);
 }
 
-bool Mutex::tryLock()
+bool Mutex::tryLock(void)
 {
     // Pass a zero timeout to poll the mutex.
     return xSemaphoreTakeRecursive(m_mutex, 0);
 }
 
-bool Mutex::lock()
+bool Mutex::lock(void)
 {
     return xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
 }
 
-bool Mutex::unlock()
+bool Mutex::unlock(void)
 {
     return xSemaphoreGiveRecursive(m_mutex);
 }
@@ -231,17 +231,17 @@ Semaphore::Semaphore(int count)
     m_sem = xSemaphoreCreateCounting(0x7fffffff, count);
 }
 
-Semaphore::~Semaphore()
+Semaphore::~Semaphore(void)
 {
     vSemaphoreDelete(m_sem);
 }
 
-void Semaphore::put()
+void Semaphore::put(void)
 {
     xSemaphoreGive(m_sem);
 }
 
-void Semaphore::putFromISR()
+void Semaphore::putFromISR(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
@@ -264,7 +264,7 @@ bool Semaphore::get(uint32_t timeout)
     return true;
 }
 
-int Semaphore::getCount() const
+int Semaphore::getCount(void) const
 {
     return static_cast<int>(uxQueueMessagesWaiting(m_sem));
 }

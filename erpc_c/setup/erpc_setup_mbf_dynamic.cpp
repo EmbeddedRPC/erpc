@@ -34,9 +34,9 @@
  */
 
 #include "erpc_config_internal.h"
+#include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
+#include "erpc_message_buffer.h"
 #include <assert.h>
 #include <new>
 
@@ -75,7 +75,7 @@ public:
 
 static ManuallyConstructed<DynamicMessageBufferFactory> s_msgFactory;
 
-erpc_mbf_t erpc_mbf_dynamic_init()
+erpc_mbf_t erpc_mbf_dynamic_init(void)
 {
     s_msgFactory.construct();
     return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());

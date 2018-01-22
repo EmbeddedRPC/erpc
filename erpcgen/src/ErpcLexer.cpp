@@ -33,11 +33,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ErpcLexer.h"
+#include "erpc_crc16.h"
 #include "erpc_version.h"
 #include "Generator.h"
 #include "HexValues.h"
 #include "SearchPath.h"
-#include "crc16.h"
 #include <algorithm>
 #include <fstream>
 #include <streambuf>

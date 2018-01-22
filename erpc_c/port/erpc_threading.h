@@ -110,7 +110,7 @@ public:
     /*!
      * @brief Destructor.
      */
-    virtual ~Thread();
+    virtual ~Thread(void);
 
     /*!
      * @brief This function sets name for thread.
@@ -124,7 +124,7 @@ public:
      *
      * @return Name of thread.
      */
-    const char *getName() const { return m_name; }
+    const char *getName(void) const { return m_name; }
 
     /*!
      * @brief This function initializes thread.
@@ -154,7 +154,7 @@ public:
      *
      * @return Thread id.
      */
-    thread_id_t getThreadId() const
+    thread_id_t getThreadId(void) const
     {
 #if ERPC_THREADS_IS(PTHREADS)
         return reinterpret_cast<thread_id_t>(m_thread);
@@ -170,7 +170,7 @@ public:
      *
      * @return Thread id.
      */
-    static thread_id_t getCurrentThreadId()
+    static thread_id_t getCurrentThreadId(void)
     {
 #if ERPC_THREADS_IS(PTHREADS)
         return reinterpret_cast<thread_id_t>(pthread_self());
@@ -195,7 +195,7 @@ public:
      *
      * @return Thread instance.
      */
-    static Thread *getCurrentThread();
+    static Thread *getCurrentThread(void);
 
     /*!
      * @brief Compare operator compares two threads.
@@ -211,7 +211,7 @@ protected:
     /*!
      * @brief This function execute entry function.
      */
-    virtual void threadEntryPoint();
+    virtual void threadEntryPoint(void);
 
 private:
     const char *m_name;     /*!< Thread name. */
@@ -304,7 +304,7 @@ public:
         /*!
          * @brief Destructor.
          */
-        ~Guard() { m_mutex.unlock(); }
+        ~Guard(void) { m_mutex.unlock(); }
 
     private:
         Mutex &m_mutex; /*!< Mutex to lock. */
@@ -313,12 +313,12 @@ public:
     /*!
      * @brief Constructor.
      */
-    Mutex();
+    Mutex(void);
 
     /*!
      * @brief Destructor.
      */
-    ~Mutex();
+    ~Mutex(void);
 
     /*!
      * @brief This function try lock mutex.
@@ -326,7 +326,7 @@ public:
      * @retval true When mutex locked successfully.
      * @retval false When mutex didn't locked.
      */
-    bool tryLock();
+    bool tryLock(void);
 
     /*!
      * @brief This function lock mutex.
@@ -334,7 +334,7 @@ public:
      * @retval true When mutex locked successfully.
      * @retval false When mutex didn't locked.
      */
-    bool lock();
+    bool lock(void);
 
     /*!
      * @brief This function unlock mutex.
@@ -342,7 +342,7 @@ public:
      * @retval true When mutex unlocked successfully.
      * @retval false When mutex didn't unlocked.
      */
-    bool unlock();
+    bool unlock(void);
 
 #if ERPC_THREADS_IS(PTHREADS)
     /*!
@@ -350,7 +350,7 @@ public:
      *
      * @return Pointer to mutex.
      */
-    pthread_mutex_t *getPtr() { return &m_mutex; }
+    pthread_mutex_t *getPtr(void) { return &m_mutex; }
 #endif
 
 private:
@@ -400,18 +400,18 @@ public:
     /*!
      * @brief Destructor.
      */
-    ~Semaphore();
+    ~Semaphore(void);
 
     /*!
      * @brief This function puts semaphore.
      */
-    void put();
+    void put(void);
 
 #if ERPC_THREADS_IS(FREERTOS)
     /*!
      * @brief This function puts semaphore from interrupt.
      */
-    void putFromISR();
+    void putFromISR(void);
 #endif // ERPC_HAS_FREERTOS
 
     /*!
@@ -429,7 +429,7 @@ public:
      *
      * @return Semaphore count number.
      */
-    int getCount() const;
+    int getCount(void) const;
 
 private:
 #if ERPC_THREADS_IS(PTHREADS)

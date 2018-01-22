@@ -35,7 +35,7 @@
 #ifndef _EMBEDDED_RPC__UNIT_TEST_H_
 #define _EMBEDDED_RPC__UNIT_TEST_H_
 
-#include "simple_server.h"
+#include "erpc_simple_server.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Function Prototypes

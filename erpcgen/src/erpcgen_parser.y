@@ -395,16 +395,9 @@ const_def       :   "const" simple_data_type ident '=' const_expr
  */
 enum_def        :   "enum" name_opt[name] '{' enumerator_list_opt '}'
                         {
-                            if ($enumerator_list_opt == NULL)
-                            {
-                                throw semantic_error(format_string("Enum on the %d.line must have at least one member.", $1->getFirstLine()));
-                            }
-                            else
-                            {
-                                $$ = new AstNode(*$1);
-                                $$->appendChild($name);
-                                $$->appendChild($enumerator_list_opt);
-                            }
+                            $$ = new AstNode(*$1);
+                            $$->appendChild($name);
+                            $$->appendChild($enumerator_list_opt);
                         }
                 ;
 

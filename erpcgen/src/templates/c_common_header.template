@@ -115,8 +115,8 @@ enum _{$iface.name}_ids
     k{$iface.name}_{$fn.name}_id = {$fn.id},
 {%  endfor %}
 };
-{% endfor %}
 
+{% endfor %}
 #if defined(__cplusplus)
 extern "C" {
 #endif

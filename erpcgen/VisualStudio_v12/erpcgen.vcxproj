@@ -158,7 +158,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     </Bison>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\erpc_c\infra\crc16.h" />
+    <ClInclude Include="..\..\erpc_c\infra\erpc_crc16.h" />
     <ClInclude Include="..\..\erpc_c\infra\erpc_version.h" />
     <ClInclude Include="..\src\annotations.h" />
     <ClInclude Include="..\src\format_string.h" />
@@ -204,7 +204,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\erpc_c\infra\crc16.cpp" />
+    <ClCompile Include="..\..\erpc_c\infra\erpc_crc16.cpp" />
     <ClCompile Include="..\src\format_string.cpp" />
     <ClCompile Include="..\src\HexValues.cpp" />
     <ClCompile Include="..\src\Logging.cpp" />

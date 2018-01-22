@@ -34,9 +34,9 @@
 
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
+#include "erpc_simple_server.h"
 #include "erpc_transport_setup.h"
 #include "myAlloc.h"
-#include "simple_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 

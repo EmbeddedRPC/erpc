@@ -33,9 +33,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_manually_constructed.h"
+#include "erpc_spi_master_transport.h"
 #include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "spi_master_transport.h"
 
 using namespace erpc;
 

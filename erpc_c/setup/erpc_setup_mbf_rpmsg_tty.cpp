@@ -34,12 +34,12 @@
  */
 
 #include "erpc_config_internal.h"
+#include "erpc_framed_transport.h"
+#include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
-#include "framed_transport.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
+#include "erpc_message_buffer.h"
+#include "erpc_rpmsg_lite_base_transport.h"
 #include "rpmsg_lite.h"
-#include "rpmsg_lite_base_transport.h"
 #include <assert.h>
 
 using namespace erpc;
@@ -66,14 +66,14 @@ public:
     /*!
      * @brief Destructor
      */
-    virtual ~RPMsgTTYMessageBufferFactory() {}
+    virtual ~RPMsgTTYMessageBufferFactory(void) {}
 
     /*!
      * @brief This function creates new message buffer.
      *
      * @return MessageBuffer New created MessageBuffer.
      */
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         void *buf = NULL;
         unsigned long size = 0;
@@ -118,7 +118,7 @@ public:
         }
     }
 
-    virtual bool createServerBuffer() { return false; }
+    virtual bool createServerBuffer(void) { return false; }
 
 protected:
     struct rpmsg_lite_instance *m_rpmsg; /*!< Pointer to instance of RPMSG lite. */

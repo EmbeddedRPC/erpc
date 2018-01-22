@@ -34,12 +34,12 @@
  */
 
 #include "erpc_server_setup.h"
-#include "basic_codec.h"
-#include "crc16.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
-#include "simple_server.h"
-#include "transport.h"
+#include "erpc_basic_codec.h"
+#include "erpc_crc16.h"
+#include "erpc_manually_constructed.h"
+#include "erpc_message_buffer.h"
+#include "erpc_simple_server.h"
+#include "erpc_transport.h"
 #include <cassert>
 
 using namespace erpc;
@@ -77,7 +77,7 @@ erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_bu
     return reinterpret_cast<erpc_server_t>(g_server);
 }
 
-void erpc_server_deinit()
+void erpc_server_deinit(void)
 {
     s_crc16.destroy();
     s_codecFactory.destroy();
@@ -98,7 +98,7 @@ void erpc_server_set_crc(uint32_t crcStart)
     s_crc16->setCrcStart(crcStart);
 }
 
-erpc_status_t erpc_server_run()
+erpc_status_t erpc_server_run(void)
 {
     if (g_server != NULL)
     {
@@ -107,7 +107,7 @@ erpc_status_t erpc_server_run()
     return kErpcStatus_Fail;
 }
 
-erpc_status_t erpc_server_poll()
+erpc_status_t erpc_server_poll(void)
 {
     if (g_server != NULL)
     {
@@ -116,7 +116,7 @@ erpc_status_t erpc_server_poll()
     return kErpcStatus_Fail;
 }
 
-void erpc_server_stop()
+void erpc_server_stop(void)
 {
     if (g_server != NULL)
     {

@@ -34,9 +34,9 @@
  */
 
 #include "erpc_config_internal.h"
+#include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
+#include "erpc_message_buffer.h"
 #include <assert.h>
 
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
@@ -58,7 +58,7 @@ public:
     /*!
      * @brief Constructor.
      */
-    StaticMessageBufferFactory()
+    StaticMessageBufferFactory(void)
     : m_semaphore(0)
     {
         uint32_t i;
@@ -71,14 +71,14 @@ public:
     /*!
      * @brief CodecFactory destructor
      */
-    virtual ~StaticMessageBufferFactory() {}
+    virtual ~StaticMessageBufferFactory(void) {}
 
     /*!
      * @brief This function creates new message buffer.
      *
      * @return MessageBuffer New created MessageBuffer.
      */
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         uint8_t idx = 0;
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
@@ -147,7 +147,7 @@ protected:
 
 static ManuallyConstructed<StaticMessageBufferFactory> s_msgFactory;
 
-erpc_mbf_t erpc_mbf_static_init()
+erpc_mbf_t erpc_mbf_static_init(void)
 {
     s_msgFactory.construct();
     return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());

@@ -4,7 +4,7 @@
 {% endif %}
 {$commonHeader()}
 
-#include "client_manager.h"
+#include "erpc_client_manager.h"
 #include "erpc_port.h"
 #include "{$codecHeader}"
 extern "C"
@@ -45,7 +45,7 @@ extern ClientManager *g_client;
 
 {% endif -- generateErrorChecks %}
 {% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable};
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
 
 {% endif -- isNotVoid %}
     // Get a new request.

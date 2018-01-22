@@ -62,6 +62,9 @@ extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
 extern const char *const kCCrc;
 
+// number which makes list temporary variables unique.
+static uint8_t listCounter = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
@@ -1139,6 +1142,9 @@ data_map CGenerator::getStructDeclarationTemplateData(StructType *structType)
 
 data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *structType, data_map structInfo)
 {
+    // reset list numbering.
+    listCounter = 0;
+
     structInfo["hasNullableMember"] = false;
     structInfo["needTempVariable"] = false;
     structInfo["genStructWrapperF"] = !isBinaryStruct(structType);
@@ -1408,6 +1414,9 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
 {
     data_map info;
     Symbol *fnSymbol = dynamic_cast<Symbol *>(fn);
+
+    // reset list numbering.
+    listCounter = 0;
 
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
@@ -1741,8 +1750,7 @@ data_map CGenerator::getFunctionTypeTemplateData(Group *group, FunctionType *fn)
     {
         if (structMember->getName().empty())
         {
-            structMember->setName("param" + j);
-            ++j;
+            structMember->setName("param" + boost::lexical_cast<std::string>(j++));
         }
     }
 
@@ -2411,14 +2419,13 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
         }
         case DataType::kArrayType:
         {
-            static uint32_t arrayCounter;
+            static uint8_t arrayCounter;
             ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
             assert(arrayType);
             DataType *elementType = arrayType->getElementType();
             DataType *trueElementType = elementType->getTrueDataType();
 
             string arrayName = name;
-            ++arrayCounter;
             templateData["decode"] = m_templateData["decodeArrayType"];
             templateData["encode"] = m_templateData["encodeArrayType"];
 
@@ -2429,10 +2436,10 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                     getScalarTypename(elementType);
 
             giveBracesToArrays(arrayName);
-            templateData["protoNext"] =
-                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter), group,
-                                    elementType, structType, true, structMember, needTempVariable, isFunctionParam);
             templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
+            templateData["protoNext"] =
+                getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter++), group,
+                                    elementType, structType, true, structMember, needTempVariable, isFunctionParam);
             templateData["size"] = format_string("%d", arrayType->getElementCount());
             templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
             templateData["isElementArrayType"] = trueElementType->isArray();
@@ -2545,8 +2552,6 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             {
                 templateData["hasLengthVariable"] = true;
 
-                static uint32_t listCounter;
-                ++listCounter;
                 nextName = format_string("%s[listCount%d]", name.c_str(), listCounter);
                 // needDealloc(templateData, t, nullptr, structMember);
                 // length is global constant. Should be defined in IDL as array[global_constant] @nullable?
@@ -2604,6 +2609,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                 }
                 templateData["forLoopCount"] = string("listCount") + to_string(listCounter);
                 templateData["isElementArrayType"] = trueElementType->isArray();
+                ++listCounter;
             }
             else
             {

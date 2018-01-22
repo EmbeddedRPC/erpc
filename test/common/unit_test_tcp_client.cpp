@@ -32,13 +32,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_basic_codec.h"
+#include "erpc_client_manager.h"
+#include "erpc_tcp_transport.h"
 #include "Logging.h"
-#include "basic_codec.h"
-#include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "myAlloc.h"
-#include "tcp_transport.h"
 #include "test_unit_test_common.h"
 
 using namespace erpc;

@@ -163,13 +163,13 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
         case InterfaceDefinition::kBasicCodec:
         {
             m_templateData["codecClass"] = "BasicCodec";
-            m_templateData["codecHeader"] = "basic_codec.h";
+            m_templateData["codecHeader"] = "erpc_basic_codec.h";
             break;
         }
         default:
         {
             m_templateData["codecClass"] = "Codec";
-            m_templateData["codecHeader"] = "codec.h";
+            m_templateData["codecHeader"] = "erpc_codec.h";
             break;
         }
     }

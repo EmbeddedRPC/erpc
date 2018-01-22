@@ -35,8 +35,8 @@
 #ifndef _EMBEDDED_RPC__SNIFFER_H_
 #define _EMBEDDED_RPC__SNIFFER_H_
 
-#include "erpc_c/infra/basic_codec.h"
-#include "erpc_c/infra/transport.h"
+#include "erpc_c/infra/erpc_basic_codec.h"
+#include "erpc_c/infra/erpc_transport.h"
 #include "CGenerator.h"
 #include <chrono>
 ////////////////////////////////////////////////////////////////////////////////

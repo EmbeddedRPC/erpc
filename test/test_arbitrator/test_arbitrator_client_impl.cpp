@@ -33,7 +33,7 @@
  */
 
 #include "gtest.h"
-#include "simple_server.h"
+#include "erpc_simple_server.h"
 #include "test_firstInterface.h"
 #include "test_secondInterface_server.h"
 

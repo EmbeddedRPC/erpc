@@ -32,6 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_crc16.h"
+#include "erpc_tcp_transport.h"
+#include "erpc_transport.h"
 #include "erpc_transport_setup.h"
 #include "erpc_version.h"
 #include "ErpcLexer.h"
@@ -41,10 +44,7 @@
 #include "Sniffer.h"
 #include "UniqueIdChecker.h"
 #include "annotations.h"
-#include "crc16.h"
 #include "options.h"
-#include "tcp_transport.h"
-#include "transport.h"
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>

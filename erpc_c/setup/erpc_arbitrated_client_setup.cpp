@@ -34,11 +34,11 @@
  */
 
 #include "erpc_arbitrated_client_setup.h"
-#include "arbitrated_client_manager.h"
-#include "basic_codec.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
-#include "transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.h"
+#include "erpc_basic_codec.h"
+#include "erpc_manually_constructed.h"
+#include "erpc_message_buffer.h"
+#include "erpc_transport_arbitrator.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
 #endif
@@ -133,7 +133,7 @@ bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
 }
 #endif
 
-void erpc_arbitrated_client_deinit()
+void erpc_arbitrated_client_deinit(void)
 {
     s_client.destroy();
     s_codecFactory.destroy();

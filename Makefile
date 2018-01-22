@@ -50,9 +50,9 @@ erpc:
 install: erpc erpc_c erpcgen $(ERPCSNIFFER)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c install
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcgen install
-	ifeq "$(is_linux)" "1"
+ifeq "$(is_linux)" "1"
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcsniffer install
-	endif
+endif
 
 #make all target
 .PHONY: all

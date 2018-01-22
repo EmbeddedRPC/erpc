@@ -32,11 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_basic_codec.h"
+#include "erpc_serial_transport.h"
+#include "erpc_simple_server.h"
 #include "Logging.h"
-#include "basic_codec.h"
 #include "myAlloc.h"
-#include "serial_transport.h"
-#include "simple_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include <stdlib.h>

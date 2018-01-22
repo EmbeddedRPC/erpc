@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "simple_server.h"
+#include "erpc_simple_server.h"
 #include "test_firstInterface_server.h"
 #include "test_secondInterface.h"
 

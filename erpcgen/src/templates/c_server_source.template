@@ -8,7 +8,7 @@
 #include <new>
 #include "erpc_port.h"
 {% if dynamicServices == false %}
-#include "manually_constructed.h"
+#include "erpc_manually_constructed.h"
 {% endif --dynamicServices == false %}
 {% if empty(group.includes) == false %}
 extern "C"

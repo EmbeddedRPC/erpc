@@ -33,7 +33,7 @@
  */
 
 #include "Sniffer.h"
-#include "erpc_c/infra/message_buffer.h"
+#include "erpc_c/infra/erpc_message_buffer.h"
 #include "Logging.h"
 #include "annotations.h"
 #include <boost/algorithm/string.hpp>

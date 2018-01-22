@@ -34,12 +34,12 @@
  */
 
 #include "erpc_client_setup.h"
-#include "basic_codec.h"
-#include "client_manager.h"
-#include "crc16.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
-#include "transport.h"
+#include "erpc_basic_codec.h"
+#include "erpc_client_manager.h"
+#include "erpc_crc16.h"
+#include "erpc_manually_constructed.h"
+#include "erpc_message_buffer.h"
+#include "erpc_transport.h"
 #include <cassert>
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
@@ -121,7 +121,7 @@ bool erpc_client_add_message_logger(erpc_transport_t transport)
 }
 #endif
 
-void erpc_client_deinit()
+void erpc_client_deinit(void)
 {
     s_crc16.destroy();
     s_client.destroy();
