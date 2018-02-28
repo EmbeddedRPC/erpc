@@ -113,6 +113,18 @@ static void eRPCReadyEventHandler(uint16_t eventData, void *context)
 {
     eRPCReadyEventData = eventData;
 }
+
+/*!
+ * @brief Application-specific implementation of the SystemInitHook() weak function.
+ */
+void SystemInitHook(void)
+{
+    /* Initialize MCMGR - low level multicore management library. Call this
+       function as close to the reset entry as possible to allow CoreUp event
+       triggering. The SystemInitHook() weak function overloading is used in this
+       application. */
+    MCMGR_EarlyInit();
+}
 #endif
 
 int main(int argc, char **argv)
@@ -148,11 +160,6 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(RPMSG)
-    /* Initialize MCMGR - low level multicore management library.
-       Call this function as close to the reset entry as possible,
-       (into the startup sequence) to allow CoreUp event trigerring. */
-    MCMGR_EarlyInit();
-
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
 

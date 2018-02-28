@@ -136,13 +136,20 @@ void runClient(void *arg)
     vTaskSuspend(NULL);
 }
 
+/*!
+ * @brief Application-specific implementation of the SystemInitHook() weak function.
+ */
+void SystemInitHook(void)
+{
+    /* Initialize MCMGR - low level multicore management library. Call this
+       function as close to the reset entry as possible to allow CoreUp event
+       triggering. The SystemInitHook() weak function overloading is used in this
+       application. */
+    MCMGR_EarlyInit();
+}
+
 void runInit(void *arg)
 {
-    /* Initialize MCMGR - low level multicore management library.
-       Call this function as close to the reset entry as possible,
-       (into the startup sequence) to allow CoreUp event trigerring. */
-    MCMGR_EarlyInit();
-
     // Initialize MCMGR before calling its API
     MCMGR_Init();
 

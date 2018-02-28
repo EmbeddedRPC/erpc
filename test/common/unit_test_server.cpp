@@ -66,6 +66,17 @@ static void SignalReady(void)
     /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
     MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
+/*!
+ * @brief Application-specific implementation of the SystemInitHook() weak function.
+ */
+void SystemInitHook(void)
+{
+    /* Initialize MCMGR - low level multicore management library. Call this
+       function as close to the reset entry as possible to allow CoreUp event
+       triggering. The SystemInitHook() weak function overloading is used in this
+       application. */
+    MCMGR_EarlyInit();
+}
 #endif
 
 int main(int argc, const char *argv[])
@@ -73,11 +84,6 @@ int main(int argc, const char *argv[])
 #if defined(RPMSG)
     uint32_t startupData;
     mcmgr_status_t status;
-
-    /* Initialize MCMGR - low level multicore management library.
-       Call this function as close to the reset entry as possible,
-       (into the startup sequence) to allow CoreUp event trigerring. */
-    MCMGR_EarlyInit();
 
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
