@@ -29,10 +29,10 @@
  */
 
 #include "erpc_port.h"
-#include "FreeRTOS.h"
 #include <new>
 
 extern "C" {
+#include "FreeRTOS.h"
 #include "MemManager.h"
 }
 
@@ -40,36 +40,36 @@ extern "C" {
 using namespace std;
 #endif
 
-void *operator new(std::size_t count) _THROWS(_XSTD bad_alloc)
+void *operator new(std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new(std::size_t count, const std::nothrow_t &tag) _THROW0()
+void *operator new(std::size_t count, const std::nothrow_t &tag) THROW NOEXCEPT
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new[](std::size_t count) _THROWS(_XSTD bad_alloc)
+void *operator new[](std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void *operator new[](std::size_t count, const std::nothrow_t &tag) _THROW0()
+void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW NOEXCEPT
 {
     void *p = erpc_malloc(count);
     return p;
 }
 
-void operator delete(void *ptr) _THROW0()
+void operator delete(void *ptr) THROW
 {
     erpc_free(ptr);
 }
 
-void operator delete[](void *ptr) _THROW0()
+void operator delete[](void *ptr) THROW
 {
     erpc_free(ptr);
 }
