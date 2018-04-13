@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B314F839-7BC9-471E-AA64-78FC946473F6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>erpcgen</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="custom_build_rules\win_flex_bison_custom_build.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <BuildDependsOn>
+      GenerateTemplates;
+      $(BuildDependsOn)
+    </BuildDependsOn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_66_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;$(ProjectDir)\..\..\erpc_c\infra;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <DisableSpecificWarnings>4018;4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\boost_1_66_0\lib32-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)\%(Filename).tab.cpp</OutputFile>
+    </Bison>
+    <Bison>
+      <DefinesFile>$(ProjectDir)\%(Filename).tab.hpp</DefinesFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)\%(Filename).flex.cpp</OutputFile>
+    </Flex>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>
+      </Inputs>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
+python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
+python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
+python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
+python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
+python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
+python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_RELEASE;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\boost_1_66_0;$(ProjectDir);$(ProjectDir)\..\src\types;$(ProjectDir)\..\src;$(ProjectDir)\..\src\cpptemplate;$(ProjectDir)\..\src\common;$(ProjectDir)\..\..\erpc_c\infra;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4018;4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(ProjectDir)\boost_1_66_0\lib32-msvc-14.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PreBuildEvent>
+      <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
+python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
+python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
+python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_common.template
+python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
+python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
+python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
+    </PreBuildEvent>
+    <Flex>
+      <OutputFile>$(ProjectDir)\%(Filename).flex.cpp</OutputFile>
+    </Flex>
+    <Bison>
+      <OutputFile>$(ProjectDir)\%(Filename).tab.cpp</OutputFile>
+      <DefinesFile>$(ProjectDir)\%(Filename).tab.hpp</DefinesFile>
+    </Bison>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\erpc_c\infra\erpc_crc16.h" />
+    <ClInclude Include="..\..\erpc_c\infra\erpc_version.h" />
+    <ClInclude Include="..\src\annotations.h" />
+    <ClInclude Include="..\src\format_string.h" />
+    <ClInclude Include="..\src\HexValues.h" />
+    <ClInclude Include="..\src\Logging.h" />
+    <ClInclude Include="..\src\options.h" />
+    <ClInclude Include="..\src\SearchPath.h" />
+    <ClInclude Include="..\src\smart_ptr.h" />
+    <ClInclude Include="..\src\types\FunctionType.h" />
+    <ClInclude Include="..\src\types\UnionCase.h" />
+    <ClInclude Include="..\src\types\UnionType.h" />
+    <ClInclude Include="..\src\Value.h" />
+    <ClInclude Include="..\src\cpptemplate\cpptempl.h" />
+    <ClInclude Include="..\src\AstNode.h" />
+    <ClInclude Include="..\src\AstWalker.h" />
+    <ClInclude Include="..\src\CGenerator.h" />
+    <ClInclude Include="..\src\ErpcLexer.h" />
+    <ClInclude Include="..\src\Generator.h" />
+    <ClInclude Include="..\src\InterfaceDefinition.h" />
+    <ClInclude Include="..\src\ParseErrors.h" />
+    <ClInclude Include="..\src\PythonGenerator.h" />
+    <ClInclude Include="..\src\SymbolScanner.h" />
+    <ClInclude Include="..\src\Token.h" />
+    <ClInclude Include="..\src\types\AliasType.h" />
+    <ClInclude Include="..\src\types\Annotation.h" />
+    <ClInclude Include="..\src\types\ArrayType.h" />
+    <ClInclude Include="..\src\types\BuiltinType.h" />
+    <ClInclude Include="..\src\types\ConstType.h" />
+    <ClInclude Include="..\src\types\DataType.h" />
+    <ClInclude Include="..\src\types\EnumMember.h" />
+    <ClInclude Include="..\src\types\EnumType.h" />
+    <ClInclude Include="..\src\types\Function.h" />
+    <ClInclude Include="..\src\types\Interface.h" />
+    <ClInclude Include="..\src\types\ListType.h" />
+    <ClInclude Include="..\src\types\Program.h" />
+    <ClInclude Include="..\src\types\StructMember.h" />
+    <ClInclude Include="..\src\types\StructType.h" />
+    <ClInclude Include="..\src\types\Symbol.h" />
+    <ClInclude Include="..\src\types\SymbolScope.h" />
+    <ClInclude Include="..\src\types\VoidType.h" />
+    <ClInclude Include="..\src\UniqueIdChecker.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\erpc_c\infra\erpc_crc16.cpp" />
+    <ClCompile Include="..\src\format_string.cpp" />
+    <ClCompile Include="..\src\HexValues.cpp" />
+    <ClCompile Include="..\src\Logging.cpp" />
+    <ClCompile Include="..\src\options.cpp" />
+    <ClCompile Include="..\src\SearchPath.cpp" />
+    <ClCompile Include="..\src\cpptemplate\cpptempl.cpp" />
+    <ClCompile Include="..\src\AstNode.cpp" />
+    <ClCompile Include="..\src\AstWalker.cpp" />
+    <ClCompile Include="..\src\CGenerator.cpp" />
+    <ClCompile Include="..\src\erpcgen.cpp" />
+    <ClCompile Include="..\src\ErpcLexer.cpp" />
+    <ClCompile Include="..\src\Generator.cpp" />
+    <ClCompile Include="..\src\InterfaceDefinition.cpp" />
+    <ClCompile Include="..\src\ParseErrors.cpp" />
+    <ClCompile Include="..\src\PythonGenerator.cpp" />
+    <ClCompile Include="..\src\SymbolScanner.cpp" />
+    <ClCompile Include="..\src\Token.cpp" />
+    <ClCompile Include="..\src\types\Type.cpp" />
+    <ClCompile Include="..\src\UniqueIdChecker.cpp" />
+    <ClCompile Include="c_client_source.cpp" />
+    <ClCompile Include="c_coders.cpp" />
+    <ClCompile Include="c_common_header.cpp" />
+    <ClCompile Include="c_crc.cpp" />
+    <ClCompile Include="c_server_header.cpp" />
+    <ClCompile Include="c_server_source.cpp" />
+    <ClCompile Include="c_common_functions.cpp" />
+    <ClCompile Include="erpcgen_lexer.flex.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4005;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="erpcgen_parser.tab.cpp" />
+    <ClCompile Include="py_client.cpp" />
+    <ClCompile Include="py_coders.cpp" />
+    <ClCompile Include="py_common.cpp" />
+    <ClCompile Include="py_global_init.cpp" />
+    <ClCompile Include="py_init.cpp" />
+    <ClCompile Include="py_interface.cpp" />
+    <ClCompile Include="py_server.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Flex Include="..\src\erpcgen_lexer.l" />
+  </ItemGroup>
+  <ItemGroup>
+    <Bison Include="..\src\erpcgen_parser.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme_erpcgen.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="custom_build_rules\win_flex_bison_custom_build.targets" />
+  </ImportGroup>
+  <Target Name="GenerateTemplates">
+    <Message Text="Generating templates" />
+    <Exec Command="gen_templates.bat" />
+  </Target>
+</Project>

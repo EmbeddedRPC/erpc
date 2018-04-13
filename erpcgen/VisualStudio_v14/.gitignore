@@ -28,6 +28,7 @@ UNISTD_ERROR.readme
 win_bison.exe
 win_flex.exe
 README.txt
+.vs
 
 #boost libraries
 boost_*

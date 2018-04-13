@@ -45,7 +45,7 @@ namespace erpc {
 
 /*!
  * @brief RPMSG Linux transport to send/receive messages through RPMSG endpoints
- * based on https://github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171
+ * based on https://github.com/codeauroraforum/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171
  * implementation.
  * @ingroup rpmsg_linux_transport
  */

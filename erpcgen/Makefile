@@ -87,12 +87,12 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 
 ifeq "$(is_mingw)" "1"
-SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_client_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_coders.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp \
+SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_header.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_client_source.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_header.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_source.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_coders.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_functions.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \

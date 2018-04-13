@@ -32,4 +32,4 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #Should be same as in erpc_version.h
-ERPC_VERSION = "1.6.0"
+ERPC_VERSION = "1.7.0"

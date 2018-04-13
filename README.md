@@ -61,7 +61,7 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
+* [NXP RPMsg-Lite](https://github.com/codeauroraforum/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 
@@ -71,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 5c1cd41e34622ad5612a6ca26f6a85c10a615c30.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 3d7fb192a32fb8b5eef9fd953d592ac048259a70.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -102,7 +102,7 @@ These build instructions apply to host PCs and embedded Linux. For bare metal or
 The primary build system is makefile based. It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests.
 
 The makefiles are compatible with gcc or clang on Linux, OS X, and Cygwin. A Windows build
-of erpcgen using Visual Studio is also available in the `erpcgen/VisualStudio_v12/` directory.
+of erpcgen using Visual Studio is also available in the `erpcgen/VisualStudio_v14/` directory.
 There is also an Xcode project file in the `erpcgen/` directory which can be used to build erpcgen
 for OS X.
 
@@ -110,7 +110,7 @@ for OS X.
 
 #### Windows
 
-Steps are described in [`erpcgen/VisualStudio_v12/readme_erpcgen.txt`](erpcgen/VisualStudio_v12/readme_erpcgen.txt).
+Steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
 
 #### Linux and Cygwin
 
