@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -42,8 +42,8 @@
 #if ERPC_NESTED_CALLS
 #include "erpc_server_setup.h"
 #endif
+#include "erpc_client_manager.h"
 #include "erpc_transport_setup.h"
-#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -59,7 +59,7 @@
 extern "C" {
 #endif
 
-typedef void (*client_error_handler_t)(erpc_status_t err); /*!< eRPC error handler function type. */
+#include <stdint.h>
 
 //! @name Arbitrated client setup
 //@{
@@ -91,7 +91,18 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
  *
  * @param[in] error_handler Pointer to function error handler.
  */
-void erpc_client_set_error_handler(client_error_handler_t error_handler);
+void erpc_arbitrated_client_set_error_handler(client_error_handler_t error_handler);
+
+/*!
+ * @brief Can be used to set own crcStart number.
+ *
+ * For example can be used generated crc from erpcgen
+ * which is providing when @crc annotation is used.
+ * Accessed can be through 'extern const uint32_t erpc_generated_crc;'
+ *
+ * @param[in] crcStart Set start number for crc.
+ */
+void erpc_arbitrated_client_set_crc(uint32_t crcStart);
 
 #if ERPC_NESTED_CALLS
 /*!
@@ -99,14 +110,14 @@ void erpc_client_set_error_handler(client_error_handler_t error_handler);
  *
  * @param[in] server Initiated server.
  */
-void erpc_client_set_server(erpc_server_t server);
+void erpc_arbitrated_client_set_server(erpc_server_t server);
 
 /*!
  * @brief This function sets server thread id.
  *
  * @param[in] serverThreadId Id of thread where server run function is executed.
  */
-void erpc_client_set_server_thread_id(void *serverThreadId);
+void erpc_arbitrated_client_set_server_thread_id(void *serverThreadId);
 #endif
 
 #if ERPC_MESSAGE_LOGGING
@@ -114,8 +125,11 @@ void erpc_client_set_server_thread_id(void *serverThreadId);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was successfully added.
+ * @retval False When transport wasn't added.
  */
-void erpc_server_add_message_logger(erpc_transport_t transport);
+bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport);
 #endif
 
 /*!

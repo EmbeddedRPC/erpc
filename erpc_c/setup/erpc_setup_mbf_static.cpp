@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,18 +34,13 @@
  */
 
 #include "erpc_config_internal.h"
+#include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
+#include "erpc_message_buffer.h"
 #include <assert.h>
-#include <new>
 
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 #include "erpc_threading.h"
-#endif
-
-#if !(__embedded_cplusplus)
-using namespace std;
 #endif
 
 using namespace erpc;
@@ -63,8 +58,10 @@ public:
     /*!
      * @brief Constructor.
      */
-    StaticMessageBufferFactory()
+    StaticMessageBufferFactory(void)
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
     : m_semaphore(0)
+#endif
     {
         uint32_t i;
         for (i = 0; i <= (ERPC_DEFAULT_BUFFERS_COUNT >> 3); i++)
@@ -76,14 +73,14 @@ public:
     /*!
      * @brief CodecFactory destructor
      */
-    virtual ~StaticMessageBufferFactory() {}
+    virtual ~StaticMessageBufferFactory(void) {}
 
     /*!
      * @brief This function creates new message buffer.
      *
      * @return MessageBuffer New created MessageBuffer.
      */
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         uint8_t idx = 0;
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
@@ -138,10 +135,11 @@ public:
     }
 
 protected:
-    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3) + 1];
-    uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT][(ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t)];
+    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3) + 1]; /*!< Bitmat of used/not used buffers. */
+    uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT]
+                      [(ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t)]; /*!< Static buffers. */
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
-    Semaphore m_semaphore;
+    Semaphore m_semaphore; /*!< Semaphore.*/
 #endif
 };
 
@@ -151,7 +149,7 @@ protected:
 
 static ManuallyConstructed<StaticMessageBufferFactory> s_msgFactory;
 
-erpc_mbf_t erpc_mbf_static_init()
+erpc_mbf_t erpc_mbf_static_init(void)
 {
     s_msgFactory.construct();
     return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());

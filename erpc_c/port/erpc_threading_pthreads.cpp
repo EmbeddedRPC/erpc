@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -44,6 +44,9 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
+/*!
+ * Thread object key.
+ */
 pthread_key_t Thread::s_threadObjectKey = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,9 +73,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread()
-{
-}
+Thread::~Thread(void) {}
 
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
@@ -99,7 +100,7 @@ bool Thread::operator==(Thread &o)
     return pthread_equal(m_thread, o.m_thread);
 }
 
-Thread *Thread::getCurrentThread()
+Thread *Thread::getCurrentThread(void)
 {
     void *value = pthread_getspecific(s_threadObjectKey);
     return reinterpret_cast<Thread *>(value);
@@ -108,7 +109,7 @@ Thread *Thread::getCurrentThread()
 void Thread::sleep(uint32_t usecs)
 {
     // Sleep for the requested number of microseconds.
-    struct timespec rq = {.tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
+    struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
     struct timespec actual = { 0 };
 
     // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
@@ -124,7 +125,7 @@ void Thread::sleep(uint32_t usecs)
     }
 }
 
-void Thread::threadEntryPoint()
+void Thread::threadEntryPoint(void)
 {
     if (m_entry)
     {
@@ -143,7 +144,7 @@ void *Thread::threadEntryPointStub(void *arg)
     return 0;
 }
 
-Mutex::Mutex()
+Mutex::Mutex(void)
 {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -154,22 +155,22 @@ Mutex::Mutex()
     pthread_mutexattr_destroy(&attr);
 }
 
-Mutex::~Mutex()
+Mutex::~Mutex(void)
 {
     pthread_mutex_destroy(&m_mutex);
 }
 
-bool Mutex::tryLock()
+bool Mutex::tryLock(void)
 {
     return pthread_mutex_trylock(&m_mutex) == 0;
 }
 
-bool Mutex::lock()
+bool Mutex::lock(void)
 {
     return pthread_mutex_lock(&m_mutex) == 0;
 }
 
-bool Mutex::unlock()
+bool Mutex::unlock(void)
 {
     return pthread_mutex_unlock(&m_mutex) == 0;
 }
@@ -181,12 +182,12 @@ Semaphore::Semaphore(int count)
     pthread_cond_init(&m_cond, NULL);
 }
 
-Semaphore::~Semaphore()
+Semaphore::~Semaphore(void)
 {
     pthread_cond_destroy(&m_cond);
 }
 
-void Semaphore::put()
+void Semaphore::put(void)
 {
     Mutex::Guard guard(m_mutex);
     if (m_count == 0)
@@ -215,7 +216,7 @@ bool Semaphore::get(uint32_t timeout)
             // Create an absolute timeout time.
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            struct timespec wait = {.tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
+            struct timespec wait = { .tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
             err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
             if (err)
             {
@@ -228,7 +229,7 @@ bool Semaphore::get(uint32_t timeout)
     return true;
 }
 
-int Semaphore::getCount() const
+int Semaphore::getCount(void) const
 {
     return m_count;
 }

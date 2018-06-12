@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -52,8 +52,8 @@ private:
     {
         int serverAlloc = getServerAllocated();
 
-        EXPECT_TRUE(MyAlloc::allocated() == 0) << "Leaked (on client side) : " << MyAlloc::allocated()
-                                               << " unit(s) need be freed!";
+        EXPECT_TRUE(MyAlloc::allocated() == 0)
+            << "Leaked (on client side) : " << MyAlloc::allocated() << " unit(s) need be freed!";
         EXPECT_TRUE(serverAlloc == 0) << "Leaked (on server side) : " << serverAlloc << " unit(s) need be freed!";
         MyAlloc::allocated(0);
     }

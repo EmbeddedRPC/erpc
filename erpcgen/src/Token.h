@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -62,8 +62,21 @@ struct token_loc_t
     , m_lastChar(0)
     {
     }
+
+    /*!
+     * @brief Default copy constructor.
+     *
+     * @param[in] other Token location struct to copy.
+     */
     token_loc_t(const token_loc_t &other) = default;
 
+    /*!
+     * @brief Default assign operator.
+     *
+     * @param[in] other Token location struct to copy.
+     *
+     * @return Token location struct reference.
+     */
     token_loc_t &operator=(const token_loc_t &other) = default;
 };
 
@@ -281,31 +294,31 @@ public:
      *
      * @exception internal_error Thrown if variable m_value is null.
      */
-    uint32_t getIntValue() const;
+    uint64_t getIntValue() const;
     //@}
 
     //! @name Location
     //@{
     /*!
-     * @brief This function returns token location (location from analysed file).
+     * @brief This function returns token location (location from analyzed file).
      *
-     * @return Return token location (location from analysed file).
+     * @return Return token location (location from analyzed file).
      *
      * @see void Token::setLocation()
      */
     const token_loc_t &getLocation() const { return m_location; }
 
     /*!
-     * @brief This function set token location (location from analysed file).
+     * @brief This function set token location (location from analyzed file).
      *
-     * @param[in] loc Token location (location from analysed file).
+     * @param[in] loc Token location (location from analyzed file).
      *
      * @see void Token::getLocation()
      */
     void setLocation(const token_loc_t &loc) { m_location = loc; }
 
     /*!
-     * @brief This function set token location (location from analysed file).
+     * @brief This function set token location (location from analyzed file).
      *
      * @param[in] first Token locations, which values are copied to this object locations.
      * @param[in] last Token locations, which values are copied to this object locations.
@@ -314,9 +327,9 @@ public:
 
     /*!
      * @brief This function returns first line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
-     * @return Return first line of token location (location from analysed file).
+     * @return Return first line of token location (location from analyzed file).
      *
      * @see void Token::getLastLine()
      */
@@ -324,9 +337,9 @@ public:
 
     /*!
      * @brief This function returns last line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
-     * @return Return last line of token location (location from analysed file).
+     * @return Return last line of token location (location from analyzed file).
      *
      * @see void Token::getFirstLine()
      */
@@ -334,7 +347,7 @@ public:
 
     /*!
      * @brief This function returns last line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
      * @retval true Return true when token means binary operation.
      * @retval false Return false when token doesn't mean binary operation.

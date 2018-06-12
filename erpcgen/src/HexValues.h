@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -41,7 +41,7 @@
 //! \brief Determines whether \a c is a hex digit character.
 bool isHexDigit(char c);
 
-//! \brief Converts a hexidecimal character to the integer equivalent.
+//! \brief Converts a hexadecimal character to the integer equivalent.
 uint8_t hexCharToInt(char c);
 
 //! \brief Converts a hex-encoded byte to the integer equivalent.

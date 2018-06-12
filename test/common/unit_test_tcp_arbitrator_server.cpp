@@ -4,10 +4,9 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,15 +32,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_arbitrated_client_manager.h"
+#include "erpc_basic_codec.h"
+#include "erpc_simple_server.h"
+#include "erpc_tcp_transport.h"
+#include "erpc_transport_arbitrator.h"
 #include "Logging.h"
-#include "arbitrated_client_manager.h"
-#include "basic_codec.h"
 #include "myAlloc.h"
-#include "simple_server.h"
-#include "tcp_transport.h"
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
-#include "transport_arbitrator.h"
 #include "unit_test.h"
 #include <unistd.h>
 

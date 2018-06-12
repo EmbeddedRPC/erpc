@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -90,7 +90,7 @@ public:
      *
      * @return String representation of enum member value.
      */
-    uint32_t getValue() const { return m_value; }
+    uint32_t getValue() const { return (uint32_t)m_value; }
 
     /*!
      * @brief This function return true if enum member has set value.
@@ -98,7 +98,7 @@ public:
      * @retval true When enum member has set value.
      * @retval false When enum member has not set value.
      */
-    bool hasValue() const { return -1 != (uint32_t)m_value; }
+    bool hasValue() const { return -1 != (int32_t)m_value.getValue(); }
 
     /*!
      * @brief This function returns description about the enum member.

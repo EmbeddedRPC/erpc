@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,9 +33,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_manually_constructed.h"
 #include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "uart_cmsis_transport.h"
+#include "erpc_uart_cmsis_transport.h"
 
 using namespace erpc;
 
@@ -52,6 +52,9 @@ static ManuallyConstructed<UartTransport> s_transport;
 erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv)
 {
     s_transport.construct((ARM_DRIVER_USART *)uartDrv);
-    s_transport->init();
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    if (s_transport->init() == kErpcStatus_Success)
+    {
+        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    }
+    return NULL;
 }

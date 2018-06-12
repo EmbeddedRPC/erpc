@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -150,14 +150,6 @@ public:
     const std::string &getName() const { return m_name; }
 
     /*!
-     * @brief This function returns symbol output name.
-     * Can be different to getName() when @name is used.
-     *
-     * @returns Return symbol output name.
-     */
-    std::string getOutputName();
-
-    /*!
      * @brief This function set symbol name.
      *
      * @param[in] newName New name for symbol.
@@ -223,21 +215,27 @@ public:
     /*!
      * @brief Find annotation in the annotation list
      *
+     * @param[in] name Annotation name.
+     * @param[in] lang Programing language for which is annotation intended.
+     *
      * @return An index into the annotation list
      */
-    Annotation *findAnnotation(std::string name);
+    Annotation *findAnnotation(std::string name, Annotation::program_lang_t lang);
 
     /*!
      * @brief Find annotations matching name in the annotation list
+     *
+     * @param[in] name Annotation name.
+     * @param[in] lang Programing language for which is annotation intended.
      *
      * @return A vector of matching annotations
      */
-    std::vector<Annotation *> getAnnotations(std::string name);
+    std::vector<Annotation *> getAnnotations(std::string name, Annotation::program_lang_t lang);
 
     /*!
-     * @brief Find annotations matching name in the annotation list
+     * @brief Return all Symbol annotations.
      *
-     * @return A vector of matching annotations
+     * @return A vector of Symbol annotations.
      */
     const std::vector<Annotation> &getAnnotations() const { return m_annotations; };
 
@@ -245,19 +243,21 @@ public:
      * @brief This function search and returns Value object for given annotation name.
      *
      * @param[in] annName Given annotation name.
+     * @param[in] lang Programing language for which is annotation intended.
      *
      * @return NULL if annotation is not found else value object.
      */
-    Value *getAnnValue(const std::string annName);
+    Value *getAnnValue(const std::string annName, Annotation::program_lang_t lang);
 
     /*!
      * @brief This function search and returns string for given annotation name.
      *
-     * @param[in] ann Given annotation name.
+     * @param[in] annName Given annotation name.
+     * @param[in] lang Programing language for which is annotation intended.
      *
      * @return empty string if annotation is not found else string value.
      */
-    std::string getAnnStringValue(const std::string annName);
+    std::string getAnnStringValue(const std::string annName, Annotation::program_lang_t lang);
 
     /*!
      * @brief This function returns multiline comment for this symbol declared in IDL file.

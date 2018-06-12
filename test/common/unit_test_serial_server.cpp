@@ -4,10 +4,9 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,11 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_basic_codec.h"
+#include "erpc_serial_transport.h"
+#include "erpc_simple_server.h"
 #include "Logging.h"
-#include "basic_codec.h"
 #include "myAlloc.h"
-#include "serial_transport.h"
-#include "simple_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include <stdlib.h>
@@ -111,9 +110,7 @@ void add_common_service(SimpleServer *server)
     server->addService(svc);
 }
 
-extern "C" void erpc_add_service_to_server(void *service)
-{
-}
+extern "C" void erpc_add_service_to_server(void *service) {}
 ////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////

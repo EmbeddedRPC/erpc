@@ -50,54 +50,54 @@ INCLUDES += $(ERPC_C_ROOT)/config \
 			$(ERPC_C_ROOT)/setup \
 			$(ERPC_C_ROOT)/transports
 
-SOURCES += 	$(ERPC_C_ROOT)/infra/arbitrated_client_manager.cpp \
-			$(ERPC_C_ROOT)/infra/basic_codec.cpp \
-			$(ERPC_C_ROOT)/infra/client_manager.cpp \
-			$(ERPC_C_ROOT)/infra/crc16.cpp \
-			$(ERPC_C_ROOT)/infra/framed_transport.cpp \
-			$(ERPC_C_ROOT)/infra/message_buffer.cpp \
-			$(ERPC_C_ROOT)/infra/message_loggers.cpp \
-			$(ERPC_C_ROOT)/infra/server.cpp \
-			$(ERPC_C_ROOT)/infra/simple_server.cpp \
-			$(ERPC_C_ROOT)/infra/transport_arbitrator.cpp \
+SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_basic_codec.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_client_manager.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_crc16.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_framed_transport.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_message_buffer.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_message_loggers.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_server.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_simple_server.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.cpp \
 			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
 			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
-			$(ERPC_C_ROOT)/port/serial.cpp \
+			$(ERPC_C_ROOT)/port/erpc_serial.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_server_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_setup_serial.cpp \
-			$(ERPC_C_ROOT)/transports/inter_thread_buffer_transport.cpp \
-			$(ERPC_C_ROOT)/transports/serial_transport.cpp \
-			$(ERPC_C_ROOT)/transports/tcp_transport.cpp
+			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.cpp \
+			$(ERPC_C_ROOT)/transports/erpc_serial_transport.cpp \
+			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.cpp
 
 HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
-			$(ERPC_C_ROOT)/infra/arbitrated_client_manager.h \
-			$(ERPC_C_ROOT)/infra/basic_codec.h \
-			$(ERPC_C_ROOT)/infra/client_manager.h \
-			$(ERPC_C_ROOT)/infra/codec.h \
-			$(ERPC_C_ROOT)/infra/crc16.h \
+			$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.h \
+			$(ERPC_C_ROOT)/infra/erpc_basic_codec.h \
+			$(ERPC_C_ROOT)/infra/erpc_client_manager.h \
+			$(ERPC_C_ROOT)/infra/erpc_codec.h \
+			$(ERPC_C_ROOT)/infra/erpc_crc16.h \
 			$(ERPC_C_ROOT)/infra/erpc_common.h \
 			$(ERPC_C_ROOT)/infra/erpc_version.h \
-			$(ERPC_C_ROOT)/infra/framed_transport.h \
-			$(ERPC_C_ROOT)/infra/manually_constructed.h \
-			$(ERPC_C_ROOT)/infra/message_buffer.h \
-			$(ERPC_C_ROOT)/infra/message_loggers.h \
-			$(ERPC_C_ROOT)/infra/server.h \
-			$(ERPC_C_ROOT)/infra/static_queue.h \
-			$(ERPC_C_ROOT)/infra/transport_arbitrator.h \
-			$(ERPC_C_ROOT)/infra/transport.h \
+			$(ERPC_C_ROOT)/infra/erpc_framed_transport.h \
+			$(ERPC_C_ROOT)/infra/erpc_manually_constructed.h \
+			$(ERPC_C_ROOT)/infra/erpc_message_buffer.h \
+			$(ERPC_C_ROOT)/infra/erpc_message_loggers.h \
+			$(ERPC_C_ROOT)/infra/erpc_server.h \
+			$(ERPC_C_ROOT)/infra/erpc_static_queue.h \
+			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.h \
+			$(ERPC_C_ROOT)/infra/erpc_transport.h \
 			$(ERPC_C_ROOT)/port/erpc_config_internal.h \
 			$(ERPC_C_ROOT)/port/erpc_port.h \
 			$(ERPC_C_ROOT)/port/erpc_threading.h \
-			$(ERPC_C_ROOT)/port/serial.h \
+			$(ERPC_C_ROOT)/port/erpc_serial.h \
 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_server_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_transport_setup.h \
-			$(ERPC_C_ROOT)/transports/inter_thread_buffer_transport.h \
-			$(ERPC_C_ROOT)/transports/serial_transport.h \
-			$(ERPC_C_ROOT)/transports/tcp_transport.h
+			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.h \
+			$(ERPC_C_ROOT)/transports/erpc_serial_transport.h \
+			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.h
 
 MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 

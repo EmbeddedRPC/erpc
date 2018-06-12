@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -53,7 +53,7 @@ namespace erpcgen {
 class EnumType : public DataType
 {
 public:
-    typedef std::vector<EnumMember *> member_vector_t; /*! Contains list of enum members */
+    typedef std::vector<EnumMember *> member_vector_t; /*!< Contains list of enum members */
 
     /*!
      * @brief Constructor.

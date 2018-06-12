@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,9 +33,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_manually_constructed.h"
+#include "erpc_rpmsg_lite_transport.h"
 #include "erpc_transport_setup.h"
-#include "manually_constructed.h"
-#include "rpmsg_lite_transport.h"
 
 using namespace erpc;
 
@@ -64,11 +64,13 @@ static ManuallyConstructed<RPMsgTransport> s_transport;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr,
-                                                       unsigned long dst_addr,
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr,
                                                        int rpmsg_link_id)
 {
     s_transport.construct();
-    s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id);
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    if (s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) == kErpcStatus_Success)
+    {
+        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    }
+    return NULL;
 }

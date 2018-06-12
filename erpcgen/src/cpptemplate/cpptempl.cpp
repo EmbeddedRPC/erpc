@@ -1150,7 +1150,10 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
                         {
                             resultValue += '\n';
                         }
-                        resultValue += params[0]->getvalue() + line;
+						if (line.size() > 0 && line[0] != '\r' && line[0] != '\n')
+						{
+							resultValue += params[0]->getvalue() + line;
+						}
                     }
                     result = resultValue;
                 }

@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -40,8 +40,6 @@
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
-#include <stdbool.h>
-#include <stdint.h>
 
 /*!
  * @addtogroup server_setup
@@ -56,6 +54,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
+#include <stdint.h>
 
 //! @brief Opaque server object type.
 typedef struct ServerType *erpc_server_t;
@@ -88,6 +89,16 @@ void erpc_server_deinit(void);
  */
 void erpc_add_service_to_server(void *service);
 
+/*!
+ * @brief Can be used to set own crcStart number.
+ *
+ * For example can be used generated crc from erpcgen
+ * which is providing when @crc annotation is used.
+ * Accessed can be through 'extern const uint32_t erpc_generated_crc;'
+ *
+ * @param[in] crcStart Set start number for crc.
+ */
+void erpc_server_set_crc(uint32_t crcStart);
 //@}
 
 //! @name Server control
@@ -125,8 +136,11 @@ void erpc_server_stop(void);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was successfully added.
+ * @retval False When transport wasn't added.
  */
-void erpc_server_add_message_logger(erpc_transport_t transport);
+bool erpc_server_add_message_logger(erpc_transport_t transport);
 #endif
 
 //@}

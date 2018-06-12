@@ -5,7 +5,7 @@ params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [uint8, "0xFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
@@ -24,21 +24,24 @@ test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
-  - if (!err)
-  - err = codec->startWriteMessage
-  - if (!err)
-  - err = g_client->performRequest
-  - if (!err)
-  - err =
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
+      - return
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
+  - err = codec->getStatus();
   - if (!err)
   - f();
+  - err = messageFactory->prepareServerBufferForSend
   - if (!err)
-  - err = codec->startWriteMessage
-  - if (!err)
-  - err =
+  - codec->startWriteMessage
+  - err = codec->getStatus();
   - return err;
 
 ---
@@ -46,13 +49,17 @@ name: not allowed
 desc: client and server erros checks forbidden
 params:
   type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [uint8, "0xFF"]
-    - [float, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
+    - [bool, "false", ""]
+    - [int8, "-1", ""]
+    - [uint8, "0xFFU", ""]
+    - [float, "-1", ""]
+    - [string, "NULL", "@max_length(10)"]
+    - [A, "NULL", ""]
+    - [B, "(B) -1", ""]
+  dir:
+    - "in"
+    - "out"
+
 idl: |
     @no_infra_errors
     @no_alloc_errors
@@ -64,17 +71,20 @@ idl: |
     enum B { one }
 
     interface ErrorTest{
-        f() -> {type[0]}
+        f({dir} {type[0]} variable {type[2]}) -> {type[0]}
     }
 test_client.cpp:
-  - not: if (!err)
+  - not: '!err'
+  - not: '(err)'
   - not: err =
   - not: if (codec == NULL)
+  - not: codec->getStatus()
 
 test_server.cpp:
-  - not: if (!err)
+  - not: '!err'
   - not: err =
-  - not: return err;
+  - not: '(err)'
+  - return codec->getStatus()
 
 ---
 name: infra allowed
@@ -83,7 +93,7 @@ params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [uint8, "0xFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
@@ -102,23 +112,26 @@ idl: |
     }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - not: if (out == NULL)
-  - not: err = kErpcStatus_MemoryError;
-  - if (!err)
-  - err = codec->startWriteMessage
-  - if (!err)
-  - err = g_client->performRequest
-  - if (!err)
-  - err =
+  - not: if (result == NULL)
+  - not: codec->updateStatus;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err, kErrorTest_f_id)
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
+  - not: if (result == NULL)
+  - err = codec->getStatus();
   - if (!err)
   - f();
+  - err = messageFactory->prepareServerBufferForSend
   - if (!err)
-  - err = codec->startWriteMessage
-  - if (!err)
-  - err =
+  - codec->startWriteMessage
+  - err = codec->getStatus();
   - return err;
 
 ---
@@ -128,7 +141,7 @@ params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [uint8, "0xFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
@@ -145,21 +158,29 @@ idl: |
     interface ErrorTest{
         f() -> {type[0]}
     }
+
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
-  - else
-  - not: err = codec
-  - not: err = g_client->performRequest
-  - if (!err)
-  - not: if (!err)
-  - not: err = codec
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
+      - return
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - not: err =
-  - not: if (!err)
+  - err = codec->getStatus();
+  - if (!err)
+  - f();
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
   - return err;
 
 ---
@@ -169,7 +190,7 @@ params:
   type:
     - [bool, "false", ""]
     - [int8, "-1", ""]
-    - [uint8, "0xFF", ""]
+    - [uint8, "0xFFU", ""]
     - [float, "-1", ""]
     - [string, "NULL", "@max_length(10)"]
     - [A, "NULL", ""]
@@ -192,71 +213,20 @@ test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
-  - if: dir in ('in', 'inout')
-    then:
-      - if (!err)
-      - err = codec->startWriteMessage
-      - if (!err)
-      - err =
-  - if (!err)
-  - err = g_client->performRequest
-  - if: dir in ('out', 'inout')
-    then:
-      - if (!err)
-      - err =
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - if: dir in ('in', 'inout')
-    then:
-      - if (!err)
+  - err = codec->getStatus();
   - if (!err)
-  - if: dir in ('out', 'inout')
-    then:
-      - if (!err)
-      - err = codec->startWriteMessage
-      - if (!err)
-      - err =
+  - f(
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
   - return err;
-
----
-name: not allowed in_out_inout
-desc: set default return value when errors occure in client shim
-params:
-  type:
-    - [bool, "false", ""]
-    - [int8, "-1", ""]
-    - [uint8, "0xFF", ""]
-    - [float, "-1", ""]
-    - [string, "NULL", "@max_length(10)"]
-    - [A, "NULL", ""]
-    - [B, "(B) -1", ""]
-  dir:
-    - "in"
-    - "out"
-    - "inout"
-idl: |
-    @no_infra_errors
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> void
-    }
-test_client.cpp:
-  - not: if (!err)
-  - not: err =
-  - not: if (codec == NULL)
-
-test_server.cpp:
-  - not: if (!err)
-  - not: err =
-  - not: return err;
 
 ---
 name: infra allowed in_out_inout
@@ -265,7 +235,7 @@ params:
   type:
     - [bool, "false", ""]
     - [int8, "-1", ""]
-    - [uint8, "0xFF", ""]
+    - [uint8, "0xFFU", ""]
     - [float, "-1", ""]
     - [string, "NULL", "@max_length(10)"]
     - [A, "NULL", ""]
@@ -290,32 +260,22 @@ test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - not: if (codec == NULL)
   - not: err = kErpcStatus_MemoryError;
-  - if: dir in ('in', 'inout')
-    then:
-      - if (!err)
-      - err = codec->startWriteMessage
-      - if (!err)
-      - err =
-  - if (!err)
-  - err = g_client->performRequest
-  - if: dir in ('out', 'inout')
-    then:
-      - if (!err)
-      - err =
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - if: dir in ('in', 'inout')
-    then:
-      - if (!err)
-      - err =
+  - not: if (variable == NULL)
+  - err = codec->getStatus();
   - if (!err)
+  - f(
   - if: dir in ('out', 'inout')
     then:
       - if (!err)
-      - err = codec->startWriteMessage
-      - if (!err)
-      - err =
+      - codec->startWriteMessage
+      - err = codec->getStatus();
   - return err;
 
 ---
@@ -325,7 +285,7 @@ params:
   type:
     - [bool, "false", ""]
     - [int8, "-1", ""]
-    - [uint8, "0xFF", ""]
+    - [uint8, "0xFFU", ""]
     - [float, "-1", ""]
     - [string, "NULL", "@max_length(10)"]
     - [A, "NULL", ""]
@@ -351,119 +311,16 @@ test_client.cpp:
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
   - else
-  - not: err = codec
-  - not: err = g_client->performRequest
-  - if (!err)
-  - not: if (!err)
-  - not: err = codec
+  - codec->startWriteMessage
+  - g_client->performRequest(request);
+  - err = codec->getStatus();
+  - g_client->releaseRequest(request);
+  - g_client->callErrorHandler(err, kErrorTest_f_id);
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
-  - not: if (!err)
+  - err = codec->getStatus();
+  - if (!err)
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
   - return err;
-
----
-name: NULL init
-desc: Server init pointers to NULL when alloc error checks are allowed
-params:
-  type:
-    - [string, "@max_length(10)", "char *"]
-    - [A, "", "A *"]
-    - [list<int32>, "@length(10)", "int32_t *"]
-    - [binary, "@length(10)", "uint8_t *"]
-  dir:
-    - "in"
-    - "out"
-    - "inout"
-  annotations:
-    - "@no_infra_errors"
-    - ""
-idl: |
-    {annotations}
-    program test
-    struct A{
-        int32 a;
-    }
-
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[1]}) -> void
-    }
-
-test_server.cpp:
-  - "{type[2]} variable = NULL;"
-
----
-name: error handling
-desc: Client need call error handler function when error occur
-params:
-  type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [uint8, "0xFF"]
-    - [float, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
-  annotations:
-    - "@no_infra_errors"
-    - "@no_alloc_errors"
-    - ""
-idl: |
-    {annotations}
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
-
-test_client.cpp:
-  - result = {type[1]};
-  - if (err)
-  - '{'
-  - g_client->callErrorHandler(err);
-  - '}'
-
----
-name: error handling in_out_inout
-desc: Client need call error handler function when error occur
-params:
-  type:
-    - [bool, "false", ""]
-    - [int8, "-1", ""]
-    - [uint8, "0xFF", ""]
-    - [float, "-1", ""]
-    - [string, "NULL", "@max_length(10)"]
-    - [A, "NULL", ""]
-    - [B, "(B) -1", ""]
-  dir:
-    - "in"
-    - "out"
-    - "inout"
-  annotations:
-    - "@no_infra_errors"
-    - "@no_alloc_errors"
-    - ""
-idl: |
-    {annotations}
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> void
-    }
-
-test_client.cpp:
-  - if (err)
-  - '{'
-  - g_client->callErrorHandler(err);
-  - not: return
-  - '}'

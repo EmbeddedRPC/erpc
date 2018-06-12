@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -73,7 +73,6 @@ public:
     , m_currentEnum(nullptr)
     , m_currentAlias(nullptr)
     , m_currentUnion(nullptr)
-    , m_isNewInterface(false)
     {
     }
 
@@ -94,7 +93,6 @@ public:
     , m_currentEnum(nullptr)
     , m_currentAlias(nullptr)
     , m_currentUnion(nullptr)
-    , m_isNewInterface(false)
     {
     }
 
@@ -103,17 +101,23 @@ public:
      */
     virtual ~SymbolScanner() {}
 
+    /*!
+     * @brief Program is out of global symbol scope.
+     *
+     * @return Program symbol.
+     */
+    Program *getProgram() { return m_currentProgram; }
+
 protected:
     SymbolScope
-        *m_globals;                                          /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
-    Interface *m_currentInterface;                           /*!< Contains pointer to interface when interface is handled. */
-    StructType *m_currentStruct;                             /*!< Contains pointer to structure when structure is handled. */
-    Program *m_currentProgram;                               /*!< Contains pointer to program when program was set in parsed file. */
-    EnumType *m_currentEnum;                                 /*!< Contains pointer to enumeration when enumeration is handled. */
-    AliasType *m_currentAlias;                               /*!< Contains pointer to alias when alias is handled. */
-    UnionType *m_currentUnion;                               /*!< Contains pointer to union when union is handled. */
-    std::vector<UnionCase *> m_emptyUnionCases;              /*!< Vector of union cases. */
-    bool m_isNewInterface;                                   /*!< When next interface is handled. */
+        *m_globals; /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
+    Interface *m_currentInterface;              /*!< Contains pointer to interface when interface is handled. */
+    StructType *m_currentStruct;                /*!< Contains pointer to structure when structure is handled. */
+    Program *m_currentProgram;                  /*!< Contains pointer to program when program was set in parsed file. */
+    EnumType *m_currentEnum;                    /*!< Contains pointer to enumeration when enumeration is handled. */
+    AliasType *m_currentAlias;                  /*!< Contains pointer to alias when alias is handled. */
+    UnionType *m_currentUnion;                  /*!< Contains pointer to union when union is handled. */
+    std::vector<UnionCase *> m_emptyUnionCases; /*!< Vector of union cases. */
     std::map<std::string, DataType *> m_forwardDeclarations; /*!< To keep forward declarations. */
 
     /*!
@@ -260,7 +264,7 @@ protected:
      *
      * @see AstNode * SymbolScanner::handleExpr()
      * @see AstNode * SymbolScanner::handleUnaryOp()
-    */
+     */
     virtual AstNode *handleBinaryOp(AstNode *node, bottom_up);
 
     /*!
@@ -580,7 +584,7 @@ protected:
      *
      * @exception semantic_error Thrown if given ast node has not child with token type TOK_INT_LITERAL.
      */
-    uint32_t getIntExprValue(const AstNode *exprNode);
+    uint64_t getIntExprValue(const AstNode *exprNode);
 
     /*!
      * @brief Determines if the right hand side of a constant declaration
@@ -638,22 +642,21 @@ protected:
     Value *getAnnotationValue(AstNode *annotationNode);
 
     /*!
+     * @brief Helper function to get programming language type if specified for which is annotation intended.
+     *
+     * @param[in] annotationNode AstNode pointing to the annotation
+     *
+     * @return Programming language type.
+     */
+    Annotation::program_lang_t getAnnotationLang(AstNode *annotationNode);
+
+    /*!
      * @brief Controlling annotations used on structure members.
      *
      * Struct members are examined for @length and @max_length annotations, and the length member is denoted.
      * This function is also used on function parameters, since they are represented as structs.
      */
     void scanStructForAnnotations();
-
-    /*!
-     * @brief Check if annotation is integer number or integer type variable.
-     *
-     * Annotation can contain reference to integer data type or it can be integer number.
-     * Referenced integer data type can be presented in global scope or in same structure scope.
-     *
-     * @param[in] ann Annotation to check.
-     */
-    void checkIfAnnValueIsIntNumberOrIntType(Annotation *ann);
 
     /*!
      * @brief This function sets to given symbol given doxygen comments.
@@ -680,7 +683,7 @@ protected:
     StructMember *createCallbackParam(StructMember *structMember, const std::string &name);
 
     /*!
-     * @brief This function registratate forward union/structure declarations.
+     * @brief This function registers forward union/structure declarations.
      *
      * @param[in] dataType Union/structure data type.
      */

@@ -1,10 +1,13 @@
 /*
+ * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -17,6 +20,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -50,7 +54,7 @@
 int main(int argc, char *argv[], char *envp[]);
 
 namespace erpcgen {
-
+using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,11 +66,16 @@ const char k_toolName[] = "erpcgen";
 const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright 2016-2017 NXP. All rights reserved.";
+const char k_copyright[] = "Copyright 2016-2018 NXP. All rights reserved.";
 
-static const char *k_optionsDefinition[] = {
-    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", "c:codec <codecType>", NULL
-};
+static const char *k_optionsDefinition[] = { "?|help",
+                                             "V|version",
+                                             "o:output <filePath>",
+                                             "v|verbose",
+                                             "I:path <filePath>",
+                                             "g:generate <language>",
+                                             "c:codec <codecType>",
+                                             NULL };
 
 /*! Help string. */
 const char k_usageText[] =
@@ -115,15 +124,15 @@ protected:
         kPythonLanguage,
     }; /*!< Generated outputs format. */
 
-    typedef vector<string> string_vector_t;
+    typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
 
-    int m_argc;                   /*!< Number of command line arguments. */
-    char **m_argv;                /*!< String value for each command line argument. */
-    StdoutLogger *m_logger;       /*!< Singleton logger instance. */
-    verbose_type_t m_verboseType; /*!< Which type of log is need to set (warning, info, debug). */
-    const char *m_outputFilePath; /*!< Path to the output file. */
-    const char *m_ErpcFile;       /*!< ERPC file. */
-    string_vector_t m_positionalArgs;
+    int m_argc;                           /*!< Number of command line arguments. */
+    char **m_argv;                        /*!< String value for each command line argument. */
+    StdoutLogger *m_logger;               /*!< Singleton logger instance. */
+    verbose_type_t m_verboseType;         /*!< Which type of log is need to set (warning, info, debug). */
+    const char *m_outputFilePath;         /*!< Path to the output file. */
+    const char *m_ErpcFile;               /*!< ERPC file. */
+    string_vector_t m_positionalArgs;     /*!< Positional arguments. */
     languages_t m_outputLanguage;         /*!< Output language we're generating. */
     InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
 
@@ -318,7 +327,7 @@ public:
 
             // Parse and build definition model.
             InterfaceDefinition def;
-            uint16_t idlCrc16 = def.parse(m_ErpcFile);
+            def.parse(m_ErpcFile);
 
             // Check for duplicate function IDs
             UniqueIdChecker uniqueIdCheck;
@@ -330,10 +339,10 @@ public:
             switch (m_outputLanguage)
             {
                 case kCLanguage:
-                    CGenerator(&def, idlCrc16).generate();
+                    CGenerator(&def).generate();
                     break;
                 case kPythonLanguage:
-                    PythonGenerator(&def, idlCrc16).generate();
+                    PythonGenerator(&def).generate();
                     break;
             }
         }
@@ -354,13 +363,13 @@ public:
     /*!
      * @brief Validate arguments that can be checked.
      *
-     * @exception std::runtime_error Thrown if an argument value fails to pass validation.
+     * @exception runtime_error Thrown if an argument value fails to pass validation.
      */
     void checkArguments()
     {
         //      if (m_outputFilePath == NULL)
         //      {
-        //          throw std::runtime_error("no output file was specified");
+        //          throw runtime_error("no output file was specified");
         //      }
     }
 

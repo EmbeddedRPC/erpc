@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -53,9 +53,11 @@
 #include "UnionCase.h"
 #include "UnionType.h"
 #include "annotations.h"
+#include "cpptempl.h"
 #include <cstring>
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -82,29 +84,9 @@ Value *Annotation::getValueObject()
     }
 }
 
-std::string Symbol::getOutputName()
+string Symbol::printAnnotations()
 {
-    Annotation *ann = findAnnotation(NAME_ANNOTATION);
-    if (ann)
-    {
-        std::string annName = ann->getValueObject()->toString();
-        if (annName.empty())
-        {
-            throw semantic_error(format_string("Missing value for annotation named @%s on line '%d'", NAME_ANNOTATION,
-                                               ann->getLocation().m_firstLine));
-        }
-        Log::warning("line %d: Be careful when @%s annotation is used. This can cause compile issue. See documentation.\n", ann->getLocation().m_firstLine, NAME_ANNOTATION);
-        return annName;
-    }
-    else
-    {
-        return m_name;
-    }
-}
-
-std::string Symbol::printAnnotations()
-{
-    std::string ret;
+    string ret;
     ret += "Annotations [ ";
     int16_t annotationCount = (int16_t)m_annotations.size();
     int16_t annotationIndex = 1;
@@ -122,9 +104,9 @@ std::string Symbol::printAnnotations()
     return ret;
 }
 
-Annotation *Symbol::findAnnotation(std::string name)
+Annotation *Symbol::findAnnotation(string name, Annotation::program_lang_t lang)
 {
-    std::vector<Annotation *> annotationList = getAnnotations(name);
+    vector<Annotation *> annotationList = getAnnotations(name, lang);
     if (0 < annotationList.size())
     {
         return annotationList.back();
@@ -135,12 +117,13 @@ Annotation *Symbol::findAnnotation(std::string name)
     }
 }
 
-std::vector<Annotation *> Symbol::getAnnotations(std::string name)
+vector<Annotation *> Symbol::getAnnotations(string name, Annotation::program_lang_t lang)
 {
-    std::vector<Annotation *> anList;
+    vector<Annotation *> anList;
     for (int i = 0; i < m_annotations.size(); ++i)
     {
-        if (m_annotations[i].getName() == name)
+        if (m_annotations[i].getName() == name &&
+            (m_annotations[i].getLang() == lang || m_annotations[i].getLang() == Annotation::kAll))
         {
             anList.push_back(&m_annotations[i]);
         }
@@ -148,15 +131,15 @@ std::vector<Annotation *> Symbol::getAnnotations(std::string name)
     return anList;
 }
 
-Value *Symbol::getAnnValue(const std::string annName)
+Value *Symbol::getAnnValue(const string annName, Annotation::program_lang_t lang)
 {
-    Annotation *ann = findAnnotation(annName);
+    Annotation *ann = findAnnotation(annName, lang);
     return (ann) ? ann->getValueObject() : nullptr;
 }
 
-std::string Symbol::getAnnStringValue(const std::string annName)
+string Symbol::getAnnStringValue(const string annName, Annotation::program_lang_t lang)
 {
-    Value *annVallue = getAnnValue(annName);
+    Value *annVallue = getAnnValue(annName, lang);
     return (annVallue) ? annVallue->toString() : "";
 }
 
@@ -204,7 +187,7 @@ SymbolScope::symbol_vector_t SymbolScope::getSymbolsOfType(Symbol::symbol_type_t
     return syms;
 }
 
-bool SymbolScope::hasSymbol(const std::string &name, bool recursive)
+bool SymbolScope::hasSymbol(const string &name, bool recursive)
 {
     bool isPresent = (m_symbolMap.find(name) != m_symbolMap.end());
     if (!isPresent && m_parent && recursive)
@@ -214,7 +197,7 @@ bool SymbolScope::hasSymbol(const std::string &name, bool recursive)
     return isPresent;
 }
 
-Symbol *SymbolScope::getSymbol(const std::string &name, bool recursive)
+Symbol *SymbolScope::getSymbol(const string &name, bool recursive)
 {
     auto it = m_symbolMap.find(name);
     if (it != m_symbolMap.end())
@@ -308,12 +291,12 @@ void SymbolScope::clear()
     m_symbolVector.clear();
 }
 
-std::string ListType::getDescription() const
+string ListType::getDescription() const
 {
     return format_string("<list:%s>", m_elementType ? m_elementType->getDescription().c_str() : "(null)");
 }
 
-std::string ArrayType::getDescription() const
+string ArrayType::getDescription() const
 {
     return format_string("<array:%d:%s>", m_elementCount,
                          m_elementType ? m_elementType->getDescription().c_str() : "(null)");
@@ -363,9 +346,9 @@ void StructType::addMember(StructMember *newMember)
     m_members.push_back(newMember);
 }
 
-std::string StructType::getDescription() const
+string StructType::getDescription() const
 {
-    std::string members;
+    string members;
     int n = 0;
     for (auto it : m_members)
     {
@@ -380,13 +363,12 @@ std::string StructType::getDescription() const
     return format_string("<struct %s [%s]>", m_name.c_str(), members.c_str());
 }
 
-std::string StructMember::getDescription() const
+string StructMember::getDescription() const
 {
-    return format_string("<member %s:%s>", m_name.c_str(),
-                         (m_dataType ? m_dataType->getName().c_str() : "(no type)"));
+    return format_string("<member %s:%s>", m_name.c_str(), (m_dataType ? m_dataType->getName().c_str() : "(no type)"));
 }
 
-EnumMember *EnumType::getMember(std::string name)
+EnumMember *EnumType::getMember(string name)
 {
     for (auto member : m_members)
     {
@@ -404,9 +386,9 @@ void EnumType::addMember(EnumMember *newMember)
     m_members.push_back(newMember);
 }
 
-std::string EnumType::getDescription() const
+string EnumType::getDescription() const
 {
-    std::string members;
+    string members;
     int n = 0;
     for (auto it : m_members)
     {
@@ -421,7 +403,7 @@ std::string EnumType::getDescription() const
     return format_string("<enum %s [%s]>", m_name.c_str(), members.c_str());
 }
 
-std::string EnumMember::getDescription() const
+string EnumMember::getDescription() const
 {
     if (this->hasValue())
     {
@@ -446,12 +428,12 @@ void Group::addDirToSymbolsMap(Symbol *symbol, _param_direction dir)
     auto it = m_symbolDirections.find(symbol);
     if (it == m_symbolDirections.end())
     {
-        std::set<_param_direction> directions;
+        set<_param_direction> directions;
         directions.insert(dir);
         m_symbolDirections[symbol] = directions;
 
         // add symbol into list of symbols
-        if (std::find(m_symbols.begin(), m_symbols.end(), symbol) == m_symbols.end())
+        if (find(m_symbols.begin(), m_symbols.end(), symbol) == m_symbols.end())
         {
             m_symbols.push_back(symbol);
         }
@@ -466,9 +448,9 @@ void Group::setTemplate(cpptempl::data_map groupTemplate)
     m_template = groupTemplate;
 }
 
-const std::set<_param_direction> Group::getSymbolDirections(Symbol *symbol) const
+const set<_param_direction> Group::getSymbolDirections(Symbol *symbol) const
 {
-    std::set<_param_direction> directions;
+    set<_param_direction> directions;
     auto it = m_symbolDirections.find(symbol);
     if (it != m_symbolDirections.end())
     {
@@ -478,9 +460,9 @@ const std::set<_param_direction> Group::getSymbolDirections(Symbol *symbol) cons
     return directions;
 }
 
-std::string Group::getDescription() const
+string Group::getDescription() const
 {
-    std::string ifaces;
+    string ifaces;
     int n = 0;
     for (auto it : m_interfaces)
     {
@@ -495,7 +477,7 @@ std::string Group::getDescription() const
     return format_string("<group \"%s\" [%s]>", m_name.c_str(), ifaces.c_str());
 }
 
-std::string AliasType::getDescription() const
+string AliasType::getDescription() const
 {
     return format_string("<type %s [%s]>", m_name.c_str(), m_elementType->getDescription().c_str());
 }
@@ -536,14 +518,14 @@ DataType *DataType::getTrueContainerDataType()
     }
 }
 
-std::string FunctionType::getDescription() const
+string FunctionType::getDescription() const
 {
     return format_string("<function %s->%s [%s]>", m_name.c_str(),
                          (m_returnType ? m_returnType->getDescription().c_str() : "(oneway)"),
                          m_parameters.getDescription().c_str());
 }
 
-std::string Function::getDescription() const
+string Function::getDescription() const
 {
     return format_string("<function(%u) %s->%s [%s]>", m_uniqueId, m_name.c_str(),
                          (m_returnType ? m_returnType->getDescription().c_str() : "(oneway)"),
@@ -558,9 +540,9 @@ void Interface::addFunction(Function *func)
     m_functions.push_back(func);
 }
 
-std::string Interface::getDescription() const
+string Interface::getDescription() const
 {
-    std::string fns;
+    string fns;
     int n = 0;
     for (auto it : m_functions)
     {
@@ -587,10 +569,10 @@ bool UnionCase::caseMemberIsVoid() const
     return false;
 }
 
-std::string UnionCase::getDescription() const
+string UnionCase::getDescription() const
 {
-    std::string description;
-    std::string caseName = ("" != m_caseName) ? m_caseName : std::to_string(m_caseValue);
+    string description;
+    string caseName = ("" != m_caseName) ? m_caseName : to_string(m_caseValue);
     description += "<" + caseName + ":";
     if (caseMemberIsVoid())
     {
@@ -610,7 +592,7 @@ std::string UnionCase::getDescription() const
     return description;
 }
 
-StructMember *UnionCase::getUnionMemberDeclaration(const std::string &name)
+StructMember *UnionCase::getUnionMemberDeclaration(const string &name)
 {
     return m_containingUnion->getUnionMemberDeclaration(name);
 }
@@ -623,9 +605,9 @@ void UnionType::addCase(UnionCase *unionCase)
     m_unionCases.push_back(unionCase);
 }
 
-std::string UnionType::getDescription() const
+string UnionType::getDescription() const
 {
-    std::string description;
+    string description;
     for (auto caseMember : m_unionCases)
     {
         description += caseMember->getDescription();
@@ -657,8 +639,8 @@ UnionType::case_vector_t UnionType::getUniqueCases()
 
 bool UnionType::casesAreTheSame(UnionCase *a, UnionCase *b)
 {
-    std::vector<std::string> aNames = a->getMemberDeclarationNames();
-    std::vector<std::string> bNames = b->getMemberDeclarationNames();
+    vector<string> aNames = a->getMemberDeclarationNames();
+    vector<string> bNames = b->getMemberDeclarationNames();
     if (aNames.size() != bNames.size())
     {
         return false;
@@ -673,7 +655,7 @@ bool UnionType::casesAreTheSame(UnionCase *a, UnionCase *b)
     return true;
 }
 
-bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dataType)
+bool UnionType::addUnionMemberDeclaration(const string &name, DataType *dataType)
 {
     if (declarationExists(name))
     {
@@ -684,7 +666,7 @@ bool UnionType::addUnionMemberDeclaration(const std::string &name, DataType *dat
     return true;
 }
 
-bool UnionType::declarationExists(const std::string &name)
+bool UnionType::declarationExists(const string &name)
 {
     for (auto member : m_members.getMembers())
     {
@@ -696,7 +678,7 @@ bool UnionType::declarationExists(const std::string &name)
     return false;
 }
 
-StructMember *UnionType::getUnionMemberDeclaration(const std::string &name)
+StructMember *UnionType::getUnionMemberDeclaration(const string &name)
 {
     for (auto caseMember : m_members.getMembers())
     {

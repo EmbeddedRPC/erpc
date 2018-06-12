@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -38,86 +38,190 @@
 #include "format_string.h"
 #include <cstdint>
 #include <string>
-//#include "Blob.h"
 
-typedef enum {
-    kIntegerValue,
-    kSizedIntegerValue,
-    kStringValue,
-    kFloatValue
-} value_type_t;
+typedef enum { kIntegerValue, kStringValue, kFloatValue } value_type_t; /*!< Value types */
 
 /*!
- * \brief Abstract base class for values of arbitrary types.
+ * @brief Abstract base class for values of arbitrary types.
  */
 class Value
 {
 public:
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] theType Value type.
+     */
     Value(value_type_t theType)
     : m_type(theType)
     {
     }
 
+    /*!
+     * @brief Destructor.
+     */
     virtual ~Value() {}
 
+    /*!
+     * @brief Get Value type.
+     *
+     * @return Value type.
+     */
     virtual value_type_t getType() const { return m_type; }
 
+    /*!
+     * @brief Get Value type name.
+     *
+     * @return Value type name.
+     */
     virtual std::string getTypeName() const = 0;
 
+    /*!
+     * @brief Get Value type size.
+     *
+     * @return Value type size.
+     */
     virtual size_t getSize() const = 0;
 
+    /*!
+     * @brief Get Value type string representation.
+     *
+     * @return Value type string representation.
+     */
     virtual std::string toString() const = 0;
 
+    /*!
+     * @brief Clone Value.
+     *
+     * @return Cloned Value.
+     */
     virtual Value *clone() const = 0;
 
 private:
-    value_type_t m_type;
+    value_type_t m_type; /*!< Value type. */
 };
 
 /*!
- * \brief 32-bit unsigned integer value.
+ * @brief 64-bit integer value.
  */
 class IntegerValue : public Value
 {
 public:
-    IntegerValue()
+    //! Supported sizes of integers.
+    typedef enum { kSigned, kSignedLong, kUnsigned, kUnsignedLong } int_type_t; //!< The integer type.
+
+    /*!
+     * @brief Constructor.
+     */
+    IntegerValue(int_type_t type = kSigned)
     : Value(kIntegerValue)
     , m_value(0)
+    , m_intType(type)
     {
     }
 
-    IntegerValue(int32_t value)
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] value IntegerValue value.
+     */
+    IntegerValue(uint64_t value, int_type_t type = kSigned)
     : Value(kIntegerValue)
     , m_value(value)
+    , m_intType(type)
     {
     }
 
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] other IntegerValue to copy.
+     */
     IntegerValue(const IntegerValue &other)
-    : Value(kIntegerValue)
+    : Value(other.getType())
     , m_value(other.m_value)
+    , m_intType(other.m_intType)
     {
     }
 
+    /*!
+     * @brief Get IntegerValue type name.
+     *
+     * @return IntegerValue type name.
+     */
     virtual std::string getTypeName() const { return "integer"; }
 
+    /*!
+     * @brief Get IntegerValue type size.
+     *
+     * @return IntegerValue type size.
+     */
     virtual size_t getSize() const { return sizeof(m_value); }
 
-    int32_t getValue() const { return m_value; }
+    /*!
+     * @brief This function returns value.
+     *
+     * @return value IntegerValue value.
+     */
+    uint64_t getValue() const
+    {
+        return (m_intType == kSignedLong || m_intType == kUnsignedLong) ? m_value : (uint32_t)m_value;
+    }
 
-    operator int32_t() const { return m_value; }
+    /*!
+     * @brief This function returns signed/unsigned type.
+     *
+     * @return value IntegerValue type.
+     */
+    int_type_t getIntType() { return m_intType; }
 
-    IntegerValue &operator=(int32_t value)
+    /*!
+     * @brief Casting operator.
+     *
+     * @return value IntegerValue value.
+     */
+    operator uint64_t() const { return m_value; }
+
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] value IntegerValue value.
+     *
+     * @return IntegerValue reference.
+     */
+    IntegerValue &operator=(int64_t value)
     {
         m_value = value;
         return *this;
     }
 
-    virtual std::string toString() const { return format_string("%d", m_value); }
+    /*!
+     * @brief Get IntegerValue type string representation.
+     *
+     * @return IntegerValue type string representation.
+     */
+    virtual std::string toString() const
+    {
+        if (m_intType == kUnsigned)
+            return format_string("%uU", (uint32_t)m_value);
+        else if (m_intType == kSigned)
+            return format_string("%d", (int32_t)m_value);
+        else if (m_intType == kUnsignedLong)
+            return format_string("%lluU", m_value);
+        else
+            return format_string("%lld", (int64_t)m_value);
+    }
 
+    /*!
+     * @brief Clone IntegerValue.
+     *
+     * @return Cloned IntegerValue.
+     */
     virtual Value *clone() const { return new IntegerValue(*this); }
 
 protected:
-    int32_t m_value; //!< The integer value.
+    uint64_t m_value;     //!< The integer value.
+    int_type_t m_intType; //!< The integer type.
 };
 
 /*!
@@ -126,60 +230,134 @@ protected:
 class FloatValue : public Value
 {
 public:
+    /*!
+     * @brief Constructor.
+     */
     FloatValue()
     : Value(kFloatValue)
     , m_value(0.0)
     {
     }
 
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] value FloatValue value.
+     */
     FloatValue(double value)
     : Value(kFloatValue)
     , m_value(value)
     {
     }
 
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] value FloatValue value.
+     */
     FloatValue(float value)
     : Value(kFloatValue)
     , m_value(value)
     {
     }
 
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] other FloatValue to copy.
+     */
     FloatValue(const FloatValue &other)
     : Value(kFloatValue)
     , m_value(other.m_value)
     {
     }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] other FloatValue to copy.
+     *
+     * @return FloatValue reference.
+     */
     FloatValue &operator=(const FloatValue &other)
     {
         m_value = other.m_value;
         return *this;
     }
 
+    /*!
+     * @brief Get FloatValue type name.
+     *
+     * @return FloatValue type name.
+     */
     virtual std::string getTypeName() const { return "float"; }
 
+    /*!
+     * @brief Get FloatValue type size.
+     *
+     * @return FloatValue type size.
+     */
     virtual size_t getSize() const { return sizeof(m_value); }
 
+    /*!
+     * @brief This function returns value.
+     *
+     * @return value FloatValue value.
+     */
     double getValue() const { return m_value; }
 
+    /*!
+     * @brief Casting operator returns value.
+     *
+     * @return value FloatValue value.
+     */
     operator double() const { return m_value; }
 
+    /*!
+     * @brief Casting operator returns value.
+     *
+     * @return value FloatValue value.
+     */
     operator float() const { return static_cast<float>(m_value); }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] value FloatValue value.
+     *
+     * @return FloatValue reference.
+     */
     FloatValue &operator=(double value)
     {
         m_value = value;
         return *this;
     }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] value FloatValue value.
+     *
+     * @return FloatValue reference.
+     */
     FloatValue &operator=(float value)
     {
         m_value = value;
         return *this;
     }
 
-    virtual std::string toString() const { return format_string("%f", m_value); }
+    /*!
+     * @brief Get FloatValue type string representation.
+     *
+     * @return FloatValue type string representation.
+     */
+    virtual std::string toString() const { return format_string("%g", m_value); }
 
+    /*!
+     * @brief Clone FloatValue.
+     *
+     * @return Cloned FloatValue.
+     */
     virtual Value *clone() const { return new FloatValue(*this); }
 
 protected:
@@ -187,189 +365,166 @@ protected:
 };
 
 /*!
- * \brief Adds a word size attribute to IntegerValue.
- *
- * The word size really only acts as an attribute that is carried along
- * with the integer value. It doesn't affect the actual value at all.
- * However, you can use the getWordSizeMask() method to mask off bits
- * that should not be there.
- *
- * The word size defaults to a 32-bit word.
- */
-class SizedIntegerValue : public IntegerValue
-{
-public:
-    //! Supported sizes of integers.
-    typedef enum {
-        kWordSize,     //!< 32-bit word.
-        kHalfWordSize, //!< 16-bit half word.
-        kByteSize      //!< 8-bit byte.
-    } int_size_t;
-
-    SizedIntegerValue()
-    : IntegerValue()
-    , m_size(kWordSize)
-    {
-        m_value = kSizedIntegerValue;
-    }
-
-    SizedIntegerValue(uint32_t value, int_size_t size = kWordSize)
-    : IntegerValue(value)
-    , m_size(size)
-    {
-        m_value = kSizedIntegerValue;
-    }
-
-    SizedIntegerValue(uint16_t value)
-    : IntegerValue(value)
-    , m_size(kHalfWordSize)
-    {
-        m_value = kSizedIntegerValue;
-    }
-
-    SizedIntegerValue(uint8_t value)
-    : IntegerValue(value)
-    , m_size(kByteSize)
-    {
-        m_value = kSizedIntegerValue;
-    }
-
-    SizedIntegerValue(const SizedIntegerValue &other)
-    : IntegerValue(other)
-    , m_size(other.m_size)
-    {
-        m_value = kSizedIntegerValue;
-    }
-
-    virtual std::string getTypeName() const { return "sized integer"; }
-
-    virtual size_t getSize() const;
-
-    int_size_t getWordSize() const { return m_size; }
-
-    void setWordSize(int_size_t size) { m_size = size; }
-
-    //! \brief Returns a 32-bit mask value dependant on the word size attribute.
-    uint32_t getWordSizeMask() const;
-
-    //! \name Assignment operators
-    //! These operators set the word size as well as the integer value.
-    //@{
-    SizedIntegerValue &operator=(uint8_t value)
-    {
-        m_value = value;
-        m_size = kByteSize;
-        return *this;
-    }
-
-    SizedIntegerValue &operator=(uint16_t value)
-    {
-        m_value = value;
-        m_size = kHalfWordSize;
-        return *this;
-    }
-
-    SizedIntegerValue &operator=(uint32_t value)
-    {
-        m_value = value;
-        m_size = kWordSize;
-        return *this;
-    }
-    //@}
-
-    virtual Value *clone() const { return new SizedIntegerValue(*this); }
-
-protected:
-    int_size_t m_size; //!< Size of the integer.
-};
-
-/*!
- * \brief String value.
+ * @brief String value.
  *
  * Simply wraps the STL std::string class.
  */
 class StringValue : public Value
 {
 public:
+    /*!
+     * @brief Constructor.
+     */
     StringValue()
     : Value(kStringValue)
     , m_value()
     {
     }
 
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] value StringValue value.
+     */
     StringValue(const std::string &value)
     : Value(kStringValue)
     , m_value(value)
     {
     }
 
+    /*!
+     * @brief Constructor.
+     *
+     * @param[in] value StringValue value.
+     */
     StringValue(const std::string *value)
     : Value(kStringValue)
     , m_value(*value)
     {
     }
 
+    /*!
+     * @brief Copy constructor.
+     *
+     * @param[in] other StringValue to copy.
+     */
     StringValue(const StringValue &other)
     : Value(kStringValue)
     , m_value(other.m_value)
     {
     }
 
+    /*!
+     * @brief Get StringValue type name.
+     *
+     * @return StringValue type name.
+     */
     virtual std::string getTypeName() const { return "string"; }
 
+    /*!
+     * @brief Get StringValue type size.
+     *
+     * @return StringValue type size.
+     */
     virtual size_t getSize() const { return m_value.size(); }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     const std::string &getString() const { return m_value; }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     operator const char *() const { return m_value.c_str(); }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     operator const std::string &() const { return m_value; }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     operator std::string &() { return m_value; }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     operator const std::string *() { return &m_value; }
 
+    /*!
+     * @brief Get StringValue value.
+     *
+     * @return StringValue value.
+     */
     operator std::string *() { return &m_value; }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] other StringValue to copy.
+     *
+     * @return StringValue reference.
+     */
     StringValue &operator=(const StringValue &other)
     {
         m_value = other.m_value;
         return *this;
     }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] value StringValue value.
+     *
+     * @return StringValue reference.
+     */
     StringValue &operator=(const std::string &value)
     {
         m_value = value;
         return *this;
     }
 
+    /*!
+     * @brief Assign operator.
+     *
+     * @param[in] value StringValue value.
+     *
+     * @return StringValue reference.
+     */
     StringValue &operator=(const char *value)
     {
         m_value = value;
         return *this;
     }
 
+    /*!
+     * @brief Get StringValue type string representation.
+     *
+     * @return StringValue type string representation.
+     */
     virtual std::string toString() const { return m_value; }
 
+    /*!
+     * @brief Clone StringValue.
+     *
+     * @return Cloned StringValue.
+     */
     virtual Value *clone() const { return new StringValue(*this); }
 
 protected:
     std::string m_value; //!< The string value.
 };
-
-#if 0
-/*!
- * \brief Binary object value of arbitrary size.
- */
-class BinaryValue : public Value, public Blob
-{
-public:
-    BinaryValue() : Value(), Blob() {}
-
-    virtual std::string getTypeName() const { return "binary"; }
-
-    virtual size_t getSize() const { return getLength(); }
-};
-#endif
 
 #endif // _Value_h_

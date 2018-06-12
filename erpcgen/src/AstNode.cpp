@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -40,6 +40,7 @@
 #include <cstdio>
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -123,18 +124,18 @@ AstNode::~AstNode()
     }
 }
 
-bool AstNode::hasAttribute(const std::string &name) const
+bool AstNode::hasAttribute(const string &name) const
 {
     auto it = m_attributes.find(name);
     return it != m_attributes.end();
 }
 
-Value *AstNode::getAttribute(const std::string &name)
+Value *AstNode::getAttribute(const string &name)
 {
     auto it = m_attributes.find(name);
     if (it == m_attributes.end())
     {
-        throw std::runtime_error(format_string("no attribute with name '%s'", name.c_str()));
+        throw runtime_error(format_string("no attribute with name '%s'", name.c_str()));
     }
     else
     {
@@ -142,12 +143,12 @@ Value *AstNode::getAttribute(const std::string &name)
     }
 }
 
-void AstNode::setAttribute(const std::string &name, Value *node)
+void AstNode::setAttribute(const string &name, Value *node)
 {
     m_attributes[name] = node;
 }
 
-void AstNode::removeAttribute(const std::string &name)
+void AstNode::removeAttribute(const string &name)
 {
     if (hasAttribute(name))
     {
@@ -208,13 +209,13 @@ void AstNode::replaceChild(AstNode *original, AstNode *replacement)
     //    delete original;
 }
 
-std::string AstNode::getDescription() const
+string AstNode::getDescription() const
 {
     const Token &tok = getToken();
     const Value *val = tok.getValue();
     const char *tokenName = get_token_name(tok.getToken());
-    std::string output = format_string("%s", tokenName);
-    std::string valToString = val ? val->toString().c_str() : "<null>";
+    string output = format_string("%s", tokenName);
+    string valToString = val ? val->toString().c_str() : "<null>";
     const token_loc_t &loc = tok.getLocation();
     if (val && tok.getToken() == TOK_ML_COMMENT)
     {

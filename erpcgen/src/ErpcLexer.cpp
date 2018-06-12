@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,17 +33,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ErpcLexer.h"
+#include "erpc_crc16.h"
 #include "erpc_version.h"
 #include "Generator.h"
 #include "HexValues.h"
 #include "SearchPath.h"
-#include "crc16.h"
 #include <algorithm>
 #include <fstream>
 #include <streambuf>
 #include <string>
 
 using namespace erpcgen;
+using namespace std;
 
 #if __WIN32__
 #define PATH_SEP_CHAR '\\'
@@ -180,7 +181,7 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     return count;
 }
 
-void ErpcLexer::pushFile(const std::string &fileName)
+void ErpcLexer::pushFile(const string &fileName)
 {
     CurrentFileInfo *newSavedFileInfo = openFile(fileName);
 
@@ -210,16 +211,16 @@ void ErpcLexer::popFile()
     yypop_buffer_state();
 }
 
-CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
+CurrentFileInfo *ErpcLexer::openFile(const string &fileName)
 {
     // search file in path
-    std::string foundFile, currentFolderPath;
+    string foundFile, currentFolderPath;
     if (!PathSearcher::getGlobalSearcher().search(fileName, PathSearcher::target_type_t::kFindFile, true, foundFile))
     {
         throw runtime_error(format_string("could not find input file %s in defined directories", fileName.c_str()));
     }
 
-    if (fileName.rfind(PATH_SEP_CHAR) != std::string::npos)
+    if (fileName.rfind(PATH_SEP_CHAR) != string::npos)
     {
         int fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
         currentFolderPath = foundFile.substr(0, fileSepPos);
@@ -237,7 +238,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
         }
     }
     // open file
-    std::ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
+    ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
     if (inputFile)
     {
         if (!inputFile->is_open())
@@ -252,7 +253,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
     }
 
     /* Counting CRC16 for Generator. */
-    std::string str((std::istreambuf_iterator<char>(*inputFile)), std::istreambuf_iterator<char>());
+    string str((istreambuf_iterator<char>(*inputFile)), istreambuf_iterator<char>());
     erpc::Crc16 crc16 = erpc::Crc16(ERPC_VERSION_NUMBER);
     m_idlCrc16 += crc16.computeCRC16((const uint8_t *)str.c_str(), str.size());
 

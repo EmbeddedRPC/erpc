@@ -3,10 +3,9 @@
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -41,7 +40,7 @@
 
 TEST(test_shared, sendReceiveBaseSharedStruct)
 {
-    BaseSharedStruct sm = {4, 5};
+    BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm;
     _sm = sendReceiveBaseSharedStruct(&sm);
     EXPECT_TRUE(_sm == &sm);
@@ -49,7 +48,7 @@ TEST(test_shared, sendReceiveBaseSharedStruct)
 
 TEST(test_shared, inoutBaseSharedStruct)
 {
-    BaseSharedStruct sm = {4, 5};
+    BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm = &sm;
     inoutBaseSharedStruct(&_sm);
     EXPECT_TRUE(_sm == &sm);

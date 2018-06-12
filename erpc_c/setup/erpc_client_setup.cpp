@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,18 +34,15 @@
  */
 
 #include "erpc_client_setup.h"
-#include "basic_codec.h"
-#include "client_manager.h"
-#include "crc16.h"
-#include "manually_constructed.h"
-#include <assert.h>
-#include <new>
+#include "erpc_basic_codec.h"
+#include "erpc_client_manager.h"
+#include "erpc_crc16.h"
+#include "erpc_manually_constructed.h"
+#include "erpc_message_buffer.h"
+#include "erpc_transport.h"
+#include <cassert>
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
-#endif
-
-#if !(__embedded_cplusplus)
-using namespace std;
 #endif
 
 using namespace erpc;
@@ -56,11 +53,9 @@ using namespace erpc;
 
 // global client variables
 static ManuallyConstructed<ClientManager> s_client;
-ClientManager *g_client;
+ClientManager *g_client = NULL;
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 static ManuallyConstructed<Crc16> s_crc16;
-
-extern const uint32_t erpc_generated_crc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -68,13 +63,15 @@ extern const uint32_t erpc_generated_crc;
 
 void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
+    assert(transport);
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init client manager with the provided transport.
     s_client.construct();
     Transport *castedTransport = reinterpret_cast<Transport *>(transport);
-    s_crc16.construct(erpc_generated_crc);
+    s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_client->setTransport(castedTransport);
     s_client->setCodecFactory(s_codecFactory);
@@ -84,34 +81,50 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
 
 void erpc_client_set_error_handler(client_error_handler_t error_handler)
 {
-    if (g_client)
+    if (g_client != NULL)
     {
         g_client->setErrorHandler(error_handler);
     }
 }
 
+void erpc_client_set_crc(uint32_t crcStart)
+{
+    s_crc16->setCrcStart(crcStart);
+}
+
 #if ERPC_NESTED_CALLS
 void erpc_client_set_server(erpc_server_t server)
 {
-    g_client->setServer(reinterpret_cast<Server *>(server));
+    if (g_client != NULL)
+    {
+        g_client->setServer(reinterpret_cast<Server *>(server));
+    }
 }
 
 void erpc_client_set_server_thread_id(void *serverThreadId)
 {
-    g_client->setServerThreadId(reinterpret_cast<Thread::thread_id_t *>(serverThreadId));
+    if (g_client != NULL)
+    {
+        g_client->setServerThreadId(reinterpret_cast<Thread::thread_id_t *>(serverThreadId));
+    }
 }
 #endif
 
 #if ERPC_MESSAGE_LOGGING
-void erpc_server_add_message_logger(erpc_transport_t transport)
+bool erpc_client_add_message_logger(erpc_transport_t transport)
 {
-    g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    if (g_client != NULL)
+    {
+        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+    return false;
 }
 #endif
 
-void erpc_client_deinit()
+void erpc_client_deinit(void)
 {
     s_crc16.destroy();
     s_client.destroy();
     s_codecFactory.destroy();
+    g_client = NULL;
 }

@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -45,9 +45,10 @@
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-//! @brief Version 1.6.0.
-#define ERPC_VERSION "1.6.0"
-#define ERPC_VERSION_NUMBER 10600
+//! @brief String version of eRPC.
+#define ERPC_VERSION "1.7.0"
+//! @brief Integer version of eRPC.
+#define ERPC_VERSION_NUMBER 10700
 
 /*! @} */
 

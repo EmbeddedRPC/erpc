@@ -65,8 +65,8 @@ else ifeq "$(is_cygwin)" "1"
 FLEX ?= /bin/flex
 BISON ?= /bin/bison
 else ifeq "$(is_mingw)" "1"
-FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v12/win_flex.exe
-BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v12/win_bison.exe
+FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
+BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
 endif
 
 ifeq "$(is_mingw)" "1"

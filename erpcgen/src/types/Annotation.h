@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -53,6 +53,13 @@ namespace erpcgen {
 class Annotation
 {
 public:
+    enum program_lang_t
+    {
+        kAll,
+        kC,
+        kPython
+    };
+
     /*!
      * @brief Constructor.
      *
@@ -60,11 +67,13 @@ public:
      *
      * @param[in] token Token contains annotation name and location in parsed file.
      * @param[in] val Pointer to value.
+     * @param[in] lang Programming language for which is annotation intended.
      */
-    Annotation(const Token &token, Value *val)
+    Annotation(const Token &token, Value *val, program_lang_t lang)
     : m_name(token.getStringValue())
     , m_value(val)
     , m_location(token.getLocation())
+    , m_lang(lang)
     {
     }
 
@@ -79,6 +88,7 @@ public:
     : m_name(token.getStringValue())
     , m_value(nullptr)
     , m_location(token.getLocation())
+    , m_lang(kAll)
     {
     }
 
@@ -93,6 +103,7 @@ public:
     : m_name(a.m_name)
     , m_value(a.m_value)
     , m_location(a.m_location)
+    , m_lang(a.m_lang)
     {
     }
 
@@ -120,6 +131,13 @@ public:
     Value *getValueObject();
 
     /*!
+     * @brief This function returns programming language type for which is annotation intended.
+     *
+     * @return Programming language type.
+     */
+    program_lang_t getLang() const { return m_lang; }
+
+    /*!
      * @brief This function returns toString representation.
      *
      * @return Returns "name = value".
@@ -137,6 +155,7 @@ private:
     std::string m_name;     /*!< Annotation name. */
     Value *m_value;         /*!< Value of annotation*/
     token_loc_t m_location; /*!< Location of annotation in parsed file. */
+    program_lang_t m_lang;  /*!< Programming language for which is annotation intended. */
 };
 
 } // namespace erpcgen

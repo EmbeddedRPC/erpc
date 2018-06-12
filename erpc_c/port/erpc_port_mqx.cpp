@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,13 +34,13 @@
  */
 
 #include "erpc_port.h"
-#include "mqx.h"
 #include <new>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
+extern "C" {
+#include "mqx.h"
+};
 
+using namespace std;
 void *operator new(std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);

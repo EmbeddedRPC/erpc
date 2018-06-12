@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,19 +34,15 @@
  */
 
 #include "erpc_arbitrated_client_setup.h"
-#include "arbitrated_client_manager.h"
-#include "basic_codec.h"
-#include "manually_constructed.h"
-#include "transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.h"
+#include "erpc_basic_codec.h"
+#include "erpc_manually_constructed.h"
+#include "erpc_message_buffer.h"
+#include "erpc_transport_arbitrator.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
 #endif
-#include <assert.h>
-#include <new>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
+#include <cassert>
 
 using namespace erpc;
 
@@ -56,11 +52,12 @@ using namespace erpc;
 
 // global client variables
 static ManuallyConstructed<ArbitratedClientManager> s_client;
-ClientManager *g_client;
+ClientManager *g_client = NULL;
 
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 static ManuallyConstructed<TransportArbitrator> s_arbitrator;
 static ManuallyConstructed<BasicCodec> s_codec;
+static ManuallyConstructed<Crc16> s_crc16;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -68,6 +65,8 @@ static ManuallyConstructed<BasicCodec> s_codec;
 
 erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
+    assert(transport);
+
     // Init factories.
     s_codecFactory.construct();
 
@@ -76,7 +75,10 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
 
     // Init the arbitrator using the passed in transport.
     s_arbitrator.construct();
-    s_arbitrator->setSharedTransport(reinterpret_cast<Transport *>(transport));
+    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    s_crc16.construct();
+    castedTransport->setCrc16(s_crc16.get());
+    s_arbitrator->setSharedTransport(castedTransport);
     s_arbitrator->setCodec(s_codec);
 
     // Init the client manager.
@@ -89,37 +91,53 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
     return reinterpret_cast<erpc_transport_t>(s_arbitrator.get());
 }
 
-void erpc_client_set_error_handler(client_error_handler_t error_handler)
+void erpc_arbitrated_client_set_error_handler(client_error_handler_t error_handler)
 {
-    if (g_client)
+    if (g_client != NULL)
     {
         g_client->setErrorHandler(error_handler);
     }
 }
 
-#if ERPC_NESTED_CALLS
-void erpc_client_set_server(erpc_server_t server)
+void erpc_arbitrated_client_set_crc(uint32_t crcStart)
 {
-    g_client->setServer(reinterpret_cast<Server *>(server));
+    s_crc16->setCrcStart(crcStart);
 }
 
-void erpc_client_set_server_thread_id(void *serverThreadId)
+#if ERPC_NESTED_CALLS
+void erpc_arbitrated_client_set_server(erpc_server_t server)
 {
-    g_client->setServerThreadId(reinterpret_cast<Thread::thread_id_t *>(serverThreadId));
+    if (g_client != NULL)
+    {
+        g_client->setServer(reinterpret_cast<Server *>(server));
+    }
+}
+
+void erpc_arbitrated_client_set_server_thread_id(void *serverThreadId)
+{
+    if (g_client != NULL)
+    {
+        g_client->setServerThreadId(reinterpret_cast<Thread::thread_id_t *>(serverThreadId));
+    }
 }
 #endif
 
 #if ERPC_MESSAGE_LOGGING
-void erpc_server_add_message_logger(erpc_transport_t transport)
+bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
 {
-    g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    if (g_client != NULL)
+    {
+        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+    return false;
 }
 #endif
 
-void erpc_arbitrated_client_deinit()
+void erpc_arbitrated_client_deinit(void)
 {
     s_client.destroy();
     s_codecFactory.destroy();
     s_codec.destroy();
     s_arbitrator.destroy();
+    g_client = NULL;
 }

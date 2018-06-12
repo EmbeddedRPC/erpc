@@ -13,19 +13,19 @@ test_client.cpp:
   - if: dir == 'inout'
     then:
       - codec->startWriteList(*c);
-      - codec->write(l[listCount1])
+      - codec->write(l[listCount0])
       - not: codec->write
       - codec->read
     else:
       - codec->startWriteList(c);
-      - codec->write(l[listCount1])
+      - codec->write(l[listCount0])
       - not: codec->write
       - not: codec->read
 test_server.cpp:
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - c = lengthTemp_1;
-  - codec->read(&l[listCount1])
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - c = lengthTemp_0;
+  - codec->read(&l[listCount0])
   - if: dir == 'inout'
     then:
       - not: codec->read
@@ -51,10 +51,10 @@ test_client.cpp:
       - codec->write(*c)
     else:
      - not: codec->write
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - "*c = lengthTemp_1;"
-  - codec->read(&l[listCount1])
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "*c = lengthTemp_0;"
+  - codec->read(&l[listCount0])
   - not: codec->read
 test_server.cpp:
   - if: dir == 'inout'
@@ -63,7 +63,7 @@ test_server.cpp:
     else:
      - not: codec->read
   - codec->startWriteList(c);
-  - codec->write(l[listCount1])
+  - codec->write(l[listCount0])
   - not: codec->write
 
 ---
@@ -76,14 +76,14 @@ idl: |
 test_client.cpp:
   - codec->startWriteList(*c);
   - not: codec->write(*c)
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - "*c = lengthTemp_1;"
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "*c = lengthTemp_0;"
   - not: codec->read(c)
 test_server.cpp:
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - "c = lengthTemp_1;"
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "c = lengthTemp_0;"
   - not: codec->read(c)
   - codec->startWriteList(c);
   - not: codec->write(c)
@@ -113,16 +113,16 @@ test_client.cpp:
   - not: codec->write
   - if: dir in ('out','inout')
     then:
-      - uint32_t lengthTemp_1;
-      - codec->readBinary(&lengthTemp_1, &dataTemp_1);
-      - "*c = lengthTemp_1;"
+      - uint32_t lengthTemp_0;
+      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - "*c = lengthTemp_0;"
   - not: codec->read
 test_server.cpp:
   - if: dir in ('in', 'inout')
     then:
-      - uint32_t lengthTemp_1;
-      - codec->readBinary(&lengthTemp_1, &dataTemp_1);
-      - c = lengthTemp_1;
+      - uint32_t lengthTemp_0;
+      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - c = lengthTemp_0;
   - not: codec->read
   - if: dir in ('out', 'inout')
     then:
@@ -156,9 +156,9 @@ test_client.cpp:
 test_server.cpp:
   - read_Fork_struct
   - not: codec->read(&cnt)
-  - uint32_t lengthTemp_1;
-  - codec->startReadList(&lengthTemp_1);
-  - data->cnt = lengthTemp_1;
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - data->cnt = lengthTemp_0;
   - not: codec->read(&cnt)
 
 ---
@@ -180,7 +180,7 @@ test_client.cpp:
   - codec->writeBinary(data->cnt, data->spoon);
   - not: codec->write(data->cnt)
 test_server.cpp:
-  - uint32_t lengthTemp_1;
-  - codec->readBinary(&lengthTemp_1, &dataTemp_1);
-  - data->cnt = lengthTemp_1;
+  - uint32_t lengthTemp_0;
+  - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+  - data->cnt = lengthTemp_0;
   - not: codec->read(&data->cnt);

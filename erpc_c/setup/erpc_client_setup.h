@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -42,9 +42,8 @@
 #if ERPC_NESTED_CALLS
 #include "erpc_server_setup.h"
 #endif
+#include "erpc_client_manager.h"
 #include "erpc_transport_setup.h"
-#include "client_manager.h"
-#include <stdint.h>
 
 /*!
  * @addtogroup client_setup
@@ -59,6 +58,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
 
 //! @name Client setup
 //@{
@@ -82,6 +83,17 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
  */
 void erpc_client_set_error_handler(client_error_handler_t error_handler);
 
+/*!
+ * @brief Can be used to set own crcStart number.
+ *
+ * For example can be used generated crc from erpcgen
+ * which is providing when @crc annotation is used.
+ * Accessed can be through 'extern const uint32_t erpc_generated_crc;'
+ *
+ * @param[in] crcStart Set start number for crc.
+ */
+void erpc_client_set_crc(uint32_t crcStart);
+
 #if ERPC_NESTED_CALLS
 /*!
  * @brief This function sets server object for handling nested eRPC calls.
@@ -103,8 +115,11 @@ void erpc_client_set_server_thread_id(void *serverThreadId);
  * @brief This function adds transport object for logging send/receive messages.
  *
  * @param[in] transport Initiated transport.
+ *
+ * @retval True When transport was successfully added.
+ * @retval False When transport wasn't added.
  */
-void erpc_server_add_message_logger(erpc_transport_t transport);
+bool erpc_client_add_message_logger(erpc_transport_t transport);
 #endif
 
 /*!

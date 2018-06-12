@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -53,8 +53,8 @@ namespace erpcgen {
 class SymbolScope
 {
 public:
-    typedef std::map<std::string, Symbol *> symbol_map_t;
-    typedef std::vector<Symbol *> symbol_vector_t;
+    typedef std::map<std::string, Symbol *> symbol_map_t; /*!< Map symbol name to symbol type. */
+    typedef std::vector<Symbol *> symbol_vector_t;        /*!< Vector of symbol types. */
 
     class typed_iterator
     {
@@ -91,6 +91,9 @@ public:
         friend class SymbolScope;
     };
 
+    /*!
+     * @brief Constructor.
+     */
     SymbolScope()
     : m_symbolMap()
     , m_symbolVector()

@@ -4,10 +4,9 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -190,8 +189,8 @@ TEST(test_arrays, sendReceivedList)
 {
     uint32_t array_count = 2;
     uint32_t elements_count = 2;
-    list_0_t send_array[2];
-    list_0_t(*received_array)[2];
+    list_int32_1_t send_array[2];
+    list_int32_1_t(*received_array)[2];
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -224,8 +223,8 @@ TEST(test_arrays, sendReceivedList)
 TEST(test_arrays, sendReceived2List)
 {
     uint32_t elements_count = 2;
-    list_0_t send_array[2][2];
-    list_0_t(*received_array)[2][2];
+    list_int32_1_t send_array[2][2];
+    list_int32_1_t(*received_array)[2][2];
 
     for (uint32_t k = 0; k < 2; ++k)
     {

@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -54,7 +54,7 @@ namespace erpcgen {
 class Interface : public Symbol
 {
 public:
-    typedef std::vector<Function *> function_vector_t;
+    typedef std::vector<Function *> function_vector_t; /*!< Vector of Interface functions. */
 
     /*!
      * @brief Constructor.
@@ -122,7 +122,7 @@ public:
      * @see std::string VoidType::getDescription() const
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
-    */
+     */
     virtual std::string getDescription() const;
 
 protected:

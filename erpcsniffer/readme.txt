@@ -4,4 +4,4 @@ Directory Structure
 
 src - Contains source code for erpcsniffer application.
 
-Currently supported os is Linux. Supported transport is tcp and serial.
+Currently supported OS is Linux. Supported transport is tcp and serial.

@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -39,10 +39,6 @@
 #include <cstdarg>
 #include <string>
 
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
-
 /*!
  * \brief Base logger class.
  *
@@ -61,7 +57,7 @@ using namespace std;
  * Most use of the logger classes is expected to be through the Log
  * class. It provides static logging methods that call through to a global
  * singleton logger instance. There is also a Log::SetOutputLevel utility
- * class that makes it extremely easiy to temporarily change the default
+ * class that makes it extremely easily to temporarily change the default
  * output logging level.
  *
  * Of all the overloaded log() methods in this class, none of them are
@@ -121,13 +117,13 @@ public:
     virtual void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    virtual void log(const string &msg) { log(msg.c_str()); }
+    virtual void log(const std::string &msg) { log(msg.c_str()); }
 
     //! \brief Log with format at a specific output level.
     virtual void log(log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    virtual void log(log_level_t level, const string &msg) { log(level, msg.c_str()); }
+    virtual void log(log_level_t level, const std::string &msg) { log(level, msg.c_str()); }
     //! \brief Log with format using an argument list.
     virtual void log(const char *fmt, va_list args);
 
@@ -175,13 +171,13 @@ public:
     static void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    static void log(const string &msg);
+    static void log(const std::string &msg);
 
     //! \brief Log with format at a specific output level.
     static void log(Logger::log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    static void log(Logger::log_level_t level, const string &msg);
+    static void log(Logger::log_level_t level, const std::string &msg);
     //@}
 
     //! @name Logging level helpers
@@ -265,6 +261,7 @@ public:
 class StdoutLogger : public Logger
 {
 public:
+    //! \brief Default constructor.
     StdoutLogger(Logger::log_level_t stderrLevel = Logger::kWarning)
     : m_stderrLevel(stderrLevel)
     {

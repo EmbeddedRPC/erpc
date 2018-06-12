@@ -4,10 +4,9 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -35,9 +34,9 @@
 
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
+#include "erpc_simple_server.h"
 #include "erpc_transport_setup.h"
 #include "myAlloc.h"
-#include "simple_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
@@ -67,6 +66,17 @@ static void SignalReady(void)
     /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
     MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
+/*!
+ * @brief Application-specific implementation of the SystemInitHook() weak function.
+ */
+void SystemInitHook(void)
+{
+    /* Initialize MCMGR - low level multicore management library. Call this
+       function as close to the reset entry as possible to allow CoreUp event
+       triggering. The SystemInitHook() weak function overloading is used in this
+       application. */
+    MCMGR_EarlyInit();
+}
 #endif
 
 int main(int argc, const char *argv[])
@@ -74,11 +84,6 @@ int main(int argc, const char *argv[])
 #if defined(RPMSG)
     uint32_t startupData;
     mcmgr_status_t status;
-
-    /* Initialize MCMGR - low level multicore management library.
-       Call this function as close to the reset entry as possible,
-       (into the startup sequence) to allow CoreUp event trigerring. */
-    MCMGR_EarlyInit();
 
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
@@ -93,7 +98,7 @@ int main(int argc, const char *argv[])
     erpc_mbf_t message_buffer_factory;
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_remote_init(101, 100, (void *)startupData, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID,
-                                                      SignalReady);
+                                                      SignalReady, NULL);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
 #else
 #if defined(UART)

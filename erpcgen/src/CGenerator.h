@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -58,9 +58,8 @@ public:
      * Interface definition contains all information about parsed files and builtin types.
      *
      * @param[in] def Contains all Symbols parsed from IDL files.
-     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    CGenerator(InterfaceDefinition *def, uint16_t idlCrc16);
+    CGenerator(InterfaceDefinition *def);
 
     /*!
      * @brief This function is destructor of CGenerator class.
@@ -87,15 +86,17 @@ private:
 
     cpptempl::data_list m_symbolsTemplate; /*!< List of all symbol templates */
 
-    std::vector<ListType *> m_listBinaryTypes; /*!<
-                                                 * Contains binary types transformed to list<uint8>.
-                                                 * More ListType are present when @length annotation is used for binary type.
-                                                 * If binary without @length is used then it is placed on first place in this vector.
-                                                 */
+    std::vector<ListType *>
+        m_listBinaryTypes; /*!<
+                            * Contains binary types transformed to list<uint8>.
+                            * More ListType are present when @length annotation is used for binary type.
+                            * If binary without @length is used then it is placed on first place in this vector.
+                            */
 
     std::vector<StructType *> m_structListTypes; /*!<
                                                   * Contains list types transformed to struct{list<>}.
-                                                  * To distinguish between user defined struct{list<>} and transformed list<> to struct{list<>}.
+                                                  * To distinguish between user defined struct{list<>} and transformed
+                                                  * list<> to struct{list<>}.
                                                   */
 
     /*!
@@ -191,17 +192,44 @@ private:
     void setBinaryList(StructMember *structMember);
 
     /*!
-     * @brief This function return interface function template data.
+     * @brief This function returns function base template data.
      *
-     * This function return interface function template data with all data, which
+     * This function returns function base template data with all data, which
      * are necessary for generating output code for output files.
      *
+     * @param[in] group Group to which function belongs.
+     * @param[in] fn From this are set function base template data.
+     *
+     * @return Contains function base data.
+     */
+    cpptempl::data_map getFunctionBaseTemplateData(Group *group, FunctionBase *fn);
+
+    /*!
+     * @brief This function returns interface function template data.
+     *
+     * This function returns interface function template data with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] group Group to which function belongs.
      * @param[in] fn From this are set interface function template data.
-     * @param[in] fnIndex Function index.
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, int fnIndex);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn);
+
+    /*!
+     * @brief This function returns function type (callbacks type) template data.
+     *
+     * This function returns function type (callbacks type) template data with all data, which
+     * are necessary for generating output code for output files. Shim code is generating
+     * common function for serialization/deserialization of data.
+     *
+     * @param[in] group Group to which function belongs.
+     * @param[in] fn From this are set function type template data.
+     *
+     * @return Contains interface function data.
+     */
+    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn);
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -234,6 +262,18 @@ private:
     cpptempl::data_map makeGroupSymbolsTemplateData(Group *group);
 
     /*!
+     * @brief This function sets group callbacks template data.
+     *
+     * This function sets group callbacks template data with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] group Pointer to a group.
+     *
+     * @return Data list of group function types (callback types).
+     */
+    cpptempl::data_list makeGroupCallbacksTemplateData(Group *group);
+
+    /*!
      * @brief This function returns template data for given structure.
      *
      * This function return structure's template data with necessary data
@@ -259,7 +299,8 @@ private:
      *
      * @return Data map with structure template data.
      */
-    cpptempl::data_map getStructDefinitionTemplateData(Group *group, StructType *structType, cpptempl::data_map structInfo);
+    cpptempl::data_map getStructDefinitionTemplateData(Group *group, StructType *structType,
+                                                       cpptempl::data_map structInfo);
 
     /*!
      * @brief This function returns template data for given union.
@@ -288,7 +329,8 @@ private:
      *
      * @return Data map with union template data.
      */
-    cpptempl::data_map getUnionDefinitionTemplateData(Group *group, UnionType *unionType, cpptempl::data_map &unionInfo, bool &needUnionsServerFree);
+    cpptempl::data_map getUnionDefinitionTemplateData(Group *group, UnionType *unionType, cpptempl::data_map &unionInfo,
+                                                      bool &needUnionsServerFree);
     /*!
      * @brief This function sets union cases template data.
      *
@@ -304,14 +346,14 @@ private:
      * @brief This function returns union cases declaration description to union.
      *
      * This function returns unions cases declaration description to union, which
-     * is necessary for generating output code for output files.
+     * is necessary for generating union encapsulated data type.
      *
      * @param[in] unionType Union, which contains union cases.
-     * @param[in] ident Additional ident used for member data.
+     * @param[in] indent Additional indent used for member data.
      *
      * @return Union cases declaration description.
      */
-    std::string getUnionMembersData(UnionType *unionType, std::string ident);
+    std::string getUnionMembersData(UnionType *unionType, std::string indent);
 
     /*!
      * @brief This function sets enum template data.
@@ -396,25 +438,28 @@ private:
      *
      * @return Return string representation of error return value.
      */
-    std::string getErrorReturnValue(Function *fn);
+    std::string getErrorReturnValue(FunctionBase *fn);
 
     /*!
      * @brief This function return interface function prototype.
      *
+     * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
+     * @param[in] name Name used for FunctionType.
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn);
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string name = "");
 
     /*!
      * @brief This function return interface function representation called by server side.
      *
      * @param[in] fn Function for interface function representation.
+     * @param[in] functionType Inside FunctionType common shim code server call need use FunctionType parameters names.
      *
      * @return String representation for given function.
      */
-    std::string getFunctionServerCall(Function *fn);
+    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr);
 
     /*!
      * @brief This function return name with guard.
@@ -461,17 +506,12 @@ private:
      * @param[in] inDataContainer Is inside data container (struct, list, array).
      * @param[in] structMember Null for return.
      * @param[out] needTempVariable Return true, when data type contains enum, function, union type.
-     * @param[in] isFunctionParam Tru for function param else false (structure member).
+     * @param[in] isFunctionParam True for function param else false (structure member).
      *
      * @return Template data for decode or encode data type.
      */
-    cpptempl::data_map getEncodeDecodeCall(const std::string &name,
-                                           Group *group,
-                                           DataType *t,
-                                           StructType *structType,
-                                           bool inDataContainer,
-                                           StructMember *structMember,
-                                           bool &needTempVariable,
+    cpptempl::data_map getEncodeDecodeCall(const std::string &name, Group *group, DataType *t, StructType *structType,
+                                           bool inDataContainer, StructMember *structMember, bool &needTempVariable,
                                            bool isFunctionParam);
 
     /*!
@@ -481,14 +521,10 @@ private:
      * @param[out] templateData Template data.
      * @param[in] structType Structure holdings structure members.
      * @param[in] structMember Null for return.
-     * @param[in] isFunctionParam Tru for function param else false (structure member).
+     * @param[in] isFunctionParam True for function param else false (structure member).
      */
-    void getEncodeDecodeBuiltin(Group *group,
-                                BuiltinType *t,
-                                cpptempl::data_map &templateData,
-                                StructType *structType,
-                                StructMember *structMember,
-                                bool isFunctionParam);
+    void getEncodeDecodeBuiltin(Group *group, BuiltinType *t, cpptempl::data_map &templateData, StructType *structType,
+                                StructMember *structMember, bool isFunctionParam);
 
     /*!
      * @brief This function encapsulate gave name, if it start with pointer.
@@ -531,7 +567,7 @@ private:
      *
      * @return Erpc_alloc function or empty.
      */
-    std::string firstAllocOnServerWhenIsNeed(std::string name, StructMember *structMember);
+    cpptempl::data_map firstAllocOnServerWhenIsNeed(std::string name, StructMember *structMember);
 
     /*!
      * @brief This function call first erpc_alloc on client side return statement if it is need.
@@ -543,18 +579,17 @@ private:
      *
      * @return Erpc_alloc function or empty.
      */
-    std::string firstAllocOnReturnWhenIsNeed(std::string name, DataType *dataType);
+    cpptempl::data_map firstAllocOnReturnWhenIsNeed(std::string name, DataType *dataType);
 
     /*!
      * @brief This function return call for alloc space based on given data type.
      *
-     * @param[in] pointer True, if inside alloc (sizeof()) need pointer to data type, else false.
      * @param[in] name Name, for which is allocating space.
      * @param[in] symbol Given symbol type contains annotations and data type.
      *
      * @return Return erpc_alloc call or empty string.
      */
-    std::string allocateCall(bool pointer, const std::string &name, Symbol *symbol);
+    cpptempl::data_map allocateCall(const std::string &name, Symbol *symbol);
 
     /*!
      * @brief This function will add to given lists given map based on given by symbol direction.
@@ -567,11 +602,8 @@ private:
      * @param[in,out] toServer List of data types designed for server direction.
      * @param[in] dataMap Map with information about structure or function parameter.
      */
-    void setSymbolDataToSide(const Symbol *symbolType,
-                             const std::set<_param_direction> directions,
-                             cpptempl::data_list &toClient,
-                             cpptempl::data_list &toServer,
-                             cpptempl::data_map &dataMap);
+    void setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> directions,
+                             cpptempl::data_list &toClient, cpptempl::data_list &toServer, cpptempl::data_map &dataMap);
 
     /*!
      * @brief This function returns true, when given data type need be freed.
@@ -629,12 +661,14 @@ private:
     bool containsList(DataType *dataType);
 
     /*!
-     * @brief This function check, if data type is struct which contains byref parameter and not contains shared annotation.
+     * @brief This function check, if data type is struct which contains byref parameter and not contains shared
+     * annotation.
      *
      * @param[in] dataType Given data type.
      * @param[in] dataTypes For loops from forward declaration detection.
      *
-     * @retval True if data type is structure and contains byref parameter and not contains shared annotation, else false.
+     * @retval True if data type is structure and contains byref parameter and not contains shared annotation, else
+     * false.
      *
      */
     bool containsByrefParamToFree(DataType *dataType, std::set<DataType *> &dataTypes);
@@ -696,7 +730,8 @@ private:
      */
     void setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol);
 
-    bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember, bool isFunctionParam, cpptempl::data_map &templateData);
+    bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember,
+                              bool isFunctionParam, cpptempl::data_map &templateData);
 
     /*!
      * @brief This function returns data type name for scalar data type.
@@ -747,6 +782,33 @@ private:
      * @retval false When Function parameter isn't null-able.
      */
     bool isNullableParam(StructMember *structMember);
+
+    /*!
+     * Stores reserved words for C/C++ program language.
+     */
+    void initCReservedWords();
+
+    /*!
+     * @brief Controlling annotations used on structure members.
+     *
+     * Struct members are examined for @length and @max_length annotations, and the length member is denoted.
+     * This function is also used on function parameters, since they are covered by structs.
+     *
+     * @param[in] currentStructType StrucType to check.
+     * @param[in] isFunction To distinguish if given structure is used for function parameters.
+     */
+    void scanStructForAnnotations(StructType *currentStructType, bool isFunction);
+
+    /*!
+     * @brief Check if annotation is integer number or integer type variable.
+     *
+     * Annotation can contain reference to integer data type or it can be integer number.
+     * Referenced integer data type can be presented in global scope or in same structure scope.
+     *
+     * @param[in] ann Annotation to check.
+     * @param[in] currentStructType StrucType to check.
+     */
+    void checkIfAnnValueIsIntNumberOrIntType(Annotation *ann, StructType *currentStructType);
 };
 } // namespace erpcgen
 

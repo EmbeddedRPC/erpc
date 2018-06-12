@@ -4,10 +4,9 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,7 +33,7 @@
  */
 
 #include "gtest.h"
-#include "simple_server.h"
+#include "erpc_simple_server.h"
 #include "test_firstInterface.h"
 #include "test_secondInterface_server.h"
 
@@ -77,8 +76,10 @@ TEST(test_arbitrator, FirstSendReceiveInt2)
 TEST(test_arbitrator, NestedCallTest)
 {
     stopSecondSide();
-    while(!enabled){};
-    EXPECT_TRUE(nestedCallTest() == nestedCallsCount *2 - 1);
+    while (!enabled)
+    {
+    };
+    EXPECT_TRUE(nestedCallTest() == nestedCallsCount * 2 - 1);
 }
 
 TEST(test_arbitrator, GetResultFromSecondSide)
@@ -100,7 +101,7 @@ int32_t secondReceiveInt()
 
 int32_t callFirstSide()
 {
-    static int _nestedCallsCount= 0;
+    static int _nestedCallsCount = 0;
     ++_nestedCallsCount;
     if (_nestedCallsCount < nestedCallsCount)
     {
@@ -125,7 +126,7 @@ void add_services(erpc::SimpleServer *server)
     SecondInterface_service *svc = new SecondInterface_service();
 
     /* Add services
-    * Example: server->addService(svc);
-    */
+     * Example: server->addService(svc);
+     */
     server->addService(svc);
 }

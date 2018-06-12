@@ -3,10 +3,10 @@
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -35,8 +35,8 @@
 #ifndef _EMBEDDED_RPC__SNIFFER_H_
 #define _EMBEDDED_RPC__SNIFFER_H_
 
-#include "erpc_c/infra/basic_codec.h"
-#include "erpc_c/infra/transport.h"
+#include "erpc_c/infra/erpc_basic_codec.h"
+#include "erpc_c/infra/erpc_transport.h"
 #include "CGenerator.h"
 #include <chrono>
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,8 @@ public:
      * @param[in] outputFilePath Path to output file used for record output.
      * @param[in] quantity How much messages record.
      */
-    Sniffer(erpc::Transport *transport, erpcgen::InterfaceDefinition *def, const char *outputFilePath, uint64_t quantity)
+    Sniffer(erpc::Transport *transport, erpcgen::InterfaceDefinition *def, const char *outputFilePath,
+            uint64_t quantity)
     : m_transport(transport)
     , m_interfaces(def->getGlobals().getSymbolsOfType(erpcgen::Symbol::kInterfaceSymbol))
     , m_outputFilePath(outputFilePath)
@@ -104,7 +105,7 @@ protected:
      *
      * @retval kErpcStatus_Success when reading passed.
      */
-    erpc_status_t readNullFlag(erpcgen::StructMember *structMember, string &nullFlag);
+    erpc_status_t readNullFlag(erpcgen::StructMember *structMember, std::string &nullFlag);
 
     /*!
      * @brief This function reads shared memory address when structMember need.
@@ -116,7 +117,7 @@ protected:
      *
      * @retval kErpcStatus_Success when reading passed.
      */
-    erpc_status_t readSharedAddress(erpcgen::StructMember *structMember, string &address);
+    erpc_status_t readSharedAddress(erpcgen::StructMember *structMember, std::string &address);
 
     /*!
      * @brief This function counts spaces for special indent.
@@ -156,7 +157,8 @@ protected:
      *
      * @retval kErpcStatus_Success when parsing passed.
      */
-    erpc_status_t parseMemberType(erpcgen::StructType *structType, erpcgen::StructMember *structMember, std::string &parsedMemberInfo);
+    erpc_status_t parseMemberType(erpcgen::StructType *structType, erpcgen::StructMember *structMember,
+                                  std::string &parsedMemberInfo);
 
     /*!
      * @brief This function returns interface object based on given id.
@@ -184,7 +186,7 @@ protected:
      *
      * @retval Data type name.
      */
-    string getDataTypeName(erpcgen::DataType *dataType);
+    std::string getDataTypeName(erpcgen::DataType *dataType);
 
     /*!
      * @brief This function returns function prototype.
@@ -193,13 +195,14 @@ protected:
      *
      * @retval Function prototype.
      */
-    string getPrototype(erpcgen::Function *function);
+    std::string getPrototype(erpcgen::Function *function);
 
     /*!
      * @brief This function parse received message based.
      *
      * @param[in,out] message Output based on parsed received message.
-     * @param[in] timeDiffernce Time difference between current received message time and previous received message time.
+     * @param[in] timeDiffernce Time difference between current received message time and previous received message
+     * time.
      * @param[in] currentTime Formatted current time.
      *
      * @retval kErpcStatus_Success when parsing passed.

@@ -11,7 +11,7 @@ idl: |
     int32 c
   }
 
-  interface foo {
+  interface test {
     bar(Vector x) -> void
   }
 test.h:

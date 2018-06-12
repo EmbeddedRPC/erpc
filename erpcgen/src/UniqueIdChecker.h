@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -57,7 +57,7 @@ namespace erpcgen {
 class UniqueIdChecker
 {
 public:
-    typedef std::pair<int, std::string> idAndName_t;
+    typedef std::pair<int, std::string> idAndName_t; /*!< Pair id of function/interface with name. */
 
     /*!
      * @brief This function will set unique id numbers for functions and interfaces

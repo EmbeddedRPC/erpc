@@ -4,10 +4,9 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -215,7 +214,7 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             for (uint32_t i = 1; i <= unionVariable->a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
-                if (i != unionVariable->a.elements[i])
+                if ((int32_t)i != unionVariable->a.elements[i])
                 {
                     newFoo->discriminator = returnVal;
                     newFoo->bing.ret = 0x55;

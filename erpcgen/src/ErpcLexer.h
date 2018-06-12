@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -70,7 +70,7 @@ using namespace std;
 namespace erpcgen {
 
 /*!
- * @brief This class contains necessary information about analysed file.
+ * @brief This class contains necessary information about analyzed file.
  */
 class CurrentFileInfo
 {
@@ -81,8 +81,8 @@ public:
      * This function set default values to object variables. Pointer to file ifstream,
      * file name and current folder path are given as function parameters.
      *
-     * @param[in] savedFile Pointer to analysed file.
-     * @param[in] fileName Name of analysed file.
+     * @param[in] savedFile Pointer to analyzed file.
+     * @param[in] fileName Name of analyzed file.
      * @param[in] currentFolderPath Path to folder of current file.
      */
     CurrentFileInfo(std::ifstream *savedFile, std::string fileName, std::string currentFolderPath)

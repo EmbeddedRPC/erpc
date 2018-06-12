@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -46,6 +46,7 @@
 #include "types/StructType.h"
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -56,8 +57,8 @@ InterfaceDefinition::InterfaceDefinition()
 , m_globals()
 , m_programName("")
 , m_outputFilename("")
-, m_error_handling_check(kAll)
 , m_codec(kNotSpecified)
+, m_program(nullptr)
 {
     init();
 }
@@ -67,16 +68,17 @@ void InterfaceDefinition::init()
     createBuiltinTypes();
 }
 
-uint16_t InterfaceDefinition::parse(const char *inputFile)
+void InterfaceDefinition::parse(const char *inputFile)
 {
     // create lexer instance
     ErpcLexer lexer(inputFile);
     int result = yyparse(&lexer, &m_ast);
+    m_idlCrc16 = lexer.getIdlCrc16();
 
     // check results
     if (result || !m_ast)
     {
-        throw std::runtime_error("failed to parse command file");
+        throw runtime_error("failed to parse command file");
     }
 
     //    Log::info("Parsing was successful!\n");
@@ -86,12 +88,11 @@ uint16_t InterfaceDefinition::parse(const char *inputFile)
     printer.dispatch();
 
     // Build table of symbols.
-    SymbolScanner scanner(&m_globals, std::string(inputFile));
+    SymbolScanner scanner(&m_globals, string(inputFile));
     scanner.startWalk(m_ast);
+    m_program = scanner.getProgram();
 
     m_globals.dump();
-
-    return lexer.getIdlCrc16();
 }
 
 void InterfaceDefinition::createBuiltinTypes()
@@ -111,47 +112,31 @@ void InterfaceDefinition::createBuiltinTypes()
     m_globals.addSymbol(new BuiltinType("binary", BuiltinType::_builtin_type::kBinaryType));
 }
 
-void InterfaceDefinition::setProgramInfo(const std::string &filename, const std::string &outputDir, codec_t codec)
+void InterfaceDefinition::setProgramInfo(const string &filename, const string &outputDir, codec_t codec)
 {
     setOutputFilename(filename);
-    setOutputDirectory(outputDir);
-    setErrorHandlingChecksType();
+    m_outputDirectory = outputDir;
     m_codec = codec;
 }
 
 bool InterfaceDefinition::hasProgramSymbol()
 {
-    return 1 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size();
+    return m_program != nullptr;
 }
 
 Program *InterfaceDefinition::getProgramSymbol()
 {
-    if (1 != m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
+    if (!hasProgramSymbol())
     {
         return nullptr;
     }
     else
     {
-        assert(nullptr != dynamic_cast<Program *>(m_globals.getSymbolsOfType(Symbol::kProgramSymbol)[0]));
-        return dynamic_cast<Program *>(m_globals.getSymbolsOfType(Symbol::kProgramSymbol)[0]);
+        return m_program;
     }
 }
 
-void InterfaceDefinition::setOutputDirectory(const std::string &outputDir)
-{
-    m_outputDirectory = outputDir;
-
-    if (hasProgramSymbol())
-    {
-        std::string outputDir = getProgramSymbol()->getAnnStringValue(OUTPUT_DIR_ANNOTATION);
-        if (!outputDir.empty())
-        {
-            m_outputDirectory /= outputDir;
-        }
-    }
-}
-
-void InterfaceDefinition::setOutputFilename(const std::string &filename)
+void InterfaceDefinition::setOutputFilename(const string &filename)
 {
     if (hasProgramSymbol())
     {
@@ -160,20 +145,5 @@ void InterfaceDefinition::setOutputFilename(const std::string &filename)
     else
     {
         m_outputFilename = filename;
-    }
-}
-
-void InterfaceDefinition::setErrorHandlingChecksType()
-{
-    if (hasProgramSymbol())
-    {
-        if (getProgramSymbol()->findAnnotation(NO_ALLOC_ERRORS_ANNOTATION))
-        {
-            m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 1);
-        }
-        if (getProgramSymbol()->findAnnotation(NO_INFRA_ERRORS_ANNOTATION))
-        {
-            m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 2);
-        }
     }
 }

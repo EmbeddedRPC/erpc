@@ -4,10 +4,9 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -55,6 +54,8 @@ extern "C" {
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
 #endif
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -112,6 +113,18 @@ static void eRPCReadyEventHandler(uint16_t eventData, void *context)
 {
     eRPCReadyEventData = eventData;
 }
+
+/*!
+ * @brief Application-specific implementation of the SystemInitHook() weak function.
+ */
+void SystemInitHook(void)
+{
+    /* Initialize MCMGR - low level multicore management library. Call this
+       function as close to the reset entry as possible to allow CoreUp event
+       triggering. The SystemInitHook() weak function overloading is used in this
+       application. */
+    MCMGR_EarlyInit();
+}
 #endif
 
 int main(int argc, char **argv)
@@ -147,11 +160,6 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(RPMSG)
-    /* Initialize MCMGR - low level multicore management library.
-       Call this function as close to the reset entry as possible,
-       (into the startup sequence) to allow CoreUp event trigerring. */
-    MCMGR_EarlyInit();
-
     /* Initialize MCMGR before calling its API */
     MCMGR_Init();
 
@@ -161,7 +169,8 @@ int main(int argc, char **argv)
     /* Boot Secondary core application */
     MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
 
-    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to communicate. */
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to
+     * communicate. */
     while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
     {
     };

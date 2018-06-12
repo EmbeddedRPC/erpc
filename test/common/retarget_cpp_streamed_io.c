@@ -1,9 +1,12 @@
 /*
+ * The Clear BSD License
  * Copyright 2017 NXP
  * Copyright (C) ARM Limited, 2006.
  * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * are permitted (subject to the limitations in the disclaimer below) provided
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -16,6 +19,7 @@
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -61,7 +65,7 @@ char *_sys_command_string(char *cmd, int len)
 }
 
 /*
- * These names are special strings which will be recognized by 
+ * These names are special strings which will be recognized by
  * _sys_open and will cause it to return the standard I/O handles, instead
  * of opening a real file.
  */
@@ -84,7 +88,7 @@ FILEHANDLE _sys_open(const char *name, int openmode)
  */
 int _sys_close(FILEHANDLE fh)
 {
-    return 0; //return success
+    return 0; // return success
 }
 
 /*
@@ -97,7 +101,7 @@ int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
     int i;
     for (i = 0; i < len; i++)
     {
-        //UART_write(buf[i]);
+        // UART_write(buf[i]);
         LOG_Push((uint8_t *)(&buf[i]), 1);
     }
 
@@ -112,8 +116,8 @@ int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
  *    the read was partially successful due to end of file
  *  - -1 if some error other than EOF occurred
  * This function receives a character from the UART, processes the character
- * if required (backspace) and then echo the character to the Terminal 
- * Emulator, printing the correct sequence after successive keystrokes.  
+ * if required (backspace) and then echo the character to the Terminal
+ * Emulator, printing the correct sequence after successive keystrokes.
  */
 int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
 {
@@ -122,7 +126,7 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
     do
     {
 
-        //buf[pos]=UART_read();
+        // buf[pos]=UART_read();
         LOG_ReadCharacter((uint8_t *)&buf[pos]);
 
         // Advance position in buffer
@@ -135,9 +139,9 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
             if (pos > 1)
             {
                 // Delete character on terminal
-                //UART_write('\b');
-                //UART_write(' ');
-                //UART_write('\b');
+                // UART_write('\b');
+                // UART_write(' ');
+                // UART_write('\b');
 
                 // Update position in buffer
                 pos -= 2;
@@ -145,7 +149,7 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
             else if (pos > 0)
                 pos--; // Backspace pressed, empty buffer
         }
-        //else UART_write(buf[pos-1]); // Echo normal char to terminal
+        // else UART_write(buf[pos-1]); // Echo normal char to terminal
         else
             LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to terminal
 
@@ -165,7 +169,7 @@ void _ttywrch(int ch)
     // Convert correctly for endianness change
     char ench = ch;
 
-    //UART_write(ench);
+    // UART_write(ench);
     LOG_Push((uint8_t *)(&ench), 1);
 }
 
@@ -179,7 +183,7 @@ int _sys_istty(FILEHANDLE fh)
 
 /*
  * Move the file position to a given offset from the file start.
- * Returns >=0 on success, <0 on failure. Seeking is not supported for the 
+ * Returns >=0 on success, <0 on failure. Seeking is not supported for the
  * UART.
  */
 int _sys_seek(FILEHANDLE fh, long pos)

@@ -29,9 +29,9 @@ test.h:
     else:
       - '{type}_t x;'
 test_client.cpp:
-  - static int32_t write_A_struct(erpc::Codec * codec, const A * data)
+  - static void write_A_struct(erpc::Codec * codec, const A * data)
 test_server.cpp:
-  - static int32_t read_A_struct(erpc::Codec * codec, A * data)
+  - static void read_A_struct(erpc::Codec * codec, A * data)
 ---
 name: return list struct
 idl: |
@@ -41,17 +41,17 @@ idl: |
     bar(ListType x) -> ListType
   }
 test.h:
-  - typedef struct list_0_t list_0_t;
-  - typedef list_0_t ListType;
-  - struct list_0_t
+  - typedef struct list_int32_1_t list_int32_1_t;
+  - typedef list_int32_1_t ListType;
+  - struct list_int32_1_t
 test_client.cpp:
-  - write_list_0_t_struct
-  - read_list_0_t_struct
+  - write_list_int32_1_t_struct
+  - read_list_int32_1_t_struct
   - ListType * bar(const ListType * x)
 test_server.cpp:
-  - read_list_0_t_struct
-  - write_list_0_t_struct
-  - free_list_0_t_struct
+  - read_list_int32_1_t_struct
+  - write_list_int32_1_t_struct
+  - free_list_int32_1_t_struct
 ---
 name: binary struct c
 idl: |

@@ -387,20 +387,20 @@ public:
     {
         DEFAULT = 0x00,    //!< Default setting
         ANYCASE = 0x01,    //!< Ignore case when matching short-options
-        QUIET = 0x02,      //!< Dont print error messages
+        QUIET = 0x02,      //!< Don't print error messages
         PLUS = 0x04,       //!< Allow "+" as a long-option prefix
-        SHORT_ONLY = 0x08, //!< Dont accept long-options
-        LONG_ONLY = 0x10,  //!< Dont accept short-options
+        SHORT_ONLY = 0x08, //!< Don't accept long-options
+        LONG_ONLY = 0x10,  //!< Don't accept short-options
                            //!< (also allows "-" as a long-option prefix).
         NOGUESSING = 0x20, //!< Normally, when we see a short (long) option
-                           //!< on the command line that doesnt match any
+                           //!< on the command line that doesn't match any
                            //!< known short (long) options, then we try to
                            //!< "guess" by seeing if it will match any known
                            //!< long (short) option. Setting this mask prevents
                            //!< this "guessing" from occurring.
         PARSE_POS = 0x40   //!< By default, Options will not present positional
                            //!< command-line arguments to the user and will
-                           //!< instead stop parsing when the first positonal
+                           //!< instead stop parsing when the first positional
                            //!< argument has been encountered. If this flag
                            //!< is given, Options will present positional
                            //!< arguments to the user with a return code of

@@ -50,15 +50,13 @@ INCLUDES += $(ERPC_ROOT)/windows \
 			$(BOOST_ROOT)
 endif
 
-SOURCES += $(ERPC_ROOT)/erpc_c/infra/crc16.cpp \
-			$(OBJS_ROOT)/erpcgen_parser.tab.cpp \
+SOURCES += 	$(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(OBJS_ROOT)/erpcgen_lexer.cpp \
 			$(ERPC_ROOT)/erpcgen/src/format_string.cpp \
 			$(ERPC_ROOT)/erpcgen/src/HexValues.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Logging.cpp \
 			$(ERPC_ROOT)/erpcgen/src/options.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SearchPath.cpp \
-			$(ERPC_ROOT)/erpcgen/src/Value.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstNode.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstWalker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \

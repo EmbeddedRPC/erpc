@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -69,15 +69,20 @@ namespace erpcgen {
 class Generator
 {
 public:
+    enum generator_type_t
+    {
+        kC,
+        kPython
+    }; /*!< Type of generator. */
+
     /*!
      * @brief Constructor.
      *
      * Interface definition contains all information about parsed files and builtin types.
      *
      * @param[in] def Contains all Symbols parsed from IDL files.
-     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    Generator(InterfaceDefinition *def, uint16_t idlCrc16);
+    Generator(InterfaceDefinition *def, generator_type_t generatorType);
 
     /*!
      * @brief Destructor.
@@ -90,13 +95,14 @@ public:
     virtual void generate() = 0;
 
 protected:
-    uint16_t m_idlCrc16;               /*!< Storing crc16 of IDL files and erpcgen verssion. */
-    cpptempl::data_map m_templateData; /*!< Data prepared for templates files. */
-
-    InterfaceDefinition *m_def;    /*!< Interface definitions. */
-    SymbolScope *m_globals;        /*!< Symbol scope data. */
-    std::vector<Group *> m_groups; /*!< List of groups. */
-
+    uint16_t m_idlCrc16;                       /*!< Storing crc16 of IDL files and erpcgen version. */
+    cpptempl::data_map m_templateData;         /*!< Data prepared for templates files. */
+    InterfaceDefinition *m_def;                /*!< Interface definitions. */
+    SymbolScope *m_globals;                    /*!< Symbol scope data. */
+    std::vector<Group *> m_groups;             /*!< List of groups. */
+    std::set<std::string> reserverdWords;      /*!< Program language reserved words. */
+    generator_type_t m_generatorType;          /*!< Type of generator. */
+    boost::filesystem::path m_outputDirectory; /*!< Output file path. */
     /*!
      * @brief This function open file
      *
@@ -118,15 +124,8 @@ protected:
      *
      * @exception TemplateException Thrown, when parse template data into output is not successfully.
      */
-    void generateOutputFile(const std::string &fileName,
-                            const std::string &templateName,
-                            cpptempl::data_map &templateData,
-                            const char *const kParseFile);
-
-    /*!
-     * @brief This function generate output crc16 source file.
-     */
-    virtual void generateCrcFile() = 0;
+    void generateOutputFile(const std::string &fileName, const std::string &templateName,
+                            cpptempl::data_map &templateData, const char *const kParseFile);
 
     /*!
      * @brief
@@ -148,8 +147,7 @@ protected:
      * @return Searched member.
      */
     StructMember *findParamReferencedFromAnn(const StructType::member_vector_t &members,
-                                             const std::string &referenceName,
-                                             const std::string &annName);
+                                             const std::string &referenceName, const std::string &annName);
 
     /*!
      * @brief This function will return pointer to function parameter/structure member where given reference name is
@@ -172,8 +170,7 @@ protected:
      *
      * @return Searched member.
      */
-    StructMember *findParamReferencedFrom(const StructType::member_vector_t &members,
-                                          const std::string &referenceName);
+    StructMember *findParamReferencedFrom(const StructType::member_vector_t &members, const std::string &referenceName);
 
     /*!
      * @brief This function return actual time string representation.
@@ -230,7 +227,7 @@ protected:
      *
      * @return Contains interface function data.
      */
-    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, int fnIndex) = 0;
+    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) = 0;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -299,10 +296,68 @@ protected:
      * @param[in] topSymbol Symbol data type which is using as a member memberSymbol data type.
      * @param[in] memberSymbol Member symbol data type of topSymbol.
      *
-     * @retval True when memberSymbol is using forward declarad type.
-     * @retval False when memberSymbol is not using forward declarad type.
+     * @retval True when memberSymbol is using forward declared type.
+     * @retval False when memberSymbol is not using forward declared type.
      */
     bool isMemberDataTypeUsingForwardDeclaration(Symbol *topSymbol, Symbol *memberSymbol);
+
+    /*!
+     * @brief This function returns symbol output name.
+     * Can be different to getName() when @name is used.
+     *
+     * @param[in] symbol Symbol.
+     * @param[in] check Check if output name is not reserved names.
+     *
+     * @returns Return symbol output name.
+     */
+    std::string getOutputName(Symbol *symbol, bool check = true);
+
+    /*!
+     * @brief Returns Generator flag used for annotation.
+     *
+     * @return Generator flag used for annotation.
+     */
+    Annotation::program_lang_t getAnnotationLang();
+
+    /*!
+     * @brief Find annotation in the annotation list
+     *
+     * @param[in] symbol Symbol from which is annotation extracted.
+     * @param[in] name Annotation name.
+     *
+     * @return An index into the annotation list
+     */
+    Annotation *findAnnotation(Symbol *symbol, std::string name);
+
+    /*!
+     * @brief Find annotations matching name in the annotation list
+     *
+     * @param[in] symbol Symbol from which is annotation extracted.
+     * @param[in] name Annotation name.
+     *
+     * @return A vector of matching annotations
+     */
+    std::vector<Annotation *> getAnnotations(Symbol *symbol, std::string name);
+
+    /*!
+     * @brief This function search and returns Value object for given annotation name.
+     *
+     * @param[in] symbol Symbol from which is annotation extracted.
+     * @param[in] name Given annotation name.
+     *
+     * @return NULL if annotation is not found else value object.
+     */
+    Value *getAnnValue(Symbol *symbol, std::string name);
+
+    /*!
+     * @brief This function search and returns string for given annotation name.
+     *
+     * @param[in] symbol Symbol from which is annotation extracted.
+     * @param[in] name Given annotation name.
+     *
+     * @return empty string if annotation is not found else string value.
+     */
+    std::string getAnnStringValue(Symbol *symbol, std::string name);
 
 private:
     /*!

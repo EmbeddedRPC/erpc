@@ -4,10 +4,10 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -57,9 +57,8 @@ public:
      * @brief This function is constructor of PythonGenerator class.
      *
      * @param[in] def Contains all Symbols parsed from IDL files.
-     * @param[in] idlCrc16 Crc16 of IDL files.
      */
-    PythonGenerator(InterfaceDefinition *def, uint16_t idlCrc16);
+    PythonGenerator(InterfaceDefinition *def);
 
     /*!
      * @brief This function is destructor of PythonGenerator class.
@@ -133,7 +132,7 @@ protected:
     /*!
      * @brief This function generate output crc16 source file.
      */
-    virtual void generateCrcFile();
+    virtual void generateGlobalInitFile();
 
     /*!
      * @brief This function return interface function template data.
@@ -147,7 +146,7 @@ protected:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, int fnIndex);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn);
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -280,7 +279,7 @@ protected:
     /*!
      * @brief Strip leading and trailing whitespace.
      *
-     * @param[in] s String from which is stripped whitespaces.
+     * @param[in] s String from which are stripped white spaces.
      */
     std::string stripWhitespace(const std::string &s);
 
@@ -290,6 +289,11 @@ protected:
      * @param[in] c Checked character.
      */
     bool checkWhitspaceChar(char c);
+
+    /*!
+     * Stores reserved words for Python program language.
+     */
+    void initPythonReservedWords();
 };
 
 } // namespace erpcgen

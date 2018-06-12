@@ -1,13 +1,13 @@
 /*
  * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -55,8 +55,10 @@
 #endif
 
 // Safely detect FreeRTOSConfig.h.
+#define ERPC_HAS_FREERTOSCONFIG_H (0)
 #if defined(__has_include)
     #if __has_include("FreeRTOSConfig.h")
+        #undef ERPC_HAS_FREERTOSCONFIG_H
         #define ERPC_HAS_FREERTOSCONFIG_H (1)
     #endif
 #endif
@@ -101,7 +103,7 @@
 #endif
 
 //NOEXCEPT support
-#if __cplusplus >= 201103 && ERPC_NOEXCEPT
+#if defined(__cplusplus) && __cplusplus >= 201103 && ERPC_NOEXCEPT
 #define NOEXCEPT noexcept
 #else
 #define NOEXCEPT
@@ -136,6 +138,22 @@
 #else
 #define THROW_BADALLOC
 #define THROW
+#endif
+
+#ifndef ERPC_TRANSPORT_MU_USE_MCMGR
+    #if defined(__has_include)
+        #if (__has_include("mcmgr.h"))
+            #define ERPC_TRANSPORT_MU_USE_MCMGR (ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED)
+        #else
+            #define ERPC_TRANSPORT_MU_USE_MCMGR (ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED)
+        #endif
+    #endif
+#else
+    #if defined(__has_include)
+        #if ((!(__has_include("mcmgr.h"))) && (ERPC_TRANSPORT_MU_USE_MCMGR == ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED))
+            #error "Do not forget to add the MCMGR library into your project!"
+        #endif
+    #endif
 #endif
 
 /* clang-format on */

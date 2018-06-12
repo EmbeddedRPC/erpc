@@ -4,10 +4,10 @@
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -34,16 +34,12 @@
  */
 
 #include "erpc_config_internal.h"
+#include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
-#include "manually_constructed.h"
-#include "message_buffer.h"
+#include "erpc_message_buffer.h"
+#include "erpc_rpmsg_lite_base_transport.h"
 #include "rpmsg_lite.h"
-#include "rpmsg_lite_base_transport.h"
 #include <assert.h>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 using namespace erpc;
 
@@ -62,22 +58,19 @@ public:
      *
      * @param [in] rpmsg Pointer to instance of RPMSG lite.
      */
-    RPMsgMessageBufferFactory(struct rpmsg_lite_instance *rpmsg)
-    {
-        m_rpmsg = rpmsg;
-    }
+    RPMsgMessageBufferFactory(struct rpmsg_lite_instance *rpmsg) { m_rpmsg = rpmsg; }
 
     /*!
      * @brief Destructor
      */
-    virtual ~RPMsgMessageBufferFactory() {}
+    virtual ~RPMsgMessageBufferFactory(void) {}
 
     /*!
      * @brief This function creates new message buffer.
      *
      * @return MessageBuffer New created MessageBuffer.
      */
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         void *buf = NULL;
         unsigned long size = 0;
@@ -121,7 +114,7 @@ public:
         }
     }
 
-    virtual bool createServerBuffer() { return false; }
+    virtual bool createServerBuffer(void) { return false; }
 
 protected:
     struct rpmsg_lite_instance *m_rpmsg; /*!< Pointer to instance of RPMSG lite. */

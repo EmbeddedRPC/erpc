@@ -3,10 +3,9 @@
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -68,18 +67,12 @@ void myFun2(const callback2_t pCallback1_t, callback2_t *pCallback2_t)
     }
 }
 
-void callback1(int32_t a, int32_t b)
-{
-}
+void callback1(int32_t a, int32_t b) {}
 
-void callback2(int32_t param1, int32_t param2)
-{
-}
+void callback2(int32_t param1, int32_t param2) {}
 
 /* will be shim code in real use case */
-void callback3(int32_t param1, int32_t param2)
-{
-}
+void callback3(int32_t param1, int32_t param2) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code

@@ -4,10 +4,9 @@
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
+ * that the following conditions are met:
  *
  * o Redistributions of source code must retain the above copyright notice, this list
  *   of conditions and the following disclaimer.
@@ -33,13 +32,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "erpc_basic_codec.h"
+#include "erpc_client_manager.h"
+#include "erpc_tcp_transport.h"
 #include "Logging.h"
-#include "basic_codec.h"
-#include "client_manager.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "myAlloc.h"
-#include "tcp_transport.h"
 #include "test_unit_test_common.h"
 
 using namespace erpc;
@@ -67,12 +66,11 @@ MyMessageBufferFactory g_msgFactory;
 TCPTransport g_transport("localhost", 12345, false);
 #if USE_MESSAGE_LOGGING
 TCPTransport g_messageLogger("localhost", 54321, false);
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 BasicCodecFactory g_basicCodecFactory;
 ClientManager *g_client;
 
-extern const uint32_t erpc_generated_crc;
-Crc16 g_crc16(erpc_generated_crc);
+Crc16 g_crc16;
 
 int MyAlloc::allocated_ = 0;
 
@@ -108,7 +106,7 @@ int main(int argc, char **argv)
         Log::error("Failed to open connection in ERPC first (client) app\n");
         return err;
     }
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 
     g_transport.setCrc16(&g_crc16);
     g_client->setMessageBufferFactory(&g_msgFactory);
@@ -116,7 +114,7 @@ int main(int argc, char **argv)
     g_client->setCodecFactory(&g_basicCodecFactory);
 #if USE_MESSAGE_LOGGING
     g_client->addMessageLogger(&g_messageLogger);
-#endif //USE_MESSAGE_LOGGING
+#endif // USE_MESSAGE_LOGGING
 
     int i = RUN_ALL_TESTS();
     quit();
