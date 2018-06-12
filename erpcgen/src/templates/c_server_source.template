@@ -77,9 +77,9 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
     {$param.nullVariable} = NULL;
 {%    endif %}
 {%    if !param.shared %}
-{%     if !param.isNullable %}
+{%     if param.isNullable == false  && param.direction != OutDirection %}
 {$> addIndent("    ", param.mallocServer)}
-{%     endif -- isNullable %}
+{%     endif -- !param.isNullable && param.direction != OutDirection %}
 {%    endif -- shared %}
 {%   endfor -- param %}
 {%   if fn.needNullVariableOnServer %}
@@ -93,7 +93,6 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 
 {%   endif %}
     // startReadMessage() was already called before this shim was invoked.
-
 {%   if fn.isSendValue %}
 {%    for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
 {%     if param.isNullable %}
@@ -107,7 +106,14 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim(Codec * codec, MessageB
 {%     endif -- isNullable %}
 {%    endfor -- parametersToServer %}
 {%   endif -- isSendValue %}
+{% for param in fn.parametersToClient %}
+{%  if !param.shared %}
+{%   if param.isNullable == false && param.direction == OutDirection && empty(param.mallocServer) == false %}
+{$> addIndent("    ", param.mallocServer)}
 
+{%   endif -- !param.isNullable && param.direction == OutDirection %}
+{%  endif -- shared %}
+{% endfor -- param %}
     // Invoke the actual served function.
 {%   if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType && generateInfraErrorChecks %} = NULL{%endif%};

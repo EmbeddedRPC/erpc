@@ -422,10 +422,10 @@ idl: |
     }
 
 test_client.cpp:
+  - result = {type[1]};
   - if (err)
   - '{'
   - g_client->callErrorHandler(err);
-  - return {type[1]};
   - '}'
 
 ---

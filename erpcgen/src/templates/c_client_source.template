@@ -81,7 +81,7 @@ extern ClientManager *g_client;
     int32_t _tmp_local;
 {%    endif %}
 {%    if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable};
+    {$fn.returnValue.resultVariable} = {$fn.returnValue.errorReturnValue};
 {%    endif %}
 {%    if generateAllocErrorChecks && not generateInfraErrorChecks %}
     if (!err)
@@ -102,7 +102,6 @@ extern ClientManager *g_client;
     if (err)
     {
         g_client->callErrorHandler(err);
-        {% if fn.returnValue.type.isNotVoid %}return {$fn.returnValue.errorReturnValue};{% endif -- isNotVoid %}
     }
 {%   endif %}
 

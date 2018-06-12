@@ -28,10 +28,10 @@ idl: |
         f() -> {type[0]}
     }
 test_client.cpp:
+  - result = {type[1]};
   - g_client->releaseRequest(request);
   - if (err)
   - '{'
-  - return {type[1]};
   - '}'
 
 ---
@@ -68,8 +68,8 @@ idl: |
         f() -> {type[0]}
     }
 test_client.cpp:
+  - result = {type[2]};
   - g_client->releaseRequest(request);
   - if (err)
   - '{'
-  - return {type[2]};
   - '}'

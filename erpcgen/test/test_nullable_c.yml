@@ -213,7 +213,7 @@ idl: |
   }
 
 test_client.cpp:
-  - pair * result;
+  - pair * result = NULL;
   - bool isNull;
   - err = codec->readNullFlag(&isNull);
   - if (!isNull)
