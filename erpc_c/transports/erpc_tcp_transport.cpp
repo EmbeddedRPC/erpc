@@ -323,7 +323,7 @@ void TCPTransport::serverThread(void)
     while (m_runServer)
     {
         struct sockaddr incomingAddress;
-        socklen_t incomingAddressLength;
+        socklen_t incomingAddressLength = sizeof(struct sockaddr);
         int incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
         if (incomingSocket > 0)
         {
