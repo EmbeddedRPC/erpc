@@ -19,7 +19,10 @@ before_install:
 install:
 #- sudo pip install --upgrade pip setuptools
 #- CC=gcc sudo pip install requests[security]
-- sudo pip install pytest
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install tornado; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install --user nose; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install pytest --upgrade --ignore-installed six; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo pip install pytest; fi
 - sudo pip install pyyaml
 - sudo pip install enum34
 - sudo pip install pyserial
