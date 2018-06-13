@@ -87,25 +87,25 @@ test_server.cpp:
 name: struct list field
 desc:
 idl: |
-  struct pair {
+  struct erpc_pair {
     string a
     list<bool> b @nullable
   }
   interface foo {
-    bar(pair s) -> void
+    bar(erpc_pair s) -> void
   }
 test_client.cpp:
-  - void write_pair_struct
+  - void write_erpc_pair_struct
   - if (data->b.elements == NULL)
   - writeNullFlag(true)
   - '{'
   - writeNullFlag(false)
   - write_list_0_t_struct
   - '}'
-  - void bar(const pair * s)
-  - write_pair_struct
+  - void bar(const erpc_pair * s)
+  - write_erpc_pair_struct
 test_server.cpp:
-  - void read_pair_struct
+  - void read_erpc_pair_struct
   - bool isNull
   - readNullFlag
   - if (!isNull)
@@ -117,24 +117,24 @@ test_server.cpp:
 name: struct binary field
 desc:
 idl: |
-  struct pair {
+  struct erpc_pair {
     binary b @nullable
   }
   interface foo {
-    bar(pair s) -> void
+    bar(erpc_pair s) -> void
   }
 test_client.cpp:
-  - void write_pair_struct
+  - void write_erpc_pair_struct
   - if (data->b.data == NULL)
   - writeNullFlag(true)
   - '{'
   - writeNullFlag(false)
   - write_binary_t_struct
   - '}'
-  - void bar(const pair * s)
-  - write_pair_struct
+  - void bar(const erpc_pair * s)
+  - write_erpc_pair_struct
 test_server.cpp:
-  - void read_pair_struct
+  - void read_erpc_pair_struct
   - bool isNull
   - readNullFlag
   - if (!isNull)
@@ -152,17 +152,17 @@ params:
     - "out"
     - "inout"
 idl: |
-  struct pair {
+  struct erpc_pair {
     string a @nullable
   }
 
   interface foo {
-    bar({dir} pair s) -> void
+    bar({dir} erpc_pair s) -> void
   }
 test_client.cpp:
   - if: dir in ('in', 'inout')
     then:
-      - void write_pair_struct
+      - void write_erpc_pair_struct
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
@@ -170,7 +170,7 @@ test_client.cpp:
       - codec->writeString(strlen(data->a), data->a);
   - if: dir in ('out', 'inout')
     then:
-      - void read_pair_struct
+      - void read_erpc_pair_struct
       - bool isNull;
       - codec->readNullFlag(&isNull);
       - if (!isNull)
@@ -181,7 +181,7 @@ test_client.cpp:
 test_server.cpp:
   - if: dir in ('in', 'inout')
     then:
-      - void read_pair_struct
+      - void read_erpc_pair_struct
       - bool isNull;
       - codec->readNullFlag(&isNull);
       - if (!isNull)
@@ -191,7 +191,7 @@ test_server.cpp:
       - data->a = 0;
   - if: dir in ('out', 'inout')
     then:
-      - void write_pair_struct
+      - void write_erpc_pair_struct
       - if (data->a == NULL)
       - codec->writeNullFlag(true);
       - else
@@ -202,16 +202,16 @@ test_server.cpp:
 name: return struct
 desc:
 idl: |
-  struct pair {
+  struct erpc_pair {
     string a
   }
 
   interface foo {
-    bar() -> @nullable pair
+    bar() -> @nullable erpc_pair
   }
 
 test_client.cpp:
-  - pair * result = NULL;
+  - erpc_pair * result = NULL;
   - bool isNull;
   - codec->readNullFlag(&isNull);
   - if (!isNull)
