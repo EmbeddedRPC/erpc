@@ -211,7 +211,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
 {
     if (message == NULL)
     {
-        return kErpcStatus_SendFailed;
+        return kErpcStatus_ReceiveFailed;
     }
 
 #if ERPC_THREADS

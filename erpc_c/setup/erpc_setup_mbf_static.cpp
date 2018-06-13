@@ -60,7 +60,7 @@ public:
      */
     StaticMessageBufferFactory(void)
 #if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
-    : m_semaphore(0)
+    : m_semaphore(1)
 #endif
     {
         uint32_t i;

@@ -14,6 +14,8 @@ before_install:
 - if [ $TRAVIS_OS_NAME == linux ]; then pyenv install 2.7.12 ; pyenv global 2.7.12; fi
 - if [ $TRAVIS_OS_NAME == osx ]; then brew update; fi
 - if [ $TRAVIS_OS_NAME == osx ]; then brew install python bison flex && brew upgrade boost || true; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then curl "https://bootstrap.pypa.io/get-pip.py" | sudo python; fi
+
 install:
 #- sudo pip install --upgrade pip setuptools
 #- CC=gcc sudo pip install requests[security]
