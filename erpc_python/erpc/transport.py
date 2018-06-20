@@ -149,6 +149,7 @@ class TCPTransport(FramedTransport):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setblocking(1)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
         s.bind((self._host, self._port))
         s.listen(5)
 
