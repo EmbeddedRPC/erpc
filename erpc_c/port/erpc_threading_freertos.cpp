@@ -250,18 +250,29 @@ void Semaphore::putFromISR(void)
 
 bool Semaphore::get(uint32_t timeout)
 {
-#if configUSE_16_BIT_TICKS
+    BaseType_t ret;
+
     if (timeout == kWaitForever)
     {
         timeout = portMAX_DELAY;
     }
-    else if (timeout > portMAX_DELAY - 1)
+    else if(timeout != 0)
     {
-        timeout = portMAX_DELAY - 1;
-    }
+        timeout = timeout / 1000 / portTICK_PERIOD_MS;
+        if(timeout == 0)
+        {
+            timeout = 1;
+        }
+#if configUSE_16_BIT_TICKS
+        else if (timeout > portMAX_DELAY - 1)
+        {
+            timeout = portMAX_DELAY - 1;
+        }
 #endif
-    xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS);
-    return true;
+    }
+
+    ret = xSemaphoreTake(m_sem, (TickType_t)timeout);
+    return ret == pdPASS;
 }
 
 int Semaphore::getCount(void) const
