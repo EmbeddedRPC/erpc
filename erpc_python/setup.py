@@ -33,7 +33,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup
-from erpc import erpc_version
 from codecs import open
 from os import path
 
@@ -42,6 +41,9 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(path.join(here, 'erpc', 'erpc_version.py')) as f:
+    exec(f.read())
+
 #steps: https://packaging.python.org/distributing/
 #source distribution: python setup.py sdist
 #wheel distribution: python setup.py bdist_wheel
@@ -49,7 +51,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name="erpc",
-    version=erpc_version.ERPC_VERSION,
+    version=ERPC_VERSION,
     description="eRPC Python infrastructure",
     long_description=long_description,
     author="NXP",
