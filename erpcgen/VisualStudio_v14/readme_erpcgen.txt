@@ -19,15 +19,15 @@ Requirements
 
 3. boost [http://boost.org]
 
-    Direct link to the boost 1.66 release downloads:
-        [https://sourceforge.net/projects/boost/files/boost-binaries/1.66.0/]
+    Direct link to the boost 1.67 release downloads:
+        [https://sourceforge.net/projects/boost/files/boost-binaries/1.67.0/]
 
     Install binary for your version of visual studio (x86 architecture)
-    into current directory (for Visual Studio 2017: boost_1_66_0-msvc-14.1-32.exe):
+    into current directory (for Visual Studio 2017: boost_1_67_0-msvc-14.1-32.exe):
         erpc\erpcgen\VisualStudio_v14\
 
         whole path has to be:
-        erpc\erpcgen\VisualStudio_v14\boost_1_66_0\
+        erpc\erpcgen\VisualStudio_v14\boost_1_67_0\
 
     For different version of Visual Studio boost library you need update project:
         in Properties\Linker\General update Additional Library Directories

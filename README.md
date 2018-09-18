@@ -61,7 +61,7 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [NXP RPMsg-Lite](https://github.com/codeauroraforum/rpmsg-lite)
+* [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 

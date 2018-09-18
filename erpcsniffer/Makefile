@@ -73,8 +73,6 @@ SOURCES += 	$(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen_lexer.cpp
 
-LIBRARIES += -L$(ERPC_LIB_OUTPUT_DIR) -lerpc
-
 OBJECT_DEP := $(OBJS_ROOT)/erpcgen_lexer.cpp
 
 include $(ERPC_ROOT)/mk/targets.mk
@@ -88,7 +86,7 @@ ifeq "$(is_mingw)" "1"
     endif
 else
     ifeq "$(is_linux)" "1"
-        LIBRARIES += -lpthread -lrt
+        LIBRARIES := -lpthread -lrt $(LIBRARIES)
     endif
 
     static_libs := NO
@@ -108,9 +106,14 @@ endif
 ifneq "$(build)" "debug"
     # Except Darwin. Darwin has static libs defined above.
     ifeq "$(is_darwin)" ""
-        LIBRARIES += -static
+#        LIBRARIES += -static
+        LIBRARIES := -static $(LIBRARIES)
     endif
 endif
+
+LIBRARIES := -L$(ERPC_LIB_OUTPUT_DIR) -lerpc $(LIBRARIES)
+
+#$(info $$var is [${LIBRARIES}])
 
 # Run flex
 $(OBJS_ROOT)/erpcgen_lexer.cpp: $(ERPC_ROOT)/erpcgen/src/erpcgen_lexer.l $(OBJS_ROOT)/erpcgen_parser.tab.hpp | $(OBJECTS_DIRS)
