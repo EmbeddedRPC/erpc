@@ -24,10 +24,10 @@ using namespace erpc;
 #if defined(__ICCARM__) /* IAR Workbench */
 #pragma location = "rpmsg_sh_mem_section"
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE];
-#elif defined(__GNUC__) /* LPCXpresso */
-char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_sh_mem")));
 #elif defined(__CC_ARM) || defined(__ARMCC_VERSION) /* Keil MDK */
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section("rpmsg_sh_mem_section")));
+#elif defined(__GNUC__)
+char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_sh_mem")));
 #else
 #error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"
 #endif

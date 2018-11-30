@@ -78,6 +78,7 @@ workspace
 # Python bytecode
 *.pyc
 __pycache__
+.pytest_cache
 
 # IAR temp files
 EW*.tmp

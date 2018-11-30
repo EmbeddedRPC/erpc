@@ -201,6 +201,7 @@ public:
     : m_line(line)
     {
     }
+    virtual ~Node(){};
     virtual NodeType gettype() = 0;
     virtual void gettext(std::ostream &stream, data_map &data) = 0;
     virtual void set_children(node_vector &children);

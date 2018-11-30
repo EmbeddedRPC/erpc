@@ -2036,13 +2036,44 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::str
             }
             paramSignature = getTypenameName(dataType, paramSignature);
 
-            if (!(m_def->hasProgramSymbol() && findAnnotation(m_def->getProgramSymbol(), NO_CONST_PARAM)))
+            if (!(m_def->hasProgramSymbol() &&
+                  (findAnnotation(m_def->getProgramSymbol(), NO_CONST_PARAM) ||
+                   ((funType && findAnnotation(funType, NO_CONST_PARAM)) ||
+                    (!funType && findAnnotation(dynamic_cast<Function *>(fn), NO_CONST_PARAM))) ||
+                   findAnnotation(it, NO_CONST_PARAM))))
             {
                 if ((dataType->isString() || dataType->isFunction() || trueDataType->isStruct() ||
+                     trueDataType->isList() || trueDataType->isArray() || trueDataType->isBinary() ||
                      trueDataType->isUnion()) &&
                     it->getDirection() == kInDirection)
                 {
-                    proto += "const ";
+                    bool pass = true;
+                    if (trueDataType->isArray())
+                    {
+                        ArrayType *arrayType = dynamic_cast<ArrayType *>(trueDataType);
+                        assert(arrayType);
+                        DataType *elementType = arrayType->getElementType()->getTrueDataType();
+                        if (elementType->isArray() || elementType->isString() || elementType->isList() ||
+                            elementType->isBinary())
+                        {
+                            pass = false;
+                        }
+                    }
+                    if (trueDataType->isList())
+                    {
+                        ListType *listType = dynamic_cast<ListType *>(trueDataType);
+                        assert(listType);
+                        DataType *elementType = listType->getElementType()->getTrueDataType();
+                        if (elementType->isArray() || elementType->isString() || elementType->isList() ||
+                            elementType->isBinary())
+                        {
+                            pass = false;
+                        }
+                    }
+                    if (pass)
+                    {
+                        proto += "const ";
+                    }
                 }
             }
 

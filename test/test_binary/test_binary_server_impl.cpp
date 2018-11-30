@@ -47,7 +47,7 @@ void test_binary_allDirection(const binary_t *a, const binary_t *b, binary_t *e)
     }
 }
 
-void test_binary_allDirectionLength(uint8_t *a, const binary_t *b, binary_t *d, uint32_t p1) {}
+void test_binary_allDirectionLength(const uint8_t *a, const binary_t *b, binary_t *d, uint32_t p1) {}
 
 /*void test_binary_allDirection(const binary *a, const binary *b, binary *c, binary **d, binary *e)
 {

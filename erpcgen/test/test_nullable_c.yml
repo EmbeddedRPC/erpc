@@ -286,9 +286,9 @@ idl: |
 test_client.cpp:
   - if: dir == 'inout'
     then:
-      - void bar(bool * l, uint32_t * c)
+      - void bar(const bool * l, uint32_t * c)
     else:
-      - void bar(bool * l, uint32_t c)
+      - void bar(const bool * l, uint32_t c)
   - if: dir == 'inout' and ann == '@nullable'
     then:
       - if (l == NULL || c == NULL)

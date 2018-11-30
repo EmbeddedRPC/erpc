@@ -10,7 +10,7 @@ test/interface.py:
   - def bar(self, l)
 test/client.py:
   - def bar(self, l)
-  - start_write_list(self.length)
+  - start_write_list(len(l))
 test/server.py:
   - start_read_list
   - not: codec.read_int32()
@@ -48,7 +48,7 @@ test/interface.py:
   - def bar(self, l)
 test/client.py:
   - def bar(self, l)
-  - start_write_list(self.length)
+  - start_write_list(len(l))
   - perform_request
   - start_read_list
   - not: codec.read_int32()

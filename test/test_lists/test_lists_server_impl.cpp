@@ -244,9 +244,9 @@ void test_list_allDirection(const list_uint32_1_t *a, const list_uint32_1_t *b, 
     }
 }
 
-int32_t testLengthAnnotation(int32_t *myList, uint32_t len)
+int32_t testLengthAnnotation(const int32_t *myList, uint32_t len)
 {
-    int32_t *itr = myList;
+    const int32_t *itr = myList;
     for (uint32_t i = 0; i < len; ++i)
     {
         if (*itr != (int32_t)(i + 1))

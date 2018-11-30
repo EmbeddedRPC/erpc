@@ -118,7 +118,7 @@ int32_t getStudentAge(const student *stud)
     return studAge;
 }
 
-student *createStudent(const char *name, float test_scores[3], school_year_t year, int32_t age)
+student *createStudent(const char *name, const float test_scores[3], school_year_t year, int32_t age)
 {
     // Log::info("returning from createStudent()\n");
     student *newStudent = (student *)erpc_malloc(sizeof(student));

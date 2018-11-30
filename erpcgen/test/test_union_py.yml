@@ -102,7 +102,7 @@ test/common.py:
   - elif discriminator == 1
   - if self.a is None
   - raise ValueError("self.a is None")
-  - codec.start_write_list(self.length)
+  - codec.start_write_list(len(self.a))
   - for _i1 in self.a
   - codec.write_int32(_i1)
   - elif discriminator == 3
@@ -111,7 +111,7 @@ test/common.py:
   - codec.write_uint32(self.cx)
   - if self.cc is None
   - raise ValueError("self.cc is None")
-  - codec.start_write_list(self.length)
+  - codec.start_write_list(len(self.cc))
   - for _i1 in self.cc
   - codec.write_int32(_i1)
   - elif discriminator == 10
