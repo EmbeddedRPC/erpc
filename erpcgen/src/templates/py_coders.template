@@ -80,7 +80,7 @@ codec.start_write_union({$self}discriminator)
 {#--------------- function ---------------#}
 {% elif info.type == "function" %}
 {%  if info.tableName != "" %}
-{$codec}.write_int32({$ info.tableName}.index({$name})){%>%}
+{$codec}.write_int8({$ info.tableName}.index({$name})){%>%}
 {%  else %}
 # When are defined less than 2 callback functions, eRPC don't need serialize any code.
 {%  endif%}
@@ -171,7 +171,7 @@ _n{$depth} = {$codec}.start_read_list()
 {#--------------- function ---------------#}
 {% elif info.type == "function" %}
 {%  if info.tableName != "" %}
-{$name} = {$ info.tableName}[{$codec}.read_int32()]
+{$name} = {$ info.tableName}[{$codec}.read_int8()]
 {%  else %}
 # When are defined less than 2 callback functions, eRPC don't need serialize any code.
 {$indent}{$name} = {$info.callbackName}
