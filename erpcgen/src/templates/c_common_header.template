@@ -129,7 +129,7 @@ extern "C" {
 {$> fn.mlComment}
 {$fn.prototype};{$fn.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- functions %}
-//@} {$iface.ilComment}
+//@}{$iface.ilComment}
 {% endfor -- iface %}
 
 #if defined(__cplusplus)
