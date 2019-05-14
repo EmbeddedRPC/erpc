@@ -53,6 +53,9 @@ void SystemInitHook(void)
 }
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int main(int argc, const char *argv[])
 {
 #if defined(RPMSG)
@@ -102,6 +105,9 @@ int main(int argc, const char *argv[])
 
     return 0;
 }
+#ifdef __cplusplus
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Server helper functions

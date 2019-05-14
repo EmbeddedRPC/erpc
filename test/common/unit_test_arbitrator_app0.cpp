@@ -78,7 +78,7 @@ void runServer(void *arg)
 
     if (err != kErpcStatus_Success)
     {
-        PRINTF("Server error: %d\n", err);
+        PRINTF("Server error: %d\r\n", err);
     }
     vTaskSuspend(NULL);
 }
@@ -140,7 +140,7 @@ void runInit(void *arg)
     if (transportClient == NULL)
     {
         // error in initialization of transport layer
-        PRINTF("Transport layer initialization failed\n");
+        PRINTF("Transport layer initialization failed\r\n");
         while (1)
         {
         }
@@ -193,29 +193,32 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
     // Called before a test starts.
     virtual void OnTestStart(const ::testing::TestInfo &test_info)
     {
-        PRINTF("*** Test %s.%s starting.\n", test_info.test_case_name(), test_info.name());
+        PRINTF("*** Test %s.%s starting.\r\n", test_info.test_case_name(), test_info.name());
     }
 
     // Called after a failed assertion or a SUCCEED() invocation.
     virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result)
     {
-        PRINTF("%s in %s:%d\n%s\n", test_part_result.failed() ? "*** Failure" : "Success", test_part_result.file_name(),
+        PRINTF("%s in %s:%d\r\n%s\r\n", test_part_result.failed() ? "*** Failure" : "Success", test_part_result.file_name(),
                test_part_result.line_number(), test_part_result.summary());
     }
 
     // Called after a test ends.
     virtual void OnTestEnd(const ::testing::TestInfo &test_info)
     {
-        PRINTF("*** Test %s.%s ending.\n", test_info.test_case_name(), test_info.name());
+        PRINTF("*** Test %s.%s ending.\r\n", test_info.test_case_name(), test_info.name());
     }
 
     virtual void OnTestCaseEnd(const ::testing::TestCase &test_case)
     {
-        PRINTF("*** Total tests passed: %d, failed: %d.\n", test_case.successful_test_count(),
+        PRINTF("*** Total tests passed: %d, failed: %d.\r\n", test_case.successful_test_count(),
                test_case.failed_test_count());
     }
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -232,7 +235,7 @@ int main(int argc, char **argv)
     // Calculate size of the image
     uint32_t core1_image_size;
     core1_image_size = get_core1_image_size();
-    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\n", CORE1_BOOT_ADDRESS, core1_image_size);
+    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\r\n", CORE1_BOOT_ADDRESS, core1_image_size);
 
     // Copy application from FLASH to RAM
     memcpy(CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
@@ -249,6 +252,9 @@ int main(int argc, char **argv)
     {
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 void quitSecondInterfaceServer()
 {

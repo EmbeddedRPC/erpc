@@ -66,9 +66,9 @@ void Thread::start(void *arg)
     // which will scan the linked list.
     taskENTER_CRITICAL();
 
-    xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
-                ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
-                this, m_priority, &m_task);
+    (void)xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
+                      ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
+                      this, m_priority, &m_task);
 
     // Link in this thread to the list.
     if (s_first)
@@ -234,7 +234,7 @@ bool Semaphore::get(uint32_t timeout)
         timeout = portMAX_DELAY - 1;
     }
 #endif
-    xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS);
+    (void)xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS);
     return true;
 }
 

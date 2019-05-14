@@ -37,7 +37,7 @@ public:
     /*!
      * @brief Constructor.
      *
-     * @param[in] spiBaseAddr Spi driver.
+     * @param[in] spiBaseAddr DSPI peripheral base address.
      * @param[in] baudRate Baudrate.
      * @param[in] srcClock_Hz Source clock.
      */

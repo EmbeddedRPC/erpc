@@ -38,41 +38,112 @@ extern "C" {
 //! @name Transport setup
 //@{
 
+//! @name CMSIS UART transport setup
+//@{
+
 /*!
  * @brief Create a CMSIS UART transport.
+ *
+ * Create a CMSIS UART transport instance, to be used on both the server 
+ * and the client side. 
+ *
+ * @param[in] uartDrv CMSIS USART driver structure address (Driver Control Block).
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
+//@}
+
+//! @name Host PC serial port transport setup
+//@{
 
 /*!
  * @brief Create a host PC serial port transport.
+ *
+ * Create a host PC serial port transport instance. 
+ *
+ * @param[in] portName Port name.
+ * @param[in] baudRate Baud rate.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate);
+//@}
+
+//! @name SPI transport setup
+//@{
 
 /*!
  * @brief Create a SPI master transport.
+ *
+ * Create SPI master transport instance, to be used at master core. 
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
 /*!
  * @brief Create a SPI slave transport.
+ *
+ * Create SPI slave transport instance, to be used at slave core. 
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_spi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name DSPI transport setup
+//@{
 
 /*!
  * @brief Create a DSPI master transport.
+ *
+ * Create DSPI master transport instance, to be used at master core. 
+ *
+ * @param[in] baseAddr Base address of DSPI peripheral used in this transport layer.
+ * @param[in] baudRate DSPI baud rate.
+ * @param[in] srcClock_Hz DSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
 /*!
  * @brief Create a DSPI slave transport.
+ *
+ * Create DSPI slave transport instance, to be used at slave core. 
+ *
+ * @param[in] baseAddr Base address of DSPI peripheral used in this transport layer.
+ * @param[in] baudRate DSPI baud rate.
+ * @param[in] srcClock_Hz DSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name MU transport setup
+//@{
 
 /*!
  * @brief Create an MU transport.
+ *
+ * Create Messaging Unit (MU) transport instance, to be used on both the server 
+ * and the client side. Base address of the MU peripheral needs to be passed. 
+ *
+ * @param[in] baseAddr Base address of MU peripheral.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_mu_init(void *baseAddr);
-
 //@}
 
 //! @name RPMsg-Lite transport setup
@@ -175,6 +246,10 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_ad
 erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr,
                                                                 void *start_address, int rpmsg_link_id,
                                                                 rpmsg_ready_cb ready, char *nameservice_name);
+//@}
+
+//! @name Linux RPMSG endpoint setup
+//@{
 
 /*!
  * @brief Create an Linux RPMSG endpoint transport.
@@ -186,16 +261,22 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(unsigned long sr
  * When type is set to '0', then Datagram model will be used, else Stream.
  *
  * @param[in] local_addr Local endpoint address.
- * @param[in] type Datagram or Stream.
+ * @param[in] type Datagram (0) or Stream (1).
  * @param[in] remote_addr Remote endpoint address.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
-//@}
 
 /*!
  * @brief Deinitialize an Linux RPMSG endpoint transport.
+ *
+ * This function deinitializes the Linux RPMSG endpoint transport.
  */
 void erpc_transport_rpmsg_linux_deinit(void);
+//@}
+
+//@}
 
 #ifdef __cplusplus
 }

@@ -184,6 +184,9 @@ void runInit(void *arg)
     vTaskSuspend(NULL);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int main(int argc, char **argv)
 {
     BOARD_InitHardware();
@@ -199,6 +202,9 @@ int main(int argc, char **argv)
     {
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 void stopSecondSide()
 {

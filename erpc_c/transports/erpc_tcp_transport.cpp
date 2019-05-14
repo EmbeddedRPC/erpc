@@ -21,7 +21,7 @@ using namespace erpc;
 
 // Set this to 1 to enable debug logging.
 // TODO fix issue with the transport not working on Linux if debug logging is disabled.
-#define TCP_TRANSPORT_DEBUG_LOG (1)
+//#define TCP_TRANSPORT_DEBUG_LOG (1)
 
 #if TCP_TRANSPORT_DEBUG_LOG
 #define TCP_DEBUG_PRINT(_fmt_, ...) printf(_fmt_, ##__VA_ARGS__)
