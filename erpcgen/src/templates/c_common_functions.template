@@ -396,24 +396,22 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{
 switch ({$info.dataLiteral}{$info.discriminatorName})
 {
 {% for case in info.cases %}
-{%  if case.needCaseFreeingCall == true %}
-{%   if case.name == "default" %}
+{%  if case.name == "default" %}
     default:
-{%   else %}
+{%  else %}
     case {% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
-{%   endif -- default or case %}
+{%  endif -- default or case %}
     {
-{%   for member in case.members %}
-{%    if member.isNeedFreeingCall %}
+{%  for member in case.members %}
+{%   if member.isNeedFreeingCall %}
 {$addIndent("        ", member.coderCall.freeingCall(member.coderCall))}
-{%    endif %}
-{%    if empty(member.coderCall.memberAllocation) == false %}
+{%   endif %}
+{%   if empty(member.coderCall.memberAllocation) == false %}
 {$addIndent("        ", member.coderCall.freeingCall2(member.coderCall))}
-{%    endif%}
-{%   endfor -- members %}
+{%   endif%}
+{%  endfor -- members %}
         break;
     }
-{%  endif %}
 {% endfor -- cases %}
 }
 {% enddef ------------------------------- freeUnion %}
