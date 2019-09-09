@@ -87,15 +87,17 @@ codec->read(&_tmp_local);
 uint32_t {$info.sizeTemp};
 {%  endif %}
 codec->startReadList(&{$info.sizeTemp});
+if({$info.sizeTemp})
+{
 {%  if info.hasLengthVariable && not info.constantVariable %}
 {%   if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {%  endif %}
 {%  if info.maxSize != info.sizeTemp %}
-if ({$info.sizeTemp} <= {$info.maxSize})
-{
-{%   set indent = "    " >%}
+    if ({$info.sizeTemp} <= {$info.maxSize})
+    {
+{%   set indent = "        " >%}
 {%  else %}
-{%   set indent = "" >%}
+{%   set indent = "    " >%}
 {%  endif %}
 {%  if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = ({$info.mallocType}) erpc_malloc({$info.maxSize} * sizeof({$info.mallocSizeType}));
@@ -110,12 +112,13 @@ if ({$info.sizeTemp} <= {$info.maxSize})
 {$addIndent(indent, decodeArrayType(info))}
 {%  endif %}
 {%  if info.maxSize != info.sizeTemp %}
-}
-else
-{
-    codec->updateStatus(kErpcStatus_Fail);
-}
+    }
+    else
+    {
+        codec->updateStatus(kErpcStatus_Fail);
+    }
 {%  endif %}
+}
 {% endif >%}
 {% enddef ------------------------------------- ListType %}
 
