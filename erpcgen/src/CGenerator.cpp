@@ -2725,8 +2725,6 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                     data_map caseData;
                     caseData["name"] = unionCase->getCaseName();
                     caseData["value"] = unionCase->getCaseValue();
-                    // if current case need call free function, default false
-                    caseData["needCaseFreeingCall"] = false;
                     data_list caseMembers;
                     data_map memberData;
                     data_map caseMembersFree;
@@ -2758,8 +2756,6 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                             {
                                 // set freeing function for current union
                                 templateData["freeingCall"] = m_templateData["freeUnion"];
-                                // current case need free memory
-                                caseData["needCaseFreeingCall"] = true;
                                 // current member need free memory
                                 memberData["isNeedFreeingCall"] = true;
                             }
