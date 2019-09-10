@@ -126,6 +126,10 @@ if({$info.sizeTemp})
     }
 {%  endif %}
 }
+else
+{
+    {$info.name} = NULL;
+}
 {% endif >%}
 {% enddef ------------------------------------- ListType %}
 
