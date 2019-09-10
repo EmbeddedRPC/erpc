@@ -34,15 +34,17 @@ uint32_t {$info.sizeTemp};
 {% endif %}
 uint8_t * {$info.dataTemp};
 codec->readBinary(&{$info.sizeTemp}, &{$info.dataTemp});
+if({$info.sizeTemp})
+{
 {% if info.hasLengthVariable && not info.constantVariable %}
 {%  if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
 if ({$info.sizeTemp} <= {$info.maxSize})
 {
-{%   set indent = "    " >%}
+{%   set indent = "        " >%}
 {% else %}
-{%   set indent = "" >%}
+{%   set indent = "    " >%}
 {% endif %}
 {% if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = (uint8_t *) erpc_malloc({$info.maxSize} * sizeof(uint8_t));
@@ -62,12 +64,17 @@ if ({$info.sizeTemp} <= {$info.maxSize})
 {$indent}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
+    }
+    else
+    {
+        codec->updateStatus(kErpcStatus_Fail);
+    }
+{% endif %}
 }
 else
 {
-    codec->updateStatus(kErpcStatus_Fail);
+    {$info.name} = NULL;
 }
-{% endif %}
 {% enddef ------------------------------- BinaryType %}
 
 {% def decodeEnumType(info) ---------------- EnumType %}
