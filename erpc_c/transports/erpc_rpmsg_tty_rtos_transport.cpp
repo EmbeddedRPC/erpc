@@ -37,6 +37,10 @@ RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
 
 RPMsgTTYRTOSTransport::~RPMsgTTYRTOSTransport(void)
 {
+    if (m_rpmsg_ept != RL_NULL)
+    {
+        rpmsg_queue_destroy(s_rpmsg, m_rpmsg_ept)
+    }
     rpmsg_lite_deinit(s_rpmsg);
     s_initialized = 0;
 }
