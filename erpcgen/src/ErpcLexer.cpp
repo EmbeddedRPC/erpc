@@ -1,38 +1,24 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ErpcLexer.h"
-#include <algorithm>
+#include "erpc_crc16.h"
+#include "erpc_version.h"
+#include "Generator.h"
 #include "HexValues.h"
 #include "SearchPath.h"
+#include <algorithm>
 #include <fstream>
+#include <streambuf>
+#include <string>
 
 using namespace erpcgen;
+using namespace std;
 
 #if __WIN32__
 #define PATH_SEP_CHAR '\\'
@@ -48,6 +34,7 @@ ErpcLexer::ErpcLexer(const char *inputFile)
 : m_value(nullptr)
 , m_indents(0)
 , m_currentFileInfo(NULL)
+, m_idlCrc16(0)
 {
     m_currentFileInfo = openFile(inputFile);
     yyrestart(m_currentFileInfo->m_savedFile.get()); // instead of yyFlexLexer(idlFile);
@@ -168,7 +155,7 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     return count;
 }
 
-void ErpcLexer::pushFile(const std::string &fileName)
+void ErpcLexer::pushFile(const string &fileName)
 {
     CurrentFileInfo *newSavedFileInfo = openFile(fileName);
 
@@ -198,18 +185,18 @@ void ErpcLexer::popFile()
     yypop_buffer_state();
 }
 
-CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
+CurrentFileInfo *ErpcLexer::openFile(const string &fileName)
 {
     // search file in path
-    std::string foundFile, currentFolderPath;
+    string foundFile, currentFolderPath;
     if (!PathSearcher::getGlobalSearcher().search(fileName, PathSearcher::target_type_t::kFindFile, true, foundFile))
     {
         throw runtime_error(format_string("could not find input file %s in defined directories", fileName.c_str()));
     }
 
-    if (fileName.rfind(PATH_SEP_CHAR) != std::string::npos)
+    if (fileName.rfind(PATH_SEP_CHAR) != string::npos)
     {
-        int32_t fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
+        int fileSepPos = foundFile.rfind(PATH_SEP_CHAR);
         currentFolderPath = foundFile.substr(0, fileSepPos);
         PathSearcher::getGlobalSearcher().setTempPath(currentFolderPath);
     }
@@ -225,7 +212,7 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
         }
     }
     // open file
-    std::ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
+    ifstream *inputFile = new ifstream(foundFile.c_str(), ios_base::in | ios_base::binary);
     if (inputFile)
     {
         if (!inputFile->is_open())
@@ -238,6 +225,15 @@ CurrentFileInfo *ErpcLexer::openFile(const std::string &fileName)
     {
         throw runtime_error(format_string("could not create ifstream object from file %s", foundFile.c_str()));
     }
+
+    /* Counting CRC16 for Generator. */
+    string str((istreambuf_iterator<char>(*inputFile)), istreambuf_iterator<char>());
+    erpc::Crc16 crc16 = erpc::Crc16(ERPC_VERSION_NUMBER);
+    m_idlCrc16 += crc16.computeCRC16((const uint8_t *)str.c_str(), str.size());
+
+    /* Reset state to beginning of file. */
+    inputFile->clear();
+    inputFile->seekg(0, ios::beg);
 
     return new CurrentFileInfo(inputFile, foundFile, currentFolderPath);
 }

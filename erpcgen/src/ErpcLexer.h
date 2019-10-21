@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 // This header just wraps the standard flex C++ header to make it easier to include
@@ -33,13 +13,13 @@
 #ifndef _EMBEDDED_RPC__ERPCLEXER_H_
 #define _EMBEDDED_RPC__ERPCLEXER_H_
 
-#include "AstNode.h"
 #undef yyFlexLexer
-#include <FlexLexer.h>
+#include "AstNode.h"
 #include "ParseErrors.h"
-#include <vector>
-#include <string>
+#include <FlexLexer.h>
 #include <fstream>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
@@ -53,18 +33,18 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 class ErpcLexer;
 }
 #include "erpcgen_parser.tab.hpp"
 
 using namespace std;
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
- * @brief This class contains necessary information about analysed file.
+ * @brief This class contains necessary information about analyzed file.
  */
 class CurrentFileInfo
 {
@@ -75,8 +55,8 @@ public:
      * This function set default values to object variables. Pointer to file ifstream,
      * file name and current folder path are given as function parameters.
      *
-     * @param[in] savedFile Pointer to analysed file.
-     * @param[in] fileName Name of analysed file.
+     * @param[in] savedFile Pointer to analyzed file.
+     * @param[in] fileName Name of analyzed file.
      * @param[in] currentFolderPath Path to folder of current file.
      */
     CurrentFileInfo(std::ifstream *savedFile, std::string fileName, std::string currentFolderPath)
@@ -149,6 +129,7 @@ public:
      *@return Current token's location.
      */
     inline token_loc_t &getLocation() { return m_location; }
+
     /*!
      * @brief Suspend actual and give new file to flex.
      *
@@ -169,30 +150,20 @@ public:
      * @return Current file name.
      */
     inline std::string &getFileName() { return m_currentFileInfo->m_fileName; }
+
     /*!
-     * @brief This function open file.
+     * @brief This function returns crc16 of all used IDL files.
      *
-     * This function will try find and open file, which is given be file name
-     * variable. When file is found and opened new current file info object is
-     * created.
-     *
-     * @param[in] fileName File name, which can contains also path to file,
-     *          which is given to flex lexical analysis.
-     *
-     * @return return new current file info object if file is
-     *          found and opened.
-     *
-     * @exception std::runtime_error Thrown if file is not found.
-     * @exception std::runtime_error Thrown if file can not open.
-     * @exception std::runtime_error Thrown if can not create ifstream object from file.
+     * @return Crc16 of all used IDL files.
      */
-    CurrentFileInfo *openFile(const std::string &fileName);
+    uint16_t getIdlCrc16() { return m_idlCrc16; }
 
 protected:
     Value *m_value;                     /*!< Value for the current token. */
     token_loc_t m_location;             /*!< Location for the current token. */
     CurrentFileInfo *m_currentFileInfo; /*!< Pointer to current file info. */
     uint32_t m_indents;                 /*!< How much indents can be removed from newlines in doxygen comments. */
+    uint16_t m_idlCrc16;                /*!< Crc16 of IDL files. */
 
     /*!
      * @brief This function thrown lexical_error with given message.
@@ -223,8 +194,27 @@ protected:
      *@return returns one token.
      */
     virtual int yylex();
+
+    /*!
+     * @brief This function open file.
+     *
+     * This function will try find and open file, which is given be file name
+     * variable. When file is found and opened new current file info object is
+     * created.
+     *
+     * @param[in] fileName File name, which can contains also path to file,
+     *          which is given to flex lexical analysis.
+     *
+     * @return return new current file info object if file is
+     *          found and opened.
+     *
+     * @exception std::runtime_error Thrown if file is not found.
+     * @exception std::runtime_error Thrown if file can not open.
+     * @exception std::runtime_error Thrown if can not create ifstream object from file.
+     */
+    CurrentFileInfo *openFile(const std::string &fileName);
 };
 
-}; // namespace erpcgen
+} // namespace erpcgen
 
 #endif // _EMBEDDED_RPC__ERPCLEXER_H_

@@ -42,17 +42,17 @@
 #define NOTHROW
 #endif // NOTHROW
 
-#include <string>
-#include <vector>
+#include <boost/lexical_cast.hpp>
 #include <map>
 #include <memory>
+#include <string>
 #include <unordered_map>
-#include <boost/lexical_cast.hpp>
+#include <vector>
 
 #include <iostream>
 
-namespace cpptempl
-{
+namespace cpptempl {
+
 // various typedefs
 class data_ptr;
 class data_map;
@@ -209,6 +209,7 @@ public:
     bool has(const std::string &key);
     data_ptr &parse_path(const std::string &key, bool create = false);
     void set_parent(data_map *p) { parent = p; }
+
 private:
     std::unordered_map<std::string, data_ptr> data;
     data_map *parent;
@@ -321,8 +322,8 @@ data_ptr make_data(const T &val)
 
 void dump_data(data_ptr data);
 
-namespace impl
-{
+namespace impl {
+
 // node classes
 class Node;
 typedef std::shared_ptr<Node> node_ptr;

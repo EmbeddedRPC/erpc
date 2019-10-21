@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
-# Copyright (C) 2014 Freescale Semiconductor, Inc. All Rights Reserved.
+# Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -13,4 +15,4 @@
 # OF SUCH DAMAGE.
 #-------------------------------------------------------------------------------
 
-ERPC_NAME=$(TEST_NAME)
+ERPC_NAME=test

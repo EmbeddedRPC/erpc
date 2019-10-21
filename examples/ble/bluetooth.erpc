@@ -1,3 +1,12 @@
+/*!
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 @outputDir("bluetooth")
 @py_types_name_strip_suffix("_t")
 program bluetooth

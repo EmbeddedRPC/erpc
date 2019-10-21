@@ -1,42 +1,17 @@
 /*
  * Copyright (c) 2013-14, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 #if !defined(_Logging_h_)
 #define _Logging_h_
 
+#include <cassert>
+#include <cstdarg>
 #include <string>
-#include <assert.h>
-#include <stdarg.h>
-
-#if !(__embedded_cplusplus)
-using namespace std;
-#endif
 
 /*!
  * \brief Base logger class.
@@ -56,7 +31,7 @@ using namespace std;
  * Most use of the logger classes is expected to be through the Log
  * class. It provides static logging methods that call through to a global
  * singleton logger instance. There is also a Log::SetOutputLevel utility
- * class that makes it extremely easiy to temporarily change the default
+ * class that makes it extremely easily to temporarily change the default
  * output logging level.
  *
  * Of all the overloaded log() methods in this class, none of them are
@@ -99,10 +74,13 @@ public:
     //@{
     //! \brief Changes the logging level to \a level.
     inline void setFilterLevel(log_level_t level) { m_filter = level; }
+
     //! \brief Returns the current logging filter level.
     inline log_level_t getFilterLevel() const { return m_filter; }
+
     //! \brief Changes the logging output level to \a level.
     inline void setOutputLevel(log_level_t level) { m_level = level; }
+
     //! \brief Returns the current logging output level.
     inline log_level_t getOutputLevel() const { return m_level; }
     //@}
@@ -113,12 +91,13 @@ public:
     virtual void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    virtual void log(const string &msg) { log(msg.c_str()); }
+    virtual void log(const std::string &msg) { log(msg.c_str()); }
+
     //! \brief Log with format at a specific output level.
     virtual void log(log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    virtual void log(log_level_t level, const string &msg) { log(level, msg.c_str()); }
+    virtual void log(log_level_t level, const std::string &msg) { log(level, msg.c_str()); }
     //! \brief Log with format using an argument list.
     virtual void log(const char *fmt, va_list args);
 
@@ -155,6 +134,7 @@ public:
     //@{
     //! \brief Returns the current global logger singleton.
     static inline Logger *getLogger() { return s_logger; }
+
     //! \brief Sets the global logger singleton instance.
     static inline void setLogger(Logger *logger) { s_logger = logger; }
     //@}
@@ -165,13 +145,13 @@ public:
     static void log(const char *fmt, ...);
 
     //! \brief Log a string object.
-    static void log(const string &msg);
+    static void log(const std::string &msg);
 
     //! \brief Log with format at a specific output level.
     static void log(Logger::log_level_t level, const char *fmt, ...);
 
     //! \brief Log a string output at a specific output level.
-    static void log(Logger::log_level_t level, const string &msg);
+    static void log(Logger::log_level_t level, const std::string &msg);
     //@}
 
     //! @name Logging level helpers
@@ -242,6 +222,7 @@ public:
         //!
         //! Restores the saved logging output level.
         ~SetOutputLevel() { m_logger->setOutputLevel(m_saved); }
+
     protected:
         Logger *m_logger;            //!< The logger instance we're controlling.
         Logger::log_level_t m_saved; //!< Original logging output level.
@@ -254,7 +235,8 @@ public:
 class StdoutLogger : public Logger
 {
 public:
-    StdoutLogger(Logger::log_level_t stderrLevel=Logger::kWarning)
+    //! \brief Default constructor.
+    StdoutLogger(Logger::log_level_t stderrLevel = Logger::kWarning)
     : m_stderrLevel(stderrLevel)
     {
     }

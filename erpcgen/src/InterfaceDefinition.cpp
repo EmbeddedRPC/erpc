@@ -1,45 +1,26 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "InterfaceDefinition.h"
-#include "Logging.h"
 #include "AstNode.h"
-#include "ErpcLexer.h"
 #include "AstWalker.h"
+#include "ErpcLexer.h"
+#include "Logging.h"
 #include "SymbolScanner.h"
 #include "annotations.h"
+#include "erpcgen_parser.tab.hpp"
+#include "types/AliasType.h"
 #include "types/BuiltinType.h"
 #include "types/StructType.h"
-#include "types/AliasType.h"
-#include "erpcgen_parser.tab.hpp"
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -50,7 +31,8 @@ InterfaceDefinition::InterfaceDefinition()
 , m_globals()
 , m_programName("")
 , m_outputFilename("")
-, m_error_handling_check(kAll)
+, m_codec(kNotSpecified)
+, m_program(nullptr)
 {
     init();
 }
@@ -65,11 +47,12 @@ void InterfaceDefinition::parse(const char *inputFile)
     // create lexer instance
     ErpcLexer lexer(inputFile);
     int result = yyparse(&lexer, &m_ast);
+    m_idlCrc16 = lexer.getIdlCrc16();
 
     // check results
     if (result || !m_ast)
     {
-        throw std::runtime_error("failed to parse command file");
+        throw runtime_error("failed to parse command file");
     }
 
     //    Log::info("Parsing was successful!\n");
@@ -79,8 +62,9 @@ void InterfaceDefinition::parse(const char *inputFile)
     printer.dispatch();
 
     // Build table of symbols.
-    SymbolScanner scanner(&m_globals, std::string(inputFile));
-    scanner.walk(m_ast);
+    SymbolScanner scanner(&m_globals, string(inputFile));
+    scanner.startWalk(m_ast);
+    m_program = scanner.getProgram();
 
     m_globals.dump();
 }
@@ -102,68 +86,38 @@ void InterfaceDefinition::createBuiltinTypes()
     m_globals.addSymbol(new BuiltinType("binary", BuiltinType::_builtin_type::kBinaryType));
 }
 
-void InterfaceDefinition::setProgramInfo(const std::string &filename, const std::string &outputDir)
+void InterfaceDefinition::setProgramInfo(const string &filename, const string &outputDir, codec_t codec)
 {
     setOutputFilename(filename);
-    setOutputDirectory(outputDir);
-    setErrorHandlingChecksType();
+    m_outputDirectory = outputDir;
+    m_codec = codec;
 }
 
 bool InterfaceDefinition::hasProgramSymbol()
 {
-    return 1 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size();
+    return m_program != nullptr;
 }
 
-Program *InterfaceDefinition::programSymbol()
+Program *InterfaceDefinition::getProgramSymbol()
 {
-    if (0 == m_globals.getSymbolsOfType(Symbol::kProgramSymbol).size())
+    if (!hasProgramSymbol())
     {
         return nullptr;
     }
     else
     {
-        assert(nullptr != dynamic_cast<Program *>(m_globals.getSymbolsOfType(Symbol::kProgramSymbol)[0]));
-        return dynamic_cast<Program *>(m_globals.getSymbolsOfType(Symbol::kProgramSymbol)[0]);
+        return m_program;
     }
 }
 
-void InterfaceDefinition::setOutputDirectory(const std::string &outputDir)
-{
-    m_outputDirectory = outputDir;
-
-    if (hasProgramSymbol())
-    {
-        Annotation *an = programSymbol()->findAnnotation(OUTPUT_DIR_ANNOTATION);
-        if (an)
-        {
-            m_outputDirectory /= an->getValueObject()->toString();
-        }
-    }
-}
-
-void InterfaceDefinition::setOutputFilename(const std::string &filename)
+void InterfaceDefinition::setOutputFilename(const string &filename)
 {
     if (hasProgramSymbol())
     {
-        m_outputFilename = programSymbol()->getName();
+        m_outputFilename = getProgramSymbol()->getName();
     }
     else
     {
         m_outputFilename = filename;
-    }
-}
-
-void InterfaceDefinition::setErrorHandlingChecksType()
-{
-    if (hasProgramSymbol())
-    {
-        if (programSymbol()->findAnnotation(NO_ALLOC_ERRORS))
-        {
-            m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 1);
-        }
-        if (programSymbol()->findAnnotation(NO_INFRA_ERRORS))
-        {
-            m_error_handling_check = (_error_handling_checks)(((int)m_error_handling_check) + 2);
-        }
     }
 }

@@ -19228,10 +19228,12 @@ class StoredResultEventListener {
   // additional data.
   virtual const BaseTestPartResult* TransformTestPartResult(const TestPartResult& test_part_result) = 0;
 
-  // Fired for adding data from base_test_part_result to output xml. This object should be cast to inheritor
+#if !GTEST_OS_BARE_METAL
+		// Fired for adding data from base_test_part_result to output xml. This object should be cast to inheritor
   // to get access to all stored data.
   virtual void OutputXmlTestPartResult(::std::ostream* stream,
                                        const BaseTestPartResult* base_test_part_result) = 0;
+#endif
 };
 
 // The convenience class for users who need to override just one or two
@@ -19242,8 +19244,10 @@ class StoredResultEventListener {
 class EmptyStoredResultEventListener : public StoredResultEventListener{
  public:
   virtual const BaseTestPartResult* TransformTestPartResult(const TestPartResult& /* test_part_result */) { return NULL; }
+#if !GTEST_OS_BARE_METAL
   virtual void OutputXmlTestPartResult(::std::ostream* /* stream */,
                                        const BaseTestPartResult* /* base_test_part_result */) {};
+#endif
 };
 
 // A UnitTest consists of a vector of TestCases.

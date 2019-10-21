@@ -1,44 +1,24 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _EMBEDDED_RPC__TOKEN_H_
 #define _EMBEDDED_RPC__TOKEN_H_
 
-#include "smart_ptr.h"
 #include "Value.h"
+#include "smart_ptr.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Token location in the source file.
  */
@@ -56,7 +36,21 @@ struct token_loc_t
     , m_lastChar(0)
     {
     }
+
+    /*!
+     * @brief Default copy constructor.
+     *
+     * @param[in] other Token location struct to copy.
+     */
     token_loc_t(const token_loc_t &other) = default;
+
+    /*!
+     * @brief Default assign operator.
+     *
+     * @param[in] other Token location struct to copy.
+     *
+     * @return Token location struct reference.
+     */
     token_loc_t &operator=(const token_loc_t &other) = default;
 };
 
@@ -156,6 +150,7 @@ public:
      * @brief Destructor.
      */
     ~Token() {}
+
     //! @name Token
     //@{
     /*!
@@ -166,6 +161,7 @@ public:
      * @see void Token::setToken()
      */
     int getToken() const { return m_token; }
+
     /*!
      * @brief This function set token number.
      *
@@ -174,6 +170,7 @@ public:
      * @see int Token::getToken()
      */
     void setToken(int tok) { m_token = tok; }
+
     /*!
      * @brief This function returns token name.
      *
@@ -211,6 +208,7 @@ public:
      * @see void Token::setValue()
      */
     bool hasValue() const { return m_value.get() != nullptr; }
+
     /*!
      * @brief This function returns token value.
      *
@@ -221,6 +219,7 @@ public:
      * @see void Token::setValue()
      */
     Value *getValue() { return m_value; }
+
     /*!
      * @brief This function returns const token value.
      *
@@ -231,6 +230,7 @@ public:
      * @see void Token::setValue()
      */
     const Value *getValue() const { return m_value; }
+
     /*!
      * @brief This function set token value.
      *
@@ -243,6 +243,7 @@ public:
      * @see const Value * Token::getValue()
      */
     void setValue(Value *val) { m_value = val; }
+
     /*!
      * @brief This function returns string value.
      *
@@ -267,29 +268,31 @@ public:
      *
      * @exception internal_error Thrown if variable m_value is null.
      */
-    uint32_t getIntValue() const;
+    uint64_t getIntValue() const;
     //@}
 
     //! @name Location
     //@{
     /*!
-     * @brief This function returns token location (location from analysed file).
+     * @brief This function returns token location (location from analyzed file).
      *
-     * @return Return token location (location from analysed file).
+     * @return Return token location (location from analyzed file).
      *
      * @see void Token::setLocation()
      */
     const token_loc_t &getLocation() const { return m_location; }
+
     /*!
-     * @brief This function set token location (location from analysed file).
+     * @brief This function set token location (location from analyzed file).
      *
-     * @param[in] loc Token location (location from analysed file).
+     * @param[in] loc Token location (location from analyzed file).
      *
      * @see void Token::getLocation()
      */
     void setLocation(const token_loc_t &loc) { m_location = loc; }
+
     /*!
-     * @brief This function set token location (location from analysed file).
+     * @brief This function set token location (location from analyzed file).
      *
      * @param[in] first Token locations, which values are copied to this object locations.
      * @param[in] last Token locations, which values are copied to this object locations.
@@ -298,25 +301,27 @@ public:
 
     /*!
      * @brief This function returns first line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
-     * @return Return first line of token location (location from analysed file).
+     * @return Return first line of token location (location from analyzed file).
      *
      * @see void Token::getLastLine()
      */
     int getFirstLine() const { return m_location.m_firstLine; }
+
     /*!
      * @brief This function returns last line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
-     * @return Return last line of token location (location from analysed file).
+     * @return Return last line of token location (location from analyzed file).
      *
      * @see void Token::getFirstLine()
      */
     int getLastLine() const { return m_location.m_lastLine; }
+
     /*!
      * @brief This function returns last line of token from token location
-     * (location from analysed file).
+     * (location from analyzed file).
      *
      * @retval true Return true when token means binary operation.
      * @retval false Return false when token doesn't mean binary operation.

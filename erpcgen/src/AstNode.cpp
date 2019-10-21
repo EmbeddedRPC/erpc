@@ -1,39 +1,20 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "AstNode.h"
-#include "format_string.h"
 #include "ErpcLexer.h"
-#include <cstdio>
+#include "format_string.h"
 #include <boost/algorithm/string.hpp>
+#include <cstdio>
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -117,18 +98,18 @@ AstNode::~AstNode()
     }
 }
 
-bool AstNode::hasAttribute(const std::string &name) const
+bool AstNode::hasAttribute(const string &name) const
 {
     auto it = m_attributes.find(name);
     return it != m_attributes.end();
 }
 
-Value *AstNode::getAttribute(const std::string &name)
+Value *AstNode::getAttribute(const string &name)
 {
     auto it = m_attributes.find(name);
     if (it == m_attributes.end())
     {
-        throw std::runtime_error(format_string("no attribute with name '%s'", name.c_str()));
+        throw runtime_error(format_string("no attribute with name '%s'", name.c_str()));
     }
     else
     {
@@ -136,12 +117,12 @@ Value *AstNode::getAttribute(const std::string &name)
     }
 }
 
-void AstNode::setAttribute(const std::string &name, Value *node)
+void AstNode::setAttribute(const string &name, Value *node)
 {
     m_attributes[name] = node;
 }
 
-void AstNode::removeAttribute(const std::string &name)
+void AstNode::removeAttribute(const string &name)
 {
     if (hasAttribute(name))
     {
@@ -202,13 +183,13 @@ void AstNode::replaceChild(AstNode *original, AstNode *replacement)
     //    delete original;
 }
 
-std::string AstNode::getDescription() const
+string AstNode::getDescription() const
 {
     const Token &tok = getToken();
     const Value *val = tok.getValue();
     const char *tokenName = get_token_name(tok.getToken());
-    std::string output = format_string("%s", tokenName);
-    std::string valToString = val ? val->toString().c_str() : "<null>";
+    string output = format_string("%s", tokenName);
+    string valToString = val ? val->toString().c_str() : "<null>";
     const token_loc_t &loc = tok.getLocation();
     if (val && tok.getToken() == TOK_ML_COMMENT)
     {

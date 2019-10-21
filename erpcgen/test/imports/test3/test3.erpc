@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+interface ArithmeticService6 {
+oneway hello1(int32 a);
+}
+
+interface ArithmeticService5 {
+oneway hello2(int32 a);
+}
+
+interface ArithmeticService4 {
+oneway hello3(int32 a);
+}
+
+interface ArithmeticService7 {
+oneway hello4(int32 a);
+}

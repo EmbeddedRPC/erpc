@@ -1,0 +1,53 @@
+/*!
+ * Copyright 2017 NXP
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+@include("myAlloc.h")
+@output_dir("erpc_outputs")
+program test;
+
+import "../common/unit_test_common.erpc"
+
+struct BaseSharedStruct
+{
+    int32 m
+    int32 n
+}
+
+/*struct SharedStructMember
+{
+    int32 m
+    int32 n
+}
+
+struct NoSharedStructMember
+{
+    int32 m
+    int32 n
+}
+
+struct SharedStruct1
+{
+    SharedStructMember s @shared;
+}
+
+struct SharedStruct2
+{
+    NoSharedStructMember s @no_shared;
+}
+
+struct NoSharedStruct3
+{
+    SharedStructMember s @shared;
+}*/
+
+interface SharedService {
+    sendReceiveBaseSharedStruct(in BaseSharedStruct a @shared) -> @shared BaseSharedStruct
+    inoutBaseSharedStruct(inout BaseSharedStruct a @shared) -> void
+    //inoutStruct1(inout SharedStruct1 a @shared) -> void
+    //inoutStruct2(inout SharedStruct2 a @shared) -> void
+    //inoutStruct3(inout NoSharedStruct3 a ) -> void
+}

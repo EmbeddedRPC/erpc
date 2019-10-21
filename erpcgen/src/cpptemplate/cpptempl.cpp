@@ -1,6 +1,7 @@
 // Copyright (c) 2010-2014 Ryan Ginstrom
 // Copyright (c) 2014 Martinho Fernandes
 // Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
+// Copyright 2016 NXP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -200,6 +201,7 @@ public:
     : m_line(line)
     {
     }
+    virtual ~Node(){};
     virtual NodeType gettype() = 0;
     virtual void gettext(std::ostream &stream, data_map &data) = 0;
     virtual void set_children(node_vector &children);
@@ -1149,7 +1151,10 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
                         {
                             resultValue += '\n';
                         }
-                        resultValue += params[0]->getvalue() + line;
+						if (line.size() > 0 && line[0] != '\r' && line[0] != '\n')
+						{
+							resultValue += params[0]->getvalue() + line;
+						}
                     }
                     result = resultValue;
                 }

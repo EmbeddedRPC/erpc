@@ -1,19 +1,12 @@
 ---
-name: error checks c allowed
-desc: set default return value when errors occure in client shim
+name: allowed
+desc: client and server erros checks allowed
 params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
-    - [double, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
     - [B, "(B) -1"]
@@ -28,40 +21,84 @@ idl: |
         f() -> {type[0]}
     }
 test_client.cpp:
-  - if (out == NULL)
-  - err = out
+  - erpc_status_t err = kErpcStatus_Success;
+  - if (codec == NULL)
+  - err = kErpcStatus_MemoryError;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
+      - return
+
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - err = codec->getStatus();
   - if (!err)
-  - '{'
-  - '}'
-  - if (in == NULL)
-  - err = in
-  - g_client->releaseRequest(request);
-  - if (err)
-  - '{'
-  - return {type[1]};
-  - '}'
+  - f();
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
+  - return err;
 
 ---
-name: error checks c not allowed
-desc: set default return value when errors occure in client shim
+name: not allowed
+desc: client and server erros checks forbidden
+params:
+  type:
+    - [bool, "false", ""]
+    - [int8, "-1", ""]
+    - [uint8, "0xFFU", ""]
+    - [float, "-1", ""]
+    - [string, "NULL", "@max_length(10)"]
+    - [A, "NULL", ""]
+    - [B, "(B) -1", ""]
+  dir:
+    - "in"
+    - "out"
+
+idl: |
+    @no_infra_errors
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({dir} {type[0]} variable {type[2]}) -> {type[0]}
+    }
+test_client.cpp:
+  - not: '!err'
+  - not: '(err)'
+  - not: err =
+  - not: if (codec == NULL)
+  - not: codec->getStatus()
+
+test_server.cpp:
+  - not: '!err'
+  - not: err =
+  - not: '(err)'
+  - return codec->getStatus()
+
+---
+name: infra allowed
+desc: client and server infra erros checks allowed
 params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
-    - [double, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
     - [B, "(B) -1"]
 idl: |
-    @no_infra_errors
     @no_alloc_errors
     program test
     struct A{
@@ -74,70 +111,38 @@ idl: |
         f() -> {type[0]}
     }
 test_client.cpp:
-  - not: err = out
-  - not: if (out == NULL)
-  - not: if (!err)
-  - not: if (in == NULL)
-  - not: err = in
-  - not: if (err)
-  - not: return {type[1]};
+  - erpc_status_t err = kErpcStatus_Success;
+  - not: if (result == NULL)
+  - not: codec->updateStatus;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err, kErrorTest_f_id)
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
 
----
-name: error checks c infra allowed
-desc: set default return value when errors occure in client shim
-params:
-  type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
-    - [float, "-1"]
-    - [double, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
-idl: |
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
-test_client.cpp:
-  - not: if (out == NULL)
-  - err = out
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - not: if (result == NULL)
+  - err = codec->getStatus();
   - if (!err)
-  - not: if (in == NULL)
-  - err = in
-  - if (err)
-  - return {type[1]};
+  - f();
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
+  - return err;
 
 ---
-name: error checks c alloc allowed
-desc: set default return value when errors occure in client shim
+name: alloc allowed
+desc: client and server allocations erros checks allowed
 params:
   type:
     - [bool, "false"]
     - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
+    - [uint8, "0xFFU"]
     - [float, "-1"]
-    - [double, "-1"]
     - [string, "NULL"]
     - [A, "NULL"]
     - [B, "(B) -1"]
@@ -153,34 +158,43 @@ idl: |
     interface ErrorTest{
         f() -> {type[0]}
     }
+
 test_client.cpp:
-  - if (out == NULL)
-  - not: err = out
-  - not: if (!err)
-  - if (in == NULL)
-  - not: err = in
-  - if (err)
-  - return {type[1]};
+  - erpc_status_t err = kErpcStatus_Success;
+  - if (codec == NULL)
+  - err = kErpcStatus_MemoryError;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
+  - if: type[1] != 'NULL'
+    then:
+      - if (err)
+      - return
+
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - err = codec->getStatus();
+  - if (!err)
+  - f();
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
+  - return err;
 
 ---
-name: error checks c allowed in_out_inout
-desc: set default return value when errors occure in client shim
+name: allowed in_out_inout
+desc: set default return value when errors occur in client shim
 params:
   type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
-    - [float, "-1"]
-    - [double, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
+    - [bool, "false", ""]
+    - [int8, "-1", ""]
+    - [uint8, "0xFFU", ""]
+    - [float, "-1", ""]
+    - [string, "NULL", "@max_length(10)"]
+    - [A, "NULL", ""]
+    - [B, "(B) -1", ""]
   dir:
     - "in"
     - "out"
@@ -193,151 +207,120 @@ idl: |
     enum B { one }
 
     interface ErrorTest{
-        f({dir} {type[0]} variable @max_length(10)) -> void
+        f({dir} {type[0]} variable {type[2]}) -> void
     }
 test_client.cpp:
-  - if (out == NULL)
-  - err = out
+  - erpc_status_t err = kErpcStatus_Success;
+  - if (codec == NULL)
+  - err = kErpcStatus_MemoryError;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - err = codec->getStatus();
   - if (!err)
-  - '{'
-  - '}'
-  - if (in == NULL)
-  - err = in
+  - f(
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - codec->startWriteMessage
+  - err = codec->getStatus();
+  - return err;
+
+---
+name: infra allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false", ""]
+    - [int8, "-1", ""]
+    - [uint8, "0xFFU", ""]
+    - [float, "-1", ""]
+    - [string, "NULL", "@max_length(10)"]
+    - [A, "NULL", ""]
+    - [B, "(B) -1", ""]
+  dir:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    @no_alloc_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({dir} {type[0]} variable {type[2]}) -> void
+    }
+test_client.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - not: if (codec == NULL)
+  - not: err = kErpcStatus_MemoryError;
+  - codec->startWriteMessage
+  - g_client->performRequest
+  - err = codec->getStatus();
+  - g_client->callErrorHandler(err,
+
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - not: if (variable == NULL)
+  - err = codec->getStatus();
+  - if (!err)
+  - f(
+  - if: dir in ('out', 'inout')
+    then:
+      - if (!err)
+      - codec->startWriteMessage
+      - err = codec->getStatus();
+  - return err;
+
+---
+name: alloc allowed in_out_inout
+desc: set default return value when errors occure in client shim
+params:
+  type:
+    - [bool, "false", ""]
+    - [int8, "-1", ""]
+    - [uint8, "0xFFU", ""]
+    - [float, "-1", ""]
+    - [string, "NULL", "@max_length(10)"]
+    - [A, "NULL", ""]
+    - [B, "(B) -1", ""]
+  dir:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+    @no_infra_errors
+    program test
+    struct A{
+        int32 a;
+    }
+
+    enum B { one }
+
+    interface ErrorTest{
+        f({dir} {type[0]} variable {type[2]}) -> void
+    }
+test_client.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - if (codec == NULL)
+  - err = kErpcStatus_MemoryError;
+  - else
+  - codec->startWriteMessage
+  - g_client->performRequest(request);
+  - err = codec->getStatus();
   - g_client->releaseRequest(request);
-  - if (err)
-  - '{'
-  - not: return {type[1]};
-  - '}'
+  - g_client->callErrorHandler(err, kErrorTest_f_id);
 
----
-name: error checks c not allowed in_out_inout
-desc: set default return value when errors occure in client shim
-params:
-  type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
-    - [float, "-1"]
-    - [double, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
-  direction:
-    - "in"
-    - "out"
-    - "inout"
-idl: |
-    @no_infra_errors
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f({direction} {type[0]} variable @max_length(10)) -> void
-    }
-test_client.cpp:
-  - not: err = out
-  - not: if (out == NULL)
-  - not: if (!err)
-  - not: if (in == NULL)
-  - not: err = in
-  - not: if (err)
-  - not: return {type[1]};
-
----
-name: error checks c infra allowed in_out_inout
-desc: set default return value when errors occure in client shim
-params:
-  type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
-    - [float, "-1"]
-    - [double, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
-  direction:
-    - "in"
-    - "out"
-    - "inout"
-idl: |
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f({direction} {type[0]} variable @max_length(10)) -> void
-    }
-test_client.cpp:
-  - not: if (out == NULL)
-  - err = out
+test_server.cpp:
+  - erpc_status_t err = kErpcStatus_Success;
+  - err = codec->getStatus();
   - if (!err)
-  - not: if (in == NULL)
-  - err = in
-  - if (err)
-  - not: return {type[1]};
-
----
-name: error checks c alloc allowed in_out_inout
-desc: set default return value when errors occure in client shim
-params:
-  type:
-    - [bool, "false"]
-    - [int8, "-1"]
-    - [int16, "-1"]
-    - [int32, "-1"]
-    - [int64, "-1"]
-    - [uint8, "0xFF"]
-    - [uint16, "0xFFFF"]
-    - [uint32, "0xFFFFFFFF"]
-    - [uint64, "0xFFFFFFFFFFFFFFFF"]
-    - [float, "-1"]
-    - [double, "-1"]
-    - [string, "NULL"]
-    - [A, "NULL"]
-    - [B, "(B) -1"]
-  direction:
-    - "in"
-    - "out"
-    - "inout"
-idl: |
-    @no_infra_errors
-    program test
-    struct A{
-        int32 a;
-    }
-
-    enum B { one }
-
-    interface ErrorTest{
-        f({direction} {type[0]} variable @max_length(10)) -> void
-    }
-test_client.cpp:
-  - if (out == NULL)
-  - not: err = out
-  - not: if (!err)
-  - if (in == NULL)
-  - not: err = in
-  - if (err)
-  - not: return {type[1]};
+  - err = messageFactory->prepareServerBufferForSend
+  - if (!err)
+  - return err;

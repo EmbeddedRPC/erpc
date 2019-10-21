@@ -1,54 +1,34 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _EMBEDDED_RPC__SYMBOLSCOPE_H_
 #define _EMBEDDED_RPC__SYMBOLSCOPE_H_
 
-#include <string>
-#include <map>
-#include <vector>
 #include "Symbol.h"
+#include <map>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief A scoped namespace containing symbols.
  */
 class SymbolScope
 {
 public:
-    typedef std::map<std::string, Symbol *> symbol_map_t;
-    typedef std::vector<Symbol *> symbol_vector_t;
+    typedef std::map<std::string, Symbol *> symbol_map_t; /*!< Map symbol name to symbol type. */
+    typedef std::vector<Symbol *> symbol_vector_t;        /*!< Vector of symbol types. */
 
     class typed_iterator
     {
@@ -59,6 +39,7 @@ public:
         operator value_type &() { return *m_vec; }
         value_type &operator*() { return *m_vec; }
         value_type &operator->() { return *m_vec; }
+
         /*!
          * @brief
          */
@@ -66,6 +47,7 @@ public:
 
         bool operator==(const typed_iterator &other) { return (m_vec == other.m_vec); }
         bool operator!=(const typed_iterator &other) { return !(*this == other); }
+
     private:
         symbol_vector_t::iterator m_vec;
         symbol_vector_t::iterator m_endvec;
@@ -83,6 +65,9 @@ public:
         friend class SymbolScope;
     };
 
+    /*!
+     * @brief Constructor.
+     */
     SymbolScope()
     : m_symbolMap()
     , m_symbolVector()
@@ -94,6 +79,7 @@ public:
      * @brief Destructor.
      */
     virtual ~SymbolScope() {}
+
     /*!
      * @brief This function returns true when name is found in symbol map.
      *
@@ -178,30 +164,35 @@ public:
      * @retval false When parent isn't set.
      */
     bool hasParent() const { return m_parent != nullptr; }
+
     /*!
      * @brief Return pointer to parent.
      *
      * @return Pointer to parent.
      */
     SymbolScope *getParent() { return m_parent; }
+
     /*!
      * @brief This function set parent for this object.
      *
      * @param[in] parent Pointer to given parent.
      */
     void setParent(SymbolScope *parent) { m_parent = parent; }
+
     /*!
      * @brief Return begin of symbol vector.
      *
      * @return Return begin of symbol vector.
      */
     symbol_vector_t::iterator begin() { return m_symbolVector.begin(); }
+
     /*!
      * @brief Return end of symbol vector.
      *
      * @return Return end of symbol vector.
      */
     symbol_vector_t::iterator end() { return m_symbolVector.end(); }
+
     /*!
      * @brief
      *
@@ -227,6 +218,13 @@ public:
      * @return Symbol vector with requested symbols.
      */
     symbol_vector_t getSymbolsOfType(Symbol::symbol_type_t predicateType);
+
+    /*!
+     * @brief This function returns symbol vector.
+     *
+     * @return Symbol vector with all symbols.
+     */
+    symbol_vector_t getSymbolVector() { return m_symbolVector; }
 
     /*!
      * @brief This function show debug description about the all symbols.

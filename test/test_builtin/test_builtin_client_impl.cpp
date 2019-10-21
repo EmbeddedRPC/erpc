@@ -1,35 +1,14 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "gtest.h"
+#include "test.h"
 #include <string.h>
-#include "test_builtin.h"
 
 using namespace std;
 
@@ -49,14 +28,6 @@ TEST(test_builtin, test_int32_in_out)
     test_int32_in(int32A);
     test_int32_out(&c);
     EXPECT_TRUE(int32A == c);
-}
-
-TEST(test_builtin, test_int32_in2_outbyref)
-{
-    int32_t d;
-    test_int32_in2(int32B);
-    test_int32_outbyref(&d);
-    EXPECT_TRUE(int32B == d);
 }
 
 TEST(test_builtin, test_int32_inout)
@@ -80,13 +51,11 @@ TEST(test_builtin, test_int32_return)
 TEST(test_builtin, test_int32_allDirection)
 {
     int32_t c;
-    int32_t d;
     int32_t e = 7;
 
-    int32_t r = test_int32_allDirection(int32A, int32B, &c, &d, &e);
+    int32_t r = test_int32_allDirection(int32A, int32B, &c, &e);
 
     EXPECT_TRUE(c == int32A);
-    EXPECT_TRUE(d == int32B);
     EXPECT_TRUE(14 == e);
     EXPECT_TRUE(int32A * int32B == r);
 }
@@ -116,15 +85,6 @@ TEST(test_builtin, test_string_in_out)
     erpc_free(c);
 }
 
-TEST(test_builtin, test_string_in2_outbyref)
-{
-    char *d;
-    test_string_in2(stringB);
-    test_string_outbyref(&d);
-    EXPECT_STREQ(stringB, d);
-    erpc_free(d);
-}
-
 TEST(test_builtin, test_string_inout)
 {
     char *e = (char *)erpc_malloc(13 * sizeof(char));
@@ -146,17 +106,14 @@ TEST(test_builtin, test_string_return)
 TEST(test_builtin, test_string_allDirection)
 {
     char *c = (char *)erpc_malloc(6 * sizeof(char));
-    char *d;
     char *e = (char *)erpc_malloc(13 * sizeof(char));
 
     strcpy(e, stringA);
     strcat(e, " ");
-    char *r = test_string_allDirection(stringA, stringB, c, &d, e);
+    char *r = test_string_allDirection(stringA, stringB, c, e);
 
     EXPECT_STREQ(stringA, c);
     erpc_free(c);
-    EXPECT_STREQ(stringB, d);
-    erpc_free(d);
     EXPECT_STREQ("Hello World!", e);
     erpc_free(e);
     EXPECT_STREQ("Hello World!", r);

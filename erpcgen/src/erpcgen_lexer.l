@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /*******************************************************************************
@@ -78,6 +58,7 @@ IDENT           [a-zA-Z_][a-zA-Z0-9_]*
 ESC             \\(x{HEXDIGIT}{2}|.)
 
 /* start conditions */
+%x doxyilcmt
 %x doxymlcmt
 %x mlcmt
 
@@ -121,7 +102,9 @@ void            { return TOK_VOID; }
 
 {INT}                               {
                                         int base = 0;
-                                        uint32_t value;
+                                        uint64_t value;
+                                        IntegerValue::int_type_t intType;
+                                        bool longType = false;
 
                                         // check for binary number
                                         if (yytext[0] == '0' && yytext[1] == 'b')
@@ -130,25 +113,66 @@ void            { return TOK_VOID; }
                                             yytext += 2;    // skip over the "0b"
                                         }
 
+                                        int lastCharIdx = strlen(yytext) - 1;
+                                        if (yytext[lastCharIdx] == 'l' || yytext[lastCharIdx] == 'L')
+                                        {
+                                            longType= true;
+                                        }
+
+                                        if (yytext[lastCharIdx] == 'u' || yytext[lastCharIdx] == 'U' || yytext[lastCharIdx -1] == 'u' || yytext[lastCharIdx-1] == 'U')
+                                        {
+                                            if (longType)
+                                            {
+                                                intType = IntegerValue::int_type_t::kUnsignedLong;
+                                            }
+                                            else
+                                            {
+                                                intType = IntegerValue::int_type_t::kUnsigned;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (longType)
+                                            {
+                                                intType = IntegerValue::int_type_t::kSignedLong;
+                                            }
+                                            else
+                                            {
+                                                intType = IntegerValue::int_type_t::kSigned;
+                                            }
+                                        }
+
                                         // convert value
-                                        value = (uint32_t)strtoul(yytext, NULL, base);
+                                        value = (uint64_t)strtoull(yytext, NULL, base);
 
                                         // set resulting symbol value
-                                        m_value = new IntegerValue(value);
+                                        m_value = new IntegerValue(value, intType);
                                         return TOK_INT_LITERAL;
                                     }
 
-[ \t]*"//"[!\/]<[^\r\n]*            {/* track in-line comment if it is doxygen comment. */
+[ \t]*\/\/[!\/]<.*                  {/* track trailing in-line comment if it is doxygen comment. */
                                         m_value = new StringValue(yytext);
                                         return TOK_IL_COMMENT;
                                     }
 
-[ \t]*"/*"[\*!]<[^\r\n]*"*/"        {
+[ \t]*\/\*[\*!]<[ \t]*              { /* start trailing in-line comment if it is doxygen comment. */
+                                        BEGIN(doxyilcmt);
                                         m_value = new StringValue(yytext);
                                         return TOK_IL_COMMENT;
                                     }
 
-"//"[!\/][^<\r\n]?[^\r\n]*          {
+<doxyilcmt>\*\/                     {   /* end trailing in-line comment comment */
+                                        m_value = new StringValue(yytext);
+                                        BEGIN(INITIAL);
+                                        return TOK_IL_COMMENT;
+                                    }
+
+<doxyilcmt>(.|\r\n|\r|\n)[ \t]*     {   /* body trailing in-line comment comment */
+                                        m_value = new StringValue(yytext);
+                                        return TOK_IL_COMMENT;
+                                    }
+
+"//"[!\/][^<\r\n]?.*                {
                                         m_value = new StringValue("\n" + std::string(yytext));
                                         return TOK_ML_COMMENT;
                                     }
@@ -213,7 +237,7 @@ void            { return TOK_VOID; }
 
 "->"                                { return TOK_ARROW; }
 
-[@{}()\[\]<>=,;:+\-*/%^~&|]          { return yytext[0]; }
+[@{}()\[\]<>=,;:+\-*/%^~&|]         { return yytext[0]; }
 
 \"(ESC|[^\"])*\"                    {
                                         // get rid of quotes
@@ -224,7 +248,7 @@ void            { return TOK_VOID; }
                                         return TOK_STRING_LITERAL;
                                     }
 
-(#.*|"//"[^\/!\r\n]?[^\r\n]*)       /* absorb single-line comment */
+(#.*|"//"[^\/!\r\n]?.*)             /* absorb single-line comment */
 
 "/*"[^!\*]?                         {   /* absorb multiline-line comment */
                                         BEGIN(mlcmt);

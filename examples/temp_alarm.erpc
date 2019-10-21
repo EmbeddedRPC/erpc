@@ -1,3 +1,12 @@
+/*!
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 program TempAlarm
 
 type SensorAddress = uint8
@@ -45,7 +54,7 @@ interface Temp
     disable_alarm(SensorAddress address, AlarmType alarmType) -> bool
 
     get_one_sensor(SensorAddress address) -> SensorInfo
-    get_all_sensors_a(out SensorInfoList infos @length(count), out uint32 count) -> bool
+    //get_all_sensors_a(out SensorInfoList infos @length(count), out uint32 count, ) -> bool
     get_all_sensors_b() -> SensorInfoList
 
     save_settings() -> SavedState

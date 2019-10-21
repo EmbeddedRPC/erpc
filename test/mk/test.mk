@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -40,13 +42,17 @@ endif
 APP_NAME ?= $(TEST_NAME)_$(APP_TYPE)_$(TRANSPORT)_test
 ERPC_OUT_DIR ?= $(RPC_OBJS_ROOT)/erpc_outputs
 UNIT_OUT_DIR = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/
-ERPC_NAME ?= $(TEST_NAME)
+ERPC_NAME ?= test
+ERPC_NAME_APP ?= $(ERPC_NAME)
 
 TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/gcc/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
 RPC_OBJS_ROOT = $(TEST_DIR)
 TARGET_OUTPUT_ROOT = $(RPC_OBJS_ROOT)
 
 UT_COMMON_SRC = $(ERPC_ROOT)/test/common
+
+USE_MESSAGE_LOGGING?= 0
+CXXFLAGS += -DUSE_MESSAGE_LOGGING=$(USE_MESSAGE_LOGGING)
 
 #-----------------------------------------------
 # Include path. Add the include paths like this:
@@ -56,12 +62,12 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
             $(ERPC_OUT_DIR) \
             $(UNIT_OUT_DIR) \
             $(UT_COMMON_SRC) \
-            $(ERPC_ROOT)/erpc_c/config \
             $(ERPC_ROOT)/erpc_c/infra \
             $(ERPC_ROOT)/erpc_c/port \
             $(ERPC_ROOT)/erpc_c/setup \
             $(ERPC_ROOT)/erpc_c/transports \
             $(ERPC_ROOT)/erpcgen/src \
+            $(ERPC_ROOT)/test/common \
             $(OBJS_ROOT)
 
 #-------------------------------
@@ -69,28 +75,26 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
 #-------------------------------
 IDL_FILE = $(CUR_DIR).erpc
 
-SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp \
+ifneq "$(TEST_NAME)" "test_arbitrator"
+
+INCLUDES += $(ERPC_ROOT)/test/common/config
+
+SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
+            $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
             $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
-ifeq "$(is_linux)" "1"
-LIBRARIES += -lpthread -lrt
-endif
-
-# Add libtest.a to build.
-LIBRARIES += -ltest
-LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
-
 .PHONY: all
-all: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
+all: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
 
-include $(ERPC_ROOT)/mk/targets.mk
 
 # Define dependency.
-$(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp
+$(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
+$(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp
+$(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
 
 # Run erpcgen for C.
-$(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp: $(IDL_FILE)
+$(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(IDL_FILE)
 	@$(call printmessage,orange,Running erpcgen-c $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gc -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
 
@@ -98,3 +102,29 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)_$(APP_TYPE).cpp: $(IDL_FILE)
 $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
 	@$(call printmessage,orange,Running erpcgen-py $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
+
+# Add libtest.a to build.
+LIBRARIES += -ltest
+LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+
+else
+
+ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
+
+include $(ERPC_ROOT)/test/mk/erpc_src.mk
+
+INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
+
+    ifeq "$(TYPE)" "CLIENT"
+include $(TEST_ROOT)/$(TEST_NAME)/client.mk
+    else
+include $(TEST_ROOT)/$(TEST_NAME)/server.mk
+    endif
+endif
+
+ifeq "$(is_linux)" "1"
+LIBRARIES += -lpthread -lrt
+endif
+
+include $(ERPC_ROOT)/mk/targets.mk
+

@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -34,6 +36,7 @@ INCLUDES += $(ERPC_ROOT) \
 			$(ERPC_ROOT)/erpcgen/src \
 			$(ERPC_ROOT)/erpcgen/src/cpptemplate \
 			$(ERPC_ROOT)/erpcgen/src/types \
+			$(ERPC_ROOT)/erpc_c/infra \
 			$(OBJS_ROOT) \
 			$(BOOST_ROOT)/include
 
@@ -50,7 +53,6 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Logging.cpp \
 			$(ERPC_ROOT)/erpcgen/src/options.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SearchPath.cpp \
-			$(ERPC_ROOT)/erpcgen/src/Value.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstNode.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstWalker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \
@@ -63,7 +65,8 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SymbolScanner.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Token.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ParseErrors.cpp \
-			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp
+			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp \
+			$(ERPC_ROOT)/erpc_c/infra/erpc_crc16.cpp
 
 # Prevent make from deleting these temp files.
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
@@ -74,20 +77,23 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 
 ifeq "$(is_mingw)" "1"
-SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_client_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_server_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_coders.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v12/c_common_functions.cpp
+SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_header.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_client_source.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_header.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_source.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_coders.cpp \
+            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_functions.cpp \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
@@ -95,12 +101,14 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 endif
 
 OBJECT_DEP := $(OBJS_ROOT)/erpcgen_lexer.cpp
@@ -115,15 +123,29 @@ ifeq "$(is_mingw)" "1"
         LIBRARIES += -lboost_system-mgw48-mt-d-1_57 -lboost_filesystem-mgw48-mt-d-1_57
     endif
 else
-ifeq "$(is_linux)" "1"
-    LIBRARIES += -lpthread -lrt
-endif
-    LIBRARIES += -lboost_system -lboost_filesystem
+    ifeq "$(is_linux)" "1"
+        LIBRARIES += -lpthread -lrt
+    endif
+
+    static_libs := NO
+    ifneq "$(build)" "debug"
+        ifeq "$(is_darwin)" "1"
+            static_libs := $(BOOST_ROOT)/lib/libboost_system.a $(BOOST_ROOT)/lib/libboost_filesystem.a
+        endif
+    endif
+    ifneq "$(static_libs)" "NO"
+        LIBRARIES += $(static_libs)
+    else
+        LIBRARIES += -lboost_system -lboost_filesystem
+    endif
 endif
 
 # Release should be alwas static. Customers don't need install things.
 ifneq "$(build)" "debug"
-	LIBRARIES += -static
+    # Except Darwin. Darwin has static libs defined above.
+    ifeq "$(is_darwin)" ""
+        LIBRARIES += -static
+    endif
 endif
 
 # Run flex

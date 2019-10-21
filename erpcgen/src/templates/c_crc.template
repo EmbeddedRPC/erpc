@@ -1,0 +1,15 @@
+{% if mlComment != ""%}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+#if !defined({$crcGuardMacro})
+#define {$crcGuardMacro}
+
+#if !defined(ERPC_GENERATED_CRC)
+#define ERPC_GENERATED_CRC {$crc16}
+#else
+#error "Macro 'ERPC_GENERATED_CRC' shouldn't be defined at this moment."
+#endif
+
+#endif // {$crcGuardMacro}

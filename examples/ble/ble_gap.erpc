@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
 /*! Advertising Type */
 //@external
@@ -437,7 +445,7 @@ struct gapServiceSecurityRequirements_t {
 struct gapDeviceSecurityRequirements_t {
     byref gapSecurityRequirements_t          pMasterSecurityRequirements;    /*!< Security requirements added to all services. */
     uint8                             cNumServices;                   /*!< Number of service-specific requirements; must be less than or equal to gcMaxServiceSpecificSecurityRequirements_d. */
-    list<gapServiceSecurityRequirements_t>   aServiceSecurityRequirements @length(cNumService);   /*!< Array of service-specific requirements. */
+    list<gapServiceSecurityRequirements_t>   aServiceSecurityRequirements @length(cNumServices);   /*!< Array of service-specific requirements. */
 }
 
 enum gattDbAccessType_t {
@@ -514,7 +522,7 @@ interface gap {
         ) -> bleResult_t
 
     Gap_GetBondedStaticAddresses(
-            out list<bleDeviceAddress_t>  aOutDeviceAddresses @max_length(maxDevice) @length(pOutActualCount),
+            out list<bleDeviceAddress_t>  aOutDeviceAddresses @max_length(maxDevices) @length(pOutActualCount),
             uint8             maxDevices,
             out uint8            pOutActualCount
         ) -> bleResult_t
@@ -566,7 +574,7 @@ interface gap {
 
     Gap_LoadEncryptionInformation(
             deviceId_t   deviceId,
-            out list<uint8>     aOutLtk @length(pOutLtkSize),
+//            out list<uint8>     aOutLtk @length(pOutLtkSize),
             out uint8     pOutLtkSize
         ) -> bleResult_t
 
@@ -600,7 +608,7 @@ interface gap {
 
     Gap_SaveDeviceName(
             deviceId_t  deviceId,
-            string    aName @length(cNameSize),
+//            string    aName @length(cNameSize),
             uint8     cNameSize
         ) -> bleResult_t
 
@@ -610,7 +618,7 @@ interface gap {
 
     Gap_GetBondedDeviceName(
             uint8     nvmIndex,
-            out string    aOutName @stringLength(maxNameSize),
+            out string    aOutName @max_length(maxNameSize),
             uint8     maxNameSize
         ) -> bleResult_t
 

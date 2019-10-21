@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /*! Bluetooth UUID type - values chosen to correspond with the ATT UUID format */
 enum bleUuidType_t {
     gBleUuidType16_c    = 0x01,    /*!< 16-bit standard UUID */
@@ -217,7 +226,7 @@ interface gatt_db {
     _GattDb_ReadAttribute(
             uint16       handle,
             uint16       maxBytes,
-            out list<uint8> /*uint8 ptr*/    aOutValue @length(pOutValueLength),
+           // @out list<uint8> /*uint8 ptr*/    aOutValue @length(pOutValueLength),
             out uint16   pOutValueLength
         ) -> bleResult_t
 
@@ -293,7 +302,7 @@ interface gatt_dynamic_db {
             bleUuidType_t                               descriptorUuidType,
             bleUuid_t                                   pDescriptorUuid,
             uint16                                      descriptorValueLength,
-            list<uint8>                                 aInitialValue @length(initialValueLength),
+//            list<uint8>                                 aInitialValue @length(initialValueLength),
             gattAttributePermissionsBitFields_t         descriptorAccessPermissions
         ) -> bleResult_t
 

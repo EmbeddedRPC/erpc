@@ -1,35 +1,14 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "gtest.h"
+#include "test.h"
 #include <string.h>
-#include "test_arrays.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
@@ -46,7 +25,7 @@ TEST(test_arrays, sendReceivedInt32)
         send_array[i] = (int32_t)i;
     }
 
-    received_array = sendReceivedInt32(&send_array);
+    received_array = sendReceivedInt32(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -68,7 +47,7 @@ TEST(test_arrays, sendReceived2Int32)
         }
     }
 
-    received_array = sendReceived2Int32(&send_array);
+    received_array = sendReceived2Int32(send_array);
     for (uint32_t i = 0; i < 12; ++i)
     {
         for (uint32_t j = 0; j < 10; ++j)
@@ -81,7 +60,7 @@ TEST(test_arrays, sendReceived2Int32)
 
 TEST(test_arrays, sendReceivedString)
 {
-    char *send_array[12];
+    char *(send_array[12]);
     char *(*received_array)[12];
 
     char text[] = "Hello";
@@ -93,7 +72,7 @@ TEST(test_arrays, sendReceivedString)
         strcpy(send_array[i], text);
     }
 
-    received_array = sendReceivedString((const char *(*)[12]) & send_array);
+    received_array = sendReceivedString(send_array);
 
     for (uint32_t i = 0; i < 12; ++i)
     {
@@ -121,7 +100,7 @@ TEST(test_arrays, sendReceived2String)
         }
     }
 
-    received_array = sendReceived2String((const char *(*)[3][5]) & send_array);
+    received_array = sendReceived2String(send_array);
 
     for (uint32_t i = 0; i < 3; ++i)
     {
@@ -146,7 +125,7 @@ TEST(test_arrays, sendReceivedEnum)
         send_array[i] = (enumColor)i;
     }
 
-    received_array = sendReceivedEnum(&send_array);
+    received_array = sendReceivedEnum(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -168,7 +147,7 @@ TEST(test_arrays, sendReceived2Enum)
         }
     }
 
-    received_array = sendReceived2Enum(&send_array);
+    received_array = sendReceived2Enum(send_array);
 
     for (uint32_t i = 0; i < 3; ++i)
     {
@@ -184,8 +163,8 @@ TEST(test_arrays, sendReceivedList)
 {
     uint32_t array_count = 2;
     uint32_t elements_count = 2;
-    list_0_t send_array[2];
-    list_0_t(*received_array)[2];
+    list_int32_1_t send_array[2];
+    list_int32_1_t(*received_array)[2];
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -197,7 +176,7 @@ TEST(test_arrays, sendReceivedList)
         }
     }
 
-    received_array = sendReceivedList(&send_array);
+    received_array = sendReceivedList(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -218,8 +197,8 @@ TEST(test_arrays, sendReceivedList)
 TEST(test_arrays, sendReceived2List)
 {
     uint32_t elements_count = 2;
-    list_0_t send_array[2][2];
-    list_0_t(*received_array)[2][2];
+    list_int32_1_t send_array[2][2];
+    list_int32_1_t(*received_array)[2][2];
 
     for (uint32_t k = 0; k < 2; ++k)
     {
@@ -234,7 +213,7 @@ TEST(test_arrays, sendReceived2List)
         }
     }
 
-    received_array = sendReceived2List(&send_array);
+    received_array = sendReceived2List(send_array);
 
     for (uint32_t k = 0; k < 2; ++k)
     {
@@ -266,7 +245,7 @@ TEST(test_arrays, sendReceivedInt32Type)
         send_array[i] = (int32_t)i;
     }
 
-    received_array = sendReceivedInt32Type(&send_array);
+    received_array = sendReceivedInt32Type(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -288,7 +267,7 @@ TEST(test_arrays, sendReceived2Int32Type)
         }
     }
 
-    received_array = sendReceived2Int32Type(&send_array);
+    received_array = sendReceived2Int32Type(send_array);
 
     for (uint32_t i = 0; i < 12; ++i)
     {
@@ -314,7 +293,7 @@ TEST(test_arrays, sendReceivedStringType)
         strcpy(send_array[i], text);
     }
 
-    received_array = sendReceivedStringType(&send_array);
+    received_array = sendReceivedStringType(send_array);
 
     for (uint32_t i = 0; i < 12; ++i)
     {
@@ -342,7 +321,7 @@ TEST(test_arrays, sendReceived2StringType)
         }
     }
 
-    received_array = sendReceived2StringType(&send_array);
+    received_array = sendReceived2StringType(send_array);
 
     for (uint32_t i = 0; i < 3; ++i)
     {
@@ -367,7 +346,7 @@ TEST(test_arrays, sendReceivedEnumType)
         send_array[i] = (enumColor)i;
     }
 
-    received_array = sendReceivedEnumType(&send_array);
+    received_array = sendReceivedEnumType(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -389,7 +368,7 @@ TEST(test_arrays, sendReceived2EnumType)
         }
     }
 
-    received_array = sendReceived2EnumType(&send_array);
+    received_array = sendReceived2EnumType(send_array);
 
     for (uint32_t i = 0; i < 3; ++i)
     {
@@ -413,7 +392,7 @@ TEST(test_arrays, sendReceivedStructType)
         send_array[i].n = i + 2;
     }
 
-    received_array = sendReceivedStructType(&send_array);
+    received_array = sendReceivedStructType(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -437,7 +416,7 @@ TEST(test_arrays, sendReceived2StructType)
         }
     }
 
-    received_array = sendReceived2StructType(&send_array);
+    received_array = sendReceived2StructType(send_array);
 
     for (uint32_t i = 0; i < 3; ++i)
     {
@@ -467,7 +446,7 @@ TEST(test_arrays, sendReceivedListType)
         }
     }
 
-    received_array = sendReceivedListType(&send_array);
+    received_array = sendReceivedListType(send_array);
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
@@ -504,7 +483,7 @@ TEST(test_arrays, sendReceived2ListType)
         }
     }
 
-    received_array = sendReceived2ListType(&send_array);
+    received_array = sendReceived2ListType(send_array);
 
     for (uint32_t k = 0; k < 2; ++k)
     {
@@ -561,7 +540,7 @@ TEST(test_arrays, sendReceiveStruct)
         }
     }
 
-    received_struct = sendReceiveStruct(&send_struct);
+    received_struct = sendReceiveStruct(send_struct);
 
     for (uint32_t k = 0; k < 2; ++k)
     {
@@ -636,7 +615,7 @@ TEST(test_arrays, sendReceive2Struct)
         }
     }
 
-    received_struct = sendReceive2Struct(&send_struct);
+    received_struct = sendReceive2Struct(send_struct);
 
     for (uint32_t k = 0; k < 1; ++k)
     {
@@ -682,35 +661,30 @@ TEST(test_arrays, test_array_allDirection)
     int32_t a[5];
     int32_t b[5];
     int32_t c[5];
-    int32_t(*d)[5];
-    int32_t e[5];
+    int32_t d[5];
     int32_t pA[5];
     int32_t pB[5];
     int32_t pC[5];
     int32_t pD[5];
-    int32_t pE[5];
 
     for (uint32_t i = 0; i < 5; ++i)
     {
         a[i] = i;
         b[i] = i * 2;
-        e[i] = i * 4;
+        d[i] = i * 4;
         pA[i] = a[i];
         pB[i] = b[i];
         pC[i] = i + 1;
-        pD[i] = i + 2;
-        pE[i] = 2 * e[i];
+        pD[i] = 2 * d[i];
     }
 
-    test_array_allDirection(&a, &b, &c, &d, &e);
+    test_array_allDirection(a, b, c, d);
 
     for (uint32_t i = 0; i < 5; ++i)
     {
         EXPECT_TRUE(a[i] == pA[i]);
         EXPECT_TRUE(b[i] == pB[i]);
         EXPECT_TRUE(c[i] == pC[i]);
-        EXPECT_TRUE((*d)[i] == pD[i]);
-        EXPECT_TRUE(e[i] == pE[i]);
+        EXPECT_TRUE(d[i] == pD[i]);
     }
-    erpc_free(d);
 }

@@ -1,36 +1,16 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_threading.h"
-#include <time.h>
-#include <sys/time.h>
 #include <errno.h>
+#include <sys/time.h>
+#include <time.h>
 
 using namespace erpc;
 
@@ -38,6 +18,9 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
+/*!
+ * Thread object key.
+ */
 pthread_key_t Thread::s_threadObjectKey = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,9 +47,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread()
-{
-}
+Thread::~Thread(void) {}
 
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
@@ -93,7 +74,7 @@ bool Thread::operator==(Thread &o)
     return pthread_equal(m_thread, o.m_thread);
 }
 
-Thread *Thread::getCurrentThread()
+Thread *Thread::getCurrentThread(void)
 {
     void *value = pthread_getspecific(s_threadObjectKey);
     return reinterpret_cast<Thread *>(value);
@@ -102,7 +83,7 @@ Thread *Thread::getCurrentThread()
 void Thread::sleep(uint32_t usecs)
 {
     // Sleep for the requested number of microseconds.
-    struct timespec rq = {.tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
+    struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
     struct timespec actual = { 0 };
 
     // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
@@ -118,7 +99,7 @@ void Thread::sleep(uint32_t usecs)
     }
 }
 
-void Thread::threadEntryPoint()
+void Thread::threadEntryPoint(void)
 {
     if (m_entry)
     {
@@ -137,7 +118,7 @@ void *Thread::threadEntryPointStub(void *arg)
     return 0;
 }
 
-Mutex::Mutex()
+Mutex::Mutex(void)
 {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -148,22 +129,22 @@ Mutex::Mutex()
     pthread_mutexattr_destroy(&attr);
 }
 
-Mutex::~Mutex()
+Mutex::~Mutex(void)
 {
     pthread_mutex_destroy(&m_mutex);
 }
 
-bool Mutex::tryLock()
+bool Mutex::tryLock(void)
 {
     return pthread_mutex_trylock(&m_mutex) == 0;
 }
 
-bool Mutex::lock()
+bool Mutex::lock(void)
 {
     return pthread_mutex_lock(&m_mutex) == 0;
 }
 
-bool Mutex::unlock()
+bool Mutex::unlock(void)
 {
     return pthread_mutex_unlock(&m_mutex) == 0;
 }
@@ -175,12 +156,12 @@ Semaphore::Semaphore(int count)
     pthread_cond_init(&m_cond, NULL);
 }
 
-Semaphore::~Semaphore()
+Semaphore::~Semaphore(void)
 {
     pthread_cond_destroy(&m_cond);
 }
 
-void Semaphore::put()
+void Semaphore::put(void)
 {
     Mutex::Guard guard(m_mutex);
     if (m_count == 0)
@@ -209,7 +190,7 @@ bool Semaphore::get(uint32_t timeout)
             // Create an absolute timeout time.
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            struct timespec wait = {.tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
+            struct timespec wait = { .tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
             err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
             if (err)
             {
@@ -222,7 +203,7 @@ bool Semaphore::get(uint32_t timeout)
     return true;
 }
 
-int Semaphore::getCount() const
+int Semaphore::getCount(void) const
 {
     return m_count;
 }

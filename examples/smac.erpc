@@ -1,5 +1,15 @@
+/*!
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 program smac
 
+type channels_t = uint8
 
 enum smacErrors_t
 {
@@ -132,7 +142,9 @@ struct smacToAppMlmeMessage_t
   smacMessageDefs_t msgType;
   uint8 appInstanceId;
   union (msgType) {
+    case gMlmeCcaCnf_c:
     smacCcaCnf_t ccaCnf;
+    case gMlmeEdCnf_c:
     smacEdCnf_t edCnf;
   } msgData;
 }
@@ -142,7 +154,9 @@ struct smacToAppDataMessage_t
   smacMessageDefs_t msgType;
   uint8 appInstanceId;
   union (msgType) {
+    case gMcpsDataCnf_c:
     smacDataCnf_t dataCnf;
+    case gMcpsDataInd_c:
     smacDataInd_t dataInd;
   } msgData;
 }

@@ -1,41 +1,21 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "UniqueIdChecker.h"
-#include "Symbol.h"
-#include "Logging.h"
 #include "Annotation.h"
+#include "Logging.h"
 #include "ParseErrors.h"
+#include "Symbol.h"
 #include "annotations.h"
 
-#include <sstream>
 #include <cstdio>
+#include <sstream>
 
 using namespace erpcgen;
 using namespace std;
@@ -53,14 +33,14 @@ void UniqueIdChecker::makeIdsUnique(erpcgen::InterfaceDefinition &def)
         assert(nullptr != it);
         Interface *interface = dynamic_cast<Interface *>(it);
         assert(interface);
-        if (Annotation *interfaceId = interface->findAnnotation(ID_ANNOTATION))
+        if (Annotation *interfaceId = interface->findAnnotation(ID_ANNOTATION, Annotation::kAll))
         {
             setInterfaceId(interface, interfaceId);
         }
         initUsedFunctionIds(interface);
         for (auto function : interface->getFunctions())
         {
-            if (Annotation *functionId = function->findAnnotation(ID_ANNOTATION))
+            if (Annotation *functionId = function->findAnnotation(ID_ANNOTATION, Annotation::kAll))
             {
                 setFunctionId(function, functionId);
             }
@@ -111,8 +91,8 @@ void UniqueIdChecker::setInterfaceId(Interface *iface, Annotation *interfaceId)
     else
     {
         assert(nullptr != dynamic_cast<IntegerValue *>(interfaceId->getValueObject()));
-        int newIdValue = dynamic_cast<IntegerValue *>(interfaceId->getValueObject())->getValue();
-        if (0 >= newIdValue && (0 != iface->getName().compare("Common")))
+        uint32_t newIdValue = (uint32_t) dynamic_cast<IntegerValue *>(interfaceId->getValueObject())->getValue();
+        if (newIdValue == 0 && 0 != iface->getName().compare("Common"))
         {
             throw semantic_error(
                 format_string("@id value for interface %s must be greater than zero", iface->getName().c_str()));
@@ -139,8 +119,8 @@ void UniqueIdChecker::setFunctionId(Function *fn, Annotation *idAnnotation)
     else
     {
         assert(nullptr != dynamic_cast<IntegerValue *>(idAnnotation->getValueObject()));
-        int newIdValue = dynamic_cast<IntegerValue *>(idAnnotation->getValueObject())->getValue();
-        if (0 >= newIdValue)
+        uint32_t newIdValue = (uint32_t) dynamic_cast<IntegerValue *>(idAnnotation->getValueObject())->getValue();
+        if (0 == newIdValue)
         {
             throw semantic_error(
                 format_string("@id value for function %s must be greater than zero", fn->getName().c_str()));
@@ -172,10 +152,8 @@ void UniqueIdChecker::checkDuplicateIds(vector<idAndName_t> ids, string idType)
     set<int> tempIdHolder;
     if (1 < ids.size())
     {
-        sort(ids.begin(), ids.end(), [](const idAndName_t &left, const idAndName_t &right)
-             {
-                 return left.first < right.first;
-             });
+        sort(ids.begin(), ids.end(),
+             [](const idAndName_t &left, const idAndName_t &right) { return left.first < right.first; });
 
         vector<idAndName_t>::iterator it;
         for (it = ids.begin(); it != ids.end() - 1; ++it)
@@ -196,7 +174,7 @@ void UniqueIdChecker::checkDuplicateIds(vector<idAndName_t> ids, string idType)
 
 void UniqueIdChecker::printDuplicateIdWarning(set<idAndName_t> duplicateIds, string idType)
 {
-    std::stringstream idStringStream;
+    stringstream idStringStream;
     int currentDuplicateId = duplicateIds.begin()->first;
     for (idAndName_t duplicatePair : duplicateIds)
     {

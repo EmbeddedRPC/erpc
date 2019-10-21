@@ -1,31 +1,10 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015 Freescale Semiconductor, Inc.
+# Copyright 2016-2017 NXP
+# All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
-#
-# o Redistributions of source code must retain the above copyright notice, this list
-#   of conditions and the following disclaimer.
-#
-# o Redistributions in binary form must reproduce the above copyright notice, this
-#   list of conditions and the following disclaimer in the documentation and/or
-#   other materials provided with the distribution.
-#
-# o Neither the name of Freescale Semiconductor, Inc. nor the names of its
-#   contributors may be used to endorse or promote products derived from this
-#   software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: BSD-3-Clause
 
 import struct
 from .codec import (MessageType, MessageInfo, Codec, CodecError)
@@ -42,41 +21,42 @@ class BasicCodec(Codec):
         self.write_uint32(header)
         self.write_uint32(msgInfo.sequence)
 
-    def end_write_message(self):
-        pass
+    def _write(self, fmt, value):
+        self._buffer += struct.pack(fmt, value)
+        self._cursor += struct.calcsize(fmt)
 
     def write_bool(self, value):
-        self._buffer += struct.pack('<?', value)
+        self._write('<?', value)
 
     def write_int8(self, value):
-        self._buffer += struct.pack('<b', value)
+        self._write('<b', value)
 
     def write_int16(self, value):
-        self._buffer += struct.pack('<h', value)
+        self._write('<h', value)
 
     def write_int32(self, value):
-        self._buffer += struct.pack('<i', value)
+        self._write('<i', value)
 
     def write_int64(self, value):
-        self._buffer += struct.pack('<q', value)
+        self._write('<q', value)
 
     def write_uint8(self, value):
-        self._buffer += struct.pack('<B', value)
+        self._write('<B', value)
 
     def write_uint16(self, value):
-        self._buffer += struct.pack('<H', value)
+        self._write('<H', value)
 
     def write_uint32(self, value):
-        self._buffer += struct.pack('<I', value)
+        self._write('<I', value)
 
     def write_uint64(self, value):
-        self._buffer += struct.pack('<Q', value)
+        self._write('<Q', value)
 
     def write_float(self, value):
-        self._buffer += struct.pack('<f', value)
+        self._write('<f', value)
 
     def write_double(self, value):
-        self._buffer += struct.pack('<d', value)
+        self._write('<d', value)
 
     def write_string(self, value):
         self.write_binary(value.encode())
@@ -88,14 +68,8 @@ class BasicCodec(Codec):
     def start_write_list(self, length):
         self.write_uint32(length)
 
-    def end_write_list(self):
-        pass
-
-    def start_write_struct(self):
-        pass
-
-    def end_write_struct(self):
-        pass
+    def start_write_union(self, discriminator):
+        self.write_uint32(discriminator)
 
     def write_null_flag(self, flag):
         self.write_uint8(1 if flag else 0)
@@ -112,9 +86,6 @@ class BasicCodec(Codec):
         request = (header >> 8) & 0xff
         msgType = MessageType(header & 0xff)
         return MessageInfo(type=msgType, service=service, request=request, sequence=sequence)
-
-    def end_read_message(self):
-        pass
 
     def _read(self, fmt):
         result = struct.unpack_from(fmt, self._buffer, self._cursor)
@@ -168,14 +139,10 @@ class BasicCodec(Codec):
     def start_read_list(self):
         return self.read_uint32()
 
-    def end_read_list(self):
-        pass
-
-    def start_read_struct(self):
-        pass
-
-    def end_read_struct(self):
-        pass
+    ##
+    # @return Int of union discriminator.
+    def start_read_union(self):
+        return self.read_int32()
 
     def read_null_flag(self):
         return self.read_uint8()

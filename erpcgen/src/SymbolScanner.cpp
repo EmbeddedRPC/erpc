@@ -1,76 +1,72 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "SymbolScanner.h"
 #include "ErpcLexer.h"
 #include "Logging.h"
 #include "annotations.h"
-#include "types/ConstType.h"
-#include "types/ListType.h"
-#include "types/ArrayType.h"
-#include "types/VoidType.h"
-#include "types/BuiltinType.h"
 #include "smart_ptr.h"
+#include "types/ArrayType.h"
+#include "types/BuiltinType.h"
+#include "types/ConstType.h"
+#include "types/FunctionType.h"
+#include "types/ListType.h"
+#include "types/VoidType.h"
+#include <algorithm>
+#include <cstring>
 
 using namespace erpcgen;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+void SymbolScanner::handleRoot(AstNode *node, bottom_up)
+{
+    if (m_forwardDeclarations.size() != 0)
+    {
+        string forwardTypes;
+        for (auto it = m_forwardDeclarations.begin(); it != m_forwardDeclarations.end(); ++it)
+        {
+            if (it != m_forwardDeclarations.begin())
+            {
+                forwardTypes += ", ";
+            }
+            forwardTypes += format_string("type name %s: line %d", it->first.c_str(), it->second->getFirstLine());
+        }
+        throw syntax_error(format_string("Missing type definitions for one or more forward type declarations: %s",
+                                         forwardTypes.c_str())
+                               .c_str());
+    }
+}
 
 AstNode *SymbolScanner::handleConst(AstNode *node, bottom_up)
 {
     DataType *constDataType = getDataTypeForConst(node->getChild(0));
     Value *constVal = getValueForConst(node, constDataType);
     ConstType *constType = new ConstType(node->getChild(1)->getToken(), constDataType, constVal);
-    constType->addAnnotations(node->getChild(3));
+    addAnnotations(node->getChild(3), constType);
 
     // doxygen comment
-    if (node->getChild(4))
-    {
-        constType->setMlComment(node->getChild(4)->getTokenString());
-    }
-    if (node->getChild(5))
-    {
-        constType->setIlComment(node->getChild(5)->getTokenString());
-    }
+    addDoxygenComments(constType, node->getChild(4), node->getChild(5));
 
-    m_globals->addSymbol(constType);
+    addGlobalSymbol(constType);
     return nullptr;
 }
 
 Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const constDataType)
 {
     Value *constVal = nullptr;
+    bool isStringConst = constDataType->getTrueDataType()->isString();
     if (rhsIsAStringLiteral(node))
     {
-        if (!dataTypeIsAString(constDataType))
+        if (!isStringConst)
         {
             throw syntax_error2("Attempt to assign a string to a non-string data type",
                                 node->getChild(0)->getToken().getLocation(), m_fileName);
@@ -86,7 +82,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
         Token &rhsExpressionChildTok = node->getChild(2)->getChild(0)->getToken();
         if (rhsExpressionChildTok.isNumberTok())
         {
-            if (dataTypeIsAString(constDataType))
+            if (isStringConst)
             {
                 throw syntax_error2("Attempt to assign a number to a string data type",
                                     node->getChild(0)->getToken().getLocation(), m_fileName);
@@ -101,7 +97,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
             constVal = getValueFromSymbol(rhsExpressionChildTok);
             if (kStringValue == constVal->getType())
             {
-                if (!dataTypeIsAString(constDataType))
+                if (!isStringConst)
                 {
                     delete constVal;
                     throw syntax_error2("Attempt to assign a string to a non-string data type",
@@ -110,7 +106,7 @@ Value *SymbolScanner::getValueForConst(AstNode *const node, DataType *const cons
             }
             else // kStringValue != constVal->getType()
             {
-                if (dataTypeIsAString(constDataType))
+                if (isStringConst)
                 {
                     delete constVal;
                     throw syntax_error2("Attempt to assign a number to a string data type",
@@ -132,29 +128,9 @@ bool SymbolScanner::rhsIsAStringLiteral(AstNode *rhs)
     return TOK_STRING_LITERAL == rhs->getChild(2)->getToken().getToken();
 }
 
-bool SymbolScanner::dataTypeIsAString(DataType *const constDataType)
-{
-    if (constDataType->isBuiltin())
-    {
-        BuiltinType *b = dynamic_cast<BuiltinType *>(constDataType);
-        assert(b);
-        if (b->isString())
-        {
-            return true;
-        }
-    }
-    else if (constDataType->isAlias())
-    {
-        assert(dynamic_cast<AliasType *>(constDataType));
-        return SymbolScanner::dataTypeIsAString(dynamic_cast<AliasType *>(constDataType)->getElementType());
-    }
-
-    return false;
-}
-
 DataType *SymbolScanner::getDataTypeForConst(AstNode *typeNode)
 {
-    const std::string &nameOfType = typeNode->getToken().getStringValue();
+    const string &nameOfType = typeNode->getToken().getStringValue();
     if (!m_globals->hasSymbol(nameOfType))
     { // throw typeNotFound exception
         throw syntax_error2("Type '" + nameOfType + "' not a defined type", typeNode->getToken().getLocation(),
@@ -170,7 +146,7 @@ AstNode *SymbolScanner::handleType(AstNode *node, top_down)
     // Extract new type name.
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     Log::debug("type: %s\n", name.c_str());
 
     // Find existing type.
@@ -184,14 +160,7 @@ AstNode *SymbolScanner::handleType(AstNode *node, top_down)
     AliasType *type = new AliasType(tok, dataType);
 
     // Get comment if exist.
-    if (node->getChild(3))
-    {
-        type->setMlComment(node->getChild(3)->getTokenString());
-    }
-    if (node->getChild(4))
-    {
-        type->setIlComment(node->getChild(4)->getTokenString());
-    }
+    addDoxygenComments(type, node->getChild(3), node->getChild(4));
 
     m_currentAlias = type;
 
@@ -202,8 +171,8 @@ AstNode *SymbolScanner::handleType(AstNode *node, bottom_up)
 {
     if (m_currentAlias)
     {
-        m_currentAlias->addAnnotations(node->getChild(2));
-        m_globals->addSymbol(m_currentAlias);
+        addAnnotations(node->getChild(2), m_currentAlias);
+        addGlobalSymbol(m_currentAlias);
         m_currentAlias = nullptr;
     }
     return nullptr;
@@ -212,7 +181,7 @@ AstNode *SymbolScanner::handleType(AstNode *node, bottom_up)
 AstNode *SymbolScanner::handleEnum(AstNode *node, top_down)
 {
     AstNode *ident = (*node)[0];
-    const std::string *name = nullptr;
+    const string *name = nullptr;
     EnumType *newEnum;
 
     if (ident)
@@ -228,15 +197,12 @@ AstNode *SymbolScanner::handleEnum(AstNode *node, top_down)
         // check_null(check_null(check_null(node->getParent())->getChild(0))->getTokenValue())->toString().c_str());
         newEnum = new EnumType();
     }
+
+    Log::debug("Enum: %s\n", newEnum->getName().c_str());
+
     // Get doxygen comment if exist.
-    if (node->getChild(3))
-    {
-        newEnum->setMlComment(node->getChild(3)->getTokenString());
-    }
-    if (node->getChild(4))
-    {
-        newEnum->setIlComment(node->getChild(4)->getTokenString());
-    }
+    addDoxygenComments(newEnum, node->getChild(3), node->getChild(4));
+
     m_currentEnum = newEnum;
     return nullptr;
 }
@@ -263,10 +229,15 @@ AstNode *SymbolScanner::handleEnum(AstNode *node, bottom_up)
     }
     else
     {
-        m_currentEnum->addAnnotations(node->getChild(2));
+        addAnnotations(node->getChild(2), m_currentEnum);
+        if (m_currentEnum->getMembers().size() == 0 &&
+            m_currentEnum->findAnnotation(EXTERNAL_ANNOTATION, Annotation::program_lang_t::kAll) == nullptr)
+        {
+            throw semantic_error("Enum may have 0 members only when is defined with external annotation.");
+        }
     }
 
-    m_globals->addSymbol(m_currentEnum);
+    addGlobalSymbol(m_currentEnum);
 
     // Clear current enum pointer.
     m_currentEnum = nullptr;
@@ -281,14 +252,14 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
 
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     if (enumMemberHasValue(node))
     {
         Value *enumValue = node->getChild(1)->getChild(0)->getTokenValue();
         if (enumValue->getType() == kIntegerValue)
         {
             assert(dynamic_cast<IntegerValue *>(enumValue));
-            m_currentEnum->setCurrentValue(dynamic_cast<IntegerValue *>(enumValue)->getValue());
+            m_currentEnum->setCurrentValue((uint32_t) dynamic_cast<IntegerValue *>(enumValue)->getValue());
         }
         else
         {
@@ -301,17 +272,13 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     Log::debug("enum member: %s\n", name.c_str());
 
     m_currentEnum->addMember(member);
-    m_globals->addSymbol(member);
+    addGlobalSymbol(member);
+
+    // add annotations
+    addAnnotations(node->getChild(2), member);
 
     // doxygen comment
-    if (node->getChild(2))
-    {
-        member->setMlComment(node->getChild(2)->getTokenString());
-    }
-    if (node->getChild(3))
-    {
-        member->setIlComment(node->getChild(3)->getTokenString());
-    }
+    addDoxygenComments(member, node->getChild(3), node->getChild(4));
 
     return nullptr;
 }
@@ -415,11 +382,11 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
 
     if (leftInt && rightInt)
     {
-        int l = *leftInt;
-        int r = *rightInt;
-        Log::debug("    %d %s %d\n", l, tok.getTokenName(), r);
+        uint64_t l = *leftInt;
+        uint64_t r = *rightInt;
+        Log::debug("    %llu %s %llu\n", l, tok.getTokenName(), r);
 
-        int result = 0;
+        uint64_t result = 0;
         switch (tok.getToken())
         {
             case '+':
@@ -472,7 +439,35 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
                 throw internal_error("unknown binary operator");
         }
 
-        resultNode = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(result)));
+        IntegerValue::int_type_t intType;
+        if (leftInt->getIntType() == IntegerValue::kUnsignedLong ||
+            rightInt->getIntType() == IntegerValue::kUnsignedLong)
+        {
+            intType = IntegerValue::kUnsignedLong;
+        }
+        else if (leftInt->getIntType() == IntegerValue::kUnsigned || rightInt->getIntType() == IntegerValue::kUnsigned)
+        {
+            if (leftInt->getIntType() == IntegerValue::kSignedLong ||
+                rightInt->getIntType() == IntegerValue::kSignedLong)
+            {
+                intType = IntegerValue::kUnsignedLong;
+            }
+            else
+            {
+                intType = IntegerValue::kUnsigned;
+            }
+        }
+        else if (leftInt->getIntType() == IntegerValue::kSignedLong ||
+                 rightInt->getIntType() == IntegerValue::kSignedLong)
+        {
+            intType = IntegerValue::kSignedLong;
+        }
+        else
+        {
+            intType = IntegerValue::kSigned;
+        }
+
+        resultNode = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(result, intType)));
     }
     else if (leftFloat && rightFloat)
     {
@@ -564,11 +559,11 @@ AstNode *SymbolScanner::handleUnaryOp(AstNode *node, bottom_up)
 
     if (valueInt)
     {
-        int value = *valueInt;
+        uint64_t value = *valueInt;
         switch (tok.getToken())
         {
             case TOK_UNARY_NEGATE:
-                value = -value;
+                value = (-(int64_t)(value));
                 break;
             case '~':
                 value = ~value;
@@ -577,7 +572,7 @@ AstNode *SymbolScanner::handleUnaryOp(AstNode *node, bottom_up)
                 throw internal_error("unknown unary operator");
         }
 
-        return new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(value)));
+        return new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(value, valueInt->getIntType())));
     }
     else if (valueFloat)
     {
@@ -610,21 +605,19 @@ AstNode *SymbolScanner::handleProgram(AstNode *node, top_down)
         throw semantic_error("Cannot define more than one program per file.");
     }
     const Token &tok = node->getChild(0)->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     Log::debug("Program: %s\n", name.c_str());
 
     Program *prog = new Program(tok);
     m_currentProgram = prog;
-
-    m_globals->addSymbol(prog);
 
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleProgram(AstNode *node, bottom_up)
 {
-    m_currentProgram->addAnnotations(node->getChild(1));
-    m_currentProgram = nullptr;
+    addAnnotations(node->getChild(1), m_currentProgram);
+    addDoxygenComments(m_currentProgram, node->getChild(2), nullptr);
     return nullptr;
 }
 
@@ -633,20 +626,40 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
     AstNode *structNameNode = (*node)[0];
     if (!structNameNode && m_currentAlias == nullptr)
     {
-        throw semantic_error(format_string("line %d: illegal anonymous struct definition at file level",
-                                           node->getToken().getFirstLine()));
+        throw semantic_error(
+            format_string("line %d: illegal anonymous struct definition at file level", node->getToken().getFirstLine())
+                .c_str());
     }
 
-    // Get the struct's name. A struct may be anonymous if it is in a type alias declaration.
-    const std::string *name = nullptr;
     // Create the struct symbol.
     StructType *newStruct;
     if (structNameNode)
     {
         const Token &tok = structNameNode->getToken();
-        name = &(tok.getStringValue());
-        Log::debug("struct: %s\n", name->c_str());
-        newStruct = new StructType(tok);
+        string name = tok.getStringValue();
+        Log::debug("struct: %s\n", name.c_str());
+
+        /* match forward declaration with definition */
+        auto forwardDecl = m_forwardDeclarations.find(name);
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            newStruct = dynamic_cast<StructType *>(forwardDecl->second);
+            if (newStruct != nullptr)
+            {
+                new (newStruct) StructType(tok);
+            }
+            else
+            {
+                throw syntax_error(format_string("line %d: Structure definition type name didn't match data type of "
+                                                 "forward declaration from line %d.",
+                                                 tok.getFirstLine(), forwardDecl->second->getFirstLine())
+                                       .c_str());
+            }
+        }
+        else
+        {
+            newStruct = new StructType(tok);
+        }
     }
     else
     {
@@ -656,30 +669,7 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
         newStruct = new StructType("");
     }
 
-    // Get comment if exist.
-    if (node->getChild(3))
-    {
-        newStruct->setMlComment(node->getChild(3)->getTokenString());
-    }
-    if (node->getChild(4))
-    {
-        newStruct->setIlComment(node->getChild(4)->getTokenString());
-    }
-
     m_currentStruct = newStruct;
-
-    if (structNameNode)
-    {
-        Annotation *externAnnotation = newStruct->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
-        {
-            // Do typedef for struct.
-            const Token &tok = structNameNode->getToken();
-
-            AliasType *type = new AliasType(tok, newStruct);
-            m_globals->addSymbol(type);
-        }
-    }
 
     return nullptr;
 }
@@ -701,10 +691,30 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, bottom_up)
     }
     else
     {
-        m_currentStruct->addAnnotations(node->getChild(2));
+        // Forward declaration have 4 nodes.
+        if (node->childCount() > 4)
+        {
+            // Get comment if exist.
+            addDoxygenComments(m_currentStruct, node->getChild(3), node->getChild(4));
+
+            addAnnotations(node->getChild(2), m_currentStruct);
+        }
     }
 
-    m_globals->addSymbol(m_currentStruct);
+    // Forward declaration have 4 nodes.
+    if (node->childCount() == 4)
+    {
+        addForwardDeclaration(m_currentStruct);
+    }
+    else
+    {
+        removeForwardDeclaration(m_currentStruct);
+
+        addGlobalSymbol(m_currentStruct);
+
+        // Handle annotations for function params
+        scanStructForAnnotations();
+    }
 
     /* Clear current struct pointer. */
     m_currentStruct = nullptr;
@@ -718,7 +728,7 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
 
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     Log::debug("struct member: %s\n", name.c_str());
 
     /* Extract member type. */
@@ -730,19 +740,18 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
             format_string("line %d: invalid data type. Structure member has same data type name as structure name.",
                           tok.getFirstLine()));
     }
+
     /* Create struct member object. */
     StructMember *param = new StructMember(tok, dataType);
-    param->addAnnotations(node->getChild(2));
+
+    // Set byref flag for structure member.
+    AstNode *memberType = node->getChild(2);
+    param->setByref(memberType->getTokenString().compare("2") == 0);
+
+    addAnnotations(node->getChild(3), param);
 
     /* doxygen comment */
-    if (node->getChild(3))
-    {
-        param->setMlComment(node->getChild(3)->getTokenString());
-    }
-    if (node->getChild(4))
-    {
-        param->setIlComment(node->getChild(4)->getTokenString());
-    }
+    addDoxygenComments(param, node->getChild(4), node->getChild(5));
 
     m_currentStruct->addMember(param);
 
@@ -751,24 +760,98 @@ AstNode *SymbolScanner::handleStructMember(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
 {
-    /* Get the name of the union variable so we can manipulate it and add it to the AST
-       under the union token */
-    std::string unionVariableName = node->getParent()->getChild(0)->getToken().getStringValue();
-    /* Create a new node in the AST for the union's name, and assign it */
-    node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_$union"))));
-    std::string unionName = node->getChild(2)->getToken().getStringValue();
-    const std::string &discriminatorName = node->getChild(0)->getToken().getStringValue();
-    UnionType *newUnion = new UnionType(unionName, discriminatorName);
+    Token *tok;
+    AstNode *astUnionName = node->getChild(0);
+    AstNode *astUnionDiscriminator = node->getChild(1);
+
+    /* get union type name*/
+    if (!astUnionName)
+    {
+        /* Get the name of the union variable so we can manipulate it and add it to the AST
+           under the union token */
+        string unionVariableName = node->getParent()->getChild(0)->getToken().getStringValue();
+
+        /* Create a new node in the AST for the union's name, and assign it */
+        node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_$union"))));
+
+        /* union token. */
+        tok = &node->getChild(3)->getToken();
+    }
+    else
+    {
+        /* union token for non-encapsulated discriminated unions. */
+        tok = &astUnionName->getToken();
+    };
+
+    Log::debug("union: %s\n", tok->getStringValue().c_str());
+
+    UnionType *newUnion;
+    /* get union type object */
+    if (astUnionDiscriminator)
+    {
+        /* discriminated unions. */
+        const string &discriminatorName = astUnionDiscriminator->getToken().getStringValue();
+        newUnion = new UnionType(*tok, discriminatorName);
+    }
+    else
+    {
+        /* match forward declaration with definition */
+        auto forwardDecl = m_forwardDeclarations.find(tok->getStringValue());
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            newUnion = dynamic_cast<UnionType *>(forwardDecl->second);
+            if (newUnion != nullptr)
+            {
+                new (newUnion) UnionType(*tok, "");
+            }
+            else
+            {
+                throw syntax_error(format_string("line %d: Union definition type name didn't match data type of "
+                                                 "forward declaration from line %d.",
+                                                 tok->getFirstLine(), forwardDecl->second->getFirstLine())
+                                       .c_str());
+            }
+        }
+        else
+        {
+            /* non-encapsulated discriminated unions. */
+            newUnion = new UnionType(*tok, "");
+        }
+    }
+
     m_currentUnion = newUnion;
+
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleUnion(AstNode *node, bottom_up)
 {
     /* add union to global symbol list */
-    assert(nullptr != m_currentStruct);
-    m_currentStruct->getScope().addSymbol(m_currentUnion);
-    m_currentUnion->setParentStruct(m_currentStruct);
+    if (m_currentUnion->isNonEncapsulatedUnion())
+    {
+        // Forward declaration have 5 nodes.
+        if (node->childCount() == 5)
+        {
+            addForwardDeclaration(m_currentUnion);
+        }
+        else
+        {
+            addAnnotations(node->getChild(3), m_currentUnion);
+
+            /* doxygen comment */
+            addDoxygenComments(m_currentUnion, node->getChild(4), node->getChild(5));
+
+            removeForwardDeclaration(m_currentUnion);
+
+            addGlobalSymbol(m_currentUnion);
+        }
+    }
+    else /* add union to structure */
+    {
+        assert(nullptr != m_currentStruct);
+        m_currentStruct->getScope().addSymbol(m_currentUnion);
+        m_currentUnion->setParentStruct(m_currentStruct);
+    }
     m_currentUnion = nullptr;
     return nullptr;
 }
@@ -778,7 +861,7 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, top_down)
     return nullptr;
 }
 
-/* TOK_UNION_CASE -> ( (TOK_EXPR -> (ident | scalar)) ident(datatype) ident(varName) ) */
+/* TOK_UNION_CASE -> ( (TOK_EXPR -> (indent | scalar)) indent(datatype) indent(varName) ) */
 AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
 {
     uint32_t caseIdIntValue;
@@ -787,6 +870,9 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
     if (TOK_DEFAULT == node->getChild(0)->getToken().getToken())
     {
         string caseIdName = node->getChild(0)->getToken().getTokenName();
+
+        Log::debug("union case id name: %s\n", caseIdName.c_str());
+
         /* remove quotation marks on caseIdName token */
         newCase = new UnionCase(caseIdName.substr(1, caseIdName.length() - 2));
 
@@ -804,38 +890,39 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
         {
             assert(TOK_EXPR == (*childCase)->getToken().getToken());
             Token caseIdTok = (*childCase)->getChild(0)->getToken();
-            /* If the case value is an identifier, record the name and find the tru value */
+            /* If the case value is an identifier, record the name and find the true value */
             if (caseIdTok.isIdentifierTok())
             {
-                const std::string caseIdName = caseIdTok.getStringValue();
                 Value *caseIdValue = getValueFromSymbol(caseIdTok);
-                if (kIntegerValue == caseIdValue->getType())
+                if (kIntegerValue != caseIdValue->getType())
                 {
-                    caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdValue)->getValue();
+                    delete caseIdValue;
+                    throw semantic_error(
+                        format_string("line %d: Value for union case must be an int\n", caseIdTok.getFirstLine()));
                 }
-                else
-                {
-                    throw semantic_error(format_string("Value for union case must be an int\n"));
-                }
+
+                caseIdIntValue = (uint32_t) dynamic_cast<IntegerValue *>(caseIdValue)->getValue();
+                const string caseIdName = caseIdTok.getStringValue();
+                Log::debug("union case id name: %s\n", caseIdName.c_str());
                 newCase = new UnionCase(caseIdName, caseIdIntValue);
                 delete caseIdValue;
             }
             /* If there is no identifier, simply record the case value */
             else if (caseIdTok.isNumberTok())
             {
-                if (kIntegerValue == caseIdTok.getValue()->getType())
+                if (kIntegerValue != caseIdTok.getValue()->getType())
                 {
-                    caseIdIntValue = dynamic_cast<IntegerValue *>(caseIdTok.getValue())->getValue();
+                    throw semantic_error(
+                        format_string("line %d: Value for union case must be an int\n", caseIdTok.getFirstLine()));
                 }
-                else
-                {
-                    throw semantic_error(format_string("Value for union case must be an int\n"));
-                }
+                caseIdIntValue = (uint32_t) dynamic_cast<IntegerValue *>(caseIdTok.getValue())->getValue();
+                Log::debug("union case id name: default\n");
                 newCase = new UnionCase(caseIdIntValue);
             }
             else
             {
-                throw semantic_error(format_string("Invalid token for case value in union\n"));
+                throw semantic_error(
+                    format_string("line %d: Invalid token for case value in union\n", caseIdTok.getFirstLine()));
             }
             // Now that we've created the new case, add it to the union it is inside
             m_currentUnion->addCase(newCase);
@@ -853,10 +940,11 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
         // Get TOK_CHILDREN node
         AstNode *unionDeclList = node->getChild(1);
         assert(TOK_CHILDREN == unionDeclList->getToken().getToken());
-        vector<std::string> declNames;
+        vector<string> declNames;
         if (TOK_VOID == unionDeclList->getChild(0)->getToken().getToken())
         {
             declNames.push_back("void");
+            Log::debug("union case member name: void\n");
         }
         else
         {
@@ -865,9 +953,14 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
             {
                 assert(TOK_CHILDREN == unionDecl->getToken().getToken());
 
-                std::string name = unionDecl->getChild(0)->getTokenValue()->toString();
+                string name = unionDecl->getChild(0)->getTokenValue()->toString();
+                Log::debug("union case member name: %s\n", name.c_str());
                 DataType *declType = lookupDataType(unionDecl->getChild(1));
-                m_currentUnion->addUnionMemberDeclaration(name, declType, unionDecl->getChild(2));
+                m_currentUnion->addUnionMemberDeclaration(name, declType);
+
+                StructMember *unionMember = m_currentUnion->getUnionMembers().getMembers().back();
+                addAnnotations(unionDecl->getChild(3), unionMember);
+                addDoxygenComments(unionMember, unionDecl->getChild(4), unionDecl->getChild(5));
 
                 declNames.push_back(name);
             }
@@ -890,31 +983,23 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, top_down)
 {
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     Log::debug("interface: %s\n", name.c_str());
 
     Interface *iface = new Interface(tok);
     iface->getScope().setParent(m_globals);
     m_currentInterface = iface;
-    m_globals->addSymbol(iface);
-    m_isNewInterface = true;
+    addGlobalSymbol(iface);
 
     // Get comment if exist.
-    if (node->getChild(3))
-    {
-        iface->setMlComment(node->getChild(3)->getTokenString());
-    }
-    if (node->getChild(4))
-    {
-        iface->setIlComment(node->getChild(4)->getTokenString());
-    }
+    addDoxygenComments(iface, node->getChild(3), node->getChild(4));
 
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
 {
-    m_currentInterface->addAnnotations(node->getChild(2));
+    addAnnotations(node->getChild(2), m_currentInterface);
 
     // Interfaces cannot be nested, so we can just clear this. If they were nestable, we would
     // have to keep a stack of open interfaces.
@@ -925,86 +1010,159 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
 {
-    assert_throw_internal((m_currentInterface), "function not in interface");
-
     // Get function name.
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
+    const string &name = tok.getStringValue();
     Log::debug("function: %s\n", name.c_str());
 
     // Create function symbol.
-    Function *func;
-    if (m_isNewInterface)
+    FunctionBase *func;
+    if (m_currentInterface) /* function definition */
     {
-        func = new Function(tok, 1);
-        m_isNewInterface = false;
+        if (m_currentInterface->getFunctions().size() == 0)
+        {
+            func = new Function(tok, m_currentInterface, 1);
+        }
+        else
+        {
+            func = new Function(tok, m_currentInterface);
+        }
+        m_currentInterface->addFunction(dynamic_cast<Function *>(func));
     }
-    else
+    else /* function type */
     {
-        func = new Function(tok);
+        func = new FunctionType(tok);
+        addGlobalSymbol(dynamic_cast<FunctionType *>(func));
     }
 
-    m_currentInterface->addFunction(func);
     m_currentStruct = &(func->getParameters());
 
     // Get return type.
-    AstNode *returnTypeNode = (*node)[1];
-    assert(returnTypeNode);
-    Token &returnTypeToken = returnTypeNode->getToken();
-
-    func->setIsOneway(false);
-    switch (returnTypeToken.getToken())
+    AstNode *returnNode = (*node)[1];
+    if (returnNode) /* Function type/definition */
     {
-        case TOK_ONEWAY:
-            func->setIsOneway(true);
-            func->setReturnType(new VoidType);
-            break;
-
-        case TOK_VOID:
-            func->setReturnType(new VoidType);
-            break;
-
-        default:
-            DataType *dataType = lookupDataType(returnTypeNode);
-            func->setReturnType(dataType);
-            DataType *trueContainerDataType = dataType->getTrueContainerDataType();
-            if (trueContainerDataType->isStruct())
+        Token &returnTokenType = returnNode->getToken();
+        if (returnTokenType.getToken() == TOK_RETURN)
+        {
+            AstNode *returnTypeNode = returnNode->getChild(0);
+            Token &returnTypeToken = returnTypeNode->getToken();
+            switch (returnTypeToken.getToken())
             {
-                if (nullptr != dynamic_cast<StructType *>(trueContainerDataType))
-                {
-                    StructType *a = dynamic_cast<StructType *>(trueContainerDataType);
-                    assert(a);
-                    a->addStructDirectionType(kReturn);
-                }
-                else
-                {
-                    throw semantic_error(
-                        format_string("failed dynamic cast for trueContainerDataType in handleFunction\n"));
-                }
+                case TOK_ONEWAY:
+                    func->setIsOneway(true);
+                    func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
+                    break;
+
+                case TOK_VOID:
+                    func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
+                    break;
+
+                default:
+                    DataType *dataType = lookupDataType(returnTypeNode);
+                    func->setReturnStructMemberType(new StructMember("(return)", dataType));
+                    break;
             }
-            break;
+            if (returnTypeToken.getToken() != TOK_ONEWAY)
+            {
+                addAnnotations(returnNode->getChild(1), func->getReturnStructMemberType());
+            }
+        }
+        else
+        {
+            throw semantic_error(
+                format_string("line %d: Unexpected token type. Expected TOK_RETURN\n", returnTokenType.getFirstLine()));
+        }
+    }
+    else
+    {
+        /* Function is callback */
+        AstNode *callbackTypeNode = (*node)[2];
+        assert(callbackTypeNode);
+        DataType *callbackDataType = lookupDataType(callbackTypeNode)->getTrueDataType();
+
+        if (!callbackDataType->isFunction())
+        {
+            throw semantic_error(
+                format_string("line %d: Expected function (callback) type.", callbackDataType->getFirstLine()));
+        }
+        FunctionType *callbackFunctionType = dynamic_cast<FunctionType *>(callbackDataType);
+        assert(callbackFunctionType);
+        Function *funcDef = dynamic_cast<Function *>(func);
+        assert(funcDef);
+
+        /* Connect callback type with callbacks. */
+        callbackFunctionType->getCallbackFuns().push_back(funcDef);
+
+        /* Connect callback with callback type. */
+        funcDef->setFunctionType(callbackFunctionType);
+
+        /* Add function oneway information. */
+        funcDef->setIsOneway(callbackFunctionType->isOneway());
+
+        /* Add function return type*/
+        funcDef->setReturnStructMemberType(callbackFunctionType->getReturnStructMemberType());
+
+        /* Add functions annotations. */
+        /*for (const Annotation &ann : callbackFunctionType->getAnnotations())
+        {
+            funcDef->addAnnotation(ann);
+        }*/
     }
 
     /* Get comment if exist. */
-    if (node->getChild(4))
-    {
-        func->setMlComment(node->getChild(4)->getTokenString());
-    }
-    if (node->getChild(5))
-    {
-        func->setIlComment(node->getChild(5)->getTokenString());
-    }
+    addDoxygenComments(dynamic_cast<Symbol *>(func), node->getChild(5), node->getChild(6));
+
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
 {
-    Function *func = m_currentInterface->getFunctions().back();
-    func->getParameters().getScope().setParent(&m_currentInterface->getScope());
 
-    /* TOK_FUNCTION -> name retVal params annotations */
-    func->addAnnotations(node->getChild(3));
+    if (m_currentInterface) /* function definition */
+    {
+        Function *func = m_currentInterface->getFunctions().back();
+        func->getParameters().getScope().setParent(&m_currentInterface->getScope());
+
+        /* Function annotations. */
+        addAnnotations(node->getChild(4), func);
+
+        /* Add missing callbacks parameters. */
+        FunctionType *callbackFunctionType = func->getFunctionType();
+        if (callbackFunctionType)
+        {
+            uint32_t paramsSize = func->getParameters().getMembers().size();
+            const StructType::member_vector_t &callbackParams = callbackFunctionType->getParameters().getMembers();
+            if (callbackFunctionType->getParameters().getMembers().size() > paramsSize)
+            {
+                for (int i = paramsSize; i < callbackParams.size(); ++i)
+                {
+                    if (callbackParams[i]->getName().compare("") == 0)
+                    {
+                        throw semantic_error(
+                            format_string("Missing function param name. That has to be defined in function definition "
+                                          "%d or function type definition %d.\n",
+                                          func->getFirstLine(), callbackFunctionType->getFirstLine()));
+                    }
+                    func->getParameters().addMember(
+                        createCallbackParam(callbackParams[i], callbackParams[i]->getName()));
+                }
+            }
+        }
+    }
+    else /* function type */
+    {
+        FunctionType *func =
+            dynamic_cast<FunctionType *>(m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol).back());
+        assert(func);
+        func->getParameters().getScope().setParent(m_globals);
+
+        /* Function annotations. */
+        addAnnotations(node->getChild(4), func);
+    }
+
+    // Handle annotations for function params
+    scanStructForAnnotations();
 
     m_currentStruct = nullptr;
 
@@ -1015,20 +1173,88 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
 {
     assert_throw_internal((m_currentStruct), "parameter not in function");
 
-    /* Extract param name. */
+    /* Is this param for callback function? */
+    StructMember *callbackParam = nullptr;
+    Function *fun = nullptr;
+    FunctionType *funType = nullptr;
+    if (m_currentInterface)
+    {
+        fun = m_currentInterface->getFunctions().back();
+        SymbolScope::symbol_vector_t vfunType = m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol);
+        for (Symbol *funSymbol : vfunType)
+        {
+            funType = dynamic_cast<FunctionType *>(funSymbol);
+            assert(funType);
+            FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+            if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
+            {
+                if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
+                {
+                    throw syntax_error(format_string("line %d: Function definition contains more parameters than "
+                                                     "function type definition from %d.\n",
+                                                     fun->getFirstLine(), funType->getFirstLine())
+                                           .c_str());
+                }
+                else
+                {
+                    callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
+                }
+                break;
+            }
+        }
+    }
+
     AstNode *ident = (*node)[0];
-    const Token &tok = ident->getToken();
-    const std::string &name = tok.getStringValue();
-    Log::debug("param: %s\n", name.c_str());
+    StructMember *param;
+    if (callbackParam) /* Callback parameters. */
+    {
+        string name;
+        if (ident) /* Get name from callback definition. */
+        {
+            const Token &tok = ident->getToken();
+            name = tok.getStringValue();
+        }
+        else /* Get name from function type definition. */
+        {
+            name = callbackParam->getName();
+        }
+        if (name.compare("") == 0)
+        {
+            assert(funType);
+            assert(fun);
+            throw semantic_error(
+                format_string("Missing function param name. That has to be defined in function definition %d or "
+                              "function type definition %d.\n",
+                              fun->getFirstLine(), funType->getFirstLine()));
+        }
+        param = createCallbackParam(callbackParam, name);
+    }
+    else /* Function or Function type parameters. */
+    {
+        /* Extract param data type. */
+        AstNode *typeNode = (*node)[1];
+        assert(typeNode);
+        DataType *dataType = lookupDataType(typeNode);
 
-    /* Extract param type. */
-    AstNode *typeNode = (*node)[1];
-    DataType *dataType = lookupDataType(typeNode);
+        /* Extract param name. */
+        if (ident)
+        {
+            Token &tok = ident->getToken();
+            param = new StructMember(tok, dataType);
+        }
+        else if (m_currentInterface && !funType) // Functions need param names. Types of functions don't.
+        {
+            throw syntax_error(
+                format_string("line %d: Missing function param name.\n", node->getToken().getFirstLine()));
+        }
+        else /* Function type don't need param name. */
+        {
+            param = new StructMember("", dataType);
+        }
+        setParameterDirection(param, (*node)[2]);
+    }
 
-    /* Create struct member for param. */
-    StructMember *param = new StructMember(tok, dataType);
-
-    setParameterDirection(param, (*node)[2]);
+    Log::debug("param: %s\n", param->getName().c_str());
 
     /* TOK_PARAM -> name datatype annotations */
     m_currentStruct->addMember(param);
@@ -1039,7 +1265,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
 AstNode *SymbolScanner::handleParam(AstNode *node, bottom_up)
 {
     StructMember *param = m_currentStruct->getMembers().back();
-    param->addAnnotations(node->getChild(3));
+    addAnnotations(node->getChild(3), param);
     return nullptr;
 }
 
@@ -1060,9 +1286,6 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
             case TOK_INOUT:
                 param_direction = kInoutDirection;
                 break;
-            case TOK_BYREF:
-                param_direction = kOutDirectionByref;
-                break;
             default:
                 delete param;
                 throw semantic_error(format_string("line %d: expected parameter direction type",
@@ -1075,13 +1298,6 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
         param_direction = kInDirection;
     }
     param->setDirection(param_direction);
-    DataType *trueContainerDataType = param->getDataType()->getTrueContainerDataType();
-    if (trueContainerDataType->isStruct())
-    {
-        StructType *a = dynamic_cast<StructType *>(trueContainerDataType);
-        assert(a);
-        a->addStructDirectionType(param_direction);
-    }
 }
 
 AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
@@ -1092,14 +1308,21 @@ AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
 
 DataType *SymbolScanner::lookupDataTypeByName(const Token &tok, SymbolScope *scope, bool recursive)
 {
-    const std::string typeName = tok.getStringValue();
+    const string typeName = tok.getStringValue();
     Symbol *dataTypeSym = scope->getSymbol(typeName, recursive);
     if (!dataTypeSym)
     {
-        throw semantic_error(format_string("line %d: undefined name '%s'", tok.getFirstLine(), typeName.c_str()));
+        auto forwardDecl = m_forwardDeclarations.find(typeName);
+        if (forwardDecl != m_forwardDeclarations.end())
+        {
+            dataTypeSym = forwardDecl->second;
+        }
+        else
+        {
+            throw semantic_error(format_string("line %d: undefined name '%s'", tok.getFirstLine(), typeName.c_str()));
+        }
     }
     DataType *dataType = dynamic_cast<DataType *>(dataTypeSym);
-    assert(dataType);
     if (!dataType)
     {
         throw semantic_error(format_string("line %d: '%s' is not a type", tok.getFirstLine(), typeName.c_str()));
@@ -1110,11 +1333,7 @@ DataType *SymbolScanner::lookupDataTypeByName(const Token &tok, SymbolScope *sco
 bool SymbolScanner::containsStructEnumDeclaration(const AstNode *typeNode)
 {
     const Token &typeToken = typeNode->getToken();
-    if (typeToken.getToken() == TOK_ENUM || typeToken.getToken() == TOK_STRUCT)
-    {
-        return true;
-    }
-    return false;
+    return (typeToken.getToken() == TOK_ENUM || typeToken.getToken() == TOK_STRUCT);
 }
 
 DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
@@ -1122,18 +1341,19 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
     const Token typeToken = typeNode->getToken();
     switch (typeToken.getToken())
     {
+        case TOK_ARRAY:
+            return createArrayType(typeNode);
+
         case TOK_IDENT:
             return lookupDataTypeByName(typeToken, m_globals);
 
         case TOK_LIST:
             return createListType(typeNode);
 
-        case TOK_ARRAY:
-            return createArrayType(typeNode);
         case TOK_UNION:
         {
             assert(nullptr != m_currentStruct);
-            return lookupDataTypeByName(typeNode->getChild(2)->getToken(), &(m_currentStruct->getScope()), false);
+            return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
             break;
         }
         default:
@@ -1161,10 +1381,10 @@ DataType *SymbolScanner::createArrayType(const AstNode *typeNode)
     DataType *elementType = lookupDataType(elementTypeNode);
 
     const AstNode *elementCountNode = (*typeNode)[1];
-    uint32_t elementCount = getIntExprValue(elementCountNode);
+    uint64_t elementCount = getIntExprValue(elementCountNode);
 
     /* Create list type. */
-    ArrayType *array = new ArrayType(elementType, elementCount);
+    ArrayType *array = new ArrayType(elementType, (uint32_t)elementCount);
 
     return array;
 }
@@ -1173,7 +1393,7 @@ Value *SymbolScanner::getValueFromSymbol(Token &tok)
 {
     if (tok.getValue() != nullptr)
     {
-        std::string name = tok.getStringValue();
+        string name = tok.getStringValue();
         Symbol *sym = m_globals->getSymbol(name);
         if (nullptr != sym)
         {
@@ -1205,7 +1425,7 @@ Value *SymbolScanner::getValueFromSymbol(Token &tok)
     throw syntax_error(format_string("line %d: cannot get token value.\n", tok.getFirstLine()));
 }
 
-uint32_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
+uint64_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
 {
     /* Check that this node is really an expr. */
     const Token &tok = exprNode->getToken();
@@ -1229,7 +1449,7 @@ uint32_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
             throw semantic_error(format_string("line %d: expected integer expression", tok2.getFirstLine()));
         }
         assert(nullptr != dynamic_cast<IntegerValue *>(val));
-        uint32_t result = dynamic_cast<IntegerValue *>(val)->getValue();
+        uint64_t result = dynamic_cast<IntegerValue *>(val)->getValue();
         delete val;
         return result;
     }
@@ -1246,4 +1466,312 @@ uint32_t SymbolScanner::getIntExprValue(const AstNode *exprNode)
     }
 
     return valueToken.getIntValue();
+}
+
+void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
+{
+    if (childNode)
+    {
+        for (auto annotation : *childNode)
+        {
+            Log::SetOutputLevel logLevel(Logger::kDebug);
+
+            // name can be optional for struct/enum
+            string nameOfType;
+            if (childNode->getParent()->getChild(0))
+            {
+                string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
+                Log::log("Handling annotations for %s\n", nameOfType.c_str());
+            }
+            else
+            {
+                Log::log("Handling annotations\n");
+            }
+
+            Annotation::program_lang_t annLang = getAnnotationLang(annotation);
+
+            // TOK_ANNOTATION -> ( (name) (TOK_EXPR -> (value)) )
+            AstNode *annotation_name = annotation->getChild(1);
+
+            checkAnnotationBeforeAdding(annotation, symbol);
+
+            const Token &nameTok = annotation_name->getToken();
+            Value *annValue = getAnnotationValue(annotation);
+
+            Annotation ann = Annotation(nameTok, annValue, annLang);
+
+            symbol->addAnnotation(ann);
+
+            // name can be optional for struct/enum
+            if (childNode->getParent()->getChild(0))
+            {
+                Log::log("\tAdding annotation: @%s() to %s\n", ann.getName().c_str(), nameOfType.c_str());
+            }
+            else
+            {
+                Log::log("\tAdding annotation: @%s()\n", ann.getName().c_str());
+            }
+        }
+    }
+}
+
+Value *SymbolScanner::getAnnotationValue(AstNode *annotation)
+{
+    if (AstNode *annotation_value = annotation->getChild(2))
+    {
+        // Strip TOK_EXPR token
+        if (0 == strcmp("TOK_EXPR", annotation_value->getToken().getTokenName()))
+        {
+            return annotation_value->getChild(0)->getToken().getValue();
+        }
+
+        return annotation_value->getToken().getValue();
+    }
+
+    return nullptr;
+}
+
+Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
+{
+    if (AstNode *annotation_value = annotation->getChild(0))
+    {
+
+        string lang = annotation_value->getToken().getValue()->toString();
+        if (lang.compare("c") == 0)
+        {
+            return Annotation::kC;
+        }
+        else if (lang.compare("py") == 0)
+        {
+            return Annotation::kPython;
+        }
+
+        throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
+                                           annotation->getToken().getFirstLine(), lang.c_str())
+                                 .c_str());
+    }
+
+    return Annotation::kAll;
+}
+
+void SymbolScanner::checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol)
+{
+    AstNode *annotation_name = annotation->getChild(1);
+    Value *annValue = getAnnotationValue(annotation);
+
+    if (annotation_name->getTokenString().compare(LENGTH_ANNOTATION) == 0)
+    {
+        StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+        if (structMember)
+        {
+            DataType *trueDataType = structMember->getDataType()->getTrueDataType();
+            if (trueDataType && (!trueDataType->isList() && !trueDataType->isBinary()))
+            {
+                throw semantic_error(
+                    format_string("line %d: Length annotation can only be applied to list or binary types",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+
+            // Check @length annotation's value.
+            if (!annValue)
+            {
+                throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member",
+                                                   annotation_name->getToken().getFirstLine()));
+            }
+        }
+    }
+    else if (annotation_name->getTokenString().compare(MAX_LENGTH_ANNOTATION) == 0)
+    {
+        StructMember *structMember = dynamic_cast<StructMember *>(symbol);
+        if (structMember)
+        {
+            DataType *trueDataType = structMember->getDataType()->getTrueDataType();
+            if (trueDataType && (!trueDataType->isList() && !trueDataType->isBinary() && !trueDataType->isString()))
+            {
+                throw semantic_error(
+                    format_string("line %d: Max_length annotation can only be applied to list, binary, or string types",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+
+            // Check @length annotation's value.
+            if (!annValue)
+            {
+                throw semantic_error(
+                    format_string("line %d: Max_length annotation must name a valid parameter or member",
+                                  annotation_name->getToken().getFirstLine()));
+            }
+        }
+    }
+}
+
+void SymbolScanner::scanStructForAnnotations()
+{
+    assert(m_currentStruct);
+
+    // go trough all structure members
+    for (StructMember *structMember : m_currentStruct->getMembers())
+    {
+        DataType *memberType = structMember->getDataType()->getTrueDataType();
+        /* Check non-encapsulated discriminated unions. */
+        if (memberType->isUnion())
+        {
+            UnionType *unionType = dynamic_cast<UnionType *>(structMember->getDataType());
+            assert(unionType);
+            Symbol *disSymbol;
+            if (unionType->isNonEncapsulatedUnion())
+            {
+                string discrimintorName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION, Annotation::kAll);
+                if (discrimintorName.empty())
+                {
+                    throw syntax_error(format_string("Missing discriminator for union variable %s on line %d",
+                                                     structMember->getName().c_str(), structMember->getFirstLine()));
+                }
+
+                // search in structure scope for member referenced with annotation
+                disSymbol = m_currentStruct->getScope().getSymbol(discrimintorName, false);
+                if (!disSymbol)
+                {
+                    disSymbol = m_globals->getSymbol(discrimintorName, false);
+                }
+                if (!disSymbol)
+                {
+                    throw syntax_error(
+                        format_string("Value defined in annotation discriminator used for union "
+                                      "variable %s on line %d has to point to variable in same/global scope.",
+                                      structMember->getName().c_str(), structMember->getFirstLine()));
+                }
+            }
+            else
+            {
+                disSymbol = m_currentStruct->getScope().getSymbol(unionType->getDiscriminatorName(), false);
+                if (!disSymbol)
+                {
+                    throw syntax_error(
+                        format_string("Discriminator used for union variable %s on line %d has to point "
+                                      "to variable in same scope.",
+                                      structMember->getName().c_str(), structMember->getFirstLine()));
+                }
+            }
+
+            // check discriminator data type
+            DataType *disType;
+            if (StructMember *disStructMember = dynamic_cast<StructMember *>(disSymbol))
+            {
+                disType = disStructMember->getDataType()->getTrueDataType();
+            }
+            else
+            {
+                ConstType *disConstMember = dynamic_cast<ConstType *>(disSymbol);
+                assert(disConstMember);
+                disType = disConstMember->getDataType()->getTrueDataType();
+            }
+
+            assert(disType);
+            if (!disType->isScalar() && !disType->isEnum())
+            {
+                throw syntax_error(
+                    format_string("Discriminator used for union variable %s on line %d has to be "
+                                  "enum, boolean, int or uint type.",
+                                  structMember->getName().c_str(), structMember->getFirstLine()));
+            }
+        }
+    }
+}
+
+void SymbolScanner::addDoxygenComments(Symbol *symbol, AstNode *above, AstNode *trailing)
+{
+    assert(symbol);
+
+    // Get doxygen comments if exist.
+    if (above)
+    {
+        symbol->setMlComment(above->getTokenString());
+    }
+    if (trailing)
+    {
+        symbol->setIlComment(trailing->getTokenString());
+    }
+}
+
+StructMember *SymbolScanner::createCallbackParam(StructMember *structMember, const string &name)
+{
+    /* struct member name */
+    string memberName;
+    if (name.compare("") == 0)
+    {
+        memberName = structMember->getName();
+    }
+    else
+    {
+        memberName = name;
+    }
+
+    /* struct member */
+    StructMember *param = new StructMember(memberName, structMember->getDataType());
+    for (const Annotation &memberAnn : structMember->getAnnotations())
+    {
+        param->addAnnotation(memberAnn);
+    }
+    /* Set parameter specific data. */
+    param->setContainList(structMember->getContainList());
+    param->setContainString(structMember->getContainString());
+    param->setDirection(structMember->getDirection());
+    return param;
+}
+
+void SymbolScanner::addForwardDeclaration(DataType *dataType)
+{
+    if (Symbol *symbol = m_globals->getSymbol(dataType->getName()))
+    {
+        throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
+                                           dataType->getFirstLine(), dataType->getName().c_str(),
+                                           symbol->getFirstLine())
+                                 .c_str());
+    }
+
+    auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        if (findDataTypeIT->second->getDataType() != dataType->getDataType())
+        {
+            throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
+                                               dataType->getFirstLine(), dataType->getName().c_str(),
+                                               findDataTypeIT->second->getFirstLine())
+                                     .c_str());
+        }
+        else
+        {
+            return;
+        }
+    }
+    m_forwardDeclarations[dataType->getName()] = dataType;
+}
+
+void SymbolScanner::removeForwardDeclaration(DataType *dataType)
+{
+    auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        if (findDataTypeIT->second->getDataType() != dataType->getDataType())
+        {
+            throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
+                                               dataType->getFirstLine(), dataType->getName().c_str(),
+                                               findDataTypeIT->second->getFirstLine())
+                                     .c_str());
+        }
+        m_forwardDeclarations.erase(findDataTypeIT);
+    }
+}
+
+void SymbolScanner::addGlobalSymbol(Symbol *symbol)
+{
+    auto findDataTypeIT = m_forwardDeclarations.find(symbol->getName());
+    if (findDataTypeIT != m_forwardDeclarations.end())
+    {
+        throw semantic_error(format_string("line %d: Declaring symbol '%s' already declared here '%d'",
+                                           symbol->getFirstLine(), symbol->getName().c_str(),
+                                           findDataTypeIT->second->getFirstLine())
+                                 .c_str());
+    }
+    m_globals->addSymbol(symbol);
 }

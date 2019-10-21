@@ -1,45 +1,24 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "PythonGenerator.h"
-#include "format_string.h"
 #include "Logging.h"
 #include "ParseErrors.h"
-#include "erpcgen_version.h"
 #include "annotations.h"
+#include "format_string.h"
 #include <algorithm>
 #include <set>
 #include <sstream>
-#include <ctime>
 
 using namespace erpcgen;
 using namespace cpptempl;
+using namespace std;
 
 // Templates strings converted from text files by txt_to_c.py.
 extern const char *const kPyCoders;
@@ -48,63 +27,74 @@ extern const char *const kPyCommon;
 extern const char *const kPyServer;
 extern const char *const kPyClient;
 extern const char *const kPyInterface;
+extern const char *const kPyGlobalInit;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
 PythonGenerator::PythonGenerator(InterfaceDefinition *def)
-: Generator(def)
+: Generator(def, kPython)
 , m_suffixStrip("")
 , m_suffixStripSize(0)
 {
+    /* Set copyright rules. */
+    if (m_def->hasProgramSymbol())
+    {
+        Symbol *program = m_def->getProgramSymbol();
+        assert(program);
+        setTemplateComments(program, m_templateData);
+    }
 }
 
-void PythonGenerator::generateOutputFiles(const std::string &fileName)
+void PythonGenerator::generateOutputFiles(const string &fileName)
 {
-    boost::filesystem::path outputDir = m_def->getOutputDirectory();
-    std::string commonFileName = stripExtension(m_def->getOutputFilename()) + fileName;
-
     // Make sure the package folder is created.
-    boost::filesystem::path dir(commonFileName);
-    dir = outputDir / dir;
+    boost::filesystem::path dir(fileName);
+    dir = m_outputDirectory / dir;
     boost::filesystem::create_directories(dir);
 
-    generateInitFile(commonFileName);
-    generateCommonFile(commonFileName);
-    generateClientFile(commonFileName);
-    generateServerFile(commonFileName);
-    generateInterfaceFile(commonFileName);
+    generateInitFile(fileName);
+    generateCommonFile(fileName);
+    generateClientFile(fileName);
+    generateServerFile(fileName);
+    generateInterfaceFile(fileName);
 }
 
-void PythonGenerator::generateInitFile(std::string fileName)
+void PythonGenerator::generateInitFile(string fileName)
 {
     fileName += "/__init__.py";
     generateOutputFile(fileName, "py_init", m_templateData, kPyInit);
 };
 
-void PythonGenerator::generateCommonFile(std::string fileName)
+void PythonGenerator::generateCommonFile(string fileName)
 {
     fileName += "/common.py";
     generateOutputFile(fileName, "py_common", m_templateData, kPyCommon);
 }
 
-void PythonGenerator::generateClientFile(std::string fileName)
+void PythonGenerator::generateClientFile(string fileName)
 {
     fileName += "/client.py";
     generateOutputFile(fileName, "py_client", m_templateData, kPyClient);
 }
 
-void PythonGenerator::generateServerFile(std::string fileName)
+void PythonGenerator::generateServerFile(string fileName)
 {
     fileName += "/server.py";
     generateOutputFile(fileName, "py_server", m_templateData, kPyServer);
 }
 
-void PythonGenerator::generateInterfaceFile(std::string fileName)
+void PythonGenerator::generateInterfaceFile(string fileName)
 {
     fileName += "/interface.py";
     generateOutputFile(fileName, "py_interface", m_templateData, kPyInterface);
+}
+
+void PythonGenerator::generateGlobalInitFile()
+{
+    /* Generate file with shim code version. */
+    generateOutputFile("__init__.py", "py_global_init", m_templateData, kPyGlobalInit);
 }
 
 void PythonGenerator::parseSubtemplates()
@@ -126,186 +116,75 @@ void PythonGenerator::generate()
     m_templateData["enums"] = empty;
     m_templateData["aliases"] = empty;
     m_templateData["structs"] = empty;
+    m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
-
-    m_templateData["erpcgenVersion"] = ERPCGEN_VERSION;
-
-    std::time_t now = std::time(nullptr);
-    std::string nowString = std::ctime(&now);
-    nowString.pop_back(); // Remove trailing newline.
-    m_templateData["todaysDate"] = nowString;
 
     parseSubtemplates();
 
+    generateGlobalInitFile();
+
     if (m_def->hasProgramSymbol())
     {
-        Log::info("program: ");
-        Log::info("%s\n", m_def->getOutputFilename().c_str());
-
-        for (auto anno: m_def->programSymbol()->getAnnotations(PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
+        for (Annotation *anno : getAnnotations(m_def->getProgramSymbol(), PY_TYPES_NAME_STRIP_SUFFIX_ANNOTATION))
         {
             m_suffixStrip = anno->getValueObject()->toString();
             m_suffixStripSize = m_suffixStrip.size();
         }
     }
 
-    // makeIncludesTemplateData();
+    findGroupDataTypes();
 
-    makeInterfacesTemplateData();
+    makeIncludesTemplateData();
+
+    makeAliasesTemplateData();
 
     makeConstTemplateData();
 
     makeEnumsTemplateData();
 
-    makeAliasesTemplateData();
+    makeFunctionsTemplateData();
 
-    makeStructsTemplateData();
-
-    // Log template data.
-    if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
+    for (Group *group : m_groups)
     {
-        dump_data(m_templateData);
+        data_map groupTemplate;
+        groupTemplate["name"] = group->getName();
+        groupTemplate["includes"] = makeGroupIncludesTemplateData(group);
+        groupTemplate["symbolsMap"] = makeGroupSymbolsTemplateData(group);
+        groupTemplate["interfaces"] = makeGroupInterfacesTemplateData(group);
+        group->setTemplate(groupTemplate);
+
+        generateGroupOutputFiles(group);
     }
 
-    generateOutputFiles("");
+    initPythonReservedWords();
 }
 
-// void PythonGenerator::makeIncludesTemplateData()
-//{
-//    data_list includeData;
-//    if(m_def->hasProgramSymbol())
-//    {
-//        for(auto include: m_def->programSymbol()->getAnnotations(INCLUDE_ANNOTATION))
-//        {
-//            includeData.push_back(make_data(include->getValueObject()->toString()));
-//            Log::info("#include %s\n", include->getValueObject()->toString().c_str());
-//        }
-//    }
-//    m_templateData["includes"] = includeData;
-//}
-
-void PythonGenerator::makeInterfacesTemplateData()
+void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 {
-    Log::info("interfaces:\n");
-    int n = 0;
-    data_list ifaces;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
-    {
-        Interface *iface = dynamic_cast<Interface *>(it);
-        assert(iface);
-
-        data_map ifaceInfo;
-        ifaceInfo["name"] = make_data(iface->getName());
-        ifaceInfo["id"] = data_ptr(iface->getUniqueId());
-        ifaceInfo["mlComment"] = convertComment(iface->getMlComment(), kMultilineComment);
-        ifaceInfo["ilComment"] = convertComment(iface->getIlComment(), kInlineComment);
-
-        Log::info("%d: (%d) %s\n", n, iface->getUniqueId(), iface->getName().c_str());
-
-        ifaceInfo["functions"] = getFunctionsTemplateData(iface);
-        ifaces.push_back(make_data(ifaceInfo));
-        ++n;
-    }
-    m_templateData["interfaces"] = ifaces;
+    symbolInfo["mlComment"] = convertComment(symbol->getMlComment(), kMultilineComment);
+    symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
 }
 
-data_list PythonGenerator::getFunctionsTemplateData(Interface *iface)
+data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
-    data_list fns;
-    int j = 0;
-    for (auto fit : iface->getFunctions())
-    {
-        fns.push_back(getFunctionTemplateData(fit, j++));
-    }
-    return fns;
-}
-
-//! TODO This should be common code.
-void PythonGenerator::scanStructForLengthAnnotation(StructType *theStruct)
-{
-    SymbolScope &structScope = theStruct->getScope();
-    for (auto member : theStruct->getMembers())
-    {
-        DataType *memberType = member->getDataType();
-        DataType *memberTrueType = memberType->getTrueDataType();
-
-        // Look for @length annotation and skip this member if not present.
-        Annotation *lengthAnno = member->findAnnotation(LENGTH_ANNOTATION);
-        if (!lengthAnno)
-        {
-            continue;
-        }
-
-        // Check the type of the member with the @length annotation.
-        if (!(memberTrueType->isList() || memberTrueType->isBinary() || memberTrueType->isString()))
-        {
-            throw semantic_error(format_string("line %d: Length annotation can only be applied to list, binary, or string types", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Check @length annotation's value.
-        if (!lengthAnno->hasValue())
-        {
-            throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Make sure the @length annotation names a valid member.
-        std::string lengthIdent = lengthAnno->getValueObject()->toString();
-        if (!structScope.hasSymbol(lengthIdent))
-        {
-            throw semantic_error(format_string("line %d: Length annotation must name a valid parameter or member", lengthAnno->getLocation().m_firstLine));
-        }
-
-        Symbol *sym = structScope.getSymbol(lengthIdent);
-        StructMember *lengthMember = dynamic_cast<StructMember*>(sym);
-        assert(lengthMember);
-
-        // Verify the length member is a scalar.
-        DataType *lengthMemberType = lengthMember->getDataType()->getTrueDataType();
-        BuiltinType *lengthMemberBuiltinType = dynamic_cast<BuiltinType*>(lengthMemberType);
-        if (!lengthMemberBuiltinType || !lengthMemberBuiltinType->isInt())
-        {
-            throw semantic_error(format_string("line %d: The parameter or member named by a length annotation must be an integer type", lengthAnno->getLocation().m_firstLine));
-        }
-
-        // Verify both the data and length members are the same direction.
-        if (member->getDirection() != lengthMember->getDirection())
-        {
-            throw semantic_error(format_string("line %d: The parameter named by a length annotation must be the same direction as the data parameter", lengthAnno->getLocation().m_firstLine));
-        }
-
-        if (memberTrueType->isList())
-        {
-            ListType *memberListType = dynamic_cast<ListType*>(memberTrueType);
-            assert(memberListType);
-            memberListType->setLengthVariableName(lengthIdent);
-        }
-
-        // Record that the referenced member is the length for this member.
-        lengthMember->setLengthForMember(member);
-    }
-}
-
-data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
-{
-    // Process @length annotations for this function.
-    scanStructForLengthAnnotation(&fn->getParameters());
-
     data_map info;
-    std::string proto = getFunctionPrototype(fn);
+    string proto = getFunctionPrototype(fn);
 
-    info["name"] = fn->getName();
+    info["name"] = getOutputName(fn);
     info["prototype"] = proto;
     info["id"] = fn->getUniqueId();
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
-    info["mlComment"] = convertComment(fn->getMlComment(), kMultilineComment);
-    info["ilComment"] = convertComment(fn->getIlComment(), kInlineComment);
+    setTemplateComments(fn, info);
+
+    /* Is function declared as external? */
+    info["isNonExternalFunction"] = findAnnotation(fn, EXTERNAL_ANNOTATION) == nullptr;
 
     // Get return value info
     data_map returnInfo;
     returnInfo["type"] = getTypeInfo(fn->getReturnType());
     // TODO support annotations on function return values
-//    returnInfo["isNullable"] = (fn->getReturnType()->findAnnotation(NULLABLE_ANNOTATION) != nullptr);
+    //    returnInfo["isNullable"] = (fn->getReturnType()->findAnnotation(NULLABLE_ANNOTATION) != nullptr);
     info["returnValue"] = returnInfo;
 
     // get function parameter info
@@ -317,15 +196,40 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     {
         data_map paramInfo;
         DataType *paramType = param->getDataType();
-        std::string name = param->getName();
+        DataType *trueDataType = paramType->getTrueDataType();
+        string name = getOutputName(param);
         paramInfo["name"] = name;
         paramInfo["type"] = getTypeInfo(paramType);
 
-        Annotation *anno = param->findAnnotation(NULLABLE_ANNOTATION);
-        paramInfo["isNullable"] = (anno != nullptr);
+        bool isNullable = ((findAnnotation(param, NULLABLE_ANNOTATION) != nullptr) &&
+                           (trueDataType->isString() || (!trueDataType->isBuiltin() && !trueDataType->isEnum())));
+        paramInfo["isNullable"] = isNullable;
 
-        StructMember *otherMember = param->getLengthForMember();
-        paramInfo["lengthForMember"] = (otherMember == nullptr ? "" : otherMember->getName());
+        // Skip data serialization for variables placed as @length value for lists.
+        // These prevent to serialized data twice.
+        StructMember *referencedFrom = findParamReferencedFromAnn(fnParams, name, LENGTH_ANNOTATION);
+        paramInfo["discriminatorForMember"] = "";
+
+        if (referencedFrom)
+        {
+            paramInfo["lengthForMember"] = getOutputName(referencedFrom);
+        }
+        else
+        {
+            paramInfo["lengthForMember"] = "";
+            // Skip data serialization for variables used as discriminator for unions.
+            // These prevent to serialized data twice.
+            referencedFrom = findParamReferencedFromUnion(fnParams, name);
+            if (referencedFrom)
+            {
+                paramInfo["discriminatorForMember"] = getOutputName(referencedFrom);
+            }
+        }
+
+        paramInfo["serializedViaMember"] = (referencedFrom) ? getOutputName(referencedFrom) : "";
+
+        /* Necessary for handling non-discriminated unions */
+        paramInfo["discriminator"] = getAnnStringValue(param, DISCRIMINATOR_ANNOTATION);
 
         _param_direction dir = param->getDirection();
         switch (dir)
@@ -354,14 +258,12 @@ data_map PythonGenerator::getFunctionTemplateData(Function *fn, int fnIndex)
     info["inParameters"] = inParams;
     info["outParameters"] = outParams;
 
-    Log::info("    %d: (%d) %s\n", fnIndex, fn->getUniqueId(), info["prototype"]->getvalue().c_str());
-
     return info;
 }
 
-std::string PythonGenerator::getFunctionPrototype(Function *fn)
+string PythonGenerator::getFunctionPrototype(Function *fn)
 {
-    std::string proto = fn->getName();
+    string proto = getOutputName(fn);
     proto += "(self";
 
     auto params = fn->getParameters().getMembers();
@@ -369,14 +271,14 @@ std::string PythonGenerator::getFunctionPrototype(Function *fn)
     {
         for (auto it : params)
         {
-            // Skip params that are length for other params.
-            if (it->getLengthForMember() != nullptr)
+            // Skip data serialization for variables placed as @length value for lists.
+            if (findParamReferencedFromAnn(params, getOutputName(it), LENGTH_ANNOTATION))
             {
                 continue;
             }
 
             proto += ", ";
-            proto += it->getName();
+            proto += getOutputName(it);
         }
     }
     proto += ")";
@@ -392,10 +294,9 @@ void PythonGenerator::makeConstTemplateData()
         ConstType *constVar = dynamic_cast<ConstType *>(it);
         assert(constVar);
         data_map constInfo;
-        Annotation *externAnnotation = constVar->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!findAnnotation(constVar, EXTERNAL_ANNOTATION))
         {
-            constInfo["name"] = constVar->getName();
+            constInfo["name"] = getOutputName(constVar);
 
             // throw nullptr exception
             if (NULL == constVar->getValue())
@@ -410,8 +311,7 @@ void PythonGenerator::makeConstTemplateData()
             {
                 constInfo["value"] = constVar->getValue()->toString();
             }
-            constInfo["mlComment"] = convertComment(constVar->getMlComment(), kMultilineComment);
-            constInfo["ilComment"] = convertComment(constVar->getIlComment(), kInlineComment);
+            setTemplateComments(constVar, constInfo);
             Log::info("Name=%s\tType=%s\tValue=%s\n", constVar->getName().c_str(),
                       constVar->getDataType()->getName().c_str(), constVar->getValue()->toString().c_str());
             consts.push_back(constInfo);
@@ -429,15 +329,13 @@ void PythonGenerator::makeEnumsTemplateData()
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
-        Annotation *externAnnotation = enumType->findAnnotation(EXTERNAL_ANNOTATION);
-        if (!externAnnotation)
+        if (!findAnnotation(enumType, EXTERNAL_ANNOTATION))
         {
             Log::info("%d: %s\n", n, enumType->getName().c_str());
             data_map enumInfo;
-            enumInfo["name"] = filterName(enumType->getName());
+            enumInfo["name"] = filterName(getOutputName(enumType));
             enumInfo["members"] = getEnumMembersTemplateData(enumType);
-            enumInfo["mlComment"] = convertComment(enumType->getMlComment(), kMultilineComment);
-            enumInfo["ilComment"] = convertComment(enumType->getIlComment(), kInlineComment);
+            setTemplateComments(enumType, enumInfo);
             enums.push_back(enumInfo);
             ++n;
         }
@@ -453,11 +351,10 @@ data_list PythonGenerator::getEnumMembersTemplateData(EnumType *enumType)
     {
         assert(member->hasValue());
         data_map enumMember;
-        enumMember["name"] = member->getName();
+        enumMember["name"] = getOutputName(member);
         enumMember["value"] = member->getValue();
         Log::info("    %d: %s = %d\n", j, member->getName().c_str(), member->getValue());
-        enumMember["mlComment"] = convertComment(member->getMlComment(), kMultilineComment);
-        enumMember["ilComment"] = convertComment(member->getIlComment(), kInlineComment);
+        setTemplateComments(member, enumMember);
         enumMembersList.push_back(enumMember);
         ++j;
     }
@@ -473,117 +370,205 @@ void PythonGenerator::makeAliasesTemplateData()
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
-//        Annotation *externAnnotation = aliasType->findAnnotation(EXTERNAL_ANNOTATION);
-//        if (!externAnnotation)
-//        {
-            Log::info("%d: ", n);
-            data_map aliasInfo;
-            DataType *elementDataType = aliasType->getElementType();
-            DataType *trueDataType = elementDataType->getTrueDataType();
+        //        Annotation *externAnnotation = aliasType->findAnnotation(EXTERNAL_ANNOTATION);
+        //        if (!externAnnotation)
+        //        {
+        Log::info("%d: ", n);
+        data_map aliasInfo;
+        DataType *elementDataType = aliasType->getElementType();
+        DataType *trueDataType = elementDataType->getTrueDataType();
 
-            // Only generate aliases for enums and structs in Python.
-            if (!(trueDataType->isEnum() || trueDataType->isStruct()))
-            {
-                continue;
-            }
+        // Only generate aliases for enums, unions and structs in Python.
+        if (!(trueDataType->isEnum() || trueDataType->isUnion() || trueDataType->isStruct()))
+        {
+            continue;
+        }
 
-            std::string realType = aliasType->getName();
-            Log::info("%s\n", realType.c_str());
+        string realType = getOutputName(aliasType);
+        Log::info("%s\n", realType.c_str());
 
-            // Ignore aliases added by SymbolScanner to generate struct typedefs for C.
-            // TODO remove these C-specific aliases.
-            if (elementDataType->getName() == aliasType->getName())
-            {
-                continue;
-            }
+        aliasInfo["name"] = filterName(realType);
+        aliasInfo["elementType"] = getTypeInfo(elementDataType);
+        aliasInfo["trueType"] = getTypeInfo(trueDataType);
 
-            aliasInfo["name"] = filterName(realType);
-            aliasInfo["elementType"] = getTypeInfo(elementDataType);
-            aliasInfo["trueType"] = getTypeInfo(trueDataType);
+        setTemplateComments(aliasType, aliasInfo);
 
-            aliasInfo["mlComment"] = aliasType->getMlComment();
-            aliasInfo["ilComment"] = aliasType->getIlComment();
-
-            aliases.push_back(aliasInfo);
-            ++n;
-//        }
+        aliases.push_back(aliasInfo);
+        ++n;
+        //        }
     }
     m_templateData["aliases"] = aliases;
 }
 
-void PythonGenerator::makeStructsTemplateData()
+data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 {
-    Log::info("Structs:\n");
+    data_map symbolsTemplate;
+    set<string> names;
+
     data_list structs;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol))
+    data_list unions;
+
+    Log::info("Group symbols:\n");
+
+    // generate templates for group symbols or for all symbols if group has no interface defined
+    for (Symbol *symbol : (group->getInterfaces().empty() ? m_globals->getSymbolVector() : group->getSymbols()))
     {
-        StructType *structType = dynamic_cast<StructType *>(it);
-        assert(structType);
-        std::string structDesc = structType->getDescription();
-        Log::info("%s\n", structDesc.c_str());
+        data_map info;
 
-        // Process @length annotations for this struct.
-        scanStructForLengthAnnotation(structType);
+        switch (symbol->getSymbolType())
+        {
+            case DataType::kStructTypeSymbol:
+            {
+                StructType *structType = dynamic_cast<StructType *>(symbol);
+                if (structType == nullptr)
+                {
+                    break;
+                }
 
-        data_map structInfo;
-        structInfo["name"] = filterName(structType->getName());
-        structInfo["mlComment"] = convertComment(structType->getMlComment(), kMultilineComment);
-        structInfo["ilComment"] = convertComment(structType->getIlComment(), kInlineComment);
-        setStructMembersTemplateData(structType, structInfo);
+                Log::info("%s\n", structType->getDescription().c_str());
 
-        structs.push_back(structInfo);
+                string name = filterName(getOutputName(structType));
+
+                // check if template for this structure has not already been generated
+                if (names.find(name) == names.end())
+                {
+                    info["name"] = name;
+
+                    setTemplateComments(structType, info);
+                    setStructMembersTemplateData(structType, info);
+
+                    names.insert(name);
+                    structs.push_back(info);
+                }
+                break;
+            }
+            case DataType::kUnionTypeSymbol:
+            {
+                UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                if (unionType == nullptr)
+                {
+                    break;
+                }
+
+                Log::info("%s\n", unionType->getDescription().c_str());
+
+                string name = filterName(getOutputName(unionType));
+
+                // check if template for this structure has not already been generated
+                if (names.find(name) == names.end())
+                {
+                    info["name"] = name;
+                    info["type"] = getTypeInfo(unionType);
+
+                    setTemplateComments(unionType, info);
+                    // setUnionMembersTemplateData(unionType, info);
+
+                    names.insert(name);
+                    unions.push_back(info);
+                }
+                break;
+            }
+            default:
+                break;
+        }
     }
-    m_templateData["structs"] = structs;
+
+    symbolsTemplate["structs"] = structs;
+    symbolsTemplate["unions"] = unions;
+
+    return symbolsTemplate;
 }
 
-void PythonGenerator::setStructMembersTemplateData(StructType *structType, cpptempl::data_map &structInfo)
+void PythonGenerator::setStructMembersTemplateData(StructType *structType, data_map &structInfo)
 {
     data_list members;
     for (auto member : structType->getMembers())
     {
         data_map member_info;
+
+        // Skip data serialization for variables placed as @length value for lists.
+        // These prevent to serialized data twice.
+        StructMember *referencedFrom =
+            findParamReferencedFromAnn(structType->getMembers(), member->getName(), LENGTH_ANNOTATION);
+
+        member_info["discriminatorForMember"] = "";
+        if (referencedFrom)
+        {
+            member_info["lengthForMember"] = getOutputName(referencedFrom);
+        }
+        else
+        {
+            member_info["lengthForMember"] = "";
+            // Skip data serialization for variables used as discriminator for unions.
+            // These prevent to serialized data twice.
+            referencedFrom = findParamReferencedFromUnion(structType->getMembers(), member->getName());
+            if (referencedFrom)
+            {
+                member_info["discriminatorForMember"] = getOutputName(referencedFrom);
+            }
+        }
+
+        member_info["serializedViaMember"] = (referencedFrom) ? getOutputName(referencedFrom) : "";
         setOneStructMemberTemplateData(member, member_info);
         members.push_back(member_info);
     }
     structInfo["members"] = members;
 }
 
-void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, cpptempl::data_map &member_info)
+void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, data_map &member_info)
 {
-    std::string memberName = member->getName();
+    string memberName = getOutputName(member);
 
-    Annotation *anno = member->findAnnotation(NULLABLE_ANNOTATION);
+    DataType *trueDataType = member->getDataType()->getTrueDataType();
 
     // Info for declaring struct in common header
     member_info["name"] = memberName;
-    member_info["isNullable"] = (anno != nullptr);
+    bool isNullable = ((findAnnotation(member, NULLABLE_ANNOTATION) != nullptr) &&
+                       (trueDataType->isBinary() || trueDataType->isString() || trueDataType->isList()));
+    member_info["isNullable"] = isNullable;
     member_info["type"] = getTypeInfo(member->getDataType());
-    member_info["mlComment"] = convertComment(member->getMlComment(), kMultilineComment);
-    member_info["ilComment"] = convertComment(member->getIlComment(), kInlineComment);
+    /* Necessary for handling non-discriminated unions */
+    member_info["discriminator"] = getAnnStringValue(member, DISCRIMINATOR_ANNOTATION);
 
-    StructMember *otherMember = member->getLengthForMember();
-    member_info["lengthForMember"] = (otherMember == nullptr ? "" : otherMember->getName());
+    setTemplateComments(member, member_info);
 }
 
-cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
+void PythonGenerator::makeFunctionsTemplateData()
+{
+    /* type definitions of functions and table of functions */
+    Log::info("Functions:\n");
+    data_list functions;
+    for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    {
+        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
+        data_map functionInfo;
+
+        /* Table template data. */
+        data_list callbacks;
+        for (Function *fun : functionType->getCallbackFuns())
+        {
+            data_map callbacksInfo;
+            callbacksInfo["name"] = fun->getName();
+            callbacks.push_back(callbacksInfo);
+        }
+        functionInfo["callbacks"] = callbacks;
+        /* Function type name. */
+        functionInfo["name"] = functionType->getName();
+        functions.push_back(functionInfo);
+    }
+    m_templateData["functions"] = functions;
+}
+
+data_map PythonGenerator::getTypeInfo(DataType *t)
 {
     data_map info;
-    info["name"] = filterName(t->getName());
+    info["name"] = filterName(getOutputName(t, false));
+    info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
-        case DataType::kVoidType:
-            info["type"] = "void";
-            break;
-        case DataType::kBuiltinType:
-            assert(dynamic_cast<const BuiltinType *>(t));
-            info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
-            break;
-        case DataType::kListType:
+        case DataType::kAliasType:
         {
-            const ListType *a = dynamic_cast<const ListType *>(t);
-            assert(a);
-            info["type"] = "list";
-            info["elementType"] = getTypeInfo(a->getElementType());
+            info = getTypeInfo(t->getTrueDataType());
             break;
         }
         case DataType::kArrayType:
@@ -596,34 +581,85 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
+        case DataType::kBuiltinType:
+        {
+            assert(dynamic_cast<const BuiltinType *>(t));
+            info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
+            break;
+        }
         case DataType::kEnumType:
+        {
             info["type"] = "enum";
             break;
+        }
+        case DataType::kFunctionType:
+        {
+            info["type"] = "function";
+            FunctionType *funType = dynamic_cast<FunctionType *>(t);
+            assert(funType);
+            const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+            if (callbacks.size() > 1)
+            {
+                info["tableName"] = "_" + funType->getName();
+            }
+            else if (callbacks.size() == 1)
+            {
+                info["tableName"] = "";
+                info["callbackName"] = callbacks[0]->getName();
+            }
+            else
+            {
+                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in "
+                                                   "IDL is missing function definition, which can be passed there.")
+                                         .c_str());
+            }
+            break;
+        }
+        case DataType::kListType:
+        {
+            const ListType *a = dynamic_cast<const ListType *>(t);
+            assert(a);
+            info["type"] = "list";
+            info["elementType"] = getTypeInfo(a->getElementType());
+            break;
+        }
         case DataType::kStructType:
+        {
             info["type"] = "struct";
             break;
+        }
         case DataType::kUnionType:
         {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             info["type"] = "union";
 
-            // Set discriminator field name.
-            std::string discriminatorName = unionType->getDiscriminatorName();
-            info["discriminatorName"] = discriminatorName;
+            // Different request for encapsulated and nonencapsulated unions
+            if (unionType->isNonEncapsulatedUnion())
+            {
+                info["isNonEncapsulatedUnion"] = true;
+                info["discriminatorName"] = "discriminator";
+            }
+            else
+            {
+                // Set discriminator field name.
+                string discriminatorName = unionType->getDiscriminatorName();
+                info["discriminatorName"] = discriminatorName;
 
-            // Fill in discriminator type info.
-            Symbol *discriminatorSym = unionType->getParentStruct()->getScope().getSymbol(discriminatorName);
-            if (!discriminatorSym)
-            {
-                throw semantic_error(format_string("unable to find union discriminator '%s' in struct", discriminatorName.c_str()));
+                // Fill in discriminator type info.
+                Symbol *discriminatorSym = unionType->getParentStruct()->getScope().getSymbol(discriminatorName);
+                if (!discriminatorSym)
+                {
+                    throw semantic_error(
+                        format_string("unable to find union discriminator '%s' in struct", discriminatorName.c_str()));
+                }
+                StructMember *discriminatorMember = dynamic_cast<StructMember *>(discriminatorSym);
+                if (!discriminatorMember)
+                {
+                    throw internal_error(format_string("union discriminator is not a struct member"));
+                }
+                info["discriminatorType"] = getTypeInfo(discriminatorMember->getDataType());
             }
-            StructMember *discriminatorMember = dynamic_cast<StructMember*>(discriminatorSym);
-            if (!discriminatorMember)
-            {
-                throw internal_error(format_string("union discriminator is not a struct member"));
-            }
-            info["discriminatorType"] = getTypeInfo(discriminatorMember->getDataType());
 
             data_list unionCases;
             for (auto unionCase : unionType->getCases())
@@ -661,16 +697,18 @@ cpptempl::data_map PythonGenerator::getTypeInfo(DataType *t)
             info["cases"] = unionCases;
             break;
         }
-        case DataType::kAliasType:
-            info = getTypeInfo(t->getTrueDataType());
+        case DataType::kVoidType:
+        {
+            info["type"] = "void";
             break;
+        }
         default:
             throw internal_error("unknown data type");
     }
     return info;
 }
 
-std::string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
+string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
 {
     switch (t->getBuiltinType())
     {
@@ -705,9 +743,9 @@ std::string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
     }
 }
 
-std::string PythonGenerator::filterName(const std::string & name)
+string PythonGenerator::filterName(const string &name)
 {
-    std::string result = name;
+    string result = name;
     if (result.size() >= m_suffixStripSize)
     {
         size_t pos = result.size() - m_suffixStripSize;
@@ -719,26 +757,13 @@ std::string PythonGenerator::filterName(const std::string & name)
     return result;
 }
 
-std::string PythonGenerator::convertComment(const std::string & comment, comment_type commentType)
+string PythonGenerator::convertComment(const string &comment, comment_type commentType)
 {
     // Longer patterns are ordered earlier than similar shorter patterns.
-    static const char * const kCommentBegins[] = {
-            "//!<",
-            "//!",
-            "///<",
-            "///",
-            "/*!<",
-            "/*!",
-            "/**<",
-            "/**",
-            0
-        };
-    static const char * const kCommentEnds[] = {
-            "*/",
-            0
-        };
+    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
+    static const char *const kCommentEnds[] = { "*/", 0 };
 
-    std::string result = stripWhitespace(comment);
+    string result = stripWhitespace(comment);
     int32_t i;
     uint32_t n;
 
@@ -751,7 +776,7 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
     for (i = 0; kCommentBegins[i] != 0; ++i)
     {
         size_t p = result.find(kCommentBegins[i]);
-        if (p != std::string::npos)
+        if (p != string::npos)
         {
             // Remove the comment begin from the result.
             size_t l = strlen(kCommentBegins[i]);
@@ -770,7 +795,7 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
     for (i = 0; kCommentEnds[i] != 0; ++i)
     {
         size_t p = result.rfind(kCommentEnds[i]);
-        if (p != std::string::npos)
+        if (p != string::npos)
         {
             // Remove the comment end from the result.
             result = result.substr(0, p);
@@ -784,18 +809,8 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
     size_t p = 0;
     while (p < result.size())
     {
-        // Find the next newline.
-        p = result.find('\n', p + 1);
-        if (p == std::string::npos)
-        {
-            break;
-        }
-        // Skip over the newline that we want to keep.
-        ++p;
-
         // Erase over any whitespace, except newlines.
-        n = 0;
-        for (; p + n < result.size(); ++n)
+        for (n = 0; p + n < result.size(); ++n)
         {
             char c = result[p + n];
             if (c != ' ' && c != '\t')
@@ -814,11 +829,11 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
         }
 
         // Look for comment line headers.
-        if (result[p] == '/' && result[p+1] == '/' && result[p+2] == '!')
+        if (result[p] == '/' && result[p + 1] == '/' && result[p + 2] == '!')
         {
             result.erase(p, 3);
         }
-        else if (result[p] == '/' && result[p+1] == '/')
+        else if (result[p] == '/' && result[p + 1] == '/')
         {
             result.erase(p, 2);
         }
@@ -829,26 +844,42 @@ std::string PythonGenerator::convertComment(const std::string & comment, comment
 
         // Insert Python line comment start.
         result.insert(p, "#");
+
+        // Find the next newline.
+        p = result.find('\n', p + 1);
+        if (p == string::npos)
+        {
+            break;
+        }
+        // Skip over the newline that we want to keep.
+        ++p;
     }
 
     // Return comment converted to Python form.
-    return (commentType == kInlineComment
-        ? "# " + result
-        : "# " + result); // "\"\"\"" + result + " \"\"\"");
+    return result;
 }
 
-std::string PythonGenerator::stripWhitespace(const std::string & s)
+bool PythonGenerator::checkWhitspaceChar(char c)
 {
-    std::string result = s;
+    if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
+    {
+        return true;
+    }
+    return false;
+}
+
+string PythonGenerator::stripWhitespace(const string &s)
+{
+    string result = s;
     int32_t i;
     uint32_t n;
 
     // Strip leading whitespace.
-    n = 0;
-    for (i = 0; i < result.size(); ++i, ++n)
+    for (n = 0, i = 0; i < result.size(); ++i, ++n)
     {
         char c = result[i];
-        if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
+
+        if ((i < result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
         {
             break;
         }
@@ -859,11 +890,10 @@ std::string PythonGenerator::stripWhitespace(const std::string & s)
     }
 
     // Strip trailing whitespace.
-    n = 0;
-    for (i = result.size() - 1; i > 0; --i, ++n)
+    for (n = 0, i = result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
-        if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
+        if (!checkWhitspaceChar(c))
         {
             break;
         }
@@ -876,3 +906,35 @@ std::string PythonGenerator::stripWhitespace(const std::string & s)
     return result;
 }
 
+void PythonGenerator::initPythonReservedWords()
+{
+    // Python reserved words
+    reserverdWords.insert("and");
+    reserverdWords.insert("assert");
+    reserverdWords.insert("break");
+    reserverdWords.insert("class");
+    reserverdWords.insert("continue");
+    reserverdWords.insert("def");
+    reserverdWords.insert("del");
+    reserverdWords.insert("elif");
+    reserverdWords.insert("else");
+    reserverdWords.insert("except");
+    reserverdWords.insert("exec");
+    reserverdWords.insert("finally");
+    reserverdWords.insert("for");
+    reserverdWords.insert("from");
+    reserverdWords.insert("global");
+    reserverdWords.insert("if");
+    reserverdWords.insert("import");
+    reserverdWords.insert("in");
+    reserverdWords.insert("is");
+    reserverdWords.insert("lambda");
+    reserverdWords.insert("not");
+    reserverdWords.insert("or");
+    reserverdWords.insert("pass");
+    reserverdWords.insert("print");
+    reserverdWords.insert("raise");
+    reserverdWords.insert("return");
+    reserverdWords.insert("try");
+    reserverdWords.insert("while");
+}

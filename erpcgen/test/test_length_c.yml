@@ -1,0 +1,186 @@
+---
+name: in list param
+desc: verify in list params with @length
+params:
+  dir:
+    - "in"
+    - "inout"
+idl: |
+  interface foo {
+    bar(list<bool> l @length(c), {dir} uint32 c) -> void
+  }
+test_client.cpp:
+  - if: dir == 'inout'
+    then:
+      - codec->startWriteList(*c);
+      - codec->write(l[listCount0])
+      - not: codec->write
+      - codec->read
+    else:
+      - codec->startWriteList(c);
+      - codec->write(l[listCount0])
+      - not: codec->write
+      - not: codec->read
+test_server.cpp:
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - c = lengthTemp_0;
+  - codec->read(&l[listCount0])
+  - if: dir == 'inout'
+    then:
+      - not: codec->read
+      - codec->write
+    else:
+      - not: codec->read
+      - not: codec->write
+
+---
+name: out list param
+desc: verify out list params with @length
+params:
+  dir:
+    - "out"
+    - "inout"
+idl: |
+  interface foo {
+    bar(out list<bool> l @length(c) @max_length(10), {dir} uint32 c) -> void
+  }
+test_client.cpp:
+  - if: dir == 'inout'
+    then:
+      - codec->write(*c)
+    else:
+     - not: codec->write
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "*c = lengthTemp_0;"
+  - codec->read(&l[listCount0])
+  - not: codec->read
+test_server.cpp:
+  - if: dir == 'inout'
+    then:
+      - codec->read(&c)
+    else:
+     - not: codec->read
+  - codec->startWriteList(c);
+  - codec->write(l[listCount0])
+  - not: codec->write
+
+---
+name: inout list param
+desc: verify inout list params with @length
+idl: |
+  interface foo {
+    bar(inout list<bool> l @length(c) @max_length(10), inout uint32 c) -> void
+  }
+test_client.cpp:
+  - codec->startWriteList(*c);
+  - not: codec->write(*c)
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "*c = lengthTemp_0;"
+  - not: codec->read(c)
+test_server.cpp:
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - "c = lengthTemp_0;"
+  - not: codec->read(c)
+  - codec->startWriteList(c);
+  - not: codec->write(c)
+
+---
+name: other param
+desc: verify non-list in/out/inout params with @length
+params:
+  dir:
+    - in
+    - out
+    - inout
+  type:
+#    - string
+    - binary
+idl: |
+  interface foo {
+    bar({dir} {type} v @length(c) @max_length(10), {dir} uint32 c) -> void
+  }
+test_client.cpp:
+  - if: dir in ('in',)
+    then:
+      - codec->writeBinary(c, v);
+  - if: dir in ('inout',)
+    then:
+      - codec->writeBinary(*c, v);
+  - not: codec->write
+  - if: dir in ('out','inout')
+    then:
+      - uint32_t lengthTemp_0;
+      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - "*c = lengthTemp_0;"
+  - not: codec->read
+test_server.cpp:
+  - if: dir in ('in', 'inout')
+    then:
+      - uint32_t lengthTemp_0;
+      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - c = lengthTemp_0;
+  - not: codec->read
+  - if: dir in ('out', 'inout')
+    then:
+      - codec->writeBinary(c, v);
+  - not: codec->write
+
+---
+name: list struct
+desc: verify lists with @length in struct
+params:
+ members: # struct parameters in either order
+   - |
+     uint32 cnt
+     list<bool> spoon @length(cnt)
+   - |
+     list<bool> spoon @length(cnt)
+     uint32 cnt
+idl: |
+ struct Fork {
+   {members}
+ }
+ interface foo {
+   bar(in Fork f) -> void
+ }
+test_client.cpp:
+  - write_Fork_struct
+  - not: codec->write(cnt)
+  - codec->startWriteList(data->cnt);
+  - not: codec->write(cnt)
+
+test_server.cpp:
+  - read_Fork_struct
+  - not: codec->read(&cnt)
+  - uint32_t lengthTemp_0;
+  - codec->startReadList(&lengthTemp_0);
+  - data->cnt = lengthTemp_0;
+  - not: codec->read(&cnt)
+
+---
+name: other struct
+desc: verify non-list struct members with @length
+params:
+  type:
+#    - string
+    - binary
+idl: |
+ struct Fork {
+     uint32 cnt
+     {type} spoon @length(cnt)
+ }
+ interface foo {
+   bar(in Fork f) -> void
+ }
+test_client.cpp:
+  - codec->writeBinary(data->cnt, data->spoon);
+  - not: codec->write(data->cnt)
+test_server.cpp:
+  - uint32_t lengthTemp_0;
+  - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+  - data->cnt = lengthTemp_0;
+  - not: codec->read(&data->cnt);

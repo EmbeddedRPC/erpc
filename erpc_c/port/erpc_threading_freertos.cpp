@@ -1,36 +1,17 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_threading.h"
-#include "task.h"
-#include <time.h>
+#include <cassert>
 #include <errno.h>
+
+#if ERPC_THREADS_IS(FREERTOS)
 
 using namespace erpc;
 
@@ -66,9 +47,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread()
-{
-}
+Thread::~Thread(void) {}
 
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
@@ -87,13 +66,9 @@ void Thread::start(void *arg)
     // which will scan the linked list.
     taskENTER_CRITICAL();
 
-    xTaskCreate(
-        threadEntryPointStub,
-        (m_name ? m_name : "task"),
-        ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
-        this,
-        m_priority,
-        &m_task);
+    (void)xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
+                      ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
+                      this, m_priority, &m_task);
 
     // Link in this thread to the list.
     if (s_first)
@@ -102,7 +77,7 @@ void Thread::start(void *arg)
     }
     s_first = this;
 
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
 }
 
 bool Thread::operator==(Thread &o)
@@ -125,7 +100,7 @@ Thread *Thread::getCurrentThread()
         }
         it = it->m_next;
     }
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
     return it;
 }
 
@@ -136,7 +111,7 @@ void Thread::sleep(uint32_t usecs)
 #endif
 }
 
-void Thread::threadEntryPoint()
+void Thread::threadEntryPoint(void)
 {
     if (m_entry)
     {
@@ -147,10 +122,8 @@ void Thread::threadEntryPoint()
 void Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
-    {
-        _this->threadEntryPoint();
-    }
+    assert(_this && "Reinterpreting 'void *arg' to 'Thread *' failed.");
+    _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
     taskENTER_CRITICAL();
@@ -158,31 +131,31 @@ void Thread::threadEntryPointStub(void *arg)
     Thread *prev = NULL;
     while (it)
     {
-        if (it == this)
+        if (it == _this)
         {
             if (it == s_first)
             {
-                s_first = m_next;
+                s_first = _this->m_next;
             }
             else if (prev)
             {
-                prev->m_next = m_next;
+                prev->m_next = _this->m_next;
             }
-            m_next = NULL;
+            _this->m_next = NULL;
 
             break;
         }
         prev = it;
         it = it->m_next;
     }
-    taskEXIT_CRITICAL()
+    taskEXIT_CRITICAL();
 
-    // Handle a task returning from its function. Delete or suspend the task, if the API is
-    // available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
-    // is available, the loop sleeps this task the maximum time each cycle. If not, it just
-    // yields.
+// Handle a task returning from its function. Delete or suspend the task, if the API is
+// available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
+// is available, the loop sleeps this task the maximum time each cycle. If not, it just
+// yields.
 #if INCLUDE_vTaskDelete
-    m_task = 0;
+    _this->m_task = 0;
     vTaskDelete(NULL);
 #elif INCLUDE_vTaskSuspend
     vTaskSuspend(NULL);
@@ -191,38 +164,38 @@ void Thread::threadEntryPointStub(void *arg)
     {
 #if INCLUDE_vTaskDelay
         vTaskDelay(portMAX_DELAY);
-#else // INCLUDE_vTaskDelay
+#else  // INCLUDE_vTaskDelay
         taskYIELD();
 #endif // INCLUDE_vTaskDelay
     }
 #endif // INCLUDE_vTaskDelete
 }
 
-Mutex::Mutex()
+Mutex::Mutex(void)
 : m_mutex(0)
 {
     m_mutex = xSemaphoreCreateMutex();
 }
 
-Mutex::~Mutex()
+Mutex::~Mutex(void)
 {
     vSemaphoreDelete(m_mutex);
 }
 
-bool Mutex::tryLock()
+bool Mutex::tryLock(void)
 {
     // Pass a zero timeout to poll the mutex.
     return xSemaphoreTakeRecursive(m_mutex, 0);
 }
 
-bool Mutex::lock()
+bool Mutex::lock(void)
 {
-    xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
+    return xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
 }
 
-bool Mutex::unlock()
+bool Mutex::unlock(void)
 {
-    xSemaphoreGiveRecursive(m_mutex);
+    return xSemaphoreGiveRecursive(m_mutex);
 }
 
 Semaphore::Semaphore(int count)
@@ -232,14 +205,21 @@ Semaphore::Semaphore(int count)
     m_sem = xSemaphoreCreateCounting(0x7fffffff, count);
 }
 
-Semaphore::~Semaphore()
+Semaphore::~Semaphore(void)
 {
     vSemaphoreDelete(m_sem);
 }
 
-void Semaphore::put()
+void Semaphore::put(void)
 {
     xSemaphoreGive(m_sem);
+}
+
+void Semaphore::putFromISR(void)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 bool Semaphore::get(uint32_t timeout)
@@ -254,14 +234,15 @@ bool Semaphore::get(uint32_t timeout)
         timeout = portMAX_DELAY - 1;
     }
 #endif
-    xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS);
+    (void)xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS);
     return true;
 }
 
-int Semaphore::getCount() const
+int Semaphore::getCount(void) const
 {
     return static_cast<int>(uxQueueMessagesWaiting(m_sem));
 }
+#endif /* ERPC_THREADS_IS(FREERTOS) */
 
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

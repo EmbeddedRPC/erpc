@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -18,18 +20,7 @@ include ../mk/erpc_common.mk
 .NOTPARALLEL:
 
 # Unit test directories.
-SUBDIRS = \
-		test_annotations \
-		test_arrays \
-		test_binary \
-		test_builtin \
-		test_const \
-		test_doxyComments \
-		test_enums \
-		test_lists \
-		test_struct \
-		test_typedef \
-		test_unions
+SUBDIRS =  $(shell echo test_*)
 
 .PHONY: all
 all : $(SUBDIRS)

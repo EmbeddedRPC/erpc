@@ -44,7 +44,7 @@
 #define _options_h
 
 #ifdef USE_STDIO
-#include <stdio.h>
+#include <cstdio>
 #else
 #include <iostream>
 #endif
@@ -55,6 +55,7 @@ class OptIter
 {
 public:
     OptIter(void) {}
+
     virtual ~OptIter(void);
 
     //! curr() returns the current item in the iterator without
@@ -158,6 +159,7 @@ public:
     //! delimiters() with NO arguments returns the current set of delimiters,
     //! If an argument is given then it is used as the new set of delimiters.
     const char *delimiters(void) { return seps; }
+
     void delimiters(const char *delims) { seps = (delims) ? delims : default_delims; }
 };
 
@@ -385,20 +387,20 @@ public:
     {
         DEFAULT = 0x00,    //!< Default setting
         ANYCASE = 0x01,    //!< Ignore case when matching short-options
-        QUIET = 0x02,      //!< Dont print error messages
+        QUIET = 0x02,      //!< Don't print error messages
         PLUS = 0x04,       //!< Allow "+" as a long-option prefix
-        SHORT_ONLY = 0x08, //!< Dont accept long-options
-        LONG_ONLY = 0x10,  //!< Dont accept short-options
+        SHORT_ONLY = 0x08, //!< Don't accept long-options
+        LONG_ONLY = 0x10,  //!< Don't accept short-options
                            //!< (also allows "-" as a long-option prefix).
         NOGUESSING = 0x20, //!< Normally, when we see a short (long) option
-                           //!< on the command line that doesnt match any
+                           //!< on the command line that doesn't match any
                            //!< known short (long) options, then we try to
                            //!< "guess" by seeing if it will match any known
                            //!< long (short) option. Setting this mask prevents
                            //!< this "guessing" from occurring.
         PARSE_POS = 0x40   //!< By default, Options will not present positional
                            //!< command-line arguments to the user and will
-                           //!< instead stop parsing when the first positonal
+                           //!< instead stop parsing when the first positional
                            //!< argument has been encountered. If this flag
                            //!< is given, Options will present positional
                            //!< arguments to the user with a return code of
@@ -423,12 +425,16 @@ public:
 
     //! name() returns the command name
     const char *name(void) const { return cmdname; }
+
     //! ctrls() (with no arguments) returns the existing control settings
     unsigned ctrls(void) const { return optctrls; }
+
     //! ctrls() (with 1 argument) sets new control settings
     void ctrls(unsigned newctrls) { optctrls = newctrls; }
+
     //! reset for another pass to parse for options
     void reset(void) { nextchar = listopt = NULL; }
+
     //! usage() prints options usage (followed by any positional arguments
     //! listed in the parameter "positionals") on the given outstream
     void usage(std::ostream &os, const char *positionals) const;

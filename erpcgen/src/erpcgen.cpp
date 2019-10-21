@@ -1,57 +1,34 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cstdint>
-#include <stdlib.h>
-#include <stdexcept>
-#include <vector>
-#include "options.h"
-#include "Logging.h"
-#include "AstNode.h"
-#include "ErpcLexer.h"
-#include "AstWalker.h"
-#include "erpcgen_parser.tab.hpp"
-#include "InterfaceDefinition.h"
+#include "erpc_version.h"
 #include "CGenerator.h"
+#include "ErpcLexer.h"
+#include "InterfaceDefinition.h"
+#include "Logging.h"
 #include "PythonGenerator.h"
-#include "types/Program.h"
 #include "SearchPath.h"
 #include "UniqueIdChecker.h"
-#include "erpcgen_version.h"
+#include "options.h"
+#include "types/Program.h"
+#include <cstdint>
+#include <cstdlib>
+#include <stdexcept>
+#include <vector>
 
 /*!
  * @brief Entry point for the tool.
  */
 int main(int argc, char *argv[], char *envp[]);
 
-namespace erpcgen
-{
+namespace erpcgen {
+using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,14 +37,19 @@ namespace erpcgen
 const char k_toolName[] = "erpcgen";
 
 /*! Current version number for the tool. */
-const char k_version[] = ERPCGEN_VERSION;
+const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright (c) 2014-2016 Freescale Semiconductor, Inc.";
+const char k_copyright[] = "Copyright 2016-2018 NXP. All rights reserved.";
 
-static const char *k_optionsDefinition[] = {
-    "?|help", "V|version", "o:output <filePath>", "v|verbose", "I:path <filePath>", "g:generate <language>", NULL
-};
+static const char *k_optionsDefinition[] = { "?|help",
+                                             "V|version",
+                                             "o:output <filePath>",
+                                             "v|verbose",
+                                             "I:path <filePath>",
+                                             "g:generate <language>",
+                                             "c:codec <codecType>",
+                                             NULL };
 
 /*! Help string. */
 const char k_usageText[] =
@@ -78,10 +60,14 @@ const char k_usageText[] =
   -v/--verbose                 Print extra detailed log information\n\
   -I/--path <filePath>         Add search path for imports\n\
   -g/--generate <language>     Select the output language (default is C)\n\
+  -c/--codec <codecType>       Specify used codec type\n\
 \n\
 Available languages (use with -g option):\n\
   c    C/C++\n\
   py   Python\n\
+\n\
+Available codecs (use with --c option):\n\
+  basic   BasicCodec\n\
 \n";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,16 +98,17 @@ protected:
         kPythonLanguage,
     }; /*!< Generated outputs format. */
 
-    typedef vector<string> string_vector_t;
+    typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
 
-    int m_argc;                   /*!< Number of command line arguments. */
-    char **m_argv;                /*!< String value for each command line argument. */
-    StdoutLogger *m_logger;       /*!< Singleton logger instance. */
-    verbose_type_t m_verboseType; /*!< Which type of log is need to set (warning, info, debug). */
-    const char *m_outputFilePath; /*!< Path to the output file. */
-    const char *m_ErpcFile;       /*!< ERPC file. */
-    string_vector_t m_positionalArgs;
-    languages_t m_outputLanguage; /*!< Output language we're generating. */
+    int m_argc;                           /*!< Number of command line arguments. */
+    char **m_argv;                        /*!< String value for each command line argument. */
+    StdoutLogger *m_logger;               /*!< Singleton logger instance. */
+    verbose_type_t m_verboseType;         /*!< Which type of log is need to set (warning, info, debug). */
+    const char *m_outputFilePath;         /*!< Path to the output file. */
+    const char *m_ErpcFile;               /*!< ERPC file. */
+    string_vector_t m_positionalArgs;     /*!< Positional arguments. */
+    languages_t m_outputLanguage;         /*!< Output language we're generating. */
+    InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
 
 public:
     /*!
@@ -140,6 +127,7 @@ public:
     , m_outputFilePath(NULL)
     , m_ErpcFile(NULL)
     , m_outputLanguage(kCLanguage)
+    , m_codec(InterfaceDefinition::kNotSpecified)
     {
         // create logger instance
         m_logger = new StdoutLogger();
@@ -151,6 +139,7 @@ public:
      * @brief Destructor.
      */
     ~erpcgenTool() {}
+
     /*!
      * @brief Reads the command line options passed into the constructor.
      *
@@ -216,6 +205,21 @@ public:
                     else
                     {
                         Log::error(format_string("error: unknown language %s", lang.c_str()).c_str());
+                        return 1;
+                    }
+                    break;
+                }
+
+                case 'c':
+                {
+                    string codec = optarg;
+                    if (codec.compare("basic") == 0)
+                    {
+                        m_codec = InterfaceDefinition::kBasicCodec;
+                    }
+                    else
+                    {
+                        Log::error(format_string("error: unknown codec type %s", codec.c_str()).c_str());
                         return 1;
                     }
                     break;
@@ -304,7 +308,7 @@ public:
             uniqueIdCheck.makeIdsUnique(def);
 
             boost::filesystem::path filePath(m_ErpcFile);
-            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath);
+            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath, m_codec);
 
             switch (m_outputLanguage)
             {
@@ -333,13 +337,13 @@ public:
     /*!
      * @brief Validate arguments that can be checked.
      *
-     * @exception std::runtime_error Thrown if an argument value fails to pass validation.
+     * @exception runtime_error Thrown if an argument value fails to pass validation.
      */
     void checkArguments()
     {
         //      if (m_outputFilePath == NULL)
         //      {
-        //          throw std::runtime_error("no output file was specified");
+        //          throw runtime_error("no output file was specified");
         //      }
     }
 

@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -33,16 +35,16 @@ TCP_SERVER_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(SERVER_NAME)/$(DEBUG_OR_
 all: test_lib test_client test_server
 
 .PHONY: test_lib
-test_lib:
+test_lib: erpcgen
 	@$(call printmessage,build,Building, test_lib,gray,,,\n)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test_lib.mk
 
 # Unit Test Targets
 .PHONY: test-tcp
-test-tcp: test_client_tcp test_server_tcp
+test-tcp: test_lib test_client_tcp test_server_tcp
 
 .PHONY: test-serial
-test-serial: test_client_serial test_server_serial
+test-serial: test_lib test_client_serial test_server_serial
 
 .PHONY: fresh
 fresh: clean all
@@ -57,8 +59,12 @@ test_client_tcp: erpcgen
 
 .PHONY: test_client_serial
 test_client_serial: erpcgen
+ifneq "$(TEST_NAME)" "test_arbitrator"
 	@$(call printmessage,build,Building, $(CUR_DIR) $@ ,gray,,,\n)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test.mk TEST_NAME=$(CUR_DIR) TYPE=CLIENT TRANSPORT=serial
+else
+	@$(call printmessage,green,Skipping, $(CUR_DIR) $@ ,gray,,,\n)
+endif
 
 .PHONY: test_server
 test_server: test_server_tcp test_server_serial
@@ -70,8 +76,12 @@ test_server_tcp: erpcgen
 
 .PHONY: test_server_serial
 test_server_serial: erpcgen
+ifneq "$(TEST_NAME)" "test_arbitrator"
 	@$(call printmessage,build,Building, $(CUR_DIR) $@ ,gray,,,\n)
 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -f $(TEST_DIR)/mk/test.mk TEST_NAME=$(CUR_DIR) TYPE=SERVER TRANSPORT=serial
+else
+	@$(call printmessage,green,Skipping, $(CUR_DIR) $@ ,gray,,,\n)
+endif
 
 .PHONY: erpcgen
 erpcgen:

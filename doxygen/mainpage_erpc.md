@@ -11,6 +11,6 @@ Here is a block diagram of an RPC system:
 
 ![](./rpc_block_diagram.png)
 
-This diagram only shows one direction of communication; it leaves out the reply from the server to send the invoked function's return value. This reply uses basically the same sequence of events, but flowing back from the server to the client.
+This diagram only shows one direction of communication. It leaves out the reply from the server to send the invoked function's return value. This reply uses basically the same sequence of events, but flows back from the server to the client.
 
 RPC implementations typically use combination of a tool (`erpcgen` in our case) and IDL (interface definition language) file to generate source code to handle the details of marshalling a function's parameters and building the data stream. The tool also generates code for a server side shim that knows how to unmarshal a request and call the appropriate function. The IDL input is used to tell the generator tool about data types and RPC services.

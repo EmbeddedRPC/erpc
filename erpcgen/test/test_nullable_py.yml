@@ -17,7 +17,7 @@ test/client.py:
   - v._write
 test/server.py:
   - def _handle_
-  - 'if not inCodec.read_null_flag():'
+  - 'if not codec.read_null_flag():'
   - Vector()._read
   - else
   - v = None
@@ -35,16 +35,10 @@ idl: |
 lang: py
 test/client.py:
   - assert type(v) is erpc.Reference
-  - read_null_flag
   - Vector()._read
-  - else
-  - v.value = None
 test/server.py:
   - v = erpc.Reference
-  - re: if v.value is None
-  - write_null_flag(True
-  - else
-  - write_null_flag(False
+  - 'if v.value != None:'
   - v.value._write
 
 ---
@@ -69,7 +63,6 @@ test/common.py:
     then:
       - start_read_list
       - re: read_[a-z]+
-      - end_read_list
     else:
       - read_string
   - else
@@ -83,6 +76,5 @@ test/common.py:
     then:
       - start_write_list
       - write_bool
-      - end_write_list
     else:
       - write_string

@@ -40,15 +40,15 @@
 //    - Added PARSE_POS control flag and POSITIONAL return value.
 // ^^**************************************************************************
 
-#include <ctype.h>
-#include <string.h>
+#include <cctype>
 #include <cstdlib>
+#include <cstring>
 
 #include "options.h"
 
 using namespace std;
 
-// static const char ident[] = "@(#)Options  1.05" ;
+// static const char indent[] = "@(#)Options  1.05" ;
 
 // I need a portable version of "tolower" that does NOT modify
 // non-uppercase characters.
@@ -56,7 +56,7 @@ using namespace std;
 #define TOLOWER(c) (isupper(c) ? tolower(c) : c)
 
 // Use this to shut the compiler up about NULL strings
-#define NULLSTR (char *) NULL
+#define NULLSTR (char *)NULL
 
 // ******************************************************** insertion operators
 
@@ -114,9 +114,7 @@ static ostream cout(stdout);
 
 // ************************************************************** OptIter
 
-OptIter::~OptIter(void)
-{
-}
+OptIter::~OptIter(void) {}
 
 const char *OptIter::operator()(void)
 {
@@ -127,19 +125,13 @@ const char *OptIter::operator()(void)
 
 // ************************************************************** OptIterRwd
 
-OptIterRwd::OptIterRwd(void)
-{
-}
+OptIterRwd::OptIterRwd(void) {}
 
-OptIterRwd::~OptIterRwd(void)
-{
-}
+OptIterRwd::~OptIterRwd(void) {}
 
 // ************************************************************** OptArgvIter
 
-OptArgvIter::~OptArgvIter(void)
-{
-}
+OptArgvIter::~OptArgvIter(void) {}
 
 const char *OptArgvIter::curr(void)
 {
@@ -211,7 +203,7 @@ void OptStrTokIter::rewind(void)
     cur = ::strtok(tokstr, seps);
 }
 
-// ************************************************************* OptIstreamIter
+    // ************************************************************* OptIstreamIter
 
 #ifdef vms
 enum
@@ -641,7 +633,7 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #endif /* USE_STDIO */
 }
 
-// ******************************************************************* Options
+    // ******************************************************************* Options
 
 #if (defined(MSWIN) || defined(OS2) || defined(MSDOS))
 #define DIR_SEP_CHAR '\\'
@@ -663,9 +655,7 @@ Options::Options(const char *name, const char *const optv[])
     check_syntax();
 }
 
-Options::~Options(void)
-{
-}
+Options::~Options(void) {}
 
 // Make sure each option-specifier has correct syntax.
 //

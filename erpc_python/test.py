@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+# Copyright (c) 2016 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 from __future__ import print_function
 
 import sys

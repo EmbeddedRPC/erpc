@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _EMBEDDED_RPC__PYTHONGENERATOR_H_
@@ -39,8 +19,8 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Code generator for Python.
  */
@@ -50,7 +30,7 @@ public:
     /*!
      * @brief This function is constructor of PythonGenerator class.
      *
-     * @param[in] prog Pointer to program with generating options.
+     * @param[in] def Contains all Symbols parsed from IDL files.
      */
     PythonGenerator(InterfaceDefinition *def);
 
@@ -60,6 +40,7 @@ public:
      * This function close opened files.
      */
     virtual ~PythonGenerator() {}
+
     /*!
      * @brief This function generate output code for output files.
      *
@@ -68,9 +49,8 @@ public:
     virtual void generate();
 
 protected:
-    cpptempl::data_map m_templateData; //!< Data prepared for templates files.
     std::string m_suffixStrip; //!< String to remove from suffixes of names.
-    size_t m_suffixStripSize; //!< Length of the suffix filter string.
+    size_t m_suffixStripSize;  //!< Length of the suffix filter string.
 
     /*!
      * @brief This function prepare helpful functions located in template files.
@@ -124,24 +104,9 @@ protected:
     void generateInterfaceFile(std::string fileName);
 
     /*!
-     * @brief This function sets interfaces template data.
-     *
-     * This function sets interfaces template data with all data, which
-     * are necessary for generating output code for output files.
+     * @brief This function generate output crc16 source file.
      */
-    void makeInterfacesTemplateData();
-
-    /*!
-     * @brief This function return interface functions list.
-     *
-     * This function return interface functions list with all data, which
-     * are necessary for generating output code for output files.
-     *
-     * @param[in] iface Pointer to interface.
-     *
-     * @return Contains interface functions data.
-     */
-    cpptempl::data_list getFunctionsTemplateData(Interface *iface);
+    virtual void generateGlobalInitFile();
 
     /*!
      * @brief This function return interface function template data.
@@ -149,12 +114,21 @@ protected:
      * This function return interface function template data with all data, which
      * are necessary for generating output code for output files.
      *
+     * @param[in] group Pointer to a group.
      * @param[in] fn From this are set interface function template data.
      * @param[in] fnIndex Function index.
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Function *fn, int fnIndex);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn);
+
+    /*!
+     * @brief This function will get symbol comments and convert to language specific ones
+     *
+     * @param[in] symbol Pointer to symbol.
+     * @param[inout] symbolInfo Data map, which contains information about symbol.
+     */
+    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo);
 
     /*!
      * @brief This function return interface function prototype.
@@ -182,6 +156,18 @@ protected:
     void makeEnumsTemplateData();
 
     /*!
+     * @brief This function sets group symbols template data.
+     *
+     * This function sets group symbols template data with all data, which
+     * are necessary for generating output code for output files.
+     *
+     * @param[in] group Pointer to a group.
+     *
+     * @return Data map with group symbols templates.
+     */
+    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group);
+
+    /*!
      * @brief This function return enum members template data.
      *
      * This function return enum members template data with all data, which
@@ -199,12 +185,11 @@ protected:
     void makeAliasesTemplateData();
 
     /*!
-     * @brief This function sets structures template data.
+     * @brief This function sets function type template data.
      *
-     * This function sets structures template data with all data, which
-     * are necessary for generating output code for output files.
+     * This is used for registering callback functions in generated output.
      */
-    void makeStructsTemplateData();
+    void makeFunctionsTemplateData();
 
     /*!
      * @brief This function sets struct member information to struct data map variable.
@@ -244,19 +229,9 @@ protected:
     std::string getBuiltinTypename(const BuiltinType *t);
 
     /*!
-     * @brief Handle @length annotations on structs.
-     *
-     * Struct members are examined for @length annotations, and the length member is denoted.
-     * This function is also used on function parameters, since they are represented as structs.
-     *
-     * @param theStruct Reference to the struct type to scan and process.
-     */
-    void scanStructForLengthAnnotation(StructType *theStruct);
-
-    /*!
      * @brief Filter symbol names.
      */
-    std::string filterName(const std::string & name);
+    std::string filterName(const std::string &name);
 
     //! @brief Possible Doxygen comment styles.
     enum comment_type
@@ -277,8 +252,22 @@ protected:
 
     /*!
      * @brief Strip leading and trailing whitespace.
+     *
+     * @param[in] s String from which are stripped white spaces.
      */
     std::string stripWhitespace(const std::string &s);
+
+    /*!
+     * @brief Check if character is whitespace type.
+     *
+     * @param[in] c Checked character.
+     */
+    bool checkWhitspaceChar(char c);
+
+    /*!
+     * Stores reserved words for Python program language.
+     */
+    void initPythonReservedWords();
 };
 
 } // namespace erpcgen

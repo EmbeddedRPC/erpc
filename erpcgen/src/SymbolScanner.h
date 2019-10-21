@@ -1,51 +1,31 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017 NXP
+ * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _EMBEDDED_RPC__SYMBOLSCANNER_H_
 #define _EMBEDDED_RPC__SYMBOLSCANNER_H_
 
 #include "AstWalker.h"
-#include "types/SymbolScope.h"
-#include "types/Program.h"
-#include "types/Interface.h"
-#include "types/StructType.h"
-#include "types/EnumType.h"
-#include "types/EnumMember.h"
 #include "types/AliasType.h"
+#include "types/EnumMember.h"
+#include "types/EnumType.h"
+#include "types/Interface.h"
+#include "types/Program.h"
+#include "types/StructType.h"
+#include "types/SymbolScope.h"
 #include "types/UnionType.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace erpcgen
-{
+namespace erpcgen {
+
 /*!
  * @brief Scans for symbol names.
  */
@@ -67,7 +47,6 @@ public:
     , m_currentEnum(nullptr)
     , m_currentAlias(nullptr)
     , m_currentUnion(nullptr)
-    , m_isNewInterface(false)
     {
     }
 
@@ -88,7 +67,6 @@ public:
     , m_currentEnum(nullptr)
     , m_currentAlias(nullptr)
     , m_currentUnion(nullptr)
-    , m_isNewInterface(false)
     {
     }
 
@@ -96,6 +74,14 @@ public:
      * @brief Destructor.
      */
     virtual ~SymbolScanner() {}
+
+    /*!
+     * @brief Program is out of global symbol scope.
+     *
+     * @return Program symbol.
+     */
+    Program *getProgram() { return m_currentProgram; }
+
 protected:
     SymbolScope
         *m_globals; /*!< SymbolScope contains information about generating data types, functions, and interfaces.*/
@@ -106,7 +92,16 @@ protected:
     AliasType *m_currentAlias;                  /*!< Contains pointer to alias when alias is handled. */
     UnionType *m_currentUnion;                  /*!< Contains pointer to union when union is handled. */
     std::vector<UnionCase *> m_emptyUnionCases; /*!< Vector of union cases. */
-    bool m_isNewInterface;                      /*!< When next interface is handled. */
+    std::map<std::string, DataType *> m_forwardDeclarations; /*!< To keep forward declarations. */
+
+    /*!
+     * @brief This function is called at the end of scanning.
+     *
+     * @param[in] node Root node.
+     *
+     * @see rest of AstNode handle functions
+     */
+    virtual void handleRoot(AstNode *node, bottom_up);
 
     /*!
      * @brief This function start handle program.
@@ -243,7 +238,7 @@ protected:
      *
      * @see AstNode * SymbolScanner::handleExpr()
      * @see AstNode * SymbolScanner::handleUnaryOp()
-    */
+     */
     virtual AstNode *handleBinaryOp(AstNode *node, bottom_up);
 
     /*!
@@ -563,16 +558,7 @@ protected:
      *
      * @exception semantic_error Thrown if given ast node has not child with token type TOK_INT_LITERAL.
      */
-    uint32_t getIntExprValue(const AstNode *exprNode);
-
-    /*!
-     * @brief Determines if the datatype (aliased or not) can hold string data
-     *
-     * @param[in] constDataType Data type to check.
-     *
-     * @retval True when given data type is string, else false.
-     */
-    bool dataTypeIsAString(DataType *const constDataType);
+    uint64_t getIntExprValue(const AstNode *exprNode);
 
     /*!
      * @brief Determines if the right hand side of a constant declaration
@@ -603,6 +589,93 @@ protected:
      * @return Literal value assigned to const variable
      */
     Value *getValueForConst(AstNode *const node, DataType *const constDataType);
+
+    /*!
+     * @brief This function add annotations to vector of symbol annotations.
+     *
+     * @param[in] childTok AstNode contains annotations information.
+     * @param[in] symbol Symbol containing vector of annotations belongs to him.
+     */
+    void addAnnotations(AstNode *childTok, Symbol *symbol);
+
+    /*!
+     * @brief This function check annotation just before it will be added to symbol.
+     *
+     * @param[in] annotation Node containing information about annotation.
+     * @param[in] symbol Symbol containing vector of annotations belongs to him.
+     */
+    void checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol);
+
+    /*!
+     * @brief Helper function to get Value from annotation AstNode
+     *
+     * @param[in] annotationNode AstNode pointing to the annotation
+     *
+     * @return Value pointer for annotation
+     */
+    Value *getAnnotationValue(AstNode *annotationNode);
+
+    /*!
+     * @brief Helper function to get programming language type if specified for which is annotation intended.
+     *
+     * @param[in] annotationNode AstNode pointing to the annotation
+     *
+     * @return Programming language type.
+     */
+    Annotation::program_lang_t getAnnotationLang(AstNode *annotationNode);
+
+    /*!
+     * @brief Controlling annotations used on structure members.
+     *
+     * Struct members are examined for @length and @max_length annotations, and the length member is denoted.
+     * This function is also used on function parameters, since they are represented as structs.
+     */
+    void scanStructForAnnotations();
+
+    /*!
+     * @brief This function sets to given symbol given doxygen comments.
+     *
+     * Comments can be placed above declaration or as trailing comments.
+     *
+     * @param[in] symbol Symbol where doxygen comments will be added.
+     * @param[in] above Doxygen comments placed above.
+     * @param[in] trailing Trailing doxygen comments.
+     */
+    void addDoxygenComments(Symbol *symbol, AstNode *above, AstNode *trailing);
+
+    /*!
+     * @brief This function creates new function parameter.
+     *
+     * Function parameter information are set based on given structure member, which is
+     * param member of function type.
+     *
+     * @param[in] structMember Function type param member.
+     * @param[in] name Param name.
+     *
+     * @return new function (callback) parameter.
+     */
+    StructMember *createCallbackParam(StructMember *structMember, const std::string &name);
+
+    /*!
+     * @brief This function registers forward union/structure declarations.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void addForwardDeclaration(DataType *dataType);
+
+    /*!
+     * @brief This function unregister union/structure declarations.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void removeForwardDeclaration(DataType *dataType);
+
+    /*!
+     * @brief This function add symbol into global symbol scope.
+     *
+     * @param[in] dataType Union/structure data type.
+     */
+    void addGlobalSymbol(Symbol *symbol);
 };
 
 } // namespace erpcgen

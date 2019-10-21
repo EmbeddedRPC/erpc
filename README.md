@@ -61,14 +61,17 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [OpenAMP RPMsg](https://github.com/OpenAMP/open-amp)
 * [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 
+## Releases
+
+[eRPC releases](https://github.com/EmbeddedRPC/erpc/releases)
+
 ## Documentation
 
-[Documentation](docs/md_doc/README.md) is in the `doc/` folder.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 7199a9c00fef4b952a6b05a8e3b0257f788e4eeb.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -99,7 +102,7 @@ These build instructions apply to host PCs and embedded Linux. For bare metal or
 The primary build system is makefile based. It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests.
 
 The makefiles are compatible with gcc or clang on Linux, OS X, and Cygwin. A Windows build
-of erpcgen using Visual Studio is also available in the `erpcgen/VisualStudio_v12/` directory.
+of erpcgen using Visual Studio is also available in the `erpcgen/VisualStudio_v14/` directory.
 There is also an Xcode project file in the `erpcgen/` directory which can be used to build erpcgen
 for OS X.
 
@@ -107,12 +110,12 @@ for OS X.
 
 #### Windows
 
-Steps are described in [`erpcgen/VisualStudio_v12/readme_erpcgen.txt`](erpcgen/VisualStudio_v12/readme_erpcgen.txt).
+Steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
 
 #### Linux and Cygwin
 
 Install these packages:
-* bison: GNU yacc-complatible parser generator
+* bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
 * libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.58.0)
 * make: the GNU version of the 'make' utility
@@ -121,10 +124,14 @@ Install these packages:
 * gcc-g++: GNU Compiler Collection (C++)
 * gcc-multilib, g++-multilib (mandatory for case, when build for different architecture is needed)
 
+Mandatory for case, when build for different architecture is needed
+* gcc-multilib, g++-multilib
+* boost libraries: for target architecture like libboost-filesystem-dev:i386 libboost-system-dev:i386
+
 #### Mac OS X
 
 Install these packages with [homebrew](http://brew.sh/):
-* bison: GNU yacc-complatible parser generator
+* bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
 * boost: Boost C++ libraries
 
@@ -159,5 +166,10 @@ To install the Python infrastructure for eRPC, first change to the `erpc_python/
 
 After installation, the `erpc` package is available via normal import statements. See the [erpc_python folder readme](erpc_python/readme.md) for more.
 
+## Code providing:
+
+Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
+
 ---
 Copyright © 2014-2016 Freescale Semiconductor, Inc.
+Copyright © 2016-2017 NXP

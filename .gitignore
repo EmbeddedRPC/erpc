@@ -26,11 +26,13 @@
 ._*
 .DS_Store
 *.swp
+*.tmp
 
 #
 # Top-level generic files
 #
-release
+[rR]elease
+[dD]ebug
 *_release
 tags
 TAGS
@@ -76,6 +78,7 @@ workspace
 # Python bytecode
 *.pyc
 __pycache__
+.pytest_cache
 
 # IAR temp files
 EW*.tmp
@@ -85,11 +88,19 @@ DerivedData/
 Build/
 
 # Generated output
-Debug/
-Release/
 erpcgen-output
 *.stackdump
+*.tags*
+/lib
+armgcc
+gcc
+atl
+kds
+iar
+mdk
+lpcx
+mcux
+tags
 
+format-files-to-commit.rb
 language\.settings\.xml
-
-

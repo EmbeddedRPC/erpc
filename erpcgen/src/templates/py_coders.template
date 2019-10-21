@@ -6,6 +6,12 @@
 {$name}._write({$codec}){%>%}
 {#--------------- union ---------------#}
 {% elif info.type == "union" %}
+{%  if info.isNonEncapsulatedUnion%}
+{%   set self = "" %}
+{% else %}
+{%   set self = "self." %}
+{%  endif %}
+codec.start_write_union({$self}discriminator)
 {# unions are always within structs, so we have self available #}
 {%  set isFirst = true %}
 {%  set hasNonVoidCase = false %}
@@ -15,7 +21,7 @@
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{% if not isFirst %}{$indent}{% endif %}{$"if" if isFirst else "elif"} self.{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if {$name}.{$cm.name} is None:
@@ -53,7 +59,7 @@
 {%   endif -- defaultCase.isVoid %}
 {%  elif hasNonVoidCase %}
 {$indent}else:
-{$indent}    raise ValueError("invalid union discriminator value %s" % repr(self.{$info.discriminatorName}))
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- defaultCase/hasNonVoidCase %}
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
@@ -71,9 +77,13 @@
 {%  endif %}
 {%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
 {$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}
-{%  if info.type == "list" %}
-{$indent}{$codec}.end_write_list()
-{%  endif %}
+{#--------------- function ---------------#}
+{% elif info.type == "function" %}
+{%  if info.tableName != "" %}
+{$codec}.write_int32({$ info.tableName}.index({$name})){%>%}
+{%  else %}
+# When are defined less than 2 callback functions, eRPC don't need serialize any code.
+{%  endif%}
 {#--------------- else ---------------#}
 {% else %}
 {$codec}.write_{$info.type}({$name}){%>%}
@@ -87,8 +97,15 @@
 {$name} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
 {#--------------- union ---------------#}
 {% elif info.type == "union" %}
-{# unions are always within structs, so we have self available #}
-{$name} = {$name}_union()
+{%  if info.isNonEncapsulatedUnion %}
+{%   set self = "" %}
+{%  else %}
+{%   set self = "self." %}
+{%  endif %}
+{$self}discriminator = codec.start_read_union()
+{%  if self == "self." %}
+{$indent}{$name} = {$name}_union()
+{% endif %}
 {%  set isFirst = true %}
 {%  set hasNonVoidCase = false %}
 {%  set defaultCase = false %}
@@ -97,7 +114,7 @@
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{$indent}{$"if" if isFirst else "elif"} self.{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if not {$codec}.read_null_flag()
@@ -131,7 +148,7 @@
 {%   endif -- defaultCase.isVoid %}
 {%  elif hasNonVoidCase %}
 {$indent}else:
-{$indent}    raise ValueError("invalid union discriminator value %s" % repr(self.{$info.discriminatorName}))
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- default/hasNonVoidCase %}
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
@@ -151,9 +168,14 @@ _n{$depth} = {$codec}.start_read_list()
 {$indent}for _i{$depth} in range({% if info.type == "list" %}_n{$depth}{% else %}{$info.elementCount}{% endif %}):
 {$indent}    {$decodeValue(info.elementType, "_v" & depth, commonPrefix, codec, indent & "    ", depth + 1)}
 {$indent}    {$name}.append(_v{$depth})
-{%   if info.type == "list" %}
-{$indent}{$codec}.end_read_list()
-{%   endif %}
+{#--------------- function ---------------#}
+{% elif info.type == "function" %}
+{%  if info.tableName != "" %}
+{$name} = {$ info.tableName}[{$codec}.read_int32()]
+{%  else %}
+# When are defined less than 2 callback functions, eRPC don't need serialize any code.
+{$indent}{$name} = {$info.callbackName}
+{%  endif%}
 {#--------------- else ---------------#}
 {% else %}
 {$name} = {$codec}.read_{$info.type}(){%>%}
@@ -167,7 +189,11 @@ list<{$prettyTypeName("", info.elementType)}>{%>%}
 {% elif info.type == "array" %}
 {$prettyTypeName("", info.elementType)}[{$info.elementCount}]
 {% elif info.type == "union" %}
+{%  if info.isNonEncapsulatedUnion == true %}
+{$info.name}{%>%}
+{%  else %}
 {$name}_union{%>%}
+{% endif %}
 {% else %}
 {$info.name}{%>%}
 {% endif %}

@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016 NXP
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+import "test21.erpc"
+
+interface ArithmeticService2 {
+oneway hello5(int32 a);
+}

@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
-# Copyright (C) 2014-2015 Freescale Semiconductor, Inc. All Rights Reserved.
+# Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
+# Copyright 2016 NXP
+# All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -49,7 +51,7 @@ INC_INSTALL_DIR = $(PREFIX)/include/erpc
 # ----------------------------------------------
 
 ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
-LD := g++
+LD := $(CXX)
 PYTHON ?= python
 
 # Tool paths. Use different paths for OS X.
@@ -63,8 +65,8 @@ else ifeq "$(is_cygwin)" "1"
 FLEX ?= /bin/flex
 BISON ?= /bin/bison
 else ifeq "$(is_mingw)" "1"
-FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v12/win_flex.exe
-BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v12/win_bison.exe
+FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
+BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
 endif
 
 ifeq "$(is_mingw)" "1"

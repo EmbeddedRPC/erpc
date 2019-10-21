@@ -13,15 +13,14 @@ test/client.py:
   - start_write_list(len(l))
 test/server.py:
   - start_read_list
-  - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 
 ---
 name: out list param
 desc: verify out list params with @length
 idl: |
   interface foo {
-    bar(out list<bool> l @length(c), out int32 c) -> void
+    bar(out list<bool> l @length(c) @max_length(10), out int32 c) -> void
   }
 lang: py
 test/interface.py:
@@ -30,20 +29,19 @@ test/client.py:
   - def bar(self, l)
   - perform_request
   - start_read_list
-  - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
   - self._handler.bar(l)
-  - outCodec.start_write_message
-  - outCodec.write_int32(len(l.value))
+  - codec.start_write_message
+  - not: codec.write_int32(len(l.value))
 
 ---
 name: inout list param
 desc: verify inout list params with @length
 idl: |
   interface foo {
-    bar(inout list<bool> l @length(c), inout int32 c) -> void
+    bar(inout list<bool> l @length(c) @max_length(10), inout int32 c) -> void
   }
 lang: py
 test/interface.py:
@@ -53,16 +51,14 @@ test/client.py:
   - start_write_list(len(l))
   - perform_request
   - start_read_list
-  - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
 test/server.py:
   - def _handle_bar
   - start_read_list
-  - end_read_list
-  - inCodec.read_int32()
+  - not: codec.read_int32()
   - self._handler.bar(l)
-  - outCodec.start_write_message
-  - outCodec.write_int32(len(l.value))
+  - codec.start_write_message
+  - not: codec.write_int32(len(l.value))
 
 ---
 name: other param
@@ -73,11 +69,11 @@ params:
     - out
     - inout
   type:
-    - string
+#    - string
     - binary
 idl: |
   interface foo {
-    bar({dir} {type} v @length(c), {dir} int32 c) -> void
+    bar({dir} {type} v @length(c) @max_length(10), {dir} int32 c) -> void
   }
 lang: py
 test/client.py:
@@ -85,23 +81,23 @@ test/client.py:
   - if: dir in ('in', 'inout')
     then:
       - write_{type}(v)
-      - write_int32(len(v))
+      - not: write_int32(len(v))
   - perform_request
   - if: dir in ('inout',)
     then:
-      - v.value = inCodec.read_{type}()
-      - _ = inCodec.read_int32()
+      - v.value = codec.read_{type}()
+      - not: _ = codec.read_int32()
 test/server.py:
   - def _handle_bar
   - if: dir in ('in', 'inout')
     then:
-      - re: v(\.value)? = inCodec.read_{type}()
-      - _ = inCodec.read_int32()
+      - re: v(\.value)? = codec.read_{type}()
+      - not: _ = codec.read_int32()
       - self._handler.bar(v)
   - if: dir in ('out',)
     then:
       - write_{type}(v.value)
-      - write_int32(len(v.value))
+      - not: write_int32(len(v.value))
 
 ---
 name: list struct
@@ -131,26 +127,26 @@ test/common.py:
   - def _read
   - if: members.startswith('int32')
     then:
-      - _ = inCodec.read_int32()
+      - not: _ = codec.read_int32()
       - start_read_list
     else:
       - start_read_list
-      - _ = inCodec.read_int32()
+      - not: _ = codec.read_int32()
   - def _write
   - if: members.startswith('int32')
     then:
-      - outCodec.write_int32(self.cnt)
+      - not: codec.write_int32(self.cnt)
       - start_write_list
     else:
       - start_write_list
-      - outCodec.write_int32(self.cnt)
+      - not: codec.write_int32(self.cnt)
 
 ---
 name: other struct
 desc: verify non-list struct members with @length
 params:
   type:
-    - string
+#    - string
     - binary
 idl: |
  struct Fork {
@@ -168,8 +164,8 @@ test/common.py:
   - "@property"
   - def cnt
   - def _read
-  - _ = inCodec.read_int32()
+  - not: _ = codec.read_int32()
   - read_{type}
   - def _write
-  - outCodec.write_int32(self.cnt)
+  - not: codec.write_int32(self.cnt)
   - write_{type}

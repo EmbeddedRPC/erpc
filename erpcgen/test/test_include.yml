@@ -1,0 +1,44 @@
+---
+name: python import
+desc:
+idl: |
+  @include("sys")
+  program test
+
+  interface foo {
+    bar(in string x) -> void
+  }
+lang: py
+test/common.py:
+  - import sys
+---
+name: C include
+desc:
+idl: |
+  @include("stdio.h")
+  program test;
+
+  interface foo {
+    bar(in string x) -> void
+  }
+test.h:
+  - '#include "stdio.h"'
+---
+name: C include two interfaces
+desc:
+idl: |
+  program test;
+
+  @include("stdio.h")
+  @include("stdio.h")
+  interface fooA {
+    barA(in string xA) -> void
+  }
+
+  @include("stdio.h")
+  interface fooB {
+    barB(in string xB) -> void
+  }
+test_server.cpp:
+  - '#include "stdio.h"'
+  - not: '#include "stdio.h"'
