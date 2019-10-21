@@ -115,6 +115,21 @@ erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long 
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
+erpc_status_t RPMsgTTYRTOSTransport::deinit(void)
+{
+    if (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg))
+    {
+        return kErpcStatus_DeinitFailed;
+    }
+
+    if (RL_SUCCESS != rpmsg_queue_destroy(s_rpmsg, m_rpmsg_ept))
+    {
+        return kErpcStatus_DeinitFailed;
+    }
+
+    return kErpcStatus_Success;
+}
+
 erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
 {
     assert(m_crcImpl && "Uninitialized Crc16 object.");

@@ -66,6 +66,9 @@ enum _erpc_status
     //! Transport layer initialization failed.
     kErpcStatus_InitFailed,
 
+    //! Transport layer deinitialization failed.
+    kErpcStatus_DeinitFailed,
+
     //! Failed to receive data.
     kErpcStatus_ReceiveFailed,
 
