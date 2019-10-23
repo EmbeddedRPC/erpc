@@ -37,8 +37,31 @@ RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
 
 RPMsgTTYRTOSTransport::~RPMsgTTYRTOSTransport(void)
 {
-    rpmsg_lite_deinit(s_rpmsg);
-    s_initialized = 0;
+    if (s_rpmsg != NULL)
+    {
+        if (m_rpmsg_ept != RL_NULL)
+        {
+            if (RL_SUCCESS != rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept))
+            {
+                return;
+            }
+        }
+
+        if (m_rpmsg_queue != RL_NULL)
+        {
+            if (RL_SUCCESS != rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue))
+            {
+                return;
+            }
+        }
+
+        if (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg))
+        {
+            return;
+        }
+
+        s_initialized = 0;
+    }
 }
 
 void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
