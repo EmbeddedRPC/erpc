@@ -249,11 +249,11 @@ private:
 #elif ERPC_THREADS_IS(MBED)
 
     /*!
-	* @brief This function execute threadEntryPoint function.
-	*
-	* @param[in] arg Thread to execute.
-	*/
-   static void threadEntryPointStub(void *arg);
+    * @brief This function execute threadEntryPoint function.
+    *
+    * @param[in] arg Thread to execute.
+    */
+    static void threadEntryPointStub(void *arg);
 
 #endif
 
@@ -442,8 +442,8 @@ private:
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_sem m_sem;     /*!< Semaphore. */
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Semaphore* m_sem;	/*!< Semaphore. */
-    int m_count;		  	/*!< Semaphore count number. */
+    rtos::Semaphore* m_sem; /*!< Semaphore. */
+    int m_count;            /*!< Semaphore count number. */
 #endif
 
 private:
