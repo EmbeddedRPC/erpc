@@ -17,12 +17,6 @@ using namespace erpc;
 
 SimpleServer::~SimpleServer(void)
 {
-    while (m_firstService != NULL)
-    {
-        Service *firstService = m_firstService;
-        m_firstService = m_firstService->getNext();
-        delete firstService;
-    }
 }
 
 void SimpleServer::disposeBufferAndCodec(Codec *codec)
