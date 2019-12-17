@@ -65,8 +65,8 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length,
-                               int rpmsg_link_id);
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                               int32_t rpmsg_link_id);
 
     /*!
      * @brief Initialization of RPMsgTransport layer - as RPMsg remote
@@ -84,7 +84,7 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id,
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, int32_t rpmsg_link_id,
                                void (*ready_cb)(void), char *nameservice_name);
 
     /*!
@@ -131,12 +131,12 @@ protected:
      *
      * @return
      */
-    static int rpmsg_read_cb(void *payload, int payload_len, unsigned long src, void *priv);
+    static int32_t rpmsg_read_cb(void *payload, uint32_t payload_len, uint32_t src, void *priv);
 
     StaticQueue<MessageBuffer, ERPC_DEFAULT_BUFFERS_COUNT>
         m_messageQueue; /*!< Received messages. Queue of messages with buffers filled in rpmsg callback. */
 
-    unsigned long m_dst_addr;                                 /*!< Destination address used by rpmsg. */
+    uint32_t m_dst_addr;                                      /*!< Destination address used by rpmsg. */
     struct rpmsg_lite_ept_static_context m_rpmsg_ept_context; /*!< RPMsg Lite Endpoint static context. */
     struct rpmsg_lite_endpoint *m_rpmsg_ept;                  /*!< Pointer to RPMsg Lite Endpoint structure. */
 

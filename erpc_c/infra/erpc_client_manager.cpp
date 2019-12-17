@@ -35,8 +35,15 @@ RequestContext ClientManager::createRequest(bool isOneway)
     return RequestContext(++m_sequence, codec, isOneway);
 }
 
-erpc_status_t ClientManager::performRequest(RequestContext &request)
+void ClientManager::performRequest(RequestContext &request)
 {
+    // Check the codec status
+    if (kErpcStatus_Success != (request.getCodec()->getStatus()))
+    {
+        // Do not perform the request
+        return;
+    }
+
 #if ERPC_NESTED_CALLS
     assert(m_serverThreadId && "server thread id was not set");
     if (Thread::getCurrentThreadId() == m_serverThreadId)
@@ -47,12 +54,13 @@ erpc_status_t ClientManager::performRequest(RequestContext &request)
     return performClientRequest(request);
 }
 
-erpc_status_t ClientManager::performClientRequest(RequestContext &request)
+void ClientManager::performClientRequest(RequestContext &request)
 {
 #if ERPC_NESTED_CALLS_DETECTION
     if (!request.isOneway() && nestingDetection)
     {
-        return kErpcStatus_NestedCallFailure;
+        request.getCodec()->updateStatus(kErpcStatus_NestedCallFailure);
+        return;
     }
 #endif
 
@@ -62,7 +70,8 @@ erpc_status_t ClientManager::performClientRequest(RequestContext &request)
     err = logMessage(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 #endif
 
@@ -70,7 +79,8 @@ erpc_status_t ClientManager::performClientRequest(RequestContext &request)
     err = m_transport->send(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 
     // If the request is oneway, then there is nothing more to do.
@@ -80,14 +90,16 @@ erpc_status_t ClientManager::performClientRequest(RequestContext &request)
         err = m_transport->receive(request.getCodec()->getBuffer());
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 
 #if ERPC_MESSAGE_LOGGING
         err = logMessage(request.getCodec()->getBuffer());
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 #endif
 
@@ -95,15 +107,16 @@ erpc_status_t ClientManager::performClientRequest(RequestContext &request)
         err = verifyReply(request);
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
     }
 
-    return kErpcStatus_Success;
+    return;
 }
 
 #if ERPC_NESTED_CALLS
-erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
+void ClientManager::performNestedClientRequest(RequestContext &request)
 {
     assert(m_transport && "transport/arbitrator not set");
 
@@ -113,7 +126,8 @@ erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
     err = logMessage(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 #endif
 
@@ -121,7 +135,8 @@ erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
     err = m_transport->send(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 
     // If the request is oneway, then there is nothing more to do.
@@ -132,14 +147,16 @@ erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
         err = m_server->run(request);
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 
 #if ERPC_MESSAGE_LOGGING
         err = logMessage(request.getCodec()->getBuffer());
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 #endif
 
@@ -147,11 +164,10 @@ erpc_status_t ClientManager::performNestedClientRequest(RequestContext &request)
         err = verifyReply(request);
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
     }
-
-    return kErpcStatus_Success;
 }
 #endif
 

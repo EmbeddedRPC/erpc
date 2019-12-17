@@ -8,7 +8,7 @@
 #define {$commonGuardMacro}
 {% if usedUnionType %}
 
-#if defined(__CC_ARM)
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 #pragma anon_unions
 #endif
 {% endif -- usedUnionType %}

@@ -40,8 +40,8 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport(void)
     s_initialized = 0;
 }
 
-erpc_status_t RPMsgRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                       unsigned long length, int rpmsg_link_id)
+erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                                       int32_t rpmsg_link_id)
 {
     if (!s_initialized)
     {
@@ -65,8 +65,8 @@ erpc_status_t RPMsgRTOSTransport::init(unsigned long src_addr, unsigned long dst
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                       int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
+erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, int32_t rpmsg_link_id,
+                                       void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -111,8 +111,8 @@ erpc_status_t RPMsgRTOSTransport::init(unsigned long src_addr, unsigned long dst
 erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 {
     char *buf = NULL;
-    int length = 0;
-    int ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
+    uint32_t length = 0;
+    int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     assert(buf);
     message->set((uint8_t *)buf, length);
     message->setUsed(length);
@@ -125,7 +125,7 @@ erpc_status_t RPMsgRTOSTransport::send(MessageBuffer *message)
     uint32_t length = message->getLength();
     uint32_t used = message->getUsed();
     message->set(NULL, 0);
-    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf, used);
+    int32_t ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf, used);
     if (ret_val == RL_SUCCESS)
     {
         return kErpcStatus_Success;

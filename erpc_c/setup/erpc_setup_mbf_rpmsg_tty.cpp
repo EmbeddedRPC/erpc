@@ -50,7 +50,7 @@ public:
     virtual MessageBuffer create(void)
     {
         void *buf = NULL;
-        unsigned long size = 0;
+        uint32_t size = 0;
         buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, TIMEOUT_MS);
 
         assert(NULL != buf);
@@ -69,7 +69,7 @@ public:
         void *tmp = (void *)buf->get();
         if (tmp)
         {
-            int ret;
+            int32_t ret;
             ret = rpmsg_lite_release_rx_buffer(m_rpmsg, (void *)(((uint8_t *)tmp) - sizeof(FramedTransport::Header)));
             if (ret != RL_SUCCESS)
             {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2019 NXP
  * All rights reserved.
  *
  *
@@ -161,8 +161,7 @@ erpc_transport_t erpc_transport_mu_init(void *baseAddr);
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr,
-                                                       int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(uint32_t src_addr, uint32_t dst_addr, int32_t rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite transport.
@@ -183,8 +182,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, u
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                       void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready,
+erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
+                                                       int32_t rpmsg_link_id, rpmsg_ready_cb ready,
                                                        char *nameservice_name);
 
 /*!
@@ -199,8 +198,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr, u
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr, unsigned long dst_addr,
-                                                            int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(uint32_t src_addr, uint32_t dst_addr,
+                                                            int32_t rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -220,9 +219,9 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_ad
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                            void *start_address, int rpmsg_link_id,
-                                                            rpmsg_ready_cb ready, char *nameservice_name);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
+                                                            int32_t rpmsg_link_id, rpmsg_ready_cb ready,
+                                                            char *nameservice_name);
 
 /*!
  * @brief Create an RPMsg-Lite TTY transport.
@@ -243,8 +242,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_ad
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                                void *start_address, int rpmsg_link_id,
+erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr,
+                                                                void *start_address, int32_t rpmsg_link_id,
                                                                 rpmsg_ready_cb ready, char *nameservice_name);
 
 /*!

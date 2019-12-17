@@ -42,6 +42,26 @@ void Server::addService(Service *service)
     link->setNext(service);
 }
 
+void Server::removeService(Service *service)
+{
+    Service *link = m_firstService;
+
+    if (link == service)
+    {
+        m_firstService = link->getNext();
+        return;
+    }
+    while (link != NULL)
+    {
+        if (link->getNext() == service)
+        {
+            link->setNext(link->getNext()->getNext());
+            return;
+        }
+        link = link->getNext();
+    }
+}
+
 erpc_status_t Server::readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId,
                                         uint32_t &sequence)
 {

@@ -240,11 +240,24 @@ erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();
 }
+
+void destroy_{$iface.serviceClassName}(erpc_service_t *service)
+{
+    if (*service)
+    {
+        delete service;
+    }
+}
 {% else --dynamicServices == true %}
 erpc_service_t create_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.construct();
     return s_{$iface.serviceClassName}.get();
+}
+
+void destroy_{$iface.serviceClassName}()
+{
+    s_{$iface.serviceClassName}.destroy();
 }
 {% endif --dynamicServices == true %}
 {% endfor -- iface %}

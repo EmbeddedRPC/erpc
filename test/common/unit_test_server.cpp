@@ -14,13 +14,15 @@
 #include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
-#if (defined(RPMSG) || defined(UART) || defined(LPUART))
+#if (defined(RPMSG) || defined(UART))
 extern "C" {
 #include "app_core1.h"
 #if defined(RPMSG)
 #define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
 #include "rpmsg_lite.h"
+#elif defined(UART)
+#include "fsl_usart_cmsis.h"
 #endif
 }
 #endif
@@ -34,6 +36,9 @@ int MyAlloc::allocated_ = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if defined(RPMSG)
 static void SignalReady(void)
 {
@@ -53,9 +58,6 @@ void SystemInitHook(void)
 }
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int main(int argc, const char *argv[])
 {
 #if defined(RPMSG)
@@ -77,14 +79,8 @@ int main(int argc, const char *argv[])
     transport = erpc_transport_rpmsg_lite_remote_init(101, 100, (void *)startupData, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID,
                                                       SignalReady, NULL);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
-#else
-#if defined(UART)
-    transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif defined(LPUART)
-    transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#endif
+#elif defined(UART)
+    transport = erpc_transport_cmsis_uart_init((void *)&Driver_USART0);
     message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 

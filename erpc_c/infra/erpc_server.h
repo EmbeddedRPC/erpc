@@ -160,6 +160,13 @@ public:
     void addService(Service *service);
 
     /*!
+     * @brief Remove service.
+     *
+     * @param[in] service Service to remove.
+     */
+    void removeService(Service *service);
+
+    /*!
      * @brief This function runs the server.
      */
     virtual erpc_status_t run(void) = 0;

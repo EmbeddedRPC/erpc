@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2018 NXP
+ * Copyright 2016-2019 NXP
  * All rights reserved.
  *
  *
@@ -94,7 +94,7 @@
 
 //! @def ERPC_MESSAGE_LOGGING
 //!
-//! Enable eRPC message logging code through the eRPC. Take look into "message_logging.h". Can be used for base printing
+//! Enable eRPC message logging code through the eRPC. Take look into "erpc_message_loggers.h". Can be used for base printing
 //! messages, or sending data to another system for data analysis. Default set to ERPC_MESSAGE_LOGGING_DISABLED.
 //!
 //! Uncomment for using logging feature.
@@ -112,7 +112,7 @@
 //! is part of the project, otherwise the ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED option is used. This settings can be
 //! overwritten from the erpc_config.h by uncommenting the ERPC_TRANSPORT_MU_USE_MCMGR macro definition. Do not forget
 //! to add the MCMGR library into your project when ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED option is used! See the
-//! mu_transport.h for additional MU settings.
+//! erpc_mu_transport.h for additional MU settings.
 //#define ERPC_TRANSPORT_MU_USE_MCMGR ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED
 //@}
 

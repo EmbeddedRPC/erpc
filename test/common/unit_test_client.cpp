@@ -14,7 +14,7 @@
 #include "myAlloc.h"
 #include "test_unit_test_common.h"
 
-#if (defined(RPMSG) || defined(UART) || defined(LPUART))
+#if (defined(RPMSG) || defined(UART))
 extern "C" {
 #include "app_core0.h"
 #include "board.h"
@@ -22,6 +22,8 @@ extern "C" {
 #include "mcmgr.h"
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
+#elif defined(UART)
+#include "fsl_usart_cmsis.h"
 #endif
 }
 
@@ -79,6 +81,9 @@ volatile uint16_t eRPCReadyEventData = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if defined(RPMSG)
 /*!
  * @brief eRPC server side ready event handler
@@ -101,9 +106,6 @@ void SystemInitHook(void)
 }
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -111,7 +113,7 @@ int main(int argc, char **argv)
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     listeners.Append(new LeakChecker);
 
-#if (defined(RPMSG) || defined(UART) || defined(LPUART))
+#if (defined(RPMSG) || defined(UART))
     delete listeners.Release(listeners.default_result_printer());
     listeners.Append(new MinimalistPrinter);
 #ifdef UNITY_DUMP_RESULTS
@@ -158,14 +160,8 @@ int main(int argc, char **argv)
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
-#else
-#if defined(UART)
-    transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif defined(LPUART)
-    transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#endif
+#elif defined(UART)
+    transport = erpc_transport_cmsis_uart_init((void *)&Driver_USART0);
     message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 

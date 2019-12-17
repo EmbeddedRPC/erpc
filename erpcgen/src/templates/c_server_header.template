@@ -50,6 +50,12 @@ typedef void * erpc_service_t;
 {% for iface in group.interfaces %}
 erpc_service_t create_{$iface.serviceClassName}(void);
 
+{% if dynamicServices == true %}
+void destroy_{$iface.serviceClassName}(erpc_service_t *service);
+{% else --dynamicServices == true %}
+void destroy_{$iface.serviceClassName}(void);
+{% endif --dynamicServices == true %}
+
 {% endfor -- iface %}
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017 NXP
+ * Copyright 2017-2019 NXP
  * All rights reserved.
  *
  *
@@ -70,8 +70,8 @@ void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
     m_crcImpl = crcImpl;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                          unsigned long length, int rpmsg_link_id)
+erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                                          int32_t rpmsg_link_id)
 {
     if (!s_initialized)
     {
@@ -95,8 +95,8 @@ erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long 
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                          int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
+erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address,
+                                          int32_t rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -143,9 +143,9 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
     assert(m_crcImpl && "Uninitialized Crc16 object.");
     FramedTransport::Header h;
     char *buf = NULL;
-    int length = 0;
+    uint32_t length = 0;
 
-    int ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
+    int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     assert(buf);
 
     memcpy((uint8_t *)&h, buf, sizeof(h));
@@ -177,7 +177,7 @@ erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
 
     memcpy(buf - sizeof(h), (uint8_t *)&h, sizeof(h));
 
-    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf - sizeof(h), used + sizeof(h));
+    int32_t ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf - sizeof(h), used + sizeof(h));
     if (ret_val == RL_SUCCESS)
     {
         return kErpcStatus_Success;

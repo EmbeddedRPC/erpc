@@ -26,18 +26,17 @@
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 
-#include "fsl_log.h"
+//#include "fsl_log.h"
+#include "fsl_debug_console.h"
 
 //#pragma import(__use_no_semihosting_swi)
 #include <rt_sys.h>
 
 #define DEFAULT_HANDLE 0x100;
 
-char *_sys_command_string(char *cmd, int len)
-{
-    return (cmd);
-}
-
+#if 0 //already defined in fsl_debug_console.c
+char *_sys_command_string(char *cmd, int len) { return (cmd); }
+#endif
 /*
  * These names are special strings which will be recognized by
  * _sys_open and will cause it to return the standard I/O handles, instead
@@ -51,18 +50,14 @@ const char __stderr_name[] = "STDERR";
  * Open a file. May return -1 if the file failed to open. We do not require
  * this function to do anything. Simply return a dummy handle.
  */
-FILEHANDLE _sys_open(const char *name, int openmode)
-{
-    return DEFAULT_HANDLE;
-}
+FILEHANDLE _sys_open(const char *name, int openmode) { return DEFAULT_HANDLE; }
 
 /*
  * Close a file. Should return 0 on success or a negative value on error.
  * Not required in this implementation. Always return success.
  */
-int _sys_close(FILEHANDLE fh)
-{
-    return 0; // return success
+int _sys_close(FILEHANDLE fh) {
+  return 0; // return success
 }
 
 /*
@@ -70,16 +65,18 @@ int _sys_close(FILEHANDLE fh)
  * of characters _not_ written on partial success. This implementation sends
  * a buffer of size 'len' to the UART.
  */
-int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
-{
-    int i;
-    for (i = 0; i < len; i++)
-    {
-        // UART_write(buf[i]);
-        LOG_Push((uint8_t *)(&buf[i]), 1);
-    }
+int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len,
+               int mode) {
+  // int i;
+  // for (i = 0; i < len; i++)
+  //{
+  //    // UART_write(buf[i]);
+  //    LOG_Push((uint8_t *)(&buf[i]), 1);
+  //}
 
-    return 0;
+  DbgConsole_SendData((uint8_t *)buf, len);
+
+  return 0;
 }
 
 /*
@@ -93,66 +90,65 @@ int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
  * if required (backspace) and then echo the character to the Terminal
  * Emulator, printing the correct sequence after successive keystrokes.
  */
-int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
-{
-    int pos = 0;
+int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode) {
+  int pos = 0;
 
-    do
-    {
+  do {
 
-        // buf[pos]=UART_read();
-        LOG_ReadCharacter((uint8_t *)&buf[pos]);
+    // buf[pos]=UART_read();
+    // LOG_ReadCharacter((uint8_t *)&buf[pos]);
+    DbgConsole_ReadCharacter((uint8_t *)&buf[pos]);
 
-        // Advance position in buffer
-        pos++;
+    // Advance position in buffer
+    pos++;
 
-        // Handle backspace
-        if (buf[pos - 1] == '\b')
-        {
-            // More than 1 char in buffer
-            if (pos > 1)
-            {
-                // Delete character on terminal
-                // UART_write('\b');
-                // UART_write(' ');
-                // UART_write('\b');
+    // Handle backspace
+    if (buf[pos - 1] == '\b') {
+      // More than 1 char in buffer
+      if (pos > 1) {
+        // Delete character on terminal
+        // UART_write('\b');
+        // UART_write(' ');
+        // UART_write('\b');
 
-                // Update position in buffer
-                pos -= 2;
-            }
-            else if (pos > 0)
-                pos--; // Backspace pressed, empty buffer
-        }
-        // else UART_write(buf[pos-1]); // Echo normal char to terminal
-        else
-            LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to terminal
+        // Update position in buffer
+        pos -= 2;
+      } else if (pos > 0)
+        pos--; // Backspace pressed, empty buffer
+    }
+    // else UART_write(buf[pos-1]); // Echo normal char to terminal
+    else
+      // LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to
+      // terminal
+      DbgConsole_SendData((uint8_t *)(&buf[pos - 1]),
+                          1); // Echo normal char to terminal
 
-    } while (buf[pos - 1] != '\r');
+  } while (buf[pos - 1] != '\r');
 
-    buf[pos] = '\0'; // Ensure Null termination
+  buf[pos] = '\0'; // Ensure Null termination
 
-    return 0;
+  return 0;
 }
 
+#if 0 //already defined in fsl_debug_console.c
 /*
  * Writes a character to the output channel. This function is used
  * for last-resort error message output.
  */
-void _ttywrch(int ch)
-{
-    // Convert correctly for endianness change
-    char ench = ch;
+void _ttywrch(int ch) {
+  // Convert correctly for endianness change
+  char ench = ch;
 
-    // UART_write(ench);
-    LOG_Push((uint8_t *)(&ench), 1);
+  // UART_write(ench);
+  // LOG_Push((uint8_t *)(&ench), 1);
+  DbgConsole_SendData((uint8_t *)(&ench), 1);
 }
-
+#endif
 /*
  * Return non-zero if the argument file is connected to a terminal.
  */
-int _sys_istty(FILEHANDLE fh)
-{
-    return 1; // no interactive device present
+int _sys_istty(FILEHANDLE fh) {
+  return 1; // no interactive device present
 }
 
 /*
@@ -160,9 +156,8 @@ int _sys_istty(FILEHANDLE fh)
  * Returns >=0 on success, <0 on failure. Seeking is not supported for the
  * UART.
  */
-int _sys_seek(FILEHANDLE fh, long pos)
-{
-    return -1; // error
+int _sys_seek(FILEHANDLE fh, long pos) {
+  return -1; // error
 }
 
 /*
@@ -170,9 +165,8 @@ int _sys_seek(FILEHANDLE fh, long pos)
  * is up to date on disk. Result is >=0 if OK, negative for an
  * error.
  */
-int _sys_ensure(FILEHANDLE fh)
-{
-    return 0; // success
+int _sys_ensure(FILEHANDLE fh) {
+  return 0; // success
 }
 
 /*
@@ -182,29 +176,23 @@ int _sys_ensure(FILEHANDLE fh)
  * called when processing SEEK_END relative fseeks, and therefore a
  * call to _sys_flen is always followed by a call to _sys_seek.
  */
-long _sys_flen(FILEHANDLE fh)
-{
-    return 0;
-}
+long _sys_flen(FILEHANDLE fh) { return 0; }
 
 /*
  * Return the name for temporary file number sig in the buffer
  * name. Returns 0 on failure. maxlen is the maximum name length
  * allowed.
  */
-int _sys_tmpnam(char *name, int sig, unsigned maxlen)
-{
-    return 0; // fail, not supported
+int _sys_tmpnam(char *name, int sig, unsigned maxlen) {
+  return 0; // fail, not supported
 }
 
+#if 0 //already defined in fsl_debug_console.c
 /*
  * Terminate the program, passing a return code back to the user.
  * This function may not return.
  */
-void _sys_exit(int returncode)
-{
-    while (1)
-    {
-    };
+void _sys_exit(int returncode) { while (1) { };
 }
+#endif
 #endif /* __CC_ARM */

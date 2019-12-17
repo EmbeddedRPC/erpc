@@ -23,7 +23,7 @@ struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg = NULL;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int RPMsgTransport::rpmsg_read_cb(void *payload, int payload_len, unsigned long src, void *priv)
+int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint32_t src, void *priv)
 {
     RPMsgTransport *transport = (RPMsgTransport *)priv;
     if (payload_len <= ERPC_DEFAULT_BUFFER_SIZE)
@@ -45,8 +45,8 @@ RPMsgTransport::RPMsgTransport(void)
 
 RPMsgTransport::~RPMsgTransport(void) {}
 
-erpc_status_t RPMsgTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                   unsigned long length, int rpmsg_link_id)
+erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                                   int32_t rpmsg_link_id)
 {
     if (!s_initialized)
     {
@@ -61,8 +61,8 @@ erpc_status_t RPMsgTransport::init(unsigned long src_addr, unsigned long dst_add
     return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
 }
 
-erpc_status_t RPMsgTransport::init(unsigned long src_addr, unsigned long dst_addr, void *base_address,
-                                   int rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
+erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, int32_t rpmsg_link_id,
+                                   void (*ready_cb)(void), char *nameservice_name)
 {
     if (!s_initialized)
     {
@@ -107,7 +107,8 @@ erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
 
 erpc_status_t RPMsgTransport::send(MessageBuffer *message)
 {
-    int ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());
+    int32_t ret_val =
+        rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());
     message->set(NULL, 0);
     return ret_val != RL_SUCCESS ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }

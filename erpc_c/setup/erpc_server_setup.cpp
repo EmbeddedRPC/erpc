@@ -67,6 +67,14 @@ void erpc_add_service_to_server(void *service)
     }
 }
 
+void erpc_remove_service_from_server(void *service)
+{
+    if (g_server != NULL && service != NULL)
+    {
+        g_server->removeService(static_cast<erpc::Service *>(service));
+    }
+}
+
 void erpc_server_set_crc(uint32_t crcStart)
 {
     s_crc16->setCrcStart(crcStart);

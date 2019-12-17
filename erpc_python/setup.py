@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2019 NXP
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README_Pypi.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 #steps: https://packaging.python.org/distributing/
@@ -26,6 +26,7 @@ setup(
     version=erpc_version.ERPC_VERSION,
     description="eRPC Python infrastructure",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="NXP",
     url='https://github.com/embeddedrpc/erpc',
     license="BSD 3-Clause",
@@ -41,7 +42,7 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX :: Linux",
     ],
-    keywords='rpc rpc-framework embedded multicore multiprocessor amp',
+    keywords='rpc rpc-framework embedded multicore multiprocessor amp rpmsg_lite',
     use_2to3=True,
     packages=['erpc'],
 )
