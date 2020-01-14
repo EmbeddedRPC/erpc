@@ -170,5 +170,6 @@ After installation, the `erpc` package is available via normal import statements
 Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
 
 ---
-Copyright © 2014-2016 Freescale Semiconductor, Inc.
-Copyright © 2016-2017 NXP
+Copyright 2014-2016 Freescale Semiconductor, Inc.
+
+Copyright 2016-2020 NXP
