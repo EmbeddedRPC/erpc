@@ -10,6 +10,8 @@
 #ifndef _ERPC_TRANSPORT_SETUP_H_
 #define _ERPC_TRANSPORT_SETUP_H_
 
+
+#include <stdbool.h>
 /*!
  * @addtogroup transport_setup
  * @{
@@ -40,6 +42,11 @@ extern "C" {
 
 //! @name CMSIS UART transport setup
 //@{
+
+/*!
+ * @brief Create a TCP transport.
+ */
+erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool isServer);
 
 /*!
  * @brief Create a CMSIS UART transport.
