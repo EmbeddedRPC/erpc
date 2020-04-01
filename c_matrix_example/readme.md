@@ -22,6 +22,8 @@ eRPC documentation can be also found in: https://github.com/EmbeddedRPC/erpc/wik
 - `service/erpc_matrix_multiply/`: eRPC output shim code generated from IDL file
 
 # Running the example
+- run make in root erpc file to generate code in erpc_c and generate shim code by running erpcgen tool on the erpc_matrix_multiply.erpc file in c_matrix_multiply/service
+- in c_matrix_multiply, run make.sh to compile the files required
 - ./server to run the server
 - ./client to run the client 
 - By default is host set as localhost and port as 40.
