@@ -28,8 +28,11 @@
     #endif
 #endif
 
+#undef ERPC_HAS_POSIX
+#define ERPC_HAS_POSIX (0)
+
 // Safely detect FreeRTOSConfig.h.
-#define ERPC_HAS_FREERTOSCONFIG_H (0)
+#define ERPC_HAS_FREERTOSCONFIG_H (1)
 #if defined(__has_include)
     #if __has_include("FreeRTOSConfig.h")
         #undef ERPC_HAS_FREERTOSCONFIG_H

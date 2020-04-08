@@ -10,6 +10,8 @@
 #include "erpc_port.h"
 #include <new>
 
+#error "we have included this file"
+
 extern "C" {
 #include "FreeRTOS.h"
 };

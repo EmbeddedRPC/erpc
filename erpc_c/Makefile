@@ -48,8 +48,11 @@ INCLUDES += $(ERPC_C_ROOT)/config \
 			$(ERPC_C_ROOT)/infra \
 			$(ERPC_C_ROOT)/port \
 			$(ERPC_C_ROOT)/setup \
-			$(ERPC_C_ROOT)/transports
-
+			$(ERPC_C_ROOT)/transports \
+			/Users/sramnath/Downloads/FreeRTOSv10.2.1/FreeRTOS/Source/include \
+			/Users/sramnath/Downloads/FreeRTOSv10.2.1/FreeRTOS/Source/portable/GCC/ARM_CM4F \
+			/Users/sramnath/STM32CubeF4/Projects/STM32F413ZH-Nucleo/Applications/FreeRTOS/FreeRTOS_LowPower/Inc			
+			
 SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_basic_codec.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_client_manager.cpp \
