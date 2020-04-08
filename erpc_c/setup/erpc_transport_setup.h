@@ -45,6 +45,15 @@ extern "C" {
 
 /*!
  * @brief Create a TCP transport.
+ *
+ *
+ * Create a TCP transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] host TCP driver structure address (Driver Control Block).
+ * @param[in] port Port for TCP 
+ * @param[in] isServer boolean value to indicate whether this is a client or a server
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool isServer);
 
