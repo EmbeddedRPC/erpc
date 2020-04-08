@@ -51,16 +51,12 @@ static ManuallyConstructed<TCPTransport> s_transport;
 
 erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool isServer)
 {
-	std::cout<<"inside erpc_transport_tcp_init" << std::endl;
     s_transport.construct(host, port, isServer);
-	std::cout<<"transport successfully constructed" << std::endl;
     if (s_transport->open() == kErpcStatus_Success)
     {
-	std::cout<<"transport successfully init" << std::endl;
         return reinterpret_cast<erpc_transport_t>(s_transport.get());
     }
 	
-	std::cout<<"transport init failed" << std::endl;
         return NULL;
 }
 
