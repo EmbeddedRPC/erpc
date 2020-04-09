@@ -10,8 +10,6 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_tcp_transport.h"
 #include "erpc_transport_setup.h"
-#include <iostream>
-using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
