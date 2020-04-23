@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Embedded Planet, Inc
+ * Copyright (c) 2020, Embedded Planet, Inc
  * All rights reserved.
  *
  * For supporting transports and examples see:
@@ -9,11 +9,26 @@
  */
 
 #include "erpc_threading.h"
+#include "erpc_port.h"
 
+#if ERPC_THREADS_IS(MBED)
+
+#include <cstdlib>
 #include "platform/CriticalSectionLock.h"
 #include "platform/mbed_assert.h"
 
-#if ERPC_THREADS_IS(MBED)
+using namespace std;
+
+void *erpc_malloc(size_t size)
+{
+    void *p = malloc(size);
+    return p;
+}
+
+void erpc_free(void *ptr)
+{
+    free(ptr);
+}
 
 namespace erpc
 {
