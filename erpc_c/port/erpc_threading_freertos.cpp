@@ -175,7 +175,7 @@ void Thread::threadEntryPointStub(void *arg)
 Mutex::Mutex(void)
 : m_mutex(0)
 {
-    m_mutex = xSemaphoreCreateMutex();
+    m_mutex = xSemaphoreCreateRecursiveMutex();
 }
 
 Mutex::~Mutex(void)
