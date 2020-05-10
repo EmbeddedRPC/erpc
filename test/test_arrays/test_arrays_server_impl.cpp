@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
@@ -43,7 +17,7 @@
 // Implementation of function code
 ////////////////////////////////////////////////////////////////////////////////
 
-int32_t (*sendReceivedInt32(int32_t arrayNumbers[12]))[12]
+int32_t (*sendReceivedInt32(const int32_t arrayNumbers[12]))[12]
 {
     int32_t(*sendArrays)[12] = (int32_t(*)[12])erpc_malloc(sizeof(int32_t[12]));
 
@@ -94,7 +68,7 @@ char *(*sendReceived2String(char *arrayStrings[3][5]))[3][5]
     return sendArrays;
 }
 
-enumColor (*sendReceivedEnum(enumColor arrayEnums[3]))[3]
+enumColor (*sendReceivedEnum(const enumColor arrayEnums[3]))[3]
 {
     enumColor(*sendArrays)[3] = (enumColor(*)[3])erpc_malloc(sizeof(enumColor[3]));
 
@@ -118,7 +92,7 @@ enumColor (*sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
     return sendArrays;
 }
 
-list_int32_1_t (*sendReceivedList(list_int32_1_t arrayLists[2]))[2]
+list_int32_1_t (*sendReceivedList(const list_int32_1_t arrayLists[2]))[2]
 {
     uint32_t array_count = 2;
 
@@ -157,7 +131,7 @@ list_int32_1_t (*sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
     return sendArrays;
 }
 
-ArrayIntType *sendReceivedInt32Type(ArrayIntType arrayNumbers)
+ArrayIntType *sendReceivedInt32Type(const ArrayIntType arrayNumbers)
 {
     ArrayIntType *send = (ArrayIntType *)erpc_malloc(sizeof(ArrayIntType));
 
@@ -210,7 +184,7 @@ Array2StringType *sendReceived2StringType(Array2StringType arrayStrings)
     return sendArrays;
 }
 
-ArrayEnumType *sendReceivedEnumType(ArrayEnumType arrayEnums)
+ArrayEnumType *sendReceivedEnumType(const ArrayEnumType arrayEnums)
 {
     ArrayEnumType *sendArrays = (ArrayEnumType *)erpc_malloc(sizeof(ArrayEnumType));
 
@@ -234,7 +208,7 @@ Array2EnumType *sendReceived2EnumType(Array2EnumType arrayEnums)
     return sendArrays;
 }
 
-ArrayStructType *sendReceivedStructType(ArrayStructType arrayStructs)
+ArrayStructType *sendReceivedStructType(const ArrayStructType arrayStructs)
 {
     ArrayStructType *sendArrays = (ArrayStructType *)erpc_malloc(sizeof(ArrayStructType));
 
@@ -260,7 +234,7 @@ Array2StructType *sendReceived2StructType(Array2StructType arrayStructs)
     return sendArrays;
 }
 
-ArrayListType *sendReceivedListType(ArrayListType arrayLists)
+ArrayListType *sendReceivedListType(const ArrayListType arrayLists)
 {
     uint32_t array_count = 2;
     ArrayListType *sendArrays = (ArrayListType *)erpc_malloc(sizeof(ArrayListType));
@@ -298,9 +272,9 @@ Array2ListType *sendReceived2ListType(Array2ListType arrayLists)
     return sendArrays;
 }
 
-AllTypes (*sendReceiveStruct(AllTypes all_types[2]))[2]
+AllTypes (*sendReceiveStruct(const AllTypes all_types[2]))[2]
 {
-    AllTypes(**received_struct) = &all_types;
+    const AllTypes(**received_struct) = &all_types;
     AllTypes(*send_struct)[2] = (AllTypes(*)[2])erpc_malloc(sizeof(AllTypes[2]));
 
     for (uint32_t k = 0; k < 2; ++k)
@@ -384,7 +358,7 @@ AllTypes (*sendReceive2Struct(AllTypes all_types[1][1]))[1][1]
     return send_struct;
 }
 
-void test_array_allDirection(int32_t a[5], int32_t b[5], int32_t c[5], int32_t d[5])
+void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5], int32_t d[5])
 {
     for (uint32_t i = 0; i < 5; ++i)
     {

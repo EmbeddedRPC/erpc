@@ -1,34 +1,8 @@
 /*
- * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
@@ -42,37 +16,38 @@
 // Implementation of function code
 ////////////////////////////////////////////////////////////////////////////////
 
-void myFun(const callback1_t pCallback1_t, callback1_t *pCallback2_t)
+callback1_t *cb1 = NULL;
+callback2_t *cb2 = NULL;
+
+void myFun(const callback1_t pCallback1_in, callback1_t *pCallback1_out)
 {
-    if (pCallback1_t == callback1)
-    {
-        *pCallback2_t = pCallback1_t;
-    }
-    else
-    {
-        *pCallback2_t = callback2;
-    }
+    cb1 = NULL;
+    pCallback1_in(1, 2);
+    *pCallback1_out = (callback1_t)cb1;
 }
 
-void myFun2(const callback2_t pCallback1_t, callback2_t *pCallback2_t)
+void myFun2(const callback2_t pCallback2_in, callback2_t *pCallback2_out)
 {
-
-    if (pCallback1_t == callback3)
-    {
-        *pCallback2_t = pCallback1_t;
-    }
-    else
-    {
-        *pCallback2_t = NULL;
-    }
+    cb2 = NULL;
+    pCallback2_in(1, 2);
+    *pCallback2_out = (callback2_t)cb2;
 }
 
-void callback1(int32_t a, int32_t b) {}
+void callback1a(int32_t a, int32_t b)
+{
+    cb1 = (callback1_t *)callback1a;
+}
 
-void callback2(int32_t param1, int32_t param2) {}
+void callback1b(int32_t param1, int32_t param2)
+{
+    cb1 = (callback1_t *)callback1b;
+}
 
 /* will be shim code in real use case */
-void callback3(int32_t param1, int32_t param2) {}
+void callback2(int32_t param1, int32_t param2)
+{
+    cb2 = (callback2_t *)callback2;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code

@@ -1,58 +1,40 @@
 /*
- * The Clear BSD License
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "gtest.h"
 #include "test_core0.h"
 #include "test_core1_server.h"
 
-void callback3(int32_t param1, int32_t param2) {}
+void callback2(int32_t param1, int32_t param2) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST(test_callbacks, In_Out_table)
+TEST(test_callbacks, In_Out_table_1)
 {
-    callback1_t pCallback2_t = NULL;
-    myFun(callback1, &pCallback2_t);
+    callback1_t pCallback1_out = NULL;
+    myFun(callback1a, &pCallback1_out);
 
-    EXPECT_TRUE(callback1 == *pCallback2_t);
+    EXPECT_TRUE(callback1a == *pCallback1_out);
+}
+
+TEST(test_callbacks, In_Out_table_2)
+{
+    callback1_t pCallback1_out = NULL;
+    myFun(callback1b, &pCallback1_out);
+
+    EXPECT_TRUE(callback1b == *pCallback1_out);
 }
 
 TEST(test_callbacks, In_Out_withoutTable)
 {
-    callback2_t pCallback2_t = NULL;
-    myFun2(callback3, &pCallback2_t);
+    callback2_t pCallback2_out = NULL;
+    myFun2(callback2, &pCallback2_out);
 
-    EXPECT_TRUE(callback3 == *pCallback2_t);
+    EXPECT_TRUE(callback2 == *pCallback2_out);
 }

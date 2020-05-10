@@ -73,7 +73,7 @@ codec.start_write_union({$self}discriminator)
 {#--------------- list, array ---------------#}
 {% elif info.type == "list" || info.type == "array" %}
 {%  if info.type == "list" %}
-{$codec}.start_write_list(self.length)
+{$codec}.start_write_list(len({$name}))
 {%  endif %}
 {%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
 {$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}

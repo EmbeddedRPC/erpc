@@ -1,36 +1,10 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2019 NXP
  * All rights reserved.
  *
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _ERPC_TRANSPORT_SETUP_H_
@@ -64,41 +38,112 @@ extern "C" {
 //! @name Transport setup
 //@{
 
+//! @name CMSIS UART transport setup
+//@{
+
 /*!
  * @brief Create a CMSIS UART transport.
+ *
+ * Create a CMSIS UART transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] uartDrv CMSIS USART driver structure address (Driver Control Block).
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
+//@}
+
+//! @name Host PC serial port transport setup
+//@{
 
 /*!
  * @brief Create a host PC serial port transport.
+ *
+ * Create a host PC serial port transport instance.
+ *
+ * @param[in] portName Port name.
+ * @param[in] baudRate Baud rate.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate);
+//@}
+
+//! @name SPI transport setup
+//@{
 
 /*!
  * @brief Create a SPI master transport.
+ *
+ * Create SPI master transport instance, to be used at master core.
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
 /*!
  * @brief Create a SPI slave transport.
+ *
+ * Create SPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_spi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name DSPI transport setup
+//@{
 
 /*!
  * @brief Create a DSPI master transport.
+ *
+ * Create DSPI master transport instance, to be used at master core.
+ *
+ * @param[in] baseAddr Base address of DSPI peripheral used in this transport layer.
+ * @param[in] baudRate DSPI baud rate.
+ * @param[in] srcClock_Hz DSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
 /*!
  * @brief Create a DSPI slave transport.
+ *
+ * Create DSPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of DSPI peripheral used in this transport layer.
+ * @param[in] baudRate DSPI baud rate.
+ * @param[in] srcClock_Hz DSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name MU transport setup
+//@{
 
 /*!
  * @brief Create an MU transport.
+ *
+ * Create Messaging Unit (MU) transport instance, to be used on both the server
+ * and the client side. Base address of the MU peripheral needs to be passed.
+ *
+ * @param[in] baseAddr Base address of MU peripheral.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_mu_init(void *baseAddr);
-
 //@}
 
 //! @name RPMsg-Lite transport setup
@@ -116,8 +161,7 @@ erpc_transport_t erpc_transport_mu_init(void *baseAddr);
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr,
-                                                       int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(uint32_t src_addr, uint32_t dst_addr, int32_t rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite transport.
@@ -138,8 +182,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, u
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                       void *start_address, int rpmsg_link_id, rpmsg_ready_cb ready,
+erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
+                                                       int32_t rpmsg_link_id, rpmsg_ready_cb ready,
                                                        char *nameservice_name);
 
 /*!
@@ -154,8 +198,8 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(unsigned long src_addr, u
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_addr, unsigned long dst_addr,
-                                                            int rpmsg_link_id);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(uint32_t src_addr, uint32_t dst_addr,
+                                                            int32_t rpmsg_link_id);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -175,9 +219,9 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(unsigned long src_ad
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                            void *start_address, int rpmsg_link_id,
-                                                            rpmsg_ready_cb ready, char *nameservice_name);
+erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
+                                                            int32_t rpmsg_link_id, rpmsg_ready_cb ready,
+                                                            char *nameservice_name);
 
 /*!
  * @brief Create an RPMsg-Lite TTY transport.
@@ -198,30 +242,47 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(unsigned long src_ad
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(unsigned long src_addr, unsigned long dst_addr,
-                                                                void *start_address, int rpmsg_link_id,
+erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr,
+                                                                void *start_address, int32_t rpmsg_link_id,
                                                                 rpmsg_ready_cb ready, char *nameservice_name);
+
+/*!
+ * @brief Deinitialize an RPMSG lite tty rtos transport.
+ *
+ * This function deinitializes the RPMSG lite tty rtos transport.
+ */
+void erpc_transport_rpmsg_lite_tty_rtos_deinit(void);
+//@}
+
+//! @name Linux RPMSG endpoint setup
+//@{
 
 /*!
  * @brief Create an Linux RPMSG endpoint transport.
  *
  * This function is using RPMSG endpoints based on this implementation:
- * https://github.com/codeauroraforum/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ * https://github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
  *
  * When local/remote address is set to '-1', then default addresses will be used.
  * When type is set to '0', then Datagram model will be used, else Stream.
  *
  * @param[in] local_addr Local endpoint address.
- * @param[in] type Datagram or Stream.
+ * @param[in] type Datagram (0) or Stream (1).
  * @param[in] remote_addr Remote endpoint address.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
-//@}
 
 /*!
  * @brief Deinitialize an Linux RPMSG endpoint transport.
+ *
+ * This function deinitializes the Linux RPMSG endpoint transport.
  */
 void erpc_transport_rpmsg_linux_deinit(void);
+//@}
+
+//@}
 
 #ifdef __cplusplus
 }

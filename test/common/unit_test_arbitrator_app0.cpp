@@ -1,35 +1,9 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- * that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "unit_test.h"
@@ -104,7 +78,7 @@ void runServer(void *arg)
 
     if (err != kErpcStatus_Success)
     {
-        PRINTF("Server error: %d\n", err);
+        PRINTF("Server error: %d\r\n", err);
     }
     vTaskSuspend(NULL);
 }
@@ -166,7 +140,7 @@ void runInit(void *arg)
     if (transportClient == NULL)
     {
         // error in initialization of transport layer
-        PRINTF("Transport layer initialization failed\n");
+        PRINTF("Transport layer initialization failed\r\n");
         while (1)
         {
         }
@@ -219,29 +193,32 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
     // Called before a test starts.
     virtual void OnTestStart(const ::testing::TestInfo &test_info)
     {
-        PRINTF("*** Test %s.%s starting.\n", test_info.test_case_name(), test_info.name());
+        PRINTF("*** Test %s.%s starting.\r\n", test_info.test_case_name(), test_info.name());
     }
 
     // Called after a failed assertion or a SUCCEED() invocation.
     virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result)
     {
-        PRINTF("%s in %s:%d\n%s\n", test_part_result.failed() ? "*** Failure" : "Success", test_part_result.file_name(),
+        PRINTF("%s in %s:%d\r\n%s\r\n", test_part_result.failed() ? "*** Failure" : "Success", test_part_result.file_name(),
                test_part_result.line_number(), test_part_result.summary());
     }
 
     // Called after a test ends.
     virtual void OnTestEnd(const ::testing::TestInfo &test_info)
     {
-        PRINTF("*** Test %s.%s ending.\n", test_info.test_case_name(), test_info.name());
+        PRINTF("*** Test %s.%s ending.\r\n", test_info.test_case_name(), test_info.name());
     }
 
     virtual void OnTestCaseEnd(const ::testing::TestCase &test_case)
     {
-        PRINTF("*** Total tests passed: %d, failed: %d.\n", test_case.successful_test_count(),
+        PRINTF("*** Total tests passed: %d, failed: %d.\r\n", test_case.successful_test_count(),
                test_case.failed_test_count());
     }
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -258,7 +235,7 @@ int main(int argc, char **argv)
     // Calculate size of the image
     uint32_t core1_image_size;
     core1_image_size = get_core1_image_size();
-    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\n", CORE1_BOOT_ADDRESS, core1_image_size);
+    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\r\n", CORE1_BOOT_ADDRESS, core1_image_size);
 
     // Copy application from FLASH to RAM
     memcpy(CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
@@ -275,6 +252,9 @@ int main(int argc, char **argv)
     {
     }
 }
+#ifdef __cplusplus
+}
+#endif
 
 void quitSecondInterfaceServer()
 {

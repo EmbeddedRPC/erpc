@@ -26,7 +26,7 @@ Client side usage:
 void example_client(void) {
     // Initialize client running over UART.
     erpc_client_init(
-        erpc_transport_cmsis_uart_init(UART0_NonBlocking_Driver);
+        erpc_transport_cmsis_uart_init(Driver_USART0);
 
     // Now we can call the remote function to turn on the green LED.
     set_led(kGreen, true);
@@ -43,7 +43,7 @@ void set_led(LEDName whichLed, bool onOrOff) {
 void example_server(void) {
     // Initialize server running over UART.
     erpc_server_init(
-        erpc_transport_uart_init(UART0_NonBlocking_Driver);
+        erpc_transport_cmsis_uart_init(Driver_USART0);
 
     // Add the IO service.
     erpc_add_service_to_server(create_IO_service());
@@ -61,7 +61,7 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [NXP RPMsg-Lite](https://github.com/codeauroraforum/rpmsg-lite)
+* [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
 
 eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
 
@@ -71,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 3d7fb192a32fb8b5eef9fd953d592ac048259a70.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 431cba8.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -170,5 +170,6 @@ After installation, the `erpc` package is available via normal import statements
 Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
 
 ---
-Copyright © 2014-2016 Freescale Semiconductor, Inc.
-Copyright © 2016-2017 NXP
+Copyright 2014-2016 Freescale Semiconductor, Inc.
+
+Copyright 2016-2020 NXP
