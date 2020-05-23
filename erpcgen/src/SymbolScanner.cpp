@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright (c) 2020 Texas Instruments Incorporated
  * All rights reserved.
  *
  *
@@ -772,7 +773,7 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
         string unionVariableName = node->getParent()->getChild(0)->getToken().getStringValue();
 
         /* Create a new node in the AST for the union's name, and assign it */
-        node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_$union"))));
+        node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_union"))));
 
         /* union token. */
         tok = &node->getChild(3)->getToken();
