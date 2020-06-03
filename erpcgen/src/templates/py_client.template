@@ -61,7 +61,11 @@ class {$iface.name}Client(interface.I{$iface.name}):
 {%   if p.type.type == 'union' %}
         {$p.name}._write(codec, {$p.discriminator})
 {%   else%}
+{%      if p.direction == "inout" %}
+        {$encodeValue(p.type, p.name & ".value", "codec", "            ", 0)}
+{%      else %}
         {$encodeValue(p.type, p.name, "codec", "        ", 0)}
+{%      endif -- p.direction %}
 {%   endif -- isUnion %}
 {%  endif -- isNullable %}
 {% endfor -- inParams %}
