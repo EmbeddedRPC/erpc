@@ -11,7 +11,7 @@
 {% else %}
 {%   set self = "self." %}
 {%  endif %}
-codec.start_write_union({$self}discriminator)
+codec.start_write_union({$self}{$info.discriminatorName})
 {# unions are always within structs, so we have self available #}
 {%  set isFirst = true %}
 {%  set hasNonVoidCase = false %}
