@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017-2019 NXP
+ * Copyright 2017-2020 NXP
  * All rights reserved.
  *
  *
@@ -19,7 +19,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgBaseTransport::s_initialized = 0;
+uint8_t RPMsgBaseTransport::s_initialized = 0U;
 struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ RPMsgTTYRTOSTransport::~RPMsgTTYRTOSTransport(void)
             return;
         }
 
-        s_initialized = 0;
+        s_initialized = 0U;
     }
 }
 
@@ -71,39 +71,40 @@ void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
-                                          int32_t rpmsg_link_id)
+                                          uint32_t rpmsg_link_id)
 {
-    if (!s_initialized)
+    if (0U == s_initialized)
     {
         s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS);
         if (!s_rpmsg)
         {
-            return kErpcStatus_InitFailed;
+            return (erpc_status_t)kErpcStatus_InitFailed;
         }
-        s_initialized = 1;
+        s_initialized = 1U;
     }
 
     m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
     if (!m_rpmsg_queue)
     {
-        return kErpcStatus_InitFailed;
+        return (erpc_status_t)kErpcStatus_InitFailed;
     }
 
     m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
 
     m_dst_addr = dst_addr;
-    return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
+
+    return m_rpmsg_ept == RL_NULL ? (erpc_status_t)kErpcStatus_InitFailed : (erpc_status_t)kErpcStatus_Success;
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address,
-                                          int32_t rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
+                                          uint32_t rpmsg_link_id, void (*ready_cb)(void), char *nameservice_name)
 {
-    if (!s_initialized)
+    if (0U == s_initialized)
     {
         s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS);
         if (!s_rpmsg)
         {
-            return kErpcStatus_InitFailed;
+            return (erpc_status_t)kErpcStatus_InitFailed;
         }
 
         /* Signal the other core we are ready */
@@ -112,11 +113,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
             ready_cb();
         }
 
-        while (!rpmsg_lite_is_link_up(s_rpmsg))
+        while (0 == rpmsg_lite_is_link_up(s_rpmsg))
         {
         }
 
-        s_initialized = 1;
+        s_initialized = 1U;
     }
 
     m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
@@ -126,16 +127,17 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
     }
     m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
 
-    if (nameservice_name)
+    if (NULL != nameservice_name)
     {
-        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name, RL_NS_CREATE))
+        if (RL_SUCCESS != rpmsg_ns_announce(s_rpmsg, m_rpmsg_ept, nameservice_name, (uint32_t)RL_NS_CREATE))
         {
-            return kErpcStatus_InitFailed;
+            return (erpc_status_t)kErpcStatus_InitFailed;
         }
     }
 
     m_dst_addr = dst_addr;
-    return m_rpmsg_ept == RL_NULL ? kErpcStatus_InitFailed : kErpcStatus_Success;
+
+    return m_rpmsg_ept == RL_NULL ? (erpc_status_t)kErpcStatus_InitFailed : (erpc_status_t)kErpcStatus_Success;
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
@@ -152,15 +154,15 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
 
     message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
 
-    // Verify CRC.
+    /* Verify CRC. */
     uint16_t computedCrc = m_crcImpl->computeCRC16(&((uint8_t *)buf)[sizeof(h)], h.m_messageSize);
     if (computedCrc != h.m_crc)
     {
-        return kErpcStatus_CrcCheckFailed;
+        return (erpc_status_t)kErpcStatus_CrcCheckFailed;
     }
 
     message->setUsed(h.m_messageSize);
-    return ret_val != RL_SUCCESS ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return ret_val != RL_SUCCESS ? (erpc_status_t)kErpcStatus_ReceiveFailed : (erpc_status_t)kErpcStatus_Success;
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
@@ -180,9 +182,9 @@ erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
     int32_t ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, buf - sizeof(h), used + sizeof(h));
     if (ret_val == RL_SUCCESS)
     {
-        return kErpcStatus_Success;
+        return (erpc_status_t)kErpcStatus_Success;
     }
     message->set(buf, length);
     message->setUsed(used);
-    return kErpcStatus_SendFailed;
+    return (erpc_status_t)kErpcStatus_SendFailed;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -24,7 +24,7 @@ static ManuallyConstructed<RPMsgRTOSTransport> s_transport;
 ////////////////////////////////////////////////////////////////////////////////
 
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
-                                                            int32_t rpmsg_link_id, rpmsg_ready_cb ready,
+                                                            uint32_t rpmsg_link_id, rpmsg_ready_cb ready,
                                                             char *nameservice_name)
 {
     s_transport.construct();

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -214,7 +214,7 @@ private:
     struct k_thread m_thread;  /*!< Current thread. */
     k_thread_stack_t *m_stack; /*!< Pointer to stack. */
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Thread* m_thread; /*!< Underlying Thread instance */
+    rtos::Thread *m_thread; /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */
 #endif
@@ -249,10 +249,10 @@ private:
 #elif ERPC_THREADS_IS(MBED)
 
     /*!
-    * @brief This function execute threadEntryPoint function.
-    *
-    * @param[in] arg Thread to execute.
-    */
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
     static void threadEntryPointStub(void *arg);
 
 #endif
@@ -359,7 +359,7 @@ private:
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_mutex m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Mutex* m_mutex; /*!< Mutex. */
+    rtos::Mutex *m_mutex;   /*!< Mutex. */
 #endif
 
 private:
@@ -442,7 +442,7 @@ private:
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_sem m_sem;     /*!< Semaphore. */
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Semaphore* m_sem; /*!< Semaphore. */
+    rtos::Semaphore *m_sem; /*!< Semaphore. */
     int m_count;            /*!< Semaphore count number. */
 #endif
 

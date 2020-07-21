@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -66,7 +66,7 @@ public:
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
     virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
-                               int32_t rpmsg_link_id);
+                               uint32_t rpmsg_link_id);
 
     /*!
      * @brief Initialization of RPMsgTransport layer - as RPMsg remote
@@ -84,7 +84,7 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, int32_t rpmsg_link_id,
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t rpmsg_link_id,
                                void (*ready_cb)(void), char *nameservice_name);
 
     /*!

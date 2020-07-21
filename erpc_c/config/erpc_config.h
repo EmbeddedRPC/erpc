@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2019 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -95,8 +95,9 @@
 
 //! @def ERPC_MESSAGE_LOGGING
 //!
-//! Enable eRPC message logging code through the eRPC. Take look into "erpc_message_loggers.h". Can be used for base printing
-//! messages, or sending data to another system for data analysis. Default set to ERPC_MESSAGE_LOGGING_DISABLED.
+//! Enable eRPC message logging code through the eRPC. Take look into "erpc_message_loggers.h". Can be used for base
+//! printing messages, or sending data to another system for data analysis. Default set to
+//! ERPC_MESSAGE_LOGGING_DISABLED.
 //!
 //! Uncomment for using logging feature.
 //#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)

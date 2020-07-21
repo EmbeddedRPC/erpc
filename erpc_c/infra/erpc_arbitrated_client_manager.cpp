@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -10,6 +10,10 @@
 #include "erpc_arbitrated_client_manager.h"
 #include "erpc_transport_arbitrator.h"
 #include "assert.h"
+
+#if ERPC_THREADS_IS(NONE)
+#error "Arbitrator code does not work in no-threading configuration."
+#endif
 
 using namespace erpc;
 

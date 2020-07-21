@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -43,6 +43,8 @@ SimpleServer g_server;
 Crc16 g_crc16;
 
 int MyAlloc::allocated_ = 0;
+
+Common_service *svc_common;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -89,18 +91,27 @@ int main(int argc, const char *argv[])
 ////////////////////////////////////////////////////////////////////////////////
 void add_common_service(SimpleServer *server)
 {
-    Common_service *svc = new Common_service();
+    svc_common = new Common_service();
 
-    server->addService(svc);
+    server->addService(svc_common);
+}
+
+void remove_common_service(SimpleServer *server)
+{
+    server->removeService(svc_common);
+    delete svc_common;
 }
 
 extern "C" void erpc_add_service_to_server(void *service) {}
+extern "C" void erpc_remove_service_from_server(void *service) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////
 void quit()
 {
+    remove_common_service(&g_server);
+    remove_services(&g_server);
     g_server.stop();
 }
 

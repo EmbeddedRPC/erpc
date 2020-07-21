@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -10,11 +10,12 @@
 #include "erpc_server_setup.h"
 #include "erpc_simple_server.h"
 #include "erpc_transport_setup.h"
+#include "board.h"
 #include "myAlloc.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
-#if (defined(RPMSG) || defined(UART))
+#if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #include "app_core1.h"
 #if defined(RPMSG)
@@ -23,6 +24,12 @@ extern "C" {
 #include "rpmsg_lite.h"
 #elif defined(UART)
 #include "fsl_usart_cmsis.h"
+#elif defined(MU)
+#define APP_ERPC_READY_EVENT_DATA (1)
+#include "mcmgr.h"
+#endif
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+int main(int argc, const char *argv[]);
 #endif
 }
 #endif
@@ -32,14 +39,12 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 int MyAlloc::allocated_ = 0;
+erpc_service_t service_common = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef __cplusplus
-extern "C" {
-#endif
-#if defined(RPMSG)
+#if (defined(RPMSG) || defined(MU))
 static void SignalReady(void)
 {
     /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
@@ -60,7 +65,7 @@ void SystemInitHook(void)
 
 int main(int argc, const char *argv[])
 {
-#if defined(RPMSG)
+#if (defined(RPMSG) || defined(MU))
     uint32_t startupData;
     mcmgr_status_t status;
 
@@ -82,6 +87,9 @@ int main(int argc, const char *argv[])
 #elif defined(UART)
     transport = erpc_transport_cmsis_uart_init((void *)&Driver_USART0);
     message_buffer_factory = erpc_mbf_dynamic_init();
+#elif defined(MU)
+    transport = erpc_transport_mu_init(MU_BASE);
+    message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 
     /* Init server */
@@ -93,6 +101,9 @@ int main(int argc, const char *argv[])
     /* Add common service */
     add_common_service();
 
+#if defined(MU)
+    SignalReady();
+#endif
     /* Add run server */
     erpc_server_run();
 
@@ -101,9 +112,6 @@ int main(int argc, const char *argv[])
 
     return 0;
 }
-#ifdef __cplusplus
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Server helper functions
@@ -111,7 +119,8 @@ int main(int argc, const char *argv[])
 
 void add_common_service()
 {
-    erpc_add_service_to_server(create_Common_service());
+    service_common = create_Common_service();
+    erpc_add_service_to_server(service_common);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +129,12 @@ void add_common_service()
 
 void quit()
 {
+    /* removing common services from the server */
+    remove_common_services_from_server(service_common);
+
+    /* removing individual test services from the server */
+    remove_services_from_server();
+
     erpc_server_stop();
 }
 
