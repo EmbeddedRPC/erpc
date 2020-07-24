@@ -45,6 +45,8 @@
     #elif ERPC_HAS_FREERTOSCONFIG_H
         // Use FreeRTOS if we can auto detect it.
         #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
+    #elif defined(WIN32)
+        #define ERPC_THREADS (ERPC_THREADS_WIN32)
     #else
         // Otherwise default to no threads.
         #define ERPC_THREADS (ERPC_THREADS_NONE)

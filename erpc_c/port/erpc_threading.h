@@ -30,6 +30,8 @@
 #else
 #warning mbed-rpc: Threading is enabled but Mbed RTOS is not present!
 #endif
+#elif ERPC_THREADS_IS(WIN32)
+#include "windows.h"
 #endif // ERPC_THREADS_IS
 
 /*!
@@ -144,6 +146,8 @@ public:
         return reinterpret_cast<thread_id_t>(m_thread);
 #elif ERPC_THREADS_IS(MBED)
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
+#elif ERPC_THREADS_IS(WIN32)
+        return reinterpret_cast<thread_id_t>(m_thread);
 #endif
     }
 
@@ -162,6 +166,8 @@ public:
         return reinterpret_cast<thread_id_t>(k_current_get());
 #elif ERPC_THREADS_IS(MBED)
         return reinterpret_cast<thread_id_t>(rtos::ThisThread::get_id());
+#elif ERPC_THREADS_IS(WIN32)
+        return reinterpret_cast<thread_id_t>(GetCurrentThread());
 #endif
     }
 
@@ -217,6 +223,13 @@ private:
     rtos::Thread *m_thread; /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */
+#elif ERPC_THREADS_IS(WIN32)
+    HANDLE m_thread;
+    unsigned int m_thrdaddr;
+    Thread *m_next;         /*!< Pointer to next Thread. */
+    static Thread *s_first; /*!< Pointer to first Thread. */
+    static CRITICAL_SECTION m_critical_section;
+    static BOOL m_critical_section_inited;
 #endif
 
 #if ERPC_THREADS_IS(PTHREADS)
@@ -254,6 +267,15 @@ private:
      * @param[in] arg Thread to execute.
      */
     static void threadEntryPointStub(void *arg);
+
+#elif ERPC_THREADS_IS(WIN32)
+
+    /*!
+    * @brief This function execute threadEntryPoint function.
+    *
+    * @param[in] arg Thread to execute.
+    */
+    static unsigned WINAPI threadEntryPointStub(void *arg);
 
 #endif
 
@@ -360,6 +382,8 @@ private:
     struct k_mutex m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(MBED)
     rtos::Mutex *m_mutex;   /*!< Mutex. */
+#elif ERPC_THREADS_IS(WIN32)
+    HANDLE m_mutex;
 #endif
 
 private:
@@ -444,6 +468,10 @@ private:
 #elif ERPC_THREADS_IS(MBED)
     rtos::Semaphore *m_sem; /*!< Semaphore. */
     int m_count;            /*!< Semaphore count number. */
+#elif ERPC_THREADS_IS(WIN32)
+    Mutex m_mutex;         /*!< Mutext. */
+    int m_count;
+    HANDLE m_sem;
 #endif
 
 private:
