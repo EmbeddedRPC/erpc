@@ -144,6 +144,9 @@ static void read_{$struct.name}_struct_shared(erpc::{$codecClass} * codec, {$str
 static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.name} * data)
 {%   endif %}
 {
+    if(NULL == data) {
+        return;
+    }
 {%   if struct.hasNullableMember %}
     bool isNull;
 {%   endif -- hasNullableMember %}
@@ -185,6 +188,9 @@ static void write_{$struct.name}_struct_shared(erpc::{$codecClass} * codec, cons
 static void write_{$struct.name}_struct(erpc::{$codecClass} * codec, const {$struct.name} * data)
 {%   endif %}
 {
+    if(NULL == data) {
+        return;
+    }
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
     if ({$mem.coderCall.name}{$mem.structElements} == NULL)
@@ -271,6 +277,9 @@ static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t
 static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data)
 {%   endif %}
 {
+    if(NULL == data) {
+        return;
+    }
 {%   if union.needTempVariable %}
     int32_t _tmp_local;
 
@@ -387,7 +396,10 @@ if ({$info.name})
 {% def freeArray(info) %}
 for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{$info.forLoopCount})
 {
-{$addIndent("    ", info.protoNext.freeingCall(info.protoNext))}
+    if ({$info.name})
+    {
+        {$addIndent("    ", info.protoNext.freeingCall(info.protoNext))}
+    }
 }
 {% enddef ------------------------------- freeArray %}
 
