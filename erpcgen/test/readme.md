@@ -4,9 +4,8 @@ erpcgen test system
 This file documents the parser and output test system for erpcgen.
 
 This test system is built on py.test using its extensive plugin hooks. To run the tests, just run
-py.test in either the `erpc/erpgen/` or `erpc/erpcgen/test/` directory.
-Because of py.test are trying run all tests in all subfolders, is safer to run py.test with parameter
-source directory (from erpcgen directory run: "pytest test"). This prevent on windows to execute
+py.test in `erpc/erpcgen/test/` directory. It's safer to run py.test with parameter source
+directory (from erpcgen directory run: "pytest test"). This prevent on windows to execute
 boost test in boost folder.
 
 
@@ -15,7 +14,7 @@ Setup
 
 Python 2.7.x is required. It will also work with Python 3.5+.
 
-py.test and pyYAML are required to run the tests. These can be installed via pip.
+py.test(**Version 5.0.0-**) and pyYAML are required to run the tests. These can be installed via pip.
 
     pip install pytest pyyaml
 
