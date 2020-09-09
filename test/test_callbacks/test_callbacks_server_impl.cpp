@@ -52,6 +52,34 @@ void callback2(int32_t param1, int32_t param2)
     cb2 = (callback2_t *)callback2;
 }
 
+int32_t myFun3(const callback3_t callback, int32_t arg1, int32_t arg2)
+{
+    return callback(arg1, arg2);
+}
+
+int32_t my_add(int32_t arg1, int32_t arg2)
+{
+    return arg1 + arg2;
+}
+
+int32_t my_sub(int32_t arg1, int32_t arg2)
+{
+    return arg1 - arg2;
+}
+
+int32_t my_mul(int32_t arg1, int32_t arg2)
+{
+    return arg1 * arg2;
+}
+
+int32_t my_div(int32_t arg1, int32_t arg2)
+{
+    if(arg2) {
+        return arg1 / arg2;
+    }
+    return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////

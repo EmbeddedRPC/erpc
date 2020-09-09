@@ -164,8 +164,6 @@ static {$callbackType.prototype}
 {
 {%   if fn.isCallback %}
     {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id{% for param in fn.parameters %}, {$param.name}{% endfor %});
-{%    if fn.returnValue.type.isNotVoid %}return;
-{%    endif %}
 {%   else -- fn.isCallback >%}
 {$ clientShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
 {%   endif -- fn.isCallback >%}
