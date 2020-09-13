@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 //! @name Transport setup
 //@{
@@ -282,6 +283,67 @@ erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type
 void erpc_transport_rpmsg_linux_deinit(void);
 //@}
 
+//! @name TCP transport setup
+//@{
+	
+/*!
+ * @brief Create and open TCP transport
+ *
+ * For server, create a TCP listen socket and wait for connections
+ * For client, connect to server
+ *
+ * @param[in] host hostname/IP address to listen on or server to connect to
+ * @param[in] port port to listen on or server to connect to
+ * @param[in] isServer true if we are a server
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_tcp_init_full(const char *host, uint16_t port, bool isServer);
+
+/*!
+ * @brief Create and configure TCP transport but do not open anything
+ *
+ * Parameters are simply memorized to be used with further init() and open()
+ *
+ * @param[in] host hostname/IP address to listen on or server to connect to
+ * @param[in] port port to listen on or server to connect to
+ *
+ */
+void erpc_transport_tcp_configure(const char *host, uint16_t port);
+
+/*!
+ * @brief Create a TCP transport
+ *
+ * Simply create transport instance, don't start anything
+ * @param[in] isServer true if we are a server
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_tcp_init(bool isServer);
+
+/*!
+ * @brief Open TCP connection
+ *
+ * For server, create a TCP listen socket and wait for connections
+ * For client, connect to server
+ *
+ * @return Return TRUE if listen/connection successful
+ */
+bool erpc_transport_tcp_open(void);
+
+/*!
+ * @brief Close TCP connection
+ *
+ * For server, stop listening and close all sockets. Note that the server mode 
+ * uses and accept() which is a not-recommended blocking method so we can't exit
+ * until a connection attempts is made. This is a deadlock but assuming that TCP
+ * code is supposed to be for test, I assume it's acceptable. Otherwise a non-blocking
+ * socket or select() shoudl be used 
+ * For client, close server connection
+ *
+ * @return Return TRUE if listen/connection successful
+ */
+void erpc_transport_tcp_close(void);
 //@}
 
 #ifdef __cplusplus
