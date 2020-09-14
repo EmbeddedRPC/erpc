@@ -102,7 +102,7 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%  else %}
 {%   set self = "self." %}
 {%  endif %}
-{$self}discriminator = codec.start_read_union()
+{$self}{$info.discriminatorName} = codec.start_read_union()
 {%  if self == "self." %}
 {$indent}{$name} = {$name}_union()
 {% endif %}

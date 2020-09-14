@@ -105,11 +105,11 @@ class {$s.name}(object):
         if {$self_m_name} is None:
             raise ValueError("{$m.name} is None")
 {%    if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == true) %}
-        {$m.name}._write(codec, self.{$m.discriminator})
+        self.{$m.name}._write(codec, self.{$m.discriminator})
 {%    else -- isNonEncapsulatedUnion %}
         {$encodeValue(m.type, self_m_name, "codec", "        ", 0)}
 {%    endif -- isNonEncapsulatedUnion %}
-{%   endif -- isNullable %}
+{%  endif -- isNullable %}
 {% endfor -- members %}
 
     def __str__(self):
