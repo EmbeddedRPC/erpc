@@ -14,6 +14,7 @@
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
+#include <stdbool.h>
 
 /*!
  * @addtogroup server_setup
