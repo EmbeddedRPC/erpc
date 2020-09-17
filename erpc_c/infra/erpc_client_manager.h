@@ -64,7 +64,12 @@ public:
      * This function initializes object attributes.
      */
     ClientManager(void)
+#if ERPC_MESSAGE_LOGGING
+    : MessageLoggers()
+    , m_messageFactory(NULL)
+#else
     : m_messageFactory(NULL)
+#endif
     , m_codecFactory(NULL)
     , m_transport(NULL)
     , m_sequence(0)
@@ -72,9 +77,6 @@ public:
 #if ERPC_NESTED_CALLS
     , m_server(NULL)
     , m_serverThreadId(NULL)
-#endif
-#if ERPC_MESSAGE_LOGGING
-    , MessageLoggers()
 #endif
     {
     }
