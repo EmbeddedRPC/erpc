@@ -2243,6 +2243,8 @@ string CGenerator::getBuiltinTypename(const BuiltinType *t)
             return "double";
         case BuiltinType::kStringType:
             return "char *";
+        case BuiltinType::kUStringType:
+            return "unsigned char*";            
         case BuiltinType::kBinaryType:
             return "uint8_t *";
         default:

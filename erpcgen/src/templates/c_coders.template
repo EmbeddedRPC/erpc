@@ -232,7 +232,7 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 {# Encode sending data #}
 {% def encodeBuiltinType(info) -----------------  %}
 {% if info.builtinType == "kStringType" %}
-codec->writeString(strlen({$info.name}), {$info.name});
+codec->writeString(strlen((const char*){$info.name}), (const char*){$info.name});
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->write(*{$info.name});

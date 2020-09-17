@@ -42,6 +42,7 @@ public:
         kFloatType,
         kDoubleType,
         kStringType,
+        kUStringType,
         kBinaryType
     };
 
@@ -111,7 +112,7 @@ public:
      * @retval true When builtin type is string.
      * @retval false When builtin type isn't string.
      */
-    virtual bool isString() const { return m_builtinType == kStringType; }
+    virtual bool isString() const { return m_builtinType == kStringType || m_builtinType == kUStringType; }
 
     /*!
      * @brief This function return true/false value for identify binary type.

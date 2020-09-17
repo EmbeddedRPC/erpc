@@ -83,6 +83,7 @@ void InterfaceDefinition::createBuiltinTypes()
     m_globals.addSymbol(new BuiltinType("float", BuiltinType::_builtin_type::kFloatType));
     m_globals.addSymbol(new BuiltinType("double", BuiltinType::_builtin_type::kDoubleType));
     m_globals.addSymbol(new BuiltinType("string", BuiltinType::_builtin_type::kStringType));
+    m_globals.addSymbol(new BuiltinType("ustring", BuiltinType::_builtin_type::kUStringType));
     m_globals.addSymbol(new BuiltinType("binary", BuiltinType::_builtin_type::kBinaryType));
 }
 
