@@ -58,9 +58,13 @@ class {$s.name}(object):
 {%   endfor -- union cases %}
 
 {% endfor -- members %}
-    def __init__(self{% for m in s.members if not m.lengthForMember %}, {$m.name}=None{% endfor %}):
+    def __init__(self{% for m in s.members if ((not m.lengthForMember) && m.type.type != 'union') %}, {$m.name}=None{% endfor %}):
 {% for m in s.members if not m.lengthForMember %}
+{%     if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == false) %}
+        self.{$m.name} = self.{$m.name}_union # {$prettyTypeName(m.name, m.type)}
+{%     else %}
         self.{$m.name} = {$m.name} # {$prettyTypeName(m.name, m.type)}
+{%     endif -- union type %}
 {% endfor -- members %}
 
 {# create read-only properties for @length counts #}
@@ -101,11 +105,11 @@ class {$s.name}(object):
         if {$self_m_name} is None:
             raise ValueError("{$m.name} is None")
 {%    if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == true) %}
-        {$m.name}._write(codec, self.{$m.discriminator})
+        self.{$m.name}._write(codec, self.{$m.discriminator})
 {%    else -- isNonEncapsulatedUnion %}
         {$encodeValue(m.type, self_m_name, "codec", "        ", 0)}
 {%    endif -- isNonEncapsulatedUnion %}
-{%   endif -- isNullable %}
+{%  endif -- isNullable %}
 {% endfor -- members %}
 
     def __str__(self):
@@ -146,10 +150,10 @@ class {$u.name}(object):
 
 {% endfor -- group.symbolsMap.unions %}
 {% endif -- not empty(group.symbolsMap.unions) %}
+{% if not empty(group.symbolsMap.aliases) %}
 
-{% if aliases %}
 # Type aliases
-{% for a in aliases %}
+{% for a in group.symbolsMap.aliases %}
 {$a.name} = {$a.elementType.name}
-{% endfor -- aliases %}
-{% endif -- aliases %}
+{% endfor -- group.symbolsMap.aliases %}
+{% endif -- not empty(group.symbolsMap.aliases) %}

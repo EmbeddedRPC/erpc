@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -186,6 +186,8 @@ int main(int argc, char **argv)
 
 void quitSecondInterfaceServer()
 {
+    // removing SecondInterface service from the server
+    remove_services(&g_server);
     // Stop server part
     g_server.stop();
     increaseWaitQuit();

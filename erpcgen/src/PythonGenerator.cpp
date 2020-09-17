@@ -136,7 +136,7 @@ void PythonGenerator::generate()
 
     makeIncludesTemplateData();
 
-    makeAliasesTemplateData();
+    //makeAliasesTemplateData();
 
     makeConstTemplateData();
 
@@ -407,6 +407,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
     data_list structs;
     data_list unions;
+    data_list aliases;
 
     Log::info("Group symbols:\n");
 
@@ -453,6 +454,10 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 Log::info("%s\n", unionType->getDescription().c_str());
 
                 string name = filterName(getOutputName(unionType));
+                if(name.find('$') != string::npos) {
+                    Log::debug("%s is inside struct!\n", name.c_str());
+                    break;
+                }
 
                 // check if template for this structure has not already been generated
                 if (names.find(name) == names.end())
@@ -468,6 +473,30 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 }
                 break;
             }
+            case DataType::kAliasTypeSymbol: 
+            {
+                AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
+                if (aliasType == nullptr)
+                    break;
+
+                DataType *elementDataType = aliasType->getElementType();
+                DataType *trueDataType = elementDataType->getTrueDataType();
+                // Only generate aliases for enums, unions and structs in Python.
+                if (!(trueDataType->isEnum() || trueDataType->isUnion() || trueDataType->isStruct()))
+                    break;
+
+                string realType = getOutputName(aliasType);
+                Log::debug("%s\n", realType.c_str());
+
+                info["name"] = filterName(realType);
+                info["elementType"] = getTypeInfo(elementDataType);
+                info["trueType"] = getTypeInfo(trueDataType);
+
+                setTemplateComments(aliasType, info);
+
+                aliases.push_back(info);
+                break;
+            }
             default:
                 break;
         }
@@ -475,6 +504,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
     symbolsTemplate["structs"] = structs;
     symbolsTemplate["unions"] = unions;
+    symbolsTemplate["aliases"] = aliases;
 
     return symbolsTemplate;
 }

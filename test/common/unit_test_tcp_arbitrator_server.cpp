@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -52,10 +52,10 @@ Mutex waitQuitMutex;
 extern const uint32_t erpc_generated_crc;
 Crc16 g_crc16(erpc_generated_crc);
 
-int waitQuit = 0;
-int waitClient = 0;
-int isTestPassing = 0;
-int stopTest = 0;
+volatile int waitQuit = 0;
+volatile int waitClient = 0;
+volatile int isTestPassing = 0;
+volatile int stopTest = 0;
 
 void increaseWaitQuit()
 {
@@ -193,6 +193,8 @@ int32_t getResultFromSecondSide()
 
 void quitFirstInterfaceServer()
 {
+    // removing FirstInterface service from the server
+    remove_services(&g_server);
     // Stop server part
     g_server.stop();
 }

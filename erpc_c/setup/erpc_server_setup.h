@@ -64,6 +64,13 @@ void erpc_server_deinit(void);
 void erpc_add_service_to_server(void *service);
 
 /*!
+ * @brief This function removes service from server.
+ *
+ * @param[in] service Service which contains implementations of functions called from client to server.
+ */
+void erpc_remove_service_from_server(void *service);
+
+/*!
  * @brief Can be used to set own crcStart number.
  *
  * For example can be used generated crc from erpcgen

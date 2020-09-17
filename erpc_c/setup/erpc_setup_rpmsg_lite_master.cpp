@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -18,7 +18,7 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(SH_MEM_TOTAL_SIZE)
-#define SH_MEM_TOTAL_SIZE (6144)
+#define SH_MEM_TOTAL_SIZE (6144U)
 #endif
 
 #if defined(__ICCARM__) /* IAR Workbench */
@@ -38,8 +38,7 @@ static ManuallyConstructed<RPMsgTransport> s_transport;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-erpc_transport_t erpc_transport_rpmsg_lite_master_init(unsigned long src_addr, unsigned long dst_addr,
-                                                       int rpmsg_link_id)
+erpc_transport_t erpc_transport_rpmsg_lite_master_init(uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id)
 {
     s_transport.construct();
     if (s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) == kErpcStatus_Success)

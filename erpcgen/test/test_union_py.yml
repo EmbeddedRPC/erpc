@@ -168,7 +168,7 @@ lang: py
 test/common.py:
   - not: class unionVariable_union(object)
   - "class structType(object):"
-  - def __init__(self, discriminator=None, unionVariable=None)
+  - def __init__(self, discriminator=None)
   - self.discriminator = discriminator # fruitType
   - self.unionVariable = unionVariable # unionType
   - self.unionVariable, self.discriminator = common.unionType()._read(codec)

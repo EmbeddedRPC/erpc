@@ -119,7 +119,7 @@ public:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performRequest(RequestContext &request);
+    virtual void performRequest(RequestContext &request);
 
     /*!
      * @brief This function releases request context.
@@ -180,7 +180,7 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performClientRequest(RequestContext &request);
+    virtual void performClientRequest(RequestContext &request);
 
 #if ERPC_NESTED_CALLS
     /*!
@@ -190,7 +190,7 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performNestedClientRequest(RequestContext &request);
+    virtual void performNestedClientRequest(RequestContext &request);
 #endif
 
     //! @brief Validate that an incoming message is a reply.

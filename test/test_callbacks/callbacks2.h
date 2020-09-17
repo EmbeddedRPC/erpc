@@ -6,4 +6,4 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-void callback3(int32_t param1, int32_t param2);
+void callback2(int32_t param1, int32_t param2);

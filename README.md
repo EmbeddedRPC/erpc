@@ -26,7 +26,7 @@ Client side usage:
 void example_client(void) {
     // Initialize client running over UART.
     erpc_client_init(
-        erpc_transport_cmsis_uart_init(UART0_NonBlocking_Driver);
+        erpc_transport_cmsis_uart_init(Driver_USART0);
 
     // Now we can call the remote function to turn on the green LED.
     set_led(kGreen, true);
@@ -43,7 +43,7 @@ void set_led(LEDName whichLed, bool onOrOff) {
 void example_server(void) {
     // Initialize server running over UART.
     erpc_server_init(
-        erpc_transport_uart_init(UART0_NonBlocking_Driver);
+        erpc_transport_cmsis_uart_init(Driver_USART0);
 
     // Add the IO service.
     erpc_add_service_to_server(create_IO_service());
@@ -71,7 +71,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 7199a9c00fef4b952a6b05a8e3b0257f788e4eeb.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 431cba8.
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
@@ -117,7 +117,7 @@ Steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/V
 Install these packages:
 * bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
-* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.58.0)
+* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.67.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter (either 2.7 or 3.5+ work)
 * gcc-core: GNU Compiler Collection (C, OpenMP)
@@ -170,5 +170,6 @@ After installation, the `erpc` package is available via normal import statements
 Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
 
 ---
-Copyright © 2014-2016 Freescale Semiconductor, Inc.
-Copyright © 2016-2017 NXP
+Copyright 2014-2016 Freescale Semiconductor, Inc.
+
+Copyright 2016-2020 NXP

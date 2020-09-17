@@ -48,7 +48,7 @@ test/interface.py:
   - def bar(self, l)
 test/client.py:
   - def bar(self, l)
-  - start_write_list(len(l))
+  - start_write_list(len(l.value))
   - perform_request
   - start_read_list
   - not: codec.read_int32()
@@ -78,9 +78,14 @@ idl: |
 lang: py
 test/client.py:
   - def bar(self, v)
+  - if: dir in ('in', )
+    then:
+    - write_{type}(v)
+  - if: dir in ('inout', )
+    then:
+    - write_{type}(v.value)
   - if: dir in ('in', 'inout')
     then:
-      - write_{type}(v)
       - not: write_int32(len(v))
   - perform_request
   - if: dir in ('inout',)

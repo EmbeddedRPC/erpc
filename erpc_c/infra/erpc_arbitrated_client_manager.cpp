@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -10,6 +10,10 @@
 #include "erpc_arbitrated_client_manager.h"
 #include "erpc_transport_arbitrator.h"
 #include "assert.h"
+
+#if ERPC_THREADS_IS(NONE)
+#error "Arbitrator code does not work in no-threading configuration."
+#endif
 
 using namespace erpc;
 
@@ -29,7 +33,7 @@ void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)
     m_transport = arbitrator;
 }
 
-erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &request)
+void ArbitratedClientManager::performClientRequest(RequestContext &request)
 {
     assert(m_arbitrator && "arbitrator not set");
 
@@ -42,13 +46,15 @@ erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &requ
 #if ERPC_NESTED_CALLS_DETECTION
         if (nestingDetection)
         {
-            return kErpcStatus_NestedCallFailure;
+            request.getCodec()->updateStatus(kErpcStatus_NestedCallFailure);
+            return;
         }
 #endif
         token = m_arbitrator->prepareClientReceive(request);
         if (!token)
         {
-            return kErpcStatus_Fail;
+            request.getCodec()->updateStatus(kErpcStatus_Fail);
+            return;
         }
     }
 
@@ -58,7 +64,8 @@ erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &requ
     err = logMessage(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 #endif
 
@@ -66,7 +73,8 @@ erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &requ
     err = m_arbitrator->send(request.getCodec()->getBuffer());
     if (err)
     {
-        return err;
+        request.getCodec()->updateStatus(err);
+        return;
     }
 
     if (!request.isOneway())
@@ -75,14 +83,16 @@ erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &requ
         err = m_arbitrator->clientReceive(token);
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 
 #if ERPC_MESSAGE_LOGGING
         err = logMessage(request.getCodec()->getBuffer());
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
 #endif
 
@@ -90,9 +100,10 @@ erpc_status_t ArbitratedClientManager::performClientRequest(RequestContext &requ
         err = verifyReply(request);
         if (err)
         {
-            return err;
+            request.getCodec()->updateStatus(err);
+            return;
         }
     }
 
-    return kErpcStatus_Success;
+    return;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -17,6 +17,10 @@
 #include "erpc_threading.h"
 #endif
 #include <cassert>
+
+#if ERPC_THREADS_IS(NONE)
+#error "Arbitrator code does not work in no-threading configuration."
+#endif
 
 using namespace erpc;
 

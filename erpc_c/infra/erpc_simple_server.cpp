@@ -15,10 +15,6 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-SimpleServer::~SimpleServer(void)
-{
-}
-
 void SimpleServer::disposeBufferAndCodec(Codec *codec)
 {
     if (codec)
