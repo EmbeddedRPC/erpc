@@ -18,7 +18,6 @@
 #endif
 #include "erpc_client_manager.h"
 #include "erpc_transport_setup.h"
-#include <stdbool.h>
 
 /*!
  * @addtogroup client_setup
@@ -34,6 +33,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stdint.h>
 
 //! @name Client setup
