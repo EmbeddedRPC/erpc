@@ -4,7 +4,7 @@ uint32_t {$info.stringLocalName}_len;
 char * {$info.stringLocalName}_local;
 codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
-{$info.name} = (char *) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
+{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {%   if generateAllocErrorChecks == true %}
 if ({$info.name} == NULL)
 {

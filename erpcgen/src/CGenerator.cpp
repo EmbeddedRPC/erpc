@@ -1861,13 +1861,9 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
             throw semantic_error(format_string("Expected value for @%s annotation for function on line %d",
                                                ERROR_RETURN_ANNOTATION, symbol->getLocation().m_firstLine));
         }
-        else if (dataType->isUString())
-        {
-            return "(unsigned char *) " + returnVal->toString();
-        }
         else if (dataType->isString())
         {
-            return "(char *) " + returnVal->toString();
+            return (dataType->isUString() ? "(unsigned char *)" : "(char*)") + returnVal->toString();
         }
         else if (dataType->isScalar())
         {
@@ -2299,14 +2295,8 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group, BuiltinType *t, data_map &
         }
         templateData["freeingCall"] = m_templateData["freeData"];
         // needDealloc(templateData, t, structType, nullptr);
-        if (t->isUString()) {
-            templateData["builtinType"] = "kStringType";
-            templateData["mallocType"] = "char*";
-        } else {
-            templateData["builtinType"] = "kUStringType";
-            templateData["mallocType"] = "unsigned char*";
-        }
-
+        templateData["builtinType"] = "kStringType";
+        templateData["builtinTypeName"] = t->isUString() ? "unsigned char*" : "char*";
     }
     else
     {
