@@ -114,13 +114,15 @@ public:
      * This function initializes object attributes.
      */
     Server(void)
+#if ERPC_MESSAGE_LOGGING
+    : MessageLoggers()
+    , m_messageFactory()
+#else
     : m_messageFactory()
+#endif
     , m_codecFactory()
     , m_transport()
     , m_firstService()
-#if ERPC_MESSAGE_LOGGING
-    , MessageLoggers()
-#endif
     {
     }
 
