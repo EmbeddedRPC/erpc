@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -43,6 +44,12 @@
 
 #define ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED (0) //!< Do not use MCMGR for MU ISR management.
 #define ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED (1)  //!< Use MCMGR for MU ISR management.
+
+#define ERPC_PRE_POST_ACTION_DISABLED (0) //!< Pre post shim callbacks functions disabled.
+#define ERPC_PRE_POST_ACTION_ENABLED (1)  //!< Pre post shim callback functions enabled.
+
+#define ERPC_PRE_POST_ACTION_DEFAULT_DISABLED (0) //!< Pre post shim default callbacks functions disabled.
+#define ERPC_PRE_POST_ACTION_DEFAULT_ENABLED (1)  //!< Pre post shim default callback functions enabled.
 //@}
 
 //! @name Configuration options
@@ -118,6 +125,22 @@
 //! erpc_mu_transport.h for additional MU settings.
 //#define ERPC_TRANSPORT_MU_USE_MCMGR ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED
 //@}
+
+//! @def ERPC_PRE_POST_ACTION
+//!
+//! Enable eRPC pre and post callback functions shim code. Take look into "erpc_pre_post_action.h". Can be used for
+//! detection of eRPC call freeze, ... Default set to ERPC_PRE_POST_ACTION_DISABLED.
+//!
+//! Uncomment for using pre post callback feature.
+//#define ERPC_PRE_POST_ACTION (ERPC_PRE_POST_ACTION_ENABLED)
+
+//! @def ERPC_PRE_POST_ACTION_DEFAULT
+//!
+//! Enable eRPC pre and post default callback functions. Take look into "erpc_setup_extensions.h". Can be used for
+//! detection of eRPC call freeze, ... Default set to ERPC_PRE_POST_ACTION_DEFAULT_DISABLED.
+//!
+//! Uncomment for using pre post default callback feature.
+//#define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_ENABLED)
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_
