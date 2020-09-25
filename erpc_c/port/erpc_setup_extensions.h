@@ -10,15 +10,14 @@
 #ifndef _EMBEDDED_RPC__SETUP_EXTENSIONS_H_
 #define _EMBEDDED_RPC__SETUP_EXTENSIONS_H_
 
-
 #include "erpc_config_internal.h"
 
 #if ERPC_THREADS
 
 #if ERPC_THREADS_IS(FREERTOS)
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "task.h"
+#include "timers.h"
 #endif
 
 #endif // ERPC_THREADS
@@ -45,32 +44,44 @@ void erpc_pre_cb_default(void);
  * @brief This function is used for default post erpc call action.
  */
 void erpc_post_cb_default(void);
-}
+} // namespace erpc
 
 extern "C" {
 #endif
 
+#if ERPC_THREADS_IS(FREERTOS)
+typedef TimerCallbackFunction_t erpc_call_timer_cb_default_t;
+#else
+typedef void *erpc_call_timer_cb_default_t;
+#endif
+
 /*!
- * @brief This function is used for creating default timer for task freeze detection.
+ * @brief This function is used for initializing variables for task freeze detection.
  *
+ * @param[in] erpc_call_timer_cb Callback function called when eRPC call freeze.
+ * When NULL default callback will be used.
  * @param[in] waitTime Platform specific time to throw error cb in case of eRPC call freeze.
  */
-void erpc_create_timer_default(uint32_t waitTime);
+void erpc_init_call_progress_detection_default(erpc_call_timer_cb_default_t erpc_call_timer_cb, uint32_t waitTime);
+
+/*!
+ * @brief This function is used for deinitialization variables for task freeze detection.
+ */
+void erpc_deinit_call_progress_detection_default(void);
 
 /*!
  * @brief This function returns default eRPC call progress status.
  *
  * @return True if eRPC call is in progress, otherwise False.
  */
-bool is_erpc_call_executed_default(void);
+bool erpc_is_call_in_progress_default(void);
 
 /*!
- * @brief This function sets default eRPC call progress status.
+ * @brief This function resets eRPC state.
  *
- * @param[in] erpc_call Set erpc call progress status.
- * (E.G. in case of frezee and user will reinitialize eRPC communication)
+ * Can be used when user reinitialize communication between client and server.
  */
-void set_erpc_call_execution_state_default(bool erpc_call);
+void erpc_reset_in_progress_state_default(void);
 
 #ifdef __cplusplus
 }
