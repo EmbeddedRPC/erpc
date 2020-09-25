@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -11,9 +12,9 @@
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
 #ifdef __cplusplus
+#include "erpc_client_server_common.h"
 #include "erpc_codec.h"
 #include "erpc_config_internal.h"
-#include "erpc_client_server_common.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_server.h"
 #include "erpc_threading.h"
