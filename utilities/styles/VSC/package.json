@@ -1,0 +1,34 @@
+{
+    "name": "erpc-code-style",
+    "displayName": "ERPC code style",
+    "description": "Formatting code relevant to eRPC language",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.49.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "erpc",
+            "aliases": ["erpc", "erpc"],
+            "extensions": [".erpc"],
+            "configuration": "./language-configuration.json"
+        }, {
+            "id": "template",
+            "aliases": ["template", "template"],
+            "extensions": [".template"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "erpc",
+            "scopeName": "source.erpc",
+            "path": "./syntaxes/erpc.tmLanguage.json"
+        }, {
+            "language": "template",
+            "scopeName": "source.template",
+            "path": "./syntaxes/template.tmLanguage.json"
+        }]
+    }
+}
