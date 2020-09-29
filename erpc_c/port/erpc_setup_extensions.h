@@ -60,9 +60,9 @@ typedef void *erpc_call_timer_cb_default_t;
  *
  * @param[in] erpc_call_timer_cb Callback function called when eRPC call freeze.
  * When NULL default callback will be used.
- * @param[in] waitTime Platform specific time to throw error cb in case of eRPC call freeze.
+ * @param[in] waitTimeMs Platform specific time to throw error cb in case of eRPC call freeze in [ms].
  */
-void erpc_init_call_progress_detection_default(erpc_call_timer_cb_default_t erpc_call_timer_cb, uint32_t waitTime);
+void erpc_init_call_progress_detection_default(erpc_call_timer_cb_default_t erpc_call_timer_cb, uint32_t waitTimeMs);
 
 /*!
  * @brief This function is used for deinitialization variables for task freeze detection.

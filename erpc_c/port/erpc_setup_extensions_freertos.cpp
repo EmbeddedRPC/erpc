@@ -36,16 +36,12 @@ void erpc_call_timer_cb_default(TimerHandle_t xTimer)
     assert(1 != 1 && "eRPC task freezed.");
 }
 
-void erpc_init_call_progress_detection_default(erpc_call_timer_cb_default_t erpc_call_timer_cb = NULL, uint32_t waitTime = 5 * 60 * 1000)
+void erpc_init_call_progress_detection_default(erpc_call_timer_cb_default_t erpc_call_timer_cb = erpc_call_timer_cb_default, uint32_t waitTimeMs = 5 * 60 * 1000)
 {
     s_erpc_call_in_progress = new Semaphore(1);
     assert(s_erpc_call_in_progress && "Creating eRPC semaphore failed.");
 
-    if (!erpc_call_timer_cb)
-    {
-        erpc_call_timer_cb = erpc_call_timer_cb_default;
-    }
-    s_erpc_call_timer_cb = xTimerCreate("Erpc client call timer", waitTime / 1000 / portTICK_PERIOD_MS, pdFALSE, NULL, erpc_call_timer_cb);
+    s_erpc_call_timer_cb = xTimerCreate("Erpc client call timer", waitTimeMs / portTICK_PERIOD_MS, pdFALSE, NULL, erpc_call_timer_cb);
     assert(s_erpc_call_timer_cb && "Creating eRPC timer failed.");
 }
 
