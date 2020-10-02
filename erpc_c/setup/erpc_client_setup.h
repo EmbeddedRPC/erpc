@@ -14,6 +14,9 @@
 #include "erpc_common.h"
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
+#if ERPC_PRE_POST_ACTION
+#include "erpc_pre_post_action.h"
+#endif
 #if ERPC_NESTED_CALLS
 #include "erpc_server_setup.h"
 #endif
@@ -96,6 +99,24 @@ void erpc_client_set_server_thread_id(void *serverThreadId);
  * @retval False When transport wasn't added.
  */
 bool erpc_client_add_message_logger(erpc_transport_t transport);
+#endif
+
+#if ERPC_PRE_POST_ACTION
+/*!
+ * @brief This function set callback function executed at the beginning of eRPC call.
+ *
+ * @param[in] preCB Callback used at the beginning of eRPC call. When NULL and ERPC_PRE_POST_ACTION_DEFAULT
+ * is enabled then default function will be set.
+ */
+void erpc_client_add_pre_cb_action(pre_post_action_cb preCB);
+
+/*!
+ * @brief This function set callback function executed at the end of eRPC call.
+ *
+ * @param[in] postCB Callback used at the end of eRPC call. When NULL and ERPC_PRE_POST_ACTION_DEFAULT
+ * is enabled then default function will be set.
+ */
+void erpc_client_add_post_cb_action(pre_post_action_cb postCB);
 #endif
 
 /*!

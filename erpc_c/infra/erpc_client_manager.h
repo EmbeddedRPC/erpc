@@ -12,11 +12,9 @@
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
 #ifdef __cplusplus
+#include "erpc_client_server_common.h"
 #include "erpc_codec.h"
 #include "erpc_config_internal.h"
-#if ERPC_MESSAGE_LOGGING
-#include "erpc_message_loggers.h"
-#endif
 #if ERPC_NESTED_CALLS
 #include "erpc_server.h"
 #include "erpc_threading.h"
@@ -52,11 +50,7 @@ class Server;
  *
  * @ingroup infra_client
  */
-#if ERPC_MESSAGE_LOGGING
-class ClientManager : public MessageLoggers
-#else
-class ClientManager
-#endif
+class ClientManager : public ClientServerCommon
 {
 public:
     /*!
@@ -65,12 +59,8 @@ public:
      * This function initializes object attributes.
      */
     ClientManager(void)
-#if ERPC_MESSAGE_LOGGING
-    : MessageLoggers()
+    : ClientServerCommon()
     , m_messageFactory(NULL)
-#else
-    : m_messageFactory(NULL)
-#endif
     , m_codecFactory(NULL)
     , m_transport(NULL)
     , m_sequence(0)
