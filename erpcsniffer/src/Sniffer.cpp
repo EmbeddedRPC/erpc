@@ -376,7 +376,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
                         return err;
                     }
                     string binaryValue;
-                    for (int i = 0; i < length; ++i)
+                    for (unsigned int i = 0; i < length; ++i)
                     {
                         binaryValue += format_string("%d|", value[i]);
                     }
@@ -394,7 +394,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
         {
             EnumType *e = dynamic_cast<EnumType *>(dataType);
             assert(e);
-            int32_t value;
+            uint32_t value;
             m_codec->read(&value);
             if ((err = m_codec->getStatus()))
             {
@@ -447,7 +447,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             {
                 return err;
             }
-            for (int i = 0; i < listSize; i++)
+            for (unsigned int i = 0; i < listSize; i++)
             {
                 string parseDataInfo;
                 err = parseDataType(listType->getElementType(), parseDataInfo);
@@ -474,7 +474,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             assert(structType);
             parsedDataInfo = "struct " + structType->getName() + ":\n";
             StructType::member_vector_t members = structType->getMembers();
-            for (int i = 0; i < members.size(); ++i)
+            for (unsigned int i = 0; i < members.size(); ++i)
             {
                 string parseDataInfo;
                 err = parseMemberType(structType, members[i], parseDataInfo);
