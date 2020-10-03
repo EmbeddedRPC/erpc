@@ -1138,7 +1138,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
             const StructType::member_vector_t &callbackParams = callbackFunctionType->getParameters().getMembers();
             if (callbackFunctionType->getParameters().getMembers().size() > paramsSize)
             {
-                for (int i = paramsSize; i < callbackParams.size(); ++i)
+                for (unsigned int i = paramsSize; i < callbackParams.size(); ++i)
                 {
                     if (callbackParams[i]->getName().compare("") == 0)
                     {
