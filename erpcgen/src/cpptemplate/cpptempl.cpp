@@ -521,6 +521,7 @@ bool DataBool::empty()
 }
 void DataBool::dump(int indent)
 {
+    (void)indent;
     std::cout << "(bool)" << getvalue() << std::endl;
 }
 int DataBool::getint() const
@@ -540,6 +541,7 @@ bool DataInt::empty()
 }
 void DataInt::dump(int indent)
 {
+    (void)indent;
     std::cout << "(int)" << m_value << std::endl;
 }
 int DataInt::getint() const
@@ -561,6 +563,7 @@ int DataValue::getint() const
 }
 void DataValue::dump(int indent)
 {
+    (void)indent;
     std::string text = boost::algorithm::replace_all_copy(getvalue(), "\n", "\\n");
     std::cout << "\"" << text << "\"" << std::endl;
 }
@@ -624,6 +627,7 @@ bool DataTemplate::empty()
 
 void DataTemplate::dump(int indent)
 {
+    (void)indent;
     std::cout << "(template)\n";
 }
 
@@ -1806,6 +1810,7 @@ NodeType NodeDef::gettype()
 
 void NodeDef::gettext(std::ostream &stream, data_map &data)
 {
+    (void)stream;
     // Follow the key path.
     data_ptr &target = data.parse_path(m_name, true);
 
@@ -1825,6 +1830,7 @@ NodeType NodeSet::gettype()
 
 void NodeSet::gettext(std::ostream &stream, data_map &data)
 {
+    (void)stream;
     TokenIterator tok(m_expr);
     tok.match(SET_TOKEN, "expected 'set'");
     std::string path = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
