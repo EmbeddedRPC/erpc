@@ -1582,7 +1582,7 @@ void NodeVar::gettext(std::ostream &stream, data_map &data)
 
         stream << str;
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1690,7 +1690,7 @@ void NodeFor::gettext(std::ostream &stream, data_map &data)
         // ignore exception - the for loop key variable doesn't exist, so just
         // don't execute the for loop at all
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1764,7 +1764,7 @@ bool NodeIf::is_true(data_map &data)
 
         return !d->empty();
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1935,7 +1935,7 @@ node_vector &TemplateParser::parse()
 
         return m_top_nodes;
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(m_current_line);
         throw e;
