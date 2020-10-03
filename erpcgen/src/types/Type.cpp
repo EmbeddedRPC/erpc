@@ -94,7 +94,7 @@ Annotation *Symbol::findAnnotation(string name, Annotation::program_lang_t lang)
 vector<Annotation *> Symbol::getAnnotations(string name, Annotation::program_lang_t lang)
 {
     vector<Annotation *> anList;
-    for (int i = 0; i < m_annotations.size(); ++i)
+    for (unsigned int i = 0; i < m_annotations.size(); ++i)
     {
         if (m_annotations[i].getName() == name &&
             (m_annotations[i].getLang() == lang || m_annotations[i].getLang() == Annotation::kAll))
@@ -239,7 +239,7 @@ void SymbolScope::replaceSymbol(Symbol *oldSym, Symbol *newSym)
 
 int32_t SymbolScope::getSymbolPos(Symbol *sym)
 {
-    for (int i = 0; i < m_symbolVector.size(); i++)
+    for (unsigned int i = 0; i < m_symbolVector.size(); i++)
     {
         if (m_symbolVector[i] == sym)
         {
@@ -323,7 +323,7 @@ void StructType::addMember(StructMember *newMember)
 string StructType::getDescription() const
 {
     string members;
-    int n = 0;
+    unsigned int n = 0;
     for (auto it : m_members)
     {
         members += format_string("%d:", n);
@@ -363,7 +363,7 @@ void EnumType::addMember(EnumMember *newMember)
 string EnumType::getDescription() const
 {
     string members;
-    int n = 0;
+    unsigned int n = 0;
     for (auto it : m_members)
     {
         members += format_string("%d:", n);
@@ -437,7 +437,7 @@ const set<_param_direction> Group::getSymbolDirections(Symbol *symbol) const
 string Group::getDescription() const
 {
     string ifaces;
-    int n = 0;
+    unsigned int n = 0;
     for (auto it : m_interfaces)
     {
         ifaces += format_string("%d:", n);
@@ -517,7 +517,7 @@ void Interface::addFunction(Function *func)
 string Interface::getDescription() const
 {
     string fns;
-    int n = 0;
+    unsigned int n = 0;
     for (auto it : m_functions)
     {
         fns += format_string("%d:", n);
@@ -619,7 +619,7 @@ bool UnionType::casesAreTheSame(UnionCase *a, UnionCase *b)
     {
         return false;
     }
-    for (int i = 0; i < aNames.size(); ++i)
+    for (unsigned int i = 0; i < aNames.size(); ++i)
     {
         if (aNames[i] != bNames[i])
         {
