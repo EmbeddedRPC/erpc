@@ -798,7 +798,7 @@ const KeywordDef k_keywords[] = { { TRUE_TOKEN, "true" },     { FALSE_TOKEN, "fa
                                   { ELSE_TOKEN, "else" },     { DEF_TOKEN, "def" },     { SET_TOKEN, "set" },
                                   { ENDFOR_TOKEN, "endfor" }, { ENDIF_TOKEN, "endif" }, { ENDDEF_TOKEN, "enddef" },
                                   { AND_TOKEN, "and" },       { OR_TOKEN, "or" },       { NOT_TOKEN, "not" },
-                                  { INVALID_TOKEN } };
+                                  { INVALID_TOKEN, NULL } };
 
 TokenType get_keyword_token(const std::string &s)
 {
