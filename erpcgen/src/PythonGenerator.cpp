@@ -65,7 +65,7 @@ void PythonGenerator::generateInitFile(string fileName)
 {
     fileName += "/__init__.py";
     generateOutputFile(fileName, "py_init", m_templateData, kPyInit);
-};
+}
 
 void PythonGenerator::generateCommonFile(string fileName)
 {
