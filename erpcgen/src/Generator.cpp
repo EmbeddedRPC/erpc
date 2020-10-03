@@ -430,7 +430,7 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         data_list functions = getFunctionsTemplateData(group, iface);
         ifaceInfo["functions"] = functions;
         ifaceInfo["isNonExternalInterface"] = false;
-        for (int i = 0; i < functions.size(); ++i)
+        for (unsigned int i = 0; i < functions.size(); ++i)
         {
             assert(dynamic_cast<DataMap *>(functions[i].get().get()));
             string isNonExternalFunction =
