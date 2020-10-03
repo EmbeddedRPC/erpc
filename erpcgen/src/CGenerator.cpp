@@ -1574,9 +1574,9 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
                 Symbol *symbol = fn->getParameters().getScope().getSymbol(maxLengthName, false);
                 if (symbol)
                 {
-                    StructMember *structMember = dynamic_cast<StructMember *>(symbol);
-                    assert(structMember);
-                    if (structMember->getDirection() != kInDirection)
+                    StructMember *symbolStructMember = dynamic_cast<StructMember *>(symbol);
+                    assert(symbolStructMember);
+                    if (symbolStructMember->getDirection() != kInDirection)
                     {
                         throw semantic_error(
                             format_string("line %d, ref %d: The parameter named by a max_length annotation must be "
@@ -2129,7 +2129,7 @@ string CGenerator::generateIncludeGuardName(const string &filename)
     size_t found = filename.find_last_of("/\\");
     if (found != string::npos)
     {
-        string fileNoPath = filename.substr(found + 1);
+        fileNoPath = filename.substr(found + 1);
     }
     // Create include guard macro name.
     guard = "_";
