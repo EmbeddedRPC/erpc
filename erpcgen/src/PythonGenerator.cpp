@@ -167,6 +167,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 
 data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
+    (void)group;
     data_map info;
     string proto = getFunctionPrototype(fn);
 
@@ -789,6 +790,7 @@ string PythonGenerator::filterName(const string &name)
 
 string PythonGenerator::convertComment(const string &comment, comment_type commentType)
 {
+    (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
     static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
