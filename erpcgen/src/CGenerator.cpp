@@ -629,7 +629,7 @@ data_map CGenerator::getEnumTemplateData(EnumType *enumType)
 
 data_list CGenerator::getEnumMembersTemplateData(EnumType *enumType)
 {
-    int j = 0;
+    unsigned int j = 0;
     data_list enumMembersList;
     for (auto member : enumType->getMembers())
     {
@@ -720,12 +720,12 @@ void CGenerator::makeAliasesTemplateData()
             else
             {
                 /* skip structure, unions and functions type definitions */
-                for (int aliasTypesIt = i; aliasTypesIt < aliasTypeVector.size(); ++aliasTypesIt)
+                for (unsigned int aliasTypesIt = i; aliasTypesIt < aliasTypeVector.size(); ++aliasTypesIt)
                 {
                     if (callbackParamType == aliasTypeVector[aliasTypesIt])
                     {
                         // Add aliases in IDL declaration order.
-                        int nextIt = aliasTypesIt + 1;
+                        unsigned int nextIt = aliasTypesIt + 1;
                         while (nextIt < aliasTypeVector.size())
                         {
                             AliasType *nextAlias = dynamic_cast<AliasType *>(aliasTypeVector[nextIt]);
@@ -1939,7 +1939,7 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
 
     if (params.size())
     {
-        int n = 0;
+        unsigned int n = 0;
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
@@ -2015,7 +2015,7 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::str
 
     if (params.size())
     {
-        int n = 0;
+        unsigned int n = 0;
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
