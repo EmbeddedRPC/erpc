@@ -21,6 +21,7 @@ void *operator new(size_t count) THROW_BADALLOC
 
 void *operator new(size_t count, const nothrow_t &tag) THROW NOEXCEPT
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
@@ -33,6 +34,7 @@ void *operator new[](size_t count) THROW_BADALLOC
 
 void *operator new[](size_t count, const nothrow_t &tag) THROW NOEXCEPT
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
