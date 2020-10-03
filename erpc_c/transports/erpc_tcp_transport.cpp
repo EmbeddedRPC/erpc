@@ -86,7 +86,8 @@ erpc_status_t TCPTransport::connectClient(void)
     }
 
     // Fill in hints structure for getaddrinfo.
-    struct addrinfo hints = { 0 };
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_flags = AI_NUMERICSERV;
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
