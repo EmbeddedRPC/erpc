@@ -1267,6 +1267,7 @@ data_map CGenerator::getUnionDeclarationTemplateData(UnionType *unionType)
 data_map CGenerator::getUnionDefinitionTemplateData(Group *group, UnionType *unionType, data_map &unionInfo,
                                                     bool &needUnionsServerFree)
 {
+    (void)group;
     bool needTempVariable = false;
     unionInfo["coderCall"] =
         getEncodeDecodeCall("data->", nullptr, unionType, nullptr, true, nullptr, needTempVariable, false);
@@ -1842,6 +1843,7 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<_param_
 
 data_map CGenerator::getTypeInfo(DataType *t, bool isFunction)
 {
+    (void)isFunction;
     data_map info;
     info["isNotVoid"] = make_data(t->getDataType() != DataType::kVoidType);
     return info;
