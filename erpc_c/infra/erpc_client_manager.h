@@ -221,10 +221,10 @@ public:
      * @param[in] codec Set in inout codec.
      * @param[in] isOneway Set information if codec is only oneway or bidirectional.
      */
-    RequestContext(uint32_t sequence, Codec *codec, bool isOneway)
+    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway)
     : m_sequence(sequence)
     , m_codec(codec)
-    , m_oneway(isOneway)
+    , m_oneway(argIsOneway)
     {
     }
 
