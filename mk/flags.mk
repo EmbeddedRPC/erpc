@@ -29,6 +29,7 @@ else
 endif
 
 CXXFLAGS += -std=gnu++11 -D LINUX -Wunused-variable -Wno-deprecated-register -Wno-narrowing -Werror $(MARCH)
+#CXXFLAGS += -Wall -Wextra -Wshadow -pedantic-errors
 CFLAGS   += -std=gnu11 -D LINUX -D _GNU_SOURCE -Werror $(MARCH)
 YYFLAGS  += -Wno-other # --debug --verbose
 LLFLAGS  +=
