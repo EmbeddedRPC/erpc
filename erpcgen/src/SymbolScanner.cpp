@@ -30,6 +30,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 void SymbolScanner::handleRoot(AstNode *node, bottom_up)
 {
+    (void)node;
     if (m_forwardDeclarations.size() != 0)
     {
         string forwardTypes;
@@ -859,6 +860,7 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleUnionCase(AstNode *node, top_down)
 {
+    (void)node;
     return nullptr;
 }
 
@@ -1303,6 +1305,7 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
 
 AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
 {
+    (void)node;
     /* Log::debug("expr: %s\n", node->getDescription().c_str()); */
     return nullptr;
 }
