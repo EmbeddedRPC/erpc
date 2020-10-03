@@ -84,7 +84,7 @@ void Thread::sleep(uint32_t usecs)
 {
     // Sleep for the requested number of microseconds.
     struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
-    struct timespec actual = { 0 };
+    struct timespec actual = { 0, 0 };
 
     // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
     while (nanosleep(&rq, &actual) == EINTR)
