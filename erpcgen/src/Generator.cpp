@@ -26,9 +26,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 
 Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
-: m_def(def)
+: m_idlCrc16(def->getIdlCrc16())
+, m_def(def)
 , m_globals(&(def->getGlobals()))
-, m_idlCrc16(def->getIdlCrc16())
 , m_generatorType(generatorType)
 {
     m_templateData["erpcVersion"] = ERPC_VERSION;
