@@ -44,8 +44,20 @@ void operator delete(void *ptr) THROW NOEXCEPT
     erpc_free(ptr);
 }
 
+void operator delete(void* ptr, std::size_t count) THROW NOEXCEPT
+{
+    (void)count;
+    erpc_free(ptr);
+}
+
 void operator delete[](void *ptr) THROW NOEXCEPT
 {
+    erpc_free(ptr);
+}
+
+void operator delete[](void* ptr, std::size_t count) THROW NOEXCEPT
+{
+    (void)count;
     erpc_free(ptr);
 }
 
