@@ -1484,7 +1484,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
             string nameOfType;
             if (childNode->getParent()->getChild(0))
             {
-                string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
+                nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
                 Log::log("Handling annotations for %s\n", nameOfType.c_str());
             }
             else
