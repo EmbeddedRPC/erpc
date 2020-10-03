@@ -45,7 +45,7 @@ void *erpc_malloc(size_t size);
 void erpc_free(void *ptr);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 /*! @} */
