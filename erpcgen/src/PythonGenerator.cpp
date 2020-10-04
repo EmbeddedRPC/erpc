@@ -907,11 +907,11 @@ string PythonGenerator::stripWhitespace(const string &s)
     uint32_t n;
 
     // Strip leading whitespace.
-    for (n = 0, i = 0; i < result.size(); ++i, ++n)
+    for (n = 0, i = 0; i < (int)result.size(); ++i, ++n)
     {
         char c = result[i];
 
-        if ((i < result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
         {
             break;
         }
@@ -922,7 +922,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     }
 
     // Strip trailing whitespace.
-    for (n = 0, i = result.size() - 1; i > 0; --i, ++n)
+    for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
         if (!checkWhitspaceChar(c))
