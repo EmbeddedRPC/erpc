@@ -592,21 +592,21 @@ string UnionType::getDescription() const
 UnionType::case_vector_t UnionType::getUniqueCases()
 {
     UnionType::case_vector_t uniqueCases;
-    bool addCase = true;
+    bool uniqueAddCase = true;
     for (auto unionCase : getCases())
     {
         for (auto uniqueCase : uniqueCases)
         {
             if (casesAreTheSame(unionCase, uniqueCase))
             {
-                addCase = false;
+                uniqueAddCase = false;
             }
         }
-        if (addCase)
+        if (uniqueAddCase)
         {
             uniqueCases.push_back(unionCase);
         }
-        addCase = true;
+        uniqueAddCase = true;
     }
     return uniqueCases;
 }

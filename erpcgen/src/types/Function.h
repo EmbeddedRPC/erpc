@@ -82,7 +82,7 @@ public:
      *
      * @param[in] isOneway Set, if function return type is oneway.
      */
-    void setIsOneway(bool isOneway) { m_isOneway = isOneway; }
+    void setIsOneway(bool argIsOneway) { m_isOneway = argIsOneway; }
 
     /*!
      * @brief This function returns description about the interface function.
