@@ -1863,7 +1863,10 @@ void AssertHelper::operator=(const Message& message) const {
 }
 
 // Mutex for linked pointers.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 GTEST_API_ GTEST_DEFINE_STATIC_MUTEX_(g_linked_ptr_mutex);
+#pragma GCC diagnostic pop
 
 // Application pathname gotten in InitGoogleTest.
 std::string g_executable_path;
