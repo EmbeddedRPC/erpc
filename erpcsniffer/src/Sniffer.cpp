@@ -75,8 +75,8 @@ erpc_status_t Sniffer::run()
                                     0 :
                                     chrono::duration_cast<chrono::nanoseconds>(currentTime - previousTime).count());
         uint32_t timeDifferenceSize = timeDifference.size();
-        uint32_t countSpaces = floor((timeDifferenceSize - 1) / 3);
-        for (uint32_t i = 1; i <= countSpaces; ++i)
+        uint32_t diffCountSpaces = floor((timeDifferenceSize - 1) / 3);
+        for (uint32_t i = 1; i <= diffCountSpaces; ++i)
         {
             timeDifference = timeDifference.insert(timeDifferenceSize - i * 3, " ");
         }
