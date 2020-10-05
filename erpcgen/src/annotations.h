@@ -67,6 +67,9 @@
 //! Do not free memory for a parameter in the server shim.
 #define RETAIN_ANNOTATION "retain"
 
+//! Do not alloc memory for a parameter in the server shim, just pass the pointer in the received buffer
+#define DIRECT_ANNOTATION "direct"
+
 //! Data handled through shared memory area
 #define SHARED_ANNOTATION "shared"
 

@@ -109,8 +109,8 @@ void BasicCodec::writePtr(uintptr_t value)
 
 void BasicCodec::writeString(uint32_t length, const char *value)
 {
-    // Just treat the string as binary.
-    writeBinary(length, reinterpret_cast<const uint8_t *>(value));
+    // Just treat the string as binary but add trailing NULL.
+    writeBinary(length + 1, reinterpret_cast<const uint8_t *>(value));
 }
 
 void BasicCodec::writeBinary(uint32_t length, const uint8_t *value)

@@ -1,24 +1,31 @@
 {% def decodeBuiltinType(info) --------------- BuiltinType %}
 {% if info.builtinType == "kStringType" %}
 uint32_t {$info.stringLocalName}_len;
+{%  if (source == "server" && info.zeroCopy) %}
+codec->readString(&{$info.stringLocalName}_len, (char**) &{$info.stringLocalName});
+{%  else %}
 char * {$info.stringLocalName}_local;
 codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
-{%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
-{$info.name} = (char *) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
-{%   if generateAllocErrorChecks == true %}
+{%   if source == "server" && !info.zeroCopy %}
+{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
+{%    if generateAllocErrorChecks == true %}
 if ({$info.name} == NULL)
 {
     codec->updateStatus(kErpcStatus_MemoryError);
 }
 else
 {
-{%   endif -- generateAllocErrorChecks == true %}
-{%  endif -- withoutAlloc %}
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}
+{%    endif -- generateAllocErrorChecks == true %}
+    memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
+    ({$info.name})[{$info.stringLocalName}_len] = 0;
+{%    if generateAllocErrorChecks == true %}
 }
-{%  endif -- withoutAlloc && generateAllocErrorChecks %}
+{%    endif -- generateAllocErrorChecks %}
+{%   else %}
+memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
+({$info.name})[{$info.stringLocalName}_len] = 0;
+{%   endif -- server && zeroCopy %}
+{%  endif -- server && !zeroCopy %}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->read({$info.name});
@@ -232,7 +239,11 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 {# Encode sending data #}
 {% def encodeBuiltinType(info) -----------------  %}
 {% if info.builtinType == "kStringType" %}
-codec->writeString(strlen({$info.name}), {$info.name});
+{%  if source == "client" && info.zeroCopy %}
+codec->writeString(strlen((char*){$info.name}), (char*){$info.name});
+{% else %}
+codec->writeBinary(strlen((char*){$info.name}), (uint8_t*){$info.name});
+{%  endif -- zeroCopy %}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->write(*{$info.name});

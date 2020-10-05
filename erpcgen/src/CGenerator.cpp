@@ -2260,11 +2260,9 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group, BuiltinType *t, data_map &
 
     if (t->isString())
     {
+        templateData["zeroCopy"] = findAnnotation(structMember, DIRECT_ANNOTATION) && !findAnnotation(structMember, RETAIN_ANNOTATION);
         templateData["checkStringNull"] = false;
-        templateData["withoutAlloc"] = ((structMember->getDirection() == kInoutDirection) ||
-                                        (structType && group->getSymbolDirections(structType).count(kInoutDirection))) ?
-                                           true :
-                                           false;
+
         if (!isFunctionParam)
         {
             templateData["stringAllocSize"] = getOutputName(structMember) + "_len";
@@ -2282,10 +2280,6 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group, BuiltinType *t, data_map &
                 templateData["checkStringNull"] = true;
                 templateData["stringLocalName"] = getOutputName(structMember);
                 templateData["stringAllocSize"] = getAnnStringValue(structMember, MAX_LENGTH_ANNOTATION);
-                if (structMember->getDirection() == kInoutDirection || structMember->getDirection() == kOutDirection)
-                {
-                    templateData["withoutAlloc"] = true;
-                }
 
                 if (templateData["stringAllocSize"]->getvalue() == "")
                 {

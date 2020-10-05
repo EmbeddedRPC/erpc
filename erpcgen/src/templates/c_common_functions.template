@@ -354,10 +354,12 @@ else
 
 {# ---------------- freeData ---------------- #}
 {% def freeData(info) %}
+{% if !info.zeroCopy %}
 if ({$info.freeName})
 {
     erpc_free({$info.freeName});
 }
+{% endif %}
 {% enddef ------------------------------- freeData %}
 
 {# ---------------- freeStruct ---------------- #}
