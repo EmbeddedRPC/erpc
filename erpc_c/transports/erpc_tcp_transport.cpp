@@ -81,12 +81,13 @@ erpc_status_t TCPTransport::connectClient(void)
 {
     if (m_socket != -1)
     {
-        TCP_DEBUG_PRINT("socket already connected\n");
+        TCP_DEBUG_PRINT("%s", "socket already connected\n");
         return kErpcStatus_Success;
     }
 
     // Fill in hints structure for getaddrinfo.
-    struct addrinfo hints = { 0 };
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_flags = AI_NUMERICSERV;
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -247,7 +248,7 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
 
 void TCPTransport::serverThread(void)
 {
-    TCP_DEBUG_PRINT("in server thread\n");
+    TCP_DEBUG_PRINT("%s", "in server thread\n");
 
     // Create socket.
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -292,7 +293,7 @@ void TCPTransport::serverThread(void)
         return;
     }
 
-    TCP_DEBUG_PRINT("Listening for connections\n");
+    TCP_DEBUG_PRINT("%s", "Listening for connections\n");
 
     while (m_runServer)
     {

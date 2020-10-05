@@ -161,8 +161,8 @@ public:
 protected:
     Value *m_value;                     /*!< Value for the current token. */
     token_loc_t m_location;             /*!< Location for the current token. */
-    CurrentFileInfo *m_currentFileInfo; /*!< Pointer to current file info. */
     uint32_t m_indents;                 /*!< How much indents can be removed from newlines in doxygen comments. */
+    CurrentFileInfo *m_currentFileInfo; /*!< Pointer to current file info. */
     uint16_t m_idlCrc16;                /*!< Crc16 of IDL files. */
 
     /*!

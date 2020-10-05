@@ -65,7 +65,7 @@ void PythonGenerator::generateInitFile(string fileName)
 {
     fileName += "/__init__.py";
     generateOutputFile(fileName, "py_init", m_templateData, kPyInit);
-};
+}
 
 void PythonGenerator::generateCommonFile(string fileName)
 {
@@ -167,6 +167,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 
 data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
+    (void)group;
     data_map info;
     string proto = getFunctionPrototype(fn);
 
@@ -789,6 +790,7 @@ string PythonGenerator::filterName(const string &name)
 
 string PythonGenerator::convertComment(const string &comment, comment_type commentType)
 {
+    (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
     static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
@@ -905,11 +907,11 @@ string PythonGenerator::stripWhitespace(const string &s)
     uint32_t n;
 
     // Strip leading whitespace.
-    for (n = 0, i = 0; i < result.size(); ++i, ++n)
+    for (n = 0, i = 0; i < (int)result.size(); ++i, ++n)
     {
         char c = result[i];
 
-        if ((i < result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
         {
             break;
         }
@@ -920,7 +922,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     }
 
     // Strip trailing whitespace.
-    for (n = 0, i = result.size() - 1; i > 0; --i, ++n)
+    for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
         if (!checkWhitspaceChar(c))

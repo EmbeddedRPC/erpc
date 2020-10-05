@@ -1244,6 +1244,7 @@ static int yylex(YYSTYPE * lvalp, YYLTYPE * yylloc, ErpcLexer * lexer)
 
 static void yyerror(YYLTYPE * yylloc, ErpcLexer * lexer, AstNode ** resultAST, const char * error)
 {
+    (void)resultAST;
     throw syntax_error(format_string("file %s:%d:%d: %s\n", lexer->getFileName().c_str(),
         yylloc->m_firstLine, yylloc->m_firstChar, error));
 }

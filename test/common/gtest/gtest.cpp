@@ -1863,7 +1863,10 @@ void AssertHelper::operator=(const Message& message) const {
 }
 
 // Mutex for linked pointers.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 GTEST_API_ GTEST_DEFINE_STATIC_MUTEX_(g_linked_ptr_mutex);
+#pragma GCC diagnostic pop
 
 // Application pathname gotten in InitGoogleTest.
 std::string g_executable_path;
@@ -5210,13 +5213,13 @@ class DefaultStoredResultEventListener : public StoredResultEventListener{
 
 const BaseTestPartResult* DefaultStoredResultEventListener::TransformTestPartResult(const TestPartResult& test_part_result) {
   return new TestPartResult(test_part_result.type(),test_part_result.file_name(), test_part_result.line_number(), test_part_result.message());
-};
+}
 
 #if !GTEST_OS_BARE_METAL
 void DefaultStoredResultEventListener::OutputXmlTestPartResult(::std::ostream* stream,
                                                                const BaseTestPartResult* base_test_part_result) {
   XmlUnitTestResultPrinter::OutputXmlTestPartResult(stream, base_test_part_result);
-};
+}
 #endif
 // End DefaultStoredResultEventListener
 
@@ -5237,7 +5240,7 @@ class BaseStoredResultEventListener : public StoredResultEventListener{
 
 const BaseTestPartResult* BaseStoredResultEventListener::TransformTestPartResult(const TestPartResult& test_part_result) {
   return new BaseTestPartResult(test_part_result.type());
-};
+}
 
 #if !GTEST_OS_BARE_METAL
 void BaseStoredResultEventListener::OutputXmlTestPartResult(::std::ostream* stream,
@@ -5245,7 +5248,7 @@ void BaseStoredResultEventListener::OutputXmlTestPartResult(::std::ostream* stre
   *stream << "      <failure type=\""
           << ((base_test_part_result->type() == BaseTestPartResult::kFatalFailure) ? "fatal_failure" : "non_fatal_failure")
           << "\"></failure>\n";
-};
+}
 #endif
 // End BaseStoredResultEventListener
 

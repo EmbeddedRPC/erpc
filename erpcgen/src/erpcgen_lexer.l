@@ -210,7 +210,7 @@ void            { return TOK_VOID; }
                                             }
                                         }
 
-                                        if (yyleng > m_indents)    // remove indent spaces
+                                        if (yyleng > (int)m_indents)    // remove indent spaces
                                         {
                                             yytext += m_indents;
                                             yyleng -= m_indents;

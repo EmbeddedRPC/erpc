@@ -30,6 +30,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 void SymbolScanner::handleRoot(AstNode *node, bottom_up)
 {
+    (void)node;
     if (m_forwardDeclarations.size() != 0)
     {
         string forwardTypes;
@@ -859,6 +860,7 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleUnionCase(AstNode *node, top_down)
 {
+    (void)node;
     return nullptr;
 }
 
@@ -1136,7 +1138,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
             const StructType::member_vector_t &callbackParams = callbackFunctionType->getParameters().getMembers();
             if (callbackFunctionType->getParameters().getMembers().size() > paramsSize)
             {
-                for (int i = paramsSize; i < callbackParams.size(); ++i)
+                for (unsigned int i = paramsSize; i < callbackParams.size(); ++i)
                 {
                     if (callbackParams[i]->getName().compare("") == 0)
                     {
@@ -1303,6 +1305,7 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
 
 AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
 {
+    (void)node;
     /* Log::debug("expr: %s\n", node->getDescription().c_str()); */
     return nullptr;
 }
@@ -1481,7 +1484,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
             string nameOfType;
             if (childNode->getParent()->getChild(0))
             {
-                string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
+                nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
                 Log::log("Handling annotations for %s\n", nameOfType.c_str());
             }
             else

@@ -83,8 +83,10 @@ Thread *Thread::getCurrentThread(void)
 void Thread::sleep(uint32_t usecs)
 {
     // Sleep for the requested number of microseconds.
-    struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
-    struct timespec actual = { 0 };
+    struct timespec rq;
+    rq.tv_sec = usecs / 1000000;
+    rq.tv_nsec = (usecs % 1000000) * 1000;
+    struct timespec actual = { 0, 0 };
 
     // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
     while (nanosleep(&rq, &actual) == EINTR)
@@ -190,7 +192,9 @@ bool Semaphore::get(uint32_t timeout)
             // Create an absolute timeout time.
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            struct timespec wait = { .tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
+            struct timespec wait;
+            wait.tv_sec = tv.tv_sec + (timeout / 1000000);
+            wait.tv_nsec = (timeout % 1000000) * 1000;
             err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
             if (err)
             {

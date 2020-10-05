@@ -72,6 +72,7 @@ int serial_setup(int fd, speed_t speed)
         return -1;
     }
 #else
+    (void)speed;
     struct termios tty;
 
     memset(&tty, 0x00, sizeof(tty));
