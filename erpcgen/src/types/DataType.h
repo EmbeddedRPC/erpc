@@ -193,6 +193,13 @@ public:
      * @retval false Always return false.
      */
     virtual bool isString() const { return false; }
+    
+    /*!
+     * @brief This function return "false" value as default for identify ustring type.
+     *
+     * @retval false Always return false.
+     */
+    virtual bool isUString() const { return false; }
 
     /*!
      * @brief This function return "false" value as default for identify struct type.
