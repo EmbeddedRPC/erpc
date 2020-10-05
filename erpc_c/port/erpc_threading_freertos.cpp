@@ -20,6 +20,12 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 Thread *Thread::s_first = NULL;
+#ifdef ESP_PLATFORM 
+portMUX_TYPE Thread::s_mux = portMUX_INITIALIZER_UNLOCKED;
+#define SPINLOCK (&s_mux)
+#else
+#define SPINLOCK
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -40,7 +46,7 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 : m_name(name)
 , m_entry(entry)
 , m_arg(0)
-, m_stackSize(stackSize)
+, m_stackSize(stackSize < 4096 ? 4096 : stackSize)
 , m_priority(priority)
 , m_task(0)
 , m_next(0)
@@ -52,7 +58,7 @@ Thread::~Thread(void) {}
 void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
 {
     m_entry = entry;
-    m_stackSize = stackSize;
+    m_stackSize = stackSize < 4096 ? 4096 : stackSize;
     m_priority = priority;
 }
 
@@ -64,7 +70,7 @@ void Thread::start(void *arg)
     // created thread to the linked list. This prevents a race condition if the new thread is
     // higher priority than the current thread, and the new thread calls getCurrenThread(),
     // which will scan the linked list.
-    taskENTER_CRITICAL();
+    portENTER_CRITICAL(SPINLOCK);
 
     if (pdPASS == xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
                               ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
@@ -78,7 +84,7 @@ void Thread::start(void *arg)
         s_first = this;
     }
 
-    taskEXIT_CRITICAL();
+    portEXIT_CRITICAL(SPINLOCK);
 }
 
 bool Thread::operator==(Thread &o)
@@ -91,7 +97,7 @@ Thread *Thread::getCurrentThread()
     TaskHandle_t thisTask = xTaskGetCurrentTaskHandle();
 
     // Walk the threads list to find the Thread object for the current task.
-    taskENTER_CRITICAL();
+    portENTER_CRITICAL(SPINLOCK);
     Thread *it = s_first;
     while (it)
     {
@@ -101,7 +107,7 @@ Thread *Thread::getCurrentThread()
         }
         it = it->m_next;
     }
-    taskEXIT_CRITICAL();
+    portEXIT_CRITICAL(SPINLOCK);
     return it;
 }
 
@@ -127,7 +133,7 @@ void Thread::threadEntryPointStub(void *arg)
     _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
-    taskENTER_CRITICAL();
+    portENTER_CRITICAL(SPINLOCK);
     Thread *it = s_first;
     Thread *prev = NULL;
     while (it)
@@ -149,7 +155,7 @@ void Thread::threadEntryPointStub(void *arg)
         prev = it;
         it = it->m_next;
     }
-    taskEXIT_CRITICAL();
+    portEXIT_CRITICAL(SPINLOCK);
 
 // Handle a task returning from its function. Delete or suspend the task, if the API is
 // available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
@@ -175,7 +181,7 @@ void Thread::threadEntryPointStub(void *arg)
 Mutex::Mutex(void)
 : m_mutex(0)
 {
-    m_mutex = xSemaphoreCreateMutex();
+    m_mutex = xSemaphoreCreateRecursiveMutex();
 }
 
 Mutex::~Mutex(void)
@@ -220,7 +226,14 @@ void Semaphore::putFromISR(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
+#ifdef ESP_PLATFORM    
+    if (xHigherPriorityTaskWoken) 
+    {
+        portYIELD_FROM_ISR();
+    }    
+#else
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+#endif    
 }
 
 bool Semaphore::get(uint32_t timeout)

@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 //! @name Transport setup
 //@{
@@ -52,6 +53,28 @@ extern "C" {
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
+//@}
+
+
+//! @name esp-idf serial transport setup
+//@{
+
+/*!
+ * @brief Create an esp-idf UART transport.
+ *
+ * Create an esp-idf UART transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] uart_config esp-idf uart phy config (uart_config_t)
+ * @param[in] uart_num uart port number (uart_port_t)
+ * @param[in] rx_gpio gpio for RX
+ * @param[in] tx_gpio gpio for TX
+ * @param[in] rts_gpio gpio for RTS
+ * @param[in] cts_gpio gpio for CTS
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_uart_espidf_init(void *uart, int uart_num, int rx_gpio, int tx_gpio, int rts_gpio, int cts_gpio, int timeout);
 //@}
 
 //! @name Host PC serial port transport setup
@@ -128,6 +151,41 @@ erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRa
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name esp-idf spi transport setup
+//@{
+    
+/*!
+ * @brief Create a esp-idf SPI master transport.
+ *
+ * Create esp-idf SPI master transport instance, to be used at master core.
+ *
+ * @param[in] spi spi esp-idf structure of type spi_bus_config_t
+ * @param[in] spi_num esp-idf enum of type spi_host_device_t (SPI2_HOST ... SPI3_HOST)
+ * @param[in] cs_gpio gpio used for cs(-1 if not used)
+ * @param[in] ready_gpio gpio used for handshake - a positive edge signals the slave is ready (-1 if not used)
+ * @param[in] speed bus speed in Hz
+ * @param[in] timeout rx/tx request timeout in ms
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spi_master_espidf_init(void *spi, int spi_num, int cs_gpio, int ready_gpio, int speed, int timeout);
+
+/*!
+ * @brief Create a esp-idf SPI slave transport.
+ *
+ * Create esp-idf SPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] spi spi esp-idf structure of type spi_bus_config_t
+ * @param[in] spi_num esp-idf enum of type spi_host_device_t (SPI2_HOST ... SPI3_HOST)
+ * @param[in] cs_gpio gpio used for cs(-1 if not used)
+ * @param[in] ready_gpio gpio used for handshake - a positive edge signals the slave is ready (-1 if not used)
+ * @param[in] timeout rx/tx request timeout in ms
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spi_slave_espidf_init(void *spi, int spi_num, int cs_gpio, int ready_gpio, int timeout);
 //@}
 
 //! @name MU transport setup
@@ -282,6 +340,67 @@ erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type
 void erpc_transport_rpmsg_linux_deinit(void);
 //@}
 
+//! @name TCP transport setup
+//@{
+    
+/*!
+ * @brief Create and open TCP transport
+ *
+ * For server, create a TCP listen socket and wait for connections
+ * For client, connect to server
+ *
+ * @param[in] host hostname/IP address to listen on or server to connect to
+ * @param[in] port port to listen on or server to connect to
+ * @param[in] isServer true if we are a server
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_tcp_init_full(const char *host, uint16_t port, bool isServer);
+
+/*!
+ * @brief Create and configure TCP transport but do not open anything
+ *
+ * Parameters are simply memorized to be used with further init() and open()
+ *
+ * @param[in] host hostname/IP address to listen on or server to connect to
+ * @param[in] port port to listen on or server to connect to
+ *
+ */
+void erpc_transport_tcp_configure(const char *host, uint16_t port);
+
+/*!
+ * @brief Create a TCP transport
+ *
+ * Simply create transport instance, don't start anything
+ * @param[in] isServer true if we are a server
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_tcp_init(bool isServer);
+
+/*!
+ * @brief Open TCP connection
+ *
+ * For server, create a TCP listen socket and wait for connections
+ * For client, connect to server
+ *
+ * @return Return TRUE if listen/connection successful
+ */
+bool erpc_transport_tcp_open(void);
+
+/*!
+ * @brief Close TCP connection
+ *
+ * For server, stop listening and close all sockets. Note that the server mode 
+ * uses and accept() which is a not-recommended blocking method so we can't exit
+ * until a connection attempts is made. This is a deadlock but assuming that TCP
+ * code is supposed to be for test, I assume it's acceptable. Otherwise a non-blocking
+ * socket or select() shoudl be used 
+ * For client, close server connection
+ *
+ * @return Return TRUE if listen/connection successful
+ */
+void erpc_transport_tcp_close(void);
 //@}
 
 #ifdef __cplusplus

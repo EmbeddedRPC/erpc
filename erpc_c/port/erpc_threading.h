@@ -216,6 +216,9 @@ private:
     TaskHandle_t m_task;    /*!< Current task. */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */
+#ifdef ESP_PLATFORM     
+    static portMUX_TYPE s_mux; /*!< mux for critical sections. */
+#endif    
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_thread m_thread;  /*!< Current thread. */
     k_thread_stack_t *m_stack; /*!< Pointer to stack. */
