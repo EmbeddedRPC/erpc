@@ -178,7 +178,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
         uint32_t methodId;
         uint32_t sequence;
 
-        erpc_status_t err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
+        err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
 
         if (err)
         {
