@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2019 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -61,6 +62,15 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
 
     // Receive the next invocation request.
     erpc_status_t err = m_transport->receive(&buff);
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb preCB = this->getPreCB();
+    if (preCB)
+    {
+        preCB();
+    }
+#endif
+
     if (err)
     {
         // Dispose of buffers.
@@ -132,6 +142,14 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
     // Dispose of buffers and codecs.
     disposeBufferAndCodec(codec);
 
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb postCB = this->getPostCB();
+    if (postCB)
+    {
+        postCB();
+    }
+#endif
+
     return err;
 }
 
@@ -160,7 +178,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
         uint32_t methodId;
         uint32_t sequence;
 
-        erpc_status_t err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
+        err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
 
         if (err)
         {

@@ -33,6 +33,7 @@ LIBRARIES = -lc -lstdc++ -lm -lboost_unit_test_framework-mt -L$(BOOST_ROOT)/lib
 INCLUDES = -I$(BOOST_ROOT)/include
 
 CXXFLAGS = -std=gnu++11 -Werror -g3 -O0 -MMD -MP $(INCLUDES)
+CXXFLAGS += -Wall -Wextra -Wshadow -pedantic-errors
 
 .PHONY: all
 all: cpptempl_test

@@ -381,6 +381,7 @@ public:
  */
 int main(int argc, char *argv[], char *envp[])
 {
+    (void)envp;
     try
     {
         return erpcgen::erpcgenTool(argc, argv).run();

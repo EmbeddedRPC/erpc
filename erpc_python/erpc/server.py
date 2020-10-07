@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright 2016 NXP
+# Copyright 2020 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -20,8 +21,8 @@ class Service(object):
     def handle_invocation(self, methodId, sequence, codec):
         try:
             self._methods[methodId](sequence, codec)
-        except KeyError:
-            raise RequestError("invalid method ID (%d)" % (methodId))
+        except Exception as e:
+            raise RequestError("invalid method ID (%d) or method implementation: %s" % (methodId, str(e)))
 
 class Server(object):
     def __init__(self, transport=None, codecClass=None):

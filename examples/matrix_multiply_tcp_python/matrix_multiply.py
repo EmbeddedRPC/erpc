@@ -140,6 +140,9 @@ if __name__ == "__main__":
     argParser.add_argument('-s', '--server', action='store_true', help='Run server')
     argParser.add_argument('-t', '--host', default='localhost', help='Host IP address (default value is localhost)')
     argParser.add_argument('-p', '--port', default='40', help='Port (default value is 40)')
+    argParser.add_argument('-S', '--serial', default=None, help='Serial device (default value is None)')
+    argParser.add_argument('-B', '--baud', default='115200', help='Baud (default value is 115200)')
+
     args = argParser.parse_args()
 
     # check if either server or client has been selected
@@ -149,8 +152,12 @@ if __name__ == "__main__":
 
     print('eRPC Matrix Multiply TCP example')
 
-    # initialize TCP transport layer
-    transport = erpc.transport.TCPTransport(args.host, int(args.port), args.server)
+    if args.serial:
+        # initialize Serial transport layer
+        transport = erpc.transport.SerialTransport(args.serial, int(args.baud))
+    else:
+        # initialize TCP transport layer
+        transport = erpc.transport.TCPTransport(args.host, int(args.port), args.server)
 
     if args.client:
         print('Client connecting to a host on %s:%s' % (args.host, args.port))

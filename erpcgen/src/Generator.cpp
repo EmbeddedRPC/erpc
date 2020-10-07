@@ -26,9 +26,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 
 Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
-: m_def(def)
+: m_idlCrc16(def->getIdlCrc16())
+, m_def(def)
 , m_globals(&(def->getGlobals()))
-, m_idlCrc16(def->getIdlCrc16())
 , m_generatorType(generatorType)
 {
     m_templateData["erpcVersion"] = ERPC_VERSION;
@@ -430,7 +430,7 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         data_list functions = getFunctionsTemplateData(group, iface);
         ifaceInfo["functions"] = functions;
         ifaceInfo["isNonExternalInterface"] = false;
-        for (int i = 0; i < functions.size(); ++i)
+        for (unsigned int i = 0; i < functions.size(); ++i)
         {
             assert(dynamic_cast<DataMap *>(functions[i].get().get()));
             string isNonExternalFunction =

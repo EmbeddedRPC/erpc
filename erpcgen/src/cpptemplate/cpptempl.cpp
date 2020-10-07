@@ -521,6 +521,7 @@ bool DataBool::empty()
 }
 void DataBool::dump(int indent)
 {
+    (void)indent;
     std::cout << "(bool)" << getvalue() << std::endl;
 }
 int DataBool::getint() const
@@ -540,6 +541,7 @@ bool DataInt::empty()
 }
 void DataInt::dump(int indent)
 {
+    (void)indent;
     std::cout << "(int)" << m_value << std::endl;
 }
 int DataInt::getint() const
@@ -561,6 +563,7 @@ int DataValue::getint() const
 }
 void DataValue::dump(int indent)
 {
+    (void)indent;
     std::string text = boost::algorithm::replace_all_copy(getvalue(), "\n", "\\n");
     std::cout << "\"" << text << "\"" << std::endl;
 }
@@ -624,6 +627,7 @@ bool DataTemplate::empty()
 
 void DataTemplate::dump(int indent)
 {
+    (void)indent;
     std::cout << "(template)\n";
 }
 
@@ -794,7 +798,7 @@ const KeywordDef k_keywords[] = { { TRUE_TOKEN, "true" },     { FALSE_TOKEN, "fa
                                   { ELSE_TOKEN, "else" },     { DEF_TOKEN, "def" },     { SET_TOKEN, "set" },
                                   { ENDFOR_TOKEN, "endfor" }, { ENDIF_TOKEN, "endif" }, { ENDDEF_TOKEN, "enddef" },
                                   { AND_TOKEN, "and" },       { OR_TOKEN, "or" },       { NOT_TOKEN, "not" },
-                                  { INVALID_TOKEN } };
+                                  { INVALID_TOKEN, NULL } };
 
 TokenType get_keyword_token(const std::string &s)
 {
@@ -1578,7 +1582,7 @@ void NodeVar::gettext(std::ostream &stream, data_map &data)
 
         stream << str;
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1686,7 +1690,7 @@ void NodeFor::gettext(std::ostream &stream, data_map &data)
         // ignore exception - the for loop key variable doesn't exist, so just
         // don't execute the for loop at all
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1760,7 +1764,7 @@ bool NodeIf::is_true(data_map &data)
 
         return !d->empty();
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(get_line());
         throw e;
@@ -1806,6 +1810,7 @@ NodeType NodeDef::gettype()
 
 void NodeDef::gettext(std::ostream &stream, data_map &data)
 {
+    (void)stream;
     // Follow the key path.
     data_ptr &target = data.parse_path(m_name, true);
 
@@ -1825,6 +1830,7 @@ NodeType NodeSet::gettype()
 
 void NodeSet::gettext(std::ostream &stream, data_map &data)
 {
+    (void)stream;
     TokenIterator tok(m_expr);
     tok.match(SET_TOKEN, "expected 'set'");
     std::string path = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
@@ -1929,7 +1935,7 @@ node_vector &TemplateParser::parse()
 
         return m_top_nodes;
     }
-    catch (TemplateException e)
+    catch (TemplateException &e)
     {
         e.set_line_if_missing(m_current_line);
         throw e;

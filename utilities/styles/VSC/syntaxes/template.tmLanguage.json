@@ -1,0 +1,65 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "template",
+    "patterns": [{
+        "include": "#condition"
+    }, {
+        "include": "#variable"
+    }, {
+        "include": "#variable"
+    }],
+    "repository": {
+        "condition": {
+            "name": "",
+            "match": "{%[^}]*}",
+            "captures": {
+                "0": {
+                    "name": "",
+                    "patterns": [{
+                        "name": "comment.line",
+                        "match": "({%)\\s*([a-zA-Z0-9_]*)([^-%>]*)?([^}]*})",
+                        "captures": {
+                            "1": {
+                                "name": "comment.line"
+                            },
+                            "2": {
+                                "name": "keyword.control"
+                            },
+                            "3": {
+                                "name": "entity.name.function"
+                            },
+                            "4": {
+                                "name": "comment.line"
+                            }
+                        }
+                    }]
+                }
+            }
+        },
+        "variable": {
+            "name": "",
+            "match": "{\\$[^}]*}",
+            "captures": {
+                "0": {
+                    "name": "",
+                    "patterns": [{
+                        "name": "comment.line",
+                        "match": "({\\$>?)\\s*([^>}]*)(>?})",
+                        "captures": {
+                            "1": {
+                                "name": "comment.line"
+                            },
+                            "2": {
+                                "name": "variable.other"
+                            },
+                            "3": {
+                                "name": "comment.line"
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    },
+    "scopeName": "source.template"
+}

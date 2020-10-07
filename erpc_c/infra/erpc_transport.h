@@ -83,7 +83,7 @@ public:
      *
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
-    virtual void setCrc16(Crc16 *crcImpl){};
+    virtual void setCrc16(Crc16 *crcImpl) { (void)crcImpl; }
 };
 
 /*!

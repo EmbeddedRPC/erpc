@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -108,6 +109,22 @@ bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
         return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
     }
     return false;
+}
+#endif
+
+#if ERPC_PRE_POST_ACTION
+void erpc_arbitrated_client_add_pre_cb_action(pre_post_action_cb preCB)
+{
+    assert(g_client);
+
+    g_client->addPreCB(preCB);
+}
+
+void erpc_arbitrated_client_add_post_cb_action(pre_post_action_cb postCB)
+{
+    assert(g_client);
+
+    g_client->addPostCB(postCB);
 }
 #endif
 

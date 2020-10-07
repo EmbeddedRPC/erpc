@@ -90,13 +90,13 @@ int main(int argc, char **argv)
     g_client->addMessageLogger(&g_messageLogger);
 #endif // USE_MESSAGE_LOGGING
 
-    int i = RUN_ALL_TESTS();
+    int ret = RUN_ALL_TESTS();
     quit();
     free(m_logger);
     g_transport.close();
     free(g_client);
 
-    return i;
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
