@@ -63,6 +63,7 @@ BraceWrapping:
   AfterUnion: true
   BeforeCatch: true
   BeforeElse: true
+#IncludeBlocks: "Preserve" # for future version of clang
 IncludeCategories:
   - Regex: "^<" # system includes
     Priority: 10
