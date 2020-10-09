@@ -1,0 +1,13 @@
+name: clang-format lint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: DoozyX/clang-format-lint-action@v0.10
+      with:
+        exclude: 'test/common/gtest/gtest.h test/common/gtest/gtest.cpp erpcgen/src/cpptemplate/cpptempl.h erpcgen/src/cpptemplate/cpptempl.cpp erpcgen/src/cpptemplate/cpptempl_test.cpp'
+        clangFormatVersion: 5 
