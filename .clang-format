@@ -1,70 +1,71 @@
-AlignTrailingComments            : true
-AllowAllParametersOfDeclarationOnNextLine : true
-AllowShortBlocksOnASingleLine : false
-AllowShortFunctionsOnASingleLine : "None"
-AllowShortIfStatementsOnASingleLine : false
-AllowShortLoopsOnASingleLine : false
-AlwaysBreakBeforeMultilineStrings : true
-BasedOnStyle : "Google"
+#https://releases.llvm.org/5.0.2/tools/clang/docs/ClangFormatStyleOptions.html
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: "Inline"
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: true
+BasedOnStyle: "Google"
 #BinPackParameters : false
-BreakBeforeBinaryOperators : false
-BreakBeforeBraces : "Custom"
-BreakBeforeTernaryOperators : false
-ColumnLimit : 120
-ContinuationIndentWidth :     4
-DerivePointerAlignment : false
-DisableFormat : false
-IndentCaseLabels : true
-IndentWrappedFunctionNames : false
-IndentWidth : 4
-Language : "Cpp"
-MaxEmptyLinesToKeep :         1
-PointerBindsToType : false
-SpaceBeforeAssignmentOperators : true
-SpaceBeforeParens : "ControlStatements"
-SpacesBeforeTrailingComments : 1
-SpacesInCStyleCastParentheses : false
-SpacesInParentheses : false
-Standard : "Cpp03"
-TabWidth : 1
-UseTab : "Never"
-AccessModifierOffset : -4
-AlignAfterOpenBracket : "Align"
-AlignEscapedNewlines : "Left"
-AlignOperands : true
-AllowShortCaseLabelsOnASingleLine : false
-AllowShortFunctionsOnASingleLine : "Inline"
-AlwaysBreakAfterReturnType  : "None"
-AlwaysBreakTemplateDeclarations : true
-BreakBeforeInheritanceComma : false
-BreakConstructorInitializers : "BeforeComma"
-CompactNamespaces : false
-ConstructorInitializerAllOnOneLineOrOnePerLine : false
-ConstructorInitializerIndentWidth : 0
-Cpp11BracedListStyle : false
-FixNamespaceComments : true
-NamespaceIndentation : "None"
-PointerAlignment : "Right"
-SortIncludes : true
-SortUsingDeclarations : true
-SpacesInAngles : false
-SpaceAfterCStyleCast : false
-SpaceInEmptyParentheses : false
-SpacesInSquareBrackets : false
+BreakBeforeBinaryOperators: false
+BreakBeforeBraces: "Custom"
+BreakBeforeTernaryOperators: false
+ColumnLimit: 120
+ContinuationIndentWidth: 4
+DerivePointerAlignment: false
+DisableFormat: false
+IndentCaseLabels: true
+IndentWrappedFunctionNames: false
+IndentWidth: 4
+Language: "Cpp"
+MaxEmptyLinesToKeep: 1
+PointerBindsToType: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: "ControlStatements"
+SpacesBeforeTrailingComments: 1
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+Standard: "Cpp03"
+TabWidth: 1
+UseTab: "Never"
+AccessModifierOffset: -4
+AlignAfterOpenBracket: "Align"
+AlignEscapedNewlines: "Left"
+AlignOperands: true
+AllowShortCaseLabelsOnASingleLine: false
+AlwaysBreakAfterReturnType: "None"
+AlwaysBreakTemplateDeclarations: true
+BreakBeforeInheritanceComma: false
+BreakConstructorInitializers: "BeforeComma"
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 0
+Cpp11BracedListStyle: false
+FixNamespaceComments: true
+NamespaceIndentation: "None"
+PointerAlignment: "Right"
+SortIncludes: true
+SortUsingDeclarations: true
+SpacesInAngles: false
+SpaceAfterCStyleCast: false
+SpaceInEmptyParentheses: false
+SpacesInSquareBrackets: false
 KeepEmptyLinesAtTheStartOfBlocks: true
 BraceWrapping:
-  AfterClass:      true
+  AfterClass: true
   AfterControlStatement: true
-  AfterEnum:       true
-  AfterFunction:   true
-  AfterNamespace:  false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
   AfterObjCDeclaration: true
-  AfterStruct:     true
-  AfterUnion:      true
-  BeforeCatch:     true
-  BeforeElse:      true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+#IncludeBlocks: "Preserve" # for future version of clang
 IncludeCategories:
-  - Regex:         '^<' # system includes
-    Priority:       10
-  - Regex:         '^"erpc_' # erpc public includes
-    Priority:      1
+  - Regex: "^<" # system includes
+    Priority: 10
+  - Regex: '^"erpc_' # erpc public includes
+    Priority: 1
