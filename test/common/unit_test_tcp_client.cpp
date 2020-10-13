@@ -9,6 +9,7 @@
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_tcp_transport.h"
+
 #include "Logging.h"
 #include "gtest.h"
 #include "gtestListener.h"

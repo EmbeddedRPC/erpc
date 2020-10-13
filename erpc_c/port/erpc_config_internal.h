@@ -29,6 +29,15 @@
     #endif
 #endif
 
+// Determine if we are targeting WIN32 environment
+#if !defined(ERPC_HAS_WIN32)
+    #if defined(_WIN32)
+        #define ERPC_HAS_WIN32 (1)
+    #else
+        #define ERPC_HAS_WIN32 (0)
+    #endif
+#endif
+
 // Safely detect FreeRTOSConfig.h.
 #define ERPC_HAS_FREERTOSCONFIG_H (0)
 #if defined(__has_include)
@@ -46,7 +55,7 @@
     #elif ERPC_HAS_FREERTOSCONFIG_H
         // Use FreeRTOS if we can auto detect it.
         #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
-    #elif defined(WIN32)
+    #elif ERPC_HAS_WIN32
         #define ERPC_THREADS (ERPC_THREADS_WIN32)
     #else
         // Otherwise default to no threads.

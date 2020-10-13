@@ -8,11 +8,14 @@
  */
 
 #include "Generator.h"
+
 #include "erpc_version.h"
+
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
 #include "format_string.h"
+
 #include <boost/filesystem.hpp>
 #include <cstring>
 #include <ctime>
@@ -134,14 +137,12 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     // set codec information
     switch (m_def->getCodecType())
     {
-        case InterfaceDefinition::kBasicCodec:
-        {
+        case InterfaceDefinition::kBasicCodec: {
             m_templateData["codecClass"] = "BasicCodec";
             m_templateData["codecHeader"] = "erpc_basic_codec.h";
             break;
         }
-        default:
-        {
+        default: {
             m_templateData["codecClass"] = "Codec";
             m_templateData["codecHeader"] = "erpc_codec.h";
             break;
@@ -298,8 +299,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
 
     switch (dataType->getDataType())
     {
-        case DataType::kAliasType:
-        {
+        case DataType::kAliasType: {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             if (aliasType != nullptr)
             {
@@ -307,8 +307,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kArrayType:
-        {
+        case DataType::kArrayType: {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             if (arrayType != nullptr)
             {
@@ -316,8 +315,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kListType:
-        {
+        case DataType::kListType: {
             ListType *listType = dynamic_cast<ListType *>(dataType);
             if (listType != nullptr)
             {
@@ -325,8 +323,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kStructType:
-        {
+        case DataType::kStructType: {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             if (structType != nullptr)
             {
@@ -337,8 +334,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kUnionType:
-        {
+        case DataType::kUnionType: {
             // Keil need extra pragma option when unions are used.
             m_templateData["usedUnionType"] = true;
             UnionType *unionType = dynamic_cast<UnionType *>(dataType);
@@ -351,8 +347,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        default:
-        {
+        default: {
             break;
         }
     }

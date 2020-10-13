@@ -8,6 +8,7 @@
  */
 
 #include "UniqueIdChecker.h"
+
 #include "Annotation.h"
 #include "Logging.h"
 #include "ParseErrors.h"

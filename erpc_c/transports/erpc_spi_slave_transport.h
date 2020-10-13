@@ -11,8 +11,10 @@
 #define _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 
 #include "erpc_framed_transport.h"
+
 #include "fsl_gpio.h"
 #include "fsl_spi.h"
+
 #include <stdlib.h>
 
 /*!

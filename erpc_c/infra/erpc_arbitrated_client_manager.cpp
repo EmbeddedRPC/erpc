@@ -8,7 +8,9 @@
  */
 
 #include "erpc_arbitrated_client_manager.h"
+
 #include "erpc_transport_arbitrator.h"
+
 #include "assert.h"
 
 #if ERPC_THREADS_IS(NONE)
@@ -23,8 +25,10 @@ using namespace erpc;
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;
+#ifndef _WIN32
 #pragma weak nestingDetection
 bool nestingDetection = false;
+#endif
 #endif
 
 void ArbitratedClientManager::setArbitrator(TransportArbitrator *arbitrator)

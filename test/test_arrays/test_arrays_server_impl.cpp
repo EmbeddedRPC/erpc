@@ -7,10 +7,12 @@
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -46,7 +48,7 @@ int32_t (*sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
 
 char *(*sendReceivedString(char *arrayStrings[12]))[12]
 {
-    char *(*sendArrays)[12] = (char *(*)[12])erpc_malloc(sizeof(char * [12]));
+    char *(*sendArrays)[12] = (char *(*)[12])erpc_malloc(sizeof(char *[12]));
     for (int32_t i = 0; i < 12; ++i)
     {
         uint32_t textLen = strlen(arrayStrings[i]);
@@ -58,7 +60,7 @@ char *(*sendReceivedString(char *arrayStrings[12]))[12]
 
 char *(*sendReceived2String(char *arrayStrings[3][5]))[3][5]
 {
-    char *(*sendArrays)[3][5] = (char *(*)[3][5])erpc_malloc(sizeof(char * [3][5]));
+    char *(*sendArrays)[3][5] = (char *(*)[3][5])erpc_malloc(sizeof(char *[3][5]));
     for (int32_t i = 0; i < 3; ++i)
     {
         for (int32_t j = 0; j < 5; ++j)

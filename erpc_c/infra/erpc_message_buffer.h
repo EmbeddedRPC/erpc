@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__MESSAGE_BUFFER_H_
 
 #include "erpc_common.h"
+
 #include <cstddef>
 #include <stdint.h>
 
@@ -166,7 +167,7 @@ public:
     /*!
      * @brief Casting operator return local buffer.
      */
-    operator const uint8_t *(void)const { return m_buf; }
+    operator const uint8_t *(void) const { return m_buf; }
 
     /*!
      * @brief Array operator return value of buffer at given index.
@@ -276,7 +277,7 @@ public:
         /*!
          * @brief Casting operator return local buffer.
          */
-        operator const uint8_t *(void)const { return m_pos; }
+        operator const uint8_t *(void) const { return m_pos; }
 
         /*!
          * @brief Array operator return value of buffer at given index.

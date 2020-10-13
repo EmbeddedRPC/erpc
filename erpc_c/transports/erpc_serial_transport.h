@@ -11,8 +11,14 @@
 #define _EMBEDDED_RPC__SERIAL_TRANSPORT_H_
 
 #include "erpc_framed_transport.h"
+
 #include <string>
+
+#ifdef _WIN32
+typedef long speed_t;
+#else
 #include <termios.h>
+#endif
 
 /*!
  * @addtogroup serial_transport

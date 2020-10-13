@@ -12,6 +12,8 @@
 
 #include "erpc_config_internal.h"
 
+#include <stdint.h>
+
 #if ERPC_THREADS
 
 #if ERPC_THREADS_IS(FREERTOS)

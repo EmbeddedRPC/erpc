@@ -8,6 +8,7 @@
  */
 
 #include "erpc_port.h"
+
 #include <cstdlib>
 #include <new>
 
@@ -39,12 +40,12 @@ void *operator new[](size_t count, const nothrow_t &tag) THROW NOEXCEPT
     return p;
 }
 
-void operator delete(void *ptr) THROW NOEXCEPT
+void operator delete(void *ptr)THROW NOEXCEPT
 {
     erpc_free(ptr);
 }
 
-void operator delete(void* ptr, std::size_t count) THROW NOEXCEPT
+void operator delete(void *ptr, std::size_t count)THROW NOEXCEPT
 {
     (void)count;
     erpc_free(ptr);
@@ -55,7 +56,7 @@ void operator delete[](void *ptr) THROW NOEXCEPT
     erpc_free(ptr);
 }
 
-void operator delete[](void* ptr, std::size_t count) THROW NOEXCEPT
+void operator delete[](void *ptr, std::size_t count) THROW NOEXCEPT
 {
     (void)count;
     erpc_free(ptr);

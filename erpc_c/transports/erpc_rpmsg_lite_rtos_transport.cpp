@@ -8,8 +8,11 @@
  */
 
 #include "erpc_rpmsg_lite_rtos_transport.h"
+
 #include "erpc_config_internal.h"
+
 #include "rpmsg_ns.h"
+
 #include <cassert>
 
 using namespace erpc;

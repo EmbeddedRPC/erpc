@@ -8,9 +8,11 @@
  */
 
 #include "erpc_dspi_slave_transport.h"
+
 #include "board.h"
 #include "fsl_dspi.h"
 #include "fsl_gpio.h"
+
 #include <cstdio>
 
 using namespace erpc;

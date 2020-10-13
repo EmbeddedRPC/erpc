@@ -9,6 +9,7 @@
  */
 
 #include "SymbolScanner.h"
+
 #include "ErpcLexer.h"
 #include "Logging.h"
 #include "annotations.h"
@@ -19,6 +20,7 @@
 #include "types/FunctionType.h"
 #include "types/ListType.h"
 #include "types/VoidType.h"
+
 #include <algorithm>
 #include <cstring>
 
@@ -1354,8 +1356,7 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
         case TOK_LIST:
             return createListType(typeNode);
 
-        case TOK_UNION:
-        {
+        case TOK_UNION: {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
             break;

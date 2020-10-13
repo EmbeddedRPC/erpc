@@ -9,12 +9,14 @@
  */
 
 #include "erpc_client_setup.h"
+
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_crc16.h"
 #include "erpc_manually_constructed.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
+
 #include <cassert>
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"

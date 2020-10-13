@@ -7,10 +7,12 @@
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_ArithmeticService_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 #include <string.h>
 

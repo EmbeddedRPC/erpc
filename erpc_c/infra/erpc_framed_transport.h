@@ -13,6 +13,7 @@
 #include "erpc_config_internal.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
+
 #include <cstring>
 
 #if ERPC_THREADS

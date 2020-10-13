@@ -8,6 +8,7 @@
  */
 
 #include "Token.h"
+
 #include "ErpcLexer.h"
 #include "ParseErrors.h"
 

@@ -12,6 +12,7 @@
 
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
+
 #include "rpmsg_lite.h"
 #include "rpmsg_queue.h"
 

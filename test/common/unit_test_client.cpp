@@ -9,6 +9,7 @@
 #include "erpc_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
+
 #include "board.h"
 #include "gtest.h"
 #include "gtestListener.h"

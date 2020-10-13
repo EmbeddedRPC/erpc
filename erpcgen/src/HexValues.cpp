@@ -8,6 +8,7 @@
  */
 
 #include "HexValues.h"
+
 #include <cctype>
 
 bool isHexDigit(char c)

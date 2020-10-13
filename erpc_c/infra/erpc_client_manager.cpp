@@ -8,6 +8,7 @@
  */
 
 #include "erpc_client_manager.h"
+
 #include "assert.h"
 
 using namespace erpc;
@@ -18,8 +19,10 @@ using namespace erpc;
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;
+#ifndef _WIN32
 #pragma weak nestingDetection
 bool nestingDetection = false;
+#endif
 #endif
 
 void ClientManager::setTransport(Transport *transport)

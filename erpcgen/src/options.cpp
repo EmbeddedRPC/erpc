@@ -40,11 +40,11 @@
 //    - Added PARSE_POS control flag and POSITIONAL return value.
 // ^^**************************************************************************
 
+#include "options.h"
+
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
-
-#include "options.h"
 
 using namespace std;
 
@@ -203,7 +203,7 @@ void OptStrTokIter::rewind(void)
     cur = ::strtok(tokstr, seps);
 }
 
-    // ************************************************************* OptIstreamIter
+// ************************************************************* OptIstreamIter
 
 #ifdef vms
 enum
@@ -633,7 +633,7 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #endif /* USE_STDIO */
 }
 
-    // ******************************************************************* Options
+// ******************************************************************* Options
 
 #if (defined(MSWIN) || defined(OS2) || defined(MSDOS))
 #define DIR_SEP_CHAR '\\'

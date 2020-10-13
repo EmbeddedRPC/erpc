@@ -12,4 +12,4 @@ jobs:
       with:
         source: '.'  
         exclude: 'test/common/gtest/gtest.h test/common/gtest/gtest.cpp erpcgen/src/cpptemplate/cpptempl.h erpcgen/src/cpptemplate/cpptempl.cpp erpcgen/src/cpptemplate/cpptempl_test.cpp'
-        clangFormatVersion: 5 
+        clangFormatVersion: 10 

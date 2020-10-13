@@ -7,8 +7,8 @@
  */
 
 #include "erpc_manually_constructed.h"
-#include "erpc_transport_setup.h"
 #include "erpc_tcp_transport.h"
+#include "erpc_transport_setup.h"
 
 using namespace erpc;
 
@@ -25,11 +25,11 @@ static ManuallyConstructed<TCPTransport> s_transport;
 erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool isServer)
 {
     s_transport.construct(host, port, isServer);
-    if (kErpcStatus_Success == s_transport->open()) 
+    if (kErpcStatus_Success == s_transport->open())
     {
         return reinterpret_cast<erpc_transport_t>(s_transport.get());
-    }    
-    return NULL;    
+    }
+    return NULL;
 }
 
 void erpc_transport_tcp_close(void)

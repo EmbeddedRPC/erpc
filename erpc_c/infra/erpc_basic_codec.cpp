@@ -8,6 +8,7 @@
  */
 
 #include "erpc_basic_codec.h"
+
 #include <cassert>
 
 using namespace erpc;

@@ -8,6 +8,7 @@
  */
 
 #include "erpc_message_buffer.h"
+
 #include <cassert>
 #include <cstring>
 

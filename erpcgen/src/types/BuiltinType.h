@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__BUILTINTYPE_H_
 
 #include "DataType.h"
+
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +114,7 @@ public:
      * @retval false When builtin type isn't string or ustring.
      */
     virtual bool isString() const { return m_builtinType == kStringType || m_builtinType == kUStringType; }
-    
+
     /*!
      * @brief This function return true/false value for identify ustring type.
      *

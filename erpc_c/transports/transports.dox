@@ -28,6 +28,12 @@
 */
 
 /*!
+@defgroup spidev_master_transport SPIdev Linux Master
+@ingroup transports
+@brief SPIdev Linux transport.
+*/
+
+/*!
 @defgroup itbp_transport Inter-thread
 @ingroup transports
 @brief Simple inter-thread communications transport.
@@ -57,6 +63,12 @@
 */
 
 /*!
+@defgroup rpmsg_tty_rtos_transport RPMsg TTY RTOS
+@ingroup transports
+@brief RPMsg TTY RTOS transport.
+*/
+
+/*!
 @defgroup tcp_transport TCP/IP
 @ingroup transports
 @brief Simple TCP/IP transport.
@@ -72,4 +84,10 @@
 @defgroup rpmsg_linux_transport RPMsg Endpoints
 @ingroup transports
 @brief RPMsg endpoints linux transport.
+*/
+
+/*!
+@defgroup USB_CDC_transport USB CDC
+@ingroup transports
+@brief USB CDC transport.
 */

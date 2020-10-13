@@ -6,21 +6,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "unit_test.h"
-
 #include "erpc_arbitrated_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 
 #include "FreeRTOS.h"
+#include "gtest.h"
 #include "semphr.h"
 #include "task.h"
-
-#include "gtest.h"
-
 #include "test_firstInterface.h"
 #include "test_secondInterface_server.h"
+#include "unit_test.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -7,6 +7,7 @@
  */
 
 #include "erpc_threading.h"
+
 #include <cassert>
 
 #if ERPC_THREADS_IS(ZEPHYR)

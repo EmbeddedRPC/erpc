@@ -7,17 +7,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_tcp_transport.h"
+
 #include <cstdio>
 #if ERPC_HAS_POSIX
 #include <err.h>
 #endif
 #include <errno.h>
 #include <netdb.h>
+#include <netinet/tcp.h>
 #include <signal.h>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <netinet/tcp.h>
 #include <unistd.h>
 
 using namespace erpc;
@@ -89,7 +90,7 @@ erpc_status_t TCPTransport::connectClient(void)
     }
 
     // Fill in hints structure for getaddrinfo.
-    struct addrinfo hints = { };
+    struct addrinfo hints = {};
     hints.ai_flags = AI_NUMERICSERV;
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
@@ -143,7 +144,7 @@ erpc_status_t TCPTransport::connectClient(void)
         TCP_DEBUG_ERR("connecting failed");
         return kErpcStatus_ConnectionFailure;
     }
-    
+
     int set = 1;
     setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int));
 
@@ -321,7 +322,7 @@ void TCPTransport::serverThread(void)
             TCP_DEBUG_ERR("accept failed");
         }
     }
-    
+
     ::close(serverSocket);
 }
 

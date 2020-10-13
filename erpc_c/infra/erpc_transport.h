@@ -13,6 +13,7 @@
 #include "erpc_common.h"
 #include "erpc_crc16.h"
 #include "erpc_message_buffer.h"
+
 #include <cstring>
 
 /*!

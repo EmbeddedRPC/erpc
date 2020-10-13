@@ -8,6 +8,7 @@
  */
 
 #include "erpc_server.h"
+
 #include "assert.h"
 
 using namespace erpc;

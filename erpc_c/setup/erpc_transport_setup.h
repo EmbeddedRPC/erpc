@@ -34,8 +34,8 @@ typedef void (*rpmsg_ready_cb)(void);
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 //! @name Transport setup
 //@{
@@ -130,6 +130,22 @@ erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRa
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name SPIdev transport setup
+//@{
+
+/*!
+ * @brief Create a SPIdev transport.
+ *
+ * Create SPIdev master transport instance, to be used at master core.
+ *
+ * @param[in] spidev SPI device name.
+ * @param[in] speed_Hz SPI clock speed in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spidev_master_init(const char *spidev, uint32_t speed_Hz);
 //@}
 
 //! @name MU transport setup
@@ -286,7 +302,7 @@ void erpc_transport_rpmsg_linux_deinit(void);
 
 //! @name TCP transport setup
 //@{
-	
+
 /*!
  * @brief Create and open TCP transport
  *
@@ -304,16 +320,42 @@ erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool i
 /*!
  * @brief Close TCP connection
  *
- * For server, stop listening and close all sockets. Note that the server mode 
+ * For server, stop listening and close all sockets. Note that the server mode
  * uses and accept() which is a not-recommended blocking method so we can't exit
  * until a connection attempts is made. This is a deadlock but assuming that TCP
  * code is supposed to be for test, I assume it's acceptable. Otherwise a non-blocking
- * socket or select() shoudl be used 
+ * socket or select() shoudl be used
  * For client, close server connection
  *
  * @return Return TRUE if listen/connection successful
  */
 void erpc_transport_tcp_close(void);
+//@}
+
+//! @name USB CDC transport setup
+//@{
+
+/*!
+ * @brief Create an USB CDC transport.
+ *
+ * Create an USB CDC transport instance.
+ *
+ * @param[in] serialHandle Pointer to point to a memory space of size #SERIAL_MANAGER_HANDLE_SIZE allocated by the
+ * caller, see serial manager header file.
+ * @param[in] serialConfig Pointer to user-defined configuration structure allocated by the caller, see serial manager
+ * header file.
+ * @param[in] usbCdcConfig Pointer to serial port usb config structure allocated by the caller, see serial manager
+ * header file.
+ * @param[in] usbRingBuffer Pointer to point serial manager ring buffer allocated by the caller, see serial manager
+ * header file.
+ * @param[in] usbRingBufferLength Serial manager ring buffer size.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_usb_cdc_init(void *serialHandle, void *serialConfig, void *usbCdcConfig,
+                                             uint8_t *usbRingBuffer, uint32_t usbRingBufferLength);
+//@}
+
 //@}
 
 #ifdef __cplusplus

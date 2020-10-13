@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__DATATYPE_H_
 
 #include "Symbol.h"
+
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +194,7 @@ public:
      * @retval false Always return false.
      */
     virtual bool isString() const { return false; }
-    
+
     /*!
      * @brief This function return "false" value as default for identify ustring type.
      *

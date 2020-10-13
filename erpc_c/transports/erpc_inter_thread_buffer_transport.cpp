@@ -8,6 +8,7 @@
  */
 
 #include "erpc_inter_thread_buffer_transport.h"
+
 #include <cassert>
 
 using namespace erpc;

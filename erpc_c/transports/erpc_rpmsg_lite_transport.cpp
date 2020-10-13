@@ -7,7 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_rpmsg_lite_transport.h"
+
 #include "erpc_config_internal.h"
+
 #include "rpmsg_ns.h"
 
 using namespace erpc;

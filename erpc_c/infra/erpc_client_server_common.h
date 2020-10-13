@@ -37,22 +37,22 @@ namespace erpc {
  */
 class ClientServerCommon
 #if ERPC_MESSAGE_LOGGING
-# ifdef ERPC_OTHER_INHERITANCE
-,
-# else
-# define ERPC_OTHER_INHERITANCE 1
+#ifdef ERPC_OTHER_INHERITANCE
+    ,
+#else
+#define ERPC_OTHER_INHERITANCE 1
 :
-# endif
-public MessageLoggers
+#endif
+    public MessageLoggers
 #endif
 #if ERPC_PRE_POST_ACTION
-# ifdef ERPC_OTHER_INHERITANCE
-,
-# else
-# define ERPC_OTHER_INHERITANCE 1
+#ifdef ERPC_OTHER_INHERITANCE
+    ,
+#else
+#define ERPC_OTHER_INHERITANCE 1
 :
-# endif
-public PrePostAction
+#endif
+    public PrePostAction
 #endif
 {
 public:
@@ -61,27 +61,27 @@ public:
      */
     ClientServerCommon(void)
 #ifdef ERPC_OTHER_INHERITANCE
-# undef ERPC_OTHER_INHERITANCE
+#undef ERPC_OTHER_INHERITANCE
 #endif
 #if ERPC_MESSAGE_LOGGING
-# ifdef ERPC_OTHER_INHERITANCE
-    ,
-# else
-#  define ERPC_OTHER_INHERITANCE 1
+#ifdef ERPC_OTHER_INHERITANCE
+        ,
+#else
+#define ERPC_OTHER_INHERITANCE 1
     :
-# endif
-    MessageLoggers()
+#endif
+        MessageLoggers()
 #endif
 #if ERPC_PRE_POST_ACTION
-# ifdef ERPC_OTHER_INHERITANCE
-    ,
-# else
-# define ERPC_OTHER_INHERITANCE 1
+#ifdef ERPC_OTHER_INHERITANCE
+            ,
+#else
+#define ERPC_OTHER_INHERITANCE 1
     :
-# endif
-    PrePostAction()
 #endif
-{};
+        PrePostAction()
+#endif
+            {};
 
     /*!
      * @brief ClientServerCommon destructor

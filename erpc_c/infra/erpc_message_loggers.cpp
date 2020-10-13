@@ -7,6 +7,7 @@
  */
 
 #include "erpc_message_loggers.h"
+
 #include <new>
 
 using namespace erpc;

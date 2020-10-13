@@ -8,7 +8,11 @@
  */
 
 #include "erpc_threading.h"
+
+#include <errno.h>
 #include <process.h>
+#include <time.h>
+#include <windows.h>
 
 using namespace erpc;
 
@@ -68,13 +72,7 @@ void Thread::start(void *arg)
     m_arg = arg;
 
     EnterCriticalSection(&m_critical_section);
-    m_thread = (HANDLE)_beginthreadex(
-        NULL,
-        m_stackSize,
-        threadEntryPointStub,
-        this,
-        0,
-        &m_thrdaddr);
+    m_thread = (HANDLE)_beginthreadex(NULL, m_stackSize, threadEntryPointStub, this, 0, &m_thrdaddr);
 
     // Link in this thread to the list.
     if (NULL != s_first)
@@ -111,7 +109,21 @@ Thread *Thread::getCurrentThread(void)
 
 void Thread::sleep(uint32_t usecs)
 {
-    Sleep(usecs);
+    LARGE_INTEGER startTime;
+    LARGE_INTEGER currTick;
+    LARGE_INTEGER freq;
+    uint32_t elapsedTimeMicroSeconds;
+
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&startTime);
+
+    do
+    {
+        QueryPerformanceCounter(&currTick);
+
+        elapsedTimeMicroSeconds =
+            static_cast<uint32_t>(((currTick.QuadPart - startTime.QuadPart) * 1000000) / freq.QuadPart);
+    } while (elapsedTimeMicroSeconds < usecs);
 }
 
 void Thread::threadEntryPoint(void)

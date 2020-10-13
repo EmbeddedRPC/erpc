@@ -11,6 +11,7 @@
 #define __embedded_rpc__thread__
 
 #include "erpc_config_internal.h"
+
 #include <stdint.h>
 
 // Exclude the rest of the file if threading is disabled.
@@ -272,10 +273,10 @@ private:
 #elif ERPC_THREADS_IS(WIN32)
 
     /*!
-    * @brief This function execute threadEntryPoint function.
-    *
-    * @param[in] arg Thread to execute.
-    */
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
     static unsigned WINAPI threadEntryPointStub(void *arg);
 
 #endif
@@ -470,7 +471,7 @@ private:
     rtos::Semaphore *m_sem; /*!< Semaphore. */
     int m_count;            /*!< Semaphore count number. */
 #elif ERPC_THREADS_IS(WIN32)
-    Mutex m_mutex;         /*!< Mutext. */
+    Mutex m_mutex; /*!< Mutext. */
     int m_count;
     HANDLE m_sem;
 #endif

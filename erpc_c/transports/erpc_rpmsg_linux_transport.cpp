@@ -7,6 +7,7 @@
  */
 
 #include "erpc_rpmsg_linux_transport.h"
+
 #include <cassert>
 #include <unistd.h>
 

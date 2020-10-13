@@ -16,6 +16,7 @@
 #undef yyFlexLexer
 #include "AstNode.h"
 #include "ParseErrors.h"
+
 #include <FlexLexer.h>
 #include <fstream>
 #include <string>

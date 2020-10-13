@@ -11,9 +11,9 @@
 #ifndef _EMBEDDED_RPC__SERVER_H_
 #define _EMBEDDED_RPC__SERVER_H_
 
+#include "erpc_client_server_common.h"
 #include "erpc_codec.h"
 #include "erpc_config_internal.h"
-#include "erpc_client_server_common.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_client_manager.h"
 #endif

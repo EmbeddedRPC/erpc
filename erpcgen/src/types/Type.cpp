@@ -28,6 +28,7 @@
 #include "UnionType.h"
 #include "annotations.h"
 #include "cpptempl.h"
+
 #include <cstring>
 
 using namespace erpcgen;
@@ -475,14 +476,12 @@ DataType *DataType::getTrueContainerDataType()
     DataType *trueDataType = this->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::kListType:
-        {
+        case DataType::kListType: {
             ListType *l = dynamic_cast<ListType *>(trueDataType);
             assert(l);
             return l->getElementType()->getTrueContainerDataType();
         }
-        case DataType::kArrayType:
-        {
+        case DataType::kArrayType: {
             ArrayType *a = dynamic_cast<ArrayType *>(trueDataType);
             assert(a);
             return a->getElementType()->getTrueContainerDataType();

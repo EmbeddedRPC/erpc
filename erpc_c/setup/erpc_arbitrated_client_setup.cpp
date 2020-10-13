@@ -9,6 +9,7 @@
  */
 
 #include "erpc_arbitrated_client_setup.h"
+
 #include "erpc_arbitrated_client_manager.h"
 #include "erpc_basic_codec.h"
 #include "erpc_manually_constructed.h"

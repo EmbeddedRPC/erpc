@@ -8,6 +8,7 @@
  */
 
 #include "erpc_threading.h"
+
 #include <cassert>
 #include <errno.h>
 

@@ -8,6 +8,7 @@
  */
 
 #include "SearchPath.h"
+
 #include <cstdio>
 
 #if __WIN32__

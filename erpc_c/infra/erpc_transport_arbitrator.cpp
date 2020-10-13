@@ -7,7 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_transport_arbitrator.h"
+
 #include "erpc_config_internal.h"
+
 #include <cassert>
 #include <cstdio>
 #include <string>
@@ -56,16 +58,16 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
         erpc_status_t err = m_sharedTransport->receive(message);
         if (err)
         {
-            // if we timeout, we must unblock all pending client(s)    
+            // if we timeout, we must unblock all pending client(s)
             if (err == kErpcStatus_Timeout)
-            {    
+            {
                 PendingClientInfo *client = m_clientList;
                 for (; client; client = client->m_next)
                 {
                     if (client->m_isValid)
                     {
                         client->m_sem.put();
-                    }    
+                    }
                 }
             }
             return err;

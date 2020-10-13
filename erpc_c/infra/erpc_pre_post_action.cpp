@@ -8,6 +8,7 @@
  */
 
 #include "erpc_pre_post_action.h"
+
 #include "erpc_config_internal.h"
 #if ERPC_PRE_POST_ACTION_DEFAULT
 #include "erpc_setup_extensions.h"

@@ -8,11 +8,20 @@
  */
 
 #include "erpc_serial_transport.h"
+
 #include "erpc_message_buffer.h"
 #include "erpc_serial.h"
+
 #include <cstdio>
 #include <string>
+
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#include <windows.h>
+#else
 #include <termios.h>
+#endif
 
 using namespace erpc;
 
@@ -39,10 +48,14 @@ erpc_status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
     {
         return kErpcStatus_InitFailed;
     }
+#ifdef _WIN32
+    // TODO
+#else
     if (!isatty(m_serialHandle))
     {
         return kErpcStatus_InitFailed;
     }
+#endif
     if (-1 == serial_setup(m_serialHandle, m_baudRate))
     {
         return kErpcStatus_InitFailed;
@@ -51,10 +64,14 @@ erpc_status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
     {
         return kErpcStatus_InitFailed;
     }
+#ifdef _WIN32
+    // TODO
+#else
     if (-1 == tcflush(m_serialHandle, TCIOFLUSH))
     {
         return kErpcStatus_InitFailed;
     }
+#endif
     return kErpcStatus_Success;
 }
 

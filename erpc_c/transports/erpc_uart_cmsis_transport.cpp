@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -8,6 +8,7 @@
  */
 
 #include "erpc_uart_cmsis_transport.h"
+
 #include <cstdio>
 
 using namespace erpc;
@@ -18,6 +19,7 @@ using namespace erpc;
 
 static volatile bool s_isTransferReceiveCompleted = false;
 static volatile bool s_isTransferSendCompleted = false;
+static UartTransport *s_uart_instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -25,7 +27,12 @@ static volatile bool s_isTransferSendCompleted = false;
 
 UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv)
 : m_uartDrv(uartDrv)
+#if ERPC_THREADS
+, m_rxSemaphore()
+, m_txSemaphore()
+#endif
 {
+    s_uart_instance = this;
 }
 
 UartTransport::~UartTransport(void)
@@ -33,17 +40,37 @@ UartTransport::~UartTransport(void)
     (*m_uartDrv).Uninitialize();
 }
 
+void UartTransport::tx_cb(void)
+{
+#if ERPC_THREADS
+    m_txSemaphore.putFromISR();
+#else
+    s_isTransferSendCompleted = true;
+#endif
+}
+
+void UartTransport::rx_cb(void)
+{
+#if ERPC_THREADS
+    m_rxSemaphore.putFromISR();
+#else
+    s_isTransferReceiveCompleted = true;
+#endif
+}
+
 /* Transfer callback */
 void TransferCallback(uint32_t event)
 {
+    UartTransport *transport = s_uart_instance;
+
     if (event == ARM_USART_EVENT_SEND_COMPLETE)
     {
-        s_isTransferSendCompleted = true;
+        transport->tx_cb();
     }
 
     if (event == ARM_USART_EVENT_RECEIVE_COMPLETE)
     {
-        s_isTransferReceiveCompleted = true;
+        transport->rx_cb();
     }
 }
 
@@ -77,9 +104,14 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
     int32_t status = (*m_uartDrv).Receive(data, size);
     if (status == ARM_DRIVER_OK)
     {
+/* wait until the receiving is finished */
+#if ERPC_THREADS
+        m_rxSemaphore.get();
+#else
         while (!s_isTransferReceiveCompleted)
         {
         }
+#endif
         return kErpcStatus_Success;
     }
 
@@ -93,9 +125,14 @@ erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
     int32_t status = (*m_uartDrv).Send(data, size);
     if (status == ARM_DRIVER_OK)
     {
+/* wait until the sending is finished */
+#if ERPC_THREADS
+        m_txSemaphore.get();
+#else
         while (!s_isTransferSendCompleted)
         {
         }
+#endif
         return kErpcStatus_Success;
     }
 

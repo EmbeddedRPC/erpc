@@ -52,11 +52,11 @@ public:
     T *get(void) { return reinterpret_cast<T *>(&m_storage); }
     const T *get(void) const { return reinterpret_cast<const T *>(&m_storage); }
     T *operator->(void) { return get(); }
-    const T *operator->(void)const { return get(); }
+    const T *operator->(void) const { return get(); }
     T &operator*(void) { return *get(); }
-    const T &operator*(void)const { return *get(); }
+    const T &operator*(void) const { return *get(); }
     operator T *(void) { return get(); }
-    operator const T *(void)const { return get(); }
+    operator const T *(void) const { return get(); }
     //@}
 
     //! @name Explicit construction methods
@@ -91,7 +91,7 @@ public:
     {
         new (m_storage) T(a1, a2, a3, a4, a5);
     }
-    
+
     template <typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5, const A6 &a6)
     {
