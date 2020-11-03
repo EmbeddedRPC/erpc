@@ -7,8 +7,8 @@
  */
 
 #include "erpc_rpmsg_linux_transport.h"
+#include "erpc_config.h"
 
-#include <cassert>
 #include <unistd.h>
 
 using namespace erpc;
@@ -28,7 +28,7 @@ RPMsgLinuxTransport::~RPMsgLinuxTransport(void) {}
 
 erpc_status_t RPMsgLinuxTransport::init(void)
 {
-    assert(m_endPoint != NULL);
+    erpc_assert(m_endPoint != NULL);
 
     if (!m_endPoint->init())
     {
