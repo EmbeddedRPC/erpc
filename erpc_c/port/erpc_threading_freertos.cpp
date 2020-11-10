@@ -20,11 +20,13 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 Thread *Thread::s_first = NULL;
-#ifdef ESP_PLATFORM 
+#ifdef ESP_PLATFORM
 portMUX_TYPE Thread::s_mux = portMUX_INITIALIZER_UNLOCKED;
-#define SPINLOCK (&s_mux)
+#define erpcENTER_CRITICAL() (portENTER_CRITICAL(&s_mux))
+#define erpcEXIT_CRITICAL() (portEXIT_CRITICAL(&s_mux))
 #else
-#define SPINLOCK
+#define erpcENTER_CRITICAL() (portENTER_CRITICAL())
+#define erpcEXIT_CRITICAL() (portEXIT_CRITICAL())
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +72,7 @@ void Thread::start(void *arg)
     // created thread to the linked list. This prevents a race condition if the new thread is
     // higher priority than the current thread, and the new thread calls getCurrenThread(),
     // which will scan the linked list.
-    portENTER_CRITICAL(SPINLOCK);
+    erpcENTER_CRITICAL();
 
     if (pdPASS == xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
                               ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
@@ -84,7 +86,7 @@ void Thread::start(void *arg)
         s_first = this;
     }
 
-    portEXIT_CRITICAL(SPINLOCK);
+    erpcEXIT_CRITICAL();
 }
 
 bool Thread::operator==(Thread &o)
@@ -97,7 +99,7 @@ Thread *Thread::getCurrentThread()
     TaskHandle_t thisTask = xTaskGetCurrentTaskHandle();
 
     // Walk the threads list to find the Thread object for the current task.
-    portENTER_CRITICAL(SPINLOCK);
+    erpcENTER_CRITICAL();
     Thread *it = s_first;
     while (it)
     {
@@ -107,7 +109,7 @@ Thread *Thread::getCurrentThread()
         }
         it = it->m_next;
     }
-    portEXIT_CRITICAL(SPINLOCK);
+    erpcEXIT_CRITICAL();
     return it;
 }
 
@@ -133,7 +135,7 @@ void Thread::threadEntryPointStub(void *arg)
     _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
-    portENTER_CRITICAL(SPINLOCK);
+    erpcENTER_CRITICAL();
     Thread *it = s_first;
     Thread *prev = NULL;
     while (it)
@@ -155,7 +157,7 @@ void Thread::threadEntryPointStub(void *arg)
         prev = it;
         it = it->m_next;
     }
-    portEXIT_CRITICAL(SPINLOCK);
+    erpcEXIT_CRITICAL();
 
 // Handle a task returning from its function. Delete or suspend the task, if the API is
 // available. If neither API is included, then just enter an infinite loop. If vTaskDelay()
