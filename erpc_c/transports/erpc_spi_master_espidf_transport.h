@@ -42,9 +42,9 @@ public:
      * @param[in] cs_gpio chip select gpio (-1 to disable)
      * @param[in] ready_gpio gpio used for handshake - a positive edge signals the slave is ready (-1 if not used)
      * @param[in] speed bus speed in Hz (0 or -1 for auto)
-     
+
      */
-    SpiMasterTransport(spi_bus_config_t *bus_config, spi_host_device_t host = SPI2_HOST, gpio_num_t cs_gpio = GPIO_NUM_NC, 
+    SpiMasterTransport(spi_bus_config_t *bus_config, spi_host_device_t host = SPI2_HOST, gpio_num_t cs_gpio = GPIO_NUM_NC,
                        gpio_num_t ready_gpio = GPIO_NUM_NC, int speed = 0);
 
     /*!

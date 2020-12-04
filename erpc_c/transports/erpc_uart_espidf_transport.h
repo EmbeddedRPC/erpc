@@ -41,9 +41,9 @@ public:
      * @param[in] rx_gpio RX gpio
      * @param[in] tx_gpio TX gpio
      * @param[in] rts_gpio RTS gpio (-1 to disable)
-     * @param[in] cts_gpio CTS gpio (-1 to disable)     
+     * @param[in] cts_gpio CTS gpio (-1 to disable)
      */
-    UartTransport(uart_config_t *uart_config, uart_port_t uart_num = UART_NUM_1, 
+    UartTransport(uart_config_t *uart_config, uart_port_t uart_num = UART_NUM_1,
                  gpio_num_t rx_gpio = GPIO_NUM_NC, gpio_num_t tx_gpio = GPIO_NUM_NC,
                  gpio_num_t rts_gpio = GPIO_NUM_NC, gpio_num_t cts_gpio = GPIO_NUM_NC);
 
@@ -65,11 +65,11 @@ public:
 protected:
     struct {
         uart_config_t config;
-        uart_port_t num;        
+        uart_port_t num;
         gpio_num_t rx_gpio, tx_gpio, rts_gpio, cts_gpio;
         int rx_ring_size, tx_ring_size, queue_size;
         QueueHandle_t *queue;
-        int intr_alloc_flags;        
+        int intr_alloc_flags;
     } m_uart;
     TickType_t m_timeout;
 
