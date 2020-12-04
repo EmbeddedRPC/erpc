@@ -49,13 +49,13 @@ class ManuallyConstructed
 public:
     //! @name Object access
     //@{
-    T *get(void) { return (isConstructed) ? reinterpret_cast<T *>(&m_storage) : nullptr; }
-    const T *get(void) const { return (isConstructed) ? reinterpret_cast<const T *>(&m_storage) : nullptr; }
+    T *get(void) { return (m_isConstructed) ? reinterpret_cast<T *>(&m_storage) : nullptr; }
+    const T *get(void) const { return (m_isConstructed) ? reinterpret_cast<const T *>(&m_storage) : nullptr; }
     T *operator->(void) { return get(); }
     const T *operator->(void) const { return get(); }
     T &operator*(void)
     {
-        if (isConstructed)
+        if (m_isConstructed)
         {
             return *get();
         }
@@ -67,7 +67,7 @@ public:
     }
     const T &operator*(void) const
     {
-        if (isConstructed)
+        if (m_isConstructed)
         {
             return *get();
         }
@@ -85,60 +85,60 @@ public:
     //@{
     void construct(void)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T;
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
 
     template <typename A1>
     void construct(const A1 &a1)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T(a1);
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
 
     template <typename A1, typename A2>
     void construct(const A1 &a1, const A2 &a2)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T(a1, a2);
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
 
     template <typename A1, typename A2, typename A3>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T(a1, a2, a3);
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
 
     template <typename A1, typename A2, typename A3, typename A4>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T(a1, a2, a3, a4);
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
 
     template <typename A1, typename A2, typename A3, typename A4, typename A5>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
     {
-        if (!isConstructed)
+        if (!m_isConstructed)
         {
             new (m_storage) T(a1, a2, a3, a4, a5);
-            isConstructed = true;
+            m_isConstructed = true;
         }
     }
     //@}
@@ -150,10 +150,10 @@ public:
      */
     void destroy(void)
     {
-        if (isConstructed)
+        if (m_isConstructed)
         {
             get()->~T();
-            isConstructed = false;
+            m_isConstructed = false;
         }
     }
 
@@ -170,7 +170,7 @@ protected:
      *
      * Based on this variable we can allow or forbid construct/destruct calls.
      */
-    bool isConstructed = false;
+    bool m_isConstructed = false;
 };
 
 } // namespace erpc
