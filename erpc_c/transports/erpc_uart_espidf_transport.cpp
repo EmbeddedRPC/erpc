@@ -23,7 +23,7 @@ static volatile bool s_isTransferSendCompleted = false;
 ////////////////////////////////////////////////////////////////////////////////
 
 UartTransport::UartTransport(uart_config_t *uart_config, uart_port_t uart_num, gpio_num_t rx_gpio,
-                            gpio_num_t tx_gpio, gpio_num_t rts_gpio, gpio_num_t cts_gpio)
+                             gpio_num_t tx_gpio, gpio_num_t rts_gpio, gpio_num_t cts_gpio)
 : m_uart{
         .config = *uart_config,
         .num = (uart_port_t) uart_num,
@@ -59,8 +59,10 @@ erpc_status_t UartTransport::init(int timeout)
     }
 
     esp_err_t err = uart_param_config(m_uart.num, &m_uart.config);
-    err |= uart_set_pin(m_uart.num, m_uart.tx_gpio, m_uart.rx_gpio, m_uart.rts_gpio, m_uart.cts_gpio);
-    err |= uart_driver_install(m_uart.num, m_uart.rx_ring_size, m_uart.tx_ring_size, m_uart.queue_size, m_uart.queue, m_uart.intr_alloc_flags);
+    err |= uart_set_pin(m_uart.num, m_uart.tx_gpio, m_uart.rx_gpio, m_uart.rts_gpio,
+                        m_uart.cts_gpio);
+    err |= uart_driver_install(m_uart.num, m_uart.rx_ring_size, m_uart.tx_ring_size,
+                               m_uart.queue_size, m_uart.queue, m_uart.intr_alloc_flags);
 
     return err == ESP_OK ? kErpcStatus_Success : kErpcStatus_InitFailed;
 }
@@ -71,7 +73,9 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 
     TickType_t timeout = (size * 10 * 1000 * 2) / m_uart.config.baud_rate / portTICK_RATE_MS;
 
-    while (size && ((len = uart_read_bytes(m_uart.num, data, size, timeout < m_timeout ? m_timeout : timeout)) > 0))
+    while (size &&
+           ((len = uart_read_bytes(
+                 m_uart.num, data, size, timeout < m_timeout ? m_timeout : timeout)) > 0))
     {
         size -= len;
     }

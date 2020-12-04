@@ -40,7 +40,8 @@ public:
      * @param[in] bus_config a pointer to a spi_bus_config_t or NULL if bus already initialized
      * @param[in] host user host SPI2_HOST or SPI3_HOST (1 is reserved)
      * @param[in] cs_gpio chip select gpio (-1 to disable)
-     * @param[in] ready_gpio gpio used for handshake - a positive edge signals the slave is ready (-1 if not used)
+     * @param[in] ready_gpio gpio used for handshake - a positive edge signals the slave is ready
+     *            (-1 if not used)
      * @param[in] speed bus speed in Hz (0 or -1 for auto)
 
      */

@@ -33,15 +33,16 @@ static DMA_ATTR uint8_t dummy[MAX_SIZE];
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-#define SET_GPIO(g,v)                 \
-    do {                             \
-        if (g != GPIO_NUM_NC)        \
-        {                            \
-            gpio_set_level(g,v);    \
-        }                            \
+#define SET_GPIO(g,v)            \
+    do {                         \
+        if (g != GPIO_NUM_NC)    \
+        {                        \
+            gpio_set_level(g,v); \
+        }                        \
     } while (0)
 
-SpiSlaveTransport::SpiSlaveTransport(spi_bus_config_t *bus_config, spi_host_device_t host, gpio_num_t cs_gpio, gpio_num_t ready_gpio)
+SpiSlaveTransport::SpiSlaveTransport(
+    spi_bus_config_t *bus_config, spi_host_device_t host, gpio_num_t cs_gpio, gpio_num_t ready_gpio)
 : m_spi{
         .bus_config = *bus_config,
         .config = { },

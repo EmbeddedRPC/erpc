@@ -31,7 +31,12 @@ static void IRAM_ATTR handshakeHandler(void* arg)
     }
 }
 
-SpiMasterTransport::SpiMasterTransport(spi_bus_config_t *bus_config, spi_host_device_t host, gpio_num_t cs_gpio, gpio_num_t ready_gpio, int speed)
+SpiMasterTransport::SpiMasterTransport(
+    spi_bus_config_t *bus_config,
+    spi_host_device_t host,
+    gpio_num_t cs_gpio,
+    gpio_num_t ready_gpio,
+    int speed)
 : m_spi{
         .bus_config = NULL,
         .config = { },
