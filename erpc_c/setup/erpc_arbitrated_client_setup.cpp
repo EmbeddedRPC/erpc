@@ -32,8 +32,8 @@ using namespace erpc;
 
 // global client variables
 ERPC_MANUALLY_CONSTRUCTED(ArbitratedClientManager, s_client);
-extern ClientManager *g_client;
-ClientManager *g_client = NULL;
+ClientManager *g_client;
+#pragma weak g_client
 
 ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
 ERPC_MANUALLY_CONSTRUCTED(TransportArbitrator, s_arbitrator);

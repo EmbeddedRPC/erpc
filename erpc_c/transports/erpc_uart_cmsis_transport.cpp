@@ -103,9 +103,9 @@ erpc_status_t UartTransport::init(void)
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     erpc_status_t erpcStatus = kErpcStatus_ReceiveFailed;
-    int32_t status = (*m_uartDrv).Receive(data, size);
 
     s_isTransferReceiveCompleted = false;
+    int32_t status = (*m_uartDrv).Receive(data, size);
 
     if (status == ARM_DRIVER_OK)
     {
@@ -126,9 +126,9 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     erpc_status_t erpcStatus = kErpcStatus_SendFailed;
-    int32_t status = (*m_uartDrv).Send(data, size);
 
     s_isTransferSendCompleted = false;
+    int32_t status = (*m_uartDrv).Send(data, size);
 
     if (status == ARM_DRIVER_OK)
     {
