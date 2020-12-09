@@ -85,61 +85,49 @@ public:
     //@{
     void construct(void)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T;
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T;
+        m_isConstructed = true;
     }
 
     template <typename A1>
     void construct(const A1 &a1)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T(a1);
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T(a1);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2>
     void construct(const A1 &a1, const A2 &a2)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T(a1, a2);
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T(a1, a2);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T(a1, a2, a3);
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T(a1, a2, a3);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3, typename A4>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T(a1, a2, a3, a4);
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T(a1, a2, a3, a4);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3, typename A4, typename A5>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
     {
-        if (!m_isConstructed)
-        {
-            new (m_storage) T(a1, a2, a3, a4, a5);
-            m_isConstructed = true;
-        }
+        destroy();
+        new (m_storage) T(a1, a2, a3, a4, a5);
+        m_isConstructed = true;
     }
     //@}
 
