@@ -97,6 +97,11 @@ public:
      */
     virtual void setCrc16(Crc16 *crcImpl);
 
+    /*
+     * Tells clients if the transport has a message available
+     */
+    virtual bool hasMessage(void);
+
 protected:
     Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
     Codec *m_codec;               //!< Codec used to read incoming message headers.
