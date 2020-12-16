@@ -97,6 +97,14 @@ public:
      */
     virtual void setCrc16(Crc16 *crcImpl);
 
+    /*!
+     * @brief Check if the underlying shared transport has a message
+     *
+     * @retval The underlying transport is expected to return true when a message is available to
+     *         process and false otherwise.
+     */
+    virtual bool hasMessage(void);
+
 protected:
     Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
     Codec *m_codec;               //!< Codec used to read incoming message headers.
