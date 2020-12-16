@@ -105,3 +105,24 @@ erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
 
     return kErpcStatus_SendFailed;
 }
+
+bool UartTransport::hasMessage(void)
+{
+    /*
+     * It's not possible to know whether we truly have a message without reading a couple of bytes
+     * from the UART that indicate the total size of the message beyond the 4-byte header and it is
+     * inconvenient to do so because higher level code in FramedTransport will call
+     * underlyingReceive and expect to get those first two bytes that indicate the size of the
+     * message.
+     *
+     * Since it's not easy for us to know whether we truly have a message, we return true in the
+     * case that we have at least 4 bytes (the size of the message header).
+     */
+    size_t buffered_data_len;
+    if (uart_get_buffered_data_len(m_uart.num, &buffered_data_len) == ESP_OK)
+    {
+        return buffered_data_len >= sizeof(FramedTransport::Header);
+    }
+
+    return false;
+}

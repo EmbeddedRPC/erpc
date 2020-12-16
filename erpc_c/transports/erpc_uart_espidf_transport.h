@@ -62,6 +62,11 @@ public:
      */
     virtual erpc_status_t init(int timeout = -1);
 
+    /*
+     * Tells clients if the transport has a message available
+     */
+    virtual bool hasMessage(void);
+
 protected:
     struct {
         uart_config_t config;
