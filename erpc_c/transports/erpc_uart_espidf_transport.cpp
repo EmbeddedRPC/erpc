@@ -85,20 +85,13 @@ erpc_status_t UartTransport::init(int timeout)
 
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    int len = -1;
-
-    TickType_t timeout = (size * 10 * 1000 * 2) / m_uart.config.baud_rate / portTICK_RATE_MS;
-
-    while (size &&
-           ((len = uart_read_bytes(
-                 m_uart.num, data, size, timeout < m_timeout ? m_timeout : timeout)) > 0))
-    {
-        size -= len;
-    }
-
-    if (size)
-    {
-        return (len == -1) ? kErpcStatus_ReceiveFailed : kErpcStatus_Timeout;
+    while (size != 0) {
+        int read_res = uart_read_bytes(m_uart.num, data, size, portMAX_DELAY);
+        if (read_res == -1) {
+            // The ESP-IDF doesn't give insight into why the UART read failed
+            return kErpcStatus_Fail;
+        }
+        size -= read_res;
     }
 
     return kErpcStatus_Success;
