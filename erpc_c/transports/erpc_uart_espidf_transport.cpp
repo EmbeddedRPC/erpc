@@ -58,13 +58,29 @@ erpc_status_t UartTransport::init(int timeout)
         uart_driver_delete(m_uart.num);
     }
 
-    esp_err_t err = uart_param_config(m_uart.num, &m_uart.config);
-    err |= uart_set_pin(m_uart.num, m_uart.tx_gpio, m_uart.rx_gpio, m_uart.rts_gpio,
-                        m_uart.cts_gpio);
-    err |= uart_driver_install(m_uart.num, m_uart.rx_ring_size, m_uart.tx_ring_size,
-                               m_uart.queue_size, m_uart.queue, m_uart.intr_alloc_flags);
+    esp_err_t err;
+    err = uart_param_config(m_uart.num, &m_uart.config);
+    if (err != ESP_OK) {
+        return kErpcStatus_InitFailed;
+    }
 
-    return err == ESP_OK ? kErpcStatus_Success : kErpcStatus_InitFailed;
+    err = uart_set_pin(m_uart.num, m_uart.tx_gpio, m_uart.rx_gpio, m_uart.rts_gpio, m_uart.cts_gpio);
+    if (err != ESP_OK) {
+        return kErpcStatus_InitFailed;
+    }
+
+    err = uart_driver_install(
+        m_uart.num,
+        m_uart.rx_ring_size,
+        m_uart.tx_ring_size,
+        m_uart.queue_size,
+        m_uart.queue,
+        m_uart.intr_alloc_flags);
+    if (err != ESP_OK) {
+        return kErpcStatus_InitFailed;
+    }
+
+    return ESP_OK;
 }
 
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
