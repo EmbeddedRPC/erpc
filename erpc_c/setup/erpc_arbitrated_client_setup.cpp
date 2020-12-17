@@ -15,10 +15,10 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport_arbitrator.h"
+#include "erpc_config.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
 #endif
-#include <cassert>
 
 #if ERPC_THREADS_IS(NONE)
 #error "Arbitrator code does not work in no-threading configuration."
@@ -45,7 +45,7 @@ static ManuallyConstructed<Crc16> s_crc16;
 
 erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
-    assert(transport);
+    erpc_assert(transport);
 
     // Init factories.
     s_codecFactory.construct();
@@ -116,14 +116,14 @@ bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
 #if ERPC_PRE_POST_ACTION
 void erpc_arbitrated_client_add_pre_cb_action(pre_post_action_cb preCB)
 {
-    assert(g_client);
+    erpc_assert(g_client);
 
     g_client->addPreCB(preCB);
 }
 
 void erpc_arbitrated_client_add_post_cb_action(pre_post_action_cb postCB)
 {
-    assert(g_client);
+    erpc_assert(g_client);
 
     g_client->addPostCB(postCB);
 }

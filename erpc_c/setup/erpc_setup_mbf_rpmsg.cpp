@@ -12,10 +12,9 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
+#include "erpc_config.h"
 
 #include "rpmsg_lite.h"
-
-#include <assert.h>
 
 using namespace erpc;
 
@@ -52,7 +51,7 @@ public:
         uint32_t size = 0;
         buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, RL_BLOCK);
 
-        assert(NULL != buf);
+        erpc_assert(NULL != buf);
         return MessageBuffer((uint8_t *)buf, size);
     }
 
@@ -63,7 +62,7 @@ public:
      */
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         void *tmp = (void *)buf->get();
         if (tmp)
         {
