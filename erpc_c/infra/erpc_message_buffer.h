@@ -53,8 +53,8 @@ public:
      *
      * This function initializes object attributes.
      *
-     * param[in] buffer Pointer to buffer.
-     * param[in] length Length of buffer.
+     * @param[in] buffer Pointer to buffer.
+     * @param[in] length Length of buffer.
      */
     MessageBuffer(uint8_t *buffer, uint16_t length)
     : m_buf(buffer)
@@ -205,7 +205,7 @@ public:
          *
          * This function initializes object attributes.
          *
-         * param[in] buffer MessageBuffer for sending/receiving.
+         * @param[in] buffer MessageBuffer for sending/receiving.
          */
         Cursor(MessageBuffer *buffer)
         : m_buffer(buffer)

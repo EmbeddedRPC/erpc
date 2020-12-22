@@ -68,14 +68,14 @@ public:
     /*!
      * @brief This function returns node belong to this object.
      *
-     * return AstNode * Node belong to this object.
+     * @return AstNode * Node belong to this object.
      */
     AstNode *getAst() { return m_ast; }
 
     /*!
      * @brief This function returns global symbol scope.
      *
-     * return SymbolScope & Global symbol scope.
+     * @return SymbolScope & Global symbol scope.
      */
     SymbolScope &getGlobals() { return m_globals; }
 
