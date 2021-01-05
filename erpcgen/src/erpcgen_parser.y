@@ -18,7 +18,7 @@
 %define api.pure full
 
 /* put more info in error messages */
-%error-verbose
+%define parse.error verbose
 
 /* enable location processing */
 %locations
