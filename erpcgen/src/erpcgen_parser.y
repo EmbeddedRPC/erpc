@@ -541,6 +541,10 @@ param_list_opt  :   param_list
                         {
                             $$ = $param_list;
                         }
+                |   TOK_VOID
+                        {
+                            $$ = NULL;
+                        }
                 |   /* empty */
                         {
                             $$ = NULL;
