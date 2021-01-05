@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -22,7 +22,7 @@ using namespace erpc;
 FramedTransport::FramedTransport(void)
 : Transport()
 , m_crcImpl(NULL)
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 , m_sendLock()
 , m_receiveLock()
 #endif
@@ -43,7 +43,7 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
     Header h;
 
     {
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
         Mutex::Guard lock(m_receiveLock);
 #endif
 
@@ -88,7 +88,7 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 erpc_status_t FramedTransport::send(MessageBuffer *message)
 {
     assert(m_crcImpl && "Uninitialized Crc16 object.");
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     Mutex::Guard lock(m_sendLock);
 #endif
 

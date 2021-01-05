@@ -200,8 +200,8 @@ protected:
     Codec *createBufferAndCodec(void);
 
 private:
-    ClientManager(const ClientManager &);            //!< Disable copy ctor.
-    ClientManager &operator=(const ClientManager &); //!< Disable copy ctor.
+    ClientManager(const ClientManager &other);            //!< Disable copy ctor.
+    ClientManager &operator=(const ClientManager &other); //!< Disable copy ctor.
 };
 
 /*!

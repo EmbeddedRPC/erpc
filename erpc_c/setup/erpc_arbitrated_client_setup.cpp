@@ -32,6 +32,7 @@ using namespace erpc;
 
 // global client variables
 static ManuallyConstructed<ArbitratedClientManager> s_client;
+extern ClientManager *g_client;
 ClientManager *g_client = NULL;
 
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;

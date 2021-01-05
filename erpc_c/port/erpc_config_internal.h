@@ -70,13 +70,13 @@
 // Set default buffer size.
 #if !defined(ERPC_DEFAULT_BUFFER_SIZE)
     //! @brief Size of buffers allocated by BasicMessageBufferFactory in setup functions.
-    #define ERPC_DEFAULT_BUFFER_SIZE (256)
+    #define ERPC_DEFAULT_BUFFER_SIZE (256U)
 #endif
 
 // Set default buffers count.
 #if !defined(ERPC_DEFAULT_BUFFERS_COUNT)
     //! @brief Count of buffers allocated by StaticMessageBufferFactory.
-    #define ERPC_DEFAULT_BUFFERS_COUNT (2)
+    #define ERPC_DEFAULT_BUFFERS_COUNT (2U)
 #endif
 
 // Disable/enable noexcept.

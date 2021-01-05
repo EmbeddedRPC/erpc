@@ -69,7 +69,7 @@ static inline void SpiSlaveTransport_NotifyTransferGpioCompleted()
 }
 #endif
 
-void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, erpc_status_t status, void *userData)
+static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, erpc_status_t status, void *userData)
 {
     s_isTransferCompleted = true;
 }

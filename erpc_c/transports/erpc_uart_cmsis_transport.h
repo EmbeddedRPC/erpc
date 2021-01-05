@@ -11,7 +11,7 @@
 #define _EMBEDDED_RPC__UART_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
 #include "erpc_framed_transport.h"
@@ -76,7 +76,7 @@ public:
 
 protected:
     ARM_DRIVER_USART *m_uartDrv; /*!< Access structure of the USART Driver */
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     Semaphore m_rxSemaphore; /*!< Semaphore used by RTOS to block task until the receiving is not complete */
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 #endif

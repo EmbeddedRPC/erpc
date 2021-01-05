@@ -69,7 +69,7 @@ static void ERPC_SerialManagerRxCallback(void *callbackParam, serial_manager_cal
 
 void UsbCdcTransport::tx_cb(void)
 {
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     m_txSemaphore.putFromISR();
 #else
     s_isTransferSendCompleted = true;
@@ -78,7 +78,7 @@ void UsbCdcTransport::tx_cb(void)
 
 void UsbCdcTransport::rx_cb(void)
 {
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     m_rxSemaphore.putFromISR();
 #else
     s_isTransferReceiveCompleted = true;
@@ -93,7 +93,7 @@ UsbCdcTransport::UsbCdcTransport(serial_handle_t serialHandle, serial_manager_co
 , m_usbCdcConfig(usbCdcConfig)
 , m_usbRingBuffer(usbRingBuffer)
 , m_usbRingBufferLength(usbRingBufferLength)
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 , m_rxSemaphore()
 , m_txSemaphore()
 #endif
@@ -148,7 +148,7 @@ erpc_status_t UsbCdcTransport::underlyingReceive(uint8_t *data, uint32_t size)
     if (kStatus_SerialManager_Success == SerialManager_ReadNonBlocking(s_serialReadHandle, data, size))
     {
 /* wait until the receiving is finished */
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
         m_rxSemaphore.get();
 #else
         while (!s_isTransferReceiveCompleted)
@@ -168,7 +168,7 @@ erpc_status_t UsbCdcTransport::underlyingSend(const uint8_t *data, uint32_t size
     if (kStatus_SerialManager_Success == SerialManager_WriteNonBlocking(s_serialWriteHandle, (uint8_t *)data, size))
     {
 /* wait until the sending is finished */
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
         m_txSemaphore.get();
 #else
         while (!s_isTransferSendCompleted)

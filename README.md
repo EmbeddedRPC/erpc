@@ -26,7 +26,8 @@ Client side usage:
 void example_client(void) {
     // Initialize client running over UART.
     erpc_client_init(
-        erpc_transport_cmsis_uart_init(Driver_USART0);
+        erpc_transport_cmsis_uart_init(Driver_USART0),
+        erpc_mbf_dynamic_init());
 
     // Now we can call the remote function to turn on the green LED.
     set_led(kGreen, true);
@@ -43,7 +44,8 @@ void set_led(LEDName whichLed, bool onOrOff) {
 void example_server(void) {
     // Initialize server running over UART.
     erpc_server_init(
-        erpc_transport_cmsis_uart_init(Driver_USART0);
+        erpc_transport_cmsis_uart_init(Driver_USART0),
+        erpc_mbf_dynamic_init());
 
     // Add the IO service.
     erpc_add_service_to_server(create_IO_service());
@@ -61,9 +63,12 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [NXP RPMsg-Lite](https://github.com/NXPmicro/rpmsg-lite)
+* [NXP RPMsg-Lite / RPMsg TTY](https://github.com/NXPmicro/rpmsg-lite)
+* SPIdev Linux
+* USB CDC
+* NXP Messaging Unit
 
-eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE file for the full license text.
+eRPC is available with an unrestrictive BSD 3-clause license. See the [LICENSE file](https://github.com/EmbeddedRPC/erpc/blob/develop/LICENSE) for the full license text.
 
 ## Releases
 
@@ -71,10 +76,19 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 ## Documentation
 
-[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section. Commit sha in wiki repository: 431cba8.
+[Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section.
+
+[eRPC Infrastructure documentation](https://embeddedrpc.github.io/)
+
+## Examples
 
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
+Plenty of eRPC multicore and multiprocessor examples can be also found in NXP MCUXpressoSDK packages. Visit [https://mcuxpresso.nxp.com](https://mcuxpresso.nxp.com) to configure, build and download these packages.<br>
+To get the board list with multicore support (eRPC included) use filtering based on Middleware and search for 'multicore' string. Once the selected package with the multicore middleware is downloaded, see<br> 
+<MCUXpressoSDK_install_dir>/boards/<board_name>/multicore_examples for eRPC multicore examples (RPMsg_Lite or Messaging Unit transports used) or<br>
+<MCUXpressoSDK_install_dir>/boards/<board_name>/multiprocessor_examples for eRPC multiprocessor examples (UART or SPI transports used).<br>
+eRPC examples use 'erpc_' name prefix. 
 
 ## Directories
 
@@ -88,11 +102,15 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the LICENSE fi
 
 `erpcgen` - Holds source code for erpcgen and makefiles or project files to build erpcgen on Windows, Linux, and OS X.
 
+`erpcsniffer` - Holds source code for erpcsniffer application.
+
 `examples` - Several example IDL files.
 
 `mk` - Contains common makefiles for building eRPC components.
 
 `test` - Client/server tests. These tests verify the entire communications path from client to server and back.
+
+`utilities` - Holds utilities which bring additional benefit to eRPC apps developers.
 
 
 ## Building and installing
@@ -117,11 +135,11 @@ Steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/V
 Install these packages:
 * bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
-* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.67.0)
+* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.65.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter (either 2.7 or 3.5+ work)
-* gcc-core: GNU Compiler Collection (C, OpenMP)
-* gcc-g++: GNU Compiler Collection (C++)
+* gcc-7: GNU C compiler (recommended version)
+* g++-7: GNU C++ compiler (recommended version)
 
 Mandatory for case, when build for different architecture is needed
 * gcc-multilib, g++-multilib
@@ -130,9 +148,9 @@ Mandatory for case, when build for different architecture is needed
 #### Mac OS X
 
 Install these packages with [homebrew](http://brew.sh/):
-* bison: GNU yacc-compatible parser generator
-* flex: A fast lexical analyzer generator
-* boost: Boost C++ libraries
+* bison: GNU yacc-compatible parser generator (version 3.7.3 is recommended)
+* flex: A fast lexical analyzer generator (version 2.6.4 is recommended)
+* boost: Boost C++ libraries (version 1.74 is recommended)
 
 ### Building
 
@@ -157,6 +175,8 @@ List of top level Makefile targets:
 - `all`: build all of the above
 - `install`: install liberpc.a, erpcgen, and include files
 
+eRPC code is validated with respect to the C++ 11 standard.
+
 ### Installing for Python
 
 To install the Python infrastructure for eRPC, first change to the `erpc_python/` directory. Then run the setup.py script like this:
@@ -165,7 +185,7 @@ To install the Python infrastructure for eRPC, first change to the `erpc_python/
 
 After installation, the `erpc` package is available via normal import statements. See the [erpc_python folder readme](erpc_python/readme.md) for more.
 
-## Code providing:
+## Code providing
 
 Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
 

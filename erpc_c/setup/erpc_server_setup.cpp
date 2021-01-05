@@ -27,6 +27,7 @@ using namespace erpc;
 
 // global server variables
 static ManuallyConstructed<SimpleServer> s_server;
+extern SimpleServer *g_server;
 SimpleServer *g_server = NULL;
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 static ManuallyConstructed<Crc16> s_crc16;

@@ -17,7 +17,7 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(SH_MEM_TOTAL_SIZE)
-#define SH_MEM_TOTAL_SIZE (6144)
+#define SH_MEM_TOTAL_SIZE (6144U)
 #endif
 
 #if defined(__ICCARM__) /* IAR Workbench */
@@ -25,7 +25,7 @@ using namespace erpc;
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE];
 #elif defined(__CC_ARM) || defined(__ARMCC_VERSION) /* Keil MDK */
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section("rpmsg_sh_mem_section")));
-#elif defined(__GNUC__)                             /* LPCXpresso */
+#elif defined(__GNUC__)
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_sh_mem")));
 #else
 #error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"

@@ -64,7 +64,7 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
     erpc_status_t err = m_transport->receive(&buff);
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb preCB = this->getPreCB();
+    pre_post_action_cb preCB = this->getPreCB(void);
     if (preCB)
     {
         preCB();

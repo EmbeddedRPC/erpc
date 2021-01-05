@@ -226,8 +226,8 @@ protected:
 
 private:
     // Disable copy ctor.
-    Server(const Server &);            /*!< Disable copy ctor. */
-    Server &operator=(const Server &); /*!< Disable copy ctor. */
+    Server(const Server &other);            /*!< Disable copy ctor. */
+    Server &operator=(const Server &other); /*!< Disable copy ctor. */
 };
 
 } // namespace erpc
