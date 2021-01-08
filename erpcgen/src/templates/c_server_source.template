@@ -206,6 +206,7 @@ static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t func
 // Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
+    erpc_status_t erpcStatus;
 {%  if codecClass != "Codec" %}
     {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
 {%   endif %}
@@ -213,12 +214,20 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
     {
 {%  for fn in iface.functions %}
         case k{$iface.name}_{$fn.name}_id:
-            return {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
+        {
+            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
+            break;
+        }
 
 {%  endfor -- fn %}
         default:
-            return kErpcStatus_InvalidArgument;
+        {
+            erpcStatus = kErpcStatus_InvalidArgument;
+            break;
+        }
     }
+
+    return erpcStatus;
 }
 {%  for fn in iface.functions %}
 

@@ -2415,8 +2415,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             templateData["protoNext"] =
                 getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter++), group,
                                     elementType, structType, true, structMember, needTempVariable, isFunctionParam);
-            templateData["size"] = format_string("%d", arrayType->getElementCount());
-            templateData["sizeTemp"] = format_string("%d", arrayType->getElementCount());
+            templateData["size"] = format_string("%dU", arrayType->getElementCount());
+            templateData["sizeTemp"] = format_string("%dU", arrayType->getElementCount());
             templateData["isElementArrayType"] = trueElementType->isArray();
             if (generateServerFreeFunctions(structMember) && isNeedCallFree(t))
             {
