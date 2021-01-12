@@ -42,7 +42,7 @@ enum _null_flag
 class BasicCodec : public Codec
 {
 public:
-    static const uint32_t kBasicCodecVersion; /*!< Codec version. */
+    static const uint8_t kBasicCodecVersion; /*!< Codec version. */
 
     BasicCodec(void)
     : Codec()

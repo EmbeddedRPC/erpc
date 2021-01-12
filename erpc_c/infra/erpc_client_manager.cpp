@@ -40,21 +40,25 @@ RequestContext ClientManager::createRequest(bool isOneway)
 
 void ClientManager::performRequest(RequestContext &request)
 {
+    bool performRequest;
     // Check the codec status
-    if (kErpcStatus_Success != (request.getCodec()->getStatus()))
-    {
-        // Do not perform the request
-        return;
-    }
+    performRequest = request.getCodec()->isStatusOk();
 
 #if ERPC_NESTED_CALLS
-    assert(m_serverThreadId && "server thread id was not set");
-    if (Thread::getCurrentThreadId() == m_serverThreadId)
+    if (performRequest)
     {
-        return performNestedClientRequest(request);
+        assert(m_serverThreadId && "server thread id was not set");
+        if (Thread::getCurrentThreadId() == m_serverThreadId)
+        {
+            performNestedClientRequest(request);
+            performRequest = false;
+        }
     }
 #endif
-    return performClientRequest(request);
+    if (performRequest)
+    {
+        performClientRequest(request);
+    }
 }
 
 void ClientManager::performClientRequest(RequestContext &request)
@@ -63,18 +67,18 @@ void ClientManager::performClientRequest(RequestContext &request)
     if (!request.isOneway() && nestingDetection)
     {
         request.getCodec()->updateStatus(kErpcStatus_NestedCallFailure);
-        return;
     }
 #endif
 
-    erpc_status_t err;
-
 #if ERPC_MESSAGE_LOGGING
-    err = logMessage(request.getCodec()->getBuffer());
-    if (err)
+    if ()
     {
-        request.getCodec()->updateStatus(err);
-        return;
+        err = logMessage(request.getCodec()->getBuffer());
+        if (err)
+        {
+            request.getCodec()->updateStatus(err);
+            return;
+        }
     }
 #endif
 

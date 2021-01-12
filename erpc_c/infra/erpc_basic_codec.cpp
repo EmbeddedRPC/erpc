@@ -17,7 +17,7 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-const uint32_t BasicCodec::kBasicCodecVersion = 1;
+const uint8_t BasicCodec::kBasicCodecVersion = 1;
 
 void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
 {
@@ -141,7 +141,7 @@ void BasicCodec::writeNullFlag(bool isNull)
 
 void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback)
 {
-    assert(callbacksCount > 1);
+    assert(callbacksCount > 1U);
     // callbacks = callbacks table
     for (uint8_t i = 0; i < callbacksCount; i++)
     {
@@ -150,7 +150,7 @@ void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, 
             write(i);
             break;
         }
-        if (i + 1 == callbacksCount)
+        if ((i + 1U) == callbacksCount)
         {
             updateStatus(kErpcStatus_UnknownCallback);
         }
@@ -172,16 +172,16 @@ void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint3
     uint32_t header;
     read(&header);
 
-    if (((header >> 24) & 0xff) != kBasicCodecVersion)
+    if (((header >> 24) & 0xffU) != kBasicCodecVersion)
     {
         updateStatus(kErpcStatus_InvalidMessageVersion);
     }
 
     if (!m_status)
     {
-        *service = ((header >> 16) & 0xff);
-        *request = ((header >> 8) & 0xff);
-        *type = static_cast<message_type_t>(header & 0xff);
+        *service = ((header >> 16) & 0xffU);
+        *request = ((header >> 8) & 0xffU);
+        *type = static_cast<message_type_t>(header & 0xffU);
 
         read(sequence);
     }
@@ -311,7 +311,8 @@ void BasicCodec::startReadList(uint32_t *length)
 {
     // Read list length as u32.
     read(length);
-    if (m_status)
+
+    if (!isStatusOk())
     {
         *length = 0;
     }
@@ -327,9 +328,9 @@ void BasicCodec::readNullFlag(bool *isNull)
 {
     uint8_t flag;
     read(&flag);
-    if (!m_status)
+    if (isStatusOk())
     {
-        *isNull = (flag == kIsNull);
+        *isNull = (flag == (uint8_t)kIsNull);
     }
 }
 
@@ -339,7 +340,7 @@ void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, f
     // callbacks = callbacks table
     uint8_t _tmp_local;
     read(&_tmp_local);
-    if (!m_status)
+    if (isStatusOk())
     {
         if (_tmp_local < callbacksCount)
         {
