@@ -21,7 +21,7 @@ void erpc::erpc_pre_cb_default()
 {
     assert(s_erpc_call_in_progress &&
            "If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default.");
-    s_erpc_call_in_progress->get(s_erpc_call_in_progress->kWaitForever);
+    (void)s_erpc_call_in_progress->get(s_erpc_call_in_progress->kWaitForever);
     assert(s_erpc_call_timer_cb &&
            "If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default.");
     xTimerStart(s_erpc_call_timer_cb, 0);
@@ -35,11 +35,13 @@ void erpc::erpc_post_cb_default()
 
 void erpc_call_timer_cb_default(TimerHandle_t xTimer)
 {
-    assert(1 != 1 && "eRPC task freezed.");
+    (void)xTimer;
+    assert(1 && "eRPC task freezed.");
 }
 
 void erpc_init_call_progress_detection_default(
-    erpc_call_timer_cb_default_t erpc_call_timer_cb = erpc_call_timer_cb_default, uint32_t waitTimeMs = 5 * 60 * 1000)
+    erpc_call_timer_cb_default_t erpc_call_timer_cb = erpc_call_timer_cb_default,
+    uint32_t waitTimeMs = (5U * 60U * 1000U))
 {
     s_erpc_call_in_progress = new Semaphore(1);
     assert(s_erpc_call_in_progress && "Creating eRPC semaphore failed.");
@@ -51,13 +53,13 @@ void erpc_init_call_progress_detection_default(
 
 void erpc_deinit_call_progress_detection_default()
 {
-    if (s_erpc_call_in_progress)
+    if (s_erpc_call_in_progress != NULL)
     {
         delete s_erpc_call_in_progress;
         s_erpc_call_in_progress = NULL;
     }
 
-    if (s_erpc_call_timer_cb)
+    if (s_erpc_call_timer_cb != NULL)
     {
         xTimerDelete(s_erpc_call_timer_cb, 0);
         s_erpc_call_timer_cb = NULL;

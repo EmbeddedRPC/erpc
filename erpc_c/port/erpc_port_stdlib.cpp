@@ -78,6 +78,7 @@ void erpc_free(void *ptr)
 extern "C" void __cxa_pure_virtual()
 {
     while (1)
-        ;
+    {
+    };
 }
 #endif
