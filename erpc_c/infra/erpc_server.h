@@ -110,10 +110,10 @@ public:
      */
     Server(void)
     : ClientServerCommon()
-    , m_messageFactory()
-    , m_codecFactory()
-    , m_transport()
-    , m_firstService()
+    , m_messageFactory(NULL)
+    , m_codecFactory(NULL)
+    , m_transport(NULL)
+    , m_firstService(NULL)
     {
     }
 

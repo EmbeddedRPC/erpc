@@ -47,6 +47,7 @@ void BasicCodec::write(bool value)
 {
     // Make sure the bool is a single byte.
     uint8_t v = value;
+
     writeData(&v, sizeof(v));
 }
 
@@ -103,6 +104,7 @@ void BasicCodec::write(double value)
 void BasicCodec::writePtr(uintptr_t value)
 {
     uint8_t ptrSize = sizeof(value);
+
     write(ptrSize);
 
     writeData(&value, ptrSize);
@@ -141,9 +143,12 @@ void BasicCodec::writeNullFlag(bool isNull)
 
 void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback)
 {
+    uint8_t i;
+
     assert(callbacksCount > 1U);
+
     // callbacks = callbacks table
-    for (uint8_t i = 0; i < callbacksCount; i++)
+    for (i = 0; i < callbacksCount; i++)
     {
         if (callbacks[i] == callback)
         {
@@ -170,6 +175,7 @@ void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
 void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
 {
     uint32_t header;
+
     read(&header);
 
     if (((header >> 24) & 0xffU) != kBasicCodecVersion)
@@ -205,6 +211,7 @@ void BasicCodec::readData(void *value, uint32_t length)
 void BasicCodec::read(bool *value)
 {
     uint8_t v = 0;
+
     readData(&v, sizeof(v));
     if (!m_status)
     {
@@ -265,6 +272,7 @@ void BasicCodec::read(double *value)
 void BasicCodec::readPtr(uintptr_t *value)
 {
     uint8_t ptrSize;
+
     read(&ptrSize);
 
     if (ptrSize > sizeof(*value))
@@ -327,6 +335,7 @@ void BasicCodec::startReadUnion(int32_t *discriminator)
 void BasicCodec::readNullFlag(bool *isNull)
 {
     uint8_t flag;
+
     read(&flag);
     if (isStatusOk())
     {
@@ -336,9 +345,11 @@ void BasicCodec::readNullFlag(bool *isNull)
 
 void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback)
 {
-    assert(callbacksCount > 1);
-    // callbacks = callbacks table
     uint8_t _tmp_local;
+
+    assert(callbacksCount > 1U);
+
+    // callbacks = callbacks table
     read(&_tmp_local);
     if (isStatusOk())
     {

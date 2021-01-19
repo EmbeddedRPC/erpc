@@ -46,7 +46,7 @@ public:
      *
      * Will never jump out from this function.
      */
-    virtual erpc_status_t run(void);
+    virtual erpc_status_t run(void) override;
 
     /*!
      * @brief Run server implementation only if exist message to process.
@@ -62,7 +62,7 @@ public:
     /*!
      * @brief This function sets server from ON to OFF
      */
-    virtual void stop(void);
+    virtual void stop(void) override;
 
 protected:
     /*!
@@ -100,7 +100,7 @@ protected:
      *
      * @param[in] Request context to check that answer was for nested call.
      */
-    virtual erpc_status_t run(RequestContext &request);
+    virtual erpc_status_t run(RequestContext &request) override;
 #endif
 
     /*!

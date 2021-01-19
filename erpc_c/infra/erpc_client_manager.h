@@ -187,7 +187,7 @@ protected:
 #endif
 
     //! @brief Validate that an incoming message is a reply.
-    virtual erpc_status_t verifyReply(RequestContext &request);
+    virtual void verifyReply(RequestContext &request);
 
     /*!
      * @brief Create message buffer and codec.

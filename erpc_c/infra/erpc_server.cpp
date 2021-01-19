@@ -31,16 +31,18 @@ void Server::addService(Service *service)
     if (!m_firstService)
     {
         m_firstService = service;
-        return;
     }
-
-    Service *link = m_firstService;
-    while (link->getNext() != NULL)
+    else
     {
-        link = link->getNext();
-    }
 
-    link->setNext(service);
+        Service *link = m_firstService;
+        while (link->getNext() != NULL)
+        {
+            link = link->getNext();
+        }
+
+        link->setNext(service);
+    }
 }
 
 void Server::removeService(Service *service)
@@ -50,16 +52,18 @@ void Server::removeService(Service *service)
     if (link == service)
     {
         m_firstService = link->getNext();
-        return;
     }
-    while (link != NULL)
+    else
     {
-        if (link->getNext() == service)
+        while (link != NULL)
         {
-            link->setNext(link->getNext()->getNext());
-            return;
+            if (link->getNext() == service)
+            {
+                link->setNext(link->getNext()->getNext());
+                break;
+            }
+            link = link->getNext();
         }
-        link = link->getNext();
     }
 }
 
@@ -73,18 +77,29 @@ erpc_status_t Server::readHeadOfMessage(Codec *codec, message_type_t &msgType, u
 erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId,
                                      uint32_t sequence)
 {
-    if (msgType != kInvocationMessage && msgType != kOnewayMessage)
+    erpc_status_t err = kErpcStatus_Success;
+    Service *service;
+
+    if ((msgType != kInvocationMessage) && (msgType != kOnewayMessage))
     {
-        return kErpcStatus_InvalidArgument;
+        err = kErpcStatus_InvalidArgument;
     }
 
-    Service *service = findServiceWithId(serviceId);
-    if (!service)
+    if (err == kErpcStatus_Success)
     {
-        return kErpcStatus_InvalidArgument;
+        service = findServiceWithId(serviceId);
+        if (!service)
+        {
+            err = kErpcStatus_InvalidArgument;
+        }
     }
 
-    return service->handleInvocation(methodId, sequence, codec, m_messageFactory);
+    if (err == kErpcStatus_Success)
+    {
+        err = service->handleInvocation(methodId, sequence, codec, m_messageFactory);
+    }
+
+    return err;
 }
 
 Service *Server::findServiceWithId(uint32_t serviceId)
@@ -94,10 +109,10 @@ Service *Server::findServiceWithId(uint32_t serviceId)
     {
         if (service->getServiceId() == serviceId)
         {
-            return service;
+            break;
         }
 
         service = service->getNext();
     }
-    return NULL;
+    return service;
 }

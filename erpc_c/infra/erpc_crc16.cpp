@@ -29,19 +29,23 @@ Crc16::~Crc16(void) {}
 uint16_t Crc16::computeCRC16(const uint8_t *data, uint32_t lengthInBytes)
 {
     uint32_t crc = m_crcStart;
-
     uint32_t j;
+    uint32_t i;
+    uint32_t byte;
+    uint32_t temp;
+    const uint32_t andValue = 0x8000U;
+    const uint32_t xorValue = 0x1021U;
+
     for (j = 0; j < lengthInBytes; ++j)
     {
-        uint32_t i;
-        uint32_t byte = data[j];
+        byte = data[j];
         crc ^= byte << 8;
-        for (i = 0; i < 8; ++i)
+        for (i = 0; i < 8U; ++i)
         {
-            uint32_t temp = crc << 1;
-            if (crc & 0x8000)
+            temp = crc << 1;
+            if (crc & andValue)
             {
-                temp ^= 0x1021;
+                temp ^= xorValue;
             }
             crc = temp;
         }

@@ -43,7 +43,7 @@ public:
      * This function initializes object attributes.
      */
     MessageBuffer(void)
-    : m_buf(0)
+    : m_buf(NULL)
     , m_len(0)
     , m_used(0)
     {

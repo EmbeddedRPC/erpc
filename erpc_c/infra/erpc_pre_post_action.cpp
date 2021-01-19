@@ -23,7 +23,7 @@ using namespace std;
 
 void PrePostAction::addPreCB(pre_post_action_cb preCB)
 {
-    if (preCB)
+    if (preCB != NULL)
     {
         m_preCB = preCB;
     }
@@ -37,7 +37,7 @@ void PrePostAction::addPreCB(pre_post_action_cb preCB)
 
 void PrePostAction::addPostCB(pre_post_action_cb postCB)
 {
-    if (postCB)
+    if (postCB != NULL)
     {
         m_postCB = postCB;
     }

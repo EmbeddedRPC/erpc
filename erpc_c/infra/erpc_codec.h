@@ -108,7 +108,7 @@ public:
      * @retval True Current status value is kErpcStatus_Success.
      * @retval False Current status is other than kErpcStatus_Success.
      */
-    bool isStatusOk(void) { return (m_status == (int32_t)kErpcStatus_Success); }
+    bool isStatusOk(void) { return (m_status == kErpcStatus_Success); }
 
     /*!
      * @brief Set current status of eRPC message processing to given value.

@@ -83,7 +83,7 @@ enum _erpc_status
 };
 
 /*! @brief Type used for all status and error return values. */
-typedef int32_t erpc_status_t;
+typedef enum _erpc_status erpc_status_t;
 
 /*! @} */
 

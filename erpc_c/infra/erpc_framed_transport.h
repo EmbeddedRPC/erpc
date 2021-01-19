@@ -82,7 +82,7 @@ public:
      * @retval kErpcStatus_CrcCheckFailed When receiving failed.
      * @retval other Subclass may return other errors from the underlyingReceive() method.
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -92,7 +92,7 @@ public:
      * @retval kErpcStatus_Success When sending was successful.
      * @retval other Subclass may return other errors from the underlyingSend() method.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*! @brief Contents of the header that prefixes each message. */
     struct Header
@@ -106,7 +106,7 @@ public:
      *
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
-    virtual void setCrc16(Crc16 *crcImpl);
+    virtual void setCrc16(Crc16 *crcImpl) override;
 
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */
