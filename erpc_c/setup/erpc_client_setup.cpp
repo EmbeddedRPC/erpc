@@ -42,12 +42,14 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
 {
     assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init client manager with the provided transport.
     s_client.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_client->setTransport(castedTransport);
@@ -90,11 +92,18 @@ void erpc_client_set_server_thread_id(void *serverThreadId)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_client_add_message_logger(erpc_transport_t transport)
 {
-    if (g_client != NULL)
+    bool retVal;
+
+    if (g_client == NULL)
     {
-        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
 }
 #endif
 

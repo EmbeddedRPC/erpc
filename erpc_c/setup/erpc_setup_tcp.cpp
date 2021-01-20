@@ -24,12 +24,19 @@ static ManuallyConstructed<TCPTransport> s_transport;
 
 erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool isServer)
 {
+    erpc_transport_t transport;
+
     s_transport.construct(host, port, isServer);
     if (kErpcStatus_Success == s_transport->open())
     {
-        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
     }
-    return NULL;
+    else
+    {
+        transport = NULL;
+    }
+
+    return transport;
 }
 
 void erpc_transport_tcp_close(void)

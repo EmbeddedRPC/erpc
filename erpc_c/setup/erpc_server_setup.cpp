@@ -39,12 +39,14 @@ erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_bu
 {
     assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init server with the provided transport.
     s_server.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_server->setTransport(castedTransport);
@@ -64,7 +66,7 @@ void erpc_server_deinit(void)
 
 void erpc_add_service_to_server(void *service)
 {
-    if (g_server != NULL && service != NULL)
+    if ((g_server != NULL) && (service != NULL))
     {
         g_server->addService(static_cast<erpc::Service *>(service));
     }
@@ -72,7 +74,7 @@ void erpc_add_service_to_server(void *service)
 
 void erpc_remove_service_from_server(void *service)
 {
-    if (g_server != NULL && service != NULL)
+    if ((g_server != NULL) && (service != NULL))
     {
         g_server->removeService(static_cast<erpc::Service *>(service));
     }
@@ -85,20 +87,34 @@ void erpc_server_set_crc(uint32_t crcStart)
 
 erpc_status_t erpc_server_run(void)
 {
-    if (g_server != NULL)
+    erpc_status_t status;
+
+    if (g_server == NULL)
     {
-        return g_server->run();
+        status = kErpcStatus_Fail;
     }
-    return kErpcStatus_Fail;
+    else
+    {
+        status = g_server->run();
+    }
+
+    return status;
 }
 
 erpc_status_t erpc_server_poll(void)
 {
-    if (g_server != NULL)
+    erpc_status_t status;
+
+    if (g_server == NULL)
     {
-        return g_server->poll();
+        status = kErpcStatus_Fail;
     }
-    return kErpcStatus_Fail;
+    else
+    {
+        status = g_server->poll();
+    }
+
+    return status;
 }
 
 void erpc_server_stop(void)
@@ -112,11 +128,18 @@ void erpc_server_stop(void)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_server_add_message_logger(erpc_transport_t transport)
 {
-    if (g_server != NULL)
+    bool retVal;
+
+    if (g_server == NULL)
     {
-        return g_server->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_server->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
 }
 #endif
 

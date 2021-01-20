@@ -69,7 +69,7 @@ public:
     {
         assert(buf);
         void *tmp = (void *)buf->get();
-        if (tmp)
+        if (tmp != NULL)
         {
             int32_t ret;
             ret = rpmsg_lite_release_rx_buffer(m_rpmsg, (void *)(((uint8_t *)tmp) - sizeof(FramedTransport::Header)));
@@ -82,16 +82,20 @@ public:
 
     virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message)
     {
+        erpc_status_t status;
+
         dispose(message);
         *message = create();
         if (message->get() != NULL)
         {
-            return kErpcStatus_Success;
+            status = kErpcStatus_Success;
         }
         else
         {
-            return kErpcStatus_MemoryError;
+            status = kErpcStatus_MemoryError;
         }
+
+        return status;
     }
 
     virtual bool createServerBuffer(void) { return false; }
