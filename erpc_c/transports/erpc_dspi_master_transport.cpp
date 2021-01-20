@@ -80,7 +80,7 @@ erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t siz
     status = DSPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
     s_isSlaveReady = false;
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
@@ -100,7 +100,7 @@ erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t 
     status = DSPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
     s_isSlaveReady = false;
 
-    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 extern "C" {

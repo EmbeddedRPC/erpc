@@ -30,6 +30,11 @@ static volatile bool s_isTransferCompleted = false;
 
 void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, erpc_status_t status, void *userData)
 {
+    (void)base;
+    (void)handle;
+    (void)status;
+    (void)userData;
+
     GPIO_PortSet(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
     s_isTransferCompleted = true;
 }
@@ -88,7 +93,7 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
     {
     }
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
@@ -109,5 +114,5 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
     {
     }
 
-    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }

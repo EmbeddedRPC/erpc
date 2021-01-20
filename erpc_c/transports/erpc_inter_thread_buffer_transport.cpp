@@ -26,14 +26,14 @@ void InterThreadBufferTransport::linkWithPeer(InterThreadBufferTransport *peer)
 
     if (!m_state)
     {
-        if (peer->m_state)
-        {
-            m_state = peer->m_state;
-        }
-        else
+        if (peer->m_state == NULL)
         {
             m_state = new SharedState;
             peer->m_state = m_state;
+        }
+        else
+        {
+            m_state = peer->m_state;
         }
     }
 }
