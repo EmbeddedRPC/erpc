@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <string>
 
-#if ERPC_THREADS_IS(NONE)
+#if ERPC_THREADS_IS(ERPC_THREADS_NONE)
 #error "Arbitrator code does not work in no-threading configuration."
 #endif
 

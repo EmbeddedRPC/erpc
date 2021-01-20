@@ -18,6 +18,7 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 #if ERPC_NESTED_CALLS_DETECTION
+extern bool nestingDetection;
 bool nestingDetection = false;
 #endif
 

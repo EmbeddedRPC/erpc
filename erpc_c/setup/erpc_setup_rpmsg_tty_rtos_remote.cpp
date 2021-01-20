@@ -44,7 +44,7 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(uint32_t src_add
     return transport;
 }
 
-void erpc_transport_rpmsg_lite_tty_rtos_deinit()
+void erpc_transport_rpmsg_lite_tty_rtos_deinit(void)
 {
     s_transport.destroy();
 }

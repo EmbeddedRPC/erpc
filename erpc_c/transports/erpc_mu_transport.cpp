@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2020 NXP
  * All rights reserved.
  *
  *
@@ -81,7 +81,7 @@ MUTransport::MUTransport(void)
 , m_txMsgSize(0)
 , m_txCntBytes(0)
 , m_txBuffer(NULL)
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 , m_rxSemaphore()
 , m_txSemaphore()
 , m_sendLock()
@@ -149,8 +149,8 @@ void MUTransport::rx_cb(void)
         if (m_rxCntBytes >= m_rxMsgSize)
         {
             m_rxBuffer = NULL;
-#if ERPC_THREADS
             MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
             m_rxSemaphore.putFromISR();
 #endif
         }
@@ -183,7 +183,7 @@ void MUTransport::tx_cb(void)
 
         // unblock caller of the send function
         m_txBuffer = NULL;
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
         m_txSemaphore.putFromISR();
 #endif
     }
@@ -199,7 +199,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
     }
     else
     {
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
         Mutex::Guard lock(m_receiveLock);
 #endif
 
@@ -211,7 +211,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
         MU_EnableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
 
 // wait until the receiving is not complete
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
         m_rxSemaphore.get();
 #else
         while (m_rxBuffer != NULL)
@@ -239,7 +239,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
     }
     else
     {
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
         Mutex::Guard lock(m_sendLock);
 #endif
 
@@ -268,7 +268,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
             // enable MU tx empty irq from the last mu tx reg
             MU_EnableInterrupts(m_muBase, (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
 // wait until the sending is not complete
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
             m_txSemaphore.get();
 #else
             while (m_txBuffer != NULL)

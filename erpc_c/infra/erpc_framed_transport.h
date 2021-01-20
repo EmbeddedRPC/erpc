@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -16,7 +16,7 @@
 
 #include <cstring>
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 #include "erpc_threading.h"
 #endif
 
@@ -111,7 +111,7 @@ public:
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
     Mutex m_sendLock;    //!< Mutex protecting send.
     Mutex m_receiveLock; //!< Mutex protecting receive.
 #endif

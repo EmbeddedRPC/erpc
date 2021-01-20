@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 // Exclude the rest of the file if threading is disabled.
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 
 #if ERPC_THREADS_IS(PTHREADS)
 #include <pthread.h>

@@ -10,7 +10,7 @@
 #define _EMBEDDED_RPC__USB_CDC_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
 #include "erpc_threading.h"
 #endif
 
@@ -84,7 +84,7 @@ public:
     void tx_cb(void);
 
 protected:
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
     Semaphore m_rxSemaphore; /*!< Semaphore used by RTOS to block task until the receiving is not complete */
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 #endif

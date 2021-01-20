@@ -79,7 +79,7 @@ public:
 #define ERPC_OTHER_INHERITANCE 1
     :
 #endif
-        PrePostAction()
+        PrePostAction(void)
 #endif
             {};
 

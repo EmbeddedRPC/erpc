@@ -42,7 +42,7 @@ public:
     /*!
      * @brief PrePostAction constructor.
      */
-    PrePostAction()
+    PrePostAction(void)
     : m_preCB(NULL)
     , m_postCB(NULL){};
 
@@ -67,14 +67,14 @@ public:
      *
      * @return preCB Pointer for callback function.
      */
-    pre_post_action_cb getPreCB() { return m_preCB; }
+    pre_post_action_cb getPreCB(void) { return m_preCB; }
 
     /*!
      * @brief This function returns "after eRPC call finish" callback function.
      *
      * @return postCB Pointer for callback function.
      */
-    pre_post_action_cb getPostCB() { return m_postCB; }
+    pre_post_action_cb getPostCB(void) { return m_postCB; }
 
     /*!
      * @brief PrePostAction destructor
