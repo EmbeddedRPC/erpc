@@ -1,6 +1,6 @@
 /*
  * Copyright 2020 NXP
- * Copyright 2020 ACRIOS Systems s.r.o.
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *

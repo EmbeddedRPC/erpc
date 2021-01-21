@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
- * Copyright 2019 ACRIOS Systems s.r.o.
+ * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *

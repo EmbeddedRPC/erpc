@@ -1,5 +1,6 @@
 /*
  * Copyright 2020 (c) Sierra Wireless
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *

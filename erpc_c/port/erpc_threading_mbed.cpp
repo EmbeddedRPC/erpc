@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, Embedded Planet, Inc
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  * For supporting transports and examples see:
