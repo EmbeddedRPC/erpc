@@ -103,7 +103,7 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }
@@ -166,7 +166,7 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
             {
                 if (RL_SUCCESS != rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept))
                 {
-                    skip = true;
+                    m_rpmsg_ept = NULL;
                 }
             }
 
@@ -174,7 +174,7 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }
@@ -189,7 +189,7 @@ erpc_status_t RPMsgTransport::receive(MessageBuffer *message)
     {
     }
 
-    return (erpc_status_t)kErpcStatus_Success;
+    return kErpcStatus_Success;
 }
 
 erpc_status_t RPMsgTransport::send(MessageBuffer *message)
@@ -198,5 +198,5 @@ erpc_status_t RPMsgTransport::send(MessageBuffer *message)
         rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, (char *)message->get(), message->getUsed());
     message->set(NULL, 0);
 
-    return (ret_val != RL_SUCCESS) ? (erpc_status_t)kErpcStatus_SendFailed : (erpc_status_t)kErpcStatus_Success;
+    return (ret_val != RL_SUCCESS) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }

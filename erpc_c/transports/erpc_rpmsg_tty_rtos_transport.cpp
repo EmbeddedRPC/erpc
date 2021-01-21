@@ -118,9 +118,9 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
         {
             if (m_rpmsg_queue != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue)
+                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue))
                 {
-                    m_rpmsg_queue = RL_NULL;
+                    m_rpmsg_queue = NULL;
                 }
             }
 
@@ -128,7 +128,7 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }
@@ -174,7 +174,7 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
             m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
             if (m_rpmsg_ept == RL_NULL)
             {
-                status = kErpcStatus_InitFailed
+                status = kErpcStatus_InitFailed;
             }
         }
 
@@ -198,17 +198,17 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
         {
             if (m_rpmsg_ept != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept)
+                if (RL_SUCCESS == rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept))
                 {
-                    m_rpmsg_ept = RL_NULL;
+                    m_rpmsg_ept = NULL;
                 }
             }
 
             if (m_rpmsg_queue != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue)
+                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue))
                 {
-                    m_rpmsg_queue = RL_NULL;
+                    m_rpmsg_queue = NULL;
                 }
             }
 
@@ -216,7 +216,7 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }

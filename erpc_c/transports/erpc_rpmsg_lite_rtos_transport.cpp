@@ -110,9 +110,9 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
         {
             if (m_rpmsg_queue != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue)
+                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue))
                 {
-                    m_rpmsg_queue = RL_NULL;
+                    m_rpmsg_queue = NULL;
                 }
             }
 
@@ -120,7 +120,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }
@@ -190,17 +190,17 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
         {
             if (m_rpmsg_ept != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept)
+                if (RL_SUCCESS == rpmsg_lite_destroy_ept(s_rpmsg, m_rpmsg_ept))
                 {
-                    m_rpmsg_ept = RL_NULL;
+                    m_rpmsg_ept = NULL;
                 }
             }
 
             if (m_rpmsg_queue != RL_NULL)
             {
-                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue)
+                if (RL_SUCCESS == rpmsg_queue_destroy(s_rpmsg, m_rpmsg_queue))
                 {
-                    m_rpmsg_queue = RL_NULL;
+                    m_rpmsg_queue = NULL;
                 }
             }
 
@@ -208,7 +208,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
             {
                 if (RL_SUCCESS == rpmsg_lite_deinit(s_rpmsg))
                 {
-                    s_rpmsg == RL_NULL;
+                    s_rpmsg = NULL;
                 }
             }
         }
