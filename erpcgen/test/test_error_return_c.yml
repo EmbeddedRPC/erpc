@@ -18,23 +18,24 @@ params:
     - [A, "NULL"]
     - [B, "(B) -1"]
 idl: |
-    struct A{
-        int32 a;
-    }
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
+  interface ErrorTest{
+      f() -> {type[0]}
+  }
 test_client.cpp:
   - g_client->releaseRequest(request);
   - if: type[1] != 'NULL'
     then:
-      - if (err)
-      - '{'
-      - return {type[1]};
-      - '}'
+      - if (err != kErpcStatus_Success)
+      - "{"
+      - result = {type[1]};
+      - "}"
+      - return result;
 
 ---
 name: error_return c set errors
@@ -43,7 +44,7 @@ params:
   type:
     - [bool, "true", "true"]
     - [bool, "false", "false"]
-    - [int8, "-3", "-3" ]
+    - [int8, "-3", "-3"]
     - [int16, "-5", "-5"]
     - [int32, "10", "10"]
     - [int64, "-1", "-1"]
@@ -54,26 +55,27 @@ params:
     - [float, "25.6", "25.6"]
     - [double, "-32.1", "-32.1"]
     - [string, "errVal", "(char *) errVal"]
-    - [A, "\"NULL\"", "NULL"]
+    - [A, '"NULL"', "NULL"]
     - [B, "one", "one"]
 idl: |
-    struct A{
-        int32 a;
-    }
+  struct A{
+      int32 a;
+  }
 
-    const string errVal = "error";
+  const string errVal = "error";
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        @error_return({type[1]})
-        f() -> {type[0]}
-    }
+  interface ErrorTest{
+      @error_return({type[1]})
+      f() -> {type[0]}
+  }
 test_client.cpp:
   - g_client->releaseRequest(request);
   - if: type[0] != 'A' and type[0] != 'string'
     then:
-      - if (err)
-      - '{'
-      - return {type[2]};
-      - '}'
+      - if (err != kErpcStatus_Success)
+      - "{"
+      - result = {type[2]};
+      - "}"
+      - return result;

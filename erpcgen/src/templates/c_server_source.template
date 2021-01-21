@@ -105,7 +105,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
 {% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
 {%  set serverIndent = "    " >%}
     err = codec->getStatus();
-    if (!err)
+    if (err == kErpcStatus_Success)
     {
 {% endif -- generateErrorChecks %}
 {$serverIndent}    // Invoke the actual served function.
@@ -132,7 +132,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
 {%  if generateErrorChecks %}
     }
 
-    if (!err)
+    if (err == kErpcStatus_Success)
     {
 {%  endif -- generateErrorChecks %}
 {$serverIndent}    // preparing codec for serializing data
