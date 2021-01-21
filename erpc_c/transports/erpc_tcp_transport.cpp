@@ -285,7 +285,7 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
             }
             else
             {
-                if (statusno == EPIPE)
+                if (result == EPIPE)
                 {
                     // close socket, not server
                     close(false);
