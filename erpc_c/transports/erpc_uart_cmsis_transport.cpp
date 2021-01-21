@@ -27,7 +27,7 @@ static UartTransport *s_uart_instance = NULL;
 
 UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv)
 : m_uartDrv(uartDrv)
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
 , m_rxSemaphore()
 , m_txSemaphore()
 #endif
@@ -42,7 +42,7 @@ UartTransport::~UartTransport(void)
 
 void UartTransport::tx_cb(void)
 {
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
     m_txSemaphore.putFromISR();
 #else
     s_isTransferSendCompleted = true;
@@ -51,7 +51,7 @@ void UartTransport::tx_cb(void)
 
 void UartTransport::rx_cb(void)
 {
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
     m_rxSemaphore.putFromISR();
 #else
     s_isTransferReceiveCompleted = true;
@@ -109,7 +109,7 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
     if (status == ARM_DRIVER_OK)
     {
 /* wait until the receiving is finished */
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
         m_rxSemaphore.get();
 #else
         while (!s_isTransferReceiveCompleted)
@@ -132,7 +132,7 @@ erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
     if (status == ARM_DRIVER_OK)
     {
 /* wait until the sending is finished */
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
         m_txSemaphore.get();
 #else
         while (!s_isTransferSendCompleted)

@@ -23,7 +23,7 @@ using namespace erpc;
 FramedTransport::FramedTransport(void)
 : Transport()
 , m_crcImpl(NULL)
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
 , m_sendLock()
 , m_receiveLock()
 #endif
@@ -47,7 +47,7 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
     assert(m_crcImpl && "Uninitialized Crc16 object.");
 
     {
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
         Mutex::Guard lock(m_receiveLock);
 #endif
 
@@ -104,7 +104,7 @@ erpc_status_t FramedTransport::send(MessageBuffer *message)
 
     assert(m_crcImpl && "Uninitialized Crc16 object.");
 
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
     Mutex::Guard lock(m_sendLock);
 #endif
 

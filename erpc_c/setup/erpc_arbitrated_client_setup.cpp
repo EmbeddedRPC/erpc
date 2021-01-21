@@ -20,7 +20,7 @@
 #endif
 #include <cassert>
 
-#if ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if ERPC_THREADS_IS(NONE)
 #error "Arbitrator code does not work in no-threading configuration."
 #endif
 

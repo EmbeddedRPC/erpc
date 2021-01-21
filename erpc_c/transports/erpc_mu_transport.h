@@ -10,7 +10,7 @@
 #define _EMBEDDED_RPC__MU_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
 #include "erpc_message_buffer.h"
@@ -185,7 +185,7 @@ protected:
     uint32_t m_txCntBytes; /*!< Count of currently received bytes of message */
     uint32_t *volatile m_txBuffer; /*!< Pointer to buffer from which is copied data to MU registers during sending */
 
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
     Semaphore m_rxSemaphore; /*!< Semaphore used by RTOS to block task until the receiving is not complete */
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 

@@ -16,7 +16,7 @@
 
 #include <cstring>
 
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
 
@@ -111,7 +111,7 @@ public:
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */
 
-#if !ERPC_THREADS_IS(ERPC_THREADS_NONE)
+#if !ERPC_THREADS_IS(NONE)
     Mutex m_sendLock;    //!< Mutex protecting send.
     Mutex m_receiveLock; //!< Mutex protecting receive.
 #endif
