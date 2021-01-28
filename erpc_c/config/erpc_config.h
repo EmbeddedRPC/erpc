@@ -57,7 +57,7 @@
 //! Leave commented out to attempt to auto-detect. Auto-detection works well for pthreads.
 //! FreeRTOS can be detected when building with compilers that support __has_include().
 //! Otherwise, the default is no threading.
-//#define ERPC_THREADS (ERPC_THREADS_FREERTOS)
+#define ERPC_THREADS (ERPC_THREADS_FREERTOS)
 
 //! @def ERPC_DEFAULT_BUFFER_SIZE
 //!
