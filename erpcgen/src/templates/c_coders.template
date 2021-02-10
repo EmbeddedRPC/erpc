@@ -123,7 +123,7 @@ else
 {% if codecClass == "BasicCodec" && !empty(info.builtinTypeName) >%}
 {$decodeData(info)>}
 {% else >%}
-for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.sizeTemp}; ++{$info.forLoopCount})
+for (uint32_t {$info.forLoopCount} = 0U; {$info.forLoopCount} < {$info.sizeTemp}; ++{$info.forLoopCount})
 {
 {$addIndent("    ", info.protoNext.decode(info.protoNext))}
 }
@@ -267,7 +267,7 @@ codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% 
 {% if codecClass == "BasicCodec" && !empty(info.builtinTypeName) >%}
 {$encodeData(info) >}
 {% else >%}
-for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}; ++{$info.forLoopCount})
+for (uint32_t {$info.forLoopCount} = 0U; {$info.forLoopCount} < {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}; ++{$info.forLoopCount})
 {
 {$addIndent("    ", info.protoNext.encode(info.protoNext))}
 }

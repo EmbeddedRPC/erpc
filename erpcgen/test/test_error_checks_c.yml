@@ -11,15 +11,15 @@ params:
     - [A, "NULL"]
     - [B, "(B) -1"]
 idl: |
-    struct A{
-        int32 a;
-    }
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
+  interface ErrorTest{
+      f() -> {type[0]}
+  }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
@@ -30,16 +30,16 @@ test_client.cpp:
   - g_client->callErrorHandler(err,
   - if: type[1] != 'NULL'
     then:
-      - if (err)
+      - if (err != kErpcStatus_Success)
       - return
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - f();
   - err = messageFactory->prepareServerBufferForSend
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - codec->startWriteMessage
   - err = codec->getStatus();
   - return err;
@@ -61,29 +61,29 @@ params:
     - "out"
 
 idl: |
-    @no_infra_errors
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
+  @no_infra_errors
+  @no_alloc_errors
+  program test
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> {type[0]}
-    }
+  interface ErrorTest{
+      f({dir} {type[0]} variable {type[2]}) -> {type[0]}
+  }
 test_client.cpp:
-  - not: '!err'
-  - not: '(err)'
+  - not: "!err"
+  - not: "(err != kErpcStatus_Success)"
   - not: err =
   - not: if (codec == NULL)
   - not: codec->getStatus()
 
 test_server.cpp:
-  - not: '!err'
+  - not: "!err"
   - not: err =
-  - not: '(err)'
+  - not: "(err != kErpcStatus_Success)"
   - return codec->getStatus()
 
 ---
@@ -99,17 +99,17 @@ params:
     - [A, "NULL"]
     - [B, "(B) -1"]
 idl: |
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
+  @no_alloc_errors
+  program test
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
+  interface ErrorTest{
+      f() -> {type[0]}
+  }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - not: if (result == NULL)
@@ -120,16 +120,16 @@ test_client.cpp:
   - g_client->callErrorHandler(err, kErrorTest_f_id)
   - if: type[1] != 'NULL'
     then:
-      - if (err)
+      - if (err != kErpcStatus_Success)
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - not: if (result == NULL)
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - f();
   - err = messageFactory->prepareServerBufferForSend
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - codec->startWriteMessage
   - err = codec->getStatus();
   - return err;
@@ -147,17 +147,17 @@ params:
     - [A, "NULL"]
     - [B, "(B) -1"]
 idl: |
-    @no_infra_errors
-    program test
-    struct A{
-        int32 a;
-    }
+  @no_infra_errors
+  program test
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f() -> {type[0]}
-    }
+  interface ErrorTest{
+      f() -> {type[0]}
+  }
 
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
@@ -169,16 +169,16 @@ test_client.cpp:
   - g_client->callErrorHandler(err,
   - if: type[1] != 'NULL'
     then:
-      - if (err)
+      - if (err != kErpcStatus_Success)
       - return
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - f();
   - err = messageFactory->prepareServerBufferForSend
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - codec->startWriteMessage
   - err = codec->getStatus();
   - return err;
@@ -200,15 +200,15 @@ params:
     - "out"
     - "inout"
 idl: |
-    struct A{
-        int32 a;
-    }
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> void
-    }
+  interface ErrorTest{
+      f({dir} {type[0]} variable {type[2]}) -> void
+  }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
@@ -220,10 +220,10 @@ test_client.cpp:
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - f(
   - err = messageFactory->prepareServerBufferForSend
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - codec->startWriteMessage
   - err = codec->getStatus();
   - return err;
@@ -245,17 +245,17 @@ params:
     - "out"
     - "inout"
 idl: |
-    @no_alloc_errors
-    program test
-    struct A{
-        int32 a;
-    }
+  @no_alloc_errors
+  program test
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> void
-    }
+  interface ErrorTest{
+      f({dir} {type[0]} variable {type[2]}) -> void
+  }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - not: if (codec == NULL)
@@ -269,11 +269,11 @@ test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - not: if (variable == NULL)
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - f(
   - if: dir in ('out', 'inout')
     then:
-      - if (!err)
+      - if (err == kErpcStatus_Success)
       - codec->startWriteMessage
       - err = codec->getStatus();
   - return err;
@@ -295,17 +295,17 @@ params:
     - "out"
     - "inout"
 idl: |
-    @no_infra_errors
-    program test
-    struct A{
-        int32 a;
-    }
+  @no_infra_errors
+  program test
+  struct A{
+      int32 a;
+  }
 
-    enum B { one }
+  enum B { one }
 
-    interface ErrorTest{
-        f({dir} {type[0]} variable {type[2]}) -> void
-    }
+  interface ErrorTest{
+      f({dir} {type[0]} variable {type[2]}) -> void
+  }
 test_client.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - if (codec == NULL)
@@ -320,7 +320,7 @@ test_client.cpp:
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
   - err = codec->getStatus();
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - err = messageFactory->prepareServerBufferForSend
-  - if (!err)
+  - if (err == kErpcStatus_Success)
   - return err;
