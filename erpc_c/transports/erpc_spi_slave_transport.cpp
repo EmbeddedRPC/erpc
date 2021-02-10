@@ -184,7 +184,7 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
         }
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     }
-#else ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+#else
         delete[] spiData;
     }
     else
