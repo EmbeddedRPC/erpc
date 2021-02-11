@@ -17,6 +17,7 @@
 #include <netinet/tcp.h>
 #include <signal.h>
 #include <string>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -35,6 +36,9 @@ using namespace erpc;
 #define TCP_DEBUG_ERR(_msg_)
 #endif
 
+#ifndef SOL_TCP
+#define SOL_TCP IPPROTO_TCP
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
@@ -276,6 +280,13 @@ void TCPTransport::serverThread(void)
     // Turn on reuse address option.
     int yes = 1;
     int result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+    if (result < 0)
+    {
+        TCP_DEBUG_ERR("setsockopt failed");
+        ::close(serverSocket);
+        return;
+    }
+    result = setsockopt(serverSocket, SOL_TCP, TCP_NODELAY, &yes, sizeof(yes));
     if (result < 0)
     {
         TCP_DEBUG_ERR("setsockopt failed");
