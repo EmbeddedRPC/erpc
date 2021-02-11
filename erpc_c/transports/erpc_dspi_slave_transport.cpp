@@ -65,17 +65,17 @@ static inline void DSpiSlaveTransport_NotifyTransferGpioReady(void)
 /* @brief Notify the SPI Master that the Slave has finished the transfer */
 static inline void DSpiSlaveTransport_NotifyTransferGpioCompleted(void)
 {
-    (void)base;
-    (void)handle;
-    (void)status;
-    (void)userData;
-
     GPIO_PortSet(ERPC_BOARD_DSPI_INT_GPIO, 1U << ERPC_BOARD_DSPI_INT_PIN);
 }
 #endif
 
 static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, status_t status, void *userData)
 {
+    (void)base;
+    (void)handle;
+    (void)status;
+    (void)userData;
+
     s_isTransferCompleted = true;
 }
 
