@@ -74,7 +74,7 @@ static inline void DSpiSlaveTransport_NotifyTransferGpioCompleted(void)
 }
 #endif
 
-static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, erpc_status_t status, void *userData)
+static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, status_t status, void *userData)
 {
     s_isTransferCompleted = true;
 }
@@ -118,7 +118,7 @@ erpc_status_t DspiSlaveTransport::init(void)
 
 erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t slaveXfer;
 
     slaveXfer.txData = NULL;
@@ -147,7 +147,7 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 
 erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t slaveXfer;
     s_isTransferCompleted = false;
 

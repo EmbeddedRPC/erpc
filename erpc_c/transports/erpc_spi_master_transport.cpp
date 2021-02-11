@@ -128,7 +128,7 @@ erpc_status_t SpiMasterTransport::init(void)
 
 erpc_status_t SpiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t masterXfer;
 
     masterXfer.txData = NULL;
@@ -151,7 +151,7 @@ erpc_status_t SpiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size
 
 erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t masterXfer;
 
     masterXfer.txData = (uint8_t *)data;

@@ -70,7 +70,7 @@ static inline void SpiSlaveTransport_NotifyTransferGpioCompleted()
 }
 #endif
 
-static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, erpc_status_t status, void *userData)
+static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, status_t status, void *userData)
 {
     (void)base;
     (void)handle;
@@ -119,7 +119,7 @@ erpc_status_t SpiSlaveTransport::init(void)
 
 erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t slaveXfer;
 
     slaveXfer.txData = NULL;
@@ -147,7 +147,7 @@ erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 
 erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t slaveXfer;
     s_isTransferCompleted = false;
 

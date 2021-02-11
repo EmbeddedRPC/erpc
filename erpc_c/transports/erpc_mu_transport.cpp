@@ -222,7 +222,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
 
         message->setUsed(m_rxMsgSize);
         m_newMessage = false;
-        status = kErpcStatus_Success
+        status = kErpcStatus_Success;
     }
 
     return status;

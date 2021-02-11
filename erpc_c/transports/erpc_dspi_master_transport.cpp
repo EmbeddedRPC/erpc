@@ -129,7 +129,7 @@ erpc_status_t DspiMasterTransport::init(void)
 
 erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t masterXfer;
 
     masterXfer.txData = NULL;
@@ -153,7 +153,7 @@ erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t siz
 
 erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t masterXfer;
 
     masterXfer.txData = (uint8_t *)data;
