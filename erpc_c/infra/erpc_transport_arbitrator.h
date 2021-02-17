@@ -67,28 +67,52 @@ public:
      */
     void setCodec(Codec *codec) { m_codec = codec; }
 
-    //! @brief Receive method for the server.
-    virtual erpc_status_t receive(MessageBuffer *message);
+    /*!
+     * @brief Prototype for receiving message.
+     *
+     * Each transport layer need define this function.
+     *
+     * @param[out] message Will return pointer to received message buffer.
+     *
+     * @return based on receive implementation.
+     */
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
-    //! @brief Add a client request to the client list.
-    //!
-    //! This call is made by the client thread prior to sending the invocation to the server. It
-    //! ensures that the transport arbitrator has the client's response message buffer ready in
-    //! case it sees the response before the client even has a chance to call clientReceive().
-    //!
-    //! A token is returned to the client
+    /*!
+     * @brief Add a client request to the client list.
+     *
+     * This call is made by the client thread prior to sending the invocation to the server. It
+     * ensures that the transport arbitrator has the client's response message buffer ready in
+     * case it sees the response before the client even has a chance to call clientReceive().
+     *
+     * @param[in] request Reuquest context for receive action.
+     *
+     * @return A token is returned to the client
+     */
     client_token_t prepareClientReceive(RequestContext &request);
 
-    //! @brief Receive method for the client.
-    //!
-    //! Blocks until the a reply message is received with the expected sequence number that is
-    //! associated with @a token. The client must have called prepareClientReceive() previously.
-    //!
-    //! @param token The token previously returned by prepareClientReceive().
+    /*!
+     * @brief Receive method for the client.
+     *
+     * Blocks until the a reply message is received with the expected sequence number that is
+     * associated with @a token. The client must have called prepareClientReceive() previously.
+     *
+     * @param[in] token The token previously returned by prepareClientReceive().
+     *
+     * @return erpc_status_t Return erpc status of client receive function.
+     */
     erpc_status_t clientReceive(client_token_t token);
 
-    //! @brief Shared client/server send method.
-    virtual erpc_status_t send(MessageBuffer *message);
+    /*!
+     * @brief Prototype for send message.
+     *
+     * Each transport layer need define this function.
+     *
+     * @param[in] message Pass message buffer to send.
+     *
+     * @return based on send implementation.
+     */
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
      * @brief This functions sets the CRC-16 implementation.

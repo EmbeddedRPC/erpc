@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
- * Copyright 2019 ACRIOS Systems s.r.o.
+ * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -18,9 +18,9 @@ using namespace erpc;
 
 void SimpleServer::disposeBufferAndCodec(Codec *codec)
 {
-    if (codec)
+    if (codec != NULL)
     {
-        if (codec->getBuffer())
+        if (codec->getBuffer() != NULL)
         {
             m_messageFactory->dispose(codec->getBuffer());
         }
@@ -40,75 +40,79 @@ erpc_status_t SimpleServer::runInternal(void)
     uint32_t sequence;
 
     erpc_status_t err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
-    if (err)
+    if (err == kErpcStatus_Success)
     {
-        return err;
+        err = runInternalEnd(codec, msgType, serviceId, methodId, sequence);
     }
 
-    return runInternalEnd(codec, msgType, serviceId, methodId, sequence);
+    return err;
 }
 
 erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff, message_type_t &msgType,
                                              uint32_t &serviceId, uint32_t &methodId, uint32_t &sequence)
 {
-    if (m_messageFactory->createServerBuffer())
+    erpc_status_t err = kErpcStatus_Success;
+
+    if (m_messageFactory->createServerBuffer() == true)
     {
         buff = m_messageFactory->create();
         if (!buff.get())
         {
-            return kErpcStatus_MemoryError;
+            err = kErpcStatus_MemoryError;
         }
     }
 
     // Receive the next invocation request.
-    erpc_status_t err = m_transport->receive(&buff);
+    if (err == kErpcStatus_Success)
+    {
+        err = m_transport->receive(&buff);
+    }
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb preCB = this->getPreCB(void);
-    if (preCB)
+    pre_post_action_cb preCB = this->getPreCB();
+    if (preCB != NULL)
     {
         preCB();
     }
 #endif
 
-    if (err)
-    {
-        // Dispose of buffers.
-        if (buff.get())
-        {
-            m_messageFactory->dispose(&buff);
-        }
-        return err;
-    }
-
 #if ERPC_MESSAGE_LOGGING
-    err = logMessage(&buff);
-    if (err)
+    if (err == kErpcStatus_Success)
     {
-        // Dispose of buffers.
-        if (buff.get())
-        {
-            m_messageFactory->dispose(&buff);
-        }
-        return err;
+        err = logMessage(&buff);
     }
 #endif
 
-    *codec = m_codecFactory->create();
-    if (!*codec)
+    if (err == kErpcStatus_Success)
     {
-        m_messageFactory->dispose(&buff);
-        return kErpcStatus_MemoryError;
+        *codec = m_codecFactory->create();
+        if (*codec == NULL)
+        {
+            err = kErpcStatus_MemoryError;
+        }
     }
 
-    (*codec)->setBuffer(buff);
-
-    err = readHeadOfMessage(*codec, msgType, serviceId, methodId, sequence);
-    if (err)
+    if (err != kErpcStatus_Success)
     {
-        // Dispose of buffers and codecs.
-        disposeBufferAndCodec(*codec);
+        // Dispose of buffers.
+        if (buff.get() != NULL)
+        {
+            m_messageFactory->dispose(&buff);
+        }
     }
+
+    if (err == kErpcStatus_Success)
+    {
+        (*codec)->setBuffer(buff);
+
+        err = readHeadOfMessage(*codec, msgType, serviceId, methodId, sequence);
+        if (err != kErpcStatus_Success)
+        {
+            // Dispose of buffers and codecs.
+            disposeBufferAndCodec(*codec);
+        }
+    }
+
     return err;
 }
 
@@ -117,38 +121,32 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
 {
     erpc_status_t err = processMessage(codec, msgType, serviceId, methodId, sequence);
 
-    if (err)
+    if (err == kErpcStatus_Success)
     {
-        // Dispose of buffers and codecs.
-        disposeBufferAndCodec(codec);
-        return err;
-    }
-
-    if (msgType != kOnewayMessage)
-    {
-
-#if ERPC_MESSAGE_LOGGING
-        err = logMessage(codec->getBuffer());
-        if (err)
+        if (msgType != kOnewayMessage)
         {
-            // Dispose of buffers and codecs.
-            disposeBufferAndCodec(codec);
-            return err;
+#if ERPC_MESSAGE_LOGGING
+            err = logMessage(codec->getBuffer());
+            if (err == kErpcStatus_Success)
+            {
+#endif
+                err = m_transport->send(codec->getBuffer());
+#if ERPC_MESSAGE_LOGGING
+            }
+#endif
+        }
+
+#if ERPC_PRE_POST_ACTION
+        pre_post_action_cb postCB = this->getPostCB();
+        if (postCB != NULL)
+        {
+            postCB();
         }
 #endif
-        err = m_transport->send(codec->getBuffer());
     }
 
     // Dispose of buffers and codecs.
     disposeBufferAndCodec(codec);
-
-#if ERPC_PRE_POST_ACTION
-    pre_post_action_cb postCB = this->getPostCB();
-    if (postCB)
-    {
-        postCB();
-    }
-#endif
 
     return err;
 }
@@ -167,22 +165,22 @@ erpc_status_t SimpleServer::run(void)
 erpc_status_t SimpleServer::run(RequestContext &request)
 {
     erpc_status_t err = kErpcStatus_Success;
+    message_type_t msgType;
+    uint32_t serviceId;
+    uint32_t methodId;
+    uint32_t sequence;
+
     while (!err && m_isServerOn)
     {
         MessageBuffer buff;
         Codec *codec = NULL;
 
         // Handle the request.
-        message_type_t msgType;
-        uint32_t serviceId;
-        uint32_t methodId;
-        uint32_t sequence;
-
         err = runInternalBegin(&codec, buff, msgType, serviceId, methodId, sequence);
 
-        if (err)
+        if (err != kErpcStatus_Success)
         {
-            return err;
+            break;
         }
 
         if (msgType == kReplyMessage)
@@ -203,7 +201,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
                 continue;
             }
 
-            return kErpcStatus_Success;
+            break;
         }
         else
         {
@@ -216,18 +214,25 @@ erpc_status_t SimpleServer::run(RequestContext &request)
 
 erpc_status_t SimpleServer::poll(void)
 {
+    erpc_status_t err;
+
     if (m_isServerOn)
     {
-        if (m_transport->hasMessage())
+        if (m_transport->hasMessage() == true)
         {
-            return runInternal();
+            err = runInternal();
         }
         else
         {
-            return kErpcStatus_Success;
+            err = kErpcStatus_Success;
         }
     }
-    return kErpcStatus_ServerIsDown;
+    else
+    {
+        err = kErpcStatus_ServerIsDown;
+    }
+
+    return err;
 }
 
 void SimpleServer::stop(void)

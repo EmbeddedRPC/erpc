@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -83,7 +84,7 @@ void Thread::start(void *arg)
     LeaveCriticalSection(&m_critical_section);
 }
 
-bool Thread::operator==(Thread &o)
+bool Thread::operator==(const Thread &o)
 {
     return (m_thrdaddr == o.m_thrdaddr);
 }
@@ -95,7 +96,7 @@ Thread *Thread::getCurrentThread(void)
     // Walk the threads list to find the Thread object for the current task.
     EnterCriticalSection(&m_critical_section);
     Thread *it = s_first;
-    while (it)
+    while (it != NULL)
     {
         if (it->m_thrdaddr == thisThrdaddr)
         {
@@ -128,7 +129,7 @@ void Thread::sleep(uint32_t usecs)
 
 void Thread::threadEntryPoint(void)
 {
-    if (m_entry)
+    if (m_entry != NULL)
     {
         m_entry(m_arg);
     }
@@ -137,7 +138,7 @@ void Thread::threadEntryPoint(void)
 unsigned WINAPI Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
+    if (_this != NULL)
     {
         _this->threadEntryPoint();
     }

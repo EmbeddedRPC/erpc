@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -8,6 +9,7 @@
  */
 
 #include "erpc_framed_transport.h"
+
 #include "erpc_message_buffer.h"
 
 #include <cassert>
@@ -39,8 +41,11 @@ void FramedTransport::setCrc16(Crc16 *crcImpl)
 
 erpc_status_t FramedTransport::receive(MessageBuffer *message)
 {
-    assert(m_crcImpl && "Uninitialized Crc16 object.");
     Header h;
+    erpc_status_t retVal;
+    uint16_t computedCrc;
+
+    assert(m_crcImpl && "Uninitialized Crc16 object.");
 
     {
 #if !ERPC_THREADS_IS(NONE)
@@ -48,62 +53,72 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 #endif
 
         // Receive header first.
-        erpc_status_t ret = underlyingReceive((uint8_t *)&h, sizeof(h));
-        if (ret != kErpcStatus_Success)
+        retVal = underlyingReceive((uint8_t *)&h, sizeof(h));
+
+        if (retVal == kErpcStatus_Success)
         {
-            return ret;
+            // received size can't be zero.
+            if (h.m_messageSize == 0U)
+            {
+                retVal = kErpcStatus_ReceiveFailed;
+            }
         }
 
-        // received size can't be zero.
-        if (h.m_messageSize == 0)
+        if (retVal == kErpcStatus_Success)
         {
-            return kErpcStatus_ReceiveFailed;
+            // received size can't be larger then buffer length.
+            if (h.m_messageSize > message->getLength())
+            {
+                retVal = kErpcStatus_ReceiveFailed;
+            }
         }
 
-        // received size can't be larger then buffer length.
-        if (h.m_messageSize > message->getLength())
+        if (retVal == kErpcStatus_Success)
         {
-            return kErpcStatus_ReceiveFailed;
-        }
-
-        // Receive rest of the message now we know its size.
-        ret = underlyingReceive(message->get(), h.m_messageSize);
-        if (ret != kErpcStatus_Success)
-        {
-            return ret;
+            // Receive rest of the message now we know its size.
+            retVal = underlyingReceive(message->get(), h.m_messageSize);
         }
     }
 
-    // Verify CRC.
-    uint16_t computedCrc = m_crcImpl->computeCRC16(message->get(), h.m_messageSize);
-    if (computedCrc != h.m_crc)
+    if (retVal == kErpcStatus_Success)
     {
-        return kErpcStatus_CrcCheckFailed;
+        // Verify CRC.
+        computedCrc = m_crcImpl->computeCRC16(message->get(), h.m_messageSize);
+        if (computedCrc == h.m_crc)
+        {
+            message->setUsed(h.m_messageSize);
+        }
+        else
+        {
+            retVal = kErpcStatus_CrcCheckFailed;
+        }
     }
 
-    message->setUsed(h.m_messageSize);
-    return kErpcStatus_Success;
+    return retVal;
 }
 
 erpc_status_t FramedTransport::send(MessageBuffer *message)
 {
+    erpc_status_t ret;
+    uint16_t messageLength;
+    Header h;
+
     assert(m_crcImpl && "Uninitialized Crc16 object.");
+
 #if !ERPC_THREADS_IS(NONE)
     Mutex::Guard lock(m_sendLock);
 #endif
 
-    uint16_t messageLength = message->getUsed();
+    messageLength = message->getUsed();
 
     // Send header first.
-    Header h;
     h.m_messageSize = messageLength;
     h.m_crc = m_crcImpl->computeCRC16(message->get(), messageLength);
-    erpc_status_t ret = underlyingSend((uint8_t *)&h, sizeof(h));
-    if (ret != kErpcStatus_Success)
+    ret = underlyingSend((uint8_t *)&h, sizeof(h));
+    if (ret == kErpcStatus_Success)
     {
-        return ret;
+        ret = underlyingSend(message->get(), messageLength);
     }
 
-    // Send the rest of the message.
-    return underlyingSend(message->get(), messageLength);
+    return ret;
 }

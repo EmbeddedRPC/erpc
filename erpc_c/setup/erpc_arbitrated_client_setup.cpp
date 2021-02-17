@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
- * Copyright 2020 ACRIOS Systems s.r.o.
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -48,6 +48,8 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
 {
     assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
@@ -56,7 +58,7 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
 
     // Init the arbitrator using the passed in transport.
     s_arbitrator.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_arbitrator->setSharedTransport(castedTransport);
@@ -106,11 +108,18 @@ void erpc_arbitrated_client_set_server_thread_id(void *serverThreadId)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
 {
-    if (g_client != NULL)
+    bool retVal;
+
+    if (g_client == NULL)
     {
-        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
 }
 #endif
 

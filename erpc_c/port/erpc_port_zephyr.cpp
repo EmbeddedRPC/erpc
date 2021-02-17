@@ -1,5 +1,6 @@
 /*
  * Copyright 2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -23,6 +24,7 @@ void *operator new(std::size_t count) THROW_BADALLOC
 
 void *operator new(std::size_t count, const std::nothrow_t &tag) THROW
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
@@ -34,8 +36,8 @@ void *operator new[](std::size_t count) THROW_BADALLOC
 }
 
 void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW
-
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
@@ -66,6 +68,7 @@ void erpc_free(void *ptr)
 extern "C" void __cxa_pure_virtual(void)
 {
     while (1)
-        ;
+    {
+    };
 }
 #endif

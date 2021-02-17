@@ -112,7 +112,7 @@ public:
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return (rpmsg_queue_get_current_size(m_rpmsg_queue) > 0 ? true : false); }
+    virtual bool hasMessage(void) { return ((rpmsg_queue_get_current_size(m_rpmsg_queue) > 0) ? true : false); }
 
 protected:
     /* Remote device */

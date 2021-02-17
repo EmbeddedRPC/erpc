@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -95,8 +96,26 @@ public:
         m_status = kErpcStatus_Success;
     }
 
+    /*!
+     * @brief Return current status of eRPC message processing.
+     *
+     * @return Current status of eRPC message processing.
+     */
     erpc_status_t getStatus(void) { return m_status; }
 
+    /*!
+     * @brief Return bool value representing current status.
+     *
+     * @retval True Current status value is kErpcStatus_Success.
+     * @retval False Current status is other than kErpcStatus_Success.
+     */
+    bool isStatusOk(void) { return (m_status == kErpcStatus_Success); }
+
+    /*!
+     * @brief Set current status of eRPC message processing to given value.
+     *
+     * @param[in] status New current value.
+     */
     void updateStatus(erpc_status_t status)
     {
         if (!m_status)

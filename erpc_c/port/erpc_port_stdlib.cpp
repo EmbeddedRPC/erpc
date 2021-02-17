@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -78,6 +79,7 @@ void erpc_free(void *ptr)
 extern "C" void __cxa_pure_virtual(void)
 {
     while (1)
-        ;
+    {
+    };
 }
 #endif

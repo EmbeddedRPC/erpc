@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -22,10 +23,11 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
+
 #ifndef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN 2
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xAB
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCD
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN 2U
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xABU
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCDU
 #else
 #ifndef ERPC_BOARD_DSPI_INT_GPIO
 #error "Please define the ERPC_BOARD_DSPI_INT_GPIO used to notify when the DSPI Slave is ready to transmit"
@@ -36,7 +38,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static dspi_slave_handle_t g_s_handle;
+static dspi_slave_handle_t s_handle;
 static volatile bool s_isTransferCompleted = false;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +70,13 @@ static inline void DSpiSlaveTransport_NotifyTransferGpioCompleted(void)
 }
 #endif
 
-static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, erpc_status_t status, void *userData)
+static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, status_t status, void *userData)
 {
+    (void)base;
+    (void)handle;
+    (void)status;
+    (void)userData;
+
     s_isTransferCompleted = true;
 }
 
@@ -100,7 +107,7 @@ erpc_status_t DspiSlaveTransport::init(void)
     DSPI_SlaveGetDefaultConfig(&dspiConfig);
 
     DSPI_SlaveInit(m_spiBaseAddr, &dspiConfig);
-    DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &g_s_handle, DSPI_SlaveUserCallback, NULL);
+    DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, DSPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpiSlaveTransport_NotifyTransferGpioInit();
@@ -112,7 +119,7 @@ erpc_status_t DspiSlaveTransport::init(void)
 
 erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t slaveXfer;
 
     slaveXfer.txData = NULL;
@@ -121,7 +128,7 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
     slaveXfer.configFlags = kDSPI_SlaveCtar0;
     s_isTransferCompleted = false;
 
-    status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &g_s_handle, &slaveXfer);
+    status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
 
     if (kStatus_Success == status)
     {
@@ -136,12 +143,12 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 #endif
     }
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     dspi_transfer_t slaveXfer;
     s_isTransferCompleted = false;
 
@@ -150,6 +157,7 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
     slaveXfer.rxData = NULL;
     slaveXfer.dataSize = size;
     slaveXfer.configFlags = kDSPI_SlaveCtar0;
+    {
 #else
     uint8_t *dspiData = new (nothrow) uint8_t[size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
     if (dspiData != NULL)
@@ -157,35 +165,37 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
         dspiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
         dspiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
         memcpy(&dspiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+
+        slaveXfer.txData = dspiData;
+        slaveXfer.rxData = NULL;
+        slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
+        slaveXfer.configFlags = kDSPI_SlaveCtar0;
+#endif
+
+        status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
+
+        if (kStatus_Success == status)
+        {
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            DSpiSlaveTransport_NotifyTransferGpioReady();
+#endif
+            while (!s_isTransferCompleted)
+            {
+            }
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            DSpiSlaveTransport_NotifyTransferGpioCompleted();
+#endif
+        }
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    }
+#else
+        delete[] dspiData;
     }
     else
     {
-        return kErpcStatus_SendFailed;
+        status = kErpcStatus_SendFailed;
     }
-
-    slaveXfer.txData = dspiData;
-    slaveXfer.rxData = NULL;
-    slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
-    slaveXfer.configFlags = kDSPI_SlaveCtar0;
 #endif
 
-    status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &g_s_handle, &slaveXfer);
-
-    if (kStatus_Success == status)
-    {
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-        DSpiSlaveTransport_NotifyTransferGpioReady();
-#endif
-        while (!s_isTransferCompleted)
-        {
-        }
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-        DSpiSlaveTransport_NotifyTransferGpioCompleted();
-#endif
-    }
-#ifndef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-    delete[] dspiData;
-#endif
-
-    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
