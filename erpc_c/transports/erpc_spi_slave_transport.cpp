@@ -38,7 +38,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static spi_slave_handle_t s_s_handle;
+static spi_slave_handle_t s_handle;
 static volatile bool s_isTransferCompleted = false;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ erpc_status_t SpiSlaveTransport::init(void)
     SPI_SlaveGetDefaultConfig(&spiConfig);
 
     SPI_SlaveInit(m_spiBaseAddr, &spiConfig);
-    SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_s_handle, SPI_SlaveUserCallback, NULL);
+    SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, SPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpiSlaveTransport_NotifyTransferGpioInit();
@@ -127,7 +127,7 @@ erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
     slaveXfer.dataSize = size;
     s_isTransferCompleted = false;
 
-    status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
+    status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
 
     if (kStatus_Success == status)
     {
@@ -168,7 +168,7 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
         slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
 #endif
 
-        status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
+        status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
 
         if (kStatus_Success == status)
         {
