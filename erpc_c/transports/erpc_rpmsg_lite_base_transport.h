@@ -29,6 +29,9 @@
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
+/* TODO: replace bellow size representing sizeof(rpmsg_queue_rx_cb_data_t)*/
+#define SIZE_OF_RPMSG_QUEUE 12
+
 namespace erpc {
 /*!
  * @brief Transport that other RPMsg transports inherits.
@@ -54,6 +57,12 @@ public:
 protected:
     static struct rpmsg_lite_instance *s_rpmsg; /*!< Pointer to instance of RPMSG lite. */
     static uint8_t s_initialized;               /*!< Represent information if the rpmsg-lite was initialized. */
+#if RL_USE_STATIC_API
+    struct rpmsg_lite_instance m_static_context;
+    struct rpmsg_lite_ept_static_context m_ept_context;
+    rpmsg_static_queue m_queu_context;
+    uint8_t m_queue_stack[SIZE_OF_RPMSG_QUEUE * RL_BUFFER_COUNT];
+#endif
 };
 
 } // namespace erpc
