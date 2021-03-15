@@ -5,11 +5,12 @@
 {$commonHeader()}
 
 #include "{$serverHeaderName}"
+#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
 #include <new>
 #include "erpc_port.h"
-{% if dynamicServices == false %}
+#elif ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
 #include "erpc_manually_constructed.h"
-{% endif --dynamicServices == false %}
+#endif
 {% if empty(group.includes) == false %}
 extern "C"
 {
@@ -28,10 +29,12 @@ using namespace std;
 extern bool nestingDetection;
 #endif
 
-{% for iface in group.interfaces if dynamicServices == false %}
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+{% for iface in group.interfaces %}
 static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName};
 
 {% endfor -- iface %}
+#endif
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {% if unitTest %}
@@ -244,7 +247,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, 
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 
-{% if dynamicServices == true %}
+#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
 erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();
@@ -257,7 +260,7 @@ void destroy_{$iface.serviceClassName}(erpc_service_t *service)
         delete service;
     }
 }
-{% else --dynamicServices == true %}
+#elif ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
 erpc_service_t create_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.construct();
@@ -268,5 +271,7 @@ void destroy_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.destroy();
 }
-{% endif --dynamicServices == true %}
+#else
+#warning "Unknow eRPC allocation policy!"
+#endif
 {% endfor -- iface %}

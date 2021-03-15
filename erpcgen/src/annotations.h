@@ -16,9 +16,6 @@
 //! Define union discriminator name for non-encapsulated unions.
 #define DISCRIMINATOR_ANNOTATION "discriminator"
 
-//! Service objects will be dynamically allocated.
-#define DYNAMIC_SERVICES_ANNOTATION "dynamic_services"
-
 //! Set error value for provide error to client
 #define ERROR_RETURN_ANNOTATION "error_return"
 
