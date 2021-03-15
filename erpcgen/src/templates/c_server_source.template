@@ -29,12 +29,10 @@ using namespace std;
 extern bool nestingDetection;
 #endif
 
-#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
 {% for iface in group.interfaces %}
-static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName};
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
 
 {% endfor -- iface %}
-#endif
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {% if unitTest %}

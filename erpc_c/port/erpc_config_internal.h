@@ -47,6 +47,35 @@
     #endif
 #endif
 
+// Detect allocation policy if not already set.
+#if !defined(ERPC_ALLOCATION_POLICY)
+    #if defined(__has_include)
+        #if __has_include("FreeRTOSConfig.h")
+            #include "FreeRTOSConfig.h"
+            #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
+                #define ERPC_ALLOCATION_POLICY (ERPC_STATIC_POLICY)
+            #else
+                #define ERPC_ALLOCATION_POLICY (ERPC_DYNAMIC_POLICY)
+            #endif
+        #endif
+    #endif
+#endif
+
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#if !defined(ERPC_CODEC_COUNT)
+#define ERPC_CODEC_COUNT (2U)
+#warning "ERPC_CODEC_COUNT is not defined. Default is used."
+#endif
+#if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
+#define ERPC_MESSAGE_LOGGERS_COUNT (0U)
+#warning "ERPC_MESSAGE_LOGGERS_COUNT is not defined. Default is used."
+#endif
+#if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
+#define ERPC_CLIENTS_THREADS_AMOUNT (1U)
+#warning "ERPC_CLIENTS_THREADS_AMOUNT is not defined. Default is used."
+#endif
+#endif
+
 // Detect threading model if not already set.
 #if !defined(ERPC_THREADS)
     #if ERPC_HAS_POSIX

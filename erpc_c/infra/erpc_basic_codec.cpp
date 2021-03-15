@@ -10,6 +10,11 @@
 
 #include "erpc_basic_codec.h"
 
+#include "erpc_manually_constructed.h"
+
+#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
+#include <new>
+#endif
 #include <cassert>
 
 using namespace erpc;
@@ -369,4 +374,16 @@ void BasicCodec::readCallback(funPtr callbacks1, funPtr *callback2)
 {
     // callbacks = callback directly
     *callback2 = callbacks1;
+}
+
+ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT);
+
+Codec *BasicCodecFactory ::create()
+{
+    ERPC_CREATE_NEW_OBJECT(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT)
+}
+
+void BasicCodecFactory ::dispose(Codec *codec)
+{
+    ERPC_DESTROY_OBJECT(codec, s_basicCodecManual, ERPC_CODEC_COUNT)
 }
