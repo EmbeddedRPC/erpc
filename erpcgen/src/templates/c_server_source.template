@@ -8,9 +8,8 @@
 #if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
 #include <new>
 #include "erpc_port.h"
-#elif ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
-#include "erpc_manually_constructed.h"
 #endif
+#include "erpc_manually_constructed.h"
 {% if empty(group.includes) == false %}
 extern "C"
 {
