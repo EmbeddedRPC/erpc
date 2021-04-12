@@ -199,7 +199,7 @@ protected:
 #define ERPC_CREATE_NEW_OBJECT(class, arrayOfObjects, numberOfObjects, ...) \
     return new (std::nothrow) class(__VA_ARGS__);
 
-#define ERPC_DESTROY_OBJECT(object, arrayOfObjects, numberOfObjects) delete object;
+#define ERPC_DESTROY_OBJECT(object, ...) delete object;
 
 #elif ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
 #define ERPC_CREATE_NEW_OBJECT(class, arrayOfObjects, numberOfObjects, ...)         \
