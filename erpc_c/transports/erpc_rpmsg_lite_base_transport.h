@@ -12,8 +12,16 @@
 #define _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
 
 #include "erpc_transport.h"
+#include "erpc_config_internal.h"
 
 #include "rpmsg_lite.h"
+
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#ifndef RL_USE_STATIC_API
+#warning "RPMSG is not set to use static allocation"
+#endif
+#endif
+
 
 /*!
  * @addtogroup rpmsg_lite_transport
@@ -61,7 +69,7 @@ protected:
 #if RL_USE_STATIC_API
     struct rpmsg_lite_instance m_static_context;
     struct rpmsg_lite_ept_static_context m_ept_context;
-    rpmsg_static_queue m_queu_context;
+    rpmsg_static_queue m_queue_context;
     uint8_t m_queue_stack[SIZE_OF_RPMSG_QUEUE * RL_BUFFER_COUNT];
 #endif
 };

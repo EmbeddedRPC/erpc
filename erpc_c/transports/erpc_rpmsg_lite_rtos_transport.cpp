@@ -91,7 +91,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
         if (status == kErpcStatus_Success)
         {
 #if RL_USE_STATIC_API
-            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queu_context);
+            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
 #else
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
 #endif
@@ -172,7 +172,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
             }
 
 #if RL_USE_STATIC_API
-            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queu_context);
+            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
 #else
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
 #endif
