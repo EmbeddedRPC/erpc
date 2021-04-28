@@ -241,7 +241,6 @@ void TransportArbitrator::freeClientList(PendingClientInfo *list)
         temp = info;
         info = info->m_next;
         ERPC_DESTROY_OBJECT(temp, s_pendingClientInfoArray, ERPC_CLIENTS_THREADS_AMOUNT)
-        delete temp;
     }
 }
 
