@@ -71,7 +71,7 @@ void Thread::start(void *arg)
     // which will scan the linked list.
     taskENTER_CRITICAL();
 
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
     if (m_stackPtr != NULL)
     {
         m_task =
@@ -205,7 +205,7 @@ void Thread::threadEntryPointStub(void *arg)
 Mutex::Mutex(void)
 : m_mutex(0)
 {
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
     m_mutex = xSemaphoreCreateRecursiveMutexStatic(&m_staticQueue);
 #elif configSUPPORT_DYNAMIC_ALLOCATION
     m_mutex = xSemaphoreCreateRecursiveMutex();
@@ -239,7 +239,7 @@ Semaphore::Semaphore(int count)
 : m_sem(0)
 {
     // Set max count to highest signed int.
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
     m_sem = xSemaphoreCreateCountingStatic(0x7fffffff, count, &m_staticQueue);
 #elif configSUPPORT_DYNAMIC_ALLOCATION
     m_sem = xSemaphoreCreateCounting(0x7fffffff, count);

@@ -228,7 +228,7 @@ private:
     TaskHandle_t m_task;       /*!< Current task. */
     Thread *m_next;            /*!< Pointer to next Thread. */
     static Thread *s_first;    /*!< Pointer to first Thread. */
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
     StaticTask_t m_staticTask; /*!< Hold static task data. */
 #endif
 #elif ERPC_THREADS_IS(ZEPHYR)
