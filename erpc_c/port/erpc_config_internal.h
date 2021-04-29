@@ -53,15 +53,15 @@
         #if __has_include("FreeRTOSConfig.h")
             #include "FreeRTOSConfig.h"
             #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
-                #define ERPC_ALLOCATION_POLICY (ERPC_STATIC_POLICY)
+                #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
             #else
-                #define ERPC_ALLOCATION_POLICY (ERPC_DYNAMIC_POLICY)
+                #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
             #endif
         #endif
     #endif
 #endif
 
-#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 #if !defined(ERPC_CODEC_COUNT)
 #define ERPC_CODEC_COUNT (2U)
 #warning "ERPC_CODEC_COUNT is not defined. Default is used."

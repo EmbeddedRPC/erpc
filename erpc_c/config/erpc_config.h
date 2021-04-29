@@ -23,8 +23,8 @@
 
 //! @name Threading model options
 //@{
-#define ERPC_DYNAMIC_POLICY (0U) //!< Dynamic allocation policy
-#define ERPC_STATIC_POLICY (1U)  //!< Static allocation policy
+#define ERPC_ALLOCATION_POLICY_DYNAMIC (0U) //!< Dynamic allocation policy
+#define ERPC_ALLOCATION_POLICY_STATIC (1U)  //!< Static allocation policy
 
 #define ERPC_THREADS_NONE (0U)     //!< No threads.
 #define ERPC_THREADS_PTHREADS (1U) //!< POSIX pthreads.
@@ -62,26 +62,26 @@
 //!
 //! @brief Choose which allocation policy should be used.
 //!
-//! Set ERPC_DYNAMIC_POLICY if dynamic allocations should be used.
-//! Set ERPC_STATIC_POLICY if static allocations should be used.
+//! Set ERPC_ALLOCATION_POLICY_DYNAMIC if dynamic allocations should be used.
+//! Set ERPC_ALLOCATION_POLICY_STATIC if static allocations should be used.
 //!
-//! Default value is ERPC_DYNAMIC_POLICY or in case of FreeRTOS it can be auto-detected if __has_include() is supported
+//! Default value is ERPC_ALLOCATION_POLICY_DYNAMIC or in case of FreeRTOS it can be auto-detected if __has_include() is supported
 //! by compiler. Uncomment comment bellow to use static allocation policy.
 //! In case of static implementation user need consider another values to set (ERPC_CODEC_COUNT,
 //! ERPC_MESSAGE_LOGGERS_COUNT, ERPC_CLIENTS_THREADS_AMOUNT).
-// #define ERPC_ALLOCATION_POLICY (ERPC_STATIC_POLICY)
+// #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
 
 //! @def ERPC_CODEC_COUNT
 //!
 //! @brief Set amount of codecs objects used simultaneously in case of ERPC_ALLOCATION_POLICY is set to
-//! ERPC_STATIC_POLICY. For example if client or server is used in one thread then 1. If both are used in one thread per
+//! ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one thread per
 //! each then 2, ... Default value 2.
 // #define ERPC_CODEC_COUNT (2U)
 
 //! @def ERPC_MESSAGE_LOGGERS_COUNT
 //!
 //! @brief Set amount of message loggers objects used simultaneously  in case of ERPC_ALLOCATION_POLICY is set to
-//! ERPC_STATIC_POLICY.
+//! ERPC_ALLOCATION_POLICY_STATIC.
 //! For example if client or server is used in one thread then 1. If both are used in one thread per each then 2, ...
 //! For arbitrated client 1 is enough.
 //! Default value 0 (May not be used).
@@ -89,7 +89,7 @@
 
 //! @def ERPC_CLIENTS_THREADS_AMOUNT
 //!
-//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_STATIC_POLICY.
+//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC.
 //! Default value 1 (Most of current cases).
 // #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
 

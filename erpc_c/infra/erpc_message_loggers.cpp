@@ -11,7 +11,7 @@
 
 #include "erpc_manually_constructed.h"
 
-#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>
 #endif
 

@@ -5,7 +5,7 @@
 {$commonHeader()}
 
 #include "{$serverHeaderName}"
-#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>
 #include "erpc_port.h"
 #endif
@@ -244,7 +244,7 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, 
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 
-#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();
@@ -257,7 +257,7 @@ void destroy_{$iface.serviceClassName}(erpc_service_t *service)
         delete service;
     }
 }
-#elif ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 erpc_service_t create_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.construct();
