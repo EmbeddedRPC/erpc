@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -40,6 +40,7 @@ using namespace erpc;
 
 static dspi_slave_handle_t s_handle;
 static volatile bool s_isTransferCompleted = false;
+static DspiSlaveTransport *s_dspi_slave_instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -70,6 +71,15 @@ static inline void DSpiSlaveTransport_NotifyTransferGpioCompleted(void)
 }
 #endif
 
+void DspiSlaveTransport::transfer_cb(void)
+{
+#if ERPC_THREADS
+    m_txrxSemaphore.putFromISR();
+#else
+    s_isTransferCompleted = true;
+#endif
+}
+
 static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, status_t status, void *userData)
 {
     (void)base;
@@ -77,7 +87,9 @@ static void DSPI_SlaveUserCallback(SPI_Type *base, dspi_slave_handle_t *handle, 
     (void)status;
     (void)userData;
 
-    s_isTransferCompleted = true;
+    DspiSlaveTransport *transport = s_dspi_slave_instance;
+
+    transport->transfer_cb();
 }
 
 DspiSlaveTransport::DspiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
@@ -85,7 +97,11 @@ DspiSlaveTransport::DspiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate,
 , m_baudRate(baudRate)
 , m_srcClock_Hz(srcClock_Hz)
 , m_isInited(false)
+#if ERPC_THREADS
+, m_txrxSemaphore()
+#endif
 {
+    s_dspi_slave_instance = this;
 }
 
 DspiSlaveTransport::~DspiSlaveTransport(void)
@@ -135,9 +151,16 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         DSpiSlaveTransport_NotifyTransferGpioReady();
 #endif
+
+/* wait until the receiving is finished */
+#if ERPC_THREADS
+        m_txrxSemaphore.get();
+#else
         while (!s_isTransferCompleted)
         {
         }
+#endif
+
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         DSpiSlaveTransport_NotifyTransferGpioCompleted();
 #endif
@@ -179,9 +202,16 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
             DSpiSlaveTransport_NotifyTransferGpioReady();
 #endif
+
+/* wait until the sending is finished */
+#if ERPC_THREADS
+            m_txrxSemaphore.get();
+#else
             while (!s_isTransferCompleted)
             {
             }
+#endif
+
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
             DSpiSlaveTransport_NotifyTransferGpioCompleted();
 #endif

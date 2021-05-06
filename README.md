@@ -194,4 +194,4 @@ Repository on Github contains two main branches. __Master__ and __develop__. Cod
 ---
 Copyright 2014-2016 Freescale Semiconductor, Inc.
 
-Copyright 2016-2020 NXP
+Copyright 2016-2021 NXP

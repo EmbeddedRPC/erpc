@@ -1,11 +1,13 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include "erpc_config_internal.h"
+#if ERPC_MESSAGE_LOGGING
 
 #include "erpc_message_loggers.h"
 
@@ -82,3 +84,4 @@ erpc_status_t MessageLoggers::logMessage(MessageBuffer *msg)
 
     return err;
 }
+#endif /* ERPC_MESSAGE_LOGGING */

@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2021 NXP
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _EMBEDDED_RPC__DSPI_SLAVE_TRANSPORT_H_
-#define _EMBEDDED_RPC__DSPI_SLAVE_TRANSPORT_H_
+#ifndef _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
+#define _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
 #if ERPC_THREADS
@@ -16,12 +15,13 @@
 #endif
 #include "erpc_framed_transport.h"
 
-#include "fsl_dspi.h"
+#include "fsl_gpio.h"
+#include "fsl_i2c.h"
 
 #include <stdlib.h>
 
 /*!
- * @addtogroup dspi_slave_transport
+ * @addtogroup i2c_slave_transport
  * @{
  * @file
  */
@@ -32,69 +32,69 @@
 
 namespace erpc {
 /*!
- * @brief Very basic transport to send/receive messages via DSPI.
+ * @brief Very basic transport to send/receive messages via I2C.
  *
- * @ingroup dspi_slave_transport
+ * @ingroup i2c_slave_transport
  */
-class DspiSlaveTransport : public FramedTransport
+class I2cSlaveTransport : public FramedTransport
 {
 public:
     /*!
      * @brief Constructor.
      *
-     * @param[in] spiBaseAddr DSPI peripheral base address.
+     * @param[in] i2cBaseAddr I2C peripheral base address.
      * @param[in] baudRate Baudrate.
      * @param[in] srcClock_Hz Source clock.
      */
-    DspiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+    I2cSlaveTransport(I2C_Type *i2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
     /*!
      * @brief Destructor.
      */
-    virtual ~DspiSlaveTransport(void);
+    virtual ~I2cSlaveTransport(void);
 
     /*!
-     * @brief Initialize DSPI peripheral configuration structure with values specified in DspiTransport constructor.
+     * @brief Initialize I2C peripheral configuration structure with values specified in I2cTransport constructor.
      *
      * @retval kErpcStatus_Success Always returns success status.
      */
     virtual erpc_status_t init(void);
 
     /*!
-     * @brief Function called from DSPI_SlaveUserCallback when SPI transfer is completed
+     * @brief Function called from I2C_SlaveUserCallback when I2C transfer is completed
      *
      * Unblocks the send/receive function.
      */
     void transfer_cb(void);
 
 protected:
-    SPI_Type *m_spiBaseAddr; /*!< Base address of DSPI peripheral used in this transport layer */
-    uint32_t m_baudRate;     /*!< Baud rate of DSPI peripheral used in this transport layer */
-    uint32_t m_srcClock_Hz;  /*!< Source clock of DSPI peripheral used in this transport layer */
-    bool m_isInited;         /*!< the SPI peripheral init status flag */
+    I2C_Type *m_i2cBaseAddr; /*!< Base address of I2C peripheral used in this transport layer */
+    uint32_t m_baudRate;     /*!< Baud rate of I2C peripheral used in this transport layer */
+    uint32_t m_srcClock_Hz;  /*!< Source clock of I2C peripheral used in this transport layer */
+    bool m_isInited;         /*!< the I2C peripheral init status flag */
 #if ERPC_THREADS
     Semaphore m_txrxSemaphore; /*!< Semaphore used by RTOS to block task until the sending/receiving is not complete */
 #endif
 
 private:
     /*!
-     * @brief Receive data from DSPI peripheral.
+     * @brief Receive data from I2C peripheral.
      *
      * @param[inout] data Preallocated buffer for receiving data.
      * @param[in] size Size of data to read.
      *
-     * @retval kErpcStatus_ReceiveFailed DSPI failed to receive data.
+     * @retval kErpcStatus_ReceiveFailed I2C failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
     virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
     /*!
-     * @brief Write data to DSPI peripheral.
+     * @brief Write data to I2C peripheral.
      *
      * @param[in] data Buffer to send.
      * @param[in] size Size of data to send.
      *
-     * @retval kErpcStatus_SendFailed DSPI failed to send data.
+     * @retval kErpcStatus_SendFailed I2C failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
     virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
@@ -104,4 +104,4 @@ private:
 
 /*! @} */
 
-#endif // _EMBEDDED_RPC__DSPI_SLAVE_TRANSPORT_H_
+#endif // _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_

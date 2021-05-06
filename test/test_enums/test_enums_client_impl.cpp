@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -58,6 +58,20 @@ TEST(test_enum, test_enumColor2_allDirection)
     enumColor2 e = a;
 
     enumColor2 r = test_enumColor2_allDirection(a, b, &c, &e);
+
+    EXPECT_TRUE(a == c);
+    EXPECT_TRUE(b == e);
+    EXPECT_TRUE(a == r);
+}
+
+TEST(test_enum, test_enumErrorCode_allDirection)
+{
+    enumErrorCode a = ERROR_NONE;
+    enumErrorCode b = ERROR_UNKNOWN;
+    enumErrorCode c;
+    enumErrorCode e = a;
+
+    enumErrorCode r = test_enumErrorCode_allDirection(a, b, &c, &e);
 
     EXPECT_TRUE(a == c);
     EXPECT_TRUE(b == e);

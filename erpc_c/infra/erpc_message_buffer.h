@@ -385,7 +385,7 @@ public:
     virtual MessageBuffer create(void) = 0;
 
     /*!
-     * @brief This function inform server if it has to create buffer for received message.
+     * @brief This function informs server if it has to create buffer for received message.
      *
      * @return Has to return TRUE when server need create buffer for receiving message.
      */
