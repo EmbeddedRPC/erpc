@@ -53,5 +53,5 @@ for folder in folders:
                     print("Ignored: ", file)
                 else:
                     print("Formatting: ", file)
-                    subprocess.call(["clang-format-10.0", "-i", file])
+                    subprocess.call(["clang-format", "-i", file])
     print('*****************************************************************************\n')
