@@ -293,31 +293,34 @@ public:
                 throw runtime_error("no input file provided");
             }
 
-            m_ErpcFile = m_positionalArgs[0].c_str();
-            if (!m_outputFilePath)
+            for (const string &idlFile : m_positionalArgs)
             {
-                m_outputFilePath = "";
-            }
+                m_ErpcFile = idlFile.c_str();
+                if (!m_outputFilePath)
+                {
+                    m_outputFilePath = "";
+                }
 
-            // Parse and build definition model.
-            InterfaceDefinition def;
-            def.parse(m_ErpcFile);
+                // Parse and build definition model.
+                InterfaceDefinition def;
+                def.parse(m_ErpcFile);
 
-            // Check for duplicate function IDs
-            UniqueIdChecker uniqueIdCheck;
-            uniqueIdCheck.makeIdsUnique(def);
+                // Check for duplicate function IDs
+                UniqueIdChecker uniqueIdCheck;
+                uniqueIdCheck.makeIdsUnique(def);
 
-            boost::filesystem::path filePath(m_ErpcFile);
-            def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath, m_codec);
+                boost::filesystem::path filePath(m_ErpcFile);
+                def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath, m_codec);
 
-            switch (m_outputLanguage)
-            {
-                case kCLanguage:
-                    CGenerator(&def).generate();
-                    break;
-                case kPythonLanguage:
-                    PythonGenerator(&def).generate();
-                    break;
+                switch (m_outputLanguage)
+                {
+                    case kCLanguage:
+                        CGenerator(&def).generate();
+                        break;
+                    case kPythonLanguage:
+                        PythonGenerator(&def).generate();
+                        break;
+                }
             }
         }
         catch (exception &e)
