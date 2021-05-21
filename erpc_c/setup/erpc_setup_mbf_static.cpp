@@ -22,8 +22,8 @@
 
 using namespace erpc;
 
-#define ERPC_BUFFER_SIZE_UINT8 ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1))
-#define ERPC_BUFFER_SIZE_UINT64 (ERPC_BUFFER_SIZE_UINT8 / sizeof(uint64_t))
+#define ERPC_BUFFER_SIZE_UINT64 \
+    ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t))
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -44,7 +44,7 @@ public:
 #endif
     {
         (void)memset(m_freeBufferBitmap, 0xff, ERPC_DEFAULT_BUFFERS_COUNT >> 3);
-        (void)memset(m_buffers, 0, ERPC_DEFAULT_BUFFERS_COUNT * ERPC_BUFFER_SIZE_UINT8);
+        (void)memset(m_buffers, 0, sizeof(m_buffers));
     }
 
     /*!
