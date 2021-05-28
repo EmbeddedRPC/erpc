@@ -50,9 +50,8 @@ INCLUDES += $(ERPC_C_ROOT)/config \
 			$(ERPC_C_ROOT)/setup \
 			$(ERPC_C_ROOT)/transports
 
-# SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp
-			# $(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp
-SOURCES +=	$(ERPC_C_ROOT)/infra/erpc_basic_codec.cpp \
+SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_basic_codec.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_crc16.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_framed_transport.cpp \
@@ -65,6 +64,7 @@ SOURCES +=	$(ERPC_C_ROOT)/infra/erpc_basic_codec.cpp \
 			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
 			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
 			$(ERPC_C_ROOT)/port/erpc_serial.cpp \
+			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_dynamic.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_static.cpp \
