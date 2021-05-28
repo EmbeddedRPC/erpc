@@ -43,7 +43,7 @@ public:
     : m_semaphore(1)
 #endif
     {
-        (void)memset(m_freeBufferBitmap, 0xff, ERPC_DEFAULT_BUFFERS_COUNT >> 3);
+        (void)memset(m_freeBufferBitmap, 0xff, sizeof(m_freeBufferBitmap));
         (void)memset(m_buffers, 0, sizeof(m_buffers));
     }
 
@@ -112,8 +112,12 @@ public:
     }
 
 protected:
-    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) + 1U];     /*!< Bitmat of used/not used buffers. */
-    uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT][ERPC_BUFFER_SIZE_UINT64]; /*!< Static buffers. */
+    //! Bitmap representing which buffers are in use. A bit value of 1 means free and 0 means in
+    //! use.
+    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) +
+                               (ERPC_DEFAULT_BUFFERS_COUNT % 8 ? 1U : 0U)];
+    //! Static buffers
+    uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT][ERPC_BUFFER_SIZE_UINT64];
 #if !ERPC_THREADS_IS(NONE)
     Semaphore m_semaphore; /*!< Semaphore.*/
 #endif
