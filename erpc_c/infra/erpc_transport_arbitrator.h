@@ -127,7 +127,7 @@ public:
      * @retval The underlying transport is expected to return true when a message is available to
      *         process and false otherwise.
      */
-    virtual bool hasMessage(void);
+    virtual bool hasMessage(void) override;
 
 protected:
     Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
