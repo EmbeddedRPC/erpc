@@ -1,0 +1,5 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 3.1)
+
+add_subdirectory(erpc_c)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
