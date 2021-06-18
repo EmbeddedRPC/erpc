@@ -210,18 +210,18 @@ int serial_read(int fd, char *buf, int size)
     unsigned long bread = 0;
     char temp[RX_BUF_BYTES] = { 0 };
     DWORD errors;
-    DWORD bytesToRead = 0;
+    DWORD totalBytesRead = 0;
     DWORD bytesRead = 0;
     DWORD ret = 0;
 
-    while (bytesToRead != size)
+    while (totalBytesRead != size)
     {
         do
         {
 
             ClearCommError(hCom, &errors, NULL);
 
-            if (!ReadFile(hCom, temp, RX_BUF_BYTES - bytesToRead, &bytesRead, &s_readOverlap))
+            if (!ReadFile(hCom, temp, size - totalBytesRead, &bytesRead, &s_readOverlap))
             {
                 if (GetLastError() == ERROR_IO_PENDING)
                 {
@@ -232,23 +232,23 @@ int serial_read(int fd, char *buf, int size)
                         if (!GetOverlappedResult(hCom, &s_readOverlap, &bytesRead, FALSE))
                         {
                             bytesRead = 0;
-                            bytesToRead = 0;
+                            totalBytesRead = 0;
                         }
                     }
                     else
                     {
                         bytesRead = 0;
-                        bytesToRead = 0;
+                        totalBytesRead = 0;
                     }
                 }
                 else
                 {
                     bytesRead = 0;
-                    bytesToRead = 0;
+                    totalBytesRead = 0;
                 }
             }
 
-            bytesToRead += bytesRead;
+            totalBytesRead += bytesRead;
 
             if (bytesRead)
             {
@@ -256,10 +256,10 @@ int serial_read(int fd, char *buf, int size)
                 buf += bytesRead;
             }
 
-        } while ((bytesRead > 0) && (RX_BUF_BYTES >= bytesToRead));
+        } while ((bytesRead > 0) && (size <= RX_BUF_BYTES)  && (RX_BUF_BYTES >= totalBytesRead));
     }
 
-    return bytesToRead;
+    return totalBytesRead;
 #else
     int len = 0;
     int ret = 0;
