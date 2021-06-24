@@ -207,7 +207,6 @@ int serial_read(int fd, char *buf, int size)
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
-    unsigned long bread = 0;
     char temp[RX_BUF_BYTES] = { 0 };
     DWORD errors;
     DWORD totalBytesRead = 0;
