@@ -32,8 +32,8 @@ using namespace erpc;
 
 // global client variables
 static ManuallyConstructed<ArbitratedClientManager> s_client;
-#pragma weak g_client
 ClientManager *g_client;
+#pragma weak g_client
 
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 static ManuallyConstructed<TransportArbitrator> s_arbitrator;
