@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -40,6 +40,7 @@ using namespace erpc;
 
 static spi_slave_handle_t s_handle;
 static volatile bool s_isTransferCompleted = false;
+static SpiSlaveTransport *s_spi_slave_instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -54,21 +55,48 @@ static inline void SpiSlaveTransport_NotifyTransferGpioInit()
     gpioConfig.pinDirection = kGPIO_DigitalOutput;
     gpioConfig.outputLogic = 1U;
 
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
+#endif
 }
 
 /* @brief Notify the SPI Master that the Slave is ready for a new transfer */
 static inline void SpiSlaveTransport_NotifyTransferGpioReady()
 {
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, 1U << ERPC_BOARD_SPI_INT_PIN);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+#endif
 }
 
 /* @brief Notify the SPI Master that the Slave has finished the transfer */
 static inline void SpiSlaveTransport_NotifyTransferGpioCompleted()
 {
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PortSet(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, 1U << ERPC_BOARD_SPI_INT_PIN);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PortSet(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+#endif
 }
 #endif
+
+void SpiSlaveTransport::transfer_cb(void)
+{
+#if ERPC_THREADS
+    m_txrxSemaphore.putFromISR();
+#else
+    s_isTransferCompleted = true;
+#endif
+}
 
 static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, status_t status, void *userData)
 {
@@ -77,7 +105,9 @@ static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, st
     (void)status;
     (void)userData;
 
-    s_isTransferCompleted = true;
+    SpiSlaveTransport *transport = s_spi_slave_instance;
+
+    transport->transfer_cb();
 }
 
 SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
@@ -85,7 +115,11 @@ SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, u
 , m_baudRate(baudRate)
 , m_srcClock_Hz(srcClock_Hz)
 , m_isInited(false)
+#if ERPC_THREADS
+, m_txrxSemaphore()
+#endif
 {
+    s_spi_slave_instance = this;
 }
 
 SpiSlaveTransport::~SpiSlaveTransport(void)
@@ -134,9 +168,16 @@ erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         SpiSlaveTransport_NotifyTransferGpioReady();
 #endif
+
+/* wait until the receiving is finished */
+#if ERPC_THREADS
+        m_txrxSemaphore.get();
+#else
         while (!s_isTransferCompleted)
         {
         }
+#endif
+
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         SpiSlaveTransport_NotifyTransferGpioCompleted();
 #endif
@@ -148,7 +189,7 @@ erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     status_t status;
-    spi_transfer_t slaveXfer;
+    spi_transfer_t slaveXfer = { 0 };
     s_isTransferCompleted = false;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
@@ -175,9 +216,16 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
             SpiSlaveTransport_NotifyTransferGpioReady();
 #endif
+
+/* wait until the sending is finished */
+#if ERPC_THREADS
+            m_txrxSemaphore.get();
+#else
             while (!s_isTransferCompleted)
             {
             }
+#endif
+
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
             SpiSlaveTransport_NotifyTransferGpioCompleted();
 #endif

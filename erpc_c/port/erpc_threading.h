@@ -34,6 +34,8 @@
 #endif
 #elif ERPC_THREADS_IS(WIN32)
 #include "windows.h"
+#elif ERPC_THREADS_IS(THREADX)
+#include "tx_api.h"
 
 #endif // ERPC_THREADS
 
@@ -159,6 +161,8 @@ public:
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
         return reinterpret_cast<thread_id_t>(m_thread);
+#elif ERPC_THREADS_IS(THREADX)    
+        return reinterpret_cast<thread_id_t>(m_thread.tx_thread_id);
 #endif
     }
 
@@ -179,6 +183,8 @@ public:
         return reinterpret_cast<thread_id_t>(rtos::ThisThread::get_id());
 #elif ERPC_THREADS_IS(WIN32)
         return reinterpret_cast<thread_id_t>(GetCurrentThread());
+#elif ERPC_THREADS_IS(THREADX)
+        return reinterpret_cast<thread_id_t>(tx_thread_identify());
 #endif
     }
 
@@ -245,6 +251,10 @@ private:
     static Thread *s_first; /*!< Pointer to first Thread. */
     static CRITICAL_SECTION m_critical_section;
     static BOOL m_critical_section_inited;
+#elif ERPC_THREADS_IS(THREADX)    
+    TX_THREAD m_thread;     /*!< Underlying Thread instance */
+    Thread *m_next;         /*!< Pointer to next Thread. */
+    static Thread *s_first; /*!< Pointer to first Thread. */
 #endif
 
 #if ERPC_THREADS_IS(PTHREADS)
@@ -292,6 +302,14 @@ private:
      */
     static unsigned WINAPI threadEntryPointStub(void *arg);
 
+#elif ERPC_THREADS_IS(THREADX)
+
+    /*!
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
+    static void threadEntryPointStub(ULONG arg);
 #endif
 
 private:
@@ -400,6 +418,8 @@ private:
     rtos::Mutex *m_mutex;   /*!< Mutex. */
 #elif ERPC_THREADS_IS(WIN32)
     HANDLE m_mutex;
+#elif ERPC_THREADS_IS(THREADX)
+    TX_MUTEX m_mutex;
 #endif
 
 private:
@@ -489,6 +509,8 @@ private:
     Mutex m_mutex; /*!< Mutext. */
     int m_count;
     HANDLE m_sem;
+#elif ERPC_THREADS_IS(THREADX)
+    TX_SEMAPHORE m_sem;   /*!< Semaphore. */
 #endif
 
 private:

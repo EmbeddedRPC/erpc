@@ -47,6 +47,15 @@
     #endif
 #endif
 
+// Safely detect tx_api.h.
+#define ERPC_HAS_THREADX_API_H (0)
+#if defined(__has_include)
+    #if __has_include("tx_api.h")
+        #undef ERPC_HAS_THREADX_API_H
+        #define ERPC_HAS_THREADX_API_H (1)
+    #endif
+#endif
+
 // Detect threading model if not already set.
 #if !defined(ERPC_THREADS)
     #if ERPC_HAS_POSIX
@@ -57,6 +66,8 @@
         #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
     #elif ERPC_HAS_WIN32
         #define ERPC_THREADS (ERPC_THREADS_WIN32)
+    #elif ERPC_HAS_THREADX_API_H
+        #define ERPC_THREADS (ERPC_THREADS_THREADX)
     #else
         // Otherwise default to no threads.
         #define ERPC_THREADS (ERPC_THREADS_NONE)

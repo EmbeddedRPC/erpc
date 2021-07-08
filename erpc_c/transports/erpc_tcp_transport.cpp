@@ -92,7 +92,7 @@ erpc_status_t TCPTransport::connectClient(void)
     struct addrinfo hints = {};
     char portString[8];
     struct addrinfo *res0;
-    int result;
+    int result, set;
     int sock = -1;
     struct addrinfo *res;
 
@@ -166,7 +166,7 @@ erpc_status_t TCPTransport::connectClient(void)
 
         if (status == kErpcStatus_Success)
         {
-            int set = 1;
+            set = 1;
             if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int)) < 0)
             {
                 ::close(sock);

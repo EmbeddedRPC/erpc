@@ -1,6 +1,6 @@
 /*!
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -20,6 +20,11 @@ enum bleResult_t {
     gBleSuccess_c = gBleStatusBase_c | 0x00
 }
 
+enum enumErrorCode {
+    ERROR_NONE = 0,
+    ERROR_UNKNOWN = -1
+}
+
 interface EnumsService {
     oneway test_enumColor_in(enumColor a)
     test_enumColor_in2(in enumColor b) -> void
@@ -28,5 +33,6 @@ interface EnumsService {
     test_enumColor_return() -> enumColor
     test_enumColor_allDirection(enumColor a, in enumColor b, out enumColor c, inout enumColor e) -> enumColor
     test_enumColor2_allDirection(enumColor2 a, in enumColor2 b, out enumColor2 c, inout enumColor2 e) -> enumColor2
+    test_enumErrorCode_allDirection(enumErrorCode a, in enumErrorCode b, out enumErrorCode c, inout enumErrorCode e) -> enumErrorCode
 }
 
