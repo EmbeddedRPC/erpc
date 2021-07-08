@@ -117,24 +117,92 @@ protected:
      * @brief Top-down handlers types, which can be called.
      */
     //@{
-    virtual void handleRoot(AstNode *node, top_down){};
-    virtual AstNode *handleProgram(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleConst(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleChildren(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleType(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleEnum(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleEnumMember(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleStruct(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleStructMember(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleUnion(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleUnionCase(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleInterface(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleFunction(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleParam(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleExpr(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleBinaryOp(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleUnaryOp(AstNode *node, top_down) { return nullptr; }
-    virtual AstNode *handleAnnotation(AstNode *node, top_down) { return nullptr; }
+    virtual void handleRoot(AstNode *node, top_down) { (void)node; };
+    virtual AstNode *handleProgram(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleConst(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleChildren(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleType(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleEnum(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleEnumMember(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleStruct(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleStructMember(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnion(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnionCase(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleInterface(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleFunction(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleParam(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleExpr(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleBinaryOp(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnaryOp(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleAnnotation(AstNode *node, top_down)
+    {
+        (void)node;
+        return nullptr;
+    }
     //@}
 
     /*
@@ -143,24 +211,92 @@ protected:
      * @brief Bottom-up handlers types, which can be called.
      */
     //@{
-    virtual void handleRoot(AstNode *node, bottom_up){};
-    virtual AstNode *handleProgram(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleConst(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleChildren(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleType(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleEnum(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleEnumMember(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleStruct(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleStructMember(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleUnion(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleUnionCase(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleInterface(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleFunction(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleParam(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleExpr(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleBinaryOp(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleUnaryOp(AstNode *node, bottom_up) { return nullptr; }
-    virtual AstNode *handleAnnotation(AstNode *node, bottom_up) { return nullptr; }
+    virtual void handleRoot(AstNode *node, bottom_up) { (void)node; };
+    virtual AstNode *handleProgram(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleConst(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleChildren(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleType(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleEnum(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleEnumMember(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleStruct(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleStructMember(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnion(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnionCase(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleInterface(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleFunction(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleParam(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleExpr(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleBinaryOp(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleUnaryOp(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
+    virtual AstNode *handleAnnotation(AstNode *node, bottom_up)
+    {
+        (void)node;
+        return nullptr;
+    }
     //@}
 };
 

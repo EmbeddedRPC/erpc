@@ -106,7 +106,7 @@ public:
     /*!
      * @brief This function adds case member name.
      *
-     * param[in] name Case member name.
+     * @param[in] name Case member name.
      */
     void addCaseMemberName(const std::string &name) { m_memberDeclarationNames.push_back(name); };
 
@@ -133,7 +133,7 @@ public:
     /*!
      * @brief This function returns union member declaration.
      *
-     * param[in] name Union member name.
+     * @param[in] name Union member name.
      *
      * @return Union member.
      */

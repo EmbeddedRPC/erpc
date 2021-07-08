@@ -72,7 +72,7 @@ protected:
     virtual void performClientRequest(RequestContext &request);
 
     //! @brief This method is not used with this class.
-    void setTransport(Transport *transport) {}
+    void setTransport(Transport *transport) { (void)transport; }
 };
 
 } // namespace erpc

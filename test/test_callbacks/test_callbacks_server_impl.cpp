@@ -6,11 +6,13 @@
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_core0_server.h"
 #include "test_core1.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 
 ClientCore0Services_service *svc;
@@ -74,7 +76,8 @@ int32_t my_mul(int32_t arg1, int32_t arg2)
 
 int32_t my_div(int32_t arg1, int32_t arg2)
 {
-    if(arg2) {
+    if (arg2)
+    {
         return arg1 / arg2;
     }
     return 0;

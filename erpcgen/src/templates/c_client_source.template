@@ -47,6 +47,14 @@ extern ClientManager *g_client;
 {% if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
 
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb preCB = g_client->getPreCB();
+    if (preCB)
+    {
+        preCB();
+    }
+#endif
+
 {% endif -- isNotVoid %}
     // Get a new request.
 {% if !fn.isReturnValue %}
@@ -132,11 +140,20 @@ extern ClientManager *g_client;
     g_client->callErrorHandler(err, {$functionIDName});
 {% endif -- generateErrorChecks %}
 {% if generateErrorChecks && fn.returnValue.type.isNotVoid %}
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb postCB = g_client->getPostCB();
+    if (postCB)
+    {
+        postCB();
+    }
+#endif
+
 {%  if empty(fn.returnValue.errorReturnValue) == false && fn.returnValue.isNullReturnType == false %}
 
-    if (err)
+    if (err != kErpcStatus_Success)
     {
-        return {$fn.returnValue.errorReturnValue};
+        result = {$fn.returnValue.errorReturnValue};
     }
 {%  endif %}
 {% endif -- generateErrorChecks %}

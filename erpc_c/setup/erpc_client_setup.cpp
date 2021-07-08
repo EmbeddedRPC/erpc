@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -8,12 +9,14 @@
  */
 
 #include "erpc_client_setup.h"
+
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_crc16.h"
 #include "erpc_manually_constructed.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
+
 #include <cassert>
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
@@ -27,6 +30,7 @@ using namespace erpc;
 
 // global client variables
 static ManuallyConstructed<ClientManager> s_client;
+extern ClientManager *g_client;
 ClientManager *g_client = NULL;
 static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
 static ManuallyConstructed<Crc16> s_crc16;
@@ -39,12 +43,14 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
 {
     assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init client manager with the provided transport.
     s_client.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_client->setTransport(castedTransport);
@@ -87,11 +93,34 @@ void erpc_client_set_server_thread_id(void *serverThreadId)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_client_add_message_logger(erpc_transport_t transport)
 {
-    if (g_client != NULL)
+    bool retVal;
+
+    if (g_client == NULL)
     {
-        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
+}
+#endif
+
+#if ERPC_PRE_POST_ACTION
+void erpc_client_add_pre_cb_action(pre_post_action_cb preCB)
+{
+    assert(g_client);
+
+    g_client->addPreCB(preCB);
+}
+
+void erpc_client_add_post_cb_action(pre_post_action_cb postCB)
+{
+    assert(g_client);
+
+    g_client->addPostCB(postCB);
 }
 #endif
 

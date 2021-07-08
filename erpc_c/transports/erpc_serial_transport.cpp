@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -8,11 +9,20 @@
  */
 
 #include "erpc_serial_transport.h"
+
 #include "erpc_message_buffer.h"
 #include "erpc_serial.h"
+
 #include <cstdio>
 #include <string>
+
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#include <windows.h>
+#else
 #include <termios.h>
+#endif
 
 using namespace erpc;
 
@@ -34,39 +44,63 @@ SerialTransport::~SerialTransport(void)
 
 erpc_status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
 {
+    erpc_status_t status = kErpcStatus_Success;
+
     m_serialHandle = serial_open(m_portName);
     if (-1 == m_serialHandle)
     {
-        return kErpcStatus_InitFailed;
+        status = kErpcStatus_InitFailed;
     }
-    if (!isatty(m_serialHandle))
+#ifdef _WIN32
+    // TODO
+#else
+    if (status == kErpcStatus_Success)
     {
-        return kErpcStatus_InitFailed;
+        if (!isatty(m_serialHandle))
+        {
+            status = kErpcStatus_InitFailed;
+        }
     }
-    if (-1 == serial_setup(m_serialHandle, m_baudRate))
+#endif
+    if (status == kErpcStatus_Success)
     {
-        return kErpcStatus_InitFailed;
+        if (-1 == serial_setup(m_serialHandle, m_baudRate))
+        {
+            status = kErpcStatus_InitFailed;
+        }
     }
-    if (-1 == serial_set_read_timeout(m_serialHandle, vtime, vmin))
+
+    if (status == kErpcStatus_Success)
     {
-        return kErpcStatus_InitFailed;
+        if (-1 == serial_set_read_timeout(m_serialHandle, vtime, vmin))
+        {
+            status = kErpcStatus_InitFailed;
+        }
     }
-    if (-1 == tcflush(m_serialHandle, TCIOFLUSH))
+#ifdef _WIN32
+    // TODO
+#else
+    if (status == kErpcStatus_Success)
     {
-        return kErpcStatus_InitFailed;
+        if (-1 == tcflush(m_serialHandle, TCIOFLUSH))
+        {
+            status = kErpcStatus_InitFailed;
+        }
     }
-    return kErpcStatus_Success;
+#endif
+
+    return status;
 }
 
 erpc_status_t SerialTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     uint32_t bytesWritten = serial_write(m_serialHandle, (char *)data, size);
 
-    return size != bytesWritten ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (size != bytesWritten) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 erpc_status_t SerialTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     uint32_t bytesRead = serial_read(m_serialHandle, (char *)data, size);
 
-    return size != bytesRead ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (size != bytesRead) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }

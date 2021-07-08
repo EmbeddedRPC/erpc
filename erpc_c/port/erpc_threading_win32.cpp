@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -8,7 +9,11 @@
  */
 
 #include "erpc_threading.h"
+
+#include <errno.h>
 #include <process.h>
+#include <time.h>
+#include <windows.h>
 
 using namespace erpc;
 
@@ -68,13 +73,7 @@ void Thread::start(void *arg)
     m_arg = arg;
 
     EnterCriticalSection(&m_critical_section);
-    m_thread = (HANDLE)_beginthreadex(
-        NULL,
-        m_stackSize,
-        threadEntryPointStub,
-        this,
-        0,
-        &m_thrdaddr);
+    m_thread = (HANDLE)_beginthreadex(NULL, m_stackSize, threadEntryPointStub, this, 0, &m_thrdaddr);
 
     // Link in this thread to the list.
     if (NULL != s_first)
@@ -85,7 +84,7 @@ void Thread::start(void *arg)
     LeaveCriticalSection(&m_critical_section);
 }
 
-bool Thread::operator==(Thread &o)
+bool Thread::operator==(const Thread &o)
 {
     return (m_thrdaddr == o.m_thrdaddr);
 }
@@ -97,7 +96,7 @@ Thread *Thread::getCurrentThread(void)
     // Walk the threads list to find the Thread object for the current task.
     EnterCriticalSection(&m_critical_section);
     Thread *it = s_first;
-    while (it)
+    while (it != NULL)
     {
         if (it->m_thrdaddr == thisThrdaddr)
         {
@@ -111,12 +110,26 @@ Thread *Thread::getCurrentThread(void)
 
 void Thread::sleep(uint32_t usecs)
 {
-    Sleep(usecs);
+    LARGE_INTEGER startTime;
+    LARGE_INTEGER currTick;
+    LARGE_INTEGER freq;
+    uint32_t elapsedTimeMicroSeconds;
+
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&startTime);
+
+    do
+    {
+        QueryPerformanceCounter(&currTick);
+
+        elapsedTimeMicroSeconds =
+            static_cast<uint32_t>(((currTick.QuadPart - startTime.QuadPart) * 1000000) / freq.QuadPart);
+    } while (elapsedTimeMicroSeconds < usecs);
 }
 
 void Thread::threadEntryPoint(void)
 {
-    if (m_entry)
+    if (m_entry != NULL)
     {
         m_entry(m_arg);
     }
@@ -125,7 +138,7 @@ void Thread::threadEntryPoint(void)
 unsigned WINAPI Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
+    if (_this != NULL)
     {
         _this->threadEntryPoint();
     }

@@ -9,6 +9,7 @@
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_tcp_transport.h"
+
 #include "Logging.h"
 #include "gtest.h"
 #include "gtestListener.h"
@@ -90,13 +91,13 @@ int main(int argc, char **argv)
     g_client->addMessageLogger(&g_messageLogger);
 #endif // USE_MESSAGE_LOGGING
 
-    int i = RUN_ALL_TESTS();
+    int ret = RUN_ALL_TESTS();
     quit();
     free(m_logger);
     g_transport.close();
     free(g_client);
 
-    return i;
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

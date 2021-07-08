@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -25,12 +26,19 @@ static ManuallyConstructed<SerialTransport> s_transport;
 
 erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate)
 {
+    erpc_transport_t transport;
     const uint8_t vtime = 0;
     const uint8_t vmin = 1;
+
     s_transport.construct(portName, baudRate);
     if (s_transport->init(vtime, vmin) == kErpcStatus_Success)
     {
-        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
     }
-    return NULL;
+    else
+    {
+        transport = NULL;
+    }
+
+    return transport;
 }

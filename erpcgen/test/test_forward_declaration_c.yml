@@ -1,6 +1,10 @@
 ---
 name: struct before function
 desc: forward declaration of structure before function which is using type.
+params:
+  dir:
+    - "in"
+    - "out"
 idl:
   struct forwardStruct;
 
@@ -13,7 +17,7 @@ idl:
 
   interface foo
   {
-    myFun(in forwardCallback_t pCallback1_t) -> void
+    myFun({dir} forwardCallback_t pCallback1_t) -> void
 
     forwardCallback_t forwardCallback;
   }
@@ -26,6 +30,12 @@ test.h:
   - "{"
   - forwardCallback_t pCallback;
   - "};"
+test_server.cpp:
+  - if: dir == 'in'
+    then:
+      - not: erpc_free(pCallback1_t);
+    else:
+      - erpc_free(pCallback1_t);
 
 ---
 name: struct before struct

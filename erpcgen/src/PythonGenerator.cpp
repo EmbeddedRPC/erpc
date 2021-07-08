@@ -8,10 +8,12 @@
  */
 
 #include "PythonGenerator.h"
+
 #include "Logging.h"
 #include "ParseErrors.h"
 #include "annotations.h"
 #include "format_string.h"
+
 #include <algorithm>
 #include <set>
 #include <sstream>
@@ -65,7 +67,7 @@ void PythonGenerator::generateInitFile(string fileName)
 {
     fileName += "/__init__.py";
     generateOutputFile(fileName, "py_init", m_templateData, kPyInit);
-};
+}
 
 void PythonGenerator::generateCommonFile(string fileName)
 {
@@ -136,7 +138,7 @@ void PythonGenerator::generate()
 
     makeIncludesTemplateData();
 
-    //makeAliasesTemplateData();
+    // makeAliasesTemplateData();
 
     makeConstTemplateData();
 
@@ -167,6 +169,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 
 data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
+    (void)group;
     data_map info;
     string proto = getFunctionPrototype(fn);
 
@@ -418,8 +421,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
         switch (symbol->getSymbolType())
         {
-            case DataType::kStructTypeSymbol:
-            {
+            case DataType::kStructTypeSymbol: {
                 StructType *structType = dynamic_cast<StructType *>(symbol);
                 if (structType == nullptr)
                 {
@@ -443,8 +445,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 }
                 break;
             }
-            case DataType::kUnionTypeSymbol:
-            {
+            case DataType::kUnionTypeSymbol: {
                 UnionType *unionType = dynamic_cast<UnionType *>(symbol);
                 if (unionType == nullptr)
                 {
@@ -454,7 +455,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 Log::info("%s\n", unionType->getDescription().c_str());
 
                 string name = filterName(getOutputName(unionType));
-                if(name.find('$') != string::npos) {
+                if (name.find('$') != string::npos)
+                {
                     Log::debug("%s is inside struct!\n", name.c_str());
                     break;
                 }
@@ -473,8 +475,7 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                 }
                 break;
             }
-            case DataType::kAliasTypeSymbol: 
-            {
+            case DataType::kAliasTypeSymbol: {
                 AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
                 if (aliasType == nullptr)
                     break;
@@ -596,13 +597,11 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
     info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
-        case DataType::kAliasType:
-        {
+        case DataType::kAliasType: {
             info = getTypeInfo(t->getTrueDataType());
             break;
         }
-        case DataType::kArrayType:
-        {
+        case DataType::kArrayType: {
             // Array type requires the array element count to come after the variable/member name.
             ArrayType *a = dynamic_cast<ArrayType *>(t);
             assert(a);
@@ -611,19 +610,16 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::kBuiltinType:
-        {
+        case DataType::kBuiltinType: {
             assert(dynamic_cast<const BuiltinType *>(t));
             info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
             break;
         }
-        case DataType::kEnumType:
-        {
+        case DataType::kEnumType: {
             info["type"] = "enum";
             break;
         }
-        case DataType::kFunctionType:
-        {
+        case DataType::kFunctionType: {
             info["type"] = "function";
             FunctionType *funType = dynamic_cast<FunctionType *>(t);
             assert(funType);
@@ -645,21 +641,18 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             break;
         }
-        case DataType::kListType:
-        {
+        case DataType::kListType: {
             const ListType *a = dynamic_cast<const ListType *>(t);
             assert(a);
             info["type"] = "list";
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::kStructType:
-        {
+        case DataType::kStructType: {
             info["type"] = "struct";
             break;
         }
-        case DataType::kUnionType:
-        {
+        case DataType::kUnionType: {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             info["type"] = "union";
@@ -727,8 +720,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["cases"] = unionCases;
             break;
         }
-        case DataType::kVoidType:
-        {
+        case DataType::kVoidType: {
             info["type"] = "void";
             break;
         }
@@ -789,6 +781,7 @@ string PythonGenerator::filterName(const string &name)
 
 string PythonGenerator::convertComment(const string &comment, comment_type commentType)
 {
+    (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
     static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
@@ -905,11 +898,11 @@ string PythonGenerator::stripWhitespace(const string &s)
     uint32_t n;
 
     // Strip leading whitespace.
-    for (n = 0, i = 0; i < result.size(); ++i, ++n)
+    for (n = 0, i = 0; i < (int)result.size(); ++i, ++n)
     {
         char c = result[i];
 
-        if ((i < result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
         {
             break;
         }
@@ -920,7 +913,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     }
 
     // Strip trailing whitespace.
-    for (n = 0, i = result.size() - 1; i > 0; --i, ++n)
+    for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
         if (!checkWhitspaceChar(c))

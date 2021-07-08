@@ -103,12 +103,12 @@ public:
     }
 
 protected:
-    uint64_t m_storage[elementCount][(sizeof(T) + sizeof(uint64_t) - 1) /
-                                     sizeof(uint64_t)]; /*!< Preallocated space based on data type size and elements
-                                                           count. */
-    uint32_t m_capacity;                                /*!< Capacity of queue */
-    uint32_t volatile m_head;                           /*!< Index to free slot */
-    uint32_t volatile m_tail;                           /*!< Index to slot with m_data */
+    uint64_t m_storage[elementCount]
+                      [(sizeof(T) + sizeof(uint64_t) - 1) / sizeof(uint64_t)]; /*!< Preallocated space based on data
+                                                                                  type size and elements count. */
+    uint32_t m_capacity;                                                       /*!< Capacity of queue */
+    uint32_t volatile m_head;                                                  /*!< Index to free slot */
+    uint32_t volatile m_tail;                                                  /*!< Index to slot with m_data */
 };
 
 } // namespace erpc

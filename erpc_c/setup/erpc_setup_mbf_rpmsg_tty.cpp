@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -13,7 +14,9 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
+
 #include "rpmsg_lite.h"
+
 #include <assert.h>
 
 using namespace erpc;
@@ -67,7 +70,7 @@ public:
     {
         assert(buf);
         void *tmp = (void *)buf->get();
-        if (tmp)
+        if (tmp != NULL)
         {
             int32_t ret;
             ret = rpmsg_lite_release_rx_buffer(m_rpmsg, (void *)(((uint8_t *)tmp) - sizeof(FramedTransport::Header)));
@@ -80,16 +83,20 @@ public:
 
     virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message)
     {
+        erpc_status_t status;
+
         dispose(message);
         *message = create();
         if (message->get() != NULL)
         {
-            return kErpcStatus_Success;
+            status = kErpcStatus_Success;
         }
         else
         {
-            return kErpcStatus_MemoryError;
+            status = kErpcStatus_MemoryError;
         }
+
+        return status;
     }
 
     virtual bool createServerBuffer(void) { return false; }

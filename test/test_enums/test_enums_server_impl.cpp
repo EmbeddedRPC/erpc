@@ -1,16 +1,18 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016-2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 
 EnumsService_service *svc;
@@ -60,6 +62,13 @@ enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor *c, en
 }
 
 enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 *c, enumColor2 *e)
+{
+    *c = a;
+    *e = b;
+    return a;
+}
+
+enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, enumErrorCode *c, enumErrorCode *e)
 {
     *c = a;
     *e = b;

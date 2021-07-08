@@ -11,6 +11,7 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
+
 #include <assert.h>
 #include <new>
 
@@ -27,7 +28,7 @@ using namespace erpc;
 class DynamicMessageBufferFactory : public MessageBufferFactory
 {
 public:
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
         return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
@@ -36,7 +37,7 @@ public:
     virtual void dispose(MessageBuffer *buf)
     {
         assert(buf);
-        if (buf->get())
+        if (buf->get() != NULL)
         {
             delete[] buf->get();
         }

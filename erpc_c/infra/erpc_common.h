@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -83,7 +84,7 @@ enum _erpc_status
 };
 
 /*! @brief Type used for all status and error return values. */
-typedef int32_t erpc_status_t;
+typedef enum _erpc_status erpc_status_t;
 
 /*! @} */
 

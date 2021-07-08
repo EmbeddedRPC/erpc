@@ -9,6 +9,7 @@
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_serial_transport.h"
+
 #include "Logging.h"
 #include "gtest.h"
 #include "gtestListener.h"
@@ -69,12 +70,12 @@ int main(int argc, char **argv)
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);
 
-    int i = RUN_ALL_TESTS();
+    int ret = RUN_ALL_TESTS();
     quit();
     free(m_logger);
     free(g_client);
 
-    return i;
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

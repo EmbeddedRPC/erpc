@@ -38,40 +38,55 @@
 
 #include "erpc_serial.h"
 
+#ifdef _WIN32
+static OVERLAPPED s_writeOverlap;
+static OVERLAPPED s_readOverlap;
+#define TX_BUF_BYTES 1024U
+#define RX_BUF_BYTES 1024U
+#endif
+
 int serial_setup(int fd, speed_t speed)
 {
-#ifdef WIN32
+#ifdef _WIN32
     COMMTIMEOUTS timeouts;
     DCB dcb = { 0 };
     HANDLE hCom = (HANDLE)fd;
 
-    dcb.DCBlength = sizeof(dcb);
+    DWORD errors;
+    COMSTAT status;
 
-    dcb.BaudRate = speed;
+    ClearCommError(hCom, &errors, &status);
+    PurgeComm(hCom, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR);
+
+    memset(&timeouts, 0, sizeof(timeouts));
+    timeouts.ReadIntervalTimeout = MAXDWORD;
+    timeouts.WriteTotalTimeoutConstant = 500;
+
+    if (!SetCommTimeouts(hCom, &timeouts))
+    {
+        return -1;
+    }
+
+    dcb.DCBlength = sizeof(dcb);
+    dcb.BaudRate = 115200;
     dcb.ByteSize = 8;
     dcb.Parity = NOPARITY;
     dcb.StopBits = ONESTOPBIT;
+    dcb.fBinary = TRUE;
+    dcb.fDtrControl = DTR_CONTROL_ENABLE;
+    dcb.fRtsControl = RTS_CONTROL_ENABLE;
 
     if (!SetCommState(hCom, &dcb))
     {
         return -1;
     }
 
-    // These timeouts mean:
-    // read: return immediately with whatever data is available, if any
-    // write: timeouts not used
-    // reference: http://www.robbayer.com/files/serial-win.pdf
-    timeouts.ReadIntervalTimeout = MAXDWORD;
-    timeouts.ReadTotalTimeoutMultiplier = 0;
-    timeouts.ReadTotalTimeoutConstant = 0;
-    timeouts.WriteTotalTimeoutMultiplier = 0;
-    timeouts.WriteTotalTimeoutConstant = 0;
+    s_writeOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    s_readOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-    if (!SetCommTimeouts(hCom, &timeouts))
-    {
-        return -1;
-    }
+    SetCommMask(hCom, EV_RXCHAR);
 #else
+    (void)speed;
     struct termios tty;
 
     memset(&tty, 0x00, sizeof(tty));
@@ -82,7 +97,7 @@ int serial_setup(int fd, speed_t speed)
     tty.c_oflag = 0;
     tty.c_lflag = 0;
 
-#ifdef LINUX
+#ifdef __linux__
     switch (speed)
     {
         case 9600:
@@ -118,56 +133,18 @@ int serial_setup(int fd, speed_t speed)
         return -1;
     }
 
-#ifdef MACOSX
+#ifdef __APPLE__
     return ioctl(fd, IOSSIOSPEED, &speed);
-#endif //#ifdef MACOSX
+#endif //#ifdef __APPLE__
 
-#endif // WIN32
+#endif // _WIN32
     return 0;
 }
 
 int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
 {
-#ifdef WIN32
-    COMMTIMEOUTS timeouts;
-    HANDLE hCom = (HANDLE)fd;
-
-    // These timeouts mean:
-    // read: return if:
-    //  1. Inter-character timeout exceeds ReadIntervalTimeout
-    //  2. Total timeout exceeds (ReadIntervalTimeout*ReadTotalTimeoutMultiplier*number of characters) +
-    //  ReadTotalTimeoutConstant
-    // In practice it seems that no matter how many characters you ask for, if no characters appear on the interface
-    // then
-    // only ReadTotalTimeoutConstant applies.
-    // write: timeouts not used
-    // reference: http://www.robbayer.com/files/serial-win.pdf
-    if (timeoutMs != 0)
-    {
-        timeouts.ReadIntervalTimeout = 1000;
-        timeouts.ReadTotalTimeoutMultiplier = 10;
-        timeouts.ReadTotalTimeoutConstant = timeoutMs;
-        timeouts.WriteTotalTimeoutMultiplier = 0;
-        timeouts.WriteTotalTimeoutConstant = 0;
-    }
-    else
-    {
-        // Need a separate case for timeoutMs == 0
-        // setting all these values to 0 results in no timeout
-        // so set them to a minimum value, this will return immediately
-        // if there is no data available
-        timeouts.ReadIntervalTimeout = 1;
-        timeouts.ReadTotalTimeoutMultiplier = 1;
-        timeouts.ReadTotalTimeoutConstant = 1;
-        timeouts.WriteTotalTimeoutMultiplier = 0;
-        timeouts.WriteTotalTimeoutConstant = 0;
-    }
-
-    if (!SetCommTimeouts(hCom, &timeouts))
-    {
-        return -1;
-    }
-
+#ifdef _WIN32
+    // TODO
 #else
     struct termios tty;
     /*memset(&tty, 0x00, sizeof(tty));
@@ -190,24 +167,37 @@ int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
         return -1;
     }
 
-#endif // WIN32
+#endif // _WIN32
     return 0;
 }
 
 int serial_write(int fd, char *buf, int size)
 {
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
+    DWORD errors;
+    COMSTAT status;
     unsigned long bwritten = 0;
 
-    if (!WriteFile(hCom, buf, size, &bwritten, NULL))
+    ClearCommError(hCom, &errors, &status);
+    if (!WriteFile(hCom, buf, size, &bwritten, &s_writeOverlap))
     {
-        return 0;
+        if (GetLastError() == ERROR_IO_PENDING)
+        {
+            if (!GetOverlappedResult(hCom, &s_writeOverlap, &bwritten, TRUE))
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            return 0;
+            ;
+        }
     }
-    else
-    {
-        return bwritten;
-    }
+    ClearCommError(hCom, &errors, &status);
+
+    return bwritten;
 #else
     return write(fd, buf, size);
 #endif
@@ -215,18 +205,61 @@ int serial_write(int fd, char *buf, int size)
 
 int serial_read(int fd, char *buf, int size)
 {
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
     unsigned long bread = 0;
+    char temp[RX_BUF_BYTES] = { 0 };
+    DWORD errors;
+    DWORD bytesToRead = 0;
+    DWORD bytesRead = 0;
+    DWORD ret = 0;
 
-    if (!ReadFile(hCom, buf, size, &bread, NULL))
+    while (bytesToRead != size)
     {
-        return 0;
+        do
+        {
+
+            ClearCommError(hCom, &errors, NULL);
+
+            if (!ReadFile(hCom, temp, RX_BUF_BYTES - bytesToRead, &bytesRead, &s_readOverlap))
+            {
+                if (GetLastError() == ERROR_IO_PENDING)
+                {
+                    ret = WaitForSingleObject(s_readOverlap.hEvent, INFINITE);
+
+                    if (WAIT_OBJECT_0 == ret)
+                    {
+                        if (!GetOverlappedResult(hCom, &s_readOverlap, &bytesRead, FALSE))
+                        {
+                            bytesRead = 0;
+                            bytesToRead = 0;
+                        }
+                    }
+                    else
+                    {
+                        bytesRead = 0;
+                        bytesToRead = 0;
+                    }
+                }
+                else
+                {
+                    bytesRead = 0;
+                    bytesToRead = 0;
+                }
+            }
+
+            bytesToRead += bytesRead;
+
+            if (bytesRead)
+            {
+                memcpy(buf, temp, bytesRead);
+                buf += bytesRead;
+            }
+
+        } while ((bytesRead > 0) && (RX_BUF_BYTES >= bytesToRead));
     }
-    else
-    {
-        return bread;
-    }
+
+    return bytesToRead;
 #else
     int len = 0;
     int ret = 0;
@@ -262,19 +295,21 @@ int serial_read(int fd, char *buf, int size)
 int serial_open(const char *port)
 {
     int fd;
-#ifdef WIN32
+#ifdef _WIN32
     static char full_path[32] = { 0 };
 
     HANDLE hCom = NULL;
 
-    if (port[0] != '\\')
+    if (memcmp(port, "\\\\.\\", 4))
     {
         _snprintf(full_path, sizeof(full_path) - 1, "\\\\.\\%s", port);
-        port = full_path;
+    }
+    else
+    {
+        memcpy(full_path, port, strnlen_s(port, sizeof(full_path) - 1));
     }
 
-#pragma warning(suppress : 6053)
-    hCom = CreateFileA(port, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    hCom = CreateFileA(full_path, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
     if (!hCom || hCom == INVALID_HANDLE_VALUE)
     {
@@ -297,7 +332,7 @@ int serial_open(const char *port)
 
 int serial_close(int fd)
 {
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
 
     CloseHandle(hCom);

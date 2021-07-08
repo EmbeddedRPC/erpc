@@ -1,5 +1,6 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -7,7 +8,9 @@
  */
 
 #include "erpc_mu_transport.h"
+
 #include "erpc_config_internal.h"
+
 #include "board.h"
 
 using namespace erpc;
@@ -42,26 +45,28 @@ void MUTransport::mu_rx_full_irq_callback(void)
 void MUTransport::mu_irq_callback(void)
 {
     MUTransport *transport = s_mu_instance;
-
     uint32_t flags;
+    uint32_t rxFlags;
+    uint32_t txFlags;
+
     flags = MU_GetStatusFlags(transport->m_muBase);
 
     // parse flags of full rx registers
-    uint32_t rxFlags = ((flags & MU_SR_RFn_MASK) >> MU_SR_RFn_SHIFT);
+    rxFlags = ((flags & MU_SR_RFn_MASK) >> MU_SR_RFn_SHIFT);
     rxFlags = (rxFlags >> (MU_RR_COUNT - MU_REG_COUNT));
 
     // parse flags of empty tx registers
-    uint32_t txFlags = ((flags & MU_SR_TEn_MASK) >> MU_SR_TEn_SHIFT);
+    txFlags = ((flags & MU_SR_TEn_MASK) >> MU_SR_TEn_SHIFT);
     txFlags = (txFlags >> (MU_TR_COUNT - MU_REG_COUNT));
 
     // RECEIVING - rx full flag and rx full irq enabled
-    if ((rxFlags & 0x1) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
+    if ((rxFlags & 0x1U) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
     {
         transport->rx_cb();
     }
 
     // TRANSMITTING - tx empty flag and tx empty irq enabled
-    if ((txFlags & 0x1) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
+    if ((txFlags & 0x1U) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
     {
         transport->tx_cb();
     }
@@ -77,7 +82,7 @@ MUTransport::MUTransport(void)
 , m_txMsgSize(0)
 , m_txCntBytes(0)
 , m_txBuffer(NULL)
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 , m_rxSemaphore()
 , m_txSemaphore()
 , m_sendLock()
@@ -110,44 +115,46 @@ erpc_status_t MUTransport::init(MU_Type *muBase)
 
 void MUTransport::rx_cb(void)
 {
+    uint32_t i = 0;
+
     if (m_rxBuffer == NULL)
     {
         // the receive function has not been called yet
         // disable MU rx full interrupt
         MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
         m_newMessage = true;
-        return;
     }
-
-    // read data from the MU rx registers
-    uint32_t i = 0;
-    if (m_rxMsgSize == 0)
+    else
     {
-        m_rxMsgSize = MU_ReceiveMsgNonBlocking(m_muBase, i++);
-    }
-
-    for (; i < MU_REG_COUNT; i++)
-    {
-        if (m_rxCntBytes < m_rxMsgSize)
+        // read data from the MU rx registers
+        if (m_rxMsgSize == 0U)
         {
-            m_rxBuffer[m_rxCntBytes >> 2] = MU_ReceiveMsgNonBlocking(m_muBase, i);
-            m_rxCntBytes += 4;
+            m_rxMsgSize = MU_ReceiveMsgNonBlocking(m_muBase, i++);
         }
-        else
-        {
-            // read MU rx reg to clear the rx full flag
-            MU_ReceiveMsgNonBlocking(m_muBase, i);
-        }
-    }
 
-    // message is complete, unblock caller of the receive function
-    if (m_rxCntBytes >= m_rxMsgSize)
-    {
-        m_rxBuffer = NULL;
-#if ERPC_THREADS
-        MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
-        m_rxSemaphore.putFromISR();
+        for (; i < MU_REG_COUNT; i++)
+        {
+            if (m_rxCntBytes < m_rxMsgSize)
+            {
+                m_rxBuffer[m_rxCntBytes >> 2] = MU_ReceiveMsgNonBlocking(m_muBase, i);
+                m_rxCntBytes += 4U;
+            }
+            else
+            {
+                // read MU rx reg to clear the rx full flag
+                MU_ReceiveMsgNonBlocking(m_muBase, i);
+            }
+        }
+
+        // message is complete, unblock caller of the receive function
+        if (m_rxCntBytes >= m_rxMsgSize)
+        {
+            m_rxBuffer = NULL;
+            MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+#if !ERPC_THREADS_IS(NONE)
+            m_rxSemaphore.putFromISR();
 #endif
+        }
     }
 }
 
@@ -155,16 +162,18 @@ void MUTransport::tx_cb(void)
 {
     // fill MU tx regs
     uint32_t i = 0;
+    uint32_t tx;
+
     for (i = 0; i < MU_REG_COUNT; i++)
     {
         // prepare uint32_t and write it to next MU tx reg
-        uint32_t tx = 0;
+        tx = 0;
         if (m_txCntBytes < m_txMsgSize)
         {
             tx = m_txBuffer[m_txCntBytes >> 2];
         }
         MU_SendMsgNonBlocking(m_muBase, i, tx);
-        m_txCntBytes += 4;
+        m_txCntBytes += 4U;
     }
 
     // if the message was sent whole, disable the MU tx empty irq
@@ -175,7 +184,7 @@ void MUTransport::tx_cb(void)
 
         // unblock caller of the send function
         m_txBuffer = NULL;
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
         m_txSemaphore.putFromISR();
 #endif
     }
@@ -183,83 +192,95 @@ void MUTransport::tx_cb(void)
 
 erpc_status_t MUTransport::receive(MessageBuffer *message)
 {
+    erpc_status_t status;
+
     if (message == NULL)
     {
-        return kErpcStatus_ReceiveFailed;
+        status = kErpcStatus_ReceiveFailed;
     }
-
-#if ERPC_THREADS
-    Mutex::Guard lock(m_receiveLock);
+    else
+    {
+#if !ERPC_THREADS_IS(NONE)
+        Mutex::Guard lock(m_receiveLock);
 #endif
 
-    m_rxMsgSize = 0;
-    m_rxCntBytes = 0;
-    m_rxBuffer = (uint32_t *)message->get();
+        m_rxMsgSize = 0;
+        m_rxCntBytes = 0;
+        m_rxBuffer = (uint32_t *)message->get();
 
-    // enable the MU rx full irq
-    MU_EnableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+        // enable the MU rx full irq
+        MU_EnableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
 
 // wait until the receiving is not complete
-#if ERPC_THREADS
-    m_rxSemaphore.get();
+#if !ERPC_THREADS_IS(NONE)
+        m_rxSemaphore.get();
 #else
-    while (m_rxBuffer)
-    {
-    }
+        while (m_rxBuffer != NULL)
+        {
+        }
 #endif
 
-    message->setUsed(m_rxMsgSize);
-    m_newMessage = false;
+        message->setUsed(m_rxMsgSize);
+        m_newMessage = false;
+        status = kErpcStatus_Success;
+    }
 
-    return kErpcStatus_Success;
+    return status;
 }
 
 erpc_status_t MUTransport::send(MessageBuffer *message)
 {
+    erpc_status_t status;
+    uint8_t i = 0;
+    uint32_t tx;
+
     if (message == NULL)
     {
-        return kErpcStatus_SendFailed;
+        status = kErpcStatus_SendFailed;
     }
-
-#if ERPC_THREADS
-    Mutex::Guard lock(m_sendLock);
+    else
+    {
+#if !ERPC_THREADS_IS(NONE)
+        Mutex::Guard lock(m_sendLock);
 #endif
 
-    m_txMsgSize = message->getUsed();
-    m_txCntBytes = 0;
-    m_txBuffer = (uint32_t *)message->get();
+        m_txMsgSize = message->getUsed();
+        m_txCntBytes = 0;
+        m_txBuffer = (uint32_t *)message->get();
 
-    MU_SendMsgNonBlocking(m_muBase, 0, m_txMsgSize);
+        MU_SendMsgNonBlocking(m_muBase, 0, m_txMsgSize);
 
-    // write to next MU tx registers
-    uint8_t i = 0;
-    for (i = 1; i < MU_REG_COUNT; i++)
-    {
-        // prepare next uint32_t and write it to next MU tx reg
-        uint32_t tx = 0;
+        // write to next MU tx registers
+        for (i = 1; i < MU_REG_COUNT; i++)
+        {
+            // prepare next uint32_t and write it to next MU tx reg
+            tx = 0;
+            if (m_txCntBytes < m_txMsgSize)
+            {
+                tx = m_txBuffer[m_txCntBytes >> 2];
+            }
+            MU_SendMsgNonBlocking(m_muBase, i, tx);
+            m_txCntBytes += 4U;
+        }
+
+        // if the message wasn't sent whole, enable the MU tx empty irq
         if (m_txCntBytes < m_txMsgSize)
         {
-            tx = m_txBuffer[m_txCntBytes >> 2];
+            // enable MU tx empty irq from the last mu tx reg
+            MU_EnableInterrupts(m_muBase, (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
+// wait until the sending is not complete
+#if !ERPC_THREADS_IS(NONE)
+            m_txSemaphore.get();
+#else
+            while (m_txBuffer != NULL)
+            {
+            }
+#endif
         }
-        MU_SendMsgNonBlocking(m_muBase, i, tx);
-        m_txCntBytes += 4;
+        status = kErpcStatus_Success;
     }
 
-    // if the message wasn't sent whole, enable the MU tx empty irq
-    if (m_txCntBytes < m_txMsgSize)
-    {
-        // enable MU tx empty irq from the last mu tx reg
-        MU_EnableInterrupts(m_muBase, (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
-// wait until the sending is not complete
-#if ERPC_THREADS
-        m_txSemaphore.get();
-#else
-        while (m_txBuffer)
-        {
-        }
-#endif
-    }
-    return kErpcStatus_Success;
+    return status;
 }
 
 extern "C" {

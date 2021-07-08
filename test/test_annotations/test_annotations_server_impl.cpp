@@ -7,10 +7,12 @@
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 
 AnnotateTest_service *svc;

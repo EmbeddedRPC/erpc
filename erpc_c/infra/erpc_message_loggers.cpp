@@ -1,12 +1,16 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include "erpc_config_internal.h"
+#if ERPC_MESSAGE_LOGGING
 
 #include "erpc_message_loggers.h"
+
 #include <new>
 
 using namespace erpc;
@@ -18,9 +22,11 @@ using namespace std;
 
 MessageLoggers::~MessageLoggers(void)
 {
+    MessageLogger *logger;
+
     while (m_logger != NULL)
     {
-        MessageLogger *logger = m_logger;
+        logger = m_logger;
         m_logger = m_logger->getNext();
         delete logger;
     }
@@ -28,40 +34,54 @@ MessageLoggers::~MessageLoggers(void)
 
 bool MessageLoggers::addMessageLogger(Transport *transport)
 {
+    bool retVal = false;
+    MessageLogger *logger;
+    MessageLogger *_logger;
+
     if (transport != NULL)
     {
-        MessageLogger *logger = new (nothrow) MessageLogger(transport);
-        if (logger)
+        logger = new (nothrow) MessageLogger(transport);
+        if (logger != NULL)
         {
             if (m_logger == NULL)
             {
                 m_logger = logger;
-                return true;
             }
-
-            MessageLogger *_logger = m_logger;
-            while (_logger->getNext() != NULL)
+            else
             {
-                _logger = _logger->getNext();
-            }
+                _logger = m_logger;
+                while (_logger->getNext() != NULL)
+                {
+                    _logger = _logger->getNext();
+                }
 
-            _logger->setNext(logger);
-            return true;
+                _logger->setNext(logger);
+            }
+            retVal = true;
         }
     }
-    return false;
+
+    return retVal;
 }
 
 erpc_status_t MessageLoggers::logMessage(MessageBuffer *msg)
 {
+    erpc_status_t err = kErpcStatus_Success;
     MessageLogger *_logger = m_logger;
+
     while (_logger != NULL)
     {
-        if (erpc_status_t err = _logger->getLogger()->send(msg))
+        err = _logger->getLogger()->send(msg);
+        if (err == kErpcStatus_Success)
         {
-            return err;
+            _logger = _logger->getNext();
         }
-        _logger = _logger->getNext();
+        else
+        {
+            break;
+        }
     }
-    return kErpcStatus_Success;
+
+    return err;
 }
+#endif /* ERPC_MESSAGE_LOGGING */

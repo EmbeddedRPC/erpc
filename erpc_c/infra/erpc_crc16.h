@@ -36,10 +36,13 @@ public:
      */
     Crc16(uint32_t crcStart);
 
+    /*!
+     * @brief Constructor.
+     */
     Crc16(void);
 
     /*!
-     * @brief Codec destructor
+     * @brief Crc16 destructor
      */
     ~Crc16(void);
 

@@ -8,7 +8,9 @@
  */
 
 #include "format_string.h"
+
 #include "smart_ptr.h"
+
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>

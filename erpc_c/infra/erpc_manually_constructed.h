@@ -130,6 +130,14 @@ public:
         new (m_storage) T(a1, a2, a3, a4, a5);
         m_isConstructed = true;
     }
+
+    template <typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
+    void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5, const A6 &a6)
+    {
+        destroy();
+        new (m_storage) T(a1, a2, a3, a4, a5, a6);
+        m_isConstructed = true;
+    }
     //@}
 
     /*!

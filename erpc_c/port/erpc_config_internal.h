@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -28,12 +29,30 @@
     #endif
 #endif
 
+// Determine if we are targeting WIN32 environment
+#if !defined(ERPC_HAS_WIN32)
+    #if defined(_WIN32)
+        #define ERPC_HAS_WIN32 (1)
+    #else
+        #define ERPC_HAS_WIN32 (0)
+    #endif
+#endif
+
 // Safely detect FreeRTOSConfig.h.
 #define ERPC_HAS_FREERTOSCONFIG_H (0)
 #if defined(__has_include)
     #if __has_include("FreeRTOSConfig.h")
         #undef ERPC_HAS_FREERTOSCONFIG_H
         #define ERPC_HAS_FREERTOSCONFIG_H (1)
+    #endif
+#endif
+
+// Safely detect tx_api.h.
+#define ERPC_HAS_THREADX_API_H (0)
+#if defined(__has_include)
+    #if __has_include("tx_api.h")
+        #undef ERPC_HAS_THREADX_API_H
+        #define ERPC_HAS_THREADX_API_H (1)
     #endif
 #endif
 
@@ -45,8 +64,10 @@
     #elif ERPC_HAS_FREERTOSCONFIG_H
         // Use FreeRTOS if we can auto detect it.
         #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
-    #elif defined(WIN32)
+    #elif ERPC_HAS_WIN32
         #define ERPC_THREADS (ERPC_THREADS_WIN32)
+    #elif ERPC_HAS_THREADX_API_H
+        #define ERPC_THREADS (ERPC_THREADS_THREADX)
     #else
         // Otherwise default to no threads.
         #define ERPC_THREADS (ERPC_THREADS_NONE)
@@ -60,13 +81,13 @@
 // Set default buffer size.
 #if !defined(ERPC_DEFAULT_BUFFER_SIZE)
     //! @brief Size of buffers allocated by BasicMessageBufferFactory in setup functions.
-    #define ERPC_DEFAULT_BUFFER_SIZE (256)
+    #define ERPC_DEFAULT_BUFFER_SIZE (256U)
 #endif
 
 // Set default buffers count.
 #if !defined(ERPC_DEFAULT_BUFFERS_COUNT)
     //! @brief Count of buffers allocated by StaticMessageBufferFactory.
-    #define ERPC_DEFAULT_BUFFERS_COUNT (2)
+    #define ERPC_DEFAULT_BUFFERS_COUNT (2U)
 #endif
 
 // Disable/enable noexcept.
@@ -130,6 +151,16 @@
             #error "Do not forget to add the MCMGR library into your project!"
         #endif
     #endif
+#endif
+
+// Disabling pre and post callback function related code.
+#if !defined(ERPC_PRE_POST_ACTION)
+    #define ERPC_PRE_POST_ACTION (ERPC_PRE_POST_ACTION_DISABLED)
+#endif
+
+// Disabling pre and post default callback function code.
+#if !defined(ERPC_PRE_POST_ACTION_DEFAULT)
+    #define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_DISABLED)
 #endif
 
 /* clang-format on */

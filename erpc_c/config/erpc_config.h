@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -28,6 +29,7 @@
 #define ERPC_THREADS_ZEPHYR (3)   //!< ZEPHYR.
 #define ERPC_THREADS_MBED (4)     //!< Mbed OS
 #define ERPC_THREADS_WIN32 (5)    //!< WIN32
+#define ERPC_THREADS_THREADX (6)    //!< THREADX
 
 #define ERPC_NOEXCEPT_DISABLED (0) //!< Disabling noexcept feature.
 #define ERPC_NOEXCEPT_ENABLED (1)  //!<  Enabling noexcept feature.
@@ -43,6 +45,12 @@
 
 #define ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED (0) //!< Do not use MCMGR for MU ISR management.
 #define ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED (1)  //!< Use MCMGR for MU ISR management.
+
+#define ERPC_PRE_POST_ACTION_DISABLED (0) //!< Pre post shim callbacks functions disabled.
+#define ERPC_PRE_POST_ACTION_ENABLED (1)  //!< Pre post shim callback functions enabled.
+
+#define ERPC_PRE_POST_ACTION_DEFAULT_DISABLED (0) //!< Pre post shim default callbacks functions disabled.
+#define ERPC_PRE_POST_ACTION_DEFAULT_ENABLED (1)  //!< Pre post shim default callback functions enabled.
 //@}
 
 //! @name Configuration options
@@ -64,13 +72,13 @@
 //! Uncomment to change the size of buffers allocated by one of MessageBufferFactory.
 //! (@ref client_setup and @ref server_setup). The default size is set to 256.
 //! For RPMsg transport layer, ERPC_DEFAULT_BUFFER_SIZE must be 2^n - 16.
-//#define ERPC_DEFAULT_BUFFER_SIZE (256)
+//#define ERPC_DEFAULT_BUFFER_SIZE (256U)
 
 //! @def ERPC_DEFAULT_BUFFERS_COUNT
 //!
 //! Uncomment to change the count of buffers allocated by one of statically allocated messages.
 //! Default value is set to 2.
-//#define ERPC_DEFAULT_BUFFERS_COUNT (2)
+//#define ERPC_DEFAULT_BUFFERS_COUNT (2U)
 
 //! @def ERPC_NOEXCEPT
 //!
@@ -118,6 +126,22 @@
 //! erpc_mu_transport.h for additional MU settings.
 //#define ERPC_TRANSPORT_MU_USE_MCMGR ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED
 //@}
+
+//! @def ERPC_PRE_POST_ACTION
+//!
+//! Enable eRPC pre and post callback functions shim code. Take look into "erpc_pre_post_action.h". Can be used for
+//! detection of eRPC call freeze, ... Default set to ERPC_PRE_POST_ACTION_DISABLED.
+//!
+//! Uncomment for using pre post callback feature.
+//#define ERPC_PRE_POST_ACTION (ERPC_PRE_POST_ACTION_ENABLED)
+
+//! @def ERPC_PRE_POST_ACTION_DEFAULT
+//!
+//! Enable eRPC pre and post default callback functions. Take look into "erpc_setup_extensions.h". Can be used for
+//! detection of eRPC call freeze, ... Default set to ERPC_PRE_POST_ACTION_DEFAULT_DISABLED.
+//!
+//! Uncomment for using pre post default callback feature.
+//#define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_ENABLED)
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_

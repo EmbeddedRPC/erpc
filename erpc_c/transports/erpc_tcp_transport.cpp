@@ -1,16 +1,21 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_tcp_transport.h"
+
 #include <cstdio>
+#if ERPC_HAS_POSIX
 #include <err.h>
+#endif
 #include <errno.h>
 #include <netdb.h>
+#include <netinet/tcp.h>
 #include <signal.h>
 #include <string>
 #include <sys/socket.h>
@@ -65,106 +70,144 @@ void TCPTransport::configure(const char *host, uint16_t port)
 
 erpc_status_t TCPTransport::open(void)
 {
+    erpc_status_t status;
+
     if (m_isServer)
     {
         m_runServer = true;
         m_serverThread.start(this);
-        return kErpcStatus_Success;
+        status = kErpcStatus_Success;
     }
     else
     {
-        return connectClient();
+        status = connectClient();
     }
+
+    return status;
 }
 
 erpc_status_t TCPTransport::connectClient(void)
 {
-    if (m_socket != -1)
-    {
-        TCP_DEBUG_PRINT("socket already connected\n");
-        return kErpcStatus_Success;
-    }
-
-    // Fill in hints structure for getaddrinfo.
-    struct addrinfo hints = { 0 };
-    hints.ai_flags = AI_NUMERICSERV;
-    hints.ai_family = PF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-
-    // Convert port number to a string.
+    erpc_status_t status = kErpcStatus_Success;
+    struct addrinfo hints = {};
     char portString[8];
-    snprintf(portString, sizeof(portString), "%d", m_port);
-
-    // Perform the name lookup.
     struct addrinfo *res0;
-    int result = getaddrinfo(m_host, portString, &hints, &res0);
-    if (result)
-    {
-        // TODO check EAI_NONAME
-        TCP_DEBUG_ERR("gettaddrinfo failed");
-        return kErpcStatus_UnknownName;
-    }
-
-    // Iterate over result addresses and try to connect. Exit the loop on the first successful
-    // connection.
+    int result, set;
     int sock = -1;
     struct addrinfo *res;
-    for (res = res0; res; res = res->ai_next)
+
+    if (m_socket != -1)
     {
-        // Create the socket.
-        sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-        if (sock < 0)
+        TCP_DEBUG_PRINT("%s", "socket already connected\n");
+    }
+    else
+    {
+        // Fill in hints structure for getaddrinfo.
+        hints.ai_flags = AI_NUMERICSERV;
+        hints.ai_family = PF_UNSPEC;
+        hints.ai_socktype = SOCK_STREAM;
+
+        // Convert port number to a string.
+        result = snprintf(portString, sizeof(portString), "%d", m_port);
+        if (result < 0)
         {
-            continue;
+            TCP_DEBUG_ERR("snprintf failed");
+            status = kErpcStatus_Fail;
         }
 
-        // Attempt to connect.
-        if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
+        if (status == kErpcStatus_Success)
         {
-            ::close(sock);
-            sock = -1;
-            continue;
+            // Perform the name lookup.
+            result = getaddrinfo(m_host, portString, &hints, &res0);
+            if (result != 0)
+            {
+                // TODO check EAI_NONAME
+                TCP_DEBUG_ERR("gettaddrinfo failed");
+                status = kErpcStatus_UnknownName;
+            }
         }
 
-        // Exit the loop for the first successful connection.
-        break;
-    }
+        if (status == kErpcStatus_Success)
+        {
+            // Iterate over result addresses and try to connect. Exit the loop on the first successful
+            // connection.
+            for (res = res0; res; res = res->ai_next)
+            {
+                // Create the socket.
+                sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+                if (sock < 0)
+                {
+                    continue;
+                }
 
-    // Free the result list.
-    freeaddrinfo(res0);
+                // Attempt to connect.
+                if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
+                {
+                    ::close(sock);
+                    sock = -1;
+                    continue;
+                }
 
-    // Check if we were able to open a connection.
-    if (sock < 0)
-    {
-        // TODO check EADDRNOTAVAIL:
-        TCP_DEBUG_ERR("connecting failed");
-        return kErpcStatus_ConnectionFailure;
-    }
+                // Exit the loop for the first successful connection.
+                break;
+            }
 
+            // Free the result list.
+            freeaddrinfo(res0);
+
+            // Check if we were able to open a connection.
+            if (sock < 0)
+            {
+                // TODO check EADDRNOTAVAIL:
+                TCP_DEBUG_ERR("connecting failed");
+                status = kErpcStatus_ConnectionFailure;
+            }
+        }
+
+        if (status == kErpcStatus_Success)
+        {
+            set = 1;
+            if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int)) < 0)
+            {
+                ::close(sock);
+                TCP_DEBUG_ERR("setsockopt failed");
+                status = kErpcStatus_Fail;
+            }
+        }
+
+        if (status == kErpcStatus_Success)
+        {
 // On some systems (BSD) we can disable SIGPIPE on the socket. For others (Linux), we have to
 // ignore SIGPIPE.
 #if defined(SO_NOSIGPIPE)
-    // Disable SIGPIPE for this socket. This will cause write() to return an EPIPE error if the
-    // other side has disappeared instead of our process receiving a SIGPIPE.
-    int set = 1;
-    if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int)) < 0)
-    {
-        ::close(sock);
-        TCP_DEBUG_ERR("setsockopt failed");
-        return kErpcStatus_Fail;
-    }
-#else
-    // globally disable the SIGPIPE signal
-    signal(SIGPIPE, SIG_IGN);
-#endif // defined(SO_NOSIGPIPE)
-    m_socket = sock;
 
-    return kErpcStatus_Success;
+            // Disable SIGPIPE for this socket. This will cause write() to return an EPIPE statusor if the
+            // other side has disappeared instead of our process receiving a SIGPIPE.
+            set = 1;
+            if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int)) < 0)
+            {
+                ::close(sock);
+                TCP_DEBUG_ERR("setsockopt failed");
+                status = kErpcStatus_Fail;
+            }
+        }
+
+        if (status == kErpcStatus_Success)
+        {
+#else
+            // globally disable the SIGPIPE signal
+            signal(SIGPIPE, SIG_IGN);
+#endif // defined(SO_NOSIGPIPE)
+            m_socket = sock;
+        }
+    }
+
+    return status;
 }
 
-erpc_status_t TCPTransport::close(void)
+erpc_status_t TCPTransport::close(bool stopServer)
 {
-    if (m_isServer)
+    if (m_isServer && stopServer)
     {
         m_runServer = false;
     }
@@ -180,6 +223,9 @@ erpc_status_t TCPTransport::close(void)
 
 erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
+    ssize_t length;
+    erpc_status_t status = kErpcStatus_Success;
+
     // Block until we have a valid connection.
     while (m_socket <= 0)
     {
@@ -187,137 +233,167 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
         Thread::sleep(10000);
     }
 
-    ssize_t length = 0;
-
     // Loop until all requested data is received.
-    while (size)
+    while (size > 0U)
     {
         length = read(m_socket, data, size);
 
         // Length will be zero if the connection is closed.
-        if (length == 0)
-        {
-            close();
-            return kErpcStatus_ConnectionClosed;
-        }
-        else if (length < 0)
-        {
-            return kErpcStatus_ReceiveFailed;
-        }
-        else
+        if (length > 0)
         {
             size -= length;
             data += length;
         }
+        else
+        {
+            if (length == 0)
+            {
+                // close socket, not server
+                close(false);
+                status = kErpcStatus_ConnectionClosed;
+            }
+            else
+            {
+                status = kErpcStatus_ReceiveFailed;
+            }
+            break;
+        }
     }
 
-    return kErpcStatus_Success;
+    return status;
 }
 
 erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
+    erpc_status_t status = kErpcStatus_Success;
+    ssize_t result;
+
     if (m_socket <= 0)
     {
-        return kErpcStatus_Success;
+        // we should not pretend to have a succesful Send or we create a deadlock
+        status = kErpcStatus_ConnectionFailure;
     }
-
-    // Loop until all data is sent.
-    while (size)
+    else
     {
-        ssize_t result = write(m_socket, data, size);
-        if (result >= 0)
+        // Loop until all data is sent.
+        while (size > 0U)
         {
-            size -= result;
-            data += result;
-        }
-        else
-        {
-            if (errno == EPIPE)
+            result = write(m_socket, data, size);
+            if (result >= 0)
             {
-                // Server closed.
-                close();
-                return kErpcStatus_ConnectionClosed;
+                size -= result;
+                data += result;
             }
-            return kErpcStatus_SendFailed;
+            else
+            {
+                if (result == EPIPE)
+                {
+                    // close socket, not server
+                    close(false);
+                    status = kErpcStatus_ConnectionClosed;
+                }
+                else
+                {
+                    status = kErpcStatus_SendFailed;
+                }
+                break;
+            }
         }
     }
 
-    return kErpcStatus_Success;
+    return status;
 }
 
 void TCPTransport::serverThread(void)
 {
-    TCP_DEBUG_PRINT("in server thread\n");
+    int yes = 1;
+    int serverSocket;
+    int result;
+    struct sockaddr incomingAddress;
+    socklen_t incomingAddressLength;
+    int incomingSocket;
+    bool status = false;
+    struct sockaddr_in serverAddress;
+
+    TCP_DEBUG_PRINT("%s", "in server thread\n");
 
     // Create socket.
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
     {
         TCP_DEBUG_ERR("failed to create server socket");
-        return;
     }
-
-    // Fill in address struct.
-    struct sockaddr_in serverAddress;
-    memset(&serverAddress, 0, sizeof(serverAddress));
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = INADDR_ANY; // htonl(local ? INADDR_LOOPBACK : INADDR_ANY);
-    serverAddress.sin_port = htons(m_port);
-
-    // Turn on reuse address option.
-    int yes = 1;
-    int result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-    if (result < 0)
+    else
     {
-        TCP_DEBUG_ERR("setsockopt failed");
-        ::close(serverSocket);
-        return;
-    }
+        // Fill in address struct.
+        (void)memset(&serverAddress, 0, sizeof(serverAddress));
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_addr.s_addr = INADDR_ANY; // htonl(local ? INADDR_LOOPBACK : INADDR_ANY);
+        serverAddress.sin_port = htons(m_port);
 
-    // Bind socket to address.
-    result = bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
-    if (result < 0)
-    {
-        TCP_DEBUG_ERR("bind failed");
-        ::close(serverSocket);
-        return;
-    }
-
-    // Listen for connections.
-    result = listen(serverSocket, 1);
-    if (result < 0)
-    {
-        TCP_DEBUG_ERR("listen failed");
-        ::close(serverSocket);
-        return;
-    }
-
-    TCP_DEBUG_PRINT("Listening for connections\n");
-
-    while (m_runServer)
-    {
-        struct sockaddr incomingAddress;
-        socklen_t incomingAddressLength = sizeof(struct sockaddr);
-        int incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
-        if (incomingSocket > 0)
+        // Turn on reuse address option.
+        result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+        if (result < 0)
         {
-            // Successfully accepted a connection.
-            m_socket = incomingSocket;
+            TCP_DEBUG_ERR("setsockopt failed");
+            status = true;
         }
-        else
-        {
-            TCP_DEBUG_ERR("accept failed");
-        }
-    }
 
-    ::close(serverSocket);
+        if (!status)
+        {
+            // Bind socket to address.
+            result = bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+            if (result < 0)
+            {
+                TCP_DEBUG_ERR("bind failed");
+                status = true;
+            }
+        }
+
+        if (!status)
+        {
+            // Listen for connections.
+            result = listen(serverSocket, 1);
+            if (result < 0)
+            {
+                TCP_DEBUG_ERR("listen failed");
+                status = true;
+            }
+        }
+
+        if (!status)
+        {
+            TCP_DEBUG_PRINT("%s", "Listening for connections\n");
+
+            while (m_runServer)
+            {
+                incomingAddressLength = sizeof(struct sockaddr);
+                // we should use select() otherwise we can't end the server properly
+                incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
+                if (incomingSocket > 0)
+                {
+                    // Successfully accepted a connection.
+                    m_socket = incomingSocket;
+                    // should be inherited from accept() socket but it's not always ...
+                    yes = 1;
+                    setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes));
+                }
+                else
+                {
+                    TCP_DEBUG_ERR("accept failed");
+                }
+            }
+        }
+        ::close(serverSocket);
+    }
 }
 
 void TCPTransport::serverThreadStub(void *arg)
 {
     TCPTransport *This = reinterpret_cast<TCPTransport *>(arg);
+
     TCP_DEBUG_PRINT("in serverThreadStub (arg=%p)\n", arg);
-    if (This)
+    if (This != NULL)
     {
         This->serverThread();
     }

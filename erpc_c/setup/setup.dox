@@ -16,7 +16,19 @@
 */
 
 /*!
+@defgroup message_buffer_factory_setup Message Buffer Factory Setup
+@ingroup setup
+@brief Message Buffer Factory setup functions.
+*/
+
+/*!
 @defgroup transport_setup Transport Setup
 @ingroup setup
 @brief Transport layer initialization.
+*/
+
+/*!
+@defgroup port_setup_extensions Extension Setup
+@ingroup setup
+@brief Extension setup functions.
 */

@@ -8,6 +8,7 @@
 
 #include "gtest.h"
 #include "test_ArithmeticService.h"
+
 #include <string.h>
 
 using namespace std;
