@@ -1,0 +1,6 @@
+image:
+  file: .gitpod.Dockerfile
+  - command: apt-get update && apt-get install flex
+
+tasks:
+  - init: make

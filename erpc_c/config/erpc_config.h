@@ -32,6 +32,7 @@
 #define ERPC_THREADS_ZEPHYR (3U)   //!< ZEPHYR.
 #define ERPC_THREADS_MBED (4U)     //!< Mbed OS
 #define ERPC_THREADS_WIN32 (5U)    //!< WIN32
+#define ERPC_THREADS_THREADX (6U)  //!< THREADX
 
 #define ERPC_NOEXCEPT_DISABLED (0U) //!< Disabling noexcept feature.
 #define ERPC_NOEXCEPT_ENABLED (1U)  //!<  Enabling noexcept feature.

@@ -42,7 +42,7 @@ const char k_toolName[] = "erpcgen";
 const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright 2016-2020 NXP. All rights reserved.";
+const char k_copyright[] = "Copyright 2016-2021 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = { "?|help",
                                              "V|version",

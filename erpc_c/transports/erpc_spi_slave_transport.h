@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * All rights reserved.
  *
  *
@@ -10,6 +10,10 @@
 #ifndef _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 
+#include "erpc_config_internal.h"
+#if ERPC_THREADS
+#include "erpc_threading.h"
+#endif
 #include "erpc_framed_transport.h"
 
 #include "fsl_gpio.h"
@@ -57,11 +61,21 @@ public:
      */
     virtual erpc_status_t init(void);
 
+    /*!
+     * @brief Function called from SPI_SlaveUserCallback when SPI transfer is completed
+     *
+     * Unblocks the send/receive function.
+     */
+    void transfer_cb(void);
+
 protected:
     SPI_Type *m_spiBaseAddr; /*!< Base address of SPI peripheral used in this transport layer */
     uint32_t m_baudRate;     /*!< Baud rate of SPI peripheral used in this transport layer */
     uint32_t m_srcClock_Hz;  /*!< Source clock of SPI peripheral used in this transport layer */
     bool m_isInited;         /*!< the SPI peripheral init status flag */
+#if ERPC_THREADS
+    Semaphore m_txrxSemaphore; /*!< Semaphore used by RTOS to block task until the sending/receiving is not complete */
+#endif
 
 private:
     /*!

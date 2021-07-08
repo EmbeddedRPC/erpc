@@ -139,7 +139,7 @@ int Semaphore::getCount(void) const
 {
     return k_sem_count_get(m_sem);
 }
-#endif /* ERPC_THREADS_IS(FREERTOS) */
+#endif /* ERPC_THREADS_IS(ZEPHYR) */
 
 ////////////////////////////////////////////////////////////////////////////////
 // EOF

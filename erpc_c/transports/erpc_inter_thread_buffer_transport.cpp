@@ -58,7 +58,7 @@ erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
     return kErpcStatus_Success;
 }
 
-erpc_status_t InterThreadBufferTransport::send(const MessageBuffer *message)
+erpc_status_t InterThreadBufferTransport::send(MessageBuffer *message)
 {
     assert(m_state && m_peer);
 
