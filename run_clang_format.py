@@ -11,7 +11,6 @@ from __future__ import print_function
 import subprocess
 import sys
 import os
-import re
 
 #Folders to scan
 folders = [
@@ -36,11 +35,14 @@ if os.environ.get('OS','') == 'Windows_NT':
 #Files with this extensions will be formatted/
 extensions = [".h", ".hpp", ".c", ".cpp"]
 
-# Check that the clang-format is installed and >= the minimum version
-clang_format_minimum_version = [10, 0, 0]
+# Check that the clang-format is installed and matches the required version. The clang-format binary
+# chosen is specified by the environment variable $CLANG_FORMAT_PATH or "clang-format" using the
+# regular $PATH resolution mechanism if $CLANG_FORMAT_PATH is undefined.
+clang_format_path = os.environ.get("CLANG_FORMAT_PATH")
+clang_format_bin = clang_format_path if clang_format_path is not None else "clang-format"
 try:
     cf = subprocess.Popen(
-        ["clang-format", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        [clang_format_bin, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 except FileNotFoundError:
     print("clang-format is not in $PATH")
     exit(1)
@@ -50,26 +52,9 @@ if cf.returncode != 0:
         clang_format_stderr.decode('utf-8')))
     exit(1)
 clang_format_stdout = clang_format_stdout.decode("utf-8")
-m = re.match('^clang-format version (\d+\.\d+\.\d+)', clang_format_stdout)
-if m is None:
-    print("clang-format --version output not understood: \"%s\"" % (clang_format_stdout))
+if not clang_format_stdout.startswith("clang-format version 10.0.0"):
+    print("clang-format is not the required version: 10.0.0")
     exit(1)
-clang_format_version = [int(e) for e in m.group(1).split(".")]
-
-if (clang_format_version[0] < clang_format_minimum_version[0]) or \
-    ((clang_format_version[0] == clang_format_minimum_version[0]) and \
-     ((clang_format_version[1] < clang_format_minimum_version[1]) or \
-      ((clang_format_version[1] == clang_format_minimum_version[1]) and \
-       (clang_format_version[2] < clang_format_minimum_version[2])))):
-     print(
-         "Installed clang-format version (%d.%d.%d) is less than the required minimum version (%d.%d.%d)" % (
-             clang_format_version[0],
-             clang_format_version[1],
-             clang_format_version[2],
-             clang_format_minimum_version[0],
-             clang_format_minimum_version[1],
-             clang_format_minimum_version[2]))
-     exit(1)
 
 #processing formatting
 for folder in folders:
