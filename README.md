@@ -92,6 +92,14 @@ To get the board list with multicore support (eRPC included) use filtering based
 <MCUXpressoSDK_install_dir>/boards/<board_name>/multiprocessor_examples for eRPC multiprocessor examples (UART or SPI transports used).<br>
 eRPC examples use 'erpc_' name prefix. 
 
+## References
+
+This section provides links to interesting erpc-based projects, articles, blogs or guides:
+
+* [erpc (EmbeddedRPC) getting started notes](https://programmersought.com/article/37585084512/)
+* [ERPC Linux Local Environment Construction and Use](https://programmersought.com/article/88827920353/)
+* [The New Wio Terminal eRPC Firmware](https://www.hackster.io/Salmanfarisvp/the-new-wio-terminal-erpc-firmware-bfd8bd)
+
 ## Directories
 
 `doc` - Documentation.
