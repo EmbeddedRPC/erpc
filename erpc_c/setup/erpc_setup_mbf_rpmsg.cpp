@@ -105,7 +105,7 @@ protected:
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<RPMsgMessageBufferFactory> s_msgFactory;
+ERPC_MANUALLY_CONSTRUCTED(RPMsgMessageBufferFactory, s_msgFactory);
 
 erpc_mbf_t erpc_mbf_rpmsg_init(erpc_transport_t transport)
 {

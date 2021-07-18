@@ -26,11 +26,11 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 // global server variables
-static ManuallyConstructed<SimpleServer> s_server;
+ERPC_MANUALLY_CONSTRUCTED(SimpleServer, s_server);
 extern SimpleServer *g_server;
 SimpleServer *g_server = NULL;
-static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-static ManuallyConstructed<Crc16> s_crc16;
+ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

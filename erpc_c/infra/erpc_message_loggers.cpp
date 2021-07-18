@@ -11,7 +11,11 @@
 
 #include "erpc_message_loggers.h"
 
+#include "erpc_manually_constructed.h"
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>
+#endif
 
 using namespace erpc;
 using namespace std;
@@ -19,6 +23,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
+
+ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(MessageLogger, s_messageLoggersManual, ERPC_MESSAGE_LOGGERS_COUNT);
 
 MessageLoggers::~MessageLoggers(void)
 {
@@ -28,7 +34,7 @@ MessageLoggers::~MessageLoggers(void)
     {
         logger = m_logger;
         m_logger = m_logger->getNext();
-        delete logger;
+        ERPC_DESTROY_OBJECT(logger, s_messageLoggersManual, ERPC_MESSAGE_LOGGERS_COUNT)
     }
 }
 
@@ -40,7 +46,7 @@ bool MessageLoggers::addMessageLogger(Transport *transport)
 
     if (transport != NULL)
     {
-        logger = new (nothrow) MessageLogger(transport);
+        logger = create(transport);
         if (logger != NULL)
         {
             if (m_logger == NULL)
@@ -84,4 +90,10 @@ erpc_status_t MessageLoggers::logMessage(MessageBuffer *msg)
 
     return err;
 }
+
+MessageLogger *MessageLoggers::create(Transport *transport)
+{
+    ERPC_CREATE_NEW_OBJECT(MessageLogger, s_messageLoggersManual, ERPC_MESSAGE_LOGGERS_COUNT, transport)
+}
+
 #endif /* ERPC_MESSAGE_LOGGING */

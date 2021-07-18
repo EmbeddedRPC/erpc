@@ -31,14 +31,14 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 // global client variables
-static ManuallyConstructed<ArbitratedClientManager> s_client;
+ERPC_MANUALLY_CONSTRUCTED(ArbitratedClientManager, s_client);
 extern ClientManager *g_client;
 ClientManager *g_client = NULL;
 
-static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-static ManuallyConstructed<TransportArbitrator> s_arbitrator;
-static ManuallyConstructed<BasicCodec> s_codec;
-static ManuallyConstructed<Crc16> s_crc16;
+ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED(TransportArbitrator, s_arbitrator);
+ERPC_MANUALLY_CONSTRUCTED(BasicCodec, s_codec);
+ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code

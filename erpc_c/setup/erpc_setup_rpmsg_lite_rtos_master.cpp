@@ -32,7 +32,7 @@ char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_s
 #error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"
 #endif
 
-static ManuallyConstructed<RPMsgRTOSTransport> s_transport;
+ERPC_MANUALLY_CONSTRUCTED(RPMsgRTOSTransport, s_transport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
