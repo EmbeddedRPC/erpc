@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -49,53 +50,93 @@ class ManuallyConstructed
 public:
     //! @name Object access
     //@{
-    T *get(void) { return reinterpret_cast<T *>(&m_storage); }
-    const T *get(void) const { return reinterpret_cast<const T *>(&m_storage); }
+    T *get(void) { return (m_isConstructed) ? reinterpret_cast<T *>(&m_storage) : nullptr; }
+    const T *get(void) const { return (m_isConstructed) ? reinterpret_cast<const T *>(&m_storage) : nullptr; }
     T *operator->(void) { return get(); }
     const T *operator->(void) const { return get(); }
-    T &operator*(void) { return *get(); }
-    const T &operator*(void) const { return *get(); }
+    T &operator*(void)
+    {
+        if (m_isConstructed)
+        {
+            return *get();
+        }
+        else
+        {
+            memset(&m_storage, 0, sizeof(m_storage) * 8);
+            return reinterpret_cast<T &>(m_storage);
+        };
+    }
+    const T &operator*(void) const
+    {
+        if (m_isConstructed)
+        {
+            return *get();
+        }
+        else
+        {
+            memset(&m_storage, 0, sizeof(m_storage) * 8);
+            return reinterpret_cast<const T &>(m_storage);
+        };
+    }
     operator T *(void) { return get(); }
     operator const T *(void) const { return get(); }
     //@}
 
     //! @name Explicit construction methods
     //@{
-    void construct(void) { new (m_storage) T; }
+    void construct(void)
+    {
+        destroy();
+        new (m_storage) T;
+        m_isConstructed = true;
+    }
+
     template <typename A1>
     void construct(const A1 &a1)
     {
+        destroy();
         new (m_storage) T(a1);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2>
     void construct(const A1 &a1, const A2 &a2)
     {
+        destroy();
         new (m_storage) T(a1, a2);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3)
     {
+        destroy();
         new (m_storage) T(a1, a2, a3);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3, typename A4>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4)
     {
+        destroy();
         new (m_storage) T(a1, a2, a3, a4);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3, typename A4, typename A5>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5)
     {
+        destroy();
         new (m_storage) T(a1, a2, a3, a4, a5);
+        m_isConstructed = true;
     }
 
     template <typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
     void construct(const A1 &a1, const A2 &a2, const A3 &a3, const A4 &a4, const A5 &a5, const A6 &a6)
     {
+        destroy();
         new (m_storage) T(a1, a2, a3, a4, a5, a6);
+        m_isConstructed = true;
     }
     //@}
 
@@ -104,7 +145,14 @@ public:
      *
      * Behavior is undefined if the objected was not previously initialized.
      */
-    void destroy(void) { get()->~T(); }
+    void destroy(void)
+    {
+        if (m_isConstructed)
+        {
+            get()->~T();
+            m_isConstructed = false;
+        }
+    }
 
 protected:
     /*!
@@ -113,6 +161,13 @@ protected:
      * An array of uint64 is used to get 8-byte alignment.
      */
     uint64_t m_storage[(sizeof(T) + sizeof(uint64_t) - 1) / sizeof(uint64_t)];
+
+    /*!
+     * @brief Track construct/destruct calls.
+     *
+     * Based on this variable we can allow or forbid construct/destruct calls.
+     */
+    bool m_isConstructed = false;
 };
 
 } // namespace erpc
