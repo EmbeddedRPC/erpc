@@ -150,8 +150,8 @@ void MUTransport::rx_cb(void)
         if (m_rxCntBytes >= m_rxMsgSize)
         {
             m_rxBuffer = NULL;
-            MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
 #if !ERPC_THREADS_IS(NONE)
+            MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
             m_rxSemaphore.putFromISR();
 #endif
         }

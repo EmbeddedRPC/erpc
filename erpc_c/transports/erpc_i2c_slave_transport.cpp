@@ -26,6 +26,8 @@ using namespace erpc;
 #error "Please define the ERPC_BOARD_I2C_INT_GPIO used to notify when the I2C Slave is ready to transmit"
 #endif
 
+#define I2C_SLAVE_TRANSPORT_ADDR_7BIT (0x7EU)
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +43,7 @@ typedef struct i2c_clb_user_data
     uint8_t *rx_buffer;
     uint32_t rx_size;
 } I2C_CLB_USER_DATA, *I2C_CLB_USER_DATA_PTR;
-static I2C_CLB_USER_DATA volatile s_callback_user_data = { NULL, 0 };
+static volatile I2C_CLB_USER_DATA s_callback_user_data = { NULL, 0, NULL, 0 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -112,6 +114,8 @@ static void I2C_SlaveUserCallback(I2C_Type *base, volatile i2c_slave_transfer_t 
             /*  Update information for transmit process */
             transfer->txData = ((I2C_CLB_USER_DATA *)userData)->tx_buffer;
             transfer->txSize = ((I2C_CLB_USER_DATA *)userData)->tx_size;
+            transfer->rxData = NULL;
+            transfer->rxSize = 0;
             break;
 
         /* Setup the slave receive buffer */
@@ -119,11 +123,17 @@ static void I2C_SlaveUserCallback(I2C_Type *base, volatile i2c_slave_transfer_t 
             /*  Update information for received process */
             transfer->rxData = ((I2C_CLB_USER_DATA *)userData)->rx_buffer;
             transfer->rxSize = ((I2C_CLB_USER_DATA *)userData)->rx_size;
+            transfer->txData = NULL;
+            transfer->txSize = 0;
             break;
 
         /* The master has sent a stop transition on the bus */
         case kI2C_SlaveCompletionEvent:
             transport->transfer_cb();
+            transfer->rxData = NULL;
+            transfer->rxSize = 0;
+            transfer->txData = NULL;
+            transfer->txSize = 0;
             break;
 
         default:
@@ -159,7 +169,7 @@ erpc_status_t I2cSlaveTransport::init(void)
     i2c_slave_config_t i2cConfig;
 
     I2C_SlaveGetDefaultConfig(&i2cConfig);
-    i2cConfig.address0.address = (0x7EU); // I2C_MASTER_SLAVE_ADDR_7BIT
+    i2cConfig.address0.address = (I2C_SLAVE_TRANSPORT_ADDR_7BIT);
 
     I2C_SlaveInit(m_i2cBaseAddr, &i2cConfig, m_srcClock_Hz);
     I2C_SlaveTransferCreateHandle(m_i2cBaseAddr, &s_handle, I2C_SlaveUserCallback, (void *)&s_callback_user_data);
@@ -177,6 +187,8 @@ erpc_status_t I2cSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 
     s_callback_user_data.rx_buffer = data;
     s_callback_user_data.rx_size = size;
+    s_callback_user_data.tx_buffer = NULL;
+    s_callback_user_data.tx_size = 0;
 
     status =
         I2C_SlaveTransferNonBlocking(m_i2cBaseAddr, &s_handle, kI2C_SlaveAddressMatchEvent | kI2C_SlaveCompletionEvent);
@@ -205,6 +217,8 @@ erpc_status_t I2cSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
     status_t status;
     s_isTransferCompleted = false;
 
+    s_callback_user_data.rx_buffer = NULL;
+    s_callback_user_data.rx_size = 0;
     s_callback_user_data.tx_buffer = (uint8_t *)data;
     s_callback_user_data.tx_size = size;
 

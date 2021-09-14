@@ -209,12 +209,28 @@ class LIBUSBSIOSPITransport(FramedTransport):
         self._baudrate = baudrate
         self._cs_gpio_port = cs_gpio_port
         self._cs_gpio_pin = cs_gpio_pin
+        self._gpioport = 0
+        self._gpiopin = 0
+        self._gpiomode = 0
 
         # Load DLL from default directory without any debugging prints
         self.sio = LIBUSBSIO()
 
         # Get number of LIBUSBSIO devices
-        res = self.sio.GetNumPorts ()
+        res = self.sio.GetNumPorts(pidvids = [LIBUSBSIO.PIDVID_LPCLINK2])
+        if res!=0:
+            self._gpioport = 1
+            self._gpiopin = 2
+            self._gpiomode = 1
+        else:
+            res = self.sio.GetNumPorts(pidvids = [LIBUSBSIO.PIDVID_MCULINK])
+            if res!=0:
+                self._gpioport = 0
+                self._gpiopin = 4
+                self._gpiomode = 0x100
+            else:
+                print('No LIBUSBSIO devices found \r\n')
+                return
         print('Total LIBUSBSIO devices: %d \r\n' % res)
 
         # Open device at index 0
@@ -237,11 +253,11 @@ class LIBUSBSIOSPITransport(FramedTransport):
         self._hSPIPort = self.sio.SPI_Open (int(self._baudrate), portNum=0, dataSize=8, preDelay=0)
 
         # Configure GPIO pin for SPI master-slave signalling 
-        res = self.sio.GPIO_ConfigIOPin (1, 2, 1)
+        res = self.sio.GPIO_ConfigIOPin (self._gpioport, self._gpiopin, self._gpiomode)
         print('GPIO_ConfigIOPin res: %d \r\n' % res)
-        res = self.sio.GPIO_SetPortInDir (1, 2)
+        res = self.sio.GPIO_SetPortInDir (self._gpioport, self._gpiopin)
         print('GPIO_SetPortInDir res: %d \r\n' % res)
-        res = self.sio.GPIO_GetPin (1, 2)
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         print('GPIO_GetPin res: %d \r\n' % res)
 
     def close(self):
@@ -252,9 +268,9 @@ class LIBUSBSIOSPITransport(FramedTransport):
 
     def _base_send(self, message):
         # Wait for SPI master-slave signalling GPIO pin to be in low state 
-        res = self.sio.GPIO_GetPin (1, 2)
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
-            res = self.sio.GPIO_GetPin (1, 2)
+            res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         # Send the header first
         data, rxbytesnumber = self._hSPIPort.Transfer (0, 15, message[:self.HEADER_LEN], self.HEADER_LEN, 0 )
         if rxbytesnumber>0:
@@ -265,10 +281,10 @@ class LIBUSBSIOSPITransport(FramedTransport):
             print('SPI transfer error: %d' % rxbytesnumber)
 
     def _base_receive(self, count):
-        # Wait for SPI master-slave signalling GPIO pin to be in low state 
-        res = self.sio.GPIO_GetPin (1, 2)
+        # Wait for SPI master-slave signalling GPIO pin to be in low state
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
-            res = self.sio.GPIO_GetPin (1, 2)
+            res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         data, rxbytesnumber = self._hSPIPort.Transfer (0, 15, range(count), count, 0 )
         if rxbytesnumber>0:
             #print('SPI received %d number of bytes' % rxbytesnumber)
@@ -290,12 +306,28 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             baudrate = 100000
 
         self._baudrate = baudrate
+        self._gpioport = 0
+        self._gpiopin = 0
+        self._gpiomode = 0
 
         # Load DLL from default directory without any debugging prints
         self.sio = LIBUSBSIO()
 
         #Get number of LIBUSBSIO devices
-        res = self.sio.GetNumPorts ()
+        res = self.sio.GetNumPorts(pidvids = [LIBUSBSIO.PIDVID_LPCLINK2])
+        if res!=0:
+            self._gpioport = 1
+            self._gpiopin = 2
+            self._gpiomode = 1
+        else:
+            res = self.sio.GetNumPorts(pidvids = [LIBUSBSIO.PIDVID_MCULINK])
+            if res!=0:
+                self._gpioport = 1
+                self._gpiopin = 3
+                self._gpiomode = 0x100
+            else:
+                print('No LIBUSBSIO devices found \r\n')
+                return
         print('Total LIBUSBSIO devices: %d \r\n' % res)
 
         # Open device at index 0
@@ -318,11 +350,11 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         self._hI2CPort = self.sio.I2C_Open (int(self._baudrate), 0, 0)
 
         # Configure GPIO pin for I2C master-slave signalling 
-        res = self.sio.GPIO_ConfigIOPin (1, 2, 1)
+        res = self.sio.GPIO_ConfigIOPin (self._gpioport, self._gpiopin, self._gpiomode)
         print('GPIO_ConfigIOPin res: %d \r\n' % res)
-        res = self.sio.GPIO_SetPortInDir (1, 2)
+        res = self.sio.GPIO_SetPortInDir (self._gpioport, self._gpiopin)
         print('GPIO_SetPortInDir res: %d \r\n' % res)
-        res = self.sio.GPIO_GetPin (1, 2)
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         print('GPIO_GetPin res: %d \r\n' % res)
 
     def close(self):
@@ -333,9 +365,9 @@ class LIBUSBSIOI2CTransport(FramedTransport):
 
     def _base_send(self, message):
         # Wait for I2C master-slave signalling GPIO pin to be in low state 
-        res = self.sio.GPIO_GetPin (1, 2)
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
-            res = self.sio.GPIO_GetPin (1, 2)
+            res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         # Send the header first
         data, rxbytesnumber = self._hI2CPort.FastXfer (0x7E, message[:self.HEADER_LEN], self.HEADER_LEN, 0, 0)
         if rxbytesnumber>0:
@@ -347,9 +379,9 @@ class LIBUSBSIOI2CTransport(FramedTransport):
 
     def _base_receive(self, count):
         # Wait for I2C master-slave signalling GPIO pin to be in low state 
-        res = self.sio.GPIO_GetPin (1, 2)
+        res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
-            res = self.sio.GPIO_GetPin (1, 2)
+            res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         # Issue the I2C_Transfer API
         data, rxbytesnumber = self._hI2CPort.FastXfer (0x7E, 0, 0, count, 0)
         if rxbytesnumber>0:
