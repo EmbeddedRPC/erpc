@@ -139,7 +139,10 @@ def pytest_configure(config):
 # Files must start with "test" and have an extension of ".yml" to be processed.
 def pytest_collect_file(parent, path):
     if path.ext == ".yml" and path.basename.startswith("test"):
-        return ErpcgenFile(path, parent)
+        if hasattr(ErpcgenFile, "from_parent"):
+            return ErpcgenFile.from_parent(parent, fspath=path)
+        else:
+            return ErpcgenFile(path, parent)
 
 ## @brief Implements collection of erpcgen test cases from YAML files.
 #
@@ -154,7 +157,10 @@ class ErpcgenFile(pytest.File):
             name = d.get('name', self.fspath.purebasename + str(n)).replace(' ', '_')
             spec = ErpcgenTestSpec(name, self.fspath, d, verbosity)
             for case in spec:
-                yield ErpcgenItem(case.desc, self, case)
+                if hasattr(ErpcgenItem, "from_parent"):
+                    yield ErpcgenItem.from_parent(self, name=case.desc, case=case)
+                else:
+                    yield ErpcgenItem(case.desc, self, case)
 
 ## @brief Wraps an ErpcgenTestCase as a pytest test.
 class ErpcgenItem(pytest.Item):
@@ -481,7 +487,7 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
         self._compiler.add_include(erpc_dir.join("erpc_c", "config"))
         self._compiler.add_include(erpc_dir.join("erpc_c", "infra"))
         self._compiler.add_include(self._out_dir)
-       
+
         # Add all server and client cpp files
         for file in os.listdir(str(self._out_dir)):
             if '.cpp' in file:
