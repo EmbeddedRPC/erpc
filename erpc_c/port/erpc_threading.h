@@ -161,7 +161,7 @@ public:
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
         return reinterpret_cast<thread_id_t>(m_thread);
-#elif ERPC_THREADS_IS(THREADX)    
+#elif ERPC_THREADS_IS(THREADX)
         return reinterpret_cast<thread_id_t>(m_thread.tx_thread_id);
 #endif
     }
@@ -234,7 +234,7 @@ private:
     TaskHandle_t m_task;       /*!< Current task. */
     Thread *m_next;            /*!< Pointer to next Thread. */
     static Thread *s_first;    /*!< Pointer to first Thread. */
-#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     StaticTask_t m_staticTask; /*!< Hold static task data. */
 #endif
 #elif ERPC_THREADS_IS(ZEPHYR)
@@ -251,7 +251,7 @@ private:
     static Thread *s_first; /*!< Pointer to first Thread. */
     static CRITICAL_SECTION m_critical_section;
     static BOOL m_critical_section_inited;
-#elif ERPC_THREADS_IS(THREADX)    
+#elif ERPC_THREADS_IS(THREADX)
     TX_THREAD m_thread;     /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */

@@ -16,7 +16,7 @@
 
 #include "rpmsg_lite.h"
 
-#if ERPC_ALLOCATION_POLICY == ERPC_STATIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 #ifndef RL_USE_STATIC_API
 #warning "RPMSG is not set to use static allocation"
 #endif

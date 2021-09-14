@@ -63,7 +63,7 @@ void erpc_deinit_call_progress_detection_default(void)
 {
     if (s_erpc_call_in_progress != NULL)
     {
-#if ERPC_ALLOCATION_POLICY == ERPC_DYNAMIC_POLICY
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
         delete s_erpc_call_in_progress;
 #endif
         s_erpc_call_in_progress = NULL;

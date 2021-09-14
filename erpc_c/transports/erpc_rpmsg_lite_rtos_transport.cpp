@@ -149,7 +149,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
 
     if (0U == s_initialized)
     {
-#if RL_USE_STATIC_API s_rpmsg =
+#if RL_USE_STATIC_API
         s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS, &m_static_context);
 #else
         s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS);
