@@ -15,6 +15,7 @@
 #include "erpc_config_internal.h"
 
 #include "rpmsg_lite.h"
+#include "rpmsg_env_specific.h"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 #ifndef RL_USE_STATIC_API
@@ -37,9 +38,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
-
-/* TODO: replace bellow size representing sizeof(rpmsg_queue_rx_cb_data_t)*/
-#define SIZE_OF_RPMSG_QUEUE 12
 
 namespace erpc {
 /*!
@@ -69,8 +67,8 @@ protected:
 #if RL_USE_STATIC_API
     struct rpmsg_lite_instance m_static_context;
     struct rpmsg_lite_ept_static_context m_ept_context;
-    rpmsg_static_queue m_queue_context;
-    uint8_t m_queue_stack[SIZE_OF_RPMSG_QUEUE * RL_BUFFER_COUNT];
+    rpmsg_static_queue_ctxt m_queue_context;
+    uint8_t m_queue_stack[RL_ENV_QUEUE_STATIC_STORAGE_SIZE];
 #endif
 };
 

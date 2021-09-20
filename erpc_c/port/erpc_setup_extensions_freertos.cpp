@@ -16,7 +16,7 @@ using namespace erpc;
 
 static Semaphore *s_erpc_call_in_progress = NULL;
 static TimerHandle_t s_erpc_call_timer_cb = NULL;
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 static StaticTimer_t s_static_erpc_call_timer_cb;
 #endif
 
@@ -49,7 +49,7 @@ void erpc_init_call_progress_detection_default(
     s_erpc_call_in_progress = new Semaphore(1);
     assert(s_erpc_call_in_progress && "Creating eRPC semaphore failed.");
 
-#if configSUPPORT_STATIC_ALLOCATION
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     s_erpc_call_timer_cb = xTimerCreateStatic("Erpc client call timer", waitTimeMs / portTICK_PERIOD_MS, pdFALSE, NULL,
                                               erpc_call_timer_cb, &s_static_erpc_call_timer_cb);
 #else
