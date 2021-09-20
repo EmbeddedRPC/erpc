@@ -49,21 +49,21 @@
 
 // Detect allocation policy if not already set.
 #if !defined(ERPC_ALLOCATION_POLICY)
-    #if defined(__has_include)
-        #if __has_include("FreeRTOSConfig.h")
-            #ifdef __cplusplus
-            extern "C" {
-            #endif
-            #include "FreeRTOSConfig.h"
-            #ifdef __cplusplus
-            }
-            #endif
-            #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
-                #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
-            #else
-                #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
-            #endif
+    #if defined(__has_include) && __has_include("FreeRTOSConfig.h")
+        #ifdef __cplusplus
+        extern "C" {
         #endif
+        #include "FreeRTOSConfig.h"
+        #ifdef __cplusplus
+        }
+        #endif
+        #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
+        #else
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
+        #endif
+    #else
+        #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
     #endif
 #endif
 
