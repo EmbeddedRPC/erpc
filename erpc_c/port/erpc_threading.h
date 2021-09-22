@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -70,6 +71,11 @@ class Thread
 public:
     //! @brief Unique identifier for a thread.
     typedef void *thread_id_t;
+#if ERPC_THREADS_IS(FREERTOS)
+    typedef StackType_t *thread_stack_pointer;
+#else
+    typedef void *thread_stack_pointer;
+#endif
 
     /*!
      * @brief Default constructor for use with the init() method.
@@ -77,7 +83,7 @@ public:
      * If this constructor is used, the init() method must be called before the thread can be
      * started.
      *
-     * @param name Optional name for the thread.
+     * @param[in] name Optional name for the thread.
      */
     Thread(const char *name = 0);
 
@@ -86,12 +92,14 @@ public:
      *
      * This constructor fully initializes the thread object.
      *
-     * @param entry
-     * @param priority
-     * @param stackSize
-     * @param name Optional name for the thread.
+     * @param[in] entry
+     * @param[in] priority
+     * @param[in] stackSize
+     * @param[in] name Optional name for the thread.
+     * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
+    Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0,
+           thread_stack_pointer stackPtr = 0);
 
     /*!
      * @brief Destructor.
@@ -118,8 +126,9 @@ public:
      * @param[in] entry Entry function.
      * @param[in] priority Task priority.
      * @param[in] stackSize Stack size.
+     * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = 0);
 
     /*!
      * @brief This function starts thread execution.
@@ -152,7 +161,7 @@ public:
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
         return reinterpret_cast<thread_id_t>(m_thread);
-#elif ERPC_THREADS_IS(THREADX)    
+#elif ERPC_THREADS_IS(THREADX)
         return reinterpret_cast<thread_id_t>(m_thread.tx_thread_id);
 #endif
     }
@@ -212,18 +221,22 @@ protected:
     virtual void threadEntryPoint(void);
 
 private:
-    const char *m_name;     /*!< Thread name. */
-    thread_entry_t m_entry; /*!< Thread entry function. */
-    void *m_arg;            /*!< Entry parameter. */
-    uint32_t m_stackSize;   /*!< Stack size. */
-    uint32_t m_priority;    /*!< Task priority. */
+    const char *m_name;              /*!< Thread name. */
+    thread_entry_t m_entry;          /*!< Thread entry function. */
+    void *m_arg;                     /*!< Entry parameter. */
+    uint32_t m_stackSize;            /*!< Stack size. */
+    uint32_t m_priority;             /*!< Task priority. */
+    thread_stack_pointer m_stackPtr; /*!< Task pointer. */
 #if ERPC_THREADS_IS(PTHREADS)
     static pthread_key_t s_threadObjectKey; /*!< Thread key. */
     pthread_t m_thread;                     /*!< Current thread. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    TaskHandle_t m_task;    /*!< Current task. */
-    Thread *m_next;         /*!< Pointer to next Thread. */
-    static Thread *s_first; /*!< Pointer to first Thread. */
+    TaskHandle_t m_task;       /*!< Current task. */
+    Thread *m_next;            /*!< Pointer to next Thread. */
+    static Thread *s_first;    /*!< Pointer to first Thread. */
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    StaticTask_t m_staticTask; /*!< Hold static task data. */
+#endif
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_thread m_thread;  /*!< Current thread. */
     k_thread_stack_t *m_stack; /*!< Pointer to stack. */
@@ -238,7 +251,7 @@ private:
     static Thread *s_first; /*!< Pointer to first Thread. */
     static CRITICAL_SECTION m_critical_section;
     static BOOL m_critical_section_inited;
-#elif ERPC_THREADS_IS(THREADX)    
+#elif ERPC_THREADS_IS(THREADX)
     TX_THREAD m_thread;     /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */
@@ -397,7 +410,8 @@ private:
 #if ERPC_THREADS_IS(PTHREADS)
     pthread_mutex_t m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(FREERTOS)
-    SemaphoreHandle_t m_mutex; /*!< Mutex.*/
+    SemaphoreHandle_t m_mutex;       /*!< Mutex.*/
+    StaticSemaphore_t m_staticQueue; /*!< Static queue. */
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_mutex m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(MBED)
@@ -484,7 +498,8 @@ private:
                               until some predicate on shared data is satisfied. */
     Mutex m_mutex;         /*!< Mutext. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    SemaphoreHandle_t m_sem;   /*!< Semaphore. */
+    SemaphoreHandle_t m_sem;         /*!< Semaphore. */
+    StaticSemaphore_t m_staticQueue; /*!< Static queue. */
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_sem m_sem;     /*!< Semaphore. */
 #elif ERPC_THREADS_IS(MBED)
