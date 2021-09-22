@@ -10,6 +10,9 @@
 
 #ifndef _EMBEDDED_RPC__MANUALLY_CONSTRUCTED_H_
 #define _EMBEDDED_RPC__MANUALLY_CONSTRUCTED_H_
+
+#include "erpc_config_internal.h"
+
 #include <new>
 #include <stdint.h>
 
@@ -154,6 +157,14 @@ public:
         }
     }
 
+    /*!
+     * @brief Returns information if object is free or is used.
+     *
+     * @return true Object is constructed and used.
+     * @return false Object wasn't constructer or it is destructed and free.
+     */
+    bool isUsed() { return m_isConstructed; }
+
 protected:
     /*!
      * @brief Storage for the object.
@@ -169,6 +180,56 @@ protected:
      */
     bool m_isConstructed = false;
 };
+
+#define ERPC_MANUALLY_CONSTRUCTED(class, variableName) static ManuallyConstructed<class> variableName
+#define ERPC_MANUALLY_CONSTRUCTED_ARRAY(class, variableName, dimension) \
+    ERPC_MANUALLY_CONSTRUCTED(class, variableName)[dimension]
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+#define ERPC_MANUALLY_CONSTRUCTED_STATIC(class, variableName) ERPC_MANUALLY_CONSTRUCTED(class, variableName)
+#else
+#define ERPC_MANUALLY_CONSTRUCTED_STATIC(class, variableName)
+#endif
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+#define ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(class, variableName, dimension) \
+    ERPC_MANUALLY_CONSTRUCTED_ARRAY(class, variableName, dimension)
+#else
+#define ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(class, variableName, dimension)
+#endif
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+#define ERPC_CREATE_NEW_OBJECT(class, arrayOfObjects, numberOfObjects, ...) \
+    return new (std::nothrow) class(__VA_ARGS__);
+
+#define ERPC_DESTROY_OBJECT(object, ...) delete object;
+
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+#define ERPC_CREATE_NEW_OBJECT(class, arrayOfObjects, numberOfObjects, ...)         \
+    uint8_t objectsIterator;                                                        \
+    class *ret = NULL;                                                              \
+    for (objectsIterator = 0; objectsIterator < numberOfObjects; objectsIterator++) \
+    {                                                                               \
+        if (!arrayOfObjects[objectsIterator].isUsed())                              \
+        {                                                                           \
+            arrayOfObjects[objectsIterator].construct(__VA_ARGS__);                 \
+            ret = arrayOfObjects[objectsIterator].get();                            \
+            break;                                                                  \
+        }                                                                           \
+    }                                                                               \
+    return ret;
+
+#define ERPC_DESTROY_OBJECT(object, arrayOfObjects, numberOfObjects)                \
+    uint8_t objectsIterator;                                                        \
+    for (objectsIterator = 0; objectsIterator < numberOfObjects; objectsIterator++) \
+    {                                                                               \
+        if (object == arrayOfObjects[objectsIterator].get())                        \
+        {                                                                           \
+            arrayOfObjects[objectsIterator].destroy();                              \
+            break;                                                                  \
+        }                                                                           \
+    }
+#endif
 
 } // namespace erpc
 
