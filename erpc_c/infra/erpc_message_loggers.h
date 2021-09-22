@@ -109,6 +109,16 @@ protected:
      * @return The eRPC status based on transport type.
      */
     erpc_status_t logMessage(MessageBuffer *msg);
+
+private:
+    /**
+     * @brief This function create new MessageLogger object
+     *
+     * @param[in] transport Transport used by MessageLogger.
+     *
+     * @return MessageLogger* Returns new MessageLogger object.
+     */
+    MessageLogger *create(Transport *transport);
 };
 
 } // namespace erpc

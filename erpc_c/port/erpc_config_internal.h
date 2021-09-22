@@ -47,6 +47,41 @@
     #endif
 #endif
 
+// Detect allocation policy if not already set.
+#if !defined(ERPC_ALLOCATION_POLICY)
+    #if defined(__has_include) && __has_include("FreeRTOSConfig.h")
+        #ifdef __cplusplus
+        extern "C" {
+        #endif
+        #include "FreeRTOSConfig.h"
+        #ifdef __cplusplus
+        }
+        #endif
+        #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
+        #else
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
+        #endif
+    #else
+        #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
+    #endif
+#endif
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+#if !defined(ERPC_CODEC_COUNT)
+#define ERPC_CODEC_COUNT (2U)
+#warning "ERPC_CODEC_COUNT is not defined. Default is used."
+#endif
+#if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
+#define ERPC_MESSAGE_LOGGERS_COUNT (0U)
+#warning "ERPC_MESSAGE_LOGGERS_COUNT is not defined. Default is used."
+#endif
+#if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
+#define ERPC_CLIENTS_THREADS_AMOUNT (1U)
+#warning "ERPC_CLIENTS_THREADS_AMOUNT is not defined. Default is used."
+#endif
+#endif
+
 // Safely detect tx_api.h.
 #define ERPC_HAS_THREADX_API_H (0)
 #if defined(__has_include)
