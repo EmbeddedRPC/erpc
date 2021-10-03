@@ -30,7 +30,7 @@ public:
     {$iface.serviceClassName}() : Service(k{$iface.name}_service_id) {}
 
     /*! @brief Call the correct server shim based on method unique ID. */
-    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, erpc::Codec * codec, erpc::MessageBufferFactory *messageFactory);
+    virtual erpc_status_t handleInvocation(erpc::Md5Hash methodId, uint32_t sequence, erpc::Codec * codec, erpc::MessageBufferFactory *messageFactory);
 
 private:
 {%  for fn in iface.functions %}

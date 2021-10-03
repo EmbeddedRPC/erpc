@@ -87,7 +87,7 @@ public:
      *
      * @return Based on handleInvocation implementation.
      */
-    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec,
+    virtual erpc_status_t handleInvocation(Md5Hash methodId, uint32_t sequence, Codec *codec,
                                            MessageBufferFactory *messageFactory) = 0;
 
 protected:
@@ -186,7 +186,7 @@ protected:
      *
      * @returns #kErpcStatus_Success or based on codec startReadMessage.
      */
-    virtual erpc_status_t processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId,
+    virtual erpc_status_t processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, Md5Hash methodId,
                                          uint32_t sequence);
 
     /*!
@@ -201,7 +201,7 @@ protected:
      * @returns #kErpcStatus_Success or based on service handleInvocation.
      */
     virtual erpc_status_t readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId,
-                                            uint32_t &methodId, uint32_t &sequence);
+                                            Md5Hash methodId, uint32_t &sequence);
 
     /*!
      * @brief This function finds service base on service ID.

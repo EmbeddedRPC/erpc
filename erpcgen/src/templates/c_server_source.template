@@ -19,6 +19,8 @@ extern "C"
 }
 {% endif -- empty(group.includes) %}
 
+#include <string>
+
 {$checkVersion()}
 {$>checkCrc()}
 using namespace erpc;
@@ -204,30 +206,18 @@ static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t func
 {% for iface in group.interfaces -- service subclass method impl %}
 
 // Call the correct server shim based on method unique ID.
-erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
+erpc_status_t {$iface.serviceClassName}::handleInvocation(erpc::Md5Hash methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
-    erpc_status_t erpcStatus;
+    string hash(methodId);
 {%  if codecClass != "Codec" %}
     {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
 {%   endif %}
-    switch (methodId)
-    {
 {%  for fn in iface.functions %}
-        case k{$iface.name}_{$fn.name}_id:
-        {
-            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
-            break;
-        }
-
-{%  endfor -- fn %}
-        default:
-        {
-            erpcStatus = kErpcStatus_InvalidArgument;
-            break;
-        }
+    if(hash.compare(k{$iface.name}_{$fn.name}_id) == 0){
+        return {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
     }
-
-    return erpcStatus;
+{%  endfor -- fn %}
+    return kErpcStatus_InvalidArgument;
 }
 {%  for fn in iface.functions %}
 

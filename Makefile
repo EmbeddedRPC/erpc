@@ -27,7 +27,7 @@ include mk/erpc_common.mk
 #.NOTPARALLEL:
 
 ifeq "$(is_linux)" "1"
-ERPCSNIFFER = erpcsniffer
+#ERPCSNIFFER = erpcsniffer
 endif
 
 # Subdirectories to run make on.
