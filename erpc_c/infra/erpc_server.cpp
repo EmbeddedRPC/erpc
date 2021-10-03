@@ -69,14 +69,14 @@ void Server::removeService(Service *service)
     }
 }
 
-erpc_status_t Server::readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, uint32_t &methodId,
-                                        uint32_t &sequence)
+erpc_status_t Server::readHeadOfMessage(Codec *codec, message_type_t &msgType, uint32_t &serviceId, Md5Hash methodId,
+                                        uint32_t& sequence)
 {
-    codec->startReadMessage(&msgType, &serviceId, &methodId, &sequence);
+    codec->startReadMessage(&msgType, &serviceId, methodId, &sequence);
     return codec->getStatus();
 }
 
-erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, uint32_t methodId,
+erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint32_t serviceId, Md5Hash methodId,
                                      uint32_t sequence)
 {
     erpc_status_t err = kErpcStatus_Success;

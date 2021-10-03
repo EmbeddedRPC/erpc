@@ -108,15 +108,12 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 {% if not genCommonTypesFile %}
 {% for iface in group.interfaces %}
 /*! @brief {$iface.name} identifiers */
-enum _{$iface.name}_ids
-{
-    k{$iface.name}_service_id = {$iface.id},
+constexpr uint8_t k{$iface.name}_service_id = {$iface.id};
 {%  for fn in iface.functions %}
-    k{$iface.name}_{$fn.name}_id = {$fn.id},
+constexpr const char* k{$iface.name}_{$fn.name}_id = "{$fn.id}";
 {%  endfor %}
-};
-
 {% endfor %}
+
 #if defined(__cplusplus)
 extern "C" {
 #endif

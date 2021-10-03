@@ -59,7 +59,7 @@ public:
      * @param[in] sequence Send sequence number to be sure that
      *                    received message is reply for current request. or write function.
      */
-    virtual void startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence) override;
+    virtual void startWriteMessage(message_type_t type, uint32_t service, const Md5Hash request, uint32_t sequence) override;
 
     /*!
      * @brief Prototype for write data stream.
@@ -219,7 +219,7 @@ public:
      * @param[out] sequence Returned sequence number to be sure that
      *                     received message is reply for current request.
      */
-    virtual void startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request,
+    virtual void startReadMessage(message_type_t *type, uint32_t *service, Md5Hash request,
                                   uint32_t *sequence) override;
 
     /*!

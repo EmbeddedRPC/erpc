@@ -13,10 +13,12 @@
 #include "ParseErrors.h"
 #include "annotations.h"
 #include "format_string.h"
+#include "md5.h"
 
 #include <algorithm>
 #include <set>
 #include <sstream>
+
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -1692,7 +1694,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
     info["name"] = getOutputName(fn);
-    info["id"] = fn->getUniqueId();
+    info["id"] = md5(proto);
 
     return info;
 }

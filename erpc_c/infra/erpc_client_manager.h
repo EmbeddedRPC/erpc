@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 typedef void (*client_error_handler_t)(erpc_status_t err,
-                                       uint32_t functionID); /*!< eRPC error handler function type. */
+                                       const Md5Hash functionID); /*!< eRPC error handler function type. */
 
 #ifdef __cplusplus
 }
@@ -136,7 +136,7 @@ public:
      * @param[in] err Specify function status at the end of eRPC call.
      * @param[in] functionID Specify eRPC function call.
      */
-    void callErrorHandler(erpc_status_t err, uint32_t functionID);
+    void callErrorHandler(erpc_status_t err, const Md5Hash functionID);
 
 #if ERPC_NESTED_CALLS
     /*!
