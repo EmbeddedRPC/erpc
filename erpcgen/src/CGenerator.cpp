@@ -1694,7 +1694,9 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
     info["name"] = getOutputName(fn);
-    info["id"] = md5(proto);
+    std::string specialProto = getFunctionPrototype(group, fn, "", true);
+    std::string hash = md5(specialProto);
+    info["id"] = hash;
 
     return info;
 }
@@ -1945,7 +1947,7 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
     return proto + ");";
 }
 
-string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string name)
+string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string name, bool skipVariableNames)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -1994,7 +1996,10 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::str
         for (auto it : params)
         {
             bool isLast = (n == params.size() - 1);
-            string paramSignature = getOutputName(it);
+            string paramSignature = "";
+            if(!skipVariableNames){
+                paramSignature = getOutputName(it);
+            }
             DataType *dataType = it->getDataType();
             DataType *trueDataType = dataType->getTrueDataType();
 

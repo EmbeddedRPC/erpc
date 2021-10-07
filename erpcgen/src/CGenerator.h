@@ -424,7 +424,7 @@ private:
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string name = "");
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string name = "", bool skipVariableNames = false);
 
     /*!
      * @brief This function return interface function representation called by server side.

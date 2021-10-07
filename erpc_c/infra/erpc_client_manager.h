@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 typedef void (*client_error_handler_t)(erpc_status_t err,
-                                       const Md5Hash functionID); /*!< eRPC error handler function type. */
+                                       const erpc::Md5Hash functionID); /*!< eRPC error handler function type. */
 
 #ifdef __cplusplus
 }
