@@ -33,6 +33,15 @@
 
 namespace erpc {
 
+
+
+/*! @brief Contents of the header that prefixes each message. */
+struct Header
+{
+    uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
+    uint16_t m_crc;         //!< CRC-16 over the message data.
+};
+
 /*!
  * @brief Base class for framed transport layers.
  *
@@ -94,13 +103,6 @@ public:
      * @retval other Subclass may return other errors from the underlyingSend() method.
      */
     virtual erpc_status_t send(MessageBuffer *message) override;
-
-    /*! @brief Contents of the header that prefixes each message. */
-    struct Header
-    {
-        uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
-        uint16_t m_crc;         //!< CRC-16 over the message data.
-    };
 
     /*!
      * @brief This functions sets the CRC-16 implementation.

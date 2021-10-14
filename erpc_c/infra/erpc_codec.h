@@ -45,13 +45,13 @@ typedef funPtr *arrayOfFunPtr; // Pointer to array of functions
 
 using Md5Hash = char[33];
 
-struct Header{
+struct PayloadHeader{
     const uint8_t codecVersion = 0;
     uint8_t service = 0;
     char id[32];
     uint8_t type = 0;
-    Header(){}
-    Header(const uint8_t version, uint8_t service, const Md5Hash hash, message_type_t type) : codecVersion(version), service(service), type(static_cast<uint8_t>(type & 0xff)){
+    PayloadHeader(){}
+    PayloadHeader(const uint8_t version, uint8_t service, const Md5Hash hash, message_type_t type) : codecVersion(version), service(service), type(static_cast<uint8_t>(type & 0xff)){
         std::memcpy(id, hash, sizeof(Md5Hash)-1);
     }
 };
