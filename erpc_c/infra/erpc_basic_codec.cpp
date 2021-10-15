@@ -19,18 +19,22 @@
 
 using namespace erpc;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
 const uint8_t BasicCodec::kBasicCodecVersion = 1;
 
-void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
+void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, const Md5Hash request, uint32_t sequence)
 {
-    uint32_t header = (kBasicCodecVersion << 24) | ((service & 0xff) << 16) | ((request & 0xff) << 8) | (type & 0xff);
+    PayloadHeader header(kBasicCodecVersion, 
+        static_cast<uint8_t>((service & 0xff)),
+        request,
+        type 
+    );
 
-    write(header);
-
+    writeData(&header, sizeof(PayloadHeader));
     write(sequence);
 }
 
@@ -178,25 +182,25 @@ void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
     }
 }
 
-void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
+void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, Md5Hash request, uint32_t *sequence)
 {
-    uint32_t header;
+    PayloadHeader header;
+    readData(&header, sizeof(PayloadHeader));
 
-    read(&header);
-
-    if (((header >> 24) & 0xffU) != kBasicCodecVersion)
+    if (header.codecVersion != kBasicCodecVersion)
     {
         updateStatus(kErpcStatus_InvalidMessageVersion);
     }
 
     if (!m_status)
     {
-        *service = ((header >> 16) & 0xffU);
-        *request = ((header >> 8) & 0xffU);
-        *type = static_cast<message_type_t>(header & 0xffU);
+        *service = header.service;
+        std::memcpy(request, header.id, sizeof(Md5Hash));
+        *type = static_cast<message_type_t>(header.type);
 
         read(sequence);
     }
+
 }
 
 void BasicCodec::readData(void *value, uint32_t length)

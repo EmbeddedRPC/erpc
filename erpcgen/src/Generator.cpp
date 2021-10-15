@@ -406,7 +406,7 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
     {
         data_map ifaceInfo;
         ifaceInfo["name"] = make_data(getOutputName(iface));
-        ifaceInfo["id"] = data_ptr(iface->getUniqueId());
+        ifaceInfo["id"] = iface->getUniqueId();
 
         setTemplateComments(iface, ifaceInfo);
 

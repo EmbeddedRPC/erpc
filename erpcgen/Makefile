@@ -58,6 +58,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/CGenerator.cpp \
 			$(ERPC_ROOT)/erpcgen/src/PythonGenerator.cpp \
+			$(ERPC_ROOT)/erpcgen/src/md5.cpp \
 			$(ERPC_ROOT)/erpcgen/src/erpcgen.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ErpcLexer.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Generator.cpp \

@@ -43,6 +43,20 @@ typedef enum _message_type
 typedef void *funPtr;          // Pointer to functions
 typedef funPtr *arrayOfFunPtr; // Pointer to array of functions
 
+using Md5Hash = char[33];
+
+struct PayloadHeader{
+    const uint8_t codecVersion = 0;
+    uint8_t service = 0;
+    char id[32];
+    uint8_t type = 0;
+    PayloadHeader(){}
+    PayloadHeader(const uint8_t version, uint8_t service, const Md5Hash hash, message_type_t type) : codecVersion(version), service(service), type(static_cast<uint8_t>(type & 0xff)){
+        std::memcpy(id, hash, sizeof(Md5Hash)-1);
+    }
+};
+
+
 /*!
  * @brief Abstract serialization encoder/decoder interface.
  *
@@ -135,7 +149,7 @@ public:
      * @param[in] sequence Send sequence number to be sure that
      *                    received message is reply for current request.
      */
-    virtual void startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence) = 0;
+    virtual void startWriteMessage(message_type_t type, uint32_t service, const Md5Hash request, uint32_t sequence) = 0;
 
     /*!
      * @brief Prototype for write boolean value.
@@ -287,7 +301,7 @@ public:
      * @param[in] sequence Returned sequence number to be sure that
      *                     received message is reply for current request.
      */
-    virtual void startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence) = 0;
+    virtual void startReadMessage(message_type_t *type, uint32_t *service, Md5Hash request, uint32_t *sequence) = 0;
 
     /*!
      * @brief Prototype for read boolean value.

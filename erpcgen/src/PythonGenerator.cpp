@@ -13,6 +13,7 @@
 #include "ParseErrors.h"
 #include "annotations.h"
 #include "format_string.h"
+#include "md5.h"
 
 #include <algorithm>
 #include <set>
@@ -175,7 +176,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 
     info["name"] = getOutputName(fn);
     info["prototype"] = proto;
-    info["id"] = fn->getUniqueId();
+    info["id"] = md5(proto);
     info["isOneway"] = fn->isOneway();
     info["isReturnValue"] = !fn->isOneway();
     setTemplateComments(fn, info);
