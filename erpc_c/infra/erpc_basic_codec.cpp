@@ -28,13 +28,13 @@ const uint8_t BasicCodec::kBasicCodecVersion = 1;
 
 void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, const Md5Hash request, uint32_t sequence)
 {
-    Header header(kBasicCodecVersion, 
+    PayloadHeader header(kBasicCodecVersion, 
         static_cast<uint8_t>((service & 0xff)),
         request,
         type 
     );
 
-    writeData(&header, sizeof(Header));
+    writeData(&header, sizeof(PayloadHeader));
     write(sequence);
 }
 
@@ -184,8 +184,8 @@ void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
 
 void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, Md5Hash request, uint32_t *sequence)
 {
-    Header header;
-    readData(&header, sizeof(Header));
+    PayloadHeader header;
+    readData(&header, sizeof(PayloadHeader));
 
     if (header.codecVersion != kBasicCodecVersion)
     {
