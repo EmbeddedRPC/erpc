@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 NXP
+ * Copyright 2020-2021 NXP
  * All rights reserved.
  *
  *
@@ -25,6 +25,6 @@ ERPC_MANUALLY_CONSTRUCTED(SpidevMasterTransport, s_transport);
 erpc_transport_t erpc_transport_spidev_master_init(const char *spidev, uint32_t speed_Hz)
 {
     s_transport.construct(spidev, speed_Hz);
-    s_transport->init();
+    (void)s_transport->init();
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

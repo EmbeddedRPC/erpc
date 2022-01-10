@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -56,7 +56,7 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
     if (m_messageFactory->createServerBuffer() == true)
     {
         buff = m_messageFactory->create();
-        if (!buff.get())
+        if (NULL == buff.get())
         {
             err = kErpcStatus_MemoryError;
         }
@@ -154,7 +154,7 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
 erpc_status_t SimpleServer::run(void)
 {
     erpc_status_t err = kErpcStatus_Success;
-    while (!err && m_isServerOn)
+    while ((err == kErpcStatus_Success) && m_isServerOn)
     {
         err = runInternal();
     }
@@ -170,7 +170,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
     uint32_t methodId;
     uint32_t sequence;
 
-    while (!err && m_isServerOn)
+    while ((err == kErpcStatus_Success) && m_isServerOn)
     {
         MessageBuffer buff;
         Codec *codec = NULL;

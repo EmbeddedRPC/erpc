@@ -189,11 +189,10 @@ eRPC code is validated with respect to the C++ 11 standard.
 
 ### Installing for Python
 
-To install the Python infrastructure for eRPC, first change to the `erpc_python/` directory. Then run the setup.py script like this:
+To install the Python infrastructure for eRPC see instructions in the [erpc_python folder readme](erpc_python/readme.md).
 
-    python setup.py install
-
-After installation, the `erpc` package is available via normal import statements. See the [erpc_python folder readme](erpc_python/readme.md) for more.
+## Known issues and limitations
+- Static allocations controlled by the ERPC_ALLOCATION_POLICY config macro are not fully supported yet, i.e. not all erpc objects can be allocated statically now. It deals with the ongoing process and the full static allocations support will be added in the future.
 
 ## Code providing
 

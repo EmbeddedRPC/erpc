@@ -25,6 +25,6 @@ static ManuallyConstructed<I2cSlaveTransport> s_transport;
 erpc_transport_t erpc_transport_i2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
 {
     s_transport.construct((I2C_Type *)baseAddr, baudRate, srcClock_Hz);
-    s_transport->init();
+    (void)s_transport->init();
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

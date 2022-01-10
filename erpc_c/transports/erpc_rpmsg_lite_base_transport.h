@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -65,10 +65,15 @@ protected:
     static struct rpmsg_lite_instance *s_rpmsg; /*!< Pointer to instance of RPMSG lite. */
     static uint8_t s_initialized;               /*!< Represent information if the rpmsg-lite was initialized. */
 #if RL_USE_STATIC_API
-    struct rpmsg_lite_instance m_static_context;
-    struct rpmsg_lite_ept_static_context m_ept_context;
-    rpmsg_static_queue_ctxt m_queue_context;
-    uint8_t m_queue_stack[RL_ENV_QUEUE_STATIC_STORAGE_SIZE];
+    struct rpmsg_lite_instance m_static_context; /*!< RPMsg-Lite preallocated context used in case of static api */
+    struct rpmsg_lite_ept_static_context
+        m_ept_context; /*!< RPMsg-Lite endpoint preallocated context used in case of static api */
+#ifdef RL_ENV_QUEUE_STATIC_STORAGE_SIZE
+    rpmsg_static_queue_ctxt
+        m_queue_context; /*!< RPMsg-Lite queue preallocated context used in case of static api and an RTOS-based env. */
+    uint8_t m_queue_stack[RL_ENV_QUEUE_STATIC_STORAGE_SIZE]; /*!< RPMsg-Lite queue static storage used in case of static
+                                                                api and an RTOS-based env. */
+#endif                                                       /* RL_ENV_QUEUE_STATIC_STORAGE_SIZE */
 #endif
 };
 

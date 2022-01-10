@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -118,7 +118,7 @@ public:
      */
     void updateStatus(erpc_status_t status)
     {
-        if (!m_status)
+        if (isStatusOk())
         {
             m_status = status;
         }

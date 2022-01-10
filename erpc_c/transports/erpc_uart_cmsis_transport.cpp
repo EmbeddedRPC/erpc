@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -38,7 +38,7 @@ UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv)
 
 UartTransport::~UartTransport(void)
 {
-    (*m_uartDrv).Uninitialize();
+    (void)(*m_uartDrv).Uninitialize();
 }
 
 void UartTransport::tx_cb(void)
@@ -111,7 +111,7 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
     {
 /* wait until the receiving is finished */
 #if !ERPC_THREADS_IS(NONE)
-        m_rxSemaphore.get();
+        (void)m_rxSemaphore.get();
 #else
         while (!s_isTransferReceiveCompleted)
         {
@@ -134,7 +134,7 @@ erpc_status_t UartTransport::underlyingSend(const uint8_t *data, uint32_t size)
     {
 /* wait until the sending is finished */
 #if !ERPC_THREADS_IS(NONE)
-        m_txSemaphore.get();
+        (void)m_txSemaphore.get();
 #else
         while (!s_isTransferSendCompleted)
         {

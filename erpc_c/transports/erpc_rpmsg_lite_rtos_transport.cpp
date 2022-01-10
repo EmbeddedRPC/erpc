@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -260,8 +260,8 @@ erpc_status_t RPMsgRTOSTransport::send(MessageBuffer *message)
 {
     erpc_status_t status = kErpcStatus_Success;
     uint8_t *buf = message->get();
-    uint32_t length = message->getLength();
-    uint32_t used = message->getUsed();
+    uint16_t length = message->getLength();
+    uint16_t used = message->getUsed();
     int32_t ret_val;
 
     message->set(NULL, 0);
