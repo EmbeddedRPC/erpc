@@ -378,12 +378,12 @@ void BasicCodec::readCallback(funPtr callbacks1, funPtr *callback2)
 
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT);
 
-Codec *BasicCodecFactory ::create()
+Codec *BasicCodecFactory::create()
 {
     ERPC_CREATE_NEW_OBJECT(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT)
 }
 
-void BasicCodecFactory ::dispose(Codec *codec)
+void BasicCodecFactory::dispose(Codec *codec)
 {
     ERPC_DESTROY_OBJECT(codec, s_basicCodecManual, ERPC_CODEC_COUNT)
 }
