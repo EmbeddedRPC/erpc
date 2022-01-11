@@ -98,8 +98,12 @@ public:
      * @param[in] name Optional name for the thread.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
+#if ERPC_THREADS_IS(FREERTOS)
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0,
            thread_stack_pointer stackPtr = 0);
+#else
+    Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
+#endif
 
     /*!
      * @brief Destructor.
@@ -128,7 +132,11 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
+#if ERPC_THREADS_IS(FREERTOS)
     void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = 0);
+#else
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0);
+#endif
 
     /*!
      * @brief This function starts thread execution.

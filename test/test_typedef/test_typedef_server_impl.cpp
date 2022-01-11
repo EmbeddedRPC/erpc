@@ -171,13 +171,13 @@ void add_services_to_server()
 void remove_services_from_server()
 {
     erpc_remove_service_from_server(service_test);
-    destroy_TypedefService_service();
+    destroy_TypedefService_service(service_test);
 }
 
 void remove_common_services_from_server(erpc_service_t service)
 {
     erpc_remove_service_from_server(service);
-    destroy_Common_service();
+    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

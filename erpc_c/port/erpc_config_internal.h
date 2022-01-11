@@ -70,15 +70,12 @@
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 #if !defined(ERPC_CODEC_COUNT)
 #define ERPC_CODEC_COUNT (2U)
-#warning "ERPC_CODEC_COUNT is not defined. Default is used."
 #endif
 #if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
 #define ERPC_MESSAGE_LOGGERS_COUNT (0U)
-#warning "ERPC_MESSAGE_LOGGERS_COUNT is not defined. Default is used."
 #endif
 #if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
 #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
-#warning "ERPC_CLIENTS_THREADS_AMOUNT is not defined. Default is used."
 #endif
 #endif
 

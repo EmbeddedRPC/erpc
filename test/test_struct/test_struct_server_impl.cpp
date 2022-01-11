@@ -229,14 +229,14 @@ void remove_services_from_server()
 {
     erpc_remove_service_from_server(service1);
     erpc_remove_service_from_server(service2);
-    destroy_ArithmeticService1_service();
-    destroy_ArithmeticService2_service();
+    destroy_ArithmeticService1_service(service1);
+    destroy_ArithmeticService2_service(service2);
 }
 
 void remove_common_services_from_server(erpc_service_t service)
 {
     erpc_remove_service_from_server(service);
-    destroy_Common_service();
+    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }
