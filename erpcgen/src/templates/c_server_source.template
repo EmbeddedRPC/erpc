@@ -269,6 +269,6 @@ void destroy_{$iface.serviceClassName}()
     s_{$iface.serviceClassName}.destroy();
 }
 #else
-#warning "Unknow eRPC allocation policy!"
+#warning "Unknown eRPC allocation policy!"
 #endif
 {% endfor -- iface %}

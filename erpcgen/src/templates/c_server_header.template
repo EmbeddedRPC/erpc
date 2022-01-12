@@ -55,7 +55,7 @@ void destroy_{$iface.serviceClassName}(erpc_service_t service);
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 void destroy_{$iface.serviceClassName}(void);
 #else
-#warning "Unknow eRPC allocation policy!"
+#warning "Unknown eRPC allocation policy!"
 #endif
 
 {% endfor -- iface %}
