@@ -93,7 +93,7 @@
 //! messages, or sending data to another system for data analysis. Default set to ERPC_MESSAGE_LOGGING_DISABLED.
 //!
 //! Uncomment for using logging feature.
-#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
+// #define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
 //@}
 
 /*! @} */
