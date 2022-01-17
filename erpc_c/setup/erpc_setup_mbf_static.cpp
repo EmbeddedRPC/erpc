@@ -22,8 +22,7 @@
 
 using namespace erpc;
 
-#define ERPC_BUFFER_SIZE_UINT64 \
-    ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t))
+#define ERPC_BUFFER_SIZE_UINT64 ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t))
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -114,8 +113,7 @@ public:
 protected:
     //! Bitmap representing which buffers are in use. A bit value of 1 means free and 0 means in
     //! use.
-    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) +
-                               (ERPC_DEFAULT_BUFFERS_COUNT % 8 ? 1U : 0U)];
+    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) + (ERPC_DEFAULT_BUFFERS_COUNT % 8 ? 1U : 0U)];
     //! Static buffers
     uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT][ERPC_BUFFER_SIZE_UINT64];
 #if !ERPC_THREADS_IS(NONE)

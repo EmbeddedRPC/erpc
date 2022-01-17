@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -263,7 +263,7 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
 
     if (ret_val == RL_SUCCESS)
     {
-        memcpy((uint8_t *)&h, buf, sizeof(h));
+        (void)memcpy((uint8_t *)&h, buf, sizeof(h));
         message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
 
         /* Verify CRC. */

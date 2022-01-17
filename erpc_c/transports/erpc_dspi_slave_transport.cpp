@@ -122,8 +122,8 @@ erpc_status_t DspiSlaveTransport::init(void)
 
     DSPI_SlaveGetDefaultConfig(&dspiConfig);
 
-    DSPI_SlaveInit(m_spiBaseAddr, &dspiConfig);
-    DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, DSPI_SlaveUserCallback, NULL);
+    (void)DSPI_SlaveInit(m_spiBaseAddr, &dspiConfig);
+    (void)DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, DSPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpiSlaveTransport_NotifyTransferGpioInit();
@@ -136,12 +136,12 @@ erpc_status_t DspiSlaveTransport::init(void)
 erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     status_t status;
-    dspi_transfer_t slaveXfer;
+    dspi_transfer_t slaveXfer = { 0 };
 
     slaveXfer.txData = NULL;
     slaveXfer.rxData = data;
     slaveXfer.dataSize = size;
-    slaveXfer.configFlags = kDSPI_SlaveCtar0;
+    slaveXfer.configFlags = (uint32_t)kDSPI_SlaveCtar0;
     s_isTransferCompleted = false;
 
     status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
@@ -172,14 +172,14 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     status_t status;
-    dspi_transfer_t slaveXfer;
+    dspi_transfer_t slaveXfer = { 0 };
     s_isTransferCompleted = false;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     slaveXfer.txData = (uint8_t *)data;
     slaveXfer.rxData = NULL;
     slaveXfer.dataSize = size;
-    slaveXfer.configFlags = kDSPI_SlaveCtar0;
+    slaveXfer.configFlags = (uint32_t)kDSPI_SlaveCtar0;
     {
 #else
     uint8_t *dspiData = new (nothrow) uint8_t[size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
@@ -187,12 +187,12 @@ erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t s
     {
         dspiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
         dspiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
-        memcpy(&dspiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+        (void)memcpy(&dspiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
 
         slaveXfer.txData = dspiData;
         slaveXfer.rxData = NULL;
         slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
-        slaveXfer.configFlags = kDSPI_SlaveCtar0;
+        slaveXfer.configFlags = (uint32_t)kDSPI_SlaveCtar0;
 #endif
 
         status = DSPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);

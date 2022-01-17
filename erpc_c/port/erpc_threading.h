@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -352,12 +352,12 @@ public:
         Guard(Mutex &mutex)
         : m_mutex(mutex)
         {
-            m_mutex.lock();
+            (void)m_mutex.lock();
         }
         /*!
          * @brief Destructor.
          */
-        ~Guard(void) { m_mutex.unlock(); }
+        ~Guard(void) { (void)m_mutex.unlock(); }
 
     private:
         Mutex &m_mutex; /*!< Mutex to lock. */
@@ -448,7 +448,7 @@ public:
     /*!
      * @brief Variable for semaphore to wait forever.
      */
-    static const uint32_t kWaitForever = 0xffffffff;
+    static const uint32_t kWaitForever = 0xffffffffu;
 
     /*!
      * @brief Constructor.
@@ -510,7 +510,7 @@ private:
     int m_count;
     HANDLE m_sem;
 #elif ERPC_THREADS_IS(THREADX)
-    TX_SEMAPHORE m_sem;   /*!< Semaphore. */
+    TX_SEMAPHORE m_sem; /*!< Semaphore. */
 #endif
 
 private:

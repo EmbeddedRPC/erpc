@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -181,7 +181,7 @@ TransportArbitrator::PendingClientInfo *TransportArbitrator::addPendingClient(vo
 
     // Get a free client info node, or allocate one.
     PendingClientInfo *info = NULL;
-    if (!m_clientFreeList)
+    if (m_clientFreeList == NULL)
     {
         info = createPendingClient();
     }
@@ -192,7 +192,7 @@ TransportArbitrator::PendingClientInfo *TransportArbitrator::addPendingClient(vo
     }
 
     // Add to active list.
-    if (!m_clientList)
+    if (m_clientList == NULL)
     {
         m_clientList = info;
     }

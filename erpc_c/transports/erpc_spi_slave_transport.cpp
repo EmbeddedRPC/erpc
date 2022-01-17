@@ -48,7 +48,7 @@ static SpiSlaveTransport *s_spi_slave_instance = NULL;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
 /* @brief Initialize the GPIO used to notify the SPI Master */
-static inline void SpiSlaveTransport_NotifyTransferGpioInit()
+static inline void SpiSlaveTransport_NotifyTransferGpioInit(void)
 {
     gpio_pin_config_t gpioConfig;
 
@@ -65,7 +65,7 @@ static inline void SpiSlaveTransport_NotifyTransferGpioInit()
 }
 
 /* @brief Notify the SPI Master that the Slave is ready for a new transfer */
-static inline void SpiSlaveTransport_NotifyTransferGpioReady()
+static inline void SpiSlaveTransport_NotifyTransferGpioReady(void)
 {
 #ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
     /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
@@ -77,7 +77,7 @@ static inline void SpiSlaveTransport_NotifyTransferGpioReady()
 }
 
 /* @brief Notify the SPI Master that the Slave has finished the transfer */
-static inline void SpiSlaveTransport_NotifyTransferGpioCompleted()
+static inline void SpiSlaveTransport_NotifyTransferGpioCompleted(void)
 {
 #ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
     /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
@@ -140,8 +140,8 @@ erpc_status_t SpiSlaveTransport::init(void)
 
     SPI_SlaveGetDefaultConfig(&spiConfig);
 
-    SPI_SlaveInit(m_spiBaseAddr, &spiConfig);
-    SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, SPI_SlaveUserCallback, NULL);
+    (void)SPI_SlaveInit(m_spiBaseAddr, &spiConfig);
+    (void)SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, SPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpiSlaveTransport_NotifyTransferGpioInit();
@@ -154,7 +154,7 @@ erpc_status_t SpiSlaveTransport::init(void)
 erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     status_t status;
-    spi_transfer_t slaveXfer;
+    spi_transfer_t slaveXfer = { 0 };
 
     slaveXfer.txData = NULL;
     slaveXfer.rxData = data;
@@ -203,7 +203,7 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
     {
         spiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
         spiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
-        memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+        (void)memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
         slaveXfer.txData = spiData;
         slaveXfer.rxData = NULL;
         slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
