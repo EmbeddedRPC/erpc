@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -98,12 +98,8 @@ public:
      * @param[in] name Optional name for the thread.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-#if ERPC_THREADS_IS(FREERTOS)
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0,
            thread_stack_pointer stackPtr = 0);
-#else
-    Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0);
-#endif
 
     /*!
      * @brief Destructor.
@@ -132,11 +128,7 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-#if ERPC_THREADS_IS(FREERTOS)
     void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = 0);
-#else
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0);
-#endif
 
     /*!
      * @brief This function starts thread execution.
@@ -360,12 +352,12 @@ public:
         Guard(Mutex &mutex)
         : m_mutex(mutex)
         {
-            m_mutex.lock();
+            (void)m_mutex.lock();
         }
         /*!
          * @brief Destructor.
          */
-        ~Guard(void) { m_mutex.unlock(); }
+        ~Guard(void) { (void)m_mutex.unlock(); }
 
     private:
         Mutex &m_mutex; /*!< Mutex to lock. */
@@ -456,7 +448,7 @@ public:
     /*!
      * @brief Variable for semaphore to wait forever.
      */
-    static const uint32_t kWaitForever = 0xffffffff;
+    static const uint32_t kWaitForever = 0xffffffffu;
 
     /*!
      * @brief Constructor.
@@ -518,7 +510,7 @@ private:
     int m_count;
     HANDLE m_sem;
 #elif ERPC_THREADS_IS(THREADX)
-    TX_SEMAPHORE m_sem;   /*!< Semaphore. */
+    TX_SEMAPHORE m_sem; /*!< Semaphore. */
 #endif
 
 private:

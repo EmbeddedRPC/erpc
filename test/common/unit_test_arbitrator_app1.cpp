@@ -231,7 +231,7 @@ void quitFirstInterfaceServer()
 {
     /* removing the service from the server */
     erpc_remove_service_from_server(service);
-    destroy_FirstInterface_service();
+    destroy_FirstInterface_service((erpc_service_t *)service);
 
     // Stop server part
     erpc_server_stop();

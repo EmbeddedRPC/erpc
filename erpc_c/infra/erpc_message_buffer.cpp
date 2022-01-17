@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -32,7 +32,7 @@ erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
     {
         if (length > 0U)
         {
-            memcpy(data, &m_buf[offset], length);
+            (void)memcpy(data, &m_buf[offset], length);
         }
 
         err = kErpcStatus_Success;
@@ -53,7 +53,7 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
     {
         if (length > 0U)
         {
-            memcpy(m_buf, data, length);
+            (void)memcpy(m_buf, data, length);
         }
 
         err = kErpcStatus_Success;
@@ -67,7 +67,7 @@ erpc_status_t MessageBuffer::copy(const MessageBuffer *other)
     assert(m_len >= other->m_len);
 
     m_used = other->m_used;
-    memcpy(m_buf, other->m_buf, m_used);
+    (void)memcpy(m_buf, other->m_buf, m_used);
 
     return kErpcStatus_Success;
 }
@@ -108,7 +108,7 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
     }
     else
     {
-        memcpy(data, m_pos, length);
+        (void)memcpy(data, m_pos, length);
         m_pos += length;
         m_remaining -= length;
 
@@ -130,7 +130,7 @@ erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
     }
     else
     {
-        memcpy(m_pos, data, length);
+        (void)memcpy(m_pos, data, length);
         m_pos += length;
         m_remaining -= length;
         m_buffer->setUsed(m_buffer->getUsed() + length);

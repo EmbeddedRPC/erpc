@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -67,7 +67,7 @@ void erpc_free(void *ptr)
 #if ((defined(__GNUC__)) && (defined(__arm__)))
 extern "C" void __cxa_pure_virtual(void)
 {
-    while (1)
+    for (;;)
     {
     };
 }

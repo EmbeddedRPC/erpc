@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 NXP
+ * Copyright 2020-2021 NXP
  * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -35,7 +35,7 @@ void erpc::erpc_pre_cb_default(void)
 
 void erpc::erpc_post_cb_default(void)
 {
-    xTimerStop(s_erpc_call_timer_cb, 0);
+    (void)xTimerStop(s_erpc_call_timer_cb, 0);
     s_erpc_call_in_progress->put();
 }
 
@@ -80,7 +80,7 @@ void erpc_deinit_call_progress_detection_default(void)
 
     if (s_erpc_call_timer_cb != NULL)
     {
-        xTimerDelete(s_erpc_call_timer_cb, 0);
+        (void)xTimerDelete(s_erpc_call_timer_cb, 0);
         s_erpc_call_timer_cb = NULL;
     }
 }
@@ -107,5 +107,5 @@ void erpc_reset_in_progress_state_default(void)
 
     assert(s_erpc_call_timer_cb &&
            "If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default.");
-    xTimerStop(s_erpc_call_timer_cb, 0);
+    (void)xTimerStop(s_erpc_call_timer_cb, 0);
 }

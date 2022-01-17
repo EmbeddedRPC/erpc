@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -75,8 +75,8 @@ void Thread::start(void *arg)
     if (m_stackPtr != NULL)
     {
         m_task =
-            xTaskCreateStatic(threadEntryPointStub, (m_name ? m_name : "task"),
-                              ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
+            xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                              (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
                               this, m_priority, m_stackPtr, &m_staticTask);
         taskCreated = true;
     }
@@ -86,8 +86,8 @@ void Thread::start(void *arg)
     if (m_stackPtr == NULL)
     {
         if (pdPASS ==
-            xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
-                        ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
+            xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                        (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
                         this, m_priority, &m_task))
         {
             taskCreated = true;
@@ -135,7 +135,7 @@ Thread *Thread::getCurrentThread(void)
 void Thread::sleep(uint32_t usecs)
 {
 #if INCLUDE_vTaskDelay
-    vTaskDelay(usecs / 1000 / portTICK_PERIOD_MS);
+    vTaskDelay(usecs / 1000U / portTICK_PERIOD_MS);
 #endif
 }
 
@@ -222,17 +222,17 @@ Mutex::~Mutex(void)
 bool Mutex::tryLock(void)
 {
     // Pass a zero timeout to poll the mutex.
-    return xSemaphoreTakeRecursive(m_mutex, 0);
+    return (pdTRUE == xSemaphoreTakeRecursive(m_mutex, 0) ? true : false);
 }
 
 bool Mutex::lock(void)
 {
-    return xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
+    return (pdTRUE == xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY) ? true : false);
 }
 
 bool Mutex::unlock(void)
 {
-    return xSemaphoreGiveRecursive(m_mutex);
+    return (pdTRUE == xSemaphoreGiveRecursive(m_mutex) ? true : false);
 }
 
 Semaphore::Semaphore(int count)
@@ -240,9 +240,9 @@ Semaphore::Semaphore(int count)
 {
     // Set max count to highest signed int.
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    m_sem = xSemaphoreCreateCountingStatic(0x7fffffff, count, &m_staticQueue);
+    m_sem = xSemaphoreCreateCountingStatic(0x7fffffffu, (UBaseType_t)count, &m_staticQueue);
 #elif configSUPPORT_DYNAMIC_ALLOCATION
-    m_sem = xSemaphoreCreateCounting(0x7fffffff, count);
+    m_sem = xSemaphoreCreateCounting(0x7fffffffu, (UBaseType_t)count);
 #else
 #error "Allocation method didn't match"
 #endif
@@ -255,13 +255,13 @@ Semaphore::~Semaphore(void)
 
 void Semaphore::put(void)
 {
-    xSemaphoreGive(m_sem);
+    (void)xSemaphoreGive(m_sem);
 }
 
 void Semaphore::putFromISR(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
+    (void)xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -281,7 +281,7 @@ bool Semaphore::get(uint32_t timeout)
     }
 #endif
 
-    return (pdTRUE == xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS));
+    return (pdTRUE == xSemaphoreTake(m_sem, timeout / 1000U / portTICK_PERIOD_MS));
 }
 
 int Semaphore::getCount(void) const

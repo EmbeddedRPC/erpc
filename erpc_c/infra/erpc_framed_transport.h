@@ -62,7 +62,7 @@ public:
     FramedTransport(void);
 
     /*!
-     * @brief Codec destructor
+     * @brief FramedTransport destructor
      */
     virtual ~FramedTransport(void);
 

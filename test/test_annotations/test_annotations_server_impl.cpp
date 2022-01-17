@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016 - 2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -79,13 +79,21 @@ void add_services_to_server()
 void remove_services_from_server()
 {
     erpc_remove_service_from_server(service_test);
-    destroy_AnnotateTest_service(&service_test);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_AnnotateTest_service((erpc_service_t *)service_test);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    destroy_AnnotateTest_service();
+#endif
 }
 
 void remove_common_services_from_server(erpc_service_t service)
 {
     erpc_remove_service_from_server(service);
-    destroy_Common_service(&service);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_Common_service((erpc_service_t *)service);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    destroy_Common_service();
+#endif
 }
 #ifdef __cplusplus
 }

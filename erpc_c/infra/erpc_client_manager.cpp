@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -197,7 +197,7 @@ Codec *ClientManager::createBufferAndCodec(void)
     if (codec != NULL)
     {
         message = m_messageFactory->create();
-        if (message.get())
+        if (NULL != message.get())
         {
             codec->setBuffer(message);
         }

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2021 NXP
 # All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -25,7 +25,7 @@ OUTPUT_ROOT := $(ERPC_ROOT)
 TEST_ROOT :=  $(ERPC_ROOT)/test
 
 ifeq "$(is_mingw)" "1"
-BOOST_ROOT ?= c:/boost_1_57_0
+BOOST_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/boost_1_67_0
 else
 BOOST_ROOT ?= /usr/local/opt/boost
 endif

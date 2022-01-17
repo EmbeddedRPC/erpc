@@ -1,8 +1,9 @@
 /*
 /*
  * Copyright (c) 2021, StarGate, Inc.
+ * Copyright 2021 NXP
  * All rights reserved.
- * 
+ *
  * Ibrahim ERTURK <ierturk@ieee.org>
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -68,7 +69,7 @@ void erpc_free(void *ptr)
 #if ((defined(__GNUC__)) && (defined(__arm__)))
 extern "C" void __cxa_pure_virtual(void)
 {
-    while (1)
+    for (;;)
     {
     };
 }

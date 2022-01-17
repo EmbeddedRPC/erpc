@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 NXP
+ * Copyright 2020-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -45,7 +45,7 @@ static volatile int s_gpioHandle = 0;
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
 static inline void SpidevMasterTransport_WaitForSlaveReadyGpio()
 {
-    while (1)
+    for (;;)
     {
         /*
          * The GPIO pin has been configured to generate interrupts on edge event
@@ -62,7 +62,7 @@ static inline void SpidevMasterTransport_WaitForSlaveReadyMarker(int spi_fd)
 {
     uint8_t detected = 0;
     uint8_t data;
-    while (1)
+    for (;;)
     {
         spidev_transfer(spi_fd, NULL, &data, 1);
         if (ERPC_BOARD_SPI_SLAVE_READY_MARKER1 == data)
