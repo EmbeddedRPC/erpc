@@ -23,8 +23,11 @@ ERPC_MANUALLY_CONSTRUCTED(SerialTransport, s_transport);
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-
+#if defined(STM32F446xx)
+erpc_transport_t erpc_transport_serial_init(USART_TypeDef *portName, long baudRate)
+#else
 erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate)
+#endif
 {
     erpc_transport_t transport;
     const uint8_t vtime = 0;

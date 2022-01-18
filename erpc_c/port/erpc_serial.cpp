@@ -45,7 +45,13 @@ static OVERLAPPED s_readOverlap;
 #define RX_BUF_BYTES 1024U
 #endif
 
+
+
+#if defined(STM32F446xx)
+HAL_StatusTypeDef serial_setup(UART_HandleTypeDef *huart, speed_t speed)
+#else
 int serial_setup(int fd, speed_t speed)
+#endif
 {
 #ifdef _WIN32
     COMMTIMEOUTS timeouts;
@@ -85,6 +91,15 @@ int serial_setup(int fd, speed_t speed)
     s_readOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
     SetCommMask(hCom, EV_RXCHAR);
+#elif defined(STM32F446xx)
+    huart->Init.BaudRate = speed;
+	huart->Init.WordLength = UART_WORDLENGTH_8B;
+	huart->Init.StopBits = UART_STOPBITS_1;
+	huart->Init.Parity = UART_PARITY_NONE;
+	huart->Init.Mode = UART_MODE_TX_RX;
+	huart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart->Init.OverSampling = UART_OVERSAMPLING_16;
+	return HAL_UART_Init(huart);
 #else
     (void)speed;
     struct termios tty;
@@ -138,13 +153,18 @@ int serial_setup(int fd, speed_t speed)
 #endif //#ifdef __APPLE__
 
 #endif // _WIN32
+#if !defined(STM32F446xx)
     return 0;
+#endif
+
 }
 
 int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
 {
 #ifdef _WIN32
     // TODO
+#elif defined(STM32F446xx)
+    /* code need to be added for uart */
 #else
     struct termios tty;
     /*memset(&tty, 0x00, sizeof(tty));
@@ -171,7 +191,11 @@ int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
     return 0;
 }
 
+#if defined(STM32F446xx)
+HAL_StatusTypeDef serial_write(UART_HandleTypeDef *huart, char *buf, int size)
+#else
 int serial_write(int fd, char *buf, int size)
+#endif
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
@@ -198,12 +222,19 @@ int serial_write(int fd, char *buf, int size)
     ClearCommError(hCom, &errors, &status);
 
     return bwritten;
+#elif defined(STM32F446xx)
+    //return HAL_UART_Transmit_IT(huart, (uint8_t *)buf, (uint16_t)size);
+    return HAL_UART_Transmit(huart, (uint8_t *)buf, (uint16_t)size, 1000);
 #else
     return write(fd, buf, size);
 #endif
 }
 
+#if defined(STM32F446xx)
+HAL_StatusTypeDef serial_read(UART_HandleTypeDef *huart, char *buf, int size)
+#else
 int serial_read(int fd, char *buf, int size)
+#endif
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
@@ -260,6 +291,9 @@ int serial_read(int fd, char *buf, int size)
     }
 
     return bytesToRead;
+#elif defined(STM32F446xx)
+    //return HAL_UART_Receive_IT(huart, (uint8_t *)buf, (uint16_t)size);
+    return HAL_UART_Receive(huart, (uint8_t *)buf, (uint16_t)size, 10000);
 #else
     int len = 0;
     int ret = 0;
@@ -291,9 +325,20 @@ int serial_read(int fd, char *buf, int size)
     return len;
 #endif
 }
-
+#if defined(STM32F446xx)
+int serial_open(USART_TypeDef *inst, UART_HandleTypeDef *huart)
+#else
 int serial_open(const char *port)
+#endif
 {
+#if defined(STM32F446xx)
+	if((inst == USART2) || (inst == USART1))
+	{
+		huart->Instance = inst;
+		return 0;
+	}
+	return -1;
+#else
     int fd;
 #ifdef _WIN32
     static char full_path[32] = { 0 };
@@ -319,6 +364,7 @@ int serial_open(const char *port)
     {
         fd = (int)hCom;
     }
+
 #else
     fd = open(port, O_RDWR | O_NOCTTY);
     if (fd == -1)
@@ -328,16 +374,26 @@ int serial_open(const char *port)
     }
 #endif
     return fd;
+#endif
 }
 
+#if defined(STM32F446xx)
+HAL_StatusTypeDef serial_close(UART_HandleTypeDef *huart)
+#else
 int serial_close(int fd)
+#endif
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
 
     CloseHandle(hCom);
+#elif defined(STM32F446xx)
+    return HAL_UART_DeInit(huart);
 #else
+
     close(fd);
 #endif
+#if !defined(STM32F446xx)
     return 0;
+#endif
 }

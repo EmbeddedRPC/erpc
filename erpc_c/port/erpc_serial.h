@@ -41,17 +41,19 @@
 #define B115200 115200
 #define B921600 921600
 
-typedef long speed_t;
+#elif defined(STM32F446xx)
+#include "stm32f4xx_hal.h"
 #else
 
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <termios.h>
+//#include <termios.h>
 #include <unistd.h>
 
 #endif
 
+typedef int speed_t;
 /*!
  * @addtogroup port_serial
  * @{
@@ -62,12 +64,24 @@ typedef long speed_t;
 extern "C" {
 #endif
 
+
+
+#if defined(STM32F446xx)
+int serial_open(USART_TypeDef  *Instance, UART_HandleTypeDef *huart);
+HAL_StatusTypeDef serial_close(UART_HandleTypeDef *huart);
+HAL_StatusTypeDef serial_write(UART_HandleTypeDef *huart, char *buf, int size);
+HAL_StatusTypeDef serial_read(UART_HandleTypeDef *huart, char *buf, int size);
+HAL_StatusTypeDef serial_setup(UART_HandleTypeDef *huart, speed_t speed);
+#else
+int serial_open(const char *port);
+int serial_close(int fd);
 int serial_setup(int fd, speed_t speed);
 int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin);
 int serial_write(int fd, char *buf, int size);
 int serial_read(int fd, char *buf, int size);
-int serial_open(const char *port);
-int serial_close(int fd);
+#endif
+
+
 
 #if __cplusplus
 }

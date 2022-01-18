@@ -11,15 +11,17 @@
 #define _EMBEDDED_RPC__SERIAL_TRANSPORT_H_
 
 #include "erpc_framed_transport.h"
+#include "stm32f4xx_hal.h"
 
 #include <string>
 
 #ifdef _WIN32
 typedef long speed_t;
-#else
+#elif _LINUX
 #include <termios.h>
+#else
 #endif
-
+typedef int speed_t;
 /*!
  * @addtogroup serial_transport
  * @{
@@ -45,7 +47,11 @@ public:
      * @param[in] portName Port name.
      * @param[in] baudRate Baudrate.
      */
+#if defined(STM32F446xx)
+    SerialTransport(USART_TypeDef *portName, speed_t baudRate);
+#else
     SerialTransport(const char *portName, speed_t baudRate);
+#endif
 
     /*!
      * @brief Destructor.
@@ -86,8 +92,14 @@ private:
     virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
 private:
+#if defined(STM32F446xx)
+    UART_HandleTypeDef *m_serialHandle;
+    USART_TypeDef      *m_portName;
+#else
     int m_serialHandle;     /*!< Serial handle id. */
     const char *m_portName; /*!< Port name. */
+#endif
+
     speed_t m_baudRate;     /*!< Bauderate. */
 };
 

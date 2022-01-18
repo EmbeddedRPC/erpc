@@ -36,6 +36,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "stm32f4xx_hal.h"
 
 //! @name Transport setup
 //@{
@@ -69,7 +70,11 @@ erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
+#if defined(STM32F446xx)
+erpc_transport_t erpc_transport_serial_init(USART_TypeDef *portName, long baudRate);
+#else
 erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate);
+#endif
 //@}
 
 //! @name SPI transport setup
