@@ -168,10 +168,10 @@ lang: py
 test/common.py:
   - not: class unionVariable_union(object)
   - "class structType(object):"
-  - def __init__(self, discriminator=None)
+  - def __init__(self, discriminator=None, unionVariable=None)
   - self.discriminator = discriminator # fruitType
   - self.unionVariable = unionVariable # unionType
-  - self.unionVariable, self.discriminator = common.unionType()._read(codec)
+  - self.unionVariable, self.discriminator = unionType()._read(codec)
   - unionVariable._write(codec, self.discriminator)
   - "class unionType(object):"
   - discriminator = codec.start_read_union()
