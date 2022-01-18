@@ -46,6 +46,5 @@ setup(
         "Operating System :: POSIX :: Linux",
     ],
     keywords='rpc rpc-framework embedded multicore multiprocessor amp rpmsg_lite',
-    use_2to3=True,
     packages=['erpc'],
 )
