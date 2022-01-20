@@ -15,7 +15,6 @@ import re
 import itertools
 import string
 import traceback
-import imp
 import textwrap
 import errno
 import shlex
@@ -682,7 +681,7 @@ class ErpcgenTestCase(object):
 
         # Escape non-regex cases.
         if not isRegex:
-            pattern = re.escape(pattern).replace('\ ', '\s*')
+            pattern = re.escape(pattern).replace(r'\ ', r'\s*')
 
         rx = re.compile(pattern, re.MULTILINE)
         match = rx.search(self._contents, self._pos)
@@ -710,7 +709,7 @@ class ErpcgenTestCase(object):
                 pattern = case['not']
 
             if not isRegex:
-                pattern = re.escape(pattern).replace('\ ', '\s*')
+                pattern = re.escape(pattern).replace(r'\ ', r'\s*')
 
             rx = re.compile(pattern, re.MULTILINE)
             match = rx.search(self._contents, pos, endPos)
