@@ -1,0 +1,48 @@
+---
+name: static
+desc: dynamic annotation is not used.
+idl: |
+    program test
+
+    interface ErrorTest{
+        oneway f()
+    }
+
+test_server.h:
+    - erpc_service_t create_ErrorTest_service(void);
+
+    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
+    - void destroy_ErrorTest_service(erpc_service_t service);
+    - "#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC"
+    - void destroy_ErrorTest_service(void);
+    - "#else"
+    - "#warning \"Unknown eRPC allocation policy!\""
+    - "#endif"
+
+test_server.cpp:
+    - ERPC_MANUALLY_CONSTRUCTED_STATIC(ErrorTest_service, s_ErrorTest_service);
+    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
+    - erpc_service_t create_ErrorTest_service()
+    - "{"
+    - return new (nothrow) ErrorTest_service();
+    - "}"
+    - void destroy_ErrorTest_service(erpc_service_t service)
+    - "{"
+    - if (service)
+    - "{"
+    - delete (ErrorTest_service *)service;
+    - "}"
+    - "}"
+    - "#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC"
+    - erpc_service_t create_ErrorTest_service()
+    - "{"
+    - s_ErrorTest_service.construct();
+    - return s_ErrorTest_service.get();
+    - "}"
+    - void destroy_ErrorTest_service()
+    - "{"
+    - s_ErrorTest_service.destroy();
+    - "}"
+    - "#else"
+    - "#warning \"Unknown eRPC allocation policy!\""
+    - "#endif"

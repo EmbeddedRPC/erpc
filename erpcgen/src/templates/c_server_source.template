@@ -250,11 +250,11 @@ erpc_service_t create_{$iface.serviceClassName}()
     return new (nothrow) {$iface.serviceClassName}();
 }
 
-void destroy_{$iface.serviceClassName}(erpc_service_t *service)
+void destroy_{$iface.serviceClassName}(erpc_service_t service)
 {
-    if (*service)
+    if (service)
     {
-        delete service;
+        delete ({$iface.serviceClassName} *)service;
     }
 }
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
