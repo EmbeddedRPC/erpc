@@ -1,0 +1,58 @@
+version: 2.1
+
+jobs:
+  build-linux-gcc:
+    machine: 
+      image: ubuntu-2004:202111-02
+    steps:
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev gcc g++
+      - run: sudo pip install pytest pyyaml enum34 pyserial
+      - run: CC=gcc CXX=g++ make all
+      - run: pushd erpcgen/test ; py.test ; popd
+      - run: python3 test/run_unit_tests.py
+  build-linux-clang:
+    machine: 
+      image: ubuntu-2004:202111-02
+    steps:
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev clang
+      - run: sudo pip install pytest pyyaml enum34 pyserial
+      - run: CC=clang CXX=clang++ make all
+      - run: pushd erpcgen/test ; py.test ; popd
+      - run: python3 test/run_unit_tests.py
+  build-mac-gcc:
+    macos: 
+      xcode: 13.2.1
+    steps:
+      - run: brew update
+      - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
+      - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
+      - run: sudo pip install tornado
+      - run: sudo pip install --user nose
+      - run: sudo pip install pytest --upgrade --ignore-installed six
+      - run: CC=gcc CXX=g++ make all
+      - run: pushd erpcgen/test ; py.test ; popd
+      - run: python3 test/run_unit_tests.py
+  build-mac-clang:
+    macos: 
+      xcode: 13.2.1
+    steps:
+      - run: brew update
+      - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
+      - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
+      - run: sudo pip install tornado
+      - run: sudo pip install --user nose
+      - run: sudo pip install pytest --upgrade --ignore-installed six
+      - run: CC=gcc CXX=g++ make all
+      - run: pushd erpcgen/test ; py.test ; popd
+      - run: python3 test/run_unit_tests.py
+
+  
+workflows:
+  build-workflow:
+    jobs:
+      - build-linux-gcc
+      - build-linux-clang
+      - build-mac-gcc
+      - build-mac-clang
