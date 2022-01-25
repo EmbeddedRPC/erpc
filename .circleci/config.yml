@@ -5,6 +5,7 @@ jobs:
     machine: 
       image: ubuntu-2004:202111-02
     steps:
+      - checkout
       - run: sudo apt-get update -qq
       - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev gcc g++
       - run: sudo pip install pytest pyyaml enum34 pyserial
@@ -15,6 +16,7 @@ jobs:
     machine: 
       image: ubuntu-2004:202111-02
     steps:
+      - checkout
       - run: sudo apt-get update -qq
       - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev clang
       - run: sudo pip install pytest pyyaml enum34 pyserial
@@ -25,6 +27,7 @@ jobs:
     macos: 
       xcode: 13.2.1
     steps:
+      - checkout
       - run: brew update
       - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
       - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
@@ -38,6 +41,7 @@ jobs:
     macos: 
       xcode: 13.2.1
     steps:
+      - checkout
       - run: brew update
       - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
       - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
