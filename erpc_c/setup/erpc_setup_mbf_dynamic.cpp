@@ -28,7 +28,7 @@ using namespace erpc;
 class DynamicMessageBufferFactory : public MessageBufferFactory
 {
 public:
-    virtual MessageBuffer create()
+    virtual MessageBuffer create(void)
     {
         uint8_t *buf = new (nothrow) uint8_t[ERPC_DEFAULT_BUFFER_SIZE];
         return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
@@ -37,7 +37,7 @@ public:
     virtual void dispose(MessageBuffer *buf)
     {
         erpc_assert(buf);
-        if (buf->get())
+        if (buf->get() != NULL)
         {
             delete[] buf->get();
         }
@@ -48,7 +48,7 @@ public:
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<DynamicMessageBufferFactory> s_msgFactory;
+ERPC_MANUALLY_CONSTRUCTED(DynamicMessageBufferFactory, s_msgFactory);
 
 erpc_mbf_t erpc_mbf_dynamic_init(void)
 {

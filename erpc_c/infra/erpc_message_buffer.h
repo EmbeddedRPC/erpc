@@ -43,7 +43,7 @@ public:
      * This function initializes object attributes.
      */
     MessageBuffer(void)
-    : m_buf(0)
+    : m_buf(NULL)
     , m_len(0)
     , m_used(0)
     {
@@ -54,8 +54,8 @@ public:
      *
      * This function initializes object attributes.
      *
-     * param[in] buffer Pointer to buffer.
-     * param[in] length Length of buffer.
+     * @param[in] buffer Pointer to buffer.
+     * @param[in] length Length of buffer.
      */
     MessageBuffer(uint8_t *buffer, uint16_t length)
     : m_buf(buffer)
@@ -206,7 +206,7 @@ public:
          *
          * This function initializes object attributes.
          *
-         * param[in] buffer MessageBuffer for sending/receiving.
+         * @param[in] buffer MessageBuffer for sending/receiving.
          */
         Cursor(MessageBuffer *buffer)
         : m_buffer(buffer)
@@ -385,7 +385,7 @@ public:
     virtual MessageBuffer create(void) = 0;
 
     /*!
-     * @brief This function inform server if it has to create buffer for received message.
+     * @brief This function informs server if it has to create buffer for received message.
      *
      * @return Has to return TRUE when server need create buffer for receiving message.
      */

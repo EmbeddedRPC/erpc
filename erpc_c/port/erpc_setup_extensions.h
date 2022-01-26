@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 
 #if ERPC_THREADS_IS(FREERTOS)
 #include "FreeRTOS.h"

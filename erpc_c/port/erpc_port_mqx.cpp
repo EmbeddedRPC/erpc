@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -24,6 +25,7 @@ void *operator new(std::size_t count) THROW_BADALLOC
 
 void *operator new(std::size_t count, const std::nothrow_t &tag) THROW
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
@@ -37,6 +39,7 @@ void *operator new[](std::size_t count) THROW_BADALLOC
 void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW
 
 {
+    (void)tag;
     void *p = erpc_malloc(count);
     return p;
 }
@@ -64,9 +67,10 @@ void erpc_free(void *ptr)
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
 #if ((defined(__GNUC__)) && (defined(__arm__)))
-extern "C" void __cxa_pure_virtual()
+extern "C" void __cxa_pure_virtual(void)
 {
-    while (1)
-        ;
+    for (;;)
+    {
+    };
 }
 #endif

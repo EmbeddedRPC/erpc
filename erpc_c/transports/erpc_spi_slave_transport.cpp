@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -24,9 +25,9 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN 2
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xAB
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCD
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN 2U
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xABU
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCDU
 #else
 #ifndef ERPC_BOARD_SPI_INT_GPIO
 #error "Please define the ERPC_BOARD_SPI_INT_GPIO used to notify when the SPI Slave is ready to transmit"
@@ -37,8 +38,9 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static spi_slave_handle_t s_s_handle;
+static spi_slave_handle_t s_handle;
 static volatile bool s_isTransferCompleted = false;
+static SpiSlaveTransport *s_spi_slave_instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -46,32 +48,66 @@ static volatile bool s_isTransferCompleted = false;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
 /* @brief Initialize the GPIO used to notify the SPI Master */
-static inline void SpiSlaveTransport_NotifyTransferGpioInit()
+static inline void SpiSlaveTransport_NotifyTransferGpioInit(void)
 {
     gpio_pin_config_t gpioConfig;
 
     gpioConfig.pinDirection = kGPIO_DigitalOutput;
     gpioConfig.outputLogic = 1U;
 
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
+#endif
 }
 
 /* @brief Notify the SPI Master that the Slave is ready for a new transfer */
-static inline void SpiSlaveTransport_NotifyTransferGpioReady()
+static inline void SpiSlaveTransport_NotifyTransferGpioReady(void)
 {
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, 1U << ERPC_BOARD_SPI_INT_PIN);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PortClear(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+#endif
 }
 
 /* @brief Notify the SPI Master that the Slave has finished the transfer */
-static inline void SpiSlaveTransport_NotifyTransferGpioCompleted()
+static inline void SpiSlaveTransport_NotifyTransferGpioCompleted(void)
 {
+#ifdef ERPC_BOARD_SPI_INT_GPIO_LPC
+    /* NXP LPC parts with the MCUXpressoSDK LPC GPIO driver */
+    GPIO_PortSet(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PORT, 1U << ERPC_BOARD_SPI_INT_PIN);
+#else
+    /* NXP Kinetis/iMX parts with the MCUXpressoSDK GPIO driver */
     GPIO_PortSet(ERPC_BOARD_SPI_INT_GPIO, 1U << ERPC_BOARD_SPI_INT_PIN);
+#endif
 }
 #endif
 
-void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, erpc_status_t status, void *userData)
+void SpiSlaveTransport::transfer_cb(void)
 {
+#if ERPC_THREADS
+    m_txrxSemaphore.putFromISR();
+#else
     s_isTransferCompleted = true;
+#endif
+}
+
+static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, status_t status, void *userData)
+{
+    (void)base;
+    (void)handle;
+    (void)status;
+    (void)userData;
+
+    SpiSlaveTransport *transport = s_spi_slave_instance;
+
+    transport->transfer_cb();
 }
 
 SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
@@ -79,7 +115,11 @@ SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, u
 , m_baudRate(baudRate)
 , m_srcClock_Hz(srcClock_Hz)
 , m_isInited(false)
+#if ERPC_THREADS
+, m_txrxSemaphore()
+#endif
 {
+    s_spi_slave_instance = this;
 }
 
 SpiSlaveTransport::~SpiSlaveTransport(void)
@@ -100,8 +140,8 @@ erpc_status_t SpiSlaveTransport::init(void)
 
     SPI_SlaveGetDefaultConfig(&spiConfig);
 
-    SPI_SlaveInit(m_spiBaseAddr, &spiConfig);
-    SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_s_handle, SPI_SlaveUserCallback, NULL);
+    (void)SPI_SlaveInit(m_spiBaseAddr, &spiConfig);
+    (void)SPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, SPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpiSlaveTransport_NotifyTransferGpioInit();
@@ -113,77 +153,93 @@ erpc_status_t SpiSlaveTransport::init(void)
 
 erpc_status_t SpiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
-    spi_transfer_t slaveXfer;
+    status_t status;
+    spi_transfer_t slaveXfer = { 0 };
 
     slaveXfer.txData = NULL;
     slaveXfer.rxData = data;
     slaveXfer.dataSize = size;
     s_isTransferCompleted = false;
 
-    status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
+    status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
 
     if (kStatus_Success == status)
     {
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         SpiSlaveTransport_NotifyTransferGpioReady();
 #endif
+
+/* wait until the receiving is finished */
+#if ERPC_THREADS
+        m_txrxSemaphore.get();
+#else
         while (!s_isTransferCompleted)
         {
         }
+#endif
+
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
         SpiSlaveTransport_NotifyTransferGpioCompleted();
 #endif
     }
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
-    spi_transfer_t slaveXfer;
+    status_t status;
+    spi_transfer_t slaveXfer = { 0 };
     s_isTransferCompleted = false;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     slaveXfer.txData = (uint8_t *)data;
     slaveXfer.rxData = NULL;
     slaveXfer.dataSize = size;
+    {
 #else
     uint8_t *spiData = new (nothrow) uint8_t[size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
     if (spiData != NULL)
     {
         spiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
         spiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
-        memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+        (void)memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+        slaveXfer.txData = spiData;
+        slaveXfer.rxData = NULL;
+        slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
+#endif
+
+        status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
+
+        if (kStatus_Success == status)
+        {
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            SpiSlaveTransport_NotifyTransferGpioReady();
+#endif
+
+/* wait until the sending is finished */
+#if ERPC_THREADS
+            m_txrxSemaphore.get();
+#else
+            while (!s_isTransferCompleted)
+            {
+            }
+#endif
+
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            SpiSlaveTransport_NotifyTransferGpioCompleted();
+#endif
+        }
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    }
+#else
+        delete[] spiData;
     }
     else
     {
-        return kErpcStatus_SendFailed;
+        status = kErpcStatus_SendFailed;
     }
-
-    slaveXfer.txData = spiData;
-    slaveXfer.rxData = NULL;
-    slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
 #endif
 
-    status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_s_handle, &slaveXfer);
-
-    if (kStatus_Success == status)
-    {
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-        SpiSlaveTransport_NotifyTransferGpioReady();
-#endif
-        while (!s_isTransferCompleted)
-        {
-        }
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-        SpiSlaveTransport_NotifyTransferGpioCompleted();
-#endif
-    }
-#ifndef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-    delete[] spiData;
-#endif
-
-    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }

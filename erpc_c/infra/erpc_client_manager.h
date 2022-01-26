@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
- * Copyright 2020 ACRIOS Systems s.r.o.
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -187,7 +187,7 @@ protected:
 #endif
 
     //! @brief Validate that an incoming message is a reply.
-    virtual erpc_status_t verifyReply(RequestContext &request);
+    virtual void verifyReply(RequestContext &request);
 
     /*!
      * @brief Create message buffer and codec.
@@ -200,8 +200,8 @@ protected:
     Codec *createBufferAndCodec(void);
 
 private:
-    ClientManager(const ClientManager &);            //!< Disable copy ctor.
-    ClientManager &operator=(const ClientManager &); //!< Disable copy ctor.
+    ClientManager(const ClientManager &other);            //!< Disable copy ctor.
+    ClientManager &operator=(const ClientManager &other); //!< Disable copy ctor.
 };
 
 /*!

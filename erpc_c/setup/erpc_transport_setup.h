@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2019 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -279,7 +279,7 @@ void erpc_transport_rpmsg_lite_tty_rtos_deinit(void);
  * @brief Create an Linux RPMSG endpoint transport.
  *
  * This function is using RPMSG endpoints based on this implementation:
- * https://github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ * github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
  *
  * When local/remote address is set to '-1', then default addresses will be used.
  * When type is set to '0', then Datagram model will be used, else Stream.
@@ -354,6 +354,23 @@ void erpc_transport_tcp_close(void);
  */
 erpc_transport_t erpc_transport_usb_cdc_init(void *serialHandle, void *serialConfig, void *usbCdcConfig,
                                              uint8_t *usbRingBuffer, uint32_t usbRingBufferLength);
+//@}
+
+//! @name I2C transport setup
+//@{
+
+/*!
+ * @brief Create an I2C slave transport.
+ *
+ * Create I2C slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of I2C peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz I2C source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_i2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 //@}
 
 //@}

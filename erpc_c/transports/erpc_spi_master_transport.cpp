@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -23,8 +24,8 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xAB
-#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCD
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER1 0xABU
+#define ERPC_BOARD_SPI_SLAVE_READY_MARKER2 0xCDU
 #else
 #ifndef ERPC_BOARD_SPI_INT_GPIO
 #error "Please define the ERPC_BOARD_SPI_INT_GPIO used to notify when the SPI Slave is ready to transmit"
@@ -50,10 +51,10 @@ static inline void SpiMasterTransport_NotifyTransferGpioInit()
     gpioConfig.pinDirection = kGPIO_DigitalInput;
 
     PORT_SetPinInterruptConfig(ERPC_BOARD_SPI_INT_PORT, ERPC_BOARD_SPI_INT_PIN, kPORT_InterruptFallingEdge);
-    EnableIRQ(ERPC_BOARD_SPI_INT_PIN_IRQ);
+    (void)EnableIRQ(ERPC_BOARD_SPI_INT_PIN_IRQ);
 
     GPIO_PinInit(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN, &gpioConfig);
-    if (!GPIO_PinRead(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN))
+    if (0U == GPIO_PinRead(ERPC_BOARD_SPI_INT_GPIO, ERPC_BOARD_SPI_INT_PIN))
     {
         s_isSlaveReady = true;
     }
@@ -72,7 +73,7 @@ static inline void SpidevMasterTransport_WaitForSlaveReadyMarker(SPI_Type *spiBa
     uint8_t data;
     spi_transfer_t masterXferSlaveReadyMarker;
 
-    while (1)
+    for (;;)
     {
         masterXferSlaveReadyMarker.txData = NULL;
         masterXferSlaveReadyMarker.rxData = &data;
@@ -127,7 +128,7 @@ erpc_status_t SpiMasterTransport::init(void)
 
 erpc_status_t SpiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t masterXfer;
 
     masterXfer.txData = NULL;
@@ -145,12 +146,12 @@ erpc_status_t SpiMasterTransport::underlyingReceive(uint8_t *data, uint32_t size
     s_isSlaveReady = false;
 #endif
 
-    return status != kStatus_Success ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
 
 erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    erpc_status_t status;
+    status_t status;
     spi_transfer_t masterXfer;
 
     masterXfer.txData = (uint8_t *)data;
@@ -166,7 +167,7 @@ erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t s
     s_isSlaveReady = false;
 #endif
 
-    return status != kStatus_Success ? kErpcStatus_SendFailed : kErpcStatus_Success;
+    return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO

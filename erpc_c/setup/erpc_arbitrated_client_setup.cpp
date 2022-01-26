@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
- * Copyright 2020 ACRIOS Systems s.r.o.
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -31,13 +31,14 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 // global client variables
-static ManuallyConstructed<ArbitratedClientManager> s_client;
-ClientManager *g_client = NULL;
+ERPC_MANUALLY_CONSTRUCTED(ArbitratedClientManager, s_client);
+ClientManager *g_client;
+#pragma weak g_client
 
-static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-static ManuallyConstructed<TransportArbitrator> s_arbitrator;
-static ManuallyConstructed<BasicCodec> s_codec;
-static ManuallyConstructed<Crc16> s_crc16;
+ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED(TransportArbitrator, s_arbitrator);
+ERPC_MANUALLY_CONSTRUCTED(BasicCodec, s_codec);
+ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -47,6 +48,8 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
 {
     erpc_assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
@@ -55,7 +58,7 @@ erpc_transport_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mb
 
     // Init the arbitrator using the passed in transport.
     s_arbitrator.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_arbitrator->setSharedTransport(castedTransport);
@@ -105,11 +108,18 @@ void erpc_arbitrated_client_set_server_thread_id(void *serverThreadId)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_arbitrated_client_add_message_logger(erpc_transport_t transport)
 {
-    if (g_client != NULL)
+    bool retVal;
+
+    if (g_client == NULL)
     {
-        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
 }
 #endif
 

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -17,7 +18,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<RPMsgTransport> s_transport;
+ERPC_MANUALLY_CONSTRUCTED(RPMsgTransport, s_transport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -27,11 +28,18 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32
                                                        uint32_t rpmsg_link_id, rpmsg_ready_cb ready,
                                                        char *nameservice_name)
 {
+    erpc_transport_t transport;
+
     s_transport.construct();
     if (s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready, nameservice_name) ==
         kErpcStatus_Success)
     {
-        return reinterpret_cast<erpc_transport_t>(s_transport.get());
+        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
     }
-    return NULL;
+    else
+    {
+        transport = NULL;
+    }
+
+    return transport;
 }

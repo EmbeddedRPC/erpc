@@ -47,6 +47,47 @@
     #endif
 #endif
 
+// Detect allocation policy if not already set.
+#if !defined(ERPC_ALLOCATION_POLICY)
+    #if defined(__has_include) && __has_include("FreeRTOSConfig.h")
+        #ifdef __cplusplus
+        extern "C" {
+        #endif
+        #include "FreeRTOSConfig.h"
+        #ifdef __cplusplus
+        }
+        #endif
+        #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
+        #else
+            #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
+        #endif
+    #else
+        #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
+    #endif
+#endif
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+#if !defined(ERPC_CODEC_COUNT)
+#define ERPC_CODEC_COUNT (2U)
+#endif
+#if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
+#define ERPC_MESSAGE_LOGGERS_COUNT (0U)
+#endif
+#if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
+#define ERPC_CLIENTS_THREADS_AMOUNT (1U)
+#endif
+#endif
+
+// Safely detect tx_api.h.
+#define ERPC_HAS_THREADX_API_H (0)
+#if defined(__has_include)
+    #if __has_include("tx_api.h")
+        #undef ERPC_HAS_THREADX_API_H
+        #define ERPC_HAS_THREADX_API_H (1)
+    #endif
+#endif
+
 // Detect threading model if not already set.
 #if !defined(ERPC_THREADS)
     #if ERPC_HAS_POSIX
@@ -57,6 +98,8 @@
         #define ERPC_THREADS (ERPC_THREADS_FREERTOS)
     #elif ERPC_HAS_WIN32
         #define ERPC_THREADS (ERPC_THREADS_WIN32)
+    #elif ERPC_HAS_THREADX_API_H
+        #define ERPC_THREADS (ERPC_THREADS_THREADX)
     #else
         // Otherwise default to no threads.
         #define ERPC_THREADS (ERPC_THREADS_NONE)
@@ -70,13 +113,13 @@
 // Set default buffer size.
 #if !defined(ERPC_DEFAULT_BUFFER_SIZE)
     //! @brief Size of buffers allocated by BasicMessageBufferFactory in setup functions.
-    #define ERPC_DEFAULT_BUFFER_SIZE (256)
+    #define ERPC_DEFAULT_BUFFER_SIZE (256U)
 #endif
 
 // Set default buffers count.
 #if !defined(ERPC_DEFAULT_BUFFERS_COUNT)
     //! @brief Count of buffers allocated by StaticMessageBufferFactory.
-    #define ERPC_DEFAULT_BUFFERS_COUNT (2)
+    #define ERPC_DEFAULT_BUFFERS_COUNT (2U)
 #endif
 
 // Disable/enable noexcept.

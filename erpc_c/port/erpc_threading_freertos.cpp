@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -37,7 +38,8 @@ Thread::Thread(const char *name)
 {
 }
 
-Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name)
+Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
+               thread_stack_pointer stackPtr)
 : m_name(name)
 , m_entry(entry)
 , m_arg(0)
@@ -50,16 +52,18 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 
 Thread::~Thread(void) {}
 
-void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
+void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize, thread_stack_pointer stackPtr)
 {
     m_entry = entry;
     m_stackSize = stackSize;
     m_priority = priority;
+    m_stackPtr = stackPtr;
 }
 
 void Thread::start(void *arg)
 {
     m_arg = arg;
+    bool taskCreated = false;
 
     // Enter a critical section to disable preemptive scheduling until we add the newly
     // created thread to the linked list. This prevents a race condition if the new thread is
@@ -67,9 +71,31 @@ void Thread::start(void *arg)
     // which will scan the linked list.
     taskENTER_CRITICAL();
 
-    if (pdPASS == xTaskCreate(threadEntryPointStub, (m_name ? m_name : "task"),
-                              ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words.
-                              this, m_priority, &m_task))
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (m_stackPtr != NULL)
+    {
+        m_task =
+            xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                              (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
+                              this, m_priority, m_stackPtr, &m_staticTask);
+        taskCreated = true;
+    }
+#endif
+
+#if configSUPPORT_DYNAMIC_ALLOCATION
+    if (m_stackPtr == NULL)
+    {
+        if (pdPASS ==
+            xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                        (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
+                        this, m_priority, &m_task))
+        {
+            taskCreated = true;
+        }
+    }
+#endif
+
+    if (taskCreated)
     {
         // Link in this thread to the list.
         if (NULL != s_first)
@@ -87,14 +113,14 @@ bool Thread::operator==(Thread &o)
     return m_task == o.m_task;
 }
 
-Thread *Thread::getCurrentThread()
+Thread *Thread::getCurrentThread(void)
 {
     TaskHandle_t thisTask = xTaskGetCurrentTaskHandle();
 
     // Walk the threads list to find the Thread object for the current task.
     taskENTER_CRITICAL();
     Thread *it = s_first;
-    while (it)
+    while (it != NULL)
     {
         if (it->m_task == thisTask)
         {
@@ -109,13 +135,13 @@ Thread *Thread::getCurrentThread()
 void Thread::sleep(uint32_t usecs)
 {
 #if INCLUDE_vTaskDelay
-    vTaskDelay(usecs / 1000 / portTICK_PERIOD_MS);
+    vTaskDelay(usecs / 1000U / portTICK_PERIOD_MS);
 #endif
 }
 
 void Thread::threadEntryPoint(void)
 {
-    if (m_entry)
+    if (m_entry != NULL)
     {
         m_entry(m_arg);
     }
@@ -131,7 +157,7 @@ void Thread::threadEntryPointStub(void *arg)
     taskENTER_CRITICAL();
     Thread *it = s_first;
     Thread *prev = NULL;
-    while (it)
+    while (it != NULL)
     {
         if (it == _this)
         {
@@ -139,9 +165,12 @@ void Thread::threadEntryPointStub(void *arg)
             {
                 s_first = _this->m_next;
             }
-            else if (prev)
+            else
             {
-                prev->m_next = _this->m_next;
+                if (prev != NULL)
+                {
+                    prev->m_next = _this->m_next;
+                }
             }
             _this->m_next = NULL;
 
@@ -176,7 +205,13 @@ void Thread::threadEntryPointStub(void *arg)
 Mutex::Mutex(void)
 : m_mutex(0)
 {
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    m_mutex = xSemaphoreCreateRecursiveMutexStatic(&m_staticQueue);
+#elif configSUPPORT_DYNAMIC_ALLOCATION
     m_mutex = xSemaphoreCreateRecursiveMutex();
+#else
+#error "Allocation method didn't match"
+#endif
 }
 
 Mutex::~Mutex(void)
@@ -187,24 +222,30 @@ Mutex::~Mutex(void)
 bool Mutex::tryLock(void)
 {
     // Pass a zero timeout to poll the mutex.
-    return xSemaphoreTakeRecursive(m_mutex, 0);
+    return (pdTRUE == xSemaphoreTakeRecursive(m_mutex, 0) ? true : false);
 }
 
 bool Mutex::lock(void)
 {
-    return xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY);
+    return (pdTRUE == xSemaphoreTakeRecursive(m_mutex, portMAX_DELAY) ? true : false);
 }
 
 bool Mutex::unlock(void)
 {
-    return xSemaphoreGiveRecursive(m_mutex);
+    return (pdTRUE == xSemaphoreGiveRecursive(m_mutex) ? true : false);
 }
 
 Semaphore::Semaphore(int count)
 : m_sem(0)
 {
     // Set max count to highest signed int.
-    m_sem = xSemaphoreCreateCounting(0x7fffffff, count);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    m_sem = xSemaphoreCreateCountingStatic(0x7fffffffu, (UBaseType_t)count, &m_staticQueue);
+#elif configSUPPORT_DYNAMIC_ALLOCATION
+    m_sem = xSemaphoreCreateCounting(0x7fffffffu, (UBaseType_t)count);
+#else
+#error "Allocation method didn't match"
+#endif
 }
 
 Semaphore::~Semaphore(void)
@@ -214,13 +255,13 @@ Semaphore::~Semaphore(void)
 
 void Semaphore::put(void)
 {
-    xSemaphoreGive(m_sem);
+    (void)xSemaphoreGive(m_sem);
 }
 
 void Semaphore::putFromISR(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
+    (void)xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -231,16 +272,16 @@ bool Semaphore::get(uint32_t timeout)
     {
         timeout = portMAX_DELAY;
     }
-    else if (timeout > portMAX_DELAY - 1)
+    else
     {
-        timeout = portMAX_DELAY - 1;
+        if (timeout > (portMAX_DELAY - 1))
+        {
+            timeout = portMAX_DELAY - 1;
+        }
     }
 #endif
-    if (pdTRUE != xSemaphoreTake(m_sem, timeout / 1000 / portTICK_PERIOD_MS))
-    {
-        return false;
-    }
-    return true;
+
+    return (pdTRUE == xSemaphoreTake(m_sem, timeout / 1000U / portTICK_PERIOD_MS));
 }
 
 int Semaphore::getCount(void) const

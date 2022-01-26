@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
- * Copyright 2020 ACRIOS Systems s.r.o.
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -28,10 +28,11 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 // global client variables
-static ManuallyConstructed<ClientManager> s_client;
-ClientManager *g_client = NULL;
-static ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-static ManuallyConstructed<Crc16> s_crc16;
+ERPC_MANUALLY_CONSTRUCTED(ClientManager, s_client);
+ClientManager *g_client;
+#pragma weak g_client
+ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -41,12 +42,14 @@ void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_fact
 {
     erpc_assert(transport);
 
+    Transport *castedTransport;
+
     // Init factories.
     s_codecFactory.construct();
 
     // Init client manager with the provided transport.
     s_client.construct();
-    Transport *castedTransport = reinterpret_cast<Transport *>(transport);
+    castedTransport = reinterpret_cast<Transport *>(transport);
     s_crc16.construct();
     castedTransport->setCrc16(s_crc16.get());
     s_client->setTransport(castedTransport);
@@ -89,11 +92,18 @@ void erpc_client_set_server_thread_id(void *serverThreadId)
 #if ERPC_MESSAGE_LOGGING
 bool erpc_client_add_message_logger(erpc_transport_t transport)
 {
-    if (g_client != NULL)
+    bool retVal;
+
+    if (g_client == NULL)
     {
-        return g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+        retVal = false;
     }
-    return false;
+    else
+    {
+        retVal = g_client->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    }
+
+    return retVal;
 }
 #endif
 

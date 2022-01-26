@@ -280,7 +280,7 @@ void quitSecondInterfaceServer()
 {
     /* removing the service from the server */
     erpc_remove_service_from_server(service);
-    destroy_SecondInterface_service();
+    destroy_SecondInterface_service((erpc_service_t *)service);
 
     // Stop server part
     erpc_server_stop();

@@ -12,7 +12,6 @@
 @output_dir("erpc_outputs/") // testing directory with slash on end
 @include("addOne.h")
 @include("external.h")
-@dynamic_services
 program test;
 import "../common/unit_test_common.erpc"
 
