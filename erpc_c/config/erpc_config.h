@@ -9,7 +9,7 @@
  */
 
 #ifndef _ERPC_CONFIG_H_
-#define _ERPC_CONFIG_H_
+#define _ERPC_CONFIG_H_ 
 
 /*!
  * @addtogroup config
