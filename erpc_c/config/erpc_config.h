@@ -183,7 +183,7 @@
 
 //! @name Assert function definition
 //@{
-#define erpc_erpc_assert(condition)      assert(condition) //!< Assert function.
+#define erpc_assert(condition)      assert(condition) //!< Assert function.
 //@}
 
 
