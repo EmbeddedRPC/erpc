@@ -9,6 +9,8 @@
 #ifndef _ERPC_CONFIG_H_
 #define _ERPC_CONFIG_H_
 
+#include <cassert>
+
 /*!
  * @addtogroup config
  * @{
@@ -178,6 +180,11 @@
 //!
 //! Uncomment for using pre post default callback feature.
 //#define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_ENABLED)
+
+//! @name Assert function definition
+//@{
+#define erpc_assert(condition)      assert(condition) //!< Assert function.
+//@}
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_
