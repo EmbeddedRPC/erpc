@@ -12,7 +12,6 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
-#include "erpc_config.h"
 
 #include <string.h>
 

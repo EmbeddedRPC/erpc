@@ -11,7 +11,6 @@
 #include "erpc_rpmsg_tty_rtos_transport.h"
 #include "erpc_config_internal.h"
 #include "erpc_framed_transport.h"
-#include "erpc_config.h"
 
 #include "rpmsg_ns.h"
 

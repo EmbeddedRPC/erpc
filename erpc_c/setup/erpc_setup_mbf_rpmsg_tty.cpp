@@ -14,7 +14,6 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
-#include "erpc_config.h"
 
 #include "rpmsg_lite.h"
 

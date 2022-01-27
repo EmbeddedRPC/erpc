@@ -9,7 +9,6 @@
  */
 #include "erpc_transport_arbitrator.h"
 #include "erpc_config_internal.h"
-#include "erpc_config.h"
 #include "erpc_manually_constructed.h"
 
 #include <cstdio>
