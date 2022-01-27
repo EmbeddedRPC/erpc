@@ -8,7 +8,6 @@
  */
 
 #include "erpc_threading.h"
-#include "erpc_config.h"
 
 #if ERPC_THREADS_IS(ZEPHYR)
 

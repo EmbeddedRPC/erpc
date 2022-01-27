@@ -15,7 +15,6 @@
 #include "erpc_message_buffer.h"
 #include "erpc_simple_server.h"
 #include "erpc_transport.h"
-#include "erpc_config.h"
 
 using namespace erpc;
 

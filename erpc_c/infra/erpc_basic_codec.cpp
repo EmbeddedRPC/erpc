@@ -9,7 +9,6 @@
  */
 
 #include "erpc_basic_codec.h"
-#include "erpc_config.h"
 #include "erpc_manually_constructed.h"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC

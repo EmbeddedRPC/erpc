@@ -9,7 +9,6 @@
  */
 
 #include "erpc_client_manager.h"
-#include "erpc_config.h"
 
 using namespace erpc;
 

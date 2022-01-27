@@ -9,7 +9,6 @@
  */
 
 #include "erpc_inter_thread_buffer_transport.h"
-#include "erpc_config.h"
 
 using namespace erpc;
 

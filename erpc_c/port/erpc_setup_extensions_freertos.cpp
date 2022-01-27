@@ -10,7 +10,6 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_setup_extensions.h"
 #include "erpc_threading.h"
-#include "erpc_config.h"
 
 using namespace erpc;
 

@@ -8,7 +8,6 @@
  */
 
 #include "erpc_rpmsg_linux_transport.h"
-#include "erpc_config.h"
 
 #include <unistd.h>
 

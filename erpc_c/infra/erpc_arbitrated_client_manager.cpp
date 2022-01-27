@@ -10,7 +10,6 @@
 
 #include "erpc_arbitrated_client_manager.h"
 #include "erpc_transport_arbitrator.h"
-#include "erpc_config.h"
 
 #if ERPC_THREADS_IS(NONE)
 #error "Arbitrator code does not work in no-threading configuration."

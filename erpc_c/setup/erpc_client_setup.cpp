@@ -15,7 +15,6 @@
 #include "erpc_manually_constructed.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
-#include "erpc_config.h"
 
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"

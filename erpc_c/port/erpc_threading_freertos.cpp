@@ -9,7 +9,6 @@
  */
 
 #include "erpc_threading.h"
-#include "erpc_config.h"
 
 #include <errno.h>
 
