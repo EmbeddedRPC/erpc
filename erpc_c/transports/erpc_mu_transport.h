@@ -167,7 +167,7 @@ protected:
     void rx_cb(void);
 
     /*!
-     * @brief Function called from MU IRQ when the MU TX empty flag is erpc_asserted and the IRQ is enabled
+     * @brief Function called from MU IRQ when the MU TX empty flag is asserted and the IRQ is enabled
      *
      * Write data from the buffer passed in send function to MU registers.
      * When is sent whole message unblock the send function.
