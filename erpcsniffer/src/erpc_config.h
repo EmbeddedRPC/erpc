@@ -10,11 +10,6 @@
 #ifndef _ERPC_CONFIG_H_
 #define _ERPC_CONFIG_H_
 
-#if !defined(erpc_assert)
-#include <cassert>
-#define erpc_assert(condition) assert(condition) //!< Assert function.
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +173,12 @@
 //!
 //! Uncomment for using pre post default callback feature.
 //#define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_ENABLED)
+
+//! @name Assert function definition
+//@{
+//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will be used.
+// #define erpc_assert(condition)
+//@}
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_
