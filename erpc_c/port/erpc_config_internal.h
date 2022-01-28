@@ -13,11 +13,6 @@
 
 #include "erpc_config.h"
 
-#if !defined(erpc_assert)
-#include <cassert>
-#define erpc_assert(condition) assert(condition) //!< Assert function.
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,6 +193,11 @@
 // Disabling pre and post default callback function code.
 #if !defined(ERPC_PRE_POST_ACTION_DEFAULT)
     #define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_DISABLED)
+#endif
+
+#if !defined(erpc_assert)
+#include <cassert>
+#define erpc_assert(condition) assert(condition) //!< Assert function.
 #endif
 
 /* clang-format on */
