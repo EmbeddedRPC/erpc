@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2015 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2021 NXP
 # All Rights Reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -25,7 +25,7 @@ OUTPUT_ROOT := $(ERPC_ROOT)
 TEST_ROOT :=  $(ERPC_ROOT)/test
 
 ifeq "$(is_mingw)" "1"
-BOOST_ROOT ?= c:/boost_1_57_0
+BOOST_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/boost_1_67_0
 else
 BOOST_ROOT ?= /usr/local/opt/boost
 endif
@@ -53,6 +53,9 @@ INC_INSTALL_DIR = $(PREFIX)/include/erpc
 ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
 LD := $(CXX)
 PYTHON ?= python
+ifeq (, $(shell which $(PYTHON)))
+ PYTHON= python3
+endif
 
 # Tool paths. Use different paths for OS X.
 ifeq "$(is_darwin)" "1"
@@ -68,6 +71,12 @@ else ifeq "$(is_mingw)" "1"
 FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
 BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
 endif
+ifeq (, $(shell which $(PYTHON)))
+ $(error "No python found")
+endif
+ifneq (3, $(shell $(PYTHON) --version | cut -c 8-8))
+ $(error "Please install and use Python3")
+endif
 
 ifeq "$(is_mingw)" "1"
 mkdirc = C:\MinGW\msys\1.0\bin\mkdir.exe
@@ -81,4 +90,3 @@ endif
 # Release by default
 #-----------------------------------------------
 build ?= debug
-

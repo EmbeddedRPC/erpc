@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -15,6 +15,17 @@
 
 using namespace erpc;
 
+/* IMPLEMNENTATION COMMENTS */
+/*
+   Implementation for baremetal (#if !ERPC_THREADS_IS(NONE) conditional section)
+   is nonblocking, the code flow is following: enable interrupt, wait for interrupt, once interrupt appears disable the
+   interrupt and set hasMessage==true, recv start, enable interrupt, get data, receive end (keep interrupt enabled for
+   the same reason as the first time).
+
+   Implementation for an RTOS (FREERTOS) is blocking, the code flow is following: enable interrupt on recv start,
+   get data once ready, disable interrupt on receive end.
+*/
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +38,8 @@ static MUTransport *s_mu_instance = NULL;
 void MUTransport::mu_tx_empty_irq_callback(void)
 {
     MUTransport *transport = s_mu_instance;
-    if ((transport) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
+    if ((transport != NULL) &&
+        (0U != (transport->m_muBase->CR & (1UL << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)))))
     {
         transport->tx_cb();
     }
@@ -36,7 +48,8 @@ void MUTransport::mu_tx_empty_irq_callback(void)
 void MUTransport::mu_rx_full_irq_callback(void)
 {
     MUTransport *transport = s_mu_instance;
-    if ((transport) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
+    if ((transport != NULL) &&
+        (0U != (transport->m_muBase->CR & (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)))))
     {
         transport->rx_cb();
     }
@@ -60,13 +73,13 @@ void MUTransport::mu_irq_callback(void)
     txFlags = (txFlags >> (MU_TR_COUNT - MU_REG_COUNT));
 
     // RECEIVING - rx full flag and rx full irq enabled
-    if ((rxFlags & 0x1U) && (transport->m_muBase->CR & (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
+    if ((rxFlags & 0x1U) && (transport->m_muBase->CR & (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))))
     {
         transport->rx_cb();
     }
 
     // TRANSMITTING - tx empty flag and tx empty irq enabled
-    if ((txFlags & 0x1U) && (transport->m_muBase->CR & (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
+    if ((txFlags & 0x1U) && (transport->m_muBase->CR & (1UL << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))))
     {
         transport->tx_cb();
     }
@@ -104,11 +117,11 @@ erpc_status_t MUTransport::init(MU_Type *muBase)
 
 #if !ERPC_THREADS
     // enabling the MU rx full irq is necessary only for BM app
-    MU_EnableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+    MU_EnableInterrupts(m_muBase, (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
 #endif
 
     NVIC_SetPriority(MU_IRQ, MU_IRQ_PRIORITY);
-    EnableIRQ(MU_IRQ);
+    (void)EnableIRQ(MU_IRQ);
 
     return kErpcStatus_Success;
 }
@@ -121,7 +134,7 @@ void MUTransport::rx_cb(void)
     {
         // the receive function has not been called yet
         // disable MU rx full interrupt
-        MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+        MU_DisableInterrupts(m_muBase, (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
         m_newMessage = true;
     }
     else
@@ -142,7 +155,7 @@ void MUTransport::rx_cb(void)
             else
             {
                 // read MU rx reg to clear the rx full flag
-                MU_ReceiveMsgNonBlocking(m_muBase, i);
+                (void)MU_ReceiveMsgNonBlocking(m_muBase, i);
             }
         }
 
@@ -151,7 +164,8 @@ void MUTransport::rx_cb(void)
         {
             m_rxBuffer = NULL;
 #if !ERPC_THREADS_IS(NONE)
-            MU_DisableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+            // disable MU rx full interrupt in rtos-based blocking implementation
+            MU_DisableInterrupts(m_muBase, (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
             m_rxSemaphore.putFromISR();
 #endif
         }
@@ -180,7 +194,7 @@ void MUTransport::tx_cb(void)
     if (m_txCntBytes >= m_txMsgSize)
     {
         // disable MU tx empty irq from the last tx reg
-        MU_DisableInterrupts(m_muBase, (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
+        MU_DisableInterrupts(m_muBase, (1UL << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
 
         // unblock caller of the send function
         m_txBuffer = NULL;
@@ -209,18 +223,18 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
         m_rxBuffer = (uint32_t *)message->get();
 
         // enable the MU rx full irq
-        MU_EnableInterrupts(m_muBase, (1U << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
+        MU_EnableInterrupts(m_muBase, (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT)));
 
 // wait until the receiving is not complete
 #if !ERPC_THREADS_IS(NONE)
-        m_rxSemaphore.get();
+        (void)m_rxSemaphore.get();
 #else
         while (m_rxBuffer != NULL)
         {
         }
 #endif
 
-        message->setUsed(m_rxMsgSize);
+        message->setUsed((uint16_t)m_rxMsgSize);
         m_newMessage = false;
         status = kErpcStatus_Success;
     }
@@ -267,10 +281,10 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
         if (m_txCntBytes < m_txMsgSize)
         {
             // enable MU tx empty irq from the last mu tx reg
-            MU_EnableInterrupts(m_muBase, (1U << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
+            MU_EnableInterrupts(m_muBase, (1UL << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT)));
 // wait until the sending is not complete
 #if !ERPC_THREADS_IS(NONE)
-            m_txSemaphore.get();
+            (void)m_txSemaphore.get();
 #else
             while (m_txBuffer != NULL)
             {

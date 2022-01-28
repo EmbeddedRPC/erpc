@@ -13,8 +13,8 @@
 
 using namespace erpc;
 
-static ManuallyConstructed<RPMsgLinuxTransport> s_transport;
-static ManuallyConstructed<RPMsgEndpoint> s_endpoint;
+ERPC_MANUALLY_CONSTRUCTED(RPMsgLinuxTransport, s_transport);
+ERPC_MANUALLY_CONSTRUCTED(RPMsgEndpoint, s_endpoint);
 
 erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr)
 {

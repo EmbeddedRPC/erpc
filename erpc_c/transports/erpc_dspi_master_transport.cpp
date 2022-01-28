@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -51,10 +51,10 @@ static inline void DSpiMasterTransport_NotifyTransferGpioInit(void)
     gpioConfig.pinDirection = kGPIO_DigitalInput;
 
     PORT_SetPinInterruptConfig(ERPC_BOARD_DSPI_INT_PORT, ERPC_BOARD_DSPI_INT_PIN, kPORT_InterruptFallingEdge);
-    EnableIRQ(ERPC_BOARD_DSPI_INT_PIN_IRQ);
+    (void)EnableIRQ(ERPC_BOARD_DSPI_INT_PIN_IRQ);
 
     GPIO_PinInit(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN, &gpioConfig);
-    if (!GPIO_PinRead(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN))
+    if (0U == GPIO_PinRead(ERPC_BOARD_DSPI_INT_GPIO, ERPC_BOARD_DSPI_INT_PIN))
     {
         s_isSlaveReady = true;
     }
@@ -73,12 +73,12 @@ static inline void DSpidevMasterTransport_WaitForSlaveReadyMarker(SPI_Type *spiB
     uint8_t data;
     dspi_transfer_t masterXferSlaveReadyMarker;
 
-    while (1)
+    for (;;)
     {
         masterXferSlaveReadyMarker.txData = NULL;
         masterXferSlaveReadyMarker.rxData = &data;
         masterXferSlaveReadyMarker.dataSize = 1;
-        masterXferSlaveReadyMarker.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+        masterXferSlaveReadyMarker.configFlags = (uint32_t)kDSPI_MasterCtar0 | (uint32_t)kDSPI_MasterPcs0;
 
         if (kStatus_Success == DSPI_MasterTransferBlocking(spiBaseAddr, &masterXferSlaveReadyMarker))
         {
@@ -135,7 +135,7 @@ erpc_status_t DspiMasterTransport::underlyingReceive(uint8_t *data, uint32_t siz
     masterXfer.txData = NULL;
     masterXfer.rxData = data;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+    masterXfer.configFlags = (uint32_t)kDSPI_MasterCtar0 | (uint32_t)kDSPI_MasterPcs0;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpidevMasterTransport_WaitForSlaveReadyGpio();
@@ -159,7 +159,7 @@ erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t 
     masterXfer.txData = (uint8_t *)data;
     masterXfer.rxData = NULL;
     masterXfer.dataSize = size;
-    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0;
+    masterXfer.configFlags = (uint32_t)kDSPI_MasterCtar0 | (uint32_t)kDSPI_MasterPcs0;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpidevMasterTransport_WaitForSlaveReadyGpio();

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright (c) 2015-2021, Freescale Semiconductor, Inc.
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -19,7 +19,6 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 uint8_t RPMsgBaseTransport::s_initialized = 0U;
-struct rpmsg_lite_instance RPMsgTransport::s_rpmsg_ctxt;
 struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +31,7 @@ int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint3
     if (payload_len <= ERPC_DEFAULT_BUFFER_SIZE)
     {
         MessageBuffer message((uint8_t *)payload, payload_len);
-        message.setUsed(payload_len);
+        message.setUsed((uint16_t)payload_len);
         (void)transport->m_messageQueue.add(message);
     }
     return RL_HOLD;
@@ -41,7 +40,6 @@ int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint3
 RPMsgTransport::RPMsgTransport(void)
 : RPMsgBaseTransport()
 , m_dst_addr(0)
-, m_rpmsg_ept_context()
 , m_rpmsg_ept(NULL)
 {
 }
@@ -78,7 +76,11 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
 
     if (0U == s_initialized)
     {
-        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS, &s_rpmsg_ctxt);
+#if RL_USE_STATIC_API
+        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS, &m_static_context);
+#else
+        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS);
+#endif
         if (s_rpmsg == RL_NULL)
         {
             status = kErpcStatus_InitFailed;
@@ -86,7 +88,11 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
 
         if (status == kErpcStatus_Success)
         {
-            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_rpmsg_ept_context);
+#if RL_USE_STATIC_API
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_ept_context);
+#else
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this);
+#endif
             if (m_rpmsg_ept == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;
@@ -120,7 +126,11 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
 
     if (0U == s_initialized)
     {
-        s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS, &s_rpmsg_ctxt);
+#if RL_USE_STATIC_API
+        s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS, &m_static_context);
+#else
+        s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS);
+#endif
         if (s_rpmsg == RL_NULL)
         {
             status = kErpcStatus_InitFailed;
@@ -138,7 +148,11 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
             {
             }
 
-            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_rpmsg_ept_context);
+#if RL_USE_STATIC_API
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_ept_context);
+#else
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this);
+#endif
             if (m_rpmsg_ept == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;

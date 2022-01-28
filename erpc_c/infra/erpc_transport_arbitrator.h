@@ -129,10 +129,6 @@ public:
      */
     virtual bool hasMessage(void) override;
 
-protected:
-    Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
-    Codec *m_codec;               //!< Codec used to read incoming message headers.
-
     /*!
      * @brief Request info for a client trying to receive a response.
      */
@@ -154,9 +150,20 @@ protected:
         ~PendingClientInfo(void);
     };
 
+protected:
+    Transport *m_sharedTransport; //!< Transport being shared through this arbitrator.
+    Codec *m_codec;               //!< Codec used to read incoming message headers.
+
     PendingClientInfo *m_clientList;     //!< Active client receive requests.
     PendingClientInfo *m_clientFreeList; //!< Unused client receive info structs.
     Mutex m_clientListMutex;             //!< Mutex guarding the client active and free lists.
+
+    /*!
+     * @brief Create a Pending Client object.
+     *
+     * @return PendingClientInfo* Return created object.
+     */
+    PendingClientInfo *createPendingClient(void);
 
     /*!
      * @brief This function adds pending client.

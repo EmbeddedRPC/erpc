@@ -9,7 +9,6 @@
  */
 
 #include "erpc_framed_transport.h"
-
 #include "erpc_message_buffer.h"
 
 #include <cassert>

@@ -44,7 +44,6 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
 
     m_templateData["sharedMemBeginAddr"] = "";
     m_templateData["sharedMemEndAddr"] = "";
-    m_templateData["dynamicServices"] = false;
 
     m_outputDirectory = m_def->getOutputDirectory();
 
@@ -74,11 +73,6 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
         if (findAnnotation(program, CRC_ANNOTATION) != nullptr)
         {
             m_templateData["crc16"] = m_idlCrc16;
-        }
-
-        if (findAnnotation(program, DYNAMIC_SERVICES_ANNOTATION) != nullptr)
-        {
-            m_templateData["dynamicServices"] = true;
         }
 
         m_outputDirectory /= getAnnStringValue(m_def->getProgramSymbol(), OUTPUT_DIR_ANNOTATION);

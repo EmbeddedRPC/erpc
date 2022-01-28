@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 NXP
+ * Copyright 2020-2021 NXP
  * All rights reserved.
  *
  *
@@ -149,7 +149,7 @@ erpc_status_t UsbCdcTransport::underlyingReceive(uint8_t *data, uint32_t size)
     {
 /* wait until the receiving is finished */
 #if !ERPC_THREADS_IS(NONE)
-        m_rxSemaphore.get();
+        (void)m_rxSemaphore.get();
 #else
         while (!s_isTransferReceiveCompleted)
         {
@@ -171,7 +171,7 @@ erpc_status_t UsbCdcTransport::underlyingSend(const uint8_t *data, uint32_t size
     {
 /* wait until the sending is finished */
 #if !ERPC_THREADS_IS(NONE)
-        m_txSemaphore.get();
+        (void)m_txSemaphore.get();
 #else
         while (!s_isTransferSendCompleted)
         {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -85,7 +85,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
 
     if (0U == s_initialized)
     {
+#if RL_USE_STATIC_API
+        s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS, &m_static_context);
+#else
         s_rpmsg = rpmsg_lite_master_init(base_address, length, rpmsg_link_id, RL_NO_FLAGS);
+#endif
         if (s_rpmsg == RL_NULL)
         {
             status = kErpcStatus_InitFailed;
@@ -93,7 +97,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
 
         if (status == kErpcStatus_Success)
         {
+#if RL_USE_STATIC_API
+            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
+#else
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
+#endif
             if (m_rpmsg_queue == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;
@@ -102,7 +110,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
 
         if (status == kErpcStatus_Success)
         {
+#if RL_USE_STATIC_API
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue, &m_ept_context);
+#else
             m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
+#endif
             if (m_rpmsg_ept == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;
@@ -144,7 +156,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
 
     if (0U == s_initialized)
     {
+#if RL_USE_STATIC_API
+        s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS, &m_static_context);
+#else
         s_rpmsg = rpmsg_lite_remote_init(base_address, rpmsg_link_id, RL_NO_FLAGS);
+#endif
         if (s_rpmsg == RL_NULL)
         {
             status = kErpcStatus_InitFailed;
@@ -162,7 +178,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
             {
             }
 
+#if RL_USE_STATIC_API
+            m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
+#else
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg);
+#endif
             if (m_rpmsg_queue == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;
@@ -171,7 +191,11 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
 
         if (status == kErpcStatus_Success)
         {
+#if RL_USE_STATIC_API
+            m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue, &m_ept_context);
+#else
             m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_queue_rx_cb, m_rpmsg_queue);
+#endif
             if (m_rpmsg_ept == RL_NULL)
             {
                 status = kErpcStatus_InitFailed;
@@ -239,7 +263,7 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
 
     if (ret_val == RL_SUCCESS)
     {
-        memcpy((uint8_t *)&h, buf, sizeof(h));
+        (void)memcpy((uint8_t *)&h, buf, sizeof(h));
         message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
 
         /* Verify CRC. */

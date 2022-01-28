@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -12,8 +12,6 @@
 #define _EMBEDDED_RPC__BASIC_SERIALIZATION_H_
 
 #include "erpc_codec.h"
-
-#include <new>
 
 /*!
  * @addtogroup infra_codec
@@ -43,7 +41,7 @@ enum _null_flag
 class BasicCodec : public Codec
 {
 public:
-    static const uint8_t kBasicCodecVersion; /*!< Codec version. */
+    static const uint32_t kBasicCodecVersion; /*!< Codec version. */
 
     BasicCodec(void)
     : Codec()
@@ -385,14 +383,14 @@ public:
      *
      * @return Pointer to created codec.
      */
-    virtual Codec *create(void) override { return new (std::nothrow) BasicCodec; }
+    virtual Codec *create(void) override;
 
     /*!
      * @brief Dispose codec.
      *
      * @param[in] codec Codec to dispose.
      */
-    virtual void dispose(Codec *codec) override { delete codec; }
+    virtual void dispose(Codec *codec) override;
 };
 
 } // namespace erpc

@@ -9,7 +9,6 @@
  */
 
 #include "erpc_arbitrated_client_manager.h"
-
 #include "erpc_transport_arbitrator.h"
 
 #include "assert.h"
