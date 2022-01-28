@@ -68,15 +68,15 @@
 #endif
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-#if !defined(ERPC_CODEC_COUNT)
-#define ERPC_CODEC_COUNT (2U)
-#endif
-#if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
-#define ERPC_MESSAGE_LOGGERS_COUNT (0U)
-#endif
-#if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
-#define ERPC_CLIENTS_THREADS_AMOUNT (1U)
-#endif
+    #if !defined(ERPC_CODEC_COUNT)
+        #define ERPC_CODEC_COUNT (2U)
+    #endif
+    #if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
+        #define ERPC_MESSAGE_LOGGERS_COUNT (0U)
+    #endif
+    #if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
+        #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
+    #endif
 #endif
 
 // Safely detect tx_api.h.
@@ -133,9 +133,9 @@
 
 //NOEXCEPT support
 #if defined(__cplusplus) && __cplusplus >= 201103 && ERPC_NOEXCEPT
-#define NOEXCEPT noexcept
+    #define NOEXCEPT noexcept
 #else
-#define NOEXCEPT
+    #define NOEXCEPT
 #endif // NOEXCEPT
 
 // Disabling nesting calls support as default.
@@ -162,11 +162,11 @@
 #endif
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION) /* Keil MDK */
-#define THROW_BADALLOC throw(std::bad_alloc)
-#define THROW throw()
+    #define THROW_BADALLOC throw(std::bad_alloc)
+    #define THROW throw()
 #else
-#define THROW_BADALLOC
-#define THROW
+    #define THROW_BADALLOC
+    #define THROW
 #endif
 
 #ifndef ERPC_TRANSPORT_MU_USE_MCMGR
@@ -196,12 +196,13 @@
 #endif
 
 #if !defined(erpc_assert)
-#if defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
-#include "platform/mbed_assert.h"
-#define erpc_assert(condition) MBED_ASSERT(condition) //!< Assert function.
-#else
-#include <cassert>
-#define erpc_assert(condition) assert(condition) //!< Assert function.
+    #if defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
+        #include "platform/mbed_assert.h"
+        #define erpc_assert(condition) MBED_ASSERT(condition) //!< Assert function.
+    #else
+        #include <cassert>
+        #define erpc_assert(condition) assert(condition) //!< Assert function.
+    #endif
 #endif
 
 /* clang-format on */
