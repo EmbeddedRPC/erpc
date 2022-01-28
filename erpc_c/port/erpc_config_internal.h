@@ -49,13 +49,13 @@
 
 // Detect allocation policy if not already set.
 #if !defined(ERPC_ALLOCATION_POLICY)
-    #if defined(__has_include) && __has_include("FreeRTOSConfig.h")
+    #if ERPC_HAS_FREERTOSCONFIG_H
         #ifdef __cplusplus
-        extern "C" {
+            extern "C" {
         #endif
         #include "FreeRTOSConfig.h"
         #ifdef __cplusplus
-        }
+            }
         #endif
         #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
             #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
@@ -196,12 +196,21 @@
 #endif
 
 #if !defined(erpc_assert)
-    #if defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
+    #if ERPC_HAS_FREERTOSCONFIG_H 
+        #ifdef __cplusplus
+            extern "C" {
+        #endif
+        #include "FreeRTOSConfig.h"
+        #ifdef __cplusplus
+            }
+        #endif
+        #define erpc_assert(condition) configASSERT(condition)
+    #elif defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
         #include "platform/mbed_assert.h"
-        #define erpc_assert(condition) MBED_ASSERT(condition) //!< Assert function.
+        #define erpc_assert(condition) MBED_ASSERT(condition)
     #else
         #include <cassert>
-        #define erpc_assert(condition) assert(condition) //!< Assert function.
+        #define erpc_assert(condition) assert(condition)
     #endif
 #endif
 
