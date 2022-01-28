@@ -196,6 +196,10 @@
 #endif
 
 #if !defined(erpc_assert)
+#if defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
+#include "platform/mbed_assert.h"
+#define erpc_assert(condition) MBED_ASSERT(condition) //!< Assert function.
+#else
 #include <cassert>
 #define erpc_assert(condition) assert(condition) //!< Assert function.
 #endif
