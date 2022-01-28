@@ -134,7 +134,7 @@ void Thread::threadEntryPoint(void)
 void Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    MBED_ASSERT(_this); // Reinterpreting 'void *arg' to 'Thread *' failed.
+    erpc_assert(_this); // Reinterpreting 'void *arg' to 'Thread *' failed.
     _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
