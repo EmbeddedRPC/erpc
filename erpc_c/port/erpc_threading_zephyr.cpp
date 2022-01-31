@@ -9,8 +9,6 @@
 
 #include "erpc_threading.h"
 
-#include <cassert>
-
 #if ERPC_THREADS_IS(ZEPHYR)
 
 using namespace erpc;
@@ -56,7 +54,7 @@ void Thread::start(void *arg)
 {
     m_arg = arg;
 
-    assert(m_stack && "Set stack address");
+    erpc_assert(m_stack && "Set stack address");
     k_thread_create(&m_thread, m_stack, m_stackSize, threadEntryPointStub, this, NULL, NULL, m_priority, 0, K_NO_WAIT);
 }
 
@@ -86,7 +84,7 @@ void Thread::threadEntryPoint(void)
 void *Thread::threadEntryPointStub(void *arg1, void *arg2, void *arg3)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg1);
-    assert(_this && "Reinterpreting 'void *arg1' to 'Thread *' failed.");
+    erpc_assert(_this && "Reinterpreting 'void *arg1' to 'Thread *' failed.");
     k_thread_custom_data_set(arg1);
     _this->threadEntryPoint();
 

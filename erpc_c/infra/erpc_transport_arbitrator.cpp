@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_transport_arbitrator.h"
-
+#include "erpc_config_internal.h"
 #include "erpc_manually_constructed.h"
 
-#include <cassert>
 #include <cstdio>
 #include <string>
 
@@ -47,21 +46,21 @@ TransportArbitrator::~TransportArbitrator(void)
 
 void TransportArbitrator::setCrc16(Crc16 *crcImpl)
 {
-    assert(crcImpl);
-    assert(m_sharedTransport);
+    erpc_assert(crcImpl);
+    erpc_assert(m_sharedTransport);
     m_sharedTransport->setCrc16(crcImpl);
 }
 
 bool TransportArbitrator::hasMessage(void)
 {
-    assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert(m_sharedTransport && "shared transport is not set");
 
     return m_sharedTransport->hasMessage();
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 {
-    assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert(m_sharedTransport && "shared transport is not set");
 
     erpc_status_t err;
     message_type_t msgType;
@@ -142,7 +141,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 
 erpc_status_t TransportArbitrator::send(MessageBuffer *message)
 {
-    assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert(m_sharedTransport && "shared transport is not set");
     return m_sharedTransport->send(message);
 }
 
@@ -159,7 +158,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
 
 erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 {
-    assert((token != 0) && "invalid client token");
+    erpc_assert((token != 0) && "invalid client token");
 
     // Convert token to pointer to info struct for this client receive request.
     PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);
