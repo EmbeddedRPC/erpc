@@ -209,7 +209,11 @@
         #include "platform/mbed_assert.h"
         #define erpc_assert(condition) MBED_ASSERT(condition)
     #else
-        #include <cassert>
+        #ifdef __cplusplus
+            #include <cassert>
+        #else
+            #include "assert.h"
+        #endif
         #define erpc_assert(condition) assert(condition)
     #endif
 #endif
