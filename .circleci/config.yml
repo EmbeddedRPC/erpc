@@ -11,7 +11,7 @@ jobs:
       - run: sudo pip3 install pytest pyyaml enum34 pyserial west
       - run: sudo apt-get install -y gcc-arm-none-eabi
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
-      - run: cd ~/circleci/project/mcuxsdk
+      - run: cd ~/project/mcuxsdk
       - run: west update 
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
