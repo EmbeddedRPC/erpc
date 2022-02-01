@@ -8,7 +8,9 @@ jobs:
       - checkout
       - run: sudo apt-get update -qq
       - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev gcc g++
-      - run: sudo pip3 install pytest pyyaml enum34 pyserial
+      - run: sudo pip3 install pytest pyyaml enum34 pyserial west
+      - run: sudo apt-get install -y gcc-arm-none-eabi
+      - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
@@ -57,6 +59,6 @@ workflows:
   build-workflow:
     jobs:
       - build-linux-gcc
-      - build-linux-clang
+      # - build-linux-clang
       # - build-mac-gcc # Mac is on going, or it can be hosted on company computer.
       # - build-mac-clang
