@@ -9,8 +9,8 @@
  */
 
 #include "erpc_message_buffer.h"
+#include "erpc_config_internal.h"
 
-#include <cassert>
 #include <cstring>
 
 using namespace erpc;
@@ -64,7 +64,7 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
 
 erpc_status_t MessageBuffer::copy(const MessageBuffer *other)
 {
-    assert(m_len >= other->m_len);
+    erpc_assert(m_len >= other->m_len);
 
     m_used = other->m_used;
     (void)memcpy(m_buf, other->m_buf, m_used);
@@ -74,7 +74,7 @@ erpc_status_t MessageBuffer::copy(const MessageBuffer *other)
 
 void MessageBuffer::swap(MessageBuffer *other)
 {
-    assert(other);
+    erpc_assert(other);
 
     MessageBuffer temp(*other);
 
@@ -90,7 +90,7 @@ void MessageBuffer::Cursor::set(MessageBuffer *buffer)
 {
     m_buffer = buffer;
     // RPMSG when nested calls are enabled can set NULL buffer.
-    // assert(buffer->get() && "Data buffer wasn't set to MessageBuffer.");
+    // erpc_assert(buffer->get() && "Data buffer wasn't set to MessageBuffer.");
     // receive function should return err if it couldn't set data buffer.
     m_pos = buffer->get();
     m_remaining = buffer->getLength();
@@ -98,7 +98,7 @@ void MessageBuffer::Cursor::set(MessageBuffer *buffer)
 
 erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 {
-    assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
+    erpc_assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
 
     erpc_status_t err;
 
@@ -120,7 +120,7 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 
 erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
-    assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
+    erpc_assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
 
     erpc_status_t err;
 

@@ -12,7 +12,6 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 
-#include <assert.h>
 #include <new>
 
 using namespace std;
@@ -36,7 +35,7 @@ public:
 
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         if (buf->get() != NULL)
         {
             delete[] buf->get();

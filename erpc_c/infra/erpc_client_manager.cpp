@@ -10,8 +10,6 @@
 
 #include "erpc_client_manager.h"
 
-#include "assert.h"
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +47,7 @@ void ClientManager::performRequest(RequestContext &request)
 #if ERPC_NESTED_CALLS
     if (performRequest)
     {
-        assert(m_serverThreadId && "server thread id was not set");
+        erpc_assert(m_serverThreadId && "server thread id was not set");
         if (Thread::getCurrentThreadId() == m_serverThreadId)
         {
             performNestedClientRequest(request);
@@ -120,7 +118,7 @@ void ClientManager::performNestedClientRequest(RequestContext &request)
 {
     erpc_status_t err;
 
-    assert(m_transport && "transport/arbitrator not set");
+    erpc_assert(m_transport && "transport/arbitrator not set");
 
 #if ERPC_MESSAGE_LOGGING
     if (request.getCodec()->isStatusOk() == true)
@@ -143,7 +141,7 @@ void ClientManager::performNestedClientRequest(RequestContext &request)
         // Receive reply.
         if (request.getCodec()->isStatusOk() == true)
         {
-            assert(m_server && "server for nesting calls was not set");
+            erpc_assert(m_server && "server for nesting calls was not set");
             err = m_server->run(request);
             request.getCodec()->updateStatus(err);
         }

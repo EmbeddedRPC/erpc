@@ -1,3 +1,7 @@
+[![Version](https://img.shields.io/github/v/release/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/releases/latest)
+[![Contributors](https://img.shields.io/github/contributors/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/EmbeddedRPC/erpc/pulls)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EmbeddedRPC/erpc)
 
 # eRPC
@@ -90,7 +94,13 @@ Plenty of eRPC multicore and multiprocessor examples can be also found in NXP MC
 To get the board list with multicore support (eRPC included) use filtering based on Middleware and search for 'multicore' string. Once the selected package with the multicore middleware is downloaded, see<br> 
 <MCUXpressoSDK_install_dir>/boards/<board_name>/multicore_examples for eRPC multicore examples (RPMsg_Lite or Messaging Unit transports used) or<br>
 <MCUXpressoSDK_install_dir>/boards/<board_name>/multiprocessor_examples for eRPC multiprocessor examples (UART or SPI transports used).<br>
-eRPC examples use 'erpc_' name prefix. 
+eRPC examples use the 'erpc_' name prefix. 
+
+Another way of getting NXP MCUXpressoSDK eRPC multicore and multiprocessor examples is using the [mcux-sdk](https://github.com/NXPmicro/mcux-sdk) Github repo. Follow the description how to use the West tool
+to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/NXPmicro/mcux-sdk#overview). Once done the armgcc eRPC examples can be found in<br>
+mcuxsdk/examples/<board_name>/multicore_examples or in<br>
+mcuxsdk/examples/<board_name>/multiprocessor_examples folders.<br>
+You can use the evkmimxrt1170 as the board_name for instance. Similar to MCUXpressoSDK packages the eRPC examples use the 'erpc_' name prefix.
 
 ## References
 

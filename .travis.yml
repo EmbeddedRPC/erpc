@@ -7,14 +7,14 @@ compiler:
 os:
 - linux
 - osx
-osx_image: xcode10.3 # OS X 10.14
+osx_image: xcode11.6 # OS X 10.15.5
 before_install:
 - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update -qq; fi
-- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install python bison flex libboost-dev libboost-filesystem-dev libboost-system-dev python ; fi
-- if [ $TRAVIS_OS_NAME == linux ]; then pyenv install 2.7.12 ; pyenv global 2.7.12; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev python3 ; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then pyenv install 3.5.1 ; pyenv global 3.5.1; fi
 - if [ $TRAVIS_OS_NAME == osx ]; then brew update; fi
-- if [ $TRAVIS_OS_NAME == osx ]; then brew install python bison flex -v -f 2>&1 && brew upgrade boost || true; fi
-- if [ $TRAVIS_OS_NAME == osx ]; then curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then curl "https://bootstrap.pypa.io/pip/get-pip.py" | sudo python3; fi
 
 install:
 #- sudo pip install --upgrade pip setuptools
@@ -29,4 +29,4 @@ install:
 script:
 - make all
 - pushd erpcgen/test ; py.test ; popd
-- python test/run_unit_tests.py
+- python3 test/run_unit_tests.py

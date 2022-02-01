@@ -13,7 +13,6 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 
-#include <assert.h>
 #include <string.h>
 
 #if !ERPC_THREADS_IS(NONE)
@@ -67,7 +66,7 @@ public:
             idx++;
         }
 
-        assert(idx < ERPC_DEFAULT_BUFFERS_COUNT);
+        erpc_assert(idx < ERPC_DEFAULT_BUFFERS_COUNT);
 
         m_freeBufferBitmap[idx >> 3U] &= ~(1U << (idx & 0x7U));
 #if !ERPC_THREADS_IS(NONE)
@@ -77,7 +76,7 @@ public:
         uint8_t *buf;
         buf = (uint8_t *)m_buffers[idx];
 
-        assert(NULL != buf);
+        erpc_assert(NULL != buf);
         return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
     }
 
@@ -88,7 +87,7 @@ public:
      */
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         uint8_t *tmp = buf->get();
         if (tmp != NULL)
         {
