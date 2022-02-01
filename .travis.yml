@@ -3,7 +3,7 @@ sudo: required
 dist: xenial
 compiler:
 - gcc
-- clang
+#- clang
 os:
 - linux
 - osx
@@ -19,13 +19,13 @@ before_install:
 install:
 #- sudo pip install --upgrade pip setuptools
 #- CC=gcc sudo pip install requests[security]
-- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install tornado; fi
-- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install --user nose; fi
-- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip install pytest --upgrade --ignore-installed six; fi
-- if [ $TRAVIS_OS_NAME == linux ]; then sudo pip install pytest; fi
-- sudo pip install pyyaml
-- sudo pip install enum34
-- sudo pip install pyserial
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip3 install tornado; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip3 install --user nose; fi
+- if [ $TRAVIS_OS_NAME == osx ]; then sudo pip3 install pytest --upgrade --ignore-installed six; fi
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo pip3 install pytest; fi
+- sudo pip3 install pyyaml
+- sudo pip3 install enum34
+- sudo pip3 install pyserial
 script:
 - make all
 - pushd erpcgen/test ; py.test ; popd
