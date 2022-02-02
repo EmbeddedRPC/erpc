@@ -62,7 +62,7 @@ extern const {$c.typeAndName} = {$c.value};
 {%    endif -- way == "serial" %}
 {%   endif -- s.type == "union/struct" %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolSource ---------------- #}
@@ -83,7 +83,7 @@ extern const {$c.typeAndName} = {$c.value};
 {%    endif -- way == "serial" %}
 {%   endif -- s.type == "union/struct" %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolFreeSpaceHeader ---------------- #}
@@ -96,7 +96,7 @@ extern const {$c.typeAndName} = {$c.value};
 {$ unionFreeSpaceHeader(s, shared)}
 {%   endif %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolFreeSpaceSource ---------------- #}
@@ -109,7 +109,7 @@ extern const {$c.typeAndName} = {$c.value};
 {$ unionFreeSpaceSource(s, shared)}
 {%   endif %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- structDeserialHeader ---------------- #}
@@ -397,7 +397,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {
 {%if info.needCaseEmptyFreeingCall %}{% for case in info.cases %}
 {%  if case.needCaseFreeingCall == false %}
-    {%   if case.name != "default" %}case {% endif%}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
 {%  endif %}
 {% endfor -- cases %}
     {
@@ -405,7 +405,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
     }{%    endif -- needCaseEmptyFreeingCall %}
 {% for case in info.cases %}
 {%  if case.needCaseFreeingCall == true %}
-    {%   if case.name != "default" %}case {% endif%}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
     {
 {%   for member in case.members %}
 {%    if member.isNeedFreeingCall %}
@@ -413,7 +413,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {%    endif %}
 {%    if empty(member.coderCall.memberAllocation) == false %}
 {$addIndent("        ", member.coderCall.freeingCall2(member.coderCall))}
-{%    endif%}
+{%    endif %}
 {%   endfor -- members %}
         break;
     }
@@ -455,7 +455,7 @@ struct
 {%  if count(unionCase) > 1 %}
 };
 {%  endif %}
-{% endfor%}
+{% endfor %}
 {% enddef ------------------------------- unionMembersDeclaration %}
 
 {% def f_paramIsNullableEncode(param) %}

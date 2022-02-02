@@ -1,4 +1,4 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
@@ -49,41 +49,33 @@ class {$iface.name}Client(interface.I{$iface.name}):
                 request=self.{$upper(fn.name)}_ID,
                 sequence=request.sequence))
 {% for p in fn.inParameters if not p.serializedViaMember %}
+{%  if p.direction == "in" %}
+{%   set p_name = p.name %}
+{%  else %}
+{%   set p_name = p.name & ".value" %}
+{%  endif -- dir %}
 {%  if p.isNullable %}
-        if {$p.name} is None:
-            codec.write_null_flag(True)
-        else:
-            codec.write_null_flag(False)
-            {$encodeValue(p.type, p.name, "codec", "            ", 0)}
+{%   set indent = "    " >%}
+        codec.write_null_flag({$p_name} is None)
+        if {$p_name} is not None:
 {%  else -- isNullable %}
-        if {$p.name} is None:
-            raise ValueError("{$p.name} is None")
-{%   if p.type.type == 'union' %}
-        {$p.name}._write(codec, {$p.discriminator})
-{%   else%}
-{%      if p.direction == "inout" %}
-        {$encodeValue(p.type, p.name & ".value", "codec", "        ", 0)}
-{%      else %}
-        {$encodeValue(p.type, p.name, "codec", "        ", 0)}
-{%      endif -- p.direction %}
-{%   endif -- isUnion %}
+{%   set indent = "" >%}
+        if {$p_name} is None:
+            raise ValueError("{$p_name} is None")
 {%  endif -- isNullable %}
+        {$indent}{$encodeValue(p.type, p_name, "codec", indent & "        ", 0)}
 {% endfor -- inParams %}
 
         # Send request{% if not fn.isOneway %} and process reply{% endif %}.
         self._clientManager.perform_request(request)
 {% if not fn.isOneway %}
 {% for p in fn.outParameters if not p.serializedViaMember %}
+{%  set indent = "" >%}
 {%  if p.isNullable %}
         if {$p.name}.value != None:
-            {$decodeValue(p.type, p.name & ".value", "common.", "codec", "            ", 0)}
-{%  else -- isNullable %}
-{%   if p.type.type == 'union' %}
-        {$p.name}, {$p.discriminator} = common.{$p.type.name}()._read(codec)
-{%   else%}
-        {$decodeValue(p.type, (p.name & ".value"), "common.", "codec", "        ", 0)}
-{%   endif -- isUnion %}
+{%           set indent = "    " >%}
 {%  endif -- isNullable %}
+        {$indent}{$decodeValue(p.type, (p.name & ".value"), "common.", "codec", indent & "        ", 0)}
 {% endfor -- outParams %}
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
         {$decodeValue(fn.returnValue.type, "_result", "common.", "codec", "        ", 0)}
@@ -96,4 +88,3 @@ class {$iface.name}Client(interface.I{$iface.name}):
 {% endfor -- fn %}
 
 {% endfor -- iface %}
-
