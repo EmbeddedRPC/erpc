@@ -12,8 +12,8 @@ jobs:
       - run: sudo apt-get install -y gcc-arm-none-eabi
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: pushd ~/project/mcuxsdk ; west update ; popd
-      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; ./build_all.sh ; popd
-      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; ./build_all.sh ; popd
+      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; sudo ./build_all.sh ; popd
+      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; sudo ./build_all.sh ; popd
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
