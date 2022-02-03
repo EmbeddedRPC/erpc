@@ -9,11 +9,21 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev gcc g++
       - run: sudo pip3 install pytest pyyaml enum34 pyserial west
-      - run: sudo apt-get install -y gcc-arm-none-eabi
+      # - run: sudo apt-get install -y gcc-arm-none-eabi
+      - run: curl -O https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.07/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
+      # - run: wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.07/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
+      - run: mkdir -p ${HOME}/opt
+      - run: cd ${HOME}/opt
+      - run: tar xjf ~/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
+      - run: chmod -R +x ${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/bin
+      - run: ${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/bin/arm-none-eabi-gcc --version
+      - run: cd ${HOME}
+      # - run: sudo apt-get -y install cmake
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: pushd ~/project/mcuxsdk ; west update ; popd
-      - run: bash ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc/build_all.sh
-      - run: bash ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc/build_all.sh
+      - run: export ARMGCC_DIR=${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/
+      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; ./build_all.sh ; popd
+      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; ./build_all.sh ; popd
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
