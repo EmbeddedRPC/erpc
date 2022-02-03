@@ -1,4 +1,4 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
@@ -47,7 +47,7 @@ extern ClientManager *g_client;
 
 {% endif -- generateErrorChecks %}
 {% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
 
 #if ERPC_PRE_POST_ACTION
     pre_post_action_cb preCB = g_client->getPreCB();

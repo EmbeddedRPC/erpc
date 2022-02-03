@@ -147,7 +147,7 @@ read_{$info.typeName}_union(codec, &_tmp_local, &{$info.name});
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
-{%  endif -- castDiscriminator%}
+{%  endif -- castDiscriminator %}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
 read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
@@ -156,7 +156,7 @@ read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
-{%  endif  -- castDiscriminator%}
+{%  endif  -- castDiscriminator %}
 {% endif -- inDataContainer %}
 {% enddef -------------------------- UnionParamType %}
 
@@ -206,17 +206,17 @@ read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.name});
 {$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
-{%    endif -- castDiscriminator%}
+{%    endif -- castDiscriminator %}
 {%   else -- not inDataContainer %}
 {%    if info.castDiscriminator %}
 read_{$info.sharedType}_union_shared(codec, &_tmp_local, {$info.name});
 {%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
-{%    endif  -- castDiscriminator%}
+{%    endif  -- castDiscriminator %}
 {%   endif -- inDataContainer %}
-{%  endif%}
-{% endif%}
+{%  endif %}
+{% endif %}
 {% enddef -------------------------- SharedType %}
 
 {% def decodeData(info) -------------------%}
@@ -314,14 +314,14 @@ codec->writeCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount},
 {% if sharedMemBeginAddr != "" %}
 if ({$info.name} >= ERPC_SHARED_MEMORY_BEGIN && {$info.name} <= ERPC_SHARED_MEMORY_END)
 {
-    codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
+    codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{% endif %}{$info.name}));
 }
 else
 {
     codec->updateStatus(kErpcStatus_MemoryError);
 }
 {% else %}
-codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
+codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{% endif %}{$info.name}));
 {% endif %}
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}
@@ -336,8 +336,8 @@ write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static
 {%   else -- not inDataContainer %}
 write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
 {%   endif -- inDataContainer %}
-{%  endif%}
-{% endif%}
+{%  endif %}
+{% endif %}
 {% enddef -------------------------- SharedType %}
 
 {% def encodeData(info) -------------------%}

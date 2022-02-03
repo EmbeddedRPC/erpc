@@ -1,4 +1,4 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
@@ -75,19 +75,23 @@ class {$s.name}(object):
 {% endfor -- s.members %}
     def _read(self, codec):
 {% for m in s.members if not m.serializedViaMember %}
-{%   set self_m_name = "self." & m.name %}
-{%   if m.isNullable %}
-        if not codec.read_null_flag():
-            {$decodeValue(m.type, self_m_name, "", "codec", "            ", 0)}
-        else:
+{%  set self_m_name = "self." & m.name %}
+{%  set indent = "" >%}
+{%  if m.isNullable %}
+        if codec.read_null_flag():
             {$self_m_name} = None
-{%   else -- isNullable %}
-{%    if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == true) %}
-        {$self_m_name}, self.{$m.discriminator} = {$m.type.name}()._read(codec)
-{%    else -- isNonEncapsulatedUnion %}
-        {$decodeValue(m.type, self_m_name, "", "codec", "        ", 0)}
-{%    endif -- isNonEncapsulatedUnion %}
-{%   endif -- isNullable %}
+        else:
+{%          set indent = "    " >%}
+{%  endif -- isNullable %}
+{%  if (m.type.type == 'union') %}
+{%   if (m.type.isNonEncapsulatedUnion == true) %}
+        {$indent}{$self_m_name}, self.{$m.discriminator} = {$m.type.name}()._read(codec)
+{%   else -- isNonEncapsulatedUnion %}
+        {$indent}{$decodeValueUnion(m.type, self_m_name, "codec", indent & "        ", 0)}
+{%   endif -- isNonEncapsulatedUnion %}
+{%  else -- union %}
+        {$indent}{$decodeValue(m.type, self_m_name, "", "codec", indent & "        ", 0)}
+{%  endif -- union %}
 {% endfor -- members %}
         return self
 
@@ -95,20 +99,23 @@ class {$s.name}(object):
 {% for m in s.members if not m.serializedViaMember %}
 {%  set self_m_name = "self." & m.name %}
 {%  if m.isNullable %}
-        if {$self_m_name} is None:
-            codec.write_null_flag(True)
-        else:
-            codec.write_null_flag(False)
-            {$encodeValue(m.type, self_m_name, "codec", "            ", 0)}
+{%      set indent = "    " >%}
+        codec.write_null_flag({$self_m_name} is None)
+        if {$self_m_name} is not None:
 {%  else -- isNullable %}
+{%      set indent = "" >%}
         if {$self_m_name} is None:
             raise ValueError("{$m.name} is None")
-{%    if (m.type.type == 'union' && m.type.isNonEncapsulatedUnion == true) %}
-        self.{$m.name}._write(codec, self.{$m.discriminator})
-{%    else -- isNonEncapsulatedUnion %}
-        {$encodeValue(m.type, self_m_name, "codec", "        ", 0)}
-{%    endif -- isNonEncapsulatedUnion %}
 {%  endif -- isNullable %}
+{%  if (m.type.type == 'union') %}
+{%   if (m.type.isNonEncapsulatedUnion == true) %}
+        {$indent}self.{$m.name}._write(codec, self.{$m.discriminator})
+{%   else -- isNonEncapsulatedUnion %}
+        {$indent}{$encodeValueUnion(m.type, self_m_name, "codec", indent & "        ", 0)}
+{%   endif -- isNonEncapsulatedUnion %}
+{%  else -- union %}
+        {$indent}{$encodeValue(m.type, self_m_name, "codec", indent & "        ", 0)}
+{%  endif -- union %}
 {% endfor -- members %}
 
     def __str__(self):
@@ -135,11 +142,11 @@ class {$u.name}(object):
 {%  endfor -- union cases %}
 
     def _read(self, codec):
-        {$decodeValue(u.type, "self", "", "codec", "        ", 0)}
+        {$decodeValueUnion(u.type, "self", "codec", "        ", 0)}
         return self, discriminator
 
     def _write(self, codec, discriminator):
-        {$encodeValue(u.type, "self", "codec", "        ", 0)}
+        {$encodeValueUnion(u.type, "self", "codec", "        ", 0)}
 
 {#    def __str__(self):
         return "<%s@%x{% for m in u.members if not m.lengthForMember %} {$m.name}=%s{% endfor %}>" % (self.__class__.__name__, id(self){% for m in u.members if not m.lengthForMember %}, self.{$m.name}{% endfor %})
