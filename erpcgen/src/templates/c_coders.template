@@ -312,7 +312,7 @@ codec->writeCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount},
 
 {% def encodeSharedType(info) %}
 {% if sharedMemBeginAddr != "" %}
-if ({$info.name} >= ERPC_SHARED_MEMORY_BEGIN && {$info.name} <= ERPC_SHARED_MEMORY_END)
+if (({$info.name} >= ERPC_SHARED_MEMORY_BEGIN) && ({$info.name} <= ERPC_SHARED_MEMORY_END))
 {
     codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{% endif %}{$info.name}));
 }
