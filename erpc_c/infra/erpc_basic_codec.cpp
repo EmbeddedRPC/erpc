@@ -37,14 +37,7 @@ void BasicCodec::writeData(const void *value, uint32_t length)
 {
     if (isStatusOk())
     {
-        if (value != NULL)
-        {
-            m_status = m_cursor.write(value, length);
-        }
-        else
-        {
-            m_status = kErpcStatus_MemoryError;
-        }
+        m_status = m_cursor.write(value, length);
     }
 }
 
@@ -202,14 +195,7 @@ void BasicCodec::readData(void *value, uint32_t length)
 {
     if (isStatusOk())
     {
-        if (value != NULL)
-        {
-            m_status = m_cursor.read(value, length);
-        }
-        else
-        {
-            m_status = kErpcStatus_MemoryError;
-        }
+        m_status = m_cursor.read(value, length);
     }
 }
 
