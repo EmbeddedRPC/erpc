@@ -335,7 +335,7 @@ test_client.cpp:
       - void bar(const bool * l, uint32_t c)
   - if: dir == 'inout' and ann == '@nullable'
     then:
-      - if (l == NULL || c == NULL)
+      - if ((l == NULL) || (c == NULL))
     else:
       - if (l == NULL)
   - codec->writeNullFlag
@@ -398,7 +398,7 @@ test_client.cpp:
   - void bar(bool * l, uint32_t * c)
   - if: ann == '@nullable'
     then:
-      - if (l == NULL || c == NULL)
+      - if ((l == NULL) || (c == NULL))
     else:
       - if (l == NULL)
   - codec->writeNullFlag
@@ -412,7 +412,7 @@ test_client.cpp:
       - codec->write
   - if: ann == '@nullable'
     then:
-      - if (l != NULL && c != NULL)
+      - if ((l != NULL) && (c != NULL))
     else:
       - if (l != NULL)
   - codec->startReadList
