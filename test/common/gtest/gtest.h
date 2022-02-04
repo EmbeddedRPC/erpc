@@ -2091,7 +2091,7 @@ using ::std::tuple_size;
 #endif
 
 // _LIBCPP_VERSION is defined by the libc++ library from the LLVM project.
-#if defined(__GLIBCXX__) || defined(_LIBCPP_VERSION)
+#if ((defined(__GLIBCXX__) || defined(_LIBCPP_VERSION)) && (!defined(__ARMCC_VERSION)))
 # define GTEST_HAS_CXXABI_H_ 1
 #else
 # define GTEST_HAS_CXXABI_H_ 0
@@ -17757,7 +17757,7 @@ class BaseTestPartResult{
   // C'tor.  BaseTestPartResult does NOT have a default constructor.
   // Always use this constructor (with parameters) to create a
   // BaseTestPartResult object.
-  BaseTestPartResult(Type type){type_ = type;}
+  BaseTestPartResult(Type arg_type){type_ = arg_type;}
 
   // D'tor. BaseTestPartResult have a virtual destructor because it could
   // be used for inheritance.

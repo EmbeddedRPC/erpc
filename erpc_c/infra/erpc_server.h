@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -10,13 +11,11 @@
 #ifndef _EMBEDDED_RPC__SERVER_H_
 #define _EMBEDDED_RPC__SERVER_H_
 
+#include "erpc_client_server_common.h"
 #include "erpc_codec.h"
 #include "erpc_config_internal.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_client_manager.h"
-#endif
-#if ERPC_MESSAGE_LOGGING
-#include "erpc_message_loggers.h"
 #endif
 
 /*!
@@ -101,11 +100,7 @@ protected:
  *
  * @ingroup infra_server
  */
-#if ERPC_MESSAGE_LOGGING
-class Server : public MessageLoggers
-#else
-class Server
-#endif
+class Server : public ClientServerCommon
 {
 public:
     /*!
@@ -114,13 +109,11 @@ public:
      * This function initializes object attributes.
      */
     Server(void)
-    : m_messageFactory()
-    , m_codecFactory()
-    , m_transport()
-    , m_firstService()
-#if ERPC_MESSAGE_LOGGING
-    , MessageLoggers()
-#endif
+    : ClientServerCommon()
+    , m_messageFactory(NULL)
+    , m_codecFactory(NULL)
+    , m_transport(NULL)
+    , m_firstService(NULL)
     {
     }
 
@@ -158,6 +151,13 @@ public:
      * @param[in] service Service to use.
      */
     void addService(Service *service);
+
+    /*!
+     * @brief Remove service.
+     *
+     * @param[in] service Service to remove.
+     */
+    void removeService(Service *service);
 
     /*!
      * @brief This function runs the server.
@@ -226,8 +226,8 @@ protected:
 
 private:
     // Disable copy ctor.
-    Server(const Server &);            /*!< Disable copy ctor. */
-    Server &operator=(const Server &); /*!< Disable copy ctor. */
+    Server(const Server &other);            /*!< Disable copy ctor. */
+    Server &operator=(const Server &other); /*!< Disable copy ctor. */
 };
 
 } // namespace erpc

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -18,7 +19,7 @@
 %define api.pure full
 
 /* put more info in error messages */
-%error-verbose
+%define parse.error verbose
 
 /* enable location processing */
 %locations
@@ -173,7 +174,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %left '|'
 %left '^'
 %left '&'
-%left "<<" ">>"
+%left TOK_LSHIFT TOK_RSHIFT
 %left '+' '-'
 %left '*' '/' '%'
 %right UNARY_OP
@@ -345,7 +346,7 @@ definition_base :   const_def
                         }
                 ;
 
-import_stmt     :   "import" TOK_STRING_LITERAL
+import_stmt     :   TOK_IMPORT TOK_STRING_LITERAL
                         {
                             std::string s = $TOK_STRING_LITERAL->getStringValue();
                             lexer->pushFile(s);
@@ -355,7 +356,7 @@ import_stmt     :   "import" TOK_STRING_LITERAL
 /*
  * TOK_CONST -> ( simple_data_type ident const_expr )
  */
-const_def       :   "const" simple_data_type ident '=' const_expr
+const_def       :   TOK_CONST simple_data_type ident '=' const_expr
                         {
                             $$ = new AstNode(*$1);
                             $$->appendChild($simple_data_type);
@@ -367,7 +368,7 @@ const_def       :   "const" simple_data_type ident '=' const_expr
 /*
  * TOK_ENUM -> ( ident, ( TOK_CHILDREN -> enums* ) )
  */
-enum_def        :   "enum" name_opt[name] '{' enumerator_list_opt '}'
+enum_def        :   TOK_ENUM name_opt[name] '{' enumerator_list_opt '}'
                         {
                             $$ = new AstNode(*$1);
                             $$->appendChild($name);
@@ -441,7 +442,7 @@ enumerator      :   doxy_ml_comment_opt ident '=' int_const_expr annotation_list
 /*
  * TOK_INTERFACE -> ( ident ( TOK_CHILDREN -> TOK_FUNCTION* ) ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
-interface_def   :   "interface"[iface] ident[name] '{' function_def_list_opt[functions] '}'
+interface_def   :   TOK_INTERFACE[iface] ident[name] '{' function_def_list_opt[functions] '}'
                         {
                             $$ = new AstNode(*$iface);
                             $$->appendChild($name);
@@ -498,7 +499,7 @@ function_type_base_def
  * TOK_FUNCTION -> ( ident ( simple_data_type | TOK_VOID | TOK_ONEWAY ) ( TOK_CHILDREN -> param_def* ) ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
 function_type_def
-                :   ident[name] '(' param_list_opt[params] ')' "->" function_return_type[return_type]
+                :   ident[name] '(' param_list_opt[params] ')' TOK_ARROW function_return_type[return_type]
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
@@ -506,7 +507,7 @@ function_type_def
                             $$->appendChild(NULL);  // function type null to recognize function and callback
                             $$->appendChild($params);
                         }
-                |    "oneway"[oneway] ident[name] '(' param_list_opt_in[params] ')'
+                |    TOK_ONEWAY[oneway] ident[name] '(' param_list_opt_in[params] ')'
                         {
                             $$ = new AstNode(Token(TOK_FUNCTION, NULL, @name));
                             $$->appendChild($name);
@@ -528,7 +529,7 @@ function_return_type
                             $$->appendChild($simple_data_type);
                             $$->appendChild($annotation_list_opt);
                         }
-                |   "void"
+                |   TOK_VOID
                         {
                             $$ = new AstNode(Token(TOK_RETURN));
                             $$->appendChild(new AstNode(*$1));
@@ -539,6 +540,10 @@ function_return_type
 param_list_opt  :   param_list
                         {
                             $$ = $param_list;
+                        }
+                |   TOK_VOID
+                        {
+                            $$ = NULL;
                         }
                 |   /* empty */
                         {
@@ -612,7 +617,7 @@ param_def_in    :   param_dir_in[dir] simple_data_type[datatype] ident_opt[name]
 /*!
  * TODO set right place!
  */
-param_dir_in    :   "in"
+param_dir_in    :   TOK_IN
                         {
                             $$ = $1;
                         }
@@ -625,11 +630,11 @@ param_dir       :   param_dir_in
                         {
                             $$ = $param_dir_in;
                         }
-                |   "out"
+                |   TOK_OUT
                         {
                             $$ = $1;
                         }
-                |   "inout"
+                |   TOK_INOUT
                         {
                             $$ = $1;
                         }
@@ -694,7 +699,7 @@ callback_param  :   ident[name]
 /*
  * TOK_TYPE -> ( ident data_type ( TOK_CHILDREN -> annotation* ) )
  */
-typedef_def     :   "type"[type] ident[name] '=' data_type[typedef]
+typedef_def     :   TOK_TYPE[type] ident[name] '=' data_type[typedef]
                         {
                             $$ = new AstNode(*$type);
                             $$->appendChild($name);
@@ -705,13 +710,13 @@ typedef_def     :   "type"[type] ident[name] '=' data_type[typedef]
 /*
  * TOK_STRUCT -> ( ident ( TOK_CHILDREN -> struct_member* ) ( TOK_CHILDREN -> annotation* ) )
  */
-struct_def      :   "struct"[struct] name_opt[name] '{' struct_member_list[members] '}'
+struct_def      :   TOK_STRUCT[struct] name_opt[name] '{' struct_member_list[members] '}'
                         {
                             $$ = new AstNode(*$struct);
                             $$->appendChild($name);
                             $$->appendChild($members);
                         }
-                |   "struct"[struct] ident[name]
+                |   TOK_STRUCT[struct] ident[name]
                         {
                             $$ = new AstNode(*$struct);
                             $$->appendChild($name);
@@ -761,11 +766,11 @@ struct_member_options_list
                 ;
 
 struct_member_options
-                :   "optional"
+                :   TOK_OPTIONAL
                         {
                             $$ = 1;
                         }
-                |   "byref"
+                |   TOK_BYREF
                         {
                             $$ = 2;
                         }
@@ -782,7 +787,7 @@ struct_data_type
                         }
                 ;
 
-union_def       :   "union"[union] '(' ident[discriminator] ')' '{' union_case_list[cases] '}'
+union_def       :   TOK_UNION[union] '(' ident[discriminator] ')' '{' union_case_list[cases] '}'
                         {
                             $$ = new AstNode(*$union);
                             $$->appendChild(NULL);
@@ -790,14 +795,14 @@ union_def       :   "union"[union] '(' ident[discriminator] ')' '{' union_case_l
                             $$->appendChild($cases);
                         }
 
-union_type_def  :   "union"[union] ident[name] '{' union_case_list[cases] '}'
+union_type_def  :   TOK_UNION[union] ident[name] '{' union_case_list[cases] '}'
                         {
                             $$ = new AstNode(*$union);
                             $$->appendChild($name);
                             $$->appendChild(NULL);
                             $$->appendChild($cases);
                         }
-                |   "union"[union] ident[name]
+                |   TOK_UNION[union] ident[name]
                         {
                             $$ = new AstNode(*$union);
                             $$->appendChild($name);
@@ -818,13 +823,13 @@ union_case_list
                 ;
 
 /* only allowing one type per case at first, including structs */
-union_case      :   "case" union_case_expr_list[case_exprs] ':' union_member_list_opt[decl_list]
+union_case      :   TOK_CASE union_case_expr_list[case_exprs] ':' union_member_list_opt[decl_list]
                         {
                             $$ = new AstNode(Token(TOK_UNION_CASE));
                             $$->appendChild($case_exprs);
                             $$->appendChild($decl_list);
                         }
-                |   "default" ':' union_member_list_opt[decl_list]
+                |   TOK_DEFAULT ':' union_member_list_opt[decl_list]
                         {
                             $$ = new AstNode(Token(TOK_UNION_CASE));
                             $$->appendChild(new AstNode(*$1));
@@ -850,7 +855,7 @@ union_member_list_opt
                         {
                             $$ = $decl;
                         }
-                |   "void"
+                |   TOK_VOID
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild(new AstNode(Token(*$1)));
@@ -936,7 +941,7 @@ name_opt        :   ident
 /*
  * TOK_LIST -> ( simple_data_type )
  */
-list_type       :   "list" '<' simple_data_type '>'
+list_type       :   TOK_LIST '<' simple_data_type '>'
                         {
                             $$ = new AstNode(*$1);
                             $$->appendChild($simple_data_type);
@@ -1140,13 +1145,13 @@ expr            :   int_value
                             $$->appendChild($1);
                             $$->appendChild($3);
                         }
-                |   expr "<<" expr
+                |   expr TOK_LSHIFT expr
                         {
                             $$ = new AstNode(*$2);
                             $$->appendChild($1);
                             $$->appendChild($3);
                         }
-                |   expr ">>" expr
+                |   expr TOK_RSHIFT expr
                         {
                             $$ = new AstNode(*$2);
                             $$->appendChild($1);
@@ -1183,11 +1188,11 @@ int_value       :   TOK_INT_LITERAL
                         {
                             $$ = new AstNode(*$TOK_INT_LITERAL);
                         }
-                |   "true"
+                |   TOK_TRUE
                         {
                             $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(1), @1));
                         }
-                |   "false"
+                |   TOK_FALSE
                         {
                             $$ = new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(0), @1));
                         }
@@ -1244,6 +1249,7 @@ static int yylex(YYSTYPE * lvalp, YYLTYPE * yylloc, ErpcLexer * lexer)
 
 static void yyerror(YYLTYPE * yylloc, ErpcLexer * lexer, AstNode ** resultAST, const char * error)
 {
+    (void)resultAST;
     throw syntax_error(format_string("file %s:%d:%d: %s\n", lexer->getFileName().c_str(),
         yylloc->m_firstLine, yylloc->m_firstChar, error));
 }

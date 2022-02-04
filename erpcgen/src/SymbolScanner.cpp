@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright (c) 2020 Texas Instruments Incorporated
  * All rights reserved.
  *
  *
@@ -8,6 +9,7 @@
  */
 
 #include "SymbolScanner.h"
+
 #include "ErpcLexer.h"
 #include "Logging.h"
 #include "annotations.h"
@@ -18,6 +20,7 @@
 #include "types/FunctionType.h"
 #include "types/ListType.h"
 #include "types/VoidType.h"
+
 #include <algorithm>
 #include <cstring>
 
@@ -29,6 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 void SymbolScanner::handleRoot(AstNode *node, bottom_up)
 {
+    (void)node;
     if (m_forwardDeclarations.size() != 0)
     {
         string forwardTypes;
@@ -772,7 +776,7 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
         string unionVariableName = node->getParent()->getChild(0)->getToken().getStringValue();
 
         /* Create a new node in the AST for the union's name, and assign it */
-        node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_$union"))));
+        node->appendChild(new AstNode(Token(TOK_IDENT, new StringValue(unionVariableName + "_union"))));
 
         /* union token. */
         tok = &node->getChild(3)->getToken();
@@ -858,6 +862,7 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, bottom_up)
 
 AstNode *SymbolScanner::handleUnionCase(AstNode *node, top_down)
 {
+    (void)node;
     return nullptr;
 }
 
@@ -1135,7 +1140,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
             const StructType::member_vector_t &callbackParams = callbackFunctionType->getParameters().getMembers();
             if (callbackFunctionType->getParameters().getMembers().size() > paramsSize)
             {
-                for (int i = paramsSize; i < callbackParams.size(); ++i)
+                for (unsigned int i = paramsSize; i < callbackParams.size(); ++i)
                 {
                     if (callbackParams[i]->getName().compare("") == 0)
                     {
@@ -1302,6 +1307,7 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
 
 AstNode *SymbolScanner::handleExpr(AstNode *node, bottom_up)
 {
+    (void)node;
     /* Log::debug("expr: %s\n", node->getDescription().c_str()); */
     return nullptr;
 }
@@ -1350,8 +1356,7 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
         case TOK_LIST:
             return createListType(typeNode);
 
-        case TOK_UNION:
-        {
+        case TOK_UNION: {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
             break;
@@ -1480,7 +1485,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
             string nameOfType;
             if (childNode->getParent()->getChild(0))
             {
-                string nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
+                nameOfType = childNode->getParent()->getChild(0)->getToken().getStringValue();
                 Log::log("Handling annotations for %s\n", nameOfType.c_str());
             }
             else

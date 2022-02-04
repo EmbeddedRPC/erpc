@@ -8,6 +8,7 @@
  */
 
 #include "UniqueIdChecker.h"
+
 #include "Annotation.h"
 #include "Logging.h"
 #include "ParseErrors.h"
@@ -60,7 +61,7 @@ void UniqueIdChecker::initUsedInterfaceIds(SymbolScope::symbol_vector_t ifaces)
 {
     if (0 < ifaces.size())
     {
-        for (int i = 0; i < ifaces.size(); ++i)
+        for (unsigned int i = 0; i < ifaces.size(); ++i)
         {
             Interface *iface = dynamic_cast<Interface *>(ifaces[i]);
             assert(iface);
@@ -75,7 +76,7 @@ void UniqueIdChecker::initUsedFunctionIds(Interface *iface)
     Interface::function_vector_t functions = iface->getFunctions();
     if (0 < functions.size())
     {
-        for (int i = 0; i < functions.size(); ++i)
+        for (unsigned int i = 0; i < functions.size(); ++i)
         {
             m_usedFunctionIds.push_back(make_pair(functions[i]->getUniqueId(), functions[i]->getName()));
         }
@@ -98,7 +99,7 @@ void UniqueIdChecker::setInterfaceId(Interface *iface, Annotation *interfaceId)
                 format_string("@id value for interface %s must be greater than zero", iface->getName().c_str()));
         }
         iface->setUniqueId(newIdValue);
-        for (int i = 0; i < m_usedInterfaceIds.size(); ++i)
+        for (unsigned int i = 0; i < m_usedInterfaceIds.size(); ++i)
         {
             if (0 == m_usedInterfaceIds[i].second.compare(iface->getName()))
             {
@@ -132,7 +133,7 @@ void UniqueIdChecker::setFunctionId(Function *fn, Annotation *idAnnotation)
             printf("%d: <id: %d, name: %s>\n",i, usedFunctionIds[i].first, usedFunctionIds[i].second.c_str());
         }
         */
-        for (int i = 0; i < m_usedFunctionIds.size(); ++i)
+        for (unsigned int i = 0; i < m_usedFunctionIds.size(); ++i)
         {
             //    printf("usedFunctionIds at i: %s\t", usedFunctionIds[i].second.c_str());
             //   printf("fn name: %s\n", fn->getName().c_str());

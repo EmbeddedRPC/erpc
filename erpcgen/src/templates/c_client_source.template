@@ -1,11 +1,13 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
 {$commonHeader()}
 
 #include "erpc_client_manager.h"
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include "erpc_port.h"
+#endif
 #include "{$codecHeader}"
 extern "C"
 {
@@ -45,9 +47,17 @@ extern ClientManager *g_client;
 
 {% endif -- generateErrorChecks %}
 {% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
-
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
 {% endif -- isNotVoid %}
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb preCB = g_client->getPreCB();
+    if (preCB)
+    {
+        preCB();
+    }
+#endif
+
     // Get a new request.
 {% if !fn.isReturnValue %}
     RequestContext request = g_client->createRequest(true);
@@ -131,12 +141,21 @@ extern ClientManager *g_client;
     // Invoke error handler callback function
     g_client->callErrorHandler(err, {$functionIDName});
 {% endif -- generateErrorChecks %}
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb postCB = g_client->getPostCB();
+    if (postCB)
+    {
+        postCB();
+    }
+#endif
+
 {% if generateErrorChecks && fn.returnValue.type.isNotVoid %}
 {%  if empty(fn.returnValue.errorReturnValue) == false && fn.returnValue.isNullReturnType == false %}
 
-    if (err)
+    if (err != kErpcStatus_Success)
     {
-        return {$fn.returnValue.errorReturnValue};
+        result = {$fn.returnValue.errorReturnValue};
     }
 {%  endif %}
 {% endif -- generateErrorChecks %}
@@ -164,8 +183,6 @@ static {$callbackType.prototype}
 {
 {%   if fn.isCallback %}
     {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id{% for param in fn.parameters %}, {$param.name}{% endfor %});
-{%    if fn.returnValue.type.isNotVoid %}return;
-{%    endif %}
 {%   else -- fn.isCallback >%}
 {$ clientShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
 {%   endif -- fn.isCallback >%}

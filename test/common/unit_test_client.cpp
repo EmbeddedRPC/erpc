@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -9,12 +9,14 @@
 #include "erpc_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
+
+#include "board.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "myAlloc.h"
 #include "test_unit_test_common.h"
 
-#if (defined(RPMSG) || defined(UART) || defined(LPUART))
+#if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #include "app_core0.h"
 #include "board.h"
@@ -22,6 +24,11 @@ extern "C" {
 #include "mcmgr.h"
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
+#elif defined(UART)
+#include "fsl_usart_cmsis.h"
+#endif
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+int main(int argc, char **argv);
 #endif
 }
 
@@ -35,6 +42,12 @@ using namespace std;
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
+/************************************************************************************
+ * Following snippet reused from https://github.com/google/googletest/blob/master/googletest/docs/advanced.md
+ * Copyright 2008, Google Inc.
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 class MinimalistPrinter : public ::testing::EmptyTestEventListener
 {
     // Called before a test starts.
@@ -46,8 +59,8 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
     // Called after a failed assertion or a SUCCEED() invocation.
     virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result)
     {
-        PRINTF("%s in %s:%d\n%s\r\n", test_part_result.failed() ? "*** Failure" : "Success", test_part_result.file_name(),
-               test_part_result.line_number(), test_part_result.summary());
+        PRINTF("%s in %s:%d\r\n%s\r\n", test_part_result.failed() ? "*** Failure" : "Success",
+               test_part_result.file_name(), test_part_result.line_number(), test_part_result.summary());
     }
 
     // Called after a test ends.
@@ -62,6 +75,9 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
                test_case.failed_test_count());
     }
 };
+/*
+ * end of reused snippet
+ ***********************************************************************************/
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,12 +90,15 @@ int MyAlloc::allocated_ = 0;
 #define APP_ERPC_READY_EVENT_DATA (1)
 extern char rpmsg_lite_base[];
 volatile uint16_t eRPCReadyEventData = 0;
+#elif defined(MU)
+#define APP_ERPC_READY_EVENT_DATA (1)
+volatile uint16_t eRPCReadyEventData = 0;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-#if defined(RPMSG)
+#if (defined(RPMSG) || defined(MU))
 /*!
  * @brief eRPC server side ready event handler
  */
@@ -101,9 +120,6 @@ void SystemInitHook(void)
 }
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
@@ -111,7 +127,7 @@ int main(int argc, char **argv)
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     listeners.Append(new LeakChecker);
 
-#if (defined(RPMSG) || defined(UART) || defined(LPUART))
+#if (defined(RPMSG) || defined(UART) || defined(MU))
     delete listeners.Release(listeners.default_result_printer());
     listeners.Append(new MinimalistPrinter);
 #ifdef UNITY_DUMP_RESULTS
@@ -125,10 +141,10 @@ int main(int argc, char **argv)
     /* Calculate size of the image */
     uint32_t core1_image_size;
     core1_image_size = get_core1_image_size();
-    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\r\n", CORE1_BOOT_ADDRESS, core1_image_size);
+    PRINTF("Copy CORE1 image to address: 0x%x, size: %d\r\n", (void *)(char *)CORE1_BOOT_ADDRESS, core1_image_size);
 
     /* Copy application from FLASH to RAM */
-    memcpy(CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
+    memcpy((void *)(char *)CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
 #endif
 
 #if defined(RPMSG)
@@ -144,7 +160,23 @@ int main(int argc, char **argv)
     MCMGR_RegisterEvent(kMCMGR_RemoteApplicationEvent, eRPCReadyEventHandler, NULL);
 
     /* Boot Secondary core application */
-    MCMGR_StartCore(kMCMGR_Core1, CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base, kMCMGR_Start_Synchronous);
+    MCMGR_StartCore(kMCMGR_Core1, (void *)(char *)CORE1_BOOT_ADDRESS, (uint32_t)rpmsg_lite_base,
+                    kMCMGR_Start_Synchronous);
+
+    /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to
+     * communicate. */
+    while (APP_ERPC_READY_EVENT_DATA != eRPCReadyEventData)
+    {
+    };
+#elif defined(MU)
+    /* Initialize MCMGR before calling its API */
+    MCMGR_Init();
+
+    /* Register the application event before starting the secondary core */
+    MCMGR_RegisterEvent(kMCMGR_RemoteApplicationEvent, eRPCReadyEventHandler, NULL);
+
+    /* Boot Secondary core application */
+    MCMGR_StartCore(kMCMGR_Core1, (void *)(char *)CORE1_BOOT_ADDRESS, (uint32_t)0, kMCMGR_Start_Asynchronous);
 
     /* Wait until the secondary core application signals the rpmsg remote has been initialized and is ready to
      * communicate. */
@@ -158,14 +190,11 @@ int main(int argc, char **argv)
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
-#else
-#if defined(UART)
-    transport = erpc_transport_uart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#elif defined(LPUART)
-    transport = erpc_transport_lpuart_init(ERPC_BOARD_UART_BASEADDR, ERPC_BOARD_UART_BAUDRATE,
-                          CLOCK_GetFreq(ERPC_BOARD_UART_CLKSRC);
-#endif
+#elif defined(UART)
+    transport = erpc_transport_cmsis_uart_init((void *)&Driver_USART0);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+#elif defined(MU)
+    transport = erpc_transport_mu_init(MU_BASE);
     message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 
@@ -183,6 +212,3 @@ int main(int argc, char **argv)
 
     return i;
 }
-#ifdef __cplusplus
-}
-#endif

@@ -22,8 +22,8 @@ TEST(test_annotations, IncludeAnnotationCheck)
 {
     EXPECT_TRUE(5 == addOne(4));
 
-    includedInt_t myInt = 5;
-    EXPECT_TRUE(5 == myInt);
+    includedInt_t testInt = 5;
+    EXPECT_TRUE(5 == testInt);
 }
 
 TEST(test_annotations, testIfMyIntAndConstExist)

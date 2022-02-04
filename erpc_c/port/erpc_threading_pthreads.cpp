@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2021 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -8,6 +9,7 @@
  */
 
 #include "erpc_threading.h"
+
 #include <errno.h>
 #include <sys/time.h>
 #include <time.h>
@@ -19,9 +21,14 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 /*!
- * Thread object key.
+ * @brief Thread object key.
  */
 pthread_key_t Thread::s_threadObjectKey = 0;
+
+/*!
+ * @brief Second to microseconds.
+ */
+const uint32_t sToUs = 1000000;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -37,7 +44,8 @@ Thread::Thread(const char *name)
 {
 }
 
-Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name)
+Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
+               thread_stack_pointer stackPtr)
 : m_name(name)
 , m_entry(entry)
 , m_arg(0)
@@ -49,11 +57,12 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 
 Thread::~Thread(void) {}
 
-void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
+void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize, thread_stack_pointer stackPtr)
 {
     m_entry = entry;
     m_stackSize = stackSize;
     m_priority = priority;
+    m_stackPtr = stackPtr;
 }
 
 void Thread::start(void *arg)
@@ -77,14 +86,18 @@ bool Thread::operator==(Thread &o)
 Thread *Thread::getCurrentThread(void)
 {
     void *value = pthread_getspecific(s_threadObjectKey);
+
     return reinterpret_cast<Thread *>(value);
 }
 
 void Thread::sleep(uint32_t usecs)
 {
+    struct timespec rq;
+    struct timespec actual = { 0, 0 };
+
     // Sleep for the requested number of microseconds.
-    struct timespec rq = { .tv_sec = usecs / 1000000, .tv_nsec = (usecs % 1000000) * 1000 };
-    struct timespec actual = { 0 };
+    rq.tv_sec = usecs / sToUs;
+    rq.tv_nsec = (usecs % sToUs) * 1000U;
 
     // Keep sleeping until the requested time elapses even if we get interrupted by a signal.
     while (nanosleep(&rq, &actual) == EINTR)
@@ -101,7 +114,7 @@ void Thread::sleep(uint32_t usecs)
 
 void Thread::threadEntryPoint(void)
 {
-    if (m_entry)
+    if (m_entry != NULL)
     {
         m_entry(m_arg);
     }
@@ -110,7 +123,8 @@ void Thread::threadEntryPoint(void)
 void *Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    if (_this)
+
+    if (_this != NULL)
     {
         _this->threadEntryPoint();
     }
@@ -174,33 +188,46 @@ void Semaphore::put(void)
 bool Semaphore::get(uint32_t timeout)
 {
     Mutex::Guard guard(m_mutex);
+    bool retVal = true;
     int err;
+
     while (m_count == 0)
     {
         if (timeout == kWaitForever)
         {
             err = pthread_cond_wait(&m_cond, m_mutex.getPtr());
-            if (err)
+            if (err != 0)
             {
-                return false;
+                retVal = false;
+                break;
             }
         }
-        else if (timeout > 0)
+        else
         {
-            // Create an absolute timeout time.
-            struct timeval tv;
-            gettimeofday(&tv, NULL);
-            struct timespec wait = { .tv_sec = tv.tv_sec + (timeout / 1000000), .tv_nsec = (timeout % 1000000) * 1000 };
-            err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
-            if (err)
+            if (timeout > 0U)
             {
-                return false;
+                // Create an absolute timeout time.
+                struct timeval tv;
+                gettimeofday(&tv, NULL);
+                struct timespec wait;
+                wait.tv_sec = tv.tv_sec + (timeout / sToUs);
+                wait.tv_nsec = (timeout % sToUs) * 1000U;
+                err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
+                if (err != 0)
+                {
+                    retVal = false;
+                    break;
+                }
             }
         }
     }
-    --m_count;
 
-    return true;
+    if (retVal)
+    {
+        --m_count;
+    }
+
+    return retVal;
 }
 
 int Semaphore::getCount(void) const

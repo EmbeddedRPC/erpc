@@ -6,25 +6,31 @@
 /*!
 @defgroup dspi_master_transport DSPI Master
 @ingroup transports
-@brief Kinetis SDK DSPI master driver transport.
+@brief MCUXpressoSDK DSPI master driver transport.
 */
 
 /*!
 @defgroup dspi_slave_transport DSPI Slave
 @ingroup transports
-@brief Kinetis SDK DSPI slave driver transport.
+@brief MCUXpressoSDK DSPI slave driver transport.
 */
 
 /*!
 @defgroup spi_master_transport SPI Master
 @ingroup transports
-@brief Kinetis SDK SPI master driver transport.
+@brief MCUXpressoSDK SPI master driver transport.
 */
 
 /*!
 @defgroup spi_slave_transport SPI Slave
 @ingroup transports
-@brief Kinetis SDK SPI slave driver transport.
+@brief MCUXpressoSDK SPI slave driver transport.
+*/
+
+/*!
+@defgroup spidev_master_transport SPIdev Linux Master
+@ingroup transports
+@brief SPIdev Linux transport.
 */
 
 /*!
@@ -57,6 +63,12 @@
 */
 
 /*!
+@defgroup rpmsg_tty_rtos_transport RPMsg TTY RTOS
+@ingroup transports
+@brief RPMsg TTY RTOS transport.
+*/
+
+/*!
 @defgroup tcp_transport TCP/IP
 @ingroup transports
 @brief Simple TCP/IP transport.
@@ -72,4 +84,16 @@
 @defgroup rpmsg_linux_transport RPMsg Endpoints
 @ingroup transports
 @brief RPMsg endpoints linux transport.
+*/
+
+/*!
+@defgroup USB_CDC_transport USB CDC
+@ingroup transports
+@brief USB CDC transport.
+*/
+
+/*!
+@defgroup i2c_slave_transport I2C Slave
+@ingroup transports
+@brief MCUXpressoSDK I2C slave driver transport.
 */

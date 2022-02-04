@@ -26,7 +26,8 @@
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 
-#include "fsl_log.h"
+//#include "fsl_log.h"
+#include "fsl_debug_console.h"
 
 //#pragma import(__use_no_semihosting_swi)
 #include <rt_sys.h>
@@ -37,7 +38,6 @@ char *_sys_command_string(char *cmd, int len)
 {
     return (cmd);
 }
-
 /*
  * These names are special strings which will be recognized by
  * _sys_open and will cause it to return the standard I/O handles, instead
@@ -72,12 +72,14 @@ int _sys_close(FILEHANDLE fh)
  */
 int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode)
 {
-    int i;
-    for (i = 0; i < len; i++)
-    {
-        // UART_write(buf[i]);
-        LOG_Push((uint8_t *)(&buf[i]), 1);
-    }
+    // int i;
+    // for (i = 0; i < len; i++)
+    //{
+    //    // UART_write(buf[i]);
+    //    LOG_Push((uint8_t *)(&buf[i]), 1);
+    //}
+
+    DbgConsole_SendData((uint8_t *)buf, len);
 
     return 0;
 }
@@ -101,7 +103,8 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
     {
 
         // buf[pos]=UART_read();
-        LOG_ReadCharacter((uint8_t *)&buf[pos]);
+        // LOG_ReadCharacter((uint8_t *)&buf[pos]);
+        DbgConsole_ReadCharacter((uint8_t *)&buf[pos]);
 
         // Advance position in buffer
         pos++;
@@ -125,7 +128,10 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
         }
         // else UART_write(buf[pos-1]); // Echo normal char to terminal
         else
-            LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to terminal
+            // LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to
+            // terminal
+            DbgConsole_SendData((uint8_t *)(&buf[pos - 1]),
+                                1); // Echo normal char to terminal
 
     } while (buf[pos - 1] != '\r');
 
@@ -144,9 +150,9 @@ void _ttywrch(int ch)
     char ench = ch;
 
     // UART_write(ench);
-    LOG_Push((uint8_t *)(&ench), 1);
+    // LOG_Push((uint8_t *)(&ench), 1);
+    DbgConsole_SendData((uint8_t *)(&ench), 1);
 }
-
 /*
  * Return non-zero if the argument file is connected to a terminal.
  */

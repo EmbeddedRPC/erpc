@@ -12,25 +12,34 @@ import "../common/unit_test_common.erpc"
 
 oneway callback1_t(int32 a, int32 b)
 oneway callback2_t(int32, int32)
+callback3_t(int32 arg1, int32 arg2) -> int32
 
 @include("test_core1.h")
 @group("core0")
 interface ClientCore0Services
 {
-    myFun(in callback1_t pCallback1_t, out callback1_t pCallback2_t) -> void
+    myFun(in callback1_t pCallback1_in, out callback1_t pCallback1_out) -> void
 
-    myFun2(callback2_t pCallback1_t, out callback2_t pCallback2_t) -> void
+    myFun2(callback2_t pCallback2_in, out callback2_t pCallback2_out) -> void
+
+    myFun3(callback3_t callback, in int32 arg1, in int32 arg2) -> int32
+    
+    callback3_t my_add;
+    callback3_t my_sub;
+    callback3_t my_mul;
+    callback3_t my_div;
 
     @include("callbacks1.h")
-    callback1_t callback1;
+    callback1_t callback1a;
+
 
     @include("callbacks1.h")
-    callback1_t callback2(param1, param2);
+    callback1_t callback1b(param1, param2);
 }
 
 @group("core1")
 interface ClientCore1Services
 {
     @include("callbacks2.h")
-    callback2_t callback3(param1, param2);
+    callback2_t callback2(param1, param2);
 }

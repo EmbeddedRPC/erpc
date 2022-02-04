@@ -69,10 +69,10 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performClientRequest(RequestContext &request);
+    virtual void performClientRequest(RequestContext &request);
 
     //! @brief This method is not used with this class.
-    void setTransport(Transport *transport) {}
+    void setTransport(Transport *transport) { (void)transport; }
 };
 
 } // namespace erpc

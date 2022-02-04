@@ -7,11 +7,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ErpcLexer.h"
+
 #include "erpc_crc16.h"
 #include "erpc_version.h"
+
 #include "Generator.h"
 #include "HexValues.h"
 #include "SearchPath.h"
+
 #include <algorithm>
 #include <fstream>
 #include <streambuf>
@@ -76,16 +79,14 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     {
         switch (*in)
         {
-            case '\\':
-            {
+            case '\\': {
                 // start of an escape sequence
                 char c = *++in;
                 switch (c)
                 {
                     case 0: // end of the string, bail
                         break;
-                    case 'x':
-                    {
+                    case 'x': {
                         // start of a hex char escape sequence
 
                         // read high and low nibbles, checking for end of string

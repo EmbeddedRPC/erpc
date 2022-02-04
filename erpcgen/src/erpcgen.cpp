@@ -8,6 +8,7 @@
  */
 
 #include "erpc_version.h"
+
 #include "CGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
@@ -17,6 +18,7 @@
 #include "UniqueIdChecker.h"
 #include "options.h"
 #include "types/Program.h"
+
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
@@ -40,7 +42,7 @@ const char k_toolName[] = "erpcgen";
 const char k_version[] = ERPC_VERSION;
 
 /*! Copyright string. */
-const char k_copyright[] = "Copyright 2016-2018 NXP. All rights reserved.";
+const char k_copyright[] = "Copyright 2016-2021 NXP. All rights reserved.";
 
 static const char *k_optionsDefinition[] = { "?|help",
                                              "V|version",
@@ -191,8 +193,7 @@ public:
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
 
-                case 'g':
-                {
+                case 'g': {
                     string lang = optarg;
                     if (lang == "c")
                     {
@@ -210,8 +211,7 @@ public:
                     break;
                 }
 
-                case 'c':
-                {
+                case 'c': {
                     string codec = optarg;
                     if (codec.compare("basic") == 0)
                     {
@@ -381,6 +381,7 @@ public:
  */
 int main(int argc, char *argv[], char *envp[])
 {
+    (void)envp;
     try
     {
         return erpcgen::erpcgenTool(argc, argv).run();

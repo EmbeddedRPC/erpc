@@ -11,6 +11,7 @@
 #include "erpc_transport.h"
 #include "erpc_transport_setup.h"
 #include "erpc_version.h"
+
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
 #include "Logging.h"
@@ -19,6 +20,7 @@
 #include "UniqueIdChecker.h"
 #include "annotations.h"
 #include "options.h"
+
 #include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
@@ -183,26 +185,22 @@ public:
         {
             switch (optchar)
             {
-                case '?':
-                {
+                case '?': {
                     printUsage(options);
                     return 0;
                 }
 
-                case 'V':
-                {
+                case 'V': {
                     printf("%s %s\n%s\n", k_toolName, k_version, k_copyright);
                     return 0;
                 }
 
-                case 'o':
-                {
+                case 'o': {
                     m_outputFilePath = optarg;
                     break;
                 }
 
-                case 'v':
-                {
+                case 'v': {
                     if (m_verboseType != kExtraDebug)
                     {
                         m_verboseType = (verbose_type_t)(((int)m_verboseType) + 1);
@@ -210,14 +208,12 @@ public:
                     break;
                 }
 
-                case 'I':
-                {
+                case 'I': {
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
                 }
 
-                case 't':
-                {
+                case 't': {
                     string transport = optarg;
                     if (transport == "tcp")
                     {
@@ -235,32 +231,27 @@ public:
                     break;
                 }
 
-                case 'q':
-                {
+                case 'q': {
                     m_quantity = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'b':
-                {
+                case 'b': {
                     m_baudrate = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'p':
-                {
+                case 'p': {
                     m_port = optarg;
                     break;
                 }
 
-                case 'h':
-                {
+                case 'h': {
                     m_host = optarg;
                     break;
                 }
 
-                default:
-                {
+                default: {
                     Log::error("error: unrecognized option\n\n");
                     printUsage(options);
                     return 0;
@@ -345,8 +336,7 @@ public:
             Transport *_transport;
             switch (m_transport)
             {
-                case kTcpTransport:
-                {
+                case kTcpTransport: {
                     uint16_t portNumber = strtoul(m_port, NULL, 10);
                     TCPTransport *tcpTransport = new TCPTransport(m_host, portNumber, true);
                     if (erpc_status_t err = tcpTransport->open())
@@ -357,16 +347,14 @@ public:
                     break;
                 }
 
-                case kSerialTransport:
-                {
+                case kSerialTransport: {
                     erpc_transport_t transport = erpc_transport_serial_init(m_port, m_baudrate);
                     _transport = reinterpret_cast<Transport *>(transport);
                     assert(_transport);
                     break;
                 }
 
-                default:
-                {
+                default: {
                     break;
                 }
             }
@@ -445,6 +433,7 @@ public:
  */
 int main(int argc, char *argv[], char *envp[])
 {
+    (void)envp;
     try
     {
         return erpcsniffer::erpcsnifferTool(argc, argv).run();

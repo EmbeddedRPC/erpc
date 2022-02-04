@@ -29,6 +29,7 @@
 #else
 #include "windows.h"
 #include "winnls.h" // unicode-multibyte conversion
+
 #include <boost/scoped_array.hpp>
 #endif
 

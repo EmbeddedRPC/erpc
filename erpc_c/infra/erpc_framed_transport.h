@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
+ * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -13,9 +14,10 @@
 #include "erpc_config_internal.h"
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
+
 #include <cstring>
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
 
@@ -60,7 +62,7 @@ public:
     FramedTransport(void);
 
     /*!
-     * @brief Codec destructor
+     * @brief FramedTransport destructor
      */
     virtual ~FramedTransport(void);
 
@@ -81,7 +83,7 @@ public:
      * @retval kErpcStatus_CrcCheckFailed When receiving failed.
      * @retval other Subclass may return other errors from the underlyingReceive() method.
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -91,7 +93,7 @@ public:
      * @retval kErpcStatus_Success When sending was successful.
      * @retval other Subclass may return other errors from the underlyingSend() method.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*! @brief Contents of the header that prefixes each message. */
     struct Header
@@ -105,12 +107,12 @@ public:
      *
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
-    virtual void setCrc16(Crc16 *crcImpl);
+    virtual void setCrc16(Crc16 *crcImpl) override;
 
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     Mutex m_sendLock;    //!< Mutex protecting send.
     Mutex m_receiveLock; //!< Mutex protecting receive.
 #endif

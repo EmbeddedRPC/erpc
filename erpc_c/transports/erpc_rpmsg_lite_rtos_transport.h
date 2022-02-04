@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  *
@@ -12,6 +12,7 @@
 
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
+
 #include "rpmsg_lite.h"
 #include "rpmsg_queue.h"
 
@@ -62,8 +63,8 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length,
-                               int rpmsg_link_id);
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                               uint32_t rpmsg_link_id);
 
     /*!
      * @brief This function call RPMsg rtos init function - as RPMsg remote
@@ -79,7 +80,7 @@ public:
      * @retval kErpcStatus_Success When rpmsg init function was executed successfully.
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id,
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t rpmsg_link_id,
                                void (*ready_cb)(void), char *nameservice_name);
 
     /*!
@@ -111,13 +112,13 @@ public:
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return (rpmsg_queue_get_current_size(m_rpmsg_queue) > 0 ? true : false); }
+    virtual bool hasMessage(void) { return ((rpmsg_queue_get_current_size(m_rpmsg_queue) > 0) ? true : false); }
 
 protected:
     /* Remote device */
     struct remote_device *m_rdev;            /*!< Device which represent the second core. */
     struct rpmsg_channel *m_app_rp_chnl;     /*!< Represent connection between two device (two cores). */
-    unsigned long m_dst_addr;                /*!< Destination address used by rpmsg. */
+    uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */
     rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */
     struct rpmsg_lite_endpoint *m_rpmsg_ept; /*!< Pointer to RPMsg Lite Endpoint structure. */
 };

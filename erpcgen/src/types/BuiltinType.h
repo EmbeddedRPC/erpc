@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__BUILTINTYPE_H_
 
 #include "DataType.h"
+
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ public:
         kFloatType,
         kDoubleType,
         kStringType,
+        kUStringType,
         kBinaryType
     };
 
@@ -108,10 +110,18 @@ public:
     /*!
      * @brief This function return true/false value for identify string type.
      *
-     * @retval true When builtin type is string.
-     * @retval false When builtin type isn't string.
+     * @retval true When builtin type is string or ustring.
+     * @retval false When builtin type isn't string or ustring.
      */
-    virtual bool isString() const { return m_builtinType == kStringType; }
+    virtual bool isString() const { return m_builtinType == kStringType || m_builtinType == kUStringType; }
+
+    /*!
+     * @brief This function return true/false value for identify ustring type.
+     *
+     * @retval true When builtin type is ustring.
+     * @retval false When builtin type isn't ustring.
+     */
+    virtual bool isUString() const { return m_builtinType == kUStringType; }
 
     /*!
      * @brief This function return true/false value for identify binary type.

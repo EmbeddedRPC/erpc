@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Hi eRPC user. Thank you for your interest and welcome. We hope you will enjoy this framework well.'
+        pr-message: 'Hi eRPC user. Thank you for your PR. We are appreciating that and we will try to review it as soon as possible. We hope you are enjoying this framework so far.'

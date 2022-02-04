@@ -10,17 +10,15 @@ idl: |
  }
 lang: py
 test/client.py:
-  - if v is None
-  - write_null_flag(True
-  - else
-  - write_null_flag(False
+  - codec.write_null_flag(v is None)
+  - 'if v is not None:'
   - v._write
 test/server.py:
   - def _handle_
-  - 'if not codec.read_null_flag():'
-  - Vector()._read
-  - else
+  - 'if codec.read_null_flag():'
   - v = None
+  - else
+  - Vector()._read
 
 ---
 name: out param struct
@@ -59,19 +57,17 @@ lang: py
 test/common.py:
   - _read
   - read_null_flag
+  - self.b = None
+  - else
   - if: type=="list<bool>"
     then:
       - start_read_list
       - re: read_[a-z]+
     else:
       - read_string
-  - else
-  - self.b = None
   - _write
-  - if self.b is None
-  - write_null_flag(True
-  - else
-  - write_null_flag(False
+  - write_null_flag(self.b is None
+  - if self.b is not None
   - if: type=="list<bool>"
     then:
       - start_write_list

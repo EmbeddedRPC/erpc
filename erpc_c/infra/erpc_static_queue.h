@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2021 NXP
  * All rights reserved.
  *
  *
@@ -60,10 +60,10 @@ public:
      */
     bool add(T element)
     {
-        if ((m_head + 1) % m_capacity != m_tail)
+        if ((m_head + 1U) % m_capacity != m_tail)
         {
-            std::memcpy(m_storage[m_head], &element, sizeof(T));
-            m_head = (m_head + 1) % m_capacity;
+            (void)std::memcpy(m_storage[m_head], &element, sizeof(T));
+            m_head = (m_head + 1U) % m_capacity;
             return true;
         }
         return false;
@@ -81,8 +81,8 @@ public:
     {
         if (m_tail != m_head)
         {
-            std::memcpy(element, m_storage[m_tail], sizeof(T));
-            m_tail = (m_tail + 1) % m_capacity;
+            (void)std::memcpy(element, m_storage[m_tail], sizeof(T));
+            m_tail = (m_tail + 1U) % m_capacity;
             return true;
         }
         return false;
@@ -93,7 +93,7 @@ public:
      *
      * @return Number of elements in queue.
      */
-    int size(void)
+    uint32_t size(void)
     {
         if (m_head >= m_tail)
         {
@@ -103,12 +103,12 @@ public:
     }
 
 protected:
-    uint64_t m_storage[elementCount][(sizeof(T) + sizeof(uint64_t) - 1) /
-                                     sizeof(uint64_t)]; /*!< Preallocated space based on data type size and elements
-                                                           count. */
-    uint32_t m_capacity;                                /*!< Capacity of queue */
-    uint32_t volatile m_head;                           /*!< Index to free slot */
-    uint32_t volatile m_tail;                           /*!< Index to slot with m_data */
+    uint64_t m_storage[elementCount]
+                      [(sizeof(T) + sizeof(uint64_t) - 1U) / sizeof(uint64_t)]; /*!< Preallocated space based on data
+                                                                                  type size and elements count. */
+    uint32_t m_capacity;                                                       /*!< Capacity of queue */
+    uint32_t volatile m_head;                                                  /*!< Index to free slot */
+    uint32_t volatile m_tail;                                                  /*!< Index to slot with m_data */
 };
 
 } // namespace erpc

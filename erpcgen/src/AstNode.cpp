@@ -8,8 +8,10 @@
  */
 
 #include "AstNode.h"
+
 #include "ErpcLexer.h"
 #include "format_string.h"
+
 #include <boost/algorithm/string.hpp>
 #include <cstdio>
 
@@ -218,8 +220,7 @@ string AstNode::getDescription() const
         case TOK_ARRAY:
         case TOK_UNION_CASE:
             break;
-        default:
-        {
+        default: {
             output += " " + valToString + " ";
             if (valToString.size() == 1)
             {

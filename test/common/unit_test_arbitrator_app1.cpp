@@ -1,24 +1,22 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
-#include "unit_test.h"
 
 #include "erpc_arbitrated_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
-
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#include "test_firstInterface_server.h"
+#include "test_secondInterface.h"
+#include "unit_test.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +24,12 @@ extern "C" {
 #include "app_core1.h"
 #include "board.h"
 #include "mcmgr.h"
+#if defined(RPMSG)
 #include "rpmsg_lite.h"
+#endif
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+int main(int argc, char **argv);
+#endif
 #ifdef __cplusplus
 }
 #endif
@@ -47,6 +50,7 @@ uint32_t startupData;
 mcmgr_status_t status;
 volatile int stopTest = 0;
 extern const uint32_t erpc_generated_crc;
+erpc_service_t service = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -143,14 +147,21 @@ void runInit(void *arg)
         status = MCMGR_GetStartupData(&startupData);
     } while (status != kStatus_MCMGR_Success);
 
-    // RPMsg-Lite transport layer initialization
     erpc_transport_t transportClient;
     erpc_transport_t transportServer;
+    erpc_mbf_t message_buffer_factory;
+
+#if defined(RPMSG)
+    // RPMsg-Lite transport layer initialization
     transportClient = erpc_transport_rpmsg_lite_rtos_remote_init(101, 100, (void *)startupData, 0, SignalReady, NULL);
 
     // MessageBufferFactory initialization
-    erpc_mbf_t message_buffer_factory;
     message_buffer_factory = erpc_mbf_rpmsg_init(transportClient);
+#elif defined(MU)
+    // MU transport layer initialization
+    transportClient = erpc_transport_mu_init(MU_BASE);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+#endif
 
     // eRPC client side initialization
     transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);
@@ -165,7 +176,12 @@ void runInit(void *arg)
     erpc_arbitrated_client_set_server_thread_id((void *)g_serverTask);
 
     // adding the service to the server
-    erpc_add_service_to_server(create_FirstInterface_service());
+    service = create_FirstInterface_service();
+    erpc_add_service_to_server(service);
+
+#if defined(MU)
+    SignalReady();
+#endif
 
     // unblock server and client task
     xTaskNotifyGive(g_serverTask);
@@ -184,9 +200,6 @@ void runInit(void *arg)
     vTaskSuspend(NULL);
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int main(int argc, char **argv)
 {
     BOARD_InitHardware();
@@ -202,9 +215,6 @@ int main(int argc, char **argv)
     {
     }
 }
-#ifdef __cplusplus
-}
-#endif
 
 void stopSecondSide()
 {
@@ -219,6 +229,10 @@ int32_t getResultFromSecondSide()
 
 void quitFirstInterfaceServer()
 {
+    /* removing the service from the server */
+    erpc_remove_service_from_server(service);
+    destroy_FirstInterface_service((erpc_service_t *)service);
+
     // Stop server part
     erpc_server_stop();
 }

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -14,6 +15,9 @@
 #include "erpc_config_internal.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
+#if ERPC_PRE_POST_ACTION
+#include "erpc_pre_post_action.h"
+#endif
 
 /*!
  * @addtogroup server_setup
@@ -62,6 +66,13 @@ void erpc_server_deinit(void);
  * @param[in] service Service which contains implementations of functions called from client to server.
  */
 void erpc_add_service_to_server(void *service);
+
+/*!
+ * @brief This function removes service from server.
+ *
+ * @param[in] service Service which contains implementations of functions called from client to server.
+ */
+void erpc_remove_service_from_server(void *service);
 
 /*!
  * @brief Can be used to set own crcStart number.
@@ -115,6 +126,24 @@ void erpc_server_stop(void);
  * @retval False When transport wasn't added.
  */
 bool erpc_server_add_message_logger(erpc_transport_t transport);
+#endif
+
+#if ERPC_PRE_POST_ACTION
+/*!
+ * @brief This function set callback function executed at the beginning of eRPC call.
+ *
+ * @param[in] preCB Callback used at the beginning of eRPC call. When NULL and ERPC_PRE_POST_ACTION_DEFAULT
+ * is enabled then default function will be set.
+ */
+void erpc_server_add_pre_cb_action(pre_post_action_cb preCB);
+
+/*!
+ * @brief This function set callback function executed at the end of eRPC call.
+ *
+ * @param[in] postCB Callback used at the end of eRPC call. When NULL and ERPC_PRE_POST_ACTION_DEFAULT
+ * is enabled then default function will be set.
+ */
+void erpc_server_add_post_cb_action(pre_post_action_cb postCB);
 #endif
 
 //@}

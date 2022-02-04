@@ -1,17 +1,22 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_server.h"
+#include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+TypedefService_service *svc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Implementation of function code
@@ -132,19 +137,55 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    // NOTE: possible memory leak? not ever deleting
-    TypedefService_service *svc = new TypedefService_service();
+    svc = new TypedefService_service();
 
     // add services
     server->addService(svc);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Remove service from server code
+////////////////////////////////////////////////////////////////////////////////
+
+void remove_services(erpc::SimpleServer *server)
+{
+    /* Remove services
+     * Example: server->removeService (svc);
+     */
+    server->removeService(svc);
+    /* Delete unused service
+     */
+    delete svc;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+erpc_service_t service_test = NULL;
 void add_services_to_server()
 {
-    erpc_add_service_to_server(create_TypedefService_service());
+    service_test = create_TypedefService_service();
+    erpc_add_service_to_server(service_test);
+}
+
+void remove_services_from_server()
+{
+    erpc_remove_service_from_server(service_test);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_TypedefService_service(service_test);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    destroy_TypedefService_service();
+#endif
+}
+
+void remove_common_services_from_server(erpc_service_t service)
+{
+    erpc_remove_service_from_server(service);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_Common_service(service);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    destroy_Common_service();
+#endif
 }
 #ifdef __cplusplus
 }

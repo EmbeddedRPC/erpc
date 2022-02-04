@@ -58,7 +58,7 @@ public:
     void linkWithPeer(InterThreadBufferTransport *peer);
 
     virtual erpc_status_t receive(MessageBuffer *message);
-    virtual erpc_status_t send(const MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message);
 
     virtual int32_t getAvailable(void) const { return 0; }
 

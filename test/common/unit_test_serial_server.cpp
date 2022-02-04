@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -9,10 +9,12 @@
 #include "erpc_basic_codec.h"
 #include "erpc_serial_transport.h"
 #include "erpc_simple_server.h"
+
 #include "Logging.h"
 #include "myAlloc.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
+
 #include <stdlib.h>
 
 using namespace erpc;
@@ -28,7 +30,7 @@ public:
 
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         if (*buf)
         {
             delete[] buf->get();
@@ -42,6 +44,8 @@ BasicCodecFactory g_basicCodecFactory;
 SimpleServer g_server;
 
 int MyAlloc::allocated_ = 0;
+
+Common_service *svc_common;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -79,17 +83,27 @@ int main(int argc, const char *argv[])
 ////////////////////////////////////////////////////////////////////////////////
 void add_common_service(SimpleServer *server)
 {
-    Common_service *svc = new Common_service();
+    svc_common = new Common_service();
 
-    server->addService(svc);
+    server->addService(svc_common);
+}
+
+void remove_common_service(SimpleServer *server)
+{
+    server->removeService(svc_common);
+    delete svc_common;
 }
 
 extern "C" void erpc_add_service_to_server(void *service) {}
+extern "C" void erpc_remove_service_from_server(void *service) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////
 void quit()
 {
+    remove_common_service(&g_server);
+    remove_services(&g_server);
     exit(0);
 }
 

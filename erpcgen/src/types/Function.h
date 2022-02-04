@@ -13,6 +13,7 @@
 #include "DataType.h"
 #include "StructType.h"
 #include "Symbol.h"
+
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +83,7 @@ public:
      *
      * @param[in] isOneway Set, if function return type is oneway.
      */
-    void setIsOneway(bool isOneway) { m_isOneway = isOneway; }
+    void setIsOneway(bool argIsOneway) { m_isOneway = argIsOneway; }
 
     /*!
      * @brief This function returns description about the interface function.
@@ -125,8 +126,8 @@ public:
      * @param[in] m_interface Parent interface.
      */
     Function(const Token &tok, Interface *interface)
-    : Symbol(kFunctionSymbol, tok)
-    , FunctionBase()
+    : FunctionBase()
+    , Symbol(kFunctionSymbol, tok)
     , m_uniqueId(++s_idCounter)
     , m_interface(interface)
     , m_functionType(nullptr)
@@ -143,8 +144,8 @@ public:
      * @param[in] uniqueId Given unique function id.
      */
     Function(const Token &tok, Interface *interface, uint32_t uniqueId)
-    : Symbol(kFunctionSymbol, tok)
-    , FunctionBase()
+    : FunctionBase()
+    , Symbol(kFunctionSymbol, tok)
     , m_uniqueId(uniqueId)
     , m_interface(interface)
     , m_functionType(nullptr)

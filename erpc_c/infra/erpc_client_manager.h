@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -11,11 +12,9 @@
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
 #ifdef __cplusplus
+#include "erpc_client_server_common.h"
 #include "erpc_codec.h"
 #include "erpc_config_internal.h"
-#if ERPC_MESSAGE_LOGGING
-#include "erpc_message_loggers.h"
-#endif
 #if ERPC_NESTED_CALLS
 #include "erpc_server.h"
 #include "erpc_threading.h"
@@ -51,11 +50,7 @@ class Server;
  *
  * @ingroup infra_client
  */
-#if ERPC_MESSAGE_LOGGING
-class ClientManager : public MessageLoggers
-#else
-class ClientManager
-#endif
+class ClientManager : public ClientServerCommon
 {
 public:
     /*!
@@ -64,7 +59,8 @@ public:
      * This function initializes object attributes.
      */
     ClientManager(void)
-    : m_messageFactory(NULL)
+    : ClientServerCommon()
+    , m_messageFactory(NULL)
     , m_codecFactory(NULL)
     , m_transport(NULL)
     , m_sequence(0)
@@ -72,9 +68,6 @@ public:
 #if ERPC_NESTED_CALLS
     , m_server(NULL)
     , m_serverThreadId(NULL)
-#endif
-#if ERPC_MESSAGE_LOGGING
-    , MessageLoggers()
 #endif
     {
     }
@@ -119,7 +112,7 @@ public:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performRequest(RequestContext &request);
+    virtual void performRequest(RequestContext &request);
 
     /*!
      * @brief This function releases request context.
@@ -180,7 +173,7 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performClientRequest(RequestContext &request);
+    virtual void performClientRequest(RequestContext &request);
 
 #if ERPC_NESTED_CALLS
     /*!
@@ -190,11 +183,11 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual erpc_status_t performNestedClientRequest(RequestContext &request);
+    virtual void performNestedClientRequest(RequestContext &request);
 #endif
 
     //! @brief Validate that an incoming message is a reply.
-    virtual erpc_status_t verifyReply(RequestContext &request);
+    virtual void verifyReply(RequestContext &request);
 
     /*!
      * @brief Create message buffer and codec.
@@ -207,8 +200,8 @@ protected:
     Codec *createBufferAndCodec(void);
 
 private:
-    ClientManager(const ClientManager &);            //!< Disable copy ctor.
-    ClientManager &operator=(const ClientManager &); //!< Disable copy ctor.
+    ClientManager(const ClientManager &other);            //!< Disable copy ctor.
+    ClientManager &operator=(const ClientManager &other); //!< Disable copy ctor.
 };
 
 /*!
@@ -228,10 +221,10 @@ public:
      * @param[in] codec Set in inout codec.
      * @param[in] isOneway Set information if codec is only oneway or bidirectional.
      */
-    RequestContext(uint32_t sequence, Codec *codec, bool isOneway)
+    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway)
     : m_sequence(sequence)
     , m_codec(codec)
-    , m_oneway(isOneway)
+    , m_oneway(argIsOneway)
     {
     }
 

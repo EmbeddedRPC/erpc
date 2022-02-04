@@ -50,6 +50,14 @@ typedef void * erpc_service_t;
 {% for iface in group.interfaces %}
 erpc_service_t create_{$iface.serviceClassName}(void);
 
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+void destroy_{$iface.serviceClassName}(erpc_service_t service);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+void destroy_{$iface.serviceClassName}(void);
+#else
+#warning "Unknown eRPC allocation policy!"
+#endif
+
 {% endfor -- iface %}
 #ifdef __cplusplus
 }

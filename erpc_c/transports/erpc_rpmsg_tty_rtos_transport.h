@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017 NXP
+ * Copyright 2020 NXP
  * All rights reserved.
  *
  *
@@ -13,6 +13,7 @@
 #include "erpc_crc16.h"
 #include "erpc_message_buffer.h"
 #include "erpc_rpmsg_lite_base_transport.h"
+
 #include "rpmsg_lite.h"
 #include "rpmsg_queue.h"
 
@@ -35,7 +36,7 @@ namespace erpc {
  * @brief Transport that uses RPMsg zero copy RTOS API for interprocessor
  * messaging.
  *
- * @ingroup rpmsg_lite_rtos_transport
+ * @ingroup rpmsg_tty_rtos_transport
  */
 class RPMsgTTYRTOSTransport : public RPMsgBaseTransport
 {
@@ -67,8 +68,8 @@ public:
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed
      * successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, unsigned long length,
-                               int rpmsg_link_id);
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
+                               uint32_t rpmsg_link_id);
 
     /*!
      * @brief This function call RPMsg rtos init function - as RPMsg remote
@@ -88,7 +89,7 @@ public:
      * @retval kErpcStatus_InitFailed When rpmsg init function wasn't executed
      * successfully.
      */
-    virtual erpc_status_t init(unsigned long src_addr, unsigned long dst_addr, void *base_address, int rpmsg_link_id,
+    virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t rpmsg_link_id,
                                void (*ready_cb)(void), char *nameservice_name);
 
     /*!
@@ -122,7 +123,7 @@ public:
     virtual void setCrc16(Crc16 *crcImpl);
 
 protected:
-    unsigned long m_dst_addr;                /*!< Destination address used by rpmsg. */
+    uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */
     rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */
     struct rpmsg_lite_endpoint *m_rpmsg_ept; /*!< Pointer to RPMsg Lite Endpoint structure. */
     Crc16 *m_crcImpl;                        //!< CRC object.

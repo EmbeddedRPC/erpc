@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2021 NXP
  * All rights reserved.
  *
  *
@@ -16,7 +16,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<MUTransport> s_transport;
+ERPC_MANUALLY_CONSTRUCTED(MUTransport, s_transport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -25,6 +25,6 @@ static ManuallyConstructed<MUTransport> s_transport;
 erpc_transport_t erpc_transport_mu_init(void *baseAddr)
 {
     s_transport.construct();
-    s_transport->init((MU_Type *)baseAddr);
+    (void)s_transport->init((MU_Type *)baseAddr);
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }
