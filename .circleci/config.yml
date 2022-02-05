@@ -12,19 +12,16 @@ jobs:
       # - run: sudo apt-get install -y gcc-arm-none-eabi
       - run: curl -O https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.07/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
       # - run: wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.07/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
-      - run: ls -la
-      - run: cd ~/project
-      - run: ls -la
-      - run: mkdir -p ${HOME}/opt
-      - run: cd ${HOME}/opt
+      - run: mkdir -p ~/project/opt
+      - run: cd ~/project/opt
       - run: tar xjf ~/project/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
-      - run: chmod -R +x ${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/bin
-      - run: ${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/bin/arm-none-eabi-gcc --version
+      - run: chmod -R +x ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin
+      - run: ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin/arm-none-eabi-gcc --version
       - run: cd ${HOME}
       # - run: sudo apt-get -y install cmake
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: pushd ~/project/mcuxsdk ; west update ; popd
-      - run: export ARMGCC_DIR=${HOME}/opt/gcc-arm-none-eabi-10.3-2021.07/
+      - run: export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/
       - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; ./build_all.sh ; popd
       - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; ./build_all.sh ; popd
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
