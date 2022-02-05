@@ -14,10 +14,7 @@ jobs:
       # - run: wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.07/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
       - run: mkdir -p ~/project/opt
       - run: cd ~/project/opt
-      - run: tar xjf ~/project/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
-      - run: ls -la
-      - run: cd ~/project/opt/gcc-arm-none-eabi-10.3-2021.07
-      - run: ls -la
+      - run: tar xjf ~/project/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2 -C ~/project/opt
       - run: chmod -R +x ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin
       - run: ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin/arm-none-eabi-gcc --version
       - run: cd ${HOME}
