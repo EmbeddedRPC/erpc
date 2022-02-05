@@ -15,6 +15,9 @@ jobs:
       - run: mkdir -p ~/project/opt
       - run: cd ~/project/opt
       - run: tar xjf ~/project/gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2
+      - run: ls -la
+      - run: cd ~/project/opt/gcc-arm-none-eabi-10.3-2021.07
+      - run: ls -la
       - run: chmod -R +x ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin
       - run: ~/project/opt/gcc-arm-none-eabi-10.3-2021.07/bin/arm-none-eabi-gcc --version
       - run: cd ${HOME}
