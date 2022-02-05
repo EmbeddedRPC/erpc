@@ -21,9 +21,14 @@ jobs:
       # - run: sudo apt-get -y install cmake
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: pushd ~/project/mcuxsdk ; west update ; popd
-      #- run: export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/
-      - run: pushd export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/ ; ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; chmod 777 build_all.sh ; ./build_all.sh ; popd
-      - run: pushd export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/ ; ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; chmod 777 build_all.sh ; ./build_all.sh ; popd
+      - run: export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/
+      - run: cd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc
+      - run: chmod 777 build_all.sh
+      - run: ./build_all.sh
+      - run: cd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc
+      - run: chmod 777 build_all.sh
+      - run: ./build_all.sh
+      - run: cd ${HOME}
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
