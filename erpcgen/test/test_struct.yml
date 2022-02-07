@@ -32,6 +32,7 @@ test_client.cpp:
   - static void write_A_struct(erpc::Codec * codec, const A * data)
 test_server.cpp:
   - static void read_A_struct(erpc::Codec * codec, A * data)
+
 ---
 name: return list struct
 idl: |
@@ -52,6 +53,7 @@ test_server.cpp:
   - read_list_int32_1_t_struct
   - write_list_int32_1_t_struct
   - free_list_int32_1_t_struct
+
 ---
 name: binary struct c
 idl: |
@@ -75,6 +77,41 @@ test_client.cpp:
   - write_binary_t_struct
   - write_Vector_struct
   - not: read
+
+---
+name: in out binary struct c
+idl: |
+  struct Vector {
+    list<binary> i
+  }
+
+  interface I {
+    foo(Vector a) -> void
+    bar() -> Vector
+  }
+test.h:
+  - typedef struct binary_t binary_t;
+  - typedef struct Vector Vector;
+  - struct binary_t
+  - struct Vector
+test_server.cpp:
+  - read_Vector_struct
+  - read_binary_t_struct
+  - read_list_binary_1_t_struct
+  - write_Vector_struct
+  - write_binary_t_struct
+  - write_list_binary_1_t_struct
+  - free_Vector_struct
+  - free_binary_t_struct
+  - free_list_binary_1_t_struct
+test_client.cpp:
+  - write_Vector_struct
+  - write_binary_t_struct
+  - write_list_binary_1_t_struct
+  - read_Vector_struct
+  - read_binary_t_struct
+  - read_list_binary_1_t_struct
+
 ---
 name: binary struct py
 lang: py
