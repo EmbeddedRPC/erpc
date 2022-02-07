@@ -144,7 +144,7 @@ test_client.cpp:
   - writeNullFlag(true)
   - '{'
   - writeNullFlag(false)
-  - write_list_0_t_struct
+  - write_list_bool_1_t_struct
   - '}'
   - void bar(const erpc_pair * s)
   - write_erpc_pair_struct
@@ -153,11 +153,12 @@ test_server.cpp:
   - bool isNull
   - readNullFlag
   - if (!isNull)
-  - read_list_0_t_struct
+  - read_list_bool_1_t_struct
   - else
   - data->b.elements = NULL
   - data->b.elementsCount = 0
 
+---
 name: struct binary field
 desc:
 idl: |
