@@ -22,6 +22,7 @@ jobs:
       - run: west init -m https://github.com/NXPmicro/mcux-sdk --mr main mcuxsdk
       - run: pushd ~/project/mcuxsdk ; west update ; ls -la ; popd
       - run: export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/
+      - run: chmod 777 ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc/build_all.sh
       - run: cd ~/project/mcuxsdk
       - run: ls -la
       - run: cd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc
