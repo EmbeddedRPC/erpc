@@ -24,17 +24,7 @@ jobs:
       - run: export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/
       - run: chmod -R 777 ~/project/mcuxsdk
       - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc ; export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/ ; ./build_all.sh ; popd
-      - run: pwd
-      - run: cd ~/project/mcuxsdk
-      - run: ls -la
-      - run: cd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm4/armgcc
-      - run: ls -la
-      - run: chmod 777 build_all.sh
-      #- run: sudo chmod 777 build_all.sh
-      - run: ./build_all.sh
-      - run: cd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc
-      - run: chmod 777 build_all.sh
-      - run: ./build_all.sh
+      - run: pushd ~/project/mcuxsdk/examples/evkmimxrt1170/multicore_examples/erpc_two_way_rpc_rpmsg_rtos/cm7/armgcc ; export ARMGCC_DIR=~/project/opt/gcc-arm-none-eabi-10.3-2021.07/ ; ./build_all.sh ; popd
       - run: cd ${HOME}
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
