@@ -64,11 +64,11 @@ is_cygwin := $(and $(findstring CYGWIN,$(os_name)),1)
 
 # Set to 1 if running on mingw.
 ifeq "$(os_name)" ""
-is_mingw := 1
-os_name = MINGW
-MAKE := mingw32-make
+    is_mingw := 1
+    os_name = MINGW
+    MAKE := mingw32-make
 else
-is_mingw := 0
+    is_mingw := 0
 endif
 
 # Set to 1 if running on redhat.
@@ -91,17 +91,17 @@ BUILD_SDK_COLOR ?= 1
 # invocations when not in VERBOSE mode.
 #VERBOSE = 1
 ifeq "$(VERBOSE)" "1"
-at :=
-silent_make :=
+    at :=
+    silent_make :=
 else
-at := @
-silent_make := -s
+    at := @
+    silent_make := -s
 endif
 
 ifeq "$(VERBOSE)" "1"
-to_dev_null=$(empty)
+    to_dev_null=$(empty)
 else
-to_dev_null=> /dev/null
+    to_dev_null=> /dev/null
 endif
 
 # These colors must be printed with the printf command. echo won't handle the
@@ -120,13 +120,13 @@ color_gray = \033[38;5;008m
 color_purple = \033[38;5;097m
 
 ifeq "$(BUILD_SDK_COLOR)" "1"
-color_build := $(color_light_blue)
-color_c := $(color_green)
-color_cxx := $(color_green)
-color_cpp := $(color_orange)
-color_asm := $(color_magenta)
-color_ar := $(color_yellow)
-color_link := $(color_purple)
+    color_build := $(color_light_blue)
+    color_c := $(color_green)
+    color_cxx := $(color_green)
+    color_cpp := $(color_orange)
+    color_asm := $(color_magenta)
+    color_ar := $(color_yellow)
+    color_link := $(color_purple)
 endif
 
 # Used in printmessage if the color args are not present.
@@ -150,14 +150,14 @@ color_ :=
 # Use like:
 #  $(call printmessage,cyan,Building, remainder of the message...)
 ifeq "$(is_mingw)" "0"
-ifeq "$(BUILD_SDK_COLOR)" "1"
+    ifeq "$(BUILD_SDK_COLOR)" "1"
 define printmessage
 if [ -t 1 ]; then printf "$(7)$(color_$(1))$(2)$(color_default)$(3)$(color_$(4))$(5)$(color_default)$(6)\n" ; \
 else printf "$(7)$(2)$(3)$(5)$(6)\n" ; fi
 endef
-else
+    else
 define printmessage
 printf "$(7)$(2)$(3)$(5)$(6)\n" ; fi
 endef
-endif
+    endif
 endif

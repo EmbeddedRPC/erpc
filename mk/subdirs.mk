@@ -44,4 +44,3 @@ $(SUBDIRS):
 .PHONY: clean
 clean::
 	@$(foreach f,$(SUBDIRS),$(MAKE) clean $(silent_make) -r -C $(f) && ) true
-
