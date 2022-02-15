@@ -21,4 +21,3 @@ ERPC_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../)
 include $(ERPC_ROOT)/mk/common.mk
 include $(ERPC_ROOT)/mk/paths.mk
 include $(ERPC_ROOT)/mk/flags.mk
-
