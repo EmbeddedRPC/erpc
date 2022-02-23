@@ -9,15 +9,15 @@
 
 #ifndef _EMBEDDED_RPC__UNIQUEIDCHECKER_H_
 #define _EMBEDDED_RPC__UNIQUEIDCHECKER_H_
+#include "Interface.h"
+#include "InterfaceDefinition.h"
+#include "SymbolScope.h"
+
 #include <cstdio>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "Interface.h"
-#include "InterfaceDefinition.h"
-#include "SymbolScope.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes

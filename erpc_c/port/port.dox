@@ -20,3 +20,15 @@
 @brief Serial port
 @ingroup port
 */
+
+/*!
+@defgroup port_spidev SPIdev
+@brief SPIdev port
+@ingroup port
+*/
+
+/*!
+@defgroup port_sysgpio SysGPIO
+@brief SysGPIO port
+@ingroup port
+*/

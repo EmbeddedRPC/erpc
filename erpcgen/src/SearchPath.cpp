@@ -8,6 +8,7 @@
  */
 
 #include "SearchPath.h"
+
 #include <cstdio>
 
 #if __WIN32__
@@ -64,6 +65,7 @@ void PathSearcher::setTempPath(const std::string &path)
 //! \retval false No match could be made. \a result has been left unmodified.
 bool PathSearcher::search(const std::string &base, target_type_t targetType, bool searchCwd, std::string &result)
 {
+    (void)targetType;
     FILE *tempFile;
     bool absolute = isAbsolute(base);
 

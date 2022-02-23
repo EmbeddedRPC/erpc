@@ -16,10 +16,10 @@ test_client.cpp:
   - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
     then:
-      - codec->writeString(strlen(a), a);
+      - codec->writeString(strlen((const char*)a), (const char*)a);
   - if: dir == 'out'
     then:
-      - not: codec->writeString(strlen(a), a);
+      - not: codec->writeString(strlen((const char*)a), (const char*)a);
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
@@ -41,7 +41,51 @@ test_server.cpp:
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
-      - codec->writeString(strlen(a), a);
+      - codec->writeString(strlen((const char*)a), (const char*)a);
+---
+name: param ustring
+desc:
+params:
+  dir:
+    - "in"
+    - "out"
+    - "inout"
+idl: |
+  interface foo {
+    bar({dir} ustring a @nullable @max_length(8)) -> void
+  }
+test_client.cpp:
+  - re: void bar\(\w*\s*unsigned\s*char\s*\* a\)
+  - if (a == NULL)
+  - codec->writeNullFlag(true)
+  - if: dir in ('in', 'inout')
+    then:
+      - codec->writeString(strlen((const char*)a), (const char*)a);
+  - if: dir == 'out'
+    then:
+      - not: codec->writeString(strlen((const char*)a), (const char*)a);
+  - if: dir in ('out', 'inout')
+    then:
+      - if (a != NULL)
+      - codec->readString(&a_len, &a_local);
+test_server.cpp:
+  - ::bar_shim
+  - unsigned char* a = NULL;
+  - bool isNull;
+  - codec->readNullFlag(&isNull)
+  - if (!isNull)
+  - if: dir in ('in', 'inout')
+    then:
+      - codec->readString(&a_len, &a_local)
+  - if: dir == 'out'
+    then:
+      - not: codec->readString(&a_len, &a_local)
+  - else
+  - a = NULL;
+  - if: dir in ('out', 'inout')
+    then:
+      - if (a != NULL)
+      - codec->writeString(strlen((const char*)a), (const char*)a);
 ---
 name: in param struct
 desc:
@@ -100,7 +144,7 @@ test_client.cpp:
   - writeNullFlag(true)
   - '{'
   - writeNullFlag(false)
-  - write_list_0_t_struct
+  - write_list_bool_1_t_struct
   - '}'
   - void bar(const erpc_pair * s)
   - write_erpc_pair_struct
@@ -109,11 +153,12 @@ test_server.cpp:
   - bool isNull
   - readNullFlag
   - if (!isNull)
-  - read_list_0_t_struct
+  - read_list_bool_1_t_struct
   - else
   - data->b.elements = NULL
   - data->b.elementsCount = 0
 
+---
 name: struct binary field
 desc:
 idl: |
@@ -167,7 +212,7 @@ test_client.cpp:
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - codec->writeString(strlen(data->a), data->a);
+      - codec->writeString(strlen((const char*)data->a), (const char*)data->a);
   - if: dir in ('out', 'inout')
     then:
       - void read_erpc_pair_struct
@@ -196,7 +241,7 @@ test_server.cpp:
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - codec->writeString(strlen(data->a), data->a);
+      - codec->writeString(strlen((const char*)data->a), (const char*)data->a);
 
 ---
 name: return struct

@@ -1,4 +1,4 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
@@ -49,21 +49,17 @@ class {$iface.name}Service(erpc.server.Service):
 {% for p in fn.inParameters if not p.serializedViaMember %}
 {%  if p.direction == "in" %}
 {%   set p_name = p.name %}
-{%  elif p.direction == "inout" %}
+{%  else %}
 {%   set p_name = p.name & ".value" %}
 {%  endif -- dir %}
+{%  set indent = "" >%}
 {%  if p.isNullable %}
-        if not codec.read_null_flag():
-            {$decodeValue(p.type, p_name, "common.", "codec", "            ", 0)}
+        if codec.read_null_flag():
+            {$p.name} = None
         else:
-            {$p.name if p.direction == "in" else p.name & ".value"} = None
-{%  else -- isNullable %}
-{%   if p.type.type == 'union' %}
-        {$p.name}, {$p.discriminator} = common.{$p.type.name}()._read(codec)
-{%   else%}
-        {$decodeValue(p.type, p_name, "common.", "codec", "        ", 0)}
-{%   endif -- isUnion %}
+{%           set indent = "    " >%}
 {%  endif -- isNullable %}
+        {$indent}{$decodeValue(p.type, p_name, "common.", "codec", indent & "        ", 0)}
 {% endfor -- inParams %}
 
         # Invoke user implementation of remote function.
@@ -81,17 +77,14 @@ class {$iface.name}Service(erpc.server.Service):
             sequence=sequence))
 {% for p in fn.outParameters if not p.serializedViaMember %}
 {%  if p.isNullable %}
+{%   set indent = "    " >%}
         if {$p.name}.value != None:
-            {$encodeValue(p.type, p.name & ".value", "codec", "            ", 0)}
 {%  else -- isNullable %}
+{%   set indent = "" >%}
         if {$p.name}.value is None:
-            raise ValueError("{$p.name} is None")
-{%   if p.type.type == 'union' %}
-        {$p.name}._write(codec, {$p.discriminator})
-{%   else%}
-        {$encodeValue(p.type, p.name & ".value", "codec", "        ", 0)}
-{%   endif -- isUnion %}
+            raise ValueError("{$p.name}.value is None")
 {%  endif -- isNullable %}
+        {$indent}{$encodeValue(p.type, p.name & ".value", "codec", indent & "        ", 0)}
 {% endfor -- outParams %}
 {% if fn.isReturnValue && fn.returnValue.type.type != "void" %}
         {$encodeValue(fn.returnValue.type, "_result", "codec", "        ", 0)}

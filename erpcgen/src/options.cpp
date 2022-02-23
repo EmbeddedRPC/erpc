@@ -40,11 +40,11 @@
 //    - Added PARSE_POS control flag and POSITIONAL return value.
 // ^^**************************************************************************
 
+#include "options.h"
+
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
-
-#include "options.h"
 
 using namespace std;
 
@@ -159,10 +159,10 @@ void OptArgvIter::rewind(void)
 static const char WHITESPACE[] = " \t\n\r\v\f";
 const char *OptStrTokIter::default_delims = WHITESPACE;
 
-OptStrTokIter::OptStrTokIter(const char *tokens, const char *delimiters)
+OptStrTokIter::OptStrTokIter(const char *tokens, const char *arg_delimiters)
 : len(unsigned(strlen(tokens)))
 , str(tokens)
-, seps(delimiters)
+, seps(arg_delimiters)
 , cur(NULLSTR)
 , tokstr(NULLSTR)
 {
@@ -203,7 +203,7 @@ void OptStrTokIter::rewind(void)
     cur = ::strtok(tokstr, seps);
 }
 
-    // ************************************************************* OptIstreamIter
+// ************************************************************* OptIstreamIter
 
 #ifdef vms
 enum
@@ -633,7 +633,7 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #endif /* USE_STDIO */
 }
 
-    // ******************************************************************* Options
+// ******************************************************************* Options
 
 #if (defined(MSWIN) || defined(OS2) || defined(MSDOS))
 #define DIR_SEP_CHAR '\\'
@@ -641,13 +641,13 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #define DIR_SEP_CHAR '/'
 #endif
 
-Options::Options(const char *name, const char *const optv[])
+Options::Options(const char *arg_name, const char *const optv[])
 : explicit_end(0)
 , optctrls(DEFAULT)
 , optvec(optv)
 , nextchar(NULLSTR)
 , listopt(NULLSTR)
-, cmdname(name)
+, cmdname(arg_name)
 {
     const char *basename = ::strrchr(cmdname, DIR_SEP_CHAR);
     if (basename)

@@ -1,16 +1,18 @@
 /*
- * Copyright 2017 - 2020 NXP
+ * Copyright 2017 - 2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_core0_server.h"
 #include "test_core1.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 
 ClientCore0Services_service *svc;
@@ -50,6 +52,35 @@ void callback1b(int32_t param1, int32_t param2)
 void callback2(int32_t param1, int32_t param2)
 {
     cb2 = (callback2_t *)callback2;
+}
+
+int32_t myFun3(const callback3_t callback, int32_t arg1, int32_t arg2)
+{
+    return callback(arg1, arg2);
+}
+
+int32_t my_add(int32_t arg1, int32_t arg2)
+{
+    return arg1 + arg2;
+}
+
+int32_t my_sub(int32_t arg1, int32_t arg2)
+{
+    return arg1 - arg2;
+}
+
+int32_t my_mul(int32_t arg1, int32_t arg2)
+{
+    return arg1 * arg2;
+}
+
+int32_t my_div(int32_t arg1, int32_t arg2)
+{
+    if (arg2)
+    {
+        return arg1 / arg2;
+    }
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,13 +125,21 @@ void add_services_to_server()
 void remove_services_from_server()
 {
     erpc_remove_service_from_server(service_test);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_ClientCore0Services_service(service_test);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     destroy_ClientCore0Services_service();
+#endif
 }
 
 void remove_common_services_from_server(erpc_service_t service)
 {
     erpc_remove_service_from_server(service);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_Common_service(service);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     destroy_Common_service();
+#endif
 }
 #ifdef __cplusplus
 }

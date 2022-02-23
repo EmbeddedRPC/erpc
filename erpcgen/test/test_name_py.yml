@@ -41,7 +41,6 @@ test/common.py:
   - if self.d is None
   - codec.write_int32(self.d)
   - self.d
-  - type = StructName
 
 test/client.py:
   - def function(self, m)

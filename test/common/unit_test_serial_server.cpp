@@ -9,10 +9,12 @@
 #include "erpc_basic_codec.h"
 #include "erpc_serial_transport.h"
 #include "erpc_simple_server.h"
+
 #include "Logging.h"
 #include "myAlloc.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
+
 #include <stdlib.h>
 
 using namespace erpc;
@@ -28,7 +30,7 @@ public:
 
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         if (*buf)
         {
             delete[] buf->get();

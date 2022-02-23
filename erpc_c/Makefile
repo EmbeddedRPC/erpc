@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2016 Freescale Semiconductor, Inc.
-# Copyright 2016-2017 NXP
+# Copyright 2016-2020 NXP
 # All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -60,13 +60,17 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_server.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_simple_server.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.cpp \
 			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
 			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
 			$(ERPC_C_ROOT)/port/erpc_serial.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.cpp \
+			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_dynamic.cpp \
+			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_static.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_server_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_setup_serial.cpp \
+			$(ERPC_C_ROOT)/setup/erpc_setup_tcp.cpp \
 			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.cpp \
 			$(ERPC_C_ROOT)/transports/erpc_serial_transport.cpp \
 			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.cpp
@@ -87,12 +91,16 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/infra/erpc_static_queue.h \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.h \
 			$(ERPC_C_ROOT)/infra/erpc_transport.h \
+			$(ERPC_C_ROOT)/infra/erpc_client_server_common.h \
+			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.h \
+			$(ERPC_C_ROOT)/port/erpc_setup_extensions.h \
 			$(ERPC_C_ROOT)/port/erpc_config_internal.h \
 			$(ERPC_C_ROOT)/port/erpc_port.h \
 			$(ERPC_C_ROOT)/port/erpc_threading.h \
 			$(ERPC_C_ROOT)/port/erpc_serial.h \
 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.h \
+			$(ERPC_C_ROOT)/setup/erpc_mbf_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_server_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_transport_setup.h \
 			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.h \

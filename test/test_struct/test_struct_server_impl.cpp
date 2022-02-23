@@ -1,16 +1,18 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016 - 2021 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "erpc_server_setup.h"
+
 #include "test_ArithmeticService_server.h"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -227,14 +229,23 @@ void remove_services_from_server()
 {
     erpc_remove_service_from_server(service1);
     erpc_remove_service_from_server(service2);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_ArithmeticService1_service(service1);
+    destroy_ArithmeticService2_service(service2);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     destroy_ArithmeticService1_service();
     destroy_ArithmeticService2_service();
+#endif
 }
 
 void remove_common_services_from_server(erpc_service_t service)
 {
     erpc_remove_service_from_server(service);
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    destroy_Common_service(service);
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     destroy_Common_service();
+#endif
 }
 #ifdef __cplusplus
 }

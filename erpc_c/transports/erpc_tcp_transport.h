@@ -76,9 +76,10 @@ public:
     /*!
      * @brief This function disconnects client or stop server host.
      *
+     * @param[in] stopServer Specify is server shall be closed as well (stop listen())
      * @retval #kErpcStatus_Success Always return this.
      */
-    virtual erpc_status_t close(void);
+    virtual erpc_status_t close(bool stopServer = true);
 
 protected:
     bool m_isServer;       /*!< If true then server is using transport, else client. */

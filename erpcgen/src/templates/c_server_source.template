@@ -5,11 +5,11 @@
 {$commonHeader()}
 
 #include "{$serverHeaderName}"
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>
 #include "erpc_port.h"
-{% if dynamicServices == false %}
+#endif
 #include "erpc_manually_constructed.h"
-{% endif --dynamicServices == false %}
 {% if empty(group.includes) == false %}
 extern "C"
 {
@@ -28,8 +28,8 @@ using namespace std;
 extern bool nestingDetection;
 #endif
 
-{% for iface in group.interfaces if dynamicServices == false %}
-static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName};
+{% for iface in group.interfaces %}
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
 
 {% endfor -- iface %}
 {$generateCrcVariable()}
@@ -57,7 +57,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
 
 {% endif -- isReturnValue || isSendValue %}
 {% for param in fn.parameters %}
-    {$param.variable}{% if param.isNullParam %} = NULL{%endif%};
+    {$param.variable}{% if param.isNullParam %} = NULL{% endif %};
 {%  if !empty(param.nullVariable) %}
     {$param.nullVariable} = NULL;
 {%  endif %}
@@ -74,7 +74,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
     int32_t _tmp_local;
 {% endif %}
 {% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{%endif%};
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
 {% endif %}
 {% if fn.isReturnValue || fn.isSendValue  %}
 
@@ -105,7 +105,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
 {% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
 {%  set serverIndent = "    " >%}
     err = codec->getStatus();
-    if (!err)
+    if (err == kErpcStatus_Success)
     {
 {% endif -- generateErrorChecks %}
 {$serverIndent}    // Invoke the actual served function.
@@ -132,7 +132,7 @@ static ManuallyConstructed<{$iface.serviceClassName}> s_{$iface.serviceClassName
 {%  if generateErrorChecks %}
     }
 
-    if (!err)
+    if (err == kErpcStatus_Success)
     {
 {%  endif -- generateErrorChecks %}
 {$serverIndent}    // preparing codec for serializing data
@@ -206,6 +206,7 @@ static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t func
 // Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
+    erpc_status_t erpcStatus;
 {%  if codecClass != "Codec" %}
     {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
 {%   endif %}
@@ -213,12 +214,20 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
     {
 {%  for fn in iface.functions %}
         case k{$iface.name}_{$fn.name}_id:
-            return {$fn.name}_shim({%if codecClass == "Codec"%}codec{% else %}_codec{% endif %}, messageFactory, sequence);
+        {
+            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, sequence);
+            break;
+        }
 
 {%  endfor -- fn %}
         default:
-            return kErpcStatus_InvalidArgument;
+        {
+            erpcStatus = kErpcStatus_InvalidArgument;
+            break;
+        }
     }
+
+    return erpcStatus;
 }
 {%  for fn in iface.functions %}
 
@@ -235,20 +244,20 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, 
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 
-{% if dynamicServices == true %}
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 erpc_service_t create_{$iface.serviceClassName}()
 {
     return new (nothrow) {$iface.serviceClassName}();
 }
 
-void destroy_{$iface.serviceClassName}(erpc_service_t *service)
+void destroy_{$iface.serviceClassName}(erpc_service_t service)
 {
-    if (*service)
+    if (service)
     {
-        delete service;
+        delete ({$iface.serviceClassName} *)service;
     }
 }
-{% else --dynamicServices == true %}
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 erpc_service_t create_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.construct();
@@ -259,5 +268,7 @@ void destroy_{$iface.serviceClassName}()
 {
     s_{$iface.serviceClassName}.destroy();
 }
-{% endif --dynamicServices == true %}
+#else
+#warning "Unknown eRPC allocation policy!"
+#endif
 {% endfor -- iface %}

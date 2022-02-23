@@ -10,10 +10,16 @@
 #define _Value_h_
 
 #include "format_string.h"
+
 #include <cstdint>
 #include <string>
 
-typedef enum { kIntegerValue, kStringValue, kFloatValue } value_type_t; /*!< Value types */
+typedef enum
+{
+    kIntegerValue,
+    kStringValue,
+    kFloatValue
+} value_type_t; /*!< Value types */
 
 /*!
  * @brief Abstract base class for values of arbitrary types.
@@ -82,7 +88,13 @@ class IntegerValue : public Value
 {
 public:
     //! Supported sizes of integers.
-    typedef enum { kSigned, kSignedLong, kUnsigned, kUnsignedLong } int_type_t; //!< The integer type.
+    typedef enum
+    {
+        kSigned,
+        kSignedLong,
+        kUnsigned,
+        kUnsignedLong
+    } int_type_t; //!< The integer type.
 
     /*!
      * @brief Constructor.

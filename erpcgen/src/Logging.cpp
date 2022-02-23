@@ -8,6 +8,7 @@
  */
 
 #include "Logging.h"
+
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>

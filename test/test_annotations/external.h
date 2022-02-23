@@ -15,7 +15,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Enumerators data types declarations
-typedef enum myEnum { one = 0, two = 1, three = 2 } myEnum;
+typedef enum myEnum
+{
+    one = 0,
+    two = 1,
+    three = 2
+} myEnum;
 
 // Aliases data types declarations
 typedef int32_t myInt;

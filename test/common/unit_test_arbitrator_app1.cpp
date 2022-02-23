@@ -6,19 +6,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "unit_test.h"
-
 #include "erpc_arbitrated_client_setup.h"
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
-
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+#include "test_firstInterface_server.h"
+#include "test_secondInterface.h"
+#include "unit_test.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -233,7 +231,7 @@ void quitFirstInterfaceServer()
 {
     /* removing the service from the server */
     erpc_remove_service_from_server(service);
-    destroy_FirstInterface_service();
+    destroy_FirstInterface_service((erpc_service_t *)service);
 
     // Stop server part
     erpc_server_stop();

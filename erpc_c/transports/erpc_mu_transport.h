@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2020 NXP
  * All rights reserved.
  *
  *
@@ -10,11 +10,12 @@
 #define _EMBEDDED_RPC__MU_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
+
 #include "fsl_device_registers.h"
 #include "fsl_mu.h"
 
@@ -122,7 +123,7 @@ public:
      *
      * @return True if exist new message, else false.
      */
-    virtual bool hasMessage() { return m_newMessage; }
+    virtual bool hasMessage(void) { return m_newMessage; }
 
 #if ERPC_TRANSPORT_MU_USE_MCMGR
     /*!
@@ -184,7 +185,7 @@ protected:
     uint32_t m_txCntBytes; /*!< Count of currently received bytes of message */
     uint32_t *volatile m_txBuffer; /*!< Pointer to buffer from which is copied data to MU registers during sending */
 
-#if ERPC_THREADS
+#if !ERPC_THREADS_IS(NONE)
     Semaphore m_rxSemaphore; /*!< Semaphore used by RTOS to block task until the receiving is not complete */
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 

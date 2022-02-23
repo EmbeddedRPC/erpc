@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2021 NXP
  * All rights reserved.
  *
  *
@@ -17,7 +17,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static ManuallyConstructed<SpiMasterTransport> s_transport;
+ERPC_MANUALLY_CONSTRUCTED(SpiMasterTransport, s_transport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -26,6 +26,6 @@ static ManuallyConstructed<SpiMasterTransport> s_transport;
 erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
 {
     s_transport.construct((SPI_Type *)baseAddr, baudRate, srcClock_Hz);
-    s_transport->init();
+    (void)s_transport->init();
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

@@ -121,9 +121,9 @@ ifneq "$(APP_NAME)" ""
 $(MAKE_TARGET): $(OBJECTS_ALL)
 	@$(call printmessage,link,Linking, $(APP_NAME))
 	$(at)$(LD) $(LDFLAGS) \
-          $(OBJECTS_ALL) \
-          $(LIBRARIES) \
-          -o $@
+		$(OBJECTS_ALL) \
+		$(LIBRARIES) \
+		-o $@
 	@echo "Output binary:" ; echo "  $(APP_NAME)"
 
 endif
@@ -138,4 +138,3 @@ clean::
 
 # Include dependency files.
 -include $(OBJECTS_ALL:.o=.d)
-

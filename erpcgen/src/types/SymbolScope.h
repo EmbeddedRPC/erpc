@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__SYMBOLSCOPE_H_
 
 #include "Symbol.h"
+
 #include <map>
 #include <string>
 #include <vector>

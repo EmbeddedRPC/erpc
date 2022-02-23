@@ -38,3 +38,18 @@ TEST(test_callbacks, In_Out_withoutTable)
 
     EXPECT_TRUE(callback2 == *pCallback2_out);
 }
+
+TEST(test_callbacks, Common_Callback)
+{
+    callback3_t callback = my_add;
+    EXPECT_TRUE(12 == myFun3(callback, 9, 3));
+
+    callback = my_sub;
+    EXPECT_TRUE(6 == myFun3(callback, 9, 3));
+
+    callback = my_mul;
+    EXPECT_TRUE(27 == myFun3(callback, 9, 3));
+
+    callback = my_div;
+    EXPECT_TRUE(3 == myFun3(callback, 9, 3));
+}

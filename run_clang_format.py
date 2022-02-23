@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-# Copyright 2016-2017 NXP
+# Copyright 2016-2021 NXP
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,37 +9,52 @@
 # $./run_clang_format.py
 from __future__ import print_function
 import subprocess
-import sys,os
+import sys
+import os
 
 #Folders to scan
-folders = []
-folders.append("erpc_c");
-folders.append("erpcgen/src");
-folders.append("erpcsniffer/src");
-folders.append("test");
+folders = [
+    "erpc_c",
+    "erpcgen/src",
+    "erpcsniffer/src",
+    "test"]
 
 #Files which will be not formatted
-exceptions = []
-exceptions.append("test/common/gtest/gtest.h");
-exceptions.append("test/common/gtest/gtest.cpp");
-exceptions.append("erpcgen/src/cpptemplate/cpptempl.h");
-exceptions.append("erpcgen/src/cpptemplate/cpptempl.cpp");
-exceptions.append("erpcgen/src/cpptemplate/cpptempl_test.cpp");
+exceptions = [
+    "test/common/gtest/gtest.h",
+    "test/common/gtest/gtest.cpp",
+    "erpcgen/src/cpptemplate/cpptempl.h",
+    "erpcgen/src/cpptemplate/cpptempl.cpp",
+    "erpcgen/src/cpptemplate/cpptempl_test.cpp"]
 
 #For windows use "\\" instead of "/" path separators.
 if os.environ.get('OS','') == 'Windows_NT':
-    for i, folder in enumerate(folders):
-        folders[i] = os.path.normpath(folder)
-
-    for i, ext in enumerate(exceptions):
-        exceptions[i] = os.path.normpath(ext)
+    folders = [os.path.normpath(folder) for folder in folders]
+    exceptions = [os.path.normpath(e) for e in exceptions]
 
 #Files with this extensions will be formatted/
-extensions = []
-extensions.append(".h")
-extensions.append(".hpp")
-extensions.append(".c")
-extensions.append(".cpp")
+extensions = [".h", ".hpp", ".c", ".cpp"]
+
+# Check that the clang-format is installed and matches the required version. The clang-format binary
+# chosen is specified by the environment variable $CLANG_FORMAT_PATH or "clang-format" using the
+# regular $PATH resolution mechanism if $CLANG_FORMAT_PATH is undefined.
+clang_format_path = os.environ.get("CLANG_FORMAT_PATH")
+clang_format_bin = clang_format_path if clang_format_path is not None else "clang-format"
+try:
+    cf = subprocess.Popen(
+        [clang_format_bin, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except FileNotFoundError:
+    print("clang-format is not in $PATH")
+    exit(1)
+clang_format_stdout, clang_format_stderr = cf.communicate()
+if cf.returncode != 0:
+    print("Failed to determine clang-format version. stderr=\"%s\"" % (
+        clang_format_stderr.decode('utf-8')))
+    exit(1)
+clang_format_stdout = clang_format_stdout.decode("utf-8")
+if not clang_format_stdout.startswith("clang-format version 10.0.0"):
+    print("clang-format is not the required version: 10.0.0")
+    exit(1)
 
 #processing formatting
 for folder in folders:
@@ -53,5 +68,5 @@ for folder in folders:
                     print("Ignored: ", file)
                 else:
                     print("Formatting: ", file)
-                    subprocess.call(["clang-format-5.0", "-i", file])
+                    subprocess.call(["clang-format", "-i", file])
     print('*****************************************************************************\n')
