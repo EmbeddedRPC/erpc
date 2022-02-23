@@ -19,7 +19,7 @@ jobs:
       - checkout
       - run: sudo apt-get update -qq
       - run: sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev clang
-      - run: sudo pip install pytest pyyaml enum34 pyserial
+      - run: sudo pip3 install pytest pyyaml enum34 pyserial
       - run: CC=clang CXX=clang++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
@@ -30,10 +30,10 @@ jobs:
       - checkout
       - run: brew update
       - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
-      - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
-      - run: sudo pip install tornado
-      - run: sudo pip install --user nose
-      - run: sudo pip install pytest --upgrade --ignore-installed six
+      - run: curl "https://bootstrap.pypa.io/pip/get-pip.py" | sudo python3;
+      - run: sudo pip3 install tornado
+      - run: sudo pip3 install --user nose
+      - run: sudo pip3 install pytest --upgrade --ignore-installed six
       - run: CC=gcc CXX=g++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
@@ -44,10 +44,10 @@ jobs:
       - checkout
       - run: brew update
       - run: brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
-      - run: curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3;
-      - run: sudo pip install tornado
-      - run: sudo pip install --user nose
-      - run: sudo pip install pytest --upgrade --ignore-installed six
+      - run: curl "https://bootstrap.pypa.io/pip/get-pip.py" | sudo python3;
+      - run: sudo pip3 install tornado
+      - run: sudo pip3 install --user nose
+      - run: sudo pip3 install pytest --upgrade --ignore-installed six
       - run: CC=clang CXX=clang++ PYTHON=python3 make all
       - run: pushd erpcgen/test ; py.test ; popd
       - run: python3 test/run_unit_tests.py
@@ -58,5 +58,5 @@ workflows:
     jobs:
       - build-linux-gcc
       - build-linux-clang
-      # - build-mac-gcc # Mac is on going, or it can be hosted on company computer.
-      # - build-mac-clang
+      - build-mac-gcc
+      - build-mac-clang
