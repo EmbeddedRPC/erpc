@@ -125,7 +125,7 @@ else
 {% else >%}
 for (uint32_t {$info.forLoopCount} = 0U; {$info.forLoopCount} < {$info.sizeTemp}; ++{$info.forLoopCount})
 {
-    {$addIndent("    ", info.protoNext.decode(info.protoNext))}
+{$addIndent("    ", info.protoNext.decode(info.protoNext))}
 }
 {% endif >%}
 {% enddef ----------------------------------- ArrayType %}

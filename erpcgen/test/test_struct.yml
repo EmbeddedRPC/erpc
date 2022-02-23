@@ -47,11 +47,19 @@ test.h:
   - struct list_int32_1_t
 test_client.cpp:
   - write_list_int32_1_t_struct
+  - if(NULL == data)
+  - return;
   - read_list_int32_1_t_struct
+  - if(NULL == data)
+  - return;
   - ListType * bar(const ListType * x)
 test_server.cpp:
   - read_list_int32_1_t_struct
+  - if(NULL == data)
+  - return;
   - write_list_int32_1_t_struct
+  - if(NULL == data)
+  - return;
   - free_list_int32_1_t_struct
 
 ---

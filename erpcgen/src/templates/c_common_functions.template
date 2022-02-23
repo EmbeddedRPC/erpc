@@ -150,7 +150,9 @@ static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.nam
 {%   if struct.needTempVariable %}
     int32_t _tmp_local;
 {%   endif %}
+{%   if struct.needTempVariable || struct.hasNullableMember %}
 
+{%   endif %}
     if(NULL == data)
     {
         return;
@@ -408,7 +410,7 @@ if ({$info.name})
 {% def freeArray(info) %}
 for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{$info.forLoopCount})
 {
-    {$addIndent("    ", info.protoNext.freeingCall(info.protoNext))}
+{$addIndent("    ", info.protoNext.freeingCall(info.protoNext))}
 }
 {% enddef ------------------------------- freeArray %}
 
