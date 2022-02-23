@@ -71,14 +71,12 @@ else
 {% enddef ------------------------------- BinaryType %}
 
 {% def decodeEnumType(info) ---------------- EnumType %}
-if (!codec->getStatus()) {
-    codec->read(&_tmp_local);
+codec->read(&_tmp_local);
 {% if source == "client" && info.pointerScalarTypes %}
-    *{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+*{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
 {% else %}
-    {$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
 {% endif -- pointerScalarTypes %}
-}
 {% enddef ---------------------------------- EnumType %}
 
 {% def decodeListType(info) ------------------- ListType %}
@@ -127,24 +125,14 @@ else
 {% else >%}
 for (uint32_t {$info.forLoopCount} = 0U; {$info.forLoopCount} < {$info.sizeTemp}; ++{$info.forLoopCount})
 {
-{% if source == "server"%}
-    if (codec->getStatus()) {
-        break;
-    }
-{% endif >%}
-    if({$info.name})
-    {
-        {$addIndent("    ", info.protoNext.decode(info.protoNext))}
-    }
+    {$addIndent("    ", info.protoNext.decode(info.protoNext))}
 }
 {% endif >%}
 {% enddef ----------------------------------- ArrayType %}
 
 {% def decodeStructType(info) --------------- StructType %}
 {% if info.inDataContainer %}
-if (!codec->getStatus()) {
-    read_{$info.typeName}_struct(codec, &({$info.name}));
-}
+read_{$info.typeName}_struct(codec, &({$info.name}));
 {% else -- not inDataContainer %}
 read_{$info.typeName}_struct(codec, {$info.name});
 {% endif -- inDataContainer %}
@@ -277,11 +265,6 @@ codec->startWriteList({% if source == "client" && info.pointerScalarTypes %}*{% 
 {% else >%}
 for (uint32_t {$info.forLoopCount} = 0U; {$info.forLoopCount} < {% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}; ++{$info.forLoopCount})
 {
-{% if source == "server" %}
-    if (codec->getStatus()) {
-        break;
-    }
-{% endif >%}
 {$addIndent("    ", info.protoNext.encode(info.protoNext))}
 }
 {% endif >%}
