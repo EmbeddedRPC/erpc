@@ -33,7 +33,7 @@ setup(
     author="NXP",
     url='https://github.com/embeddedrpc/erpc',
     license="BSD 3-Clause",
-    install_requires=["enum34","pyserial"],
+    install_requires=[],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: BSD License",
