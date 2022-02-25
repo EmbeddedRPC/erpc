@@ -271,16 +271,17 @@ bool Semaphore::get(uint32_t timeout)
     {
         timeout = portMAX_DELAY;
     }
+    else if (timeout > (portMAX_DELAY - 1))
+    {
+        timeout = portMAX_DELAY - 1;
+    }
     else
     {
-        if (timeout > (portMAX_DELAY - 1))
-        {
-            timeout = portMAX_DELAY - 1;
-        }
+        /* Misra condition */
     }
 #endif
 
-    return (pdTRUE == xSemaphoreTake(m_sem, timeout / 1000U / portTICK_PERIOD_MS));
+    return (pdTRUE == xSemaphoreTake(m_sem, timeout));
 }
 
 int Semaphore::getCount(void) const
