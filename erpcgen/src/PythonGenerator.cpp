@@ -690,6 +690,40 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 data_map caseData;
                 caseData["name"] = unionCase->getCaseName();
                 caseData["value"] = unionCase->getCaseValue();
+                if (info.has("discriminatorType") && (info["discriminatorType"].get().get()->getmap()["type"]->getvalue() == "enum"))
+                {
+                    caseData["type"] = info["discriminatorType"];
+                }
+                else if (unionCase->getCaseName() != "")
+                {
+                    for (auto it : m_globals->getSymbolsOfType(DataType::kEnumTypeSymbol))
+                    {
+                        EnumType *enumType = dynamic_cast<EnumType *>(it);
+                        assert(enumType);
+                        for (auto itMember :enumType->getMembers())
+                        {
+                            if (unionCase->getCaseName() == itMember->getName())
+                            {
+                                data_map typeInfo;
+                                typeInfo["name"] = enumType->getName();
+                                typeInfo["type"] = "enum";
+                                caseData["type"] = typeInfo;
+                                break;
+                            }
+                        }
+                        if(caseData.has("type"))
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    data_map typeInfo;
+                    typeInfo["name"] = "";
+                    typeInfo["type"] = "";
+                    caseData["type"] = typeInfo;
+                }
                 data_list caseMembers;
                 data_map caseMembersFree;
 
