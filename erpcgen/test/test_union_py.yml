@@ -73,7 +73,7 @@ test/common.py:
   - for _i1 in range(_n1)
   - _v1 = codec.read_int32()
   - self.cc.append(_v1)
-  - elif discriminator == 10
+  - elif discriminator == returnVal
   - self.ret = codec.read_int32()
   - else # default case
   - self.c = codec.read_bool()
@@ -114,7 +114,7 @@ test/common.py:
   - codec.start_write_list(len(self.cc))
   - for _i1 in self.cc
   - codec.write_int32(_i1)
-  - elif discriminator == 10
+  - elif discriminator == returnVal
   - if self.ret is None
   - raise ValueError("self.ret is None")
   - codec.write_int32(self.ret)

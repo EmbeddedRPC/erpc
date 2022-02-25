@@ -716,6 +716,22 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                             break;
                         }
                     }
+                    if(!caseData.has("type"))
+                    {
+                        for (auto it : m_globals->getSymbolsOfType(DataType::kConstSymbol))
+                        {
+                            ConstType *constType = dynamic_cast<ConstType *>(it);
+                            assert(constType);
+                            if (unionCase->getCaseName() == constType->getName())
+                            {
+                                data_map typeInfo;
+                                typeInfo["name"] = "";
+                                typeInfo["type"] = "const";
+                                caseData["type"] = typeInfo;
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
