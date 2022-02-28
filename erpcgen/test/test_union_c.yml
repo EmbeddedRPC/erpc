@@ -28,8 +28,8 @@ test.h:
  - not: float y;
 
 test_client.cpp:
-    - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
-    - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
+  - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
+  - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
 
 test_server.cpp:
   - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
@@ -101,6 +101,8 @@ test_client.cpp:
   - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
   - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
   - "{"
+  - if(NULL == data)
+  - return;
   - codec->startWriteUnion(discriminator);
   - switch (discriminator)
   - "{"
@@ -153,6 +155,8 @@ test_server.cpp:
   - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
   - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
   - "{"
+  - if(NULL == data)
+  - return;
   - codec->startReadUnion(discriminator);
   - switch (*discriminator)
   - "{"

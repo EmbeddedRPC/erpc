@@ -150,6 +150,14 @@ static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.nam
 {%   if struct.needTempVariable %}
     int32_t _tmp_local;
 {%   endif %}
+{%   if struct.needTempVariable || struct.hasNullableMember %}
+
+{%   endif %}
+    if(NULL == data)
+    {
+        return;
+    }
+
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
     codec->readNullFlag(&isNull);
@@ -185,6 +193,11 @@ static void write_{$struct.name}_struct_shared(erpc::{$codecClass} * codec, cons
 static void write_{$struct.name}_struct(erpc::{$codecClass} * codec, const {$struct.name} * data)
 {%   endif %}
 {
+    if(NULL == data)
+    {
+        return;
+    }
+
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
     if ({$mem.coderCall.name}{$mem.structElements} == NULL)
@@ -275,6 +288,11 @@ static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * disc
     int32_t _tmp_local;
 
 {%   endif %}
+    if(NULL == data)
+    {
+        return;
+    }
+
 {$addIndent("    ", decodeUnionType(union.coderCall))}
 }
 {% enddef -- unionDeserialSource %}
@@ -289,6 +307,11 @@ static void write_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_
 static void write_{$union.name}_union(erpc::{$codecClass} * codec, int32_t discriminator, const {$union.name} * data)
 {%   endif %}
 {
+    if(NULL == data)
+    {
+        return;
+    }
+
 {$addIndent("    ", encodeUnionType(union.coderCall))}
 }
 {% enddef -- unionSerialSource %}
