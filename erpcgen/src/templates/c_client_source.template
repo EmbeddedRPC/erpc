@@ -107,7 +107,12 @@ extern ClientManager *g_client;
 {%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 
 {%   if param.isNullable %}
-{$clientIndent}    if ({$param.nullableName} != NULL{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %} && {$param.lengthName} != NULL{% endif %})
+{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %}
+{%  set lengthNameCon = ") && (" & param.lengthName & " != NULL)" >%}
+{% else %}
+{%  set lengthNameCon = "" >%}
+{% endif %}
+{$clientIndent}    if ({% if lengthNameCon != "" %}({% endif %}{$param.nullableName} != NULL{$lengthNameCon})
 {$clientIndent}    {
 {$addIndent(clientIndent & "        ", param.coderCall.decode(param.coderCall))}
         }

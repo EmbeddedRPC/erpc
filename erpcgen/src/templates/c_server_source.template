@@ -114,7 +114,7 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceCla
 #endif
 {% if serverIDName == "serviceID" %}
 {%  for callbackFunction in callbackType.functions %}
-{$serverIndent}    {% if loop.first == false %}else {% endif %}if ({$serverIDName} == {$callbackFunction.serviceId} && {$functionIDName} == {$callbackFunction.id})
+{$serverIndent}    {% if loop.first == false %}else {% endif %}if (({$serverIDName} == {$callbackFunction.serviceId}) && ({$functionIDName} == {$callbackFunction.id}))
 {$serverIndent}    {
 {$serverIndent}        {$callbackFunction.serverPrototype}
 {$serverIndent}    }
