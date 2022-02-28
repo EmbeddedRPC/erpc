@@ -18,8 +18,8 @@ A clear and concise description of any alternative solutions or features you've 
 
 **Steps you didn't forgot to do**
 
-- [] I checked if there is no related issue opened/closed.
-- [] I checked that there doesn't exist opened PR which is solving this issue.
+- [ ] I checked if there is no related issue opened/closed.
+- [ ] I checked that there doesn't exist opened PR which is solving this issue.
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
