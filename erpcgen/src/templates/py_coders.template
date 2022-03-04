@@ -111,7 +111,7 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if {$name}.{$cm.name} is None:
@@ -171,7 +171,7 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if not {$codec}.read_null_flag()
