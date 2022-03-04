@@ -129,7 +129,7 @@ class {$s.name}(object):
 {% if not empty(group.symbolsMap.unions) %}
 
 # Unions data types declarations
-{% for u in group.symbolsMap.unions %}
+{% for u in group.symbolsMap.unions if u.type.isNonEncapsulatedUnion %}
 {$>(u.mlComment or u.ilComment)}
 class {$u.name}(object):
 {%  for c in u.type.cases %}
