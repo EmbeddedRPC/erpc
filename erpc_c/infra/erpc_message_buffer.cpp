@@ -22,20 +22,22 @@ using namespace std;
 
 erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
 {
-    erpc_status_t err;
+    erpc_status_t err = kErpcStatus_Success;
 
-    if ((offset + length) > m_len)
+    if (length > 0U)
     {
-        err = kErpcStatus_BufferOverrun;
-    }
-    else
-    {
-        if (length > 0U)
+        if (data == NULL)
+        {
+            err = kErpcStatus_MemoryError;
+        }
+        else if ((offset + length) > m_len || (offset + length) < offset)
+        {
+            err = kErpcStatus_BufferOverrun;
+        }
+        else
         {
             (void)memcpy(data, &m_buf[offset], length);
         }
-
-        err = kErpcStatus_Success;
     }
 
     return err;
@@ -43,20 +45,22 @@ erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
 
 erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t length)
 {
-    erpc_status_t err;
+    erpc_status_t err = kErpcStatus_Success;
 
-    if ((offset + length) > m_len)
+    if (length > 0U)
     {
-        err = kErpcStatus_BufferOverrun;
-    }
-    else
-    {
-        if (length > 0U)
+        if (data == NULL)
+        {
+            err = kErpcStatus_MemoryError;
+        }
+        else if ((offset + length) > m_len || (offset + length) < offset)
+        {
+            err = kErpcStatus_BufferOverrun;
+        }
+        else
         {
             (void)memcpy(m_buf, data, length);
         }
-
-        err = kErpcStatus_Success;
     }
 
     return err;
@@ -64,17 +68,20 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
 
 erpc_status_t MessageBuffer::copy(const MessageBuffer *other)
 {
+    erpc_status_t err;
+
+    erpc_assert(other != NULL);
     erpc_assert(m_len >= other->m_len);
 
     m_used = other->m_used;
-    (void)memcpy(m_buf, other->m_buf, m_used);
+    err = this->write(0, other->m_buf, m_used);
 
-    return kErpcStatus_Success;
+    return err;
 }
 
 void MessageBuffer::swap(MessageBuffer *other)
 {
-    erpc_assert(other);
+    erpc_assert(other != NULL);
 
     MessageBuffer temp(*other);
 
@@ -88,6 +95,8 @@ void MessageBuffer::swap(MessageBuffer *other)
 
 void MessageBuffer::Cursor::set(MessageBuffer *buffer)
 {
+    erpc_assert(buffer != NULL);
+
     m_buffer = buffer;
     // RPMSG when nested calls are enabled can set NULL buffer.
     // erpc_assert(buffer->get() && "Data buffer wasn't set to MessageBuffer.");
@@ -100,23 +109,24 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 {
     erpc_assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
 
-    erpc_status_t err;
+    erpc_status_t err = kErpcStatus_Success;
 
-    if ((length > 0U) && (data == NULL))
+    if (length > 0)
     {
-        err = kErpcStatus_MemoryError;
-    }
-    else if (length > m_remaining)
-    {
-        err = kErpcStatus_BufferOverrun;
-    }
-    else
-    {
-        (void)memcpy(data, m_pos, length);
-        m_pos += length;
-        m_remaining -= length;
-
-        err = kErpcStatus_Success;
+        if (data == NULL)
+        {
+            err = kErpcStatus_MemoryError;
+        }
+        else if (length > m_remaining)
+        {
+            err = kErpcStatus_BufferOverrun;
+        }
+        else
+        {
+            (void)memcpy(data, m_pos, length);
+            m_pos += length;
+            m_remaining -= length;
+        }
     }
 
     return err;
@@ -126,24 +136,25 @@ erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
     erpc_assert(m_pos && "Data buffer wasn't set to MessageBuffer.");
 
-    erpc_status_t err;
+    erpc_status_t err = kErpcStatus_Success;
 
-    if ((length > 0U) && (data == NULL))
+    if (length > 0)
     {
-        err = kErpcStatus_MemoryError;
-    }
-    else if (length > m_remaining)
-    {
-        err = kErpcStatus_BufferOverrun;
-    }
-    else
-    {
-        (void)memcpy(m_pos, data, length);
-        m_pos += length;
-        m_remaining -= length;
-        m_buffer->setUsed(m_buffer->getUsed() + length);
-
-        err = kErpcStatus_Success;
+        if (data == NULL)
+        {
+            err = kErpcStatus_MemoryError;
+        }
+        else if (length > m_remaining)
+        {
+            err = kErpcStatus_BufferOverrun;
+        }
+        else
+        {
+            (void)memcpy(m_pos, data, length);
+            m_pos += length;
+            m_remaining -= length;
+            m_buffer->setUsed(m_buffer->getUsed() + length);
+        }
     }
 
     return err;
