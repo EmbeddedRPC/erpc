@@ -59,7 +59,7 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
         }
         else
         {
-            (void)memcpy(m_buf, data, length);
+            (void)memcpy(&m_buf[offset], data, length);
         }
     }
 
