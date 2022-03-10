@@ -91,10 +91,10 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the [LICENSE f
 [Example IDL](examples/README.md) is available in the `examples/` folder.
 
 Plenty of eRPC multicore and multiprocessor examples can be also found in NXP MCUXpressoSDK packages. Visit [https://mcuxpresso.nxp.com](https://mcuxpresso.nxp.com) to configure, build and download these packages.<br>
-To get the board list with multicore support (eRPC included) use filtering based on Middleware and search for 'multicore' string. Once the selected package with the multicore middleware is downloaded, see<br> 
+To get the board list with multicore support (eRPC included) use filtering based on Middleware and search for 'multicore' string. Once the selected package with the multicore middleware is downloaded, see<br>
 <MCUXpressoSDK_install_dir>/boards/<board_name>/multicore_examples for eRPC multicore examples (RPMsg_Lite or Messaging Unit transports used) or<br>
 <MCUXpressoSDK_install_dir>/boards/<board_name>/multiprocessor_examples for eRPC multiprocessor examples (UART or SPI transports used).<br>
-eRPC examples use the 'erpc_' name prefix. 
+eRPC examples use the 'erpc_' name prefix.
 
 Another way of getting NXP MCUXpressoSDK eRPC multicore and multiprocessor examples is using the [mcux-sdk](https://github.com/NXPmicro/mcux-sdk) Github repo. Follow the description how to use the West tool
 to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/NXPmicro/mcux-sdk#overview). Once done the armgcc eRPC examples can be found in<br>
@@ -157,7 +157,7 @@ Install these packages:
 * flex: A fast lexical analyzer generator
 * libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.65.0)
 * make: the GNU version of the 'make' utility
-* python: Python language interpreter (either 2.7 or 3.5+ work)
+* python: Python language interpreter 3.6+ work
 * gcc-7: GNU C compiler (recommended version)
 * g++-7: GNU C++ compiler (recommended version)
 

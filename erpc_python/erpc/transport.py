@@ -2,16 +2,23 @@
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
 # Copyright 2016-2021 NXP
+# Copyright 2022 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 import struct
-import serial
 import socket
 import threading
 from .crc16 import Crc16
 from .client import RequestError
+
+try:
+    import serial
+    SerialReady = True
+except ImportError:
+    SerialReady = False
+
 try:
     from rpmsg.sysfs import RpmsgEndpoint
     RpmsgEndpointReady = True
@@ -94,6 +101,8 @@ class FramedTransport(Transport):
 class SerialTransport(FramedTransport):
     def __init__(self, url, baudrate, **kwargs):
         super(SerialTransport, self).__init__()
+        if not SerialReady:
+            raise ImportError("Please, install pySerial module (sudo pip3 install pyserial).")
         self._url = url
         self._serial = serial.serial_for_url(url, baudrate=baudrate, **kwargs) # 8N1 by default
 
@@ -166,8 +175,7 @@ class TCPTransport(FramedTransport):
 class RpmsgTransport(Transport):
     def __init__(self, ept_addr_local = None, ept_addr_remote = None, channel_name = None):
         if not RpmsgEndpointReady:
-            print("Please, install RPMsg from: https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-python")
-            raise ImportError
+            raise ImportError("Please, install RPMsg from: https://github.com/EmbeddedRPC/erpc-imx-demos/tree/master/middleware/rpmsg-python")
 
         if ept_addr_local is None:
             ept_addr_local = RpmsgEndpoint.LOCAL_DEFAULT_ADDRESS
@@ -200,8 +208,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
         super(LIBUSBSIOSPITransport, self).__init__()
 
         if not LIBUSBSIOReady:
-            print("Please, install LIBUSBSIO module")
-            raise ImportError
+            raise ImportError("Please, install LIBUSBSIO module")
 
         if baudrate is None:
             baudrate = 500000
@@ -253,10 +260,10 @@ class LIBUSBSIOSPITransport(FramedTransport):
         max_num_bytes = self.sio.GetMaxDataSize ()
         print('Max number of bytes supported for I2C/SPI transfers: %d \r\n' % max_num_bytes)
 
-        # Call SPI_Open and store the _hSPIPort handler 
+        # Call SPI_Open and store the _hSPIPort handler
         self._hSPIPort = self.sio.SPI_Open (int(self._baudrate), portNum=0, dataSize=8, preDelay=0)
 
-        # Configure GPIO pin for SPI master-slave signalling 
+        # Configure GPIO pin for SPI master-slave signalling
         res = self.sio.GPIO_ConfigIOPin (self._gpioport, self._gpiopin, self._gpiomode)
         print('GPIO_ConfigIOPin res: %d \r\n' % res)
         res = self.sio.GPIO_SetPortInDir (self._gpioport, self._gpiopin)
@@ -271,7 +278,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
         self._hSIOPort = None
 
     def _base_send(self, message):
-        # Wait for SPI master-slave signalling GPIO pin to be in low state 
+        # Wait for SPI master-slave signalling GPIO pin to be in low state
         res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
             res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
@@ -303,8 +310,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         super(LIBUSBSIOI2CTransport, self).__init__()
 
         if not LIBUSBSIOReady:
-            print("Please, install LIBUSBSIO module")
-            raise ImportError
+            raise ImportError("Please, install LIBUSBSIO module")
 
         if baudrate is None:
             baudrate = 100000
@@ -354,10 +360,10 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         max_num_bytes = self.sio.GetMaxDataSize ()
         print('Max number of bytes supported for SPI/I2C transfers: %d \r\n' % max_num_bytes)
 
-        # Call I2C_Open and store the _hI2CPort handler 
+        # Call I2C_Open and store the _hI2CPort handler
         self._hI2CPort = self.sio.I2C_Open (int(self._baudrate), 0, 0)
 
-        # Configure GPIO pin for I2C master-slave signalling 
+        # Configure GPIO pin for I2C master-slave signalling
         res = self.sio.GPIO_ConfigIOPin (self._gpioport, self._gpiopin, self._gpiomode)
         print('GPIO_ConfigIOPin res: %d \r\n' % res)
         res = self.sio.GPIO_SetPortInDir (self._gpioport, self._gpiopin)
@@ -372,7 +378,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         self._hSIOPort = None
 
     def _base_send(self, message):
-        # Wait for I2C master-slave signalling GPIO pin to be in low state 
+        # Wait for I2C master-slave signalling GPIO pin to be in low state
         res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
             res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
@@ -386,7 +392,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             print('I2C transfer error: %d' % rxbytesnumber)
 
     def _base_receive(self, count):
-        # Wait for I2C master-slave signalling GPIO pin to be in low state 
+        # Wait for I2C master-slave signalling GPIO pin to be in low state
         res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
         while (1 == res):
             res = self.sio.GPIO_GetPin (self._gpioport, self._gpiopin)
@@ -399,4 +405,3 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             #print('I2C transfer error: %d' % rxbytesnumber)
             res = self._hI2CPort.Reset ()
             return b"\00" * count
- 

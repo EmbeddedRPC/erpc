@@ -2,6 +2,7 @@
 
 # Copyright (c) 2016 Freescale Semiconductor, Inc.
 # Copyright 2016-2019 NXP
+# Copyright 2022 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -33,7 +34,7 @@ setup(
     author="NXP",
     url='https://github.com/embeddedrpc/erpc',
     license="BSD 3-Clause",
-    install_requires=["enum34","pyserial"],
+    install_requires=[],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: BSD License",
