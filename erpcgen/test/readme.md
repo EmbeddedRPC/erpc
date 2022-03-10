@@ -1,5 +1,4 @@
-erpcgen test system
-===================
+# erpcgen test system
 
 This file documents the parser and output test system for erpcgen.
 
@@ -8,22 +7,20 @@ py.test in `erpc/erpcgen/test/` directory. It's safer to run py.test with parame
 directory (from erpcgen directory run: "pytest test"). This prevent on windows to execute
 boost test in boost folder.
 
-
-Setup
------
+## Setup
 
 Python 3.6+ is required.
 
 py.test(**Version 5.0.0-**) and pyYAML are required to run the tests. These can be installed via pip.
 
-    pip install pytest pyyaml
+```sh
+pip3 install pytest pyyaml
+```
 
 Make sure you have an erpcgen executable available. Either build it via the makefiles, or build
 the VisualStudio project.
 
-
-Running
--------
+## Running
 
 Run the tests by running the py.test executable.  The tests can be run from either the
 `erpc/erpcgen/` or `erpc/erpcgen/test/` directories.
@@ -36,9 +33,7 @@ There is one erpcgen-specific command line option, `--erpcgen-verbosity` or `--e
 set the number of `-v` arguments that are passed to erpcgen calls. Specify an integer from 1 to 3,
 such as `--ev=3`. Default verbosity is 0.
 
-
-Config
-------
+## Config
 
 The tests use a config file. The standard config is `erpc/erpcgen/test/config.py`. It tries to
 figure out the erpcgen executable location based on the OS. If you need to override this, you can
@@ -53,9 +48,7 @@ Config variables:
 The `ERPCGEN` and `CC` config variables can also be overridden with an environment variables of the
 same name.
 
-
-Output
-------
+## Output
 
 The files associated with test runs are stored in numbered directories under `erpc/erpcgen/test/runs/`.
 By default, only the most recent 4 test runs are retained. See the `RUN_KEEP_COUNT` config variable.
@@ -63,7 +56,7 @@ A symlink called 'latest' is maintained to point at the most recent test run.
 
 Test cases are stored in a hierarchy of directories under the test run directory:
 
-    erpc/erpcgen/test/runs/<run#>/<yaml>/<spec>/[<params>]
+`erpc/erpcgen/test/runs/<run#>/<yaml>/<spec>/[<params>]`
 
 The "`<params>`" directory is added only if the test is parametrized. It will have a name based on
 the unique set of parameter values for the test case.
@@ -80,9 +73,7 @@ case directory. This is useful for debugging issues.
 For C language test cases, an `objects/` directory is created in the test case directory. It holds
 compilation test inputs and outputs.
 
-
-Test specs
-----------
+## Test specs
 
 All .yml files in `erpc/erpcgen/test/` whose names begin with "test" are processed for test
 specifications. Spec files can also be placed into subdirectories of `erpc/erpcgen/test/`, as long as
@@ -118,23 +109,23 @@ Filenames listed in the spec dictionary are relative to the `output/` directory 
 the filenames are lists of test patterns that must all match against the file under which they are
 listed for the test case to pass.
 
-A basic test specification looks like this:
+A basic test specification looks like this
 
-    ---
-    name: quit_fn
-    idl: |
-      interface xyz {
-        oneway quit()
-      }
-    test.h:
-      - void quit(void)
+```yml
+---
+name: quit_fn
+idl: |
+    interface xyz {
+    oneway quit()
+    }
+test.h:
+    - void quit(void)
+```
 
 This spec says to generate C output for the given IDL. It will match the string "`void quit(void)`"
 against the `test.h` output file. If that string is found, the test will pass.
 
-
-Test patterns
--------------
+## Test patterns
 
 Under each output filename in the test spec dictionary is a list of test patterns.
 
@@ -153,8 +144,10 @@ or double quotes. The same applies to patterns beginning with an open or close b
 A pattern case be made a regular expression by turning it into a dict with a single `re` key. For
 example:
 
-    - test.h:
-        - re: somevar[a-z]+
+```yml
+- test.h:
+    - re: somevar[a-z]+
+```
 
 You must remember to escape all regex control characters with a backslash if you wish to match them
 literally.
@@ -172,9 +165,11 @@ pattern as a literal match while the latter a regex.
 
 Example:
 
-    - test/common.py:
-        - not: class Foo
-        - A = 1
+```yml
+- test/common.py:
+    - not: class Foo
+    - A = 1
+```
 
 Not patterns are searched for slightly differently than other patterns. Instead of searching to
 the end of the file, not patterns are searched for within the range of the match positions of the
@@ -187,20 +182,20 @@ In the example above, the "`not: class Foo`" pattern is searched for from the st
 
 Consider this example:
 
-    - test/common.py:
-        - import erpc
-        - not: class Foo
-        - not_re: A = [0-9]+
-        - B = 1
+```yml
+- test/common.py:
+    - import erpc
+    - not: class Foo
+    - not_re: A = [0-9]+
+    - B = 1
+```
 
 Here, both not pattern searches range from the last matching character of the positive
 "`import erpc`" pattern to the first matching character of the "`B = 1`" pattern. This example
 also shows a `not_re` pattern that requires a regular expression to not match within the search
 range.
 
-
-Parametrization
----------------
+## Parametrizatio
 
 If the test spec dictionary has a `params` key, then the spec will be parametrized. The `params`
 key must have a dictionary value with parameter names for keys. Under each of the parameter names
@@ -208,6 +203,7 @@ must be a list of values.
 
 Here's an example valid `params` dict and IDL that uses the params:
 
+```yml
     params:
         type:
             - string
@@ -219,6 +215,7 @@ Here's an example valid `params` dict and IDL that uses the params:
         struct Foo {
             {type}[{length}] my_array
         }
+```
 
 A parametrized test generates test cases for all permutations of parameter values. In the above
 examples, 4 test cases would be created for the 4 combinations of _type_ and _length_ param values.
@@ -253,22 +250,22 @@ used only if the if predicate evaluates to false.
 
 Example if-then pattern:
 
-    test/common.py:
-      - if: type=="string"    # type is a param
-        then:
-          - start_read_list
-          - re: read_[a-z]+     # regex test pattern
-          - end_read_list
-        else:
-          - read_string
+```yml
+test/common.py:
+    - if: type=="string"    # type is a param
+    then:
+        - start_read_list
+        - re: read_[a-z]+     # regex test pattern
+        - end_read_list
+    else:
+        - read_string
+```
 
 If-then patterns can be nested, and include regex and not patterns as shown in the example above.
 However, "else if" expressions are not supported. If you need an "else if", you can use multiple
 if-then patterns.
 
-
-Compilation testing
--------------------
+## Compilation testing
 
 The erpcgen output from each of the test cases is run through the C/C++ compiler or Python. This is
 done only to test syntax. The code is not linked into an executable.
@@ -279,7 +276,7 @@ compile. These files test that the common generated header file can successfully
 the C and C++ compilers. The `objects/` directory also contains .o files written by the compiler.
 
 For Python test cases, the generated package is loaded and compiled. Each of the modules within the
-package are also loaded and compiled excplicitly. Loading is done directly within the Python
+package are also loaded and compiled explicitly. Loading is done directly within the Python
 executable running py.test.
 
 The `CC` config variable is used for the path to the C/C++ compiler. The default value is simply
@@ -287,9 +284,7 @@ The `CC` config variable is used for the path to the C/C++ compiler. The default
 
 Compilation testing is not currently performed on Windows systems.
 
-
-Tips for writing test specs
----------------------------
+## Tips for writing test specs
 
 1. Keep each test spec simple and focused.
 2. Test only one feature at a time.
@@ -306,13 +301,3 @@ Tips for writing test specs
 8. Complex tests can be written that test multiple features, but these should be written only after
    the individual features are thoroughly covered.
 9. Use YAML literal block scalars for the IDL so whitespace is not compressed in `test.erpc` files.
-
-
-Todo
-----
-
-- Support negative tests with invalid IDL syntax
-    - Match against erpcgen stdout
-- Compile tests working on Windows
-- Warn if test case names are not unique
-- Collect code coverage data for erpcgen

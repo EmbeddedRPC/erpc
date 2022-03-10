@@ -21,9 +21,9 @@
 
 ## Add more language features
 
-* To add features such as intellisense, hovers and validators check out the VS Code extenders documentation at https://code.visualstudio.com/docs
+* To add features such as intellisense, hovers and validators check out the VS Code extenders documentation at [code.visualstudio.com/docs](https://code.visualstudio.com/docs)
 
 ## Install your extension
 
 * To start using your extension with Visual Studio Code copy it into the `<user home>/.vscode/extensions` folder and restart Code.
-* To share your extension with the world, read on https://code.visualstudio.com/docs about publishing an extension.
+* To share your extension with the world, read on [code.visualstudio.com/docs](https://code.visualstudio.com/docs) about publishing an extension.
