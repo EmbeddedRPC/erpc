@@ -1,10 +1,9 @@
 # erpc-code-style README
 
-This exension formats code for eRPC related files. More about eRPC project is described on webpage: https://github.com/EmbeddedRPC/erpc
+This exension formats code for eRPC related files. More about eRPC project is described on webpage: [github.com/EmbeddedRPC/erpc](https://github.com/EmbeddedRPC/erpc)
 
 This extension was created thankfully this page and author of post:
-https://gcthesoftwareengineer.com/2017/01/how-to-create-custom-syntax-highlighting-in-a-visual-studio-code-extension/
-
+[gcthesoftwareengineer.com/2017/01/how-to-create-custom-syntax-highlighting-in-a-visual-studio-code-extension/](https://gcthesoftwareengineer.com/2017/01/how-to-create-custom-syntax-highlighting-in-a-visual-studio-code-extension/)
 
 ## Features
 
@@ -15,7 +14,6 @@ eRPC IDL example:
 
 template example:
 ![cpptemplate example](img/templatePic.png)
-
 
 ## Requirements
 
@@ -31,8 +29,10 @@ template example:
 
 ## Release Notes
 
+--
 
 ### 1.0.0
 
 Initial release
- - Covering most of usecases. Still some need be covered.
+
+- Covering most of usecases. Still some need be covered.
