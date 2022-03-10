@@ -12,7 +12,7 @@ boost test in boost folder.
 Setup
 -----
 
-Python 2.7.x is required. It will also work with Python 3.5+.
+Python 3.6+ is required.
 
 py.test(**Version 5.0.0-**) and pyYAML are required to run the tests. These can be installed via pip.
 
@@ -316,5 +316,3 @@ Todo
 - Compile tests working on Windows
 - Warn if test case names are not unique
 - Collect code coverage data for erpcgen
-
-
