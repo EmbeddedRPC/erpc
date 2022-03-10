@@ -6,7 +6,7 @@ codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
 {$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {%   if generateAllocErrorChecks == true %}
-if ({$info.name} == NULL)
+if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
 {
     codec->updateStatus(kErpcStatus_MemoryError);
 }
@@ -38,7 +38,7 @@ codec->readBinary(&{$info.sizeTemp}, &{$info.dataTemp});
 {%  if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
-if ({$info.sizeTemp} <= {$info.maxSize})
+if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 {
 {%   set indent = "    " >%}
 {% else %}

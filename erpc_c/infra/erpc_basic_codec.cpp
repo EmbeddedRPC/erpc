@@ -296,13 +296,13 @@ void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
         }
         else
         {
-            *length = 0;
             m_status = kErpcStatus_BufferOverrun;
         }
     }
-    else
+    if (!isStatusOk())
     {
         *length = 0;
+        *value = NULL;
     }
 }
 
@@ -350,6 +350,7 @@ void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, f
         }
         else
         {
+            *callback = NULL;
             m_status = kErpcStatus_UnknownCallback;
         }
     }
