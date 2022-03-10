@@ -256,9 +256,21 @@ void Semaphore::put(void)
     tx_semaphore_put(&m_sem);
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t usecs)
 {
-    UINT status = tx_semaphore_get(&m_sem, timeout);
+    if (usecs != kWaitForever)
+    {
+        if (usecs > 0U)
+        {
+            usecs /= 1000U;
+            if (usecs == 0U)
+            {
+                usecs = 1U;
+            }
+        }
+    }
+
+    UINT status = tx_semaphore_get(&m_sem, usecs);
     return (status == TX_SUCCESS);
 }
 

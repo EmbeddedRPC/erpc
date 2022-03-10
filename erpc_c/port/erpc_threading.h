@@ -140,7 +140,7 @@ public:
     /*!
      * @brief This function puts thread to sleep.
      *
-     * @param[in] usecs Time for sleeping.
+     * @param[in] usecs Time for sleeping in [us].
      */
     static void sleep(uint32_t usecs);
 
@@ -477,12 +477,12 @@ public:
     /*!
      * @brief This function get semaphore.
      *
-     * @param[in] timeout Time how long can wait for getting semaphore.
+     * @param[in] usecs Time how long can wait for getting semaphore in [us].
      *
      * @retval true When semaphore got successfully.
      * @retval false When mutex didn't get.
      */
-    bool get(uint32_t timeout = kWaitForever);
+    bool get(uint32_t usecs = kWaitForever);
 
     /*!
      * @brief This function returns semaphore count number.
