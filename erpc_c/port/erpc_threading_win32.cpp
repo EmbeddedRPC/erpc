@@ -194,21 +194,21 @@ void Semaphore::put(void)
     m_mutex.unlock();
 }
 
-bool Semaphore::get(uint32_t usecs)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
-    if (usecs != kWaitForever)
+    if (timeoutUsecs != kWaitForever)
     {
-        if (usecs > 0U)
+        if (timeoutUsecs > 0U)
         {
-            usecs /= 1000U;
-            if (usecs == 0U)
+            timeoutUsecs /= 1000U;
+            if (timeoutUsecs == 0U)
             {
-                usecs = 1U;
+                timeoutUsecs = 1U;
             }
         }
     }
 
-    DWORD ret = WaitForSingleObject(m_sem, usecs);
+    DWORD ret = WaitForSingleObject(m_sem, timeoutUsecs);
     m_mutex.lock();
     --m_count;
     m_mutex.unlock();

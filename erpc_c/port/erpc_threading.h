@@ -477,12 +477,12 @@ public:
     /*!
      * @brief This function get semaphore.
      *
-     * @param[in] usecs Time how long can wait for getting semaphore in [us].
+     * @param[in] timeoutUsecs Time how long can wait for getting semaphore in [us].
      *
      * @retval true When semaphore got successfully.
      * @retval false When mutex didn't get.
      */
-    bool get(uint32_t usecs = kWaitForever);
+    bool get(uint32_t timeoutUsecs = kWaitForever);
 
     /*!
      * @brief This function returns semaphore count number.
