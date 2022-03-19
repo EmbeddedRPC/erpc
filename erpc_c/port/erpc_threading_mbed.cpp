@@ -218,9 +218,21 @@ void Semaphore::put(void)
     m_sem->release();
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
-    m_count = m_sem->wait(timeout);
+    if (timeoutUsecs != kWaitForever)
+    {
+        if (timeoutUsecs > 0U)
+        {
+            timeoutUsecs /= 1000U;
+            if (timeoutUsecs == 0U)
+            {
+                timeoutUsecs = 1U;
+            }
+        }
+    }
+
+    m_count = m_sem->wait(timeoutUsecs);
     return (m_count < 0);
 }
 

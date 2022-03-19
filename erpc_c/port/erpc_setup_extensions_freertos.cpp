@@ -28,7 +28,7 @@ void erpc::erpc_pre_cb_default(void)
     (void)s_erpc_call_in_progress->get(s_erpc_call_in_progress->kWaitForever);
     erpc_assert(s_erpc_call_timer_cb &&
            "If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default.");
-    xTimerStart(s_erpc_call_timer_cb, 0);
+    (void)xTimerStart(s_erpc_call_timer_cb, 0);
 }
 
 void erpc::erpc_post_cb_default(void)

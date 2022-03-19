@@ -130,9 +130,21 @@ void Semaphore::put(void)
     k_sem_give(&m_sem);
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
-    return (k_sem_take(&m_sem, timeout / 1000) == 0);
+    if (timeoutUsecs != kWaitForever)
+    {
+        if (timeoutUsecs > 0U)
+        {
+            timeoutUsecs /= 1000U;
+            if (timeoutUsecs == 0U)
+            {
+                timeoutUsecs = 1U;
+            }
+        }
+    }
+
+    return (k_sem_take(&m_sem, timeoutUsecs) == 0);
 }
 
 int Semaphore::getCount(void) const

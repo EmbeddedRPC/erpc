@@ -185,7 +185,7 @@ void Semaphore::put(void)
     ++m_count;
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
     Mutex::Guard guard(m_mutex);
     bool retVal = true;
@@ -193,7 +193,7 @@ bool Semaphore::get(uint32_t timeout)
 
     while (m_count == 0)
     {
-        if (timeout == kWaitForever)
+        if (timeoutUsecs == kWaitForever)
         {
             err = pthread_cond_wait(&m_cond, m_mutex.getPtr());
             if (err != 0)
@@ -204,14 +204,14 @@ bool Semaphore::get(uint32_t timeout)
         }
         else
         {
-            if (timeout > 0U)
+            if (timeoutUsecs > 0U)
             {
                 // Create an absolute timeout time.
                 struct timeval tv;
                 gettimeofday(&tv, NULL);
                 struct timespec wait;
-                wait.tv_sec = tv.tv_sec + (timeout / sToUs);
-                wait.tv_nsec = (timeout % sToUs) * 1000U;
+                wait.tv_sec = tv.tv_sec + (timeoutUsecs / sToUs);
+                wait.tv_nsec = (timeoutUsecs % sToUs) * 1000U;
                 err = pthread_cond_timedwait(&m_cond, m_mutex.getPtr(), &wait);
                 if (err != 0)
                 {
