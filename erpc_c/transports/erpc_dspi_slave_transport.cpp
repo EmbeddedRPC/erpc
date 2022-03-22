@@ -122,8 +122,8 @@ erpc_status_t DspiSlaveTransport::init(void)
 
     DSPI_SlaveGetDefaultConfig(&dspiConfig);
 
-    DSPI_SlaveInit(m_spiBaseAddr, &dspiConfig);
-    DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, DSPI_SlaveUserCallback, NULL);
+    (void)DSPI_SlaveInit(m_spiBaseAddr, &dspiConfig);
+    (void)DSPI_SlaveTransferCreateHandle(m_spiBaseAddr, &s_handle, DSPI_SlaveUserCallback, NULL);
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpiSlaveTransport_NotifyTransferGpioInit();
@@ -136,7 +136,7 @@ erpc_status_t DspiSlaveTransport::init(void)
 erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     status_t status;
-    dspi_transfer_t slaveXfer;
+    dspi_transfer_t slaveXfer = { 0 };
 
     slaveXfer.txData = NULL;
     slaveXfer.rxData = data;
@@ -172,7 +172,7 @@ erpc_status_t DspiSlaveTransport::underlyingReceive(uint8_t *data, uint32_t size
 erpc_status_t DspiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     status_t status;
-    dspi_transfer_t slaveXfer;
+    dspi_transfer_t slaveXfer = { 0 };
     s_isTransferCompleted = false;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
