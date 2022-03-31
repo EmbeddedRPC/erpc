@@ -212,8 +212,11 @@ Codec *ClientManager::createBufferAndCodec(void)
 
 void ClientManager::releaseRequest(RequestContext &request)
 {
-    m_messageFactory->dispose(request.getCodec()->getBuffer());
-    m_codecFactory->dispose(request.getCodec());
+    if (request.getCodec() != NULL)
+    {
+        m_messageFactory->dispose(request.getCodec()->getBuffer());
+        m_codecFactory->dispose(request.getCodec());
+    }
 }
 
 void ClientManager::callErrorHandler(erpc_status_t err, uint32_t functionID)
