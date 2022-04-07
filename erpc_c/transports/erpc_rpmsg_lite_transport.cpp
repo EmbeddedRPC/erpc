@@ -134,9 +134,7 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
                 ready_cb();
             }
 
-            while (0 == rpmsg_lite_is_link_up(s_rpmsg))
-            {
-            }
+            rpmsg_lite_wait_for_link_up(s_rpmsg);
 
             m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_rpmsg_ept_context);
             if (m_rpmsg_ept == RL_NULL)
