@@ -15,6 +15,7 @@
 #include "Symbol.h"
 #include "annotations.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <sstream>
 
