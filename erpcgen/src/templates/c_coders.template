@@ -6,7 +6,7 @@ codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
 {$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {%   if generateAllocErrorChecks == true %}
-if ({$info.name} == NULL)
+if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
 {
     codec->updateStatus(kErpcStatus_MemoryError);
 }
@@ -38,7 +38,7 @@ codec->readBinary(&{$info.sizeTemp}, &{$info.dataTemp});
 {%  if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
-if ({$info.sizeTemp} <= {$info.maxSize})
+if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 {
 {%   set indent = "    " >%}
 {% else %}
@@ -47,7 +47,7 @@ if ({$info.sizeTemp} <= {$info.maxSize})
 {% if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = (uint8_t *) erpc_malloc({$info.maxSize} * sizeof(uint8_t));
 {%  if generateAllocErrorChecks == true %}
-{$indent}if ({$info.name} == NULL)
+{$indent}if (({$info.name} == NULL) && ({$info.sizeTemp} > 0))
 {$indent}{
 {$indent}    codec->updateStatus(kErpcStatus_MemoryError);
 {$indent}}
@@ -100,7 +100,7 @@ if ({$info.sizeTemp} <= {$info.maxSize})
 {%  if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = ({$info.mallocType}) erpc_malloc({$info.maxSize} * sizeof({$info.mallocSizeType}));
 {%   if generateAllocErrorChecks == true %}
-{$indent}if ({$info.name} == NULL)
+{$indent}if (({$info.name} == NULL) && ({$info.sizeTemp} > 0))
 {$indent}{
 {$indent}    codec->updateStatus(kErpcStatus_MemoryError);
 {$indent}}
@@ -147,7 +147,7 @@ read_{$info.typeName}_union(codec, &_tmp_local, &{$info.name});
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
-{%  endif -- castDiscriminator%}
+{%  endif -- castDiscriminator %}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
 read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
@@ -156,7 +156,7 @@ read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
-{%  endif  -- castDiscriminator%}
+{%  endif  -- castDiscriminator %}
 {% endif -- inDataContainer %}
 {% enddef -------------------------- UnionParamType %}
 
@@ -168,11 +168,7 @@ codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral != "
 switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}{$info.discriminatorName})
 {
 {% for case in info.cases %}
-{%  if case.name == "default" %}
-    default:
-{%  else %}
-    case {% if case.name != "" %}{$case.name}{% else %}{$case.value}{%  endif %}:
-{%  endif -- default or case %}
+    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{%  endif %}:
     {
 {%  for member in case.members %}
 {% if source == "server" %}
@@ -210,17 +206,17 @@ read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.name});
 {$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
-{%    endif -- castDiscriminator%}
+{%    endif -- castDiscriminator %}
 {%   else -- not inDataContainer %}
 {%    if info.castDiscriminator %}
 read_{$info.sharedType}_union_shared(codec, &_tmp_local, {$info.name});
 {%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
-{%    endif  -- castDiscriminator%}
+{%    endif  -- castDiscriminator %}
 {%   endif -- inDataContainer %}
-{%  endif%}
-{% endif%}
+{%  endif %}
+{% endif %}
 {% enddef -------------------------- SharedType %}
 
 {% def decodeData(info) -------------------%}
@@ -295,11 +291,7 @@ codec->startWriteUnion({% if info.castDiscriminator %}static_cast<int32_t>({% en
 switch ({$info.dataLiteral}{$info.discriminatorName})
 {
 {% for case in info.cases %}
-{%  if case.name == "default" %}
-    default:
-{%  else %}
-    case {% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
-{%  endif -- default or case %}
+    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
     {
 {%  for member in case.members %}
 {$> addIndent("        ", member.coderCall.encode(member.coderCall))}
@@ -320,16 +312,16 @@ codec->writeCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount},
 
 {% def encodeSharedType(info) %}
 {% if sharedMemBeginAddr != "" %}
-if ({$info.name} >= ERPC_SHARED_MEMORY_BEGIN && {$info.name} <= ERPC_SHARED_MEMORY_END)
+if (({$info.name} >= ERPC_SHARED_MEMORY_BEGIN) && ({$info.name} <= ERPC_SHARED_MEMORY_END))
 {
-    codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
+    codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{% endif %}{$info.name}));
 }
 else
 {
     codec->updateStatus(kErpcStatus_MemoryError);
 }
 {% else %}
-codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{%endif%}{$info.name}));
+codec->writePtr(reinterpret_cast<uintptr_t>({%if source == "client" && info.InoutOutDirection %}*{% endif %}{$info.name}));
 {% endif %}
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}
@@ -344,8 +336,8 @@ write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static
 {%   else -- not inDataContainer %}
 write_{$info.typeName}_union_shared(codec, {% if info.castDiscriminator %}static_cast<int32_t>({% endif %}{% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}{% if info.castDiscriminator %}){% endif %}, {$info.name});
 {%   endif -- inDataContainer %}
-{%  endif%}
-{% endif%}
+{%  endif %}
+{% endif %}
 {% enddef -------------------------- SharedType %}
 
 {% def encodeData(info) -------------------%}

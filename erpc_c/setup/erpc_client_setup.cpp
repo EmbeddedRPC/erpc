@@ -9,7 +9,6 @@
  */
 
 #include "erpc_client_setup.h"
-
 #include "erpc_basic_codec.h"
 #include "erpc_client_manager.h"
 #include "erpc_crc16.h"
@@ -17,7 +16,6 @@
 #include "erpc_message_buffer.h"
 #include "erpc_transport.h"
 
-#include <cassert>
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
 #endif
@@ -41,7 +39,7 @@ ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 void erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
-    assert(transport);
+    erpc_assert(transport);
 
     Transport *castedTransport;
 
@@ -111,14 +109,14 @@ bool erpc_client_add_message_logger(erpc_transport_t transport)
 #if ERPC_PRE_POST_ACTION
 void erpc_client_add_pre_cb_action(pre_post_action_cb preCB)
 {
-    assert(g_client);
+    erpc_assert(g_client);
 
     g_client->addPreCB(preCB);
 }
 
 void erpc_client_add_post_cb_action(pre_post_action_cb postCB)
 {
-    assert(g_client);
+    erpc_assert(g_client);
 
     g_client->addPostCB(postCB);
 }

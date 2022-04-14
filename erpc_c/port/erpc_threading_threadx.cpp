@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 2021, StarGate, Inc.
+ * Copyright 2021 NXP
  * All rights reserved.
- * 
+ *
  * Ibrahim ERTURK <ierturk@ieee.org>
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -9,12 +10,11 @@
 
 #include "erpc_threading.h"
 
-#include <cassert>
 #include <errno.h>
 
 #if ERPC_THREADS_IS(THREADX)
 
-#define TX_ERPC_APP_MEM_POOL_SIZE   (4 * 1024)
+#define TX_ERPC_APP_MEM_POOL_SIZE (4 * 1024)
 
 using namespace erpc;
 
@@ -42,7 +42,8 @@ Thread::Thread(const char *name)
 {
 }
 
-Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name)
+Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
+               thread_stack_pointer stackPtr)
 : m_name(name)
 , m_entry(entry)
 , m_arg(0)
@@ -53,7 +54,8 @@ Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, cons
 {
 }
 
-Thread::~Thread(void) {
+Thread::~Thread(void)
+{
     if (&m_thread != NULL)
     {
         tx_thread_delete(&m_thread);
@@ -61,12 +63,12 @@ Thread::~Thread(void) {
     }
 }
 
-void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
+void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize, thread_stack_pointer stackPtr)
 {
     m_entry = entry;
     m_stackSize = stackSize;
     m_priority = priority;
-
+    m_stackPtr = stackPtr;
     CHAR name[] = "Tx eRPC App memory pool";
     if (tx_byte_pool_create(&tx_app_byte_pool, name, tx_byte_pool_buffer, m_stackSize) != TX_SUCCESS)
     {
@@ -79,18 +81,15 @@ void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
         CHAR *pointer;
 
         /* Allocate the stack for MainThread.  */
-        if (tx_byte_allocate(&tx_app_byte_pool, (VOID **) &pointer, m_stackSize, TX_NO_WAIT) != TX_SUCCESS)
+        if (tx_byte_allocate(&tx_app_byte_pool, (VOID **)&pointer, m_stackSize, TX_NO_WAIT) != TX_SUCCESS)
         {
             ret = TX_POOL_ERROR;
         }
 
-
         /* Create eRPC Thread.  */
         CHAR thread_name[] = "eRPC Thread";
-        if (tx_thread_create(&m_thread, thread_name, threadEntryPointStub, (ULONG)m_entry,
-                       pointer, m_stackSize,
-                       m_priority, m_priority,
-                       TX_NO_TIME_SLICE, TX_DONT_START) != TX_SUCCESS)
+        if (tx_thread_create(&m_thread, thread_name, threadEntryPointStub, (ULONG)m_entry, pointer, m_stackSize,
+                             m_priority, m_priority, TX_NO_TIME_SLICE, TX_DONT_START) != TX_SUCCESS)
         {
             ret = TX_THREAD_ERROR;
         }
@@ -103,7 +102,7 @@ void Thread::start(void *arg)
 {
     m_arg = arg;
 
-        // ENTER CRITICAL SECTION
+    // ENTER CRITICAL SECTION
     UINT my_old_posture;
     /* Lockout interrupts */
     my_old_posture = tx_interrupt_control(TX_INT_DISABLE);
@@ -116,7 +115,7 @@ void Thread::start(void *arg)
         m_next = s_first;
     }
     s_first = this;
-    
+
     // EXIT CRITICAL SECTION
     /* Restore previous interrupt lockout posture. */
     tx_interrupt_control(my_old_posture);
@@ -132,7 +131,7 @@ Thread *Thread::getCurrentThread(void)
     TX_THREAD *thisThread = tx_thread_identify();
 
     // Walk the threads list to find the Thread object for the current task.
-    
+
     // ENTER CRITICAL SECTION
     UINT my_old_posture;
     /* Lockout interrupts */
@@ -147,7 +146,7 @@ Thread *Thread::getCurrentThread(void)
         }
         it = it->m_next;
     }
-    
+
     // EXIT CRITICAL SECTION
     /* Restore previous interrupt lockout posture. */
     tx_interrupt_control(my_old_posture);
@@ -157,7 +156,7 @@ Thread *Thread::getCurrentThread(void)
 
 void Thread::sleep(uint32_t usecs)
 {
-    tx_thread_sleep(usecs/1000);
+    tx_thread_sleep(usecs / 1000);
 }
 
 void Thread::threadEntryPoint(void)
@@ -168,11 +167,10 @@ void Thread::threadEntryPoint(void)
     }
 }
 
-
 void Thread::threadEntryPointStub(ULONG arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    assert(_this && "Reinterpreting 'void *arg' to 'Thread *' failed.");
+    erpc_assert(_this && "Reinterpreting 'void *arg' to 'Thread *' failed.");
     _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
@@ -258,9 +256,21 @@ void Semaphore::put(void)
     tx_semaphore_put(&m_sem);
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
-    UINT status = tx_semaphore_get(&m_sem, timeout);
+    if (timeoutUsecs != kWaitForever)
+    {
+        if (timeoutUsecs > 0U)
+        {
+            timeoutUsecs /= 1000U;
+            if (timeoutUsecs == 0U)
+            {
+                timeoutUsecs = 1U;
+            }
+        }
+    }
+
+    UINT status = tx_semaphore_get(&m_sem, timeoutUsecs);
     return (status == TX_SUCCESS);
 }
 
@@ -273,10 +283,11 @@ int Semaphore::getCount(void) const
     TX_SEMAPHORE *next_semaphore;
     UINT status;
 
-    status = tx_semaphore_info_get((TX_SEMAPHORE *)&m_sem, &name, &current_value,
-                &first_suspended, &suspended_count, &next_semaphore);
+    status = tx_semaphore_info_get((TX_SEMAPHORE *)&m_sem, &name, &current_value, &first_suspended, &suspended_count,
+                                   &next_semaphore);
 
-    if(status != TX_SUCCESS) {
+    if (status != TX_SUCCESS)
+    {
         // return -1;
     }
     return current_value;

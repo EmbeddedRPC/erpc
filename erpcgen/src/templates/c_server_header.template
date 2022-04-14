@@ -51,11 +51,11 @@ typedef void * erpc_service_t;
 erpc_service_t create_{$iface.serviceClassName}(void);
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-void destroy_{$iface.serviceClassName}(erpc_service_t *service);
+void destroy_{$iface.serviceClassName}(erpc_service_t service);
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
 void destroy_{$iface.serviceClassName}(void);
 #else
-#warning "Unknow eRPC allocation policy!"
+#warning "Unknown eRPC allocation policy!"
 #endif
 
 {% endfor -- iface %}

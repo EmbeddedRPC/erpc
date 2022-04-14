@@ -10,8 +10,6 @@
 
 #include "erpc_inter_thread_buffer_transport.h"
 
-#include <cassert>
-
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,13 +39,13 @@ void InterThreadBufferTransport::linkWithPeer(InterThreadBufferTransport *peer)
 
 erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
 {
-    assert(m_state && m_peer);
+    erpc_assert(m_state && m_peer);
 
     m_inSem.get();
 
     m_state->m_mutex.lock();
 
-    assert(m_inBuffer);
+    erpc_assert(m_inBuffer);
     message->copy(m_inBuffer);
     m_inBuffer = NULL;
 
@@ -60,13 +58,13 @@ erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
 
 erpc_status_t InterThreadBufferTransport::send(MessageBuffer *message)
 {
-    assert(m_state && m_peer);
+    erpc_assert(m_state && m_peer);
 
     m_peer->m_outSem.get();
 
     m_state->m_mutex.lock();
 
-    assert(m_peer->m_inBuffer == NULL);
+    erpc_assert(m_peer->m_inBuffer == NULL);
     m_peer->m_inBuffer = const_cast<MessageBuffer *>(message);
     m_peer->m_inSem.put();
 

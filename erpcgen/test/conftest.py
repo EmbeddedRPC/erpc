@@ -15,7 +15,6 @@ import re
 import itertools
 import string
 import traceback
-import imp
 import textwrap
 import errno
 import shlex
@@ -52,49 +51,8 @@ erpc_dir = test_dir.dirpath().dirpath()
 # Add erpc python dir to search path.
 sys.path.append(str(erpc_dir.join("erpc_python")))
 
-# Provide symlink support under Windows for Python 2.7.
-if sys.version_info[:2] <= (2, 7) and os.name == "nt":
-    import ctypes
-
-    ## @brief Symlink function for python27 under windows.
-    #
-    # based on page: http://stackoverflow.com/questions/6260149/os-symlink-support-in-windows
-    def symlink_ms(source, link_name):
-        csl = ctypes.windll.kernel32.CreateSymbolicLinkW
-        csl.argtypes = (ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32)
-        csl.restype = ctypes.c_ubyte
-        err = csl(link_name, source.replace('/', '\\'), 1)
-        if err == 0:
-           raise IOError(err, "failed to create symbolic link", link_name)
-
-    ## @brief islink function for python27 under windows.
-    #
-    # based on page: http://stackoverflow.com/questions/15258506/os-path-islink-on-windows-with-python
-    def islink_ms(link):
-        path = link.strpath
-        if os.path.exists(path):
-            if os.path.isdir(path):
-                FILE_ATTRIBUTE_REPARSE_POINT = 0x0400
-                attributes = ctypes.windll.kernel32.GetFileAttributesW(unicode(path))
-                return (attributes & FILE_ATTRIBUTE_REPARSE_POINT) > 0
-            else:
-                command = ['dir', path]
-                try:
-                    with open(os.devnull, 'w') as NULL_FILE:
-                        o0 = subprocess.check_output(command, stderr=NULL_FILE, shell=True)
-                except subprocess.CalledProcessError as e:
-                    print(e.output)
-                    return False
-                o1 = [s.strip() for s in o0.split('\n')]
-                if len(o1) < 6:
-                    return False
-                else:
-                    return 'SYMLINK' in o1[5]
-        else:
-            return False
-
-    create_symlink = symlink_ms
-    islink = islink_ms
+if sys.version_info[:2] <= (3, 5):
+    raise Exception("Unsupported python version")
 else:
     create_symlink = os.symlink
     islink = lambda link: link.islink()
@@ -682,7 +640,7 @@ class ErpcgenTestCase(object):
 
         # Escape non-regex cases.
         if not isRegex:
-            pattern = re.escape(pattern).replace('\ ', '\s*')
+            pattern = re.escape(pattern).replace(r'\ ', r'\s*')
 
         rx = re.compile(pattern, re.MULTILINE)
         match = rx.search(self._contents, self._pos)
@@ -710,7 +668,7 @@ class ErpcgenTestCase(object):
                 pattern = case['not']
 
             if not isRegex:
-                pattern = re.escape(pattern).replace('\ ', '\s*')
+                pattern = re.escape(pattern).replace(r'\ ', r'\s*')
 
             rx = re.compile(pattern, re.MULTILINE)
             match = rx.search(self._contents, pos, endPos)

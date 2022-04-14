@@ -8,7 +8,7 @@ eRPC is open-source project stored on github: https://github.com/EmbeddedRPC/erp
 eRPC documentation can be also found in: https://github.com/EmbeddedRPC/erpc/wiki
 
 # Prerequisites
-- Python 2.7 or 3.x
+- Python 3.6+
 
 # eRPC installation\
 1. run `python setup.py install` in folder `erpc/erpc_python/`
@@ -20,11 +20,11 @@ eRPC documentation can be also found in: https://github.com/EmbeddedRPC/erpc/wik
 - `service/erpc_matrix_multiply/`: eRPC output shim code generated from IDL file
 
 # Running the example
-- Run `matrix_multiply.py` with `-s` (or `--server`) parameter to run server 
+- Run `matrix_multiply.py` with `-s` (or `--server`) parameter to run server
 - Run `matrix_multiply.py` with `-c` (or `--client`) parameter to run client
 - Both server and client has to have specified host and port with `-t` (`--host`) and `-p` (`--port`) parameters. By default is host set as localhost and port as 40.
 
-## Example: 
+## Example:
 ```
   python matrix_multiply.py --server --host 192.168.1.10 --port 40
   python matrix_multiply.py --client --host 192.168.1.10 --port 40

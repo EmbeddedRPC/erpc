@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2021 NXP
  * Copyright 2019-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -9,13 +9,10 @@
  */
 
 #include "erpc_rpmsg_tty_rtos_transport.h"
-
 #include "erpc_config_internal.h"
 #include "erpc_framed_transport.h"
 
 #include "rpmsg_ns.h"
-
-#include <cassert>
 
 using namespace erpc;
 using namespace std;
@@ -74,7 +71,7 @@ RPMsgTTYRTOSTransport::~RPMsgTTYRTOSTransport(void)
 
 void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
 {
-    assert(crcImpl);
+    erpc_assert(crcImpl);
     m_crcImpl = crcImpl;
 }
 
@@ -256,12 +253,12 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
     int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     uint16_t computedCrc;
 
-    assert(m_crcImpl && "Uninitialized Crc16 object.");
-    assert(buf);
+    erpc_assert(m_crcImpl && "Uninitialized Crc16 object.");
+    erpc_assert(buf);
 
     if (ret_val == RL_SUCCESS)
     {
-        memcpy((uint8_t *)&h, buf, sizeof(h));
+        (void)memcpy((uint8_t *)&h, buf, sizeof(h));
         message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
 
         /* Verify CRC. */
@@ -292,7 +289,7 @@ erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
     uint32_t used = message->getUsed();
     int32_t ret_val;
 
-    assert(m_crcImpl && "Uninitialized Crc16 object.");
+    erpc_assert(m_crcImpl && "Uninitialized Crc16 object.");
     message->set(NULL, 0);
 
     h.m_crc = m_crcImpl->computeCRC16(buf, used);

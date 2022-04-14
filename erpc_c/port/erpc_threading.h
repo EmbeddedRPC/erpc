@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -140,7 +140,7 @@ public:
     /*!
      * @brief This function puts thread to sleep.
      *
-     * @param[in] usecs Time for sleeping.
+     * @param[in] usecs Time for sleeping in [us].
      */
     static void sleep(uint32_t usecs);
 
@@ -352,12 +352,12 @@ public:
         Guard(Mutex &mutex)
         : m_mutex(mutex)
         {
-            m_mutex.lock();
+            (void)m_mutex.lock();
         }
         /*!
          * @brief Destructor.
          */
-        ~Guard(void) { m_mutex.unlock(); }
+        ~Guard(void) { (void)m_mutex.unlock(); }
 
     private:
         Mutex &m_mutex; /*!< Mutex to lock. */
@@ -448,7 +448,7 @@ public:
     /*!
      * @brief Variable for semaphore to wait forever.
      */
-    static const uint32_t kWaitForever = 0xffffffff;
+    static const uint32_t kWaitForever = 0xffffffffu;
 
     /*!
      * @brief Constructor.
@@ -477,12 +477,12 @@ public:
     /*!
      * @brief This function get semaphore.
      *
-     * @param[in] timeout Time how long can wait for getting semaphore.
+     * @param[in] timeoutUsecs Time how long can wait for getting semaphore in [us].
      *
      * @retval true When semaphore got successfully.
      * @retval false When mutex didn't get.
      */
-    bool get(uint32_t timeout = kWaitForever);
+    bool get(uint32_t timeoutUsecs = kWaitForever);
 
     /*!
      * @brief This function returns semaphore count number.
@@ -510,7 +510,7 @@ private:
     int m_count;
     HANDLE m_sem;
 #elif ERPC_THREADS_IS(THREADX)
-    TX_SEMAPHORE m_sem;   /*!< Semaphore. */
+    TX_SEMAPHORE m_sem; /*!< Semaphore. */
 #endif
 
 private:

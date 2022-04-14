@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -41,7 +41,7 @@ enum _null_flag
 class BasicCodec : public Codec
 {
 public:
-    static const uint8_t kBasicCodecVersion; /*!< Codec version. */
+    static const uint32_t kBasicCodecVersion; /*!< Codec version. */
 
     BasicCodec(void)
     : Codec()
@@ -325,8 +325,8 @@ public:
     /*!
      * @brief Prototype for read binary value.
      *
-     * @param[out] length of binary.
-     * @param[out] value Binary value to read.
+     * @param[out] length of binary. 0 can be valid value or in case of error.
+     * @param[out] value Binary value to read. Null in case of error.
      */
     virtual void readBinary(uint32_t *length, uint8_t **value) override;
 
@@ -356,7 +356,7 @@ public:
      *
      * @param[in] callbacks Pointer to array of callbacks.
      * @param[in] callbacksCount Size of array of callbacks.
-     * @param[out] callback Callback which is deserialized.
+     * @param[out] callback Callback which is deserialized. Null in case of error.
      */
     virtual void readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback) override;
 

@@ -52,28 +52,28 @@ test/common.py:
   - blah = None # int32
   - def _read(self, codec)
   - discriminator = codec.start_read_union()
-  - if discriminator == 0
+  - if discriminator == fruitType.apple
   - self.myFoobar = foobar()._read(codec)
-  - elif discriminator == 2
+  - elif discriminator == fruitType.banana
   - self.x = codec.read_int32()
   - self.y = codec.read_float()
-  - elif discriminator == 5
+  - elif discriminator == fruitType.papaya
   - self.x = codec.read_int32()
   - self.y = codec.read_float()
-  - elif discriminator == 1
+  - elif discriminator == fruitType.orange
   - _n1 = codec.start_read_list()
   - self.a = []
   - for _i1 in range(_n1)
   - _v1 = codec.read_int32()
   - self.a.append(_v1)
-  - elif discriminator == 3
+  - elif discriminator == fruitType.coconut
   - self.cx = codec.read_uint32()
   - _n1 = codec.start_read_list()
   - self.cc = []
   - for _i1 in range(_n1)
   - _v1 = codec.read_int32()
   - self.cc.append(_v1)
-  - elif discriminator == 10
+  - elif discriminator == returnVal
   - self.ret = codec.read_int32()
   - else # default case
   - self.c = codec.read_bool()
@@ -81,31 +81,31 @@ test/common.py:
   - return self, discriminator
   - def _write(self, codec, discriminator)
   - codec.start_write_union(discriminator)
-  - if discriminator == 0
+  - if discriminator == fruitType.apple
   - if self.myFoobar is None
   - raise ValueError("self.myFoobar is None")
   - self.myFoobar._write(codec)
-  - elif discriminator == 2
+  - elif discriminator == fruitType.banana
   - if self.x is None
   - raise ValueError("self.x is None")
   - codec.write_int32(self.x)
   - if self.y is None
   - raise ValueError("self.y is None")
   - codec.write_float(self.y)
-  - elif discriminator == 5
+  - elif discriminator == fruitType.papaya
   - if self.x is None
   - raise ValueError("self.x is None")
   - codec.write_int32(self.x)
   - if self.y is None
   - raise ValueError("self.y is None")
   - codec.write_float(self.y)
-  - elif discriminator == 1
+  - elif discriminator == fruitType.orange
   - if self.a is None
   - raise ValueError("self.a is None")
   - codec.start_write_list(len(self.a))
   - for _i1 in self.a
   - codec.write_int32(_i1)
-  - elif discriminator == 3
+  - elif discriminator == fruitType.coconut
   - if self.cx is None
   - raise ValueError("self.cx is None")
   - codec.write_uint32(self.cx)
@@ -114,7 +114,7 @@ test/common.py:
   - codec.start_write_list(len(self.cc))
   - for _i1 in self.cc
   - codec.write_int32(_i1)
-  - elif discriminator == 10
+  - elif discriminator == returnVal
   - if self.ret is None
   - raise ValueError("self.ret is None")
   - codec.write_int32(self.ret)
@@ -168,10 +168,10 @@ lang: py
 test/common.py:
   - not: class unionVariable_union(object)
   - "class structType(object):"
-  - def __init__(self, discriminator=None)
+  - def __init__(self, discriminator=None, unionVariable=None)
   - self.discriminator = discriminator # fruitType
   - self.unionVariable = unionVariable # unionType
-  - self.unionVariable, self.discriminator = common.unionType()._read(codec)
+  - self.unionVariable, self.discriminator = unionType()._read(codec)
   - unionVariable._write(codec, self.discriminator)
   - "class unionType(object):"
   - discriminator = codec.start_read_union()

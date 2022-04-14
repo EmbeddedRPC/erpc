@@ -6,9 +6,99 @@
 {$name}._write({$codec}){%>%}
 {#--------------- union ---------------#}
 {% elif info.type == "union" %}
-{%  if info.isNonEncapsulatedUnion%}
-{%   set self = "" %}
+{$name}._write({$codec}, {$info.discriminatorName}){%>%}
+{#--------------- enum ---------------#}
+{% elif info.type == "enum" %}
+{$codec}.write_uint32({$name}){%>%}
+{#--------------- string ---------------#}
+{% elif info.type == "string" %}
+{$codec}.write_string({$name}){%>%}
+{#--------------- binary ---------------#}
+{% elif info.type == "binary" %}
+{$codec}.write_binary({$name}){%>%}
+{#--------------- list, array ---------------#}
+{% elif info.type == "list" || info.type == "array" %}
+{%  if info.type == "list" %}
+{$codec}.start_write_list(len({$name}))
+{%  endif %}
+{%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
+{$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}
+{#--------------- function ---------------#}
+{% elif info.type == "function" %}
+{%  if info.tableName != "" %}
+{$codec}.write_int8({$ info.tableName}.index({$name})){%>%}
+{%  else %}
+# When are defined less than 2 callback functions, eRPC don't need serialize any code.
+{%  endif %}
+{#--------------- else ---------------#}
 {% else %}
+{$codec}.write_{$info.type}({$name}){%>%}
+{% endif %}
+{% enddef %}
+
+{############################### decodeValue ###############################}
+{% def decodeValue(info, name, commonPrefix, codec, indent, depth) %}
+{#--------------- struct ---------------#}
+{% if info.type == "struct" %}
+{$name} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
+{#--------------- union ---------------#}
+{% elif info.type == "union" %}
+{$name}, {$info.discriminatorName} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
+{#--------------- enum ---------------#}
+{% elif info.type == "enum" %}
+{$name} = {$codec}.read_uint32(){%>%}
+{#--------------- string ---------------#}
+{% elif info.type == "string" %}
+{$name} = {$codec}.read_string(){%>%}
+{#--------------- binary ---------------#}
+{% elif info.type == "binary" %}
+{$name} = {$codec}.read_binary(){%>%}
+{#--------------- list, array ---------------#}
+{% elif info.type == "list" || info.type == "array" %}
+{%   if info.type == "list" %}
+_n{$depth} = {$codec}.start_read_list()
+{%   endif %}
+{%   if info.type == "list" %}{$indent}{%   endif %}{$name} = []
+{$indent}for _i{$depth} in range({% if info.type == "list" %}_n{$depth}{% else %}{$info.elementCount}{% endif %}):
+{$indent}    {$decodeValue(info.elementType, "_v" & depth, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    {$name}.append(_v{$depth})
+{#--------------- function ---------------#}
+{% elif info.type == "function" %}
+{%  if info.tableName != "" %}
+{$name} = {$ info.tableName}[{$codec}.read_int8()]
+{%  else %}
+# When are defined less than 2 callback functions, eRPC don't need serialize any code.
+{$indent}{$name} = {$info.callbackName}
+{%  endif %}
+{#--------------- else ---------------#}
+{% else %}
+{$name} = {$codec}.read_{$info.type}(){%>%}
+{% endif %}
+{% enddef %}
+
+{############################### prettyTypeName ###############################}
+{% def prettyTypeName(name, info) %}
+{% if info.type == "list" %}
+list<{$prettyTypeName("", info.elementType)}>{%>%}
+{% elif info.type == "array" %}
+{$prettyTypeName("", info.elementType)}[{$info.elementCount}]
+{% elif info.type == "union" %}
+{%  if info.isNonEncapsulatedUnion == true %}
+{$info.name}{%>%}
+{%  else %}
+{$name}_union{%>%}
+{% endif %}
+{% else %}
+{$info.name}{%>%}
+{% endif %}
+{% enddef %}
+
+
+{############################### union encode/decode ###############################}
+{% def encodeValueUnion(info, name, codec, indent, depth) %}
+{%  if info.isNonEncapsulatedUnion %}
+{%   set self = "" %}
+{%  else %}
 {%   set self = "self." %}
 {%  endif %}
 codec.start_write_union({$self}{$info.discriminatorName})
@@ -21,7 +111,7 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if {$name}.{$cm.name} is None:
@@ -61,42 +151,9 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {$indent}else:
 {$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- defaultCase/hasNonVoidCase %}
-{#--------------- enum ---------------#}
-{% elif info.type == "enum" %}
-{$codec}.write_uint32({$name}){%>%}
-{#--------------- string ---------------#}
-{% elif info.type == "string" %}
-{$codec}.write_string({$name}){%>%}
-{#--------------- binary ---------------#}
-{% elif info.type == "binary" %}
-{$codec}.write_binary({$name}){%>%}
-{#--------------- list, array ---------------#}
-{% elif info.type == "list" || info.type == "array" %}
-{%  if info.type == "list" %}
-{$codec}.start_write_list(len({$name}))
-{%  endif %}
-{%  if info.type == "list" %}{$indent}{%  endif %}for _i{$depth} in {$name}:
-{$indent}    {$encodeValue(info.elementType, "_i" & depth, codec, indent & "    ", depth + 1)}
-{#--------------- function ---------------#}
-{% elif info.type == "function" %}
-{%  if info.tableName != "" %}
-{$codec}.write_int8({$ info.tableName}.index({$name})){%>%}
-{%  else %}
-# When are defined less than 2 callback functions, eRPC don't need serialize any code.
-{%  endif%}
-{#--------------- else ---------------#}
-{% else %}
-{$codec}.write_{$info.type}({$name}){%>%}
-{% endif %}
 {% enddef %}
 
-{############################### decodeValue ###############################}
-{% def decodeValue(info, name, commonPrefix, codec, indent, depth) %}
-{#--------------- struct ---------------#}
-{% if info.type == "struct" %}
-{$name} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
-{#--------------- union ---------------#}
-{% elif info.type == "union" %}
+{% def decodeValueUnion(info, name, codec, indent, depth) %}
 {%  if info.isNonEncapsulatedUnion %}
 {%   set self = "" %}
 {%  else %}
@@ -105,7 +162,7 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {$self}{$info.discriminatorName} = codec.start_read_union()
 {%  if self == "self." %}
 {$indent}{$name} = {$name}_union()
-{% endif %}
+{%  endif %}
 {%  set isFirst = true %}
 {%  set hasNonVoidCase = false %}
 {%  set defaultCase = false %}
@@ -114,18 +171,18 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%    set defaultCase = c %}
 {%   elif not c.isVoid %}
 {%    set hasNonVoidCase = true %}
-{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {$c.value}:
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
 {%    for cm in c.members %}
 {%     if cm.isNullable %}
 {$indent}    if not {$codec}.read_null_flag()
-{$indent}        {$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}        {$decodeValue(cm.type, name & "." & cm.name, "", codec, indent & "    ", depth + 1)}
 {$indent}    else:
 {$indent}        {$name}.{$cm.name} = None
 {%     else -- isNullable %}
-{$indent}    {$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    {$decodeValue(cm.type, name & "." & cm.name, "", codec, indent & "    ", depth + 1)}
 {%     endif -- isNullable %}
 {%    endfor -- union case members %}
-{%  set isFirst = false %}
+{%    set isFirst = false %}
 {%   endif -- default/not void %}
 {%  endfor -- union cases %}
 {%  if defaultCase %}
@@ -138,11 +195,11 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {%    for cm in defaultCase.members %}
 {%     if cm.isNullable %}
 {$indent}    if not {$codec}.read_null_flag()
-{$indent}    {% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}    {% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, "", codec, indent & "    ", depth + 1)}
 {$indent}    else:
 {$indent}        {$name}.{$cm.name} = None
 {%     else -- isNullable %}
-{$indent}{% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, commonPrefix, codec, indent & "    ", depth + 1)}
+{$indent}{% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, "", codec, indent & "    ", depth + 1)}
 {%     endif -- isNullable %}
 {%    endfor -- union case members %}
 {%   endif -- defaultCase.isVoid %}
@@ -150,51 +207,4 @@ codec.start_write_union({$self}{$info.discriminatorName})
 {$indent}else:
 {$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
 {%  endif -- default/hasNonVoidCase %}
-{#--------------- enum ---------------#}
-{% elif info.type == "enum" %}
-{$name} = {$codec}.read_uint32(){%>%}
-{#--------------- string ---------------#}
-{% elif info.type == "string" %}
-{$name} = {$codec}.read_string(){%>%}
-{#--------------- binary ---------------#}
-{% elif info.type == "binary" %}
-{$name} = {$codec}.read_binary(){%>%}
-{#--------------- list, array ---------------#}
-{% elif info.type == "list" || info.type == "array" %}
-{%   if info.type == "list" %}
-_n{$depth} = {$codec}.start_read_list()
-{%   endif %}
-{%   if info.type == "list" %}{$indent}{%   endif %}{$name} = []
-{$indent}for _i{$depth} in range({% if info.type == "list" %}_n{$depth}{% else %}{$info.elementCount}{% endif %}):
-{$indent}    {$decodeValue(info.elementType, "_v" & depth, commonPrefix, codec, indent & "    ", depth + 1)}
-{$indent}    {$name}.append(_v{$depth})
-{#--------------- function ---------------#}
-{% elif info.type == "function" %}
-{%  if info.tableName != "" %}
-{$name} = {$ info.tableName}[{$codec}.read_int8()]
-{%  else %}
-# When are defined less than 2 callback functions, eRPC don't need serialize any code.
-{$indent}{$name} = {$info.callbackName}
-{%  endif%}
-{#--------------- else ---------------#}
-{% else %}
-{$name} = {$codec}.read_{$info.type}(){%>%}
-{% endif %}
-{% enddef %}
-
-{############################### prettyTypeName ###############################}
-{% def prettyTypeName(name, info) %}
-{% if info.type == "list" %}
-list<{$prettyTypeName("", info.elementType)}>{%>%}
-{% elif info.type == "array" %}
-{$prettyTypeName("", info.elementType)}[{$info.elementCount}]
-{% elif info.type == "union" %}
-{%  if info.isNonEncapsulatedUnion == true %}
-{$info.name}{%>%}
-{%  else %}
-{$name}_union{%>%}
-{% endif %}
-{% else %}
-{$info.name}{%>%}
-{% endif %}
 {% enddef %}

@@ -163,7 +163,7 @@ public:
      * @return true Object is constructed and used.
      * @return false Object wasn't constructer or it is destructed and free.
      */
-    bool isUsed() { return m_isConstructed; }
+    bool isUsed(void) { return m_isConstructed; }
 
 protected:
     /*!

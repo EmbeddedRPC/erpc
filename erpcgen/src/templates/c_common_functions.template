@@ -62,7 +62,7 @@ extern const {$c.typeAndName} = {$c.value};
 {%    endif -- way == "serial" %}
 {%   endif -- s.type == "union/struct" %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolSource ---------------- #}
@@ -83,7 +83,7 @@ extern const {$c.typeAndName} = {$c.value};
 {%    endif -- way == "serial" %}
 {%   endif -- s.type == "union/struct" %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolFreeSpaceHeader ---------------- #}
@@ -96,7 +96,7 @@ extern const {$c.typeAndName} = {$c.value};
 {$ unionFreeSpaceHeader(s, shared)}
 {%   endif %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- symbolFreeSpaceSource ---------------- #}
@@ -109,7 +109,7 @@ extern const {$c.typeAndName} = {$c.value};
 {$ unionFreeSpaceSource(s, shared)}
 {%   endif %}
 {%  endfor -- symbols %}
-{% endif -- symbols%}
+{% endif -- symbols %}
 {% enddef -- serialHeader %}
 
 {# ---------------- structDeserialHeader ---------------- #}
@@ -150,6 +150,14 @@ static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.nam
 {%   if struct.needTempVariable %}
     int32_t _tmp_local;
 {%   endif %}
+{%   if struct.needTempVariable || struct.hasNullableMember %}
+
+{%   endif %}
+    if(NULL == data)
+    {
+        return;
+    }
+
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
     codec->readNullFlag(&isNull);
@@ -185,6 +193,11 @@ static void write_{$struct.name}_struct_shared(erpc::{$codecClass} * codec, cons
 static void write_{$struct.name}_struct(erpc::{$codecClass} * codec, const {$struct.name} * data)
 {%   endif %}
 {
+    if(NULL == data)
+    {
+        return;
+    }
+
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
     if ({$mem.coderCall.name}{$mem.structElements} == NULL)
@@ -275,6 +288,11 @@ static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * disc
     int32_t _tmp_local;
 
 {%   endif %}
+    if(NULL == data)
+    {
+        return;
+    }
+
 {$addIndent("    ", decodeUnionType(union.coderCall))}
 }
 {% enddef -- unionDeserialSource %}
@@ -289,6 +307,11 @@ static void write_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_
 static void write_{$union.name}_union(erpc::{$codecClass} * codec, int32_t discriminator, const {$union.name} * data)
 {%   endif %}
 {
+    if(NULL == data)
+    {
+        return;
+    }
+
 {$addIndent("    ", encodeUnionType(union.coderCall))}
 }
 {% enddef -- unionSerialSource %}
@@ -395,13 +418,17 @@ for (uint32_t {$info.forLoopCount} = 0; {$info.forLoopCount} < {$info.size}; ++{
 {% def freeUnion(info) %}
 switch ({$info.dataLiteral}{$info.discriminatorName})
 {
+{%if info.needCaseEmptyFreeingCall %}{% for case in info.cases %}
+{%  if case.needCaseFreeingCall == false %}
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+{%  endif %}
+{% endfor -- cases %}
+    {
+        break;
+    }{%    endif -- needCaseEmptyFreeingCall %}
 {% for case in info.cases %}
 {%  if case.needCaseFreeingCall == true %}
-{%   if case.name == "default" %}
-    default:
-{%   else %}
-    case {% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
-{%   endif -- default or case %}
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
     {
 {%   for member in case.members %}
 {%    if member.isNeedFreeingCall %}
@@ -409,7 +436,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {%    endif %}
 {%    if empty(member.coderCall.memberAllocation) == false %}
 {$addIndent("        ", member.coderCall.freeingCall2(member.coderCall))}
-{%    endif%}
+{%    endif %}
 {%   endfor -- members %}
         break;
     }
@@ -451,11 +478,16 @@ struct
 {%  if count(unionCase) > 1 %}
 };
 {%  endif %}
-{% endfor%}
+{% endfor %}
 {% enddef ------------------------------- unionMembersDeclaration %}
 
 {% def f_paramIsNullableEncode(param) %}
-if ({$param.nullableName} == NULL{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %} || {$param.lengthName} == NULL{% endif %})
+{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %}
+{%  set lengthNameCon = ") || (" & param.lengthName & " == NULL)" >%}
+{% else %}
+{%  set lengthNameCon = "" >%}
+{% endif %}
+if ({% if lengthNameCon != "" %}({% endif %}{$param.nullableName} == NULL{$lengthNameCon})
 {
     codec->writeNullFlag(true);
 }

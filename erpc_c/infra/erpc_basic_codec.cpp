@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -9,7 +9,6 @@
  */
 
 #include "erpc_basic_codec.h"
-
 #include "erpc_manually_constructed.h"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
@@ -23,11 +22,11 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-const uint8_t BasicCodec::kBasicCodecVersion = 1;
+const uint32_t BasicCodec::kBasicCodecVersion = 1UL;
 
 void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
 {
-    uint32_t header = (kBasicCodecVersion << 24) | ((service & 0xff) << 16) | ((request & 0xff) << 8) | (type & 0xff);
+    uint32_t header = (kBasicCodecVersion << 24u) | ((service & 0xffu) << 16u) | ((request & 0xffu) << 8u) | ((uint32_t)type & 0xffu);
 
     write(header);
 
@@ -36,23 +35,16 @@ void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32
 
 void BasicCodec::writeData(const void *value, uint32_t length)
 {
-    if (!m_status)
+    if (isStatusOk())
     {
-        if (value != NULL)
-        {
-            m_status = m_cursor.write(value, length);
-        }
-        else
-        {
-            m_status = kErpcStatus_MemoryError;
-        }
+        m_status = m_cursor.write(value, length);
     }
 }
 
 void BasicCodec::write(bool value)
 {
     // Make sure the bool is a single byte.
-    uint8_t v = value;
+    uint8_t v = (uint8_t)value;
 
     writeData(&v, sizeof(v));
 }
@@ -109,7 +101,7 @@ void BasicCodec::write(double value)
 
 void BasicCodec::writePtr(uintptr_t value)
 {
-    uint8_t ptrSize = sizeof(value);
+    uint8_t ptrSize = (uint8_t)sizeof(value);
 
     write(ptrSize);
 
@@ -151,7 +143,7 @@ void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, 
 {
     uint8_t i;
 
-    assert(callbacksCount > 1U);
+    erpc_assert(callbacksCount > 1U);
 
     // callbacks = callbacks table
     for (i = 0; i < callbacksCount; i++)
@@ -189,7 +181,7 @@ void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint3
         updateStatus(kErpcStatus_InvalidMessageVersion);
     }
 
-    if (!m_status)
+    if (isStatusOk())
     {
         *service = ((header >> 16) & 0xffU);
         *request = ((header >> 8) & 0xffU);
@@ -201,16 +193,9 @@ void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint3
 
 void BasicCodec::readData(void *value, uint32_t length)
 {
-    if (!m_status)
+    if (isStatusOk())
     {
-        if (value != NULL)
-        {
-            m_status = m_cursor.read(value, length);
-        }
-        else
-        {
-            m_status = kErpcStatus_MemoryError;
-        }
+        m_status = m_cursor.read(value, length);
     }
 }
 
@@ -219,9 +204,9 @@ void BasicCodec::read(bool *value)
     uint8_t v = 0;
 
     readData(&v, sizeof(v));
-    if (!m_status)
+    if (isStatusOk())
     {
-        *value = v;
+        *value = (bool)v;
     }
 }
 
@@ -299,7 +284,7 @@ void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
     // Read length first as u32.
     read(length);
 
-    if (!m_status)
+    if (isStatusOk())
     {
         if (m_cursor.getRemaining() >= *length)
         {
@@ -307,17 +292,17 @@ void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
             *value = m_cursor.get();
 
             // Skip over data.
-            m_cursor += *length;
+            m_cursor += (uint16_t)*length;
         }
         else
         {
-            *length = 0;
             m_status = kErpcStatus_BufferOverrun;
         }
     }
-    else
+    if (!isStatusOk())
     {
         *length = 0;
+        *value = NULL;
     }
 }
 
@@ -353,7 +338,7 @@ void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, f
 {
     uint8_t _tmp_local;
 
-    assert(callbacksCount > 1U);
+    erpc_assert(callbacksCount > 1U);
 
     // callbacks = callbacks table
     read(&_tmp_local);
@@ -365,6 +350,7 @@ void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, f
         }
         else
         {
+            *callback = NULL;
             m_status = kErpcStatus_UnknownCallback;
         }
     }
@@ -378,12 +364,12 @@ void BasicCodec::readCallback(funPtr callbacks1, funPtr *callback2)
 
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT);
 
-Codec *BasicCodecFactory ::create()
+Codec *BasicCodecFactory::create(void)
 {
     ERPC_CREATE_NEW_OBJECT(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT)
 }
 
-void BasicCodecFactory ::dispose(Codec *codec)
+void BasicCodecFactory::dispose(Codec *codec)
 {
     ERPC_DESTROY_OBJECT(codec, s_basicCodecManual, ERPC_CODEC_COUNT)
 }

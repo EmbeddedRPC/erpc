@@ -26,17 +26,17 @@ include ../../mk/erpc_common.mk
 
 # client or server
 ifeq "$(TYPE)" "CLIENT"
-APP_TYPE=client
-INCLUDES +=  $(ERPC_ROOT)/test/common/gtest
+    APP_TYPE=client
+    INCLUDES +=  $(ERPC_ROOT)/test/common/gtest
 else
-APP_TYPE=server
+    APP_TYPE=server
 endif
 
 # transport
 ifeq "$(TRANSPORT)" "tcp"
-CXXFLAGS += -DTRANSPORT_TCP
+    CXXFLAGS += -DTRANSPORT_TCP
 else ifeq "$(TRANSPORT)" "serial"
-CXXFLAGS += -DSERIAL
+    CXXFLAGS += -DSERIAL
 endif
 
 APP_NAME ?= $(TEST_NAME)_$(APP_TYPE)_$(TRANSPORT)_test
@@ -77,12 +77,12 @@ IDL_FILE = $(CUR_DIR).erpc
 
 ifneq "$(TEST_NAME)" "test_arbitrator"
 
-INCLUDES += $(ERPC_ROOT)/test/common/config
+    INCLUDES += $(ERPC_ROOT)/test/common/config
 
-SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
-            $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
-            $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
-            $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
+    SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
+                $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
+                $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
 .PHONY: all
 all: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py
@@ -103,28 +103,25 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
 	@$(call printmessage,orange,Running erpcgen-py $(TEST_NAME), $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(ERPCGEN) -gpy -o $(RPC_OBJS_ROOT)/ $(IDL_FILE)
 
-# Add libtest.a to build.
-LIBRARIES += -ltest
-LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
-
+    # Add libtest.a to build.
+    LIBRARIES += -ltest
+    LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
 else
+    ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
 
-ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
+    include $(ERPC_ROOT)/test/mk/erpc_src.mk
 
-include $(ERPC_ROOT)/test/mk/erpc_src.mk
-
-INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
+    INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
 
     ifeq "$(TYPE)" "CLIENT"
-include $(TEST_ROOT)/$(TEST_NAME)/client.mk
+        include $(TEST_ROOT)/$(TEST_NAME)/client.mk
     else
-include $(TEST_ROOT)/$(TEST_NAME)/server.mk
+        include $(TEST_ROOT)/$(TEST_NAME)/server.mk
     endif
 endif
 
 ifeq "$(is_linux)" "1"
-LIBRARIES += -lpthread -lrt
+    LIBRARIES += -lpthread -lrt
 endif
 
 include $(ERPC_ROOT)/mk/targets.mk
-

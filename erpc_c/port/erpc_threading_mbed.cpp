@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2019, Embedded Planet, Inc
  * Copyright 2021 ACRIOS Systems s.r.o.
+ * Copyright 2021 NXP
  * All rights reserved.
  *
  * For supporting transports and examples see:
@@ -12,7 +13,6 @@
 #include "erpc_threading.h"
 
 #include "platform/CriticalSectionLock.h"
-#include "platform/mbed_assert.h"
 
 #if ERPC_THREADS_IS(MBED)
 
@@ -39,7 +39,8 @@ Thread::Thread(const char *name)
 {
 }
 
-Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name)
+Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
+               thread_stack_pointer stackPtr)
 : m_name(name)
 , m_entry(entry)
 , m_arg(0)
@@ -59,11 +60,12 @@ Thread::~Thread(void)
     }
 }
 
-void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize)
+void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize, thread_stack_pointer stackPtr)
 {
     m_entry = entry;
     m_stackSize = stackSize;
     m_priority = priority;
+    m_stackPtr = stackPtr;
     m_thread =
         new rtos::Thread(osPriorityNormal, // Ignore priority because erpc does not map their priority to anything
                          ((m_stackSize + sizeof(uint32_t) - 1) / sizeof(uint32_t)), // Round up number of words
@@ -132,7 +134,7 @@ void Thread::threadEntryPoint(void)
 void Thread::threadEntryPointStub(void *arg)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg);
-    MBED_ASSERT(_this); // Reinterpreting 'void *arg' to 'Thread *' failed.
+    erpc_assert(_this); // Reinterpreting 'void *arg' to 'Thread *' failed.
     _this->threadEntryPoint();
 
     // Remove this thread from the linked list.
@@ -216,9 +218,21 @@ void Semaphore::put(void)
     m_sem->release();
 }
 
-bool Semaphore::get(uint32_t timeout)
+bool Semaphore::get(uint32_t timeoutUsecs)
 {
-    m_count = m_sem->wait(timeout);
+    if (timeoutUsecs != kWaitForever)
+    {
+        if (timeoutUsecs > 0U)
+        {
+            timeoutUsecs /= 1000U;
+            if (timeoutUsecs == 0U)
+            {
+                timeoutUsecs = 1U;
+            }
+        }
+    }
+
+    m_count = m_sem->wait(timeoutUsecs);
     return (m_count < 0);
 }
 

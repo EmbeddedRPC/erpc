@@ -33,7 +33,7 @@ public:
 
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         if (*buf)
         {
             delete[] buf->get();

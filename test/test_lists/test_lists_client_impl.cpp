@@ -44,6 +44,20 @@ TEST(test_list, SendReceivedInt32)
     erpc_free(received_list);
 }
 
+TEST(test_list, sendReceiveZeroSize)
+{
+    list_int32_1_t *received_list, send_list;
+    send_list.elementsCount = 0;
+    send_list.elements = NULL;
+
+    received_list = sendReceivedInt32(&send_list);
+
+    EXPECT_TRUE(received_list->elementsCount == 0);
+
+    erpc_free(received_list->elements);
+    erpc_free(received_list);
+}
+
 TEST(test_list, SendReceived2Int32)
 {
     list_int32_2_t *received_list, send_list;

@@ -329,6 +329,12 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
 
             if (isBinaryStruct(structType) || isListStruct(structType))
             {
+                DataType *memberDataType = structType->getMembers()[0]->getDataType();
+                if (memberDataType->isList())
+                {
+                    ListType *memberListDataType = dynamic_cast<ListType *>(memberDataType);
+                    findChildDataType(dataTypes, memberListDataType->getElementType());
+                }
                 break;
             }
 
@@ -2682,6 +2688,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
                 data_list unionCases;
                 data_list unionCasesToFree;
+                bool needCaseEmptyFreeingCall = false;
                 // call free function for this union, default not call any free function
                 templateData["freeingCall"] = make_template("", &params);
                 for (auto unionCase : unionType->getCases())
@@ -2731,6 +2738,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                             {
                                 // current member don't need free memory
                                 memberData["isNeedFreeingCall"] = false;
+                                needCaseEmptyFreeingCall = true;
                             }
                             caseMembers.push_back(memberData);
                             if (casesNeedTempVariable)
@@ -2743,6 +2751,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                     unionCases.push_back(caseData);
                 }
                 templateData["cases"] = unionCases;
+                templateData["needCaseEmptyFreeingCall"] = needCaseEmptyFreeingCall;
                 templateData["encode"] = m_templateData["encodeUnionType"];
                 templateData["decode"] = m_templateData["decodeUnionType"];
             }

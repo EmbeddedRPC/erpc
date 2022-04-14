@@ -13,7 +13,6 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.h"
 
-#include <assert.h>
 #include <string.h>
 
 #if !ERPC_THREADS_IS(NONE)
@@ -22,8 +21,7 @@
 
 using namespace erpc;
 
-#define ERPC_BUFFER_SIZE_UINT64 \
-    ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t))
+#define ERPC_BUFFER_SIZE_UINT64 ((ERPC_DEFAULT_BUFFER_SIZE + sizeof(uint64_t) - 1) / sizeof(uint64_t))
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -68,7 +66,7 @@ public:
             idx++;
         }
 
-        assert(idx < ERPC_DEFAULT_BUFFERS_COUNT);
+        erpc_assert(idx < ERPC_DEFAULT_BUFFERS_COUNT);
 
         m_freeBufferBitmap[idx >> 3U] &= ~(1U << (idx & 0x7U));
 #if !ERPC_THREADS_IS(NONE)
@@ -78,7 +76,7 @@ public:
         uint8_t *buf;
         buf = (uint8_t *)m_buffers[idx];
 
-        assert(NULL != buf);
+        erpc_assert(NULL != buf);
         return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
     }
 
@@ -89,7 +87,7 @@ public:
      */
     virtual void dispose(MessageBuffer *buf)
     {
-        assert(buf);
+        erpc_assert(buf);
         uint8_t *tmp = buf->get();
         if (tmp != NULL)
         {
@@ -114,8 +112,7 @@ public:
 protected:
     //! Bitmap representing which buffers are in use. A bit value of 1 means free and 0 means in
     //! use.
-    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) +
-                               (ERPC_DEFAULT_BUFFERS_COUNT % 8 ? 1U : 0U)];
+    uint8_t m_freeBufferBitmap[(ERPC_DEFAULT_BUFFERS_COUNT >> 3U) + (ERPC_DEFAULT_BUFFERS_COUNT % 8 ? 1U : 0U)];
     //! Static buffers
     uint64_t m_buffers[ERPC_DEFAULT_BUFFERS_COUNT][ERPC_BUFFER_SIZE_UINT64];
 #if !ERPC_THREADS_IS(NONE)

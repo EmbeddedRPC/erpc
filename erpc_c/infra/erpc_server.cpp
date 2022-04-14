@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2021 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -9,8 +9,6 @@
  */
 
 #include "erpc_server.h"
-
-#include "assert.h"
 
 using namespace erpc;
 
@@ -30,7 +28,7 @@ void Server::setTransport(Transport *transport)
 
 void Server::addService(Service *service)
 {
-    if (!m_firstService)
+    if (m_firstService == NULL)
     {
         m_firstService = service;
     }
@@ -90,7 +88,7 @@ erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint3
     if (err == kErpcStatus_Success)
     {
         service = findServiceWithId(serviceId);
-        if (!service)
+        if (service == NULL)
         {
             err = kErpcStatus_InvalidArgument;
         }

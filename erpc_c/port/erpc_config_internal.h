@@ -49,13 +49,13 @@
 
 // Detect allocation policy if not already set.
 #if !defined(ERPC_ALLOCATION_POLICY)
-    #if defined(__has_include) && __has_include("FreeRTOSConfig.h")
+    #if ERPC_HAS_FREERTOSCONFIG_H
         #ifdef __cplusplus
-        extern "C" {
+            extern "C" {
         #endif
         #include "FreeRTOSConfig.h"
         #ifdef __cplusplus
-        }
+            }
         #endif
         #if defined(configSUPPORT_STATIC_ALLOCATION) && configSUPPORT_STATIC_ALLOCATION
             #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_STATIC)
@@ -68,18 +68,15 @@
 #endif
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-#if !defined(ERPC_CODEC_COUNT)
-#define ERPC_CODEC_COUNT (2U)
-#warning "ERPC_CODEC_COUNT is not defined. Default is used."
-#endif
-#if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
-#define ERPC_MESSAGE_LOGGERS_COUNT (0U)
-#warning "ERPC_MESSAGE_LOGGERS_COUNT is not defined. Default is used."
-#endif
-#if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
-#define ERPC_CLIENTS_THREADS_AMOUNT (1U)
-#warning "ERPC_CLIENTS_THREADS_AMOUNT is not defined. Default is used."
-#endif
+    #if !defined(ERPC_CODEC_COUNT)
+        #define ERPC_CODEC_COUNT (2U)
+    #endif
+    #if !defined(ERPC_MESSAGE_LOGGERS_COUNT)
+        #define ERPC_MESSAGE_LOGGERS_COUNT (0U)
+    #endif
+    #if !defined(ERPC_CLIENTS_THREADS_AMOUNT)
+        #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
+    #endif
 #endif
 
 // Safely detect tx_api.h.
@@ -136,9 +133,9 @@
 
 //NOEXCEPT support
 #if defined(__cplusplus) && __cplusplus >= 201103 && ERPC_NOEXCEPT
-#define NOEXCEPT noexcept
+    #define NOEXCEPT noexcept
 #else
-#define NOEXCEPT
+    #define NOEXCEPT
 #endif // NOEXCEPT
 
 // Disabling nesting calls support as default.
@@ -165,11 +162,11 @@
 #endif
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION) /* Keil MDK */
-#define THROW_BADALLOC throw(std::bad_alloc)
-#define THROW throw()
+    #define THROW_BADALLOC throw(std::bad_alloc)
+    #define THROW throw()
 #else
-#define THROW_BADALLOC
-#define THROW
+    #define THROW_BADALLOC
+    #define THROW
 #endif
 
 #ifndef ERPC_TRANSPORT_MU_USE_MCMGR
@@ -196,6 +193,30 @@
 // Disabling pre and post default callback function code.
 #if !defined(ERPC_PRE_POST_ACTION_DEFAULT)
     #define ERPC_PRE_POST_ACTION_DEFAULT (ERPC_PRE_POST_ACTION_DEFAULT_DISABLED)
+#endif
+
+#if !defined(erpc_assert)
+    #if ERPC_HAS_FREERTOSCONFIG_H 
+        #ifdef __cplusplus
+            extern "C" {
+        #endif
+        #include "FreeRTOS.h"
+        #include "task.h"
+        #ifdef __cplusplus
+            }
+        #endif
+        #define erpc_assert(condition) configASSERT(condition)
+    #elif defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
+        #include "platform/mbed_assert.h"
+        #define erpc_assert(condition) MBED_ASSERT(condition)
+    #else
+        #ifdef __cplusplus
+            #include <cassert>
+        #else
+            #include "assert.h"
+        #endif
+        #define erpc_assert(condition) assert(condition)
+    #endif
 #endif
 
 /* clang-format on */
