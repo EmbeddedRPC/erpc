@@ -164,9 +164,7 @@ erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, voi
                 ready_cb();
             }
 
-            while (0 == rpmsg_lite_is_link_up(s_rpmsg))
-            {
-            }
+            rpmsg_lite_wait_for_link_up(s_rpmsg);
 
 #if RL_USE_STATIC_API
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
