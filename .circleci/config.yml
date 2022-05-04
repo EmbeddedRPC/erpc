@@ -7,36 +7,28 @@ jobs:
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
-      - run: CC=gcc CXX=g++ PYTHON=python3 make all
-      - run: pushd erpcgen/test ; py.test ; popd
-      - run: python3 test/run_unit_tests.py
+      - run: chmod u+x run_tests.sh && ./run_tests.sh
   build-linux-clang:
     machine:
       image: ubuntu-2004:202111-02
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
-      - run: CC=clang CXX=clang++ PYTHON=python3 make all
-      - run: pushd erpcgen/test ; py.test ; popd
-      - run: python3 test/run_unit_tests.py
+      - run: chmod u+x run_tests.sh && ./run_tests.sh clang
   build-mac-gcc:
     macos:
       xcode: 13.2.1
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
-      - run: CC=gcc CXX=g++ PYTHON=python3 make all
-      - run: pushd erpcgen/test ; py.test ; popd
-      - run: python3 test/run_unit_tests.py
+      - run: chmod u+x run_tests.sh && ./run_tests.sh
   build-mac-clang:
     macos:
       xcode: 13.2.1
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
-      - run: CC=clang CXX=clang++ PYTHON=python3 make all
-      - run: pushd erpcgen/test ; py.test ; popd
-      - run: python3 test/run_unit_tests.py
+      - run: chmod u+x run_tests.sh && ./run_tests.sh clang
 
 
 workflows:
