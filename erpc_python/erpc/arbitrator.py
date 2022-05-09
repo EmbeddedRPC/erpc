@@ -6,17 +6,24 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import threading
-from collections import namedtuple
+
 from .codec import MessageType
 from .transport import Transport
+from .client import RequestContext
+
 
 class ClientInfo:
     event = None
     msg = None
 
-##
-# @brief Shares a transport between a server and multiple clients.
+
 class TransportArbitrator(Transport):
+    """ Shares a transport between a server and multiple clients.
+
+    Args:
+        Transport (_type_): Inherit and define transport interface methods
+    """
+
     def __init__(self, sharedTransport=None, codec=None):
         self._transport = sharedTransport
         self._codec = codec
@@ -76,17 +83,20 @@ class TransportArbitrator(Transport):
                 # No client was found, unexpected sequence number!
                 pass
 
-    ##
-    # @brief Add a client request to the client list.
-    #
-    # This call is made by the client thread prior to sending the invocation to the server. It
-    # ensures that the transport arbitrator has the client's response message buffer ready in
-    # case it sees the response before the client even has a chance to call client_receive().
-    #
-    # @param self
-    # @param requestContext
-    # @return A token value to be passed to client_receive().
-    def prepare_client_receive(self, requestContext):
+    def prepare_client_receive(self, requestContext: RequestContext):
+        """ Add a client request to the client list.
+
+        This call is made by the client thread prior to sending the invocation to the server. It
+        Ensures that the transport arbitrator has the client's response message buffer ready in
+        case it sees the response before the client even has a chance to call client_receive().
+
+        Args:
+            requestContext (client.RequestContext): _description_
+
+        Returns:
+            int: A token value to be passed to client_receive().
+        """
+
         # Create pending client info.
         info = ClientInfo()
         info.event = threading.Event()
@@ -100,16 +110,18 @@ class TransportArbitrator(Transport):
 
         return requestContext.sequence
 
-    ##
-    # @brief Receive method for the client.
-    #
-    # Blocks until the a reply message is received with the expected sequence number that is
-    # associated with @a token. The client must have called prepare_client_receive() previously.
-    #
-    # @param self
-    # @param token The token previously returned by prepare_client_receive().
-    # @return bytearray containing the received message.
-    def client_receive(self, token):
+    def client_receive(self, token: int):
+        """ Receive method for the client.
+
+        Blocks until the a reply message is received with the expected sequence number that is
+        associated with @a token. The client must have called prepare_client_receive() previously.
+
+        Args:
+            token (int): The token previously returned by prepare_client_receive().
+
+        Returns:
+            bytearray: containing the received message.
+        """
         try:
             # Look up our client info.
             try:
@@ -132,6 +144,3 @@ class TransportArbitrator(Transport):
             return client.msg
         except KeyError:
             pass
-
-
-

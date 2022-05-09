@@ -8,7 +8,7 @@
 
 //Add data structures and function prototypes here
 //using Freescale's eRPC IDL language
-@include("myAlloc.h")
+@c:include("myAlloc.h")
 @output_dir("erpc_outputs")
 program test;
 

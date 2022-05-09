@@ -7,8 +7,10 @@
 
 from .codec import MessageType
 
+
 class RequestError(RuntimeError):
     pass
+
 
 class ClientManager(object):
     def __init__(self, transport=None, codecClass=None):
@@ -73,7 +75,7 @@ class ClientManager(object):
                 raise RequestError("invalid reply message type")
             if info.sequence != request.sequence:
                 raise RequestError("unexpected sequence number in reply (was %d, expected %d)"
-                            % (info.sequence, request.sequence))
+                                   % (info.sequence, request.sequence))
 
 
 class RequestContext(object):
@@ -98,6 +100,3 @@ class RequestContext(object):
     @property
     def is_oneway(self):
         return self._isOneway
-
-
-

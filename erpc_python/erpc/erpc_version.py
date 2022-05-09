@@ -5,5 +5,5 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-#Should be same as in erpc_version.h
+# Should be same as in erpc_version.h
 ERPC_VERSION = "1.9.0"

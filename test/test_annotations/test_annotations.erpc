@@ -8,10 +8,10 @@
 
 //Add data structures and function prototypes here
 //using Freescale's eRPC IDL language
-@include("myAlloc.h")
-@output_dir("erpc_outputs/") // testing directory with slash on end
-@include("addOne.h")
-@include("external.h")
+@c:include("myAlloc.h")
+@c:output_dir("erpc_outputs/") // testing directory with slash on end
+@c:include("addOne.h")
+@c:include("external.h")
 program test;
 import "../common/unit_test_common.erpc"
 
