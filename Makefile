@@ -28,11 +28,12 @@ include mk/erpc_common.mk
 
 ifeq "$(is_linux)" "1"
 ERPCSNIFFER = erpcsniffer
+MYDEMO = examples/linux_demo
 endif
 
 # Subdirectories to run make on.
 TESTDIR = test
-SUBDIRS_LIST = erpcgen $(ERPCSNIFFER) $(TESTDIR)
+SUBDIRS_LIST = erpcgen $(ERPCSNIFFER) $(TESTDIR) $(MYDEMO)
 # test if all exists
 SUBDIRS = $(foreach f,$(SUBDIRS_LIST), $(if $(wildcard $(f)), $(f)))
 

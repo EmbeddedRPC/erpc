@@ -1,0 +1,17 @@
+/*! Define the project name, which is also the prefix of all generated source code files */
+program erpcdemo
+
+/*! Define the return status enumeration type */
+enum lockErrors_t
+{
+  lErrorOk_c = 0,
+  lErrorOutofMemory_c,
+  // ...define the status code
+  // Maximum enumeration type value
+  lErrorMaxError_c
+}
+
+/*! Define service interface function */
+interface DEMO {
+    RD_demoHello(binary txInput) -> binary
+}
