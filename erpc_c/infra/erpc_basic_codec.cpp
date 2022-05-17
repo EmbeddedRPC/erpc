@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "erpc_config_internal.h"
 #include "erpc_basic_codec.h"
 #include "erpc_manually_constructed.h"
 
@@ -56,16 +57,22 @@ void BasicCodec::write(int8_t value)
 
 void BasicCodec::write(int16_t value)
 {
+    ERPC_WRITE_AGNOSTIC_16(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(int32_t value)
 {
+    ERPC_WRITE_AGNOSTIC_32(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(int64_t value)
 {
+    ERPC_WRITE_AGNOSTIC_64(value);
+
     writeData(&value, sizeof(value));
 }
 
@@ -76,26 +83,36 @@ void BasicCodec::write(uint8_t value)
 
 void BasicCodec::write(uint16_t value)
 {
+    ERPC_WRITE_AGNOSTIC_16(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(uint32_t value)
 {
+    ERPC_WRITE_AGNOSTIC_32(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(uint64_t value)
 {
+    ERPC_WRITE_AGNOSTIC_64(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(float value)
 {
+    ERPC_WRITE_AGNOSTIC_FLOAT(value);
+
     writeData(&value, sizeof(value));
 }
 
 void BasicCodec::write(double value)
 {
+    ERPC_WRITE_AGNOSTIC_DOUBLE(value);
+
     writeData(&value, sizeof(value));
 }
 
@@ -104,6 +121,8 @@ void BasicCodec::writePtr(uintptr_t value)
     uint8_t ptrSize = (uint8_t)sizeof(value);
 
     write(ptrSize);
+
+    ERPC_WRITE_AGNOSTIC_PTR(value);
 
     writeData(&value, ptrSize);
 }
@@ -218,16 +237,28 @@ void BasicCodec::read(int8_t *value)
 void BasicCodec::read(int16_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_16(*value);
+    }
 }
 
 void BasicCodec::read(int32_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_32(*value);
+    }
 }
 
 void BasicCodec::read(int64_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_64(*value);
+    }
 }
 
 void BasicCodec::read(uint8_t *value)
@@ -238,26 +269,46 @@ void BasicCodec::read(uint8_t *value)
 void BasicCodec::read(uint16_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_16(*value);
+    }
 }
 
 void BasicCodec::read(uint32_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_32(*value);
+    }
 }
 
 void BasicCodec::read(uint64_t *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_64(*value);
+    }
 }
 
 void BasicCodec::read(float *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_FLOAT(*value);
+    }
 }
 
 void BasicCodec::read(double *value)
 {
     readData(value, sizeof(*value));
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_DOUBLE(*value);
+    }
 }
 
 void BasicCodec::readPtr(uintptr_t *value)
@@ -272,6 +323,10 @@ void BasicCodec::readPtr(uintptr_t *value)
     }
 
     readData(value, ptrSize);
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_PTR(*value);
+    }
 }
 
 void BasicCodec::readString(uint32_t *length, char **value)

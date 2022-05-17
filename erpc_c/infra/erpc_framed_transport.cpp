@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "erpc_config_internal.h"
 #include "erpc_framed_transport.h"
 #include "erpc_message_buffer.h"
 
@@ -55,6 +56,9 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 
         if (retVal == kErpcStatus_Success)
         {
+            ERPC_READ_AGNOSTIC_16(h.m_messageSize);
+            ERPC_READ_AGNOSTIC_16(h.m_crc);
+
             // received size can't be zero.
             if (h.m_messageSize == 0U)
             {
@@ -112,6 +116,10 @@ erpc_status_t FramedTransport::send(MessageBuffer *message)
     // Send header first.
     h.m_messageSize = messageLength;
     h.m_crc = m_crcImpl->computeCRC16(message->get(), messageLength);
+
+    ERPC_WRITE_AGNOSTIC_16(h.m_messageSize);
+    ERPC_WRITE_AGNOSTIC_16(h.m_crc);
+
     ret = underlyingSend((uint8_t *)&h, sizeof(h));
     if (ret == kErpcStatus_Success)
     {
