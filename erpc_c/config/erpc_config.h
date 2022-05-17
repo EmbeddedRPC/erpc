@@ -183,96 +183,110 @@
 
 //! @name Assert function definition
 //@{
-//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will be used.
+//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will
+//! be used.
 // #define erpc_assert(condition)
 //@}
-
 
 //! @def ERPC_WRITE_AGNOSTIC_16(value)
 //!
 //! Write int16_t and uint16_t in decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_16(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_16(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_WRITE_AGNOSTIC_16(value)
 
 //! @def ERPC_WRITE_AGNOSTIC_32(value)
 //!
 //! Write int32_t and uint32_t in decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_32(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_32(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_WRITE_AGNOSTIC_32(value)
 
 //! @def ERPC_WRITE_AGNOSTIC_64(value)
 //!
 //! Write int64_t and uint64_t in decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_64(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_64(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_WRITE_AGNOSTIC_64(value)
 
 //! @def ERPC_WRITE_AGNOSTIC_FLOAT(value)
 //!
-//! Write float in decided transport layer format and byte order, needed when processors uses different endianness/format for floats.
+//! Write float in decided transport layer format and byte order, needed when processors uses different
+//! endianness/format for floats.
 //!
-//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport layer byte order/format.
+//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport
+//! layer byte order/format.
 //#define ERPC_WRITE_AGNOSTIC_FLOAT(value)
 
 //! @def ERPC_WRITE_AGNOSTIC_DOUBLE(value)
 //!
-//! Write double in decided transport layer format and byte order, needed when processors uses different endianness/format for doubles.
+//! Write double in decided transport layer format and byte order, needed when processors uses different
+//! endianness/format for doubles.
 //!
-//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport layer byte order/format.
+//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport
+//! layer byte order/format.
 //#define ERPC_WRITE_AGNOSTIC_DOUBLE(value)
 
 //! @def ERPC_WRITE_AGNOSTIC_PTR(value)
 //!
 //! Write pointer in decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [probably using one of the above defines with correct num of bits] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [probably using one of the above defines with correct num of bits] if current
+//! order is not transport layer byte order.
 //#define ERPC_WRITE_AGNOSTIC_PTR(value)
 
 //! @def ERPC_READ_AGNOSTIC_16(value)
 //!
 //! Read int16_t and uint16_t from decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_16(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_16(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_READ_AGNOSTIC_16(value)
 
 //! @def ERPC_READ_AGNOSTIC_32(value)
 //!
 //! Read int32_t and uint32_t from decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_32(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_32(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_READ_AGNOSTIC_32(value)
 
 //! @def ERPC_READ_AGNOSTIC_64(value)
 //!
 //! Read int64_t and uint64_t from decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [for example, (value) = __bswap_64(value)] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [for example, (value) = __bswap_64(value)] if current order is not transport
+//! layer byte order.
 //#define ERPC_READ_AGNOSTIC_64(value)
 
 //! @def ERPC_READ_AGNOSTIC_FLOAT(value)
 //!
-//! Read float from decided transport layer format and byte order, needed when processors uses different endianness/format for floats.
+//! Read float from decided transport layer format and byte order, needed when processors uses different
+//! endianness/format for floats.
 //!
-//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport layer byte order/format.
+//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport
+//! layer byte order/format.
 //#define ERPC_READ_AGNOSTIC_FLOAT(value)
 
 //! @def ERPC_READ_AGNOSTIC_DOUBLE(value)
 //!
-//! Read double from decided transport layer format and byte order, needed when processors uses different endianness/format for doubles.
+//! Read double from decided transport layer format and byte order, needed when processors uses different
+//! endianness/format for doubles.
 //!
-//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport layer byte order/format.
+//! Uncomment and add your implementation [Dependant on your architecture] if current order/format is not transport
+//! layer byte order/format.
 //#define ERPC_READ_AGNOSTIC_DOUBLE(value)
 
 //! @def ERPC_READ_AGNOSTIC_PTR(value)
 //!
 //! Read pointer from decided transport layer byte order, needed when processors uses different endianness.
 //!
-//! Uncomment and add your implementation [probably using one of the above defines with correct num of bits] if current order is not transport layer byte order.
+//! Uncomment and add your implementation [probably using one of the above defines with correct num of bits] if current
+//! order is not transport layer byte order.
 //#define ERPC_READ_AGNOSTIC_PTR(value)
-
-
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_

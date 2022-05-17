@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_config_internal.h"
 #include "erpc_basic_codec.h"
+
+#include "erpc_config_internal.h"
 #include "erpc_manually_constructed.h"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
@@ -27,7 +28,8 @@ const uint32_t BasicCodec::kBasicCodecVersion = 1UL;
 
 void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32_t request, uint32_t sequence)
 {
-    uint32_t header = (kBasicCodecVersion << 24u) | ((service & 0xffu) << 16u) | ((request & 0xffu) << 8u) | ((uint32_t)type & 0xffu);
+    uint32_t header =
+        (kBasicCodecVersion << 24u) | ((service & 0xffu) << 16u) | ((request & 0xffu) << 8u) | ((uint32_t)type & 0xffu);
 
     write(header);
 
