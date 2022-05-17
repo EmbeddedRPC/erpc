@@ -58,13 +58,13 @@ void operator delete[](void *ptr) THROW
 
 void *erpc_malloc(size_t size)
 {
-    void *p = MEM_BufferAllocForever(size, 0);
+    void *p = MEM_BufferAllocWithId(size, 0);
     return p;
 }
 
 void erpc_free(void *ptr)
 {
-    MEM_BufferFree(ptr);
+    erpc_assert(MEM_BufferFree(ptr) == kStatus_MemSuccess);
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */

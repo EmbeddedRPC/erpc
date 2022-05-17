@@ -62,7 +62,7 @@ void *erpc_malloc(size_t size)
 
 void erpc_free(void *ptr)
 {
-    _mem_free(ptr);
+    erpc_assert(_mem_free(ptr) == MQX_OK);
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
