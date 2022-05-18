@@ -64,7 +64,10 @@ void *erpc_malloc(size_t size)
 
 void erpc_free(void *ptr)
 {
-    erpc_assert(MEM_BufferFree(ptr) == kStatus_MemSuccess);
+    if (ptr != NULL)
+    {
+        erpc_assert(MEM_BufferFree(ptr) == kStatus_MemSuccess);
+    }
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
