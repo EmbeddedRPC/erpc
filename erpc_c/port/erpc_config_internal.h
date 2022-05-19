@@ -219,43 +219,9 @@
     #endif
 #endif
 
-// Disabling endianness agnostic feature
-#if !defined(ERPC_WRITE_AGNOSTIC_16)
-    #define ERPC_WRITE_AGNOSTIC_16(value)
-#endif
-#if !defined(ERPC_WRITE_AGNOSTIC_32)
-    #define ERPC_WRITE_AGNOSTIC_32(value)
-#endif
-#if !defined(ERPC_WRITE_AGNOSTIC_64)
-    #define ERPC_WRITE_AGNOSTIC_64(value)
-#endif
-#if !defined(ERPC_WRITE_AGNOSTIC_FLOAT)
-    #define ERPC_WRITE_AGNOSTIC_FLOAT(value)
-#endif
-#if !defined(ERPC_WRITE_AGNOSTIC_DOUBLE)
-    #define ERPC_WRITE_AGNOSTIC_DOUBLE(value)
-#endif
-#if !defined(ERPC_WRITE_AGNOSTIC_PTR)
-    #define ERPC_WRITE_AGNOSTIC_PTR(value)
-#endif
-
-#if !defined(ERPC_READ_AGNOSTIC_16)
-    #define ERPC_READ_AGNOSTIC_16(value)
-#endif
-#if !defined(ERPC_READ_AGNOSTIC_32)
-    #define ERPC_READ_AGNOSTIC_32(value)
-#endif
-#if !defined(ERPC_READ_AGNOSTIC_64)
-    #define ERPC_READ_AGNOSTIC_64(value)
-#endif
-#if !defined(ERPC_READ_AGNOSTIC_FLOAT)
-    #define ERPC_READ_AGNOSTIC_FLOAT(value)
-#endif
-#if !defined(ERPC_READ_AGNOSTIC_DOUBLE)
-    #define ERPC_READ_AGNOSTIC_DOUBLE(value)
-#endif
-#if !defined(ERPC_READ_AGNOSTIC_PTR)
-    #define ERPC_READ_AGNOSTIC_PTR(value)
+// Disabling endianness agnostic feature.
+#ifndef ENDIANES_HEADER
+    #define ENDIANES_HEADER "erpc_endianness_undefined.h"
 #endif
 
 /* clang-format on */
