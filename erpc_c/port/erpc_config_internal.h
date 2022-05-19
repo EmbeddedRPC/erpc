@@ -220,8 +220,8 @@
 #endif
 
 // Disabling endianness agnostic feature.
-#ifndef ENDIANES_HEADER
-    #define ENDIANES_HEADER "erpc_endianness_undefined.h"
+#ifndef ENDIANNESS_HEADER
+    #define ENDIANNESS_HEADER "erpc_endianness_undefined.h"
 #endif
 
 /* clang-format on */

@@ -202,7 +202,7 @@
 //! #define ERPC_POINTER_SIZE_16             0
 //! #define ERPC_POINTER_SIZE_32             1
 //! #define ERPC_POINTER_SIZE_64             0
-//! #define ENDIANES_HEADER "erpc_endianness_agnostic_example.h"
+//! #define ENDIANNESS_HEADER "erpc_endianness_agnostic_example.h"
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_
