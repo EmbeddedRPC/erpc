@@ -20,6 +20,12 @@ extern "C" {
 using namespace std;
 #endif
 
+/* Backward compatibility for older version of driver. */
+#if !defined(MEM_BufferAllocForever)
+    #define MEM_BufferAllocForever MEM_BufferAllocWithId
+    #define MEM_SUCCESS_c kStatus_MemSuccess
+#endif
+
 void *operator new(std::size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
@@ -58,7 +64,7 @@ void operator delete[](void *ptr) THROW
 
 void *erpc_malloc(size_t size)
 {
-    void *p = MEM_BufferAllocWithId(size, 0);
+    void *p = MEM_BufferAllocForever(size, 0);
     return p;
 }
 
@@ -66,7 +72,7 @@ void erpc_free(void *ptr)
 {
     if (ptr != NULL)
     {
-        erpc_assert(MEM_BufferFree(ptr) == kStatus_MemSuccess);
+        erpc_assert(MEM_BufferFree(ptr) == MEM_SUCCESS_c);
     }
 }
 
