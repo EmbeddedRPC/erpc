@@ -61,8 +61,8 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_simple_server.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.cpp \
-			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
-			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
+			$(ERPC_C_ROOT)/port/erpc_port_zephyr.cpp \
+			$(ERPC_C_ROOT)/port/erpc_threading_zephyr.cpp \
 			$(ERPC_C_ROOT)/port/erpc_serial.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp \
 			$(ERPC_C_ROOT)/setup/erpc_client_setup.cpp \

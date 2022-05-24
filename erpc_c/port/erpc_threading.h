@@ -156,7 +156,7 @@ public:
 #elif ERPC_THREADS_IS(FREERTOS)
         return reinterpret_cast<thread_id_t>(m_task);
 #elif ERPC_THREADS_IS(ZEPHYR)
-        return reinterpret_cast<thread_id_t>(m_thread);
+        return reinterpret_cast<thread_id_t>(m_thread_id);
 #elif ERPC_THREADS_IS(MBED)
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
@@ -194,7 +194,7 @@ public:
      *
      * @param[in] stack Stack pointer.
      */
-    void setStackPointer(k_thread_stack_t *stack) { m_stack = stack; }
+    //void setStackPointer(k_thread_stack_t *stack) { m_stack = stack; }
 #endif
 
     /*!
@@ -239,7 +239,7 @@ private:
 #endif
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_thread m_thread;  /*!< Current thread. */
-    k_thread_stack_t *m_stack; /*!< Pointer to stack. */
+    k_tid_t m_thread_id = 0;  /*!< Current thread. */
 #elif ERPC_THREADS_IS(MBED)
     rtos::Thread *m_thread; /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
@@ -489,7 +489,7 @@ public:
      *
      * @return Semaphore count number.
      */
-    int getCount(void) const;
+    int getCount(void);
 
 private:
 #if ERPC_THREADS_IS(PTHREADS)

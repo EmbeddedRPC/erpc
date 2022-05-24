@@ -14,11 +14,11 @@
 #include <err.h>
 #endif
 #include <errno.h>
-#include <netdb.h>
-#include <netinet/tcp.h>
+//#include <netdb.h>
+//#include <netinet/tcp.h>
 #include <signal.h>
 #include <string>
-#include <sys/socket.h>
+#include <net/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -134,14 +134,14 @@ erpc_status_t TCPTransport::connectClient(void)
             for (res = res0; res; res = res->ai_next)
             {
                 // Create the socket.
-                sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+                sock = zsock_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
                 if (sock < 0)
                 {
                     continue;
                 }
 
                 // Attempt to connect.
-                if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
+                if (zsock_connect(sock, res->ai_addr, res->ai_addrlen) < 0)
                 {
                     ::close(sock);
                     sock = -1;
@@ -153,7 +153,7 @@ erpc_status_t TCPTransport::connectClient(void)
             }
 
             // Free the result list.
-            freeaddrinfo(res0);
+            zsock_freeaddrinfo(res0);
 
             // Check if we were able to open a connection.
             if (sock < 0)
@@ -167,7 +167,7 @@ erpc_status_t TCPTransport::connectClient(void)
         if (status == kErpcStatus_Success)
         {
             set = 1;
-            if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int)) < 0)
+            if (zsock_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int)) < 0)
             {
                 ::close(sock);
                 TCP_DEBUG_ERR("setsockopt failed");
@@ -184,7 +184,7 @@ erpc_status_t TCPTransport::connectClient(void)
             // Disable SIGPIPE for this socket. This will cause write() to return an EPIPE statusor if the
             // other side has disappeared instead of our process receiving a SIGPIPE.
             set = 1;
-            if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int)) < 0)
+            if (zsock_setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int)) < 0)
             {
                 ::close(sock);
                 TCP_DEBUG_ERR("setsockopt failed");
@@ -236,8 +236,7 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
     // Loop until all requested data is received.
     while (size > 0U)
     {
-        length = read(m_socket, data, size);
-
+        length = zsock_recv(m_socket, data, size, 0);
         // Length will be zero if the connection is closed.
         if (length > 0)
         {
@@ -249,7 +248,7 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
             if (length == 0)
             {
                 // close socket, not server
-                close(false);
+                zsock_close(false);
                 status = kErpcStatus_ConnectionClosed;
             }
             else
@@ -278,7 +277,7 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
         // Loop until all data is sent.
         while (size > 0U)
         {
-            result = write(m_socket, data, size);
+            result = zsock_send(m_socket, data, size, 0);
             if (result >= 0)
             {
                 size -= result;
@@ -289,7 +288,7 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
                 if (result == EPIPE)
                 {
                     // close socket, not server
-                    close(false);
+                    zsock_close(m_socket);
                     status = kErpcStatus_ConnectionClosed;
                 }
                 else
@@ -318,7 +317,7 @@ void TCPTransport::serverThread(void)
     TCP_DEBUG_PRINT("%s", "in server thread\n");
 
     // Create socket.
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    serverSocket = zsock_socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket < 0)
     {
         TCP_DEBUG_ERR("failed to create server socket");
@@ -332,7 +331,7 @@ void TCPTransport::serverThread(void)
         serverAddress.sin_port = htons(m_port);
 
         // Turn on reuse address option.
-        result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+        result = zsock_setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
         if (result < 0)
         {
             TCP_DEBUG_ERR("setsockopt failed");
@@ -342,7 +341,7 @@ void TCPTransport::serverThread(void)
         if (!status)
         {
             // Bind socket to address.
-            result = bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
+            result = zsock_bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
             if (result < 0)
             {
                 TCP_DEBUG_ERR("bind failed");
@@ -353,7 +352,7 @@ void TCPTransport::serverThread(void)
         if (!status)
         {
             // Listen for connections.
-            result = listen(serverSocket, 1);
+            result = zsock_listen(serverSocket, 1);
             if (result < 0)
             {
                 TCP_DEBUG_ERR("listen failed");
@@ -369,14 +368,14 @@ void TCPTransport::serverThread(void)
             {
                 incomingAddressLength = sizeof(struct sockaddr);
                 // we should use select() otherwise we can't end the server properly
-                incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
+                incomingSocket = zsock_accept(serverSocket, &incomingAddress, &incomingAddressLength);
                 if (incomingSocket > 0)
                 {
                     // Successfully accepted a connection.
                     m_socket = incomingSocket;
                     // should be inherited from accept() socket but it's not always ...
                     yes = 1;
-                    setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes));
+                    zsock_setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes));
                 }
                 else
                 {
