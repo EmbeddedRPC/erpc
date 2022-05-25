@@ -52,8 +52,8 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 
         // Receive header first.
         retVal = underlyingReceive((uint8_t *)&h, sizeof(h));
-        
-	if (retVal == kErpcStatus_Success)
+
+        if (retVal == kErpcStatus_Success)
         {
             // received size can't be zero.
             if (h.m_messageSize == 0U)
@@ -70,8 +70,8 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
                 retVal = kErpcStatus_ReceiveFailed;
             }
         }
-        
-	if (retVal == kErpcStatus_Success)
+
+        if (retVal == kErpcStatus_Success)
         {
             // Receive rest of the message now we know its size.
             retVal = underlyingReceive(message->get(), h.m_messageSize);
