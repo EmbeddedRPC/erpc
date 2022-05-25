@@ -14,8 +14,6 @@
 #include <err.h>
 #endif
 #include <errno.h>
-//#include <netdb.h>
-//#include <netinet/tcp.h>
 #include <signal.h>
 #include <string>
 #include <net/socket.h>
