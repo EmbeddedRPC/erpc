@@ -72,3 +72,4 @@ erpc_status_t InterThreadBufferTransport::send(MessageBuffer *message)
 
     return kErpcStatus_Success;
 }
+

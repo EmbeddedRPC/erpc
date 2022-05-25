@@ -8,7 +8,7 @@
  */
 
 #include "erpc_port.h"
-
+#include <stdlib.h>
 #include <new>
 
 extern "C" {
@@ -54,13 +54,13 @@ void operator delete[](void *ptr) THROW
 
 void *erpc_malloc(size_t size)
 {
-    void *p = k_malloc(size);
+    void *p = malloc(size);
     return p;
 }
 
 void erpc_free(void *ptr)
 {
-    k_free(ptr);
+    free(ptr);
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */
