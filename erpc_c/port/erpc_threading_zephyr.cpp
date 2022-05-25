@@ -10,7 +10,8 @@
 #include "erpc_threading.h"
 #if ERPC_THREADS_IS(ZEPHYR)
 using namespace erpc;
-K_THREAD_STACK_DEFINE(saas_thread_stack, 4096);
+#define STACK_SIZE 4096
+K_THREAD_STACK_DEFINE(saas_thread_stack, STACK_SIZE);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -50,7 +51,7 @@ void Thread::init(thread_entry_t entry, uint32_t priority, uint32_t stackSize, t
 void Thread::start(void *arg)
 {
     m_arg = arg;
-    m_thread_id = k_thread_create(&m_thread, saas_thread_stack, 4096, (k_thread_entry_t) threadEntryPointStub, this, NULL, NULL, m_priority, 0, K_NO_WAIT);
+    m_thread_id = k_thread_create(&m_thread, saas_thread_stack, STACK_SIZE, (k_thread_entry_t) threadEntryPointStub, this, NULL, NULL, m_priority, 0, K_NO_WAIT);
 }
 
 bool Thread::operator==(Thread &o)
