@@ -188,15 +188,6 @@ public:
 #endif
     }
 
-#if ERPC_THREADS_IS(ZEPHYR)
-    /*!
-     * @brief This function sets stack pointer for Zephyr task.
-     *
-     * @param[in] stack Stack pointer.
-     */
-    //void setStackPointer(k_thread_stack_t *stack) { m_stack = stack; }
-#endif
-
     /*!
      * @brief This function returns Thread instance where functions is called.
      *
