@@ -246,7 +246,7 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
             if (length == 0)
             {
                 // close socket, not server
-                zsock_close(false);
+                zsock_close(m_socket);
                 status = kErpcStatus_ConnectionClosed;
             }
             else
