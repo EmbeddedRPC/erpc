@@ -66,7 +66,7 @@ Thread *Thread::getCurrentThread(void)
 
 void Thread::sleep(uint32_t usecs)
 {
-    k_sleep(k_timeout_t {usecs / 1000});
+    k_sleep(K_USEC(usecs));
 }
 
 void Thread::threadEntryPoint(void)
