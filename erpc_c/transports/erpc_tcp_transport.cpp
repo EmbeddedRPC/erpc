@@ -195,8 +195,10 @@ erpc_status_t TCPTransport::connectClient(void)
         if (status == kErpcStatus_Success)
         {
 #else
+#if defined(SIGPIPE)
             // globally disable the SIGPIPE signal
             signal(SIGPIPE, SIG_IGN);
+#endif // defined(SIGPIPE)
 #endif // defined(SO_NOSIGPIPE)
             m_socket = sock;
         }
