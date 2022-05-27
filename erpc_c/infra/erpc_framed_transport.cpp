@@ -43,7 +43,7 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
     erpc_status_t retVal;
     uint16_t computedCrc;
 
-    erpc_assert(m_crcImpl && "Uninitialized Crc16 object.");
+    erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
 
     {
 #if !ERPC_THREADS_IS(NONE)
@@ -101,7 +101,7 @@ erpc_status_t FramedTransport::send(MessageBuffer *message)
     uint16_t messageLength;
     Header h;
 
-    erpc_assert(m_crcImpl && "Uninitialized Crc16 object.");
+    erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
 
 #if !ERPC_THREADS_IS(NONE)
     Mutex::Guard lock(m_sendLock);

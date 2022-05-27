@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016 - 2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -22,13 +22,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#if defined(RPMSG)
+#include "rpmsg_lite.h"
+#endif
 #include "app_core0.h"
 #include "board.h"
 #include "fsl_debug_console.h"
 #include "mcmgr.h"
-#if defined(RPMSG)
-#include "rpmsg_lite.h"
-#endif
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, char **argv);
 #endif
@@ -93,7 +93,9 @@ void runClient(void *arg)
     // send to ERPC second (server) app message that this app is ready.
     whenReady();
 
-    RUN_ALL_TESTS();
+    __attribute__((unused))
+    int i;
+    i = RUN_ALL_TESTS();
 
     // wait until ERPC second (server) app will announce ready to quit state.
     while (true)

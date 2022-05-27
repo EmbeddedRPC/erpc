@@ -10,27 +10,26 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "board.h"
-#include "gtest.h"
-#include "gtestListener.h"
-#include "myAlloc.h"
-#include "test_unit_test_common.h"
-
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
-#include "app_core0.h"
-#include "board.h"
-#include "fsl_debug_console.h"
-#include "mcmgr.h"
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
 #elif defined(UART)
 #include "fsl_usart_cmsis.h"
 #endif
+#include "app_core0.h"
+#include "fsl_debug_console.h"
+#include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, char **argv);
 #endif
 }
+
+#include "board.h"
+#include "gtest.h"
+#include "gtestListener.h"
+#include "myAlloc.h"
+#include "test_unit_test_common.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"

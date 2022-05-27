@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -61,7 +61,7 @@ TEST(test_arrays, sendReceived2Int32)
 
 TEST(test_arrays, sendReceivedString)
 {
-    char *(send_array[12]);
+    char *send_array[12];
     char *(*received_array)[12];
 
     char text[] = "Hello";

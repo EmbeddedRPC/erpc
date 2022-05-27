@@ -47,7 +47,7 @@ void ClientManager::performRequest(RequestContext &request)
 #if ERPC_NESTED_CALLS
     if (performRequest)
     {
-        erpc_assert(m_serverThreadId && "server thread id was not set");
+        erpc_assert((m_serverThreadId != NULL) && ("server thread id was not set" != NULL));
         if (Thread::getCurrentThreadId() == m_serverThreadId)
         {
             performNestedClientRequest(request);
@@ -118,7 +118,7 @@ void ClientManager::performNestedClientRequest(RequestContext &request)
 {
     erpc_status_t err;
 
-    erpc_assert(m_transport && "transport/arbitrator not set");
+    erpc_assert((m_transport != NULL) && ("transport/arbitrator not set" != NULL));
 
 #if ERPC_MESSAGE_LOGGING
     if (request.getCodec()->isStatusOk() == true)
@@ -141,7 +141,7 @@ void ClientManager::performNestedClientRequest(RequestContext &request)
         // Receive reply.
         if (request.getCodec()->isStatusOk() == true)
         {
-            erpc_assert(m_server && "server for nesting calls was not set");
+            erpc_assert((m_server != NULL) && ("server for nesting calls was not set" != NULL));
             err = m_server->run(request);
             request.getCodec()->updateStatus(err);
         }
