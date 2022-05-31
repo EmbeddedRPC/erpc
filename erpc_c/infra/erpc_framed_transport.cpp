@@ -11,6 +11,7 @@
 #include "erpc_framed_transport.h"
 
 #include "erpc_config_internal.h"
+#include ENDIANNESS_HEADER
 #include "erpc_message_buffer.h"
 
 #include <cstdio>
