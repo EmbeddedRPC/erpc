@@ -54,7 +54,18 @@ ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
 LD := $(CXX)
 PYTHON ?= python
 ifeq (, $(shell which $(PYTHON)))
-    PYTHON= python3
+    PYTHON=python3
+    ifeq (, $(shell which $(PYTHON)))
+        $(error "No python found. Please install python3.")
+    endif
+else
+    ifneq (3, $(shell $(PYTHON) --version | cut -c 8-8))
+        ifeq (, $(shell which python3))
+            $(error "Please install python3.")
+        else
+            PYTHON=python3
+        endif
+    endif
 endif
 
 # Tool paths. Use different paths for OS X.
@@ -70,12 +81,6 @@ else ifeq "$(is_cygwin)" "1"
 else ifeq "$(is_mingw)" "1"
     FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
     BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
-endif
-ifeq (, $(shell which $(PYTHON)))
-    $(error "No python found")
-endif
-ifneq (3, $(shell $(PYTHON) --version | cut -c 8-8))
-    $(error "Please install and use Python3")
 endif
 
 ifeq "$(is_mingw)" "1"

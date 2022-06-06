@@ -35,7 +35,7 @@ ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
-    erpc_assert(transport);
+    erpc_assert(transport != NULL);
 
     Transport *castedTransport;
 
@@ -144,14 +144,14 @@ bool erpc_server_add_message_logger(erpc_transport_t transport)
 #if ERPC_PRE_POST_ACTION
 void erpc_client_add_pre_cb_action(pre_post_action_cb preCB)
 {
-    erpc_assert(g_server);
+    erpc_assert(g_server != NULL);
 
     g_server->addPreCB(preCB);
 }
 
 void erpc_client_add_post_cb_action(pre_post_action_cb postCB)
 {
-    erpc_assert(g_server);
+    erpc_assert(g_server) != NULL;
 
     g_server->addPostCB(postCB);
 }

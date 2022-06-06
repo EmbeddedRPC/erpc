@@ -45,7 +45,7 @@ erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
 
     m_state->m_mutex.lock();
 
-    erpc_assert(m_inBuffer);
+    erpc_assert(m_inBuffer != NULL);
     message->copy(m_inBuffer);
     m_inBuffer = NULL;
 
@@ -58,7 +58,7 @@ erpc_status_t InterThreadBufferTransport::receive(MessageBuffer *message)
 
 erpc_status_t InterThreadBufferTransport::send(MessageBuffer *message)
 {
-    erpc_assert(m_state && m_peer);
+    erpc_assert((m_state != NULL) && (m_peer != NULL));
 
     m_peer->m_outSem.get();
 

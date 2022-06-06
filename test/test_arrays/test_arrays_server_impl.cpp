@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2021 NXP
+ * Copyright 2016 - 2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -279,7 +279,7 @@ Array2ListType *sendReceived2ListType(Array2ListType arrayLists)
 
 AllTypes (*sendReceiveStruct(const AllTypes all_types[2]))[2]
 {
-    const AllTypes(**received_struct) = &all_types;
+    const AllTypes **received_struct = &all_types;
     AllTypes(*send_struct)[2] = (AllTypes(*)[2])erpc_malloc(sizeof(AllTypes[2]));
 
     for (uint32_t k = 0; k < 2; ++k)
