@@ -9,6 +9,7 @@
 from .codec import MessageType
 from .client import RequestError
 
+
 class Service(object):
     def __init__(self, serviceId):
         self._id = serviceId
@@ -22,7 +23,9 @@ class Service(object):
         try:
             self._methods[methodId](sequence, codec)
         except Exception as e:
-            raise RequestError("invalid method ID (%d) or method implementation: %s" % (methodId, str(e)))
+            raise RequestError(
+                "invalid method ID (%d) or method implementation: %s" % (methodId, str(e)))
+
 
 class Server(object):
     def __init__(self, transport=None, codecClass=None):

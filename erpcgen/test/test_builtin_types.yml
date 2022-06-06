@@ -79,4 +79,3 @@ test.h:
     else:
       - '{type} i'
   - '}'
-

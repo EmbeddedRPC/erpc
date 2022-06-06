@@ -2,4 +2,5 @@
     "makefile.extensionOutputFolder": "./.vscode",
     "makefile.buildBeforeLaunch": true,
     "makefile.clearOutputBeforeBuild": true,
+    "python.formatting.provider": "autopep8"
 }
