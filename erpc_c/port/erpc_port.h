@@ -40,7 +40,7 @@ void *erpc_malloc(size_t size);
 /*!
  * @brief This function free given memory block.
  *
- * @param[in] ptr Pointer to memory which should be freed.
+ * @param[in] ptr Pointer to memory which should be freed, or NULL.
  */
 void erpc_free(void *ptr);
 
