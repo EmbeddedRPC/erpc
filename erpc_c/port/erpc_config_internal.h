@@ -219,6 +219,11 @@
     #endif
 #endif
 
+// Disabling endianness agnostic feature.
+#ifndef ENDIANNESS_HEADER
+    #define ENDIANNESS_HEADER "erpc_endianness_undefined.h"
+#endif
+
 /* clang-format on */
 #endif // _ERPC_DETECT_H_
 ////////////////////////////////////////////////////////////////////////////////
