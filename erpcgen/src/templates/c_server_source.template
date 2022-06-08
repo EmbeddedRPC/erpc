@@ -74,7 +74,7 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceCla
     int32_t _tmp_local;
 {% endif %}
 {% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% else %} = {}{% endif %};
 {% endif %}
 {% if fn.isReturnValue || fn.isSendValue  %}
 
