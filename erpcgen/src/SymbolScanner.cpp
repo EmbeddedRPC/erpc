@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "SymbolScanner.h"
+#include "SymbolScanner.hpp"
 
-#include "ErpcLexer.h"
-#include "Logging.h"
+#include "ErpcLexer.hpp"
+#include "Logging.hpp"
 #include "annotations.h"
-#include "smart_ptr.h"
-#include "types/ArrayType.h"
-#include "types/BuiltinType.h"
-#include "types/ConstType.h"
-#include "types/FunctionType.h"
-#include "types/ListType.h"
-#include "types/VoidType.h"
+#include "smart_ptr.hpp"
+#include "types/ArrayType.hpp"
+#include "types/BuiltinType.hpp"
+#include "types/ConstType.hpp"
+#include "types/FunctionType.hpp"
+#include "types/ListType.hpp"
+#include "types/VoidType.hpp"
 
 #include <algorithm>
 #include <cstring>

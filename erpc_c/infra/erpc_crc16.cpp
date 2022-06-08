@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_crc16.h"
+#include "erpc_crc16.hpp"
 
 using namespace erpc;
 

@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_basic_codec.h"
+#include "erpc_basic_codec.hpp"
 #include "erpc_config_internal.h"
 #include ENDIANNESS_HEADER
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>

@@ -10,11 +10,11 @@
 
 #include "erpc_arbitrated_client_setup.h"
 
-#include "erpc_arbitrated_client_manager.h"
-#include "erpc_basic_codec.h"
-#include "erpc_manually_constructed.h"
-#include "erpc_message_buffer.h"
-#include "erpc_transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.hpp"
+#include "erpc_basic_codec.hpp"
+#include "erpc_manually_constructed.hpp"
+#include "erpc_message_buffer.hpp"
+#include "erpc_transport_arbitrator.hpp"
 #if ERPC_NESTED_CALLS
 #include "erpc_threading.h"
 #endif

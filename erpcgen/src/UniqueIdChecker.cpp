@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "UniqueIdChecker.h"
+#include "UniqueIdChecker.hpp"
 
-#include "Annotation.h"
-#include "Logging.h"
-#include "ParseErrors.h"
-#include "Symbol.h"
+#include "Annotation.hpp"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
+#include "Symbol.hpp"
 #include "annotations.h"
 
 #include <algorithm>

@@ -6,14 +6,14 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include "ErpcLexer.h"
+#include "ErpcLexer.hpp"
 
-#include "erpc_crc16.h"
+#include "erpc_crc16.hpp"
 #include "erpc_version.h"
 
-#include "Generator.h"
-#include "HexValues.h"
-#include "SearchPath.h"
+#include "Generator.hpp"
+#include "HexValues.hpp"
+#include "SearchPath.hpp"
 
 #include <algorithm>
 #include <fstream>

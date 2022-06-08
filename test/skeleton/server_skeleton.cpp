@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Logging.h"
+#include "Logging.hpp"
 #include "out.h"
 #include "unit_test.h"
 

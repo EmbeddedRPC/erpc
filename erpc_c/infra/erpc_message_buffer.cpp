@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_message_buffer.h"
+#include "erpc_message_buffer.hpp"
 #include "erpc_config_internal.h"
 
 #include <cstring>

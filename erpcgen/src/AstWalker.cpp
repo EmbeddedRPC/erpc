@@ -7,10 +7,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "AstWalker.h"
+#include "AstWalker.hpp"
 
-#include "ErpcLexer.h"
-#include "Logging.h"
+#include "ErpcLexer.hpp"
+#include "Logging.hpp"
 
 using namespace erpcgen;
 

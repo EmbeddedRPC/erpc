@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_simple_server.h"
+#include "erpc_simple_server.hpp"
 
 #include "gtest.h"
 #include "test_firstInterface.h"

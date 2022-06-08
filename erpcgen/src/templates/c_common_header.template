@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "erpc_version.h"
 {% if empty(crc16) == false %}
-#include "erpc_crc16.h"
+#include "{$crcHeaderName}"
 {% endif  -- empty(crc16) == false %}
 {% for inc in includes %}
 #include "{$inc}"

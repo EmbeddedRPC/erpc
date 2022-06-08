@@ -9,15 +9,15 @@
 
 #include "erpc_version.h"
 
-#include "CGenerator.h"
-#include "ErpcLexer.h"
-#include "InterfaceDefinition.h"
-#include "Logging.h"
-#include "PythonGenerator.h"
-#include "SearchPath.h"
-#include "UniqueIdChecker.h"
-#include "options.h"
-#include "types/Program.h"
+#include "CGenerator.hpp"
+#include "ErpcLexer.hpp"
+#include "InterfaceDefinition.hpp"
+#include "Logging.hpp"
+#include "PythonGenerator.hpp"
+#include "SearchPath.hpp"
+#include "UniqueIdChecker.hpp"
+#include "options.hpp"
+#include "types/Program.hpp"
 
 #include <cstdint>
 #include <cstdlib>

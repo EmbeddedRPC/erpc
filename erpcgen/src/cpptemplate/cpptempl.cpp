@@ -25,7 +25,7 @@
 #include "stdafx.h"
 #endif
 
-#include "cpptempl.h"
+#include "cpptempl.hpp"
 #include <cctype>
 #include <sstream>
 #include <algorithm>

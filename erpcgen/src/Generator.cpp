@@ -7,14 +7,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Generator.h"
+#include "Generator.hpp"
 
 #include "erpc_version.h"
 
-#include "Logging.h"
-#include "ParseErrors.h"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
 #include "annotations.h"
-#include "format_string.h"
+#include "format_string.hpp"
 
 #include <boost/filesystem.hpp>
 #include <cstring>
@@ -133,12 +133,12 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     {
         case InterfaceDefinition::kBasicCodec: {
             m_templateData["codecClass"] = "BasicCodec";
-            m_templateData["codecHeader"] = "erpc_basic_codec.h";
+            m_templateData["codecHeader"] = "erpc_basic_codec.hpp";
             break;
         }
         default: {
             m_templateData["codecClass"] = "Codec";
-            m_templateData["codecHeader"] = "erpc_codec.h";
+            m_templateData["codecHeader"] = "erpc_codec.hpp";
             break;
         }
     }

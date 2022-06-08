@@ -7,9 +7,12 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include "erpc_tcp_transport.h"
+#include "erpc_tcp_transport.hpp"
 
 #include <cstdio>
+#include <string>
+
+extern "C" {
 #if ERPC_HAS_POSIX
 #include <err.h>
 #endif
@@ -17,10 +20,10 @@
 #include <netdb.h>
 #include <netinet/tcp.h>
 #include <signal.h>
-#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+}
 
 using namespace erpc;
 

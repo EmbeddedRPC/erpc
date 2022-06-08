@@ -6,9 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_usb_cdc_transport.h"
-
 #include <cstdio>
+#include "erpc_usb_cdc_transport.hpp"
 
 using namespace erpc;
 

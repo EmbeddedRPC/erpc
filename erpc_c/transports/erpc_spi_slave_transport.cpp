@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_spi_slave_transport.h"
+#include <cstdio>
+#include <new>
+#include "erpc_spi_slave_transport.hpp"
 
+extern "C" {
 #include "board.h"
 #include "fsl_gpio.h"
 #include "fsl_spi.h"
-
-#include <cstdio>
-#include <new>
+}
 
 using namespace std;
 using namespace erpc;

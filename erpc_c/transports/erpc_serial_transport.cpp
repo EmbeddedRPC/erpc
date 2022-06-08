@@ -8,14 +8,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_serial_transport.h"
+#include "erpc_serial_transport.hpp"
 
-#include "erpc_message_buffer.h"
+#include "erpc_message_buffer.hpp"
 #include "erpc_serial.h"
 
 #include <cstdio>
 #include <string>
 
+extern "C" {
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -23,6 +24,7 @@
 #else
 #include <termios.h>
 #endif
+}
 
 using namespace erpc;
 

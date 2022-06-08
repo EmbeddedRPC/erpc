@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Sniffer.h"
+#include "Sniffer.hpp"
 
-#include "erpc_c/infra/erpc_message_buffer.h"
+#include "erpc_c/infra/erpc_message_buffer.hpp"
 
-#include "Logging.h"
+#include "Logging.hpp"
 #include "annotations.h"
 
 #include <boost/algorithm/string.hpp>

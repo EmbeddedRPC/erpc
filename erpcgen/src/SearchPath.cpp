@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "SearchPath.h"
+#include "SearchPath.hpp"
 
 #include <cstdio>
 
