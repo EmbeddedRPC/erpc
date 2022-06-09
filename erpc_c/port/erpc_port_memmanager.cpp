@@ -13,7 +13,7 @@
 
 extern "C" {
 #include "FreeRTOS.h"
-#include "MemManager.h"
+#include "fsl_component_mem_manager.h"
 }
 
 #if !(__embedded_cplusplus)
@@ -58,13 +58,16 @@ void operator delete[](void *ptr) THROW
 
 void *erpc_malloc(size_t size)
 {
-    void *p = MEM_BufferAllocForever(size, 0);
+    void *p = MEM_BufferAlloc(size);
     return p;
 }
 
 void erpc_free(void *ptr)
 {
-    MEM_BufferFree(ptr);
+    if (ptr != NULL)
+    {
+        erpc_assert(MEM_BufferFree(ptr) == kStatus_MemSuccess);
+    }
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */

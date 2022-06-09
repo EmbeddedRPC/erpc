@@ -196,7 +196,7 @@
 #endif
 
 #if !defined(erpc_assert)
-    #if ERPC_HAS_FREERTOSCONFIG_H 
+    #if ERPC_HAS_FREERTOSCONFIG_H
         #ifdef __cplusplus
             extern "C" {
         #endif
