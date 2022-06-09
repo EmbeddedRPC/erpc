@@ -27,8 +27,8 @@ int main(int argc, char **argv);
 
 #include "board.h"
 #include "gtest.h"
-#include "gtestListener.h"
-#include "myAlloc.h"
+#include "gtestListener.hpp"
+#include "myAlloc.hpp"
 #include "test_unit_test_common.h"
 
 #ifdef UNITY_DUMP_RESULTS
