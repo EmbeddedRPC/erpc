@@ -6,12 +6,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_basic_codec.h"
-#include "erpc_simple_server.h"
-#include "erpc_tcp_transport.h"
+#include "erpc_basic_codec.hpp"
+#include "erpc_simple_server.hpp"
+#include "erpc_tcp_transport.hpp"
 
-#include "Logging.h"
-#include "myAlloc.h"
+#include "Logging.hpp"
+#include "myAlloc.hpp"
 #include "test_unit_test_common_server.h"
 #include "unit_test.h"
 

@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "CGenerator.h"
+#include "CGenerator.hpp"
 
-#include "Logging.h"
-#include "ParseErrors.h"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
 #include "annotations.h"
-#include "format_string.h"
+#include "format_string.hpp"
 
 #include <algorithm>
 #include <set>
@@ -131,9 +131,10 @@ void CGenerator::generateServerSourceFile(string fileName)
 
 void CGenerator::generateCrcFile()
 {
-    string filename = "erpc_crc16.h";
-    m_templateData["crcGuardMacro"] = generateIncludeGuardName(filename);
-    generateOutputFile(filename, "c_crc", m_templateData, kCCrc);
+    string filenName = "erpc_crc16.hpp";
+    m_templateData["crcGuardMacro"] = generateIncludeGuardName(filenName);
+    m_templateData["crcHeaderName"] = filenName;
+    generateOutputFile(filenName, "c_crc", m_templateData, kCCrc);
 }
 
 void CGenerator::parseSubtemplates()

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_dspi_master_transport.h"
+#include "erpc_dspi_master_transport.hpp"
 
 #include "board.h"
 #include "fsl_dspi.h"

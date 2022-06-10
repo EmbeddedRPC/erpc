@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Logging.h"
+#include "Logging.hpp"
 
 #include <cstdarg>
 #include <cstdio>

@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "HexValues.h"
+#include "HexValues.hpp"
 
 #include <cctype>
 

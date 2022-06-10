@@ -12,11 +12,11 @@
 #define _EMBEDDED_RPC__CLIENT_MANAGER_H_
 
 #ifdef __cplusplus
-#include "erpc_client_server_common.h"
-#include "erpc_codec.h"
+#include "erpc_client_server_common.hpp"
+#include "erpc_codec.hpp"
 #include "erpc_config_internal.h"
 #if ERPC_NESTED_CALLS
-#include "erpc_server.h"
+#include "erpc_server.hpp"
 #include "erpc_threading.h"
 #endif
 

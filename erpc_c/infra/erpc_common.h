@@ -11,8 +11,6 @@
 #ifndef _EMBEDDED_RPC__ERPC_COMMON_H_
 #define _EMBEDDED_RPC__ERPC_COMMON_H_
 
-#include <stdint.h>
-
 /*!
  * @addtogroup infra
  * @{

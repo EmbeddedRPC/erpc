@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_arbitrated_client_manager.h"
-#include "erpc_transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.hpp"
+#include "erpc_transport_arbitrator.hpp"
 
 #if ERPC_THREADS_IS(NONE)
 #error "Arbitrator code does not work in no-threading configuration."

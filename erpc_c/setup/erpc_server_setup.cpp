@@ -9,12 +9,12 @@
  */
 
 #include "erpc_server_setup.h"
-#include "erpc_basic_codec.h"
-#include "erpc_crc16.h"
-#include "erpc_manually_constructed.h"
-#include "erpc_message_buffer.h"
-#include "erpc_simple_server.h"
-#include "erpc_transport.h"
+#include "erpc_basic_codec.hpp"
+#include "erpc_crc16.hpp"
+#include "erpc_manually_constructed.hpp"
+#include "erpc_message_buffer.hpp"
+#include "erpc_simple_server.hpp"
+#include "erpc_transport.hpp"
 
 using namespace erpc;
 

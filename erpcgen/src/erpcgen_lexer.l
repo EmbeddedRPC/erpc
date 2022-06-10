@@ -23,13 +23,13 @@
  ******************************************************************************/
 
 %{
-#include "ErpcLexer.h"
+#include "ErpcLexer.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string>
-#include "HexValues.h"
-#include "Value.h"
+#include "HexValues.hpp"
+#include "Value.hpp"
 
 using namespace erpcgen;
 

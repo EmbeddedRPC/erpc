@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_inter_thread_buffer_transport.h"
+#include "erpc_inter_thread_buffer_transport.hpp"
 
 using namespace erpc;
 

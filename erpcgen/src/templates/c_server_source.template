@@ -9,7 +9,7 @@
 #include <new>
 #include "erpc_port.h"
 #endif
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 {% if empty(group.includes) == false %}
 extern "C"
 {

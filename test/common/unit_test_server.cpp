@@ -8,7 +8,7 @@
 
 #include "erpc_mbf_setup.h"
 #include "erpc_server_setup.h"
-#include "erpc_simple_server.h"
+#include "erpc_simple_server.hpp"
 #include "erpc_transport_setup.h"
 
 #if (defined(RPMSG) || defined(UART) || defined(MU))
@@ -31,7 +31,7 @@ int main(int argc, const char *argv[]);
 #endif
 
 #include "board.h"
-#include "myAlloc.h"
+#include "myAlloc.hpp"
 #include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 

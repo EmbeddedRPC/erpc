@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "format_string.h"
+#include "format_string.hpp"
 
-#include "smart_ptr.h"
+#include "smart_ptr.hpp"
 
 #include <cstdarg>
 #include <cstdio>

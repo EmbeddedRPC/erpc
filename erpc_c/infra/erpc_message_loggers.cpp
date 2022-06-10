@@ -9,9 +9,8 @@
 #include "erpc_config_internal.h"
 #if ERPC_MESSAGE_LOGGING
 
-#include "erpc_message_loggers.h"
-
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
+#include "erpc_message_loggers.hpp"
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>

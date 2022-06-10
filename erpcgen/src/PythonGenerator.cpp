@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "PythonGenerator.h"
+#include "PythonGenerator.hpp"
 
-#include "Logging.h"
-#include "ParseErrors.h"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
 #include "annotations.h"
-#include "format_string.h"
+#include "format_string.hpp"
 
 #include <algorithm>
 #include <set>
@@ -690,7 +690,8 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 data_map caseData;
                 caseData["name"] = unionCase->getCaseName();
                 caseData["value"] = unionCase->getCaseValue();
-                if (info.has("discriminatorType") && (info["discriminatorType"].get().get()->getmap()["type"]->getvalue() == "enum"))
+                if (info.has("discriminatorType") &&
+                    (info["discriminatorType"].get().get()->getmap()["type"]->getvalue() == "enum"))
                 {
                     caseData["type"] = info["discriminatorType"];
                 }
@@ -700,7 +701,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                     {
                         EnumType *enumType = dynamic_cast<EnumType *>(it);
                         assert(enumType);
-                        for (auto itMember :enumType->getMembers())
+                        for (auto itMember : enumType->getMembers())
                         {
                             if (unionCase->getCaseName() == itMember->getName())
                             {
@@ -711,12 +712,12 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                                 break;
                             }
                         }
-                        if(caseData.has("type"))
+                        if (caseData.has("type"))
                         {
                             break;
                         }
                     }
-                    if(!caseData.has("type"))
+                    if (!caseData.has("type"))
                     {
                         for (auto it : m_globals->getSymbolsOfType(DataType::kConstSymbol))
                         {

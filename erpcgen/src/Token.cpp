@@ -7,10 +7,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Token.h"
+#include "Token.hpp"
 
-#include "ErpcLexer.h"
-#include "ParseErrors.h"
+#include "ErpcLexer.hpp"
+#include "ParseErrors.hpp"
 
 using namespace erpcgen;
 using namespace std;

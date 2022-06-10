@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_uart_cmsis_transport.h"
+#include "erpc_uart_cmsis_transport.hpp"
 
 #include <cstdio>
 
