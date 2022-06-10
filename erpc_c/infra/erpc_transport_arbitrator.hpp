@@ -185,6 +185,11 @@ protected:
      * @param[in] list Pending client list to remove.
      */
     void freeClientList(PendingClientInfo *list);
+
+private:
+    // Disable copy ctor.
+    TransportArbitrator(const TransportArbitrator &other);            /*!< Disable copy ctor. */
+    TransportArbitrator &operator=(const TransportArbitrator &other); /*!< Disable copy ctor. */
 };
 
 } // namespace erpc
