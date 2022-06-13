@@ -239,6 +239,9 @@ codec->write({$info.name});
 {% enddef --------------------------------------- BuiltinType %}
 
 {% def encodeBinaryType(info) -----------------  %}
+{% if source == "server" %}
+erpc_assert({$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
+{% endif %}
 codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
 
