@@ -1,0 +1,76 @@
+From 9382f1d480aabeca854546d45e365fdc62853e3f Mon Sep 17 00:00:00 2001
+From: florent pirou <florent.pirou@intel.com>
+Date: Fri, 17 Jun 2022 03:03:30 -0700
+Subject: [PATCH 5/5] debian: add liberpc pkg-config file
+
+Signed-off-by: florent pirou <florent.pirou@intel.com>
+---
+ Makefile        |  1 +
+ erpc_c/Makefile |  8 ++++++++
+ mk/pkgconfig.mk | 17 +++++++++++++++++
+ 3 files changed, 26 insertions(+)
+ create mode 100644 mk/pkgconfig.mk
+
+diff --git a/Makefile b/Makefile
+index 5dca3bf..6edf7ab 100644
+--- a/Makefile
++++ b/Makefile
+@@ -51,6 +51,7 @@ install: erpc erpc_c erpcgen $(ERPCSNIFFER)
+ 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c install
+ 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcgen install
+ ifeq "$(is_linux)" "1"
++	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpc_c install_pc
+ 	@$(MAKE) $(silent_make) -j$(MAKETHREADS) -r -C erpcsniffer install
+ endif
+ 
+diff --git a/erpc_c/Makefile b/erpc_c/Makefile
+index f5d33b3..06c0840 100644
+--- a/erpc_c/Makefile
++++ b/erpc_c/Makefile
+@@ -106,6 +106,8 @@ MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
+ 
+ include $(ERPC_ROOT)/mk/targets.mk
+ 
++include $(ERPC_ROOT)/mk/pkgconfig.mk
++
+ $(TARGET_LIB)(%): %
+ 	@$(call printmessage,ar,Archiving, $(?F) in $(@F))
+ 	$(at)mkdir -p $(dir $(@))
+@@ -129,5 +131,11 @@ install_lib: $(TARGET_LIB)
+ 	$(at)mkdir -p $(LIB_INSTALL_DIR)
+ 	$(at)install $(TARGET_LIB) $(LIB_INSTALL_DIR)
+ 
++.PHONY: install_pc
++install_pc: $(LIB_NAME).pc
++	@$(call printmessage,ar,pkg-config version, $(ERPC_VERSION))
++	$(at)mkdir -p $(LIB_INSTALL_DIR)
++	$(at)install $(LIB_NAME).pc $(LIB_INSTALL_DIR)
++
+ clean::
+ 	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
+diff --git a/mk/pkgconfig.mk b/mk/pkgconfig.mk
+new file mode 100644
+index 0000000..eeae82a
+--- /dev/null
++++ b/mk/pkgconfig.mk
+@@ -0,0 +1,17 @@
++define PKG_CONFIG
++prefix=/usr
++exec_prefix=$${prefix}
++includedir=$${prefix}/include
++libdir=$${exec_prefix}/lib/x86_64-linux-gnu
++
++Name: $(LIB_NAME)
++Description: The embeddedRPC Library
++Version: $(ERPC_VERSION)
++Cflags: -I$${includedir}/$(LIB_NAME)
++Libs: -L$${libdir} -l$(LIB_NAME)
++endef
++
++ERPC_VERSION := $(shell sed -n 's/^\#define ERPC_VERSION .*"\([^"]*\)".*/\1/p' $(ERPC_C_ROOT)/infra/erpc_version.h)
++
++$(LIB_NAME).pc:
++	$(file > $@,$(PKG_CONFIG))
+-- 
+2.17.1
+

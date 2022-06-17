@@ -1,0 +1,6 @@
+erpc_c/config/*.h usr/include/erpc/
+erpc_c/infra/*.h usr/include/erpc/
+erpc_c/port/*.h usr/include/erpc/
+erpc_c/setup/*.h usr/include/erpc/
+Debug/Linux/erpc/lib/liberpc.a usr/lib/x86_64-linux-gnu/
+erpc_c/erpc.pc usr/lib/x86_64-linux-gnu/pkgconfig
