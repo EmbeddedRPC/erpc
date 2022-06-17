@@ -16,10 +16,8 @@ CPPFLAGS += -fPIC -fcf-protection=full -z noexecstack -fstack-clash-protection
 CXXFLAGS += -fPIC -fcf-protection=full -z noexecstack -fstack-clash-protection
 
 export V=1
-export PYBUILD_NAME=eprc
+export PYBUILD_NAME=erpc
 export PYBUILD_SYSTEM=distutils
-
-CONFIGURE_PREFIX=/usr
 
 override_dh_auto_configure:
 	dh_auto_configure -O--buildsystem=pybuild --sourcedirectory=$(CURDIR)/erpc_python
@@ -28,21 +26,23 @@ override_dh_auto_test:
 	dh_auto_test -- 
 
 override_dh_auto_build:
-	dh_auto_build -- -j`nproc --ignore=2`
+	dh_auto_build -- -j`nproc --ignore=2` \
+		PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_auto_build -O--buildsystem=pybuild -O--with=python3 --sourcedirectory=$(CURDIR)/erpc_python
 
 override_dh_auto_install:
 	dh_auto_install -- \
-		prefix=$(CONFIGURE_PREFIX) \
-		includedir=include \
-		libdir=lib/$(DEB_HOST_MULTIARCH)
-	dh_auto_install -O--buildsystem=pybuild  --sourcedirectory=$(CURDIR)/erpc_python
+		PREFIX=$(CURDIR)/debian/tmp/usr \
+		arch_libdir=$(DEB_HOST_MULTIARCH)/
+	dh_auto_install -O--buildsystem=pybuild -O--with=python3 --sourcedirectory=$(CURDIR)/erpc_python
 
 override_dh_auto_clean:
 	dh_auto_clean
 	dh_auto_clean -O--buildsystem=pybuild  --sourcedirectory=$(CURDIR)/erpc_python
 	$(RM) -fr $(CURDIR)/__pycache__/ \
 		$(CURDIR)/python_build/ \
+		$(CURDIR)/debian/tmp/ \
+		$(CURDIR)/debian/.pybuild/ \
 		$(CURDIR)/.pybuild/ \
 		$(CURDIR)/Debug/
 

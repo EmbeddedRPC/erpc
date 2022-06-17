@@ -1,2 +1,2 @@
-Debug/Linux/erpcgen/erpcgen usr/bin
-Debug/Linux/erpcsniffer/erpcsniffer usr/bin
+usr/bin/erpcgen 
+usr/bin/erpcsniffer
