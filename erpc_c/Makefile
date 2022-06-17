@@ -111,6 +111,8 @@ MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 
 include $(ERPC_ROOT)/mk/targets.mk
 
+include $(ERPC_ROOT)/mk/pkgconfig.mk
+
 $(TARGET_LIB)(%): %
 	@$(call printmessage,ar,Archiving, $(?F) in $(@F))
 	$(at)mkdir -p $(dir $(@))
@@ -130,9 +132,16 @@ $(INC_INSTALL_DIR):
 
 .PHONY: install_lib
 install_lib: $(TARGET_LIB)
-	@$(call printmessage,c,Installing, $(subst $(LIBS_ROOT)/,,$<) in $(LIB_INSTALL_DIR))
-	$(at)mkdir -p $(LIB_INSTALL_DIR)
-	$(at)install $(TARGET_LIB) $(LIB_INSTALL_DIR)
+	@$(call printmessage,c,Installing, $(subst $(LIBS_ROOT)/,,$<) in $(LIB_INSTALL_DIR)/$(arch_libdir))
+	$(at)mkdir -p $(LIB_INSTALL_DIR)/$(arch_libdir)
+	$(at)install $(TARGET_LIB) $(LIB_INSTALL_DIR)/$(arch_libdir)
+
+.PHONY: install_pc
+install_pc: $(LIB_NAME).pc
+	@$(call printmessage,ar,pkg-config version, $(ERPC_VERSION))
+	@$(call printmessage,ar,Installing, $(subst $(LIBS_ROOT)/,,$<) in $(CFG_INSTALL_DIR))
+	$(at)mkdir -p $(CFG_INSTALL_DIR)
+	$(at)install $(LIB_NAME).pc $(CFG_INSTALL_DIR)
 
 clean::
 	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
