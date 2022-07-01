@@ -41,7 +41,7 @@ target = "debug"
 # Check for 2 or more arguments because argv[0] is the script name
 if len(sys.argv) > 2:
     print ("Too many arguments. Please specify only the transport layer to use. Options are: tcp")
-    sys.exit()
+    sys.exit(1)
 if len(sys.argv) >= 2:
     for arg in sys.argv[1:]:
         if arg == "tcp":
@@ -54,7 +54,7 @@ if len(sys.argv) >= 2:
             target = "release"
         else:
             print("Invalid argument/s. Options are: tcp, -r, -d\n")
-            sys.exit()
+            sys.exit(1)
 
 unitTestPath = "./test/"
 # enter Unit Test Directory
@@ -66,14 +66,19 @@ dirs = os.listdir(os.curdir)
 testDirs = filter(isTestDir, dirs)
 
 build = "build=" + target
+testsExitStatus = 0
 
 for dir in testDirs:
     print(bcolors.BLUE + "\nRunning " + bcolors.ORANGE + dir + bcolors.BLUE +" unit tests with "
             + bcolors.ORANGE + transportLayer + bcolors.BLUE + " transport layer." + bcolors.ENDC)
     os.chdir(dir)
     call(["make", build, testServerCommand])
-    call(["make", build, testClientCommand])
+    testsExitStatus += call(["make", build, testClientCommand])
     os.chdir('..')
 
 # For completeness, change back to erpc/ directory
 os.chdir('..')
+
+if testsExitStatus != 0:
+    print("\n\nSome tests end with failures.\n\n")
+    sys.exit(testsExitStatus)

@@ -18,8 +18,13 @@ import traceback
 import textwrap
 import errno
 import shlex
+import importlib
 from py import path
 import os
+sys.path.insert(1, 'erpc_python')
+sys.path.insert(2, '../erpc_python')
+sys.path.insert(3, '../../erpc_python')
+import erpc
 
 # Handle maketrans difference between Python 2 and 3.
 try:
@@ -265,6 +270,9 @@ class CCompiler(object):
 class ErpcgenTestException(Exception):
     pass
 
+class ErpcTestException(Exception):
+    pass
+
 ## @brief Handles all aspects of one test case for erpcgen.
 #
 # This class is responsible for parsing a test spec dict that was read in from a YAML file. It is
@@ -469,16 +477,12 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
 # The generated Python package is loaded. Then the modules within the package are loaded
 # successively. Loaded modules are not added into sys.modules.
 class ErpcgenPythonCompileTest(ErpcgenCompileTest):
-    def _load_module(self, name, dir):
-        print("Loading {}".format(name))
-        info = imp.find_module(name.split('.')[-1], [str(dir)])
-        try:
-            mod = imp.load_module(name, *info)
-            return mod
-        finally:
-            # Make sure the file is closed if it's a module.
-            if info[0] is not None:
-                info[0].close()
+    def _load_module(self, moduleName, fileName, dir):
+        spec = importlib.util.spec_from_file_location(moduleName, os.path.join(dir, fileName))
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = mod
+        spec.loader.exec_module(mod)
+        return mod
 
     def run(self):
         # List all available packages.
@@ -486,14 +490,16 @@ class ErpcgenPythonCompileTest(ErpcgenCompileTest):
 
         for pkgName in pkgNames:
             # Load generated package.
-            pkg = self._load_module(pkgName, self._out_dir)
+            pkg = self._load_module("test", "__init__.py", self._out_dir)
 
             # Load modules in the package.
-            packageDir = path.local(pkg.__path__[0])
-            self._load_module("{}.interface".format(pkgName), packageDir)
-            self._load_module("{}.common".format(pkgName), packageDir)
-            self._load_module("{}.client".format(pkgName), packageDir)
-            self._load_module("{}.server".format(pkgName), packageDir)
+            packageDir = os.path.join(path.local(pkg.__path__[0]), pkg.__name__)
+            pkg = self._load_module("testAll", "__init__.py", packageDir)
+
+            (pkg.interface is not None)
+            (pkg.common is not None)
+            (pkg.client is not None)
+            (pkg.server is not None)
 
 ## @brief A fully parameterized test case.
 #
