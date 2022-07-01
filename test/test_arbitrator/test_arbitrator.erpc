@@ -20,6 +20,7 @@ interface FirstInterface
     firstReceiveInt() -> int32
     stopSecondSide() -> void
     getResultFromSecondSide() -> int32
+    oneway testCasesAreDone()
     oneway quitFirstInterfaceServer()
     nestedCallTest() -> int32
     @nested

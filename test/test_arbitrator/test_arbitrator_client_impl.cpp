@@ -63,6 +63,11 @@ TEST(test_arbitrator, GetResultFromSecondSide)
     EXPECT_TRUE(getResultFromSecondSide() == 0);
 }
 
+TEST(test_arbitrator, testCasesAreDone)
+{
+    testCasesAreDone();
+}
+
 void secondSendInt(int32_t a)
 {
     numbers[i] = a;
