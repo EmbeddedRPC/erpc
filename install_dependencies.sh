@@ -1,19 +1,22 @@
 #!/bin/bash
 
+# exit when any command fails
+set -e
+
 unameOut="$(uname -s)"
 case "${unameOut}" in
 Linux*)
     echo "Linux os detected. Installing dependencies."
     sudo apt-get update -qq
     sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev
-    if [ "$1"="clang" ]; then
+    if [ "$1" = "clang" ]; then
         echo "Installing clang compiler."
         sudo apt-get install clang
     else
         echo "Installing default gnu compiler."
         sudo apt-get install gcc g++
     fi
-    sudo pip3 install pytest pyyaml
+    sudo pip3 install -U pytest pyyaml
     ;;
 Darwin*)
     echo "Mac os detected. Installing dependencies."
