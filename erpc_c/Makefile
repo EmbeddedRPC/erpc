@@ -76,22 +76,22 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.cpp
 
 HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
-			$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.h \
-			$(ERPC_C_ROOT)/infra/erpc_basic_codec.h \
+			$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_basic_codec.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_client_manager.h \
-			$(ERPC_C_ROOT)/infra/erpc_codec.h \
-			$(ERPC_C_ROOT)/infra/erpc_crc16.h \
+			$(ERPC_C_ROOT)/infra/erpc_codec.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_crc16.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_common.h \
 			$(ERPC_C_ROOT)/infra/erpc_version.h \
-			$(ERPC_C_ROOT)/infra/erpc_framed_transport.h \
-			$(ERPC_C_ROOT)/infra/erpc_manually_constructed.h \
-			$(ERPC_C_ROOT)/infra/erpc_message_buffer.h \
-			$(ERPC_C_ROOT)/infra/erpc_message_loggers.h \
-			$(ERPC_C_ROOT)/infra/erpc_server.h \
-			$(ERPC_C_ROOT)/infra/erpc_static_queue.h \
-			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.h \
-			$(ERPC_C_ROOT)/infra/erpc_transport.h \
-			$(ERPC_C_ROOT)/infra/erpc_client_server_common.h \
+			$(ERPC_C_ROOT)/infra/erpc_framed_transport.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_manually_constructed.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_message_buffer.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_message_loggers.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_server.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_static_queue.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_transport.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_client_server_common.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.h \
 			$(ERPC_C_ROOT)/port/erpc_setup_extensions.h \
 			$(ERPC_C_ROOT)/port/erpc_config_internal.h \
@@ -103,9 +103,9 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/setup/erpc_mbf_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_server_setup.h \
 			$(ERPC_C_ROOT)/setup/erpc_transport_setup.h \
-			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.h \
-			$(ERPC_C_ROOT)/transports/erpc_serial_transport.h \
-			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.h
+			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.hpp \
+			$(ERPC_C_ROOT)/transports/erpc_serial_transport.hpp \
+			$(ERPC_C_ROOT)/transports/erpc_tcp_transport.hpp
 
 MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 
