@@ -16,6 +16,9 @@
             "include": "#annotations"
         },
         {
+            "include": "#annotationsKeywords"
+        },
+        {
             "include": "#enums"
         },
         {
@@ -23,6 +26,12 @@
         },
         {
             "include": "#structsMembers"
+        },
+        {
+            "include": "#unions"
+        },
+        {
+            "include": "#unionsDiscriminator"
         },
         {
             "include": "#members"
@@ -47,13 +56,13 @@
         "keywords": {
             "patterns": [{
                 "name": "keyword.control.erpc",
-                "match": "\\b(const|enum|in|inout|interface|oneway|out|program|struct|type)\\b"
+                "match": "\\b(const|enum|in|inout|interface|oneway|out|program|struct|type|import|union|case|default|list)\\b"
             }, {
                 "name": "entity.name.type",
-                "match": "\\b(binary|bool|uint8|uint16|uint32|int8|int16|int32|void)\\b"
+                "match": "\\b(binary|bool|uint8|uint16|uint32|int8|int16|int32|void|float|string|int64|uint64)\\b"
             }, {
                 "name": "keyword.other.erpc",
-                "match": "[{}(),=\\->;\\[\\]+*/;]"
+                "match": "[{}(),=\\-<>;\\[\\]+*/;]"
             }]
         },
         "strings": {
@@ -67,21 +76,21 @@
         },
         "comments": {
             "name": "comment.line.erpc",
-            "match": "//.*"
+            "match": "\\s*//.*"
         },
         "multilineCommentsDocument": {
-            "name": "comment.block.erpc",
-            "begin": "/\\*\\*",
+            "name": "comment.block.documentation.erpc",
+            "begin": "\\s*/\\*\\*",
             "end": "\\*/"
         },
         "multilineCommentsDocument2": {
-            "name": "comment.block.erpc",
-            "begin": "/\\*\\!",
+            "name": "comment.block.documentation.erpc",
+            "begin": "\\s*/\\*\\!",
             "end": "\\*/"
         },
         "multilineComments": {
             "name": "comment.block.erpc",
-            "begin": "/\\*",
+            "begin": "\\s*/\\*",
             "end": "\\*/"
         },
         "annotations": {
@@ -96,9 +105,14 @@
                 "match": "[^\")][^)]*"
             }]
         },
+        "annotationsKeywords": {
+            "name": "support.property-value.erpc",
+            "begin": "@[^\\(\\n]*",
+            "end": "\n"
+        },
         "enums": {
             "name": "keyword.control.erpc",
-            "match": "enum\\s*([a-zA-Z0-9_]+)",
+            "match": "enum\\s+([a-zA-Z0-9_]+)",
             "captures": {
                 "1": {
                     "name": "entity.name.type.erpc"
@@ -107,7 +121,7 @@
         },
         "structs": {
             "name": "keyword.control.erpc",
-            "match": "struct\\s*([a-zA-Z0-9_]+)",
+            "match": "struct\\s+([a-zA-Z0-9_]+)",
             "captures": {
                 "1": {
                     "name": "entity.name.type.erpc"
@@ -116,35 +130,65 @@
         },
         "structsMembers": {
             "name": "variable.name",
-            "match": "([a-zA-Z0-9_]*)\\s([a-zA-Z0-9_]*)(;)",
+            "match": "\\s*(byref\\s)?\\s*([a-zA-Z0-9_]*)\\s+([a-zA-Z0-9_]*)(\\s+@[a-zA-Z0-9_]+(\\(a-zA-Z0-9_]+\\))?)?(\\s*;)?(\\s*/[*/].*)?\\s*\n",
+            "captures": {
+                "1": {
+                    "name": "keyword.control.erpc"
+                },
+                "2": {
+                    "name": "entity.name.type.erpc"
+                },
+                "6": {
+                    "name": "keyword.other.erpc"
+                },
+                "7": {
+                    "name": "comment.line.erpc"
+                }
+            }
+        },
+        "unions": {
+            "name": "keyword.control.erpc",
+            "match": "union\\s+([a-zA-Z0-9_]+)",
             "captures": {
                 "1": {
                     "name": "entity.name.type.erpc"
-                },
-                "3": {
-                    "name": "keyword.other.erpc"
+                }
+            }
+        },
+        "unionsDiscriminator": {
+            "name": "keyword.control.erpc",
+            "match": "union\\s*\\(([a-zA-Z0-9_]+)\\)",
+            "captures": {
+                "1": {
+                    "name": "entity.name.type.erpc"
                 }
             }
         },
         "typeNames": {
             "name": "keyword.control.erpc",
-            "match": "type\\s[^=]*",
+            "match": "type\\s+([^=]*)=\\s*([a-zA-Z0-9_]+)",
             "captures": {
-                "0": {
+                "1": {
+                        "name": "entity.name.type.erpc"
+                },
+                "2": {
                     "patterns": [{
+                        "include": "#keywords"
+                        },{
                         "name": "entity.name.type.erpc",
-                        "match": "\\s.*"
+                        "match": "[a-zA-Z0-9_]+"
                     }]
                 }
             }
         },
         "functionTypeNames": {
-            "name": "keyword.other.erpc",
             "begin": "\\(",
             "end": "\\)",
             "patterns": [{
+                "include": "#keywords"
+                },{
                 "name": "",
-                "match": "(in\\s|out\\s|inout\\s)?([a-zA-Z0-9_\\[\\]]+\\s)([a-zA-Z0-9_]+)",
+                "match": "(in\\s|out\\s|inout\\s+)?([a-zA-Z0-9_\\[\\]]+\\s+)([a-zA-Z0-9_]+)(\\s+@[a-zA-Z0-9_]+(\\(a-zA-Z0-9_]+\\))?)?",
                 "captures": {
                     "1": {
                         "name": "keyword.control.erpc"
@@ -159,15 +203,15 @@
             }]
         },
         "returnTypes": {
-            "match": "(->)\\s*([a-zA-Z0-9_]*)",
-            "captures": {
-                "1": {
-                    "name": "keyword.other.erpc"
-                },
-                "2": {
-                    "name": "entity.name.type.erpc"
-                }
-            }
+            "name": "keyword.other.erpc",
+            "begin" :"->\\s*",
+            "end": "[\\n\\s]",
+            "patterns": [{
+                "include": "#keywords"
+                },{
+                "name": "entity.name.type.erpc",
+                "match":"[a-zA-Z0-9_]+"
+                }]
         }
     },
     "scopeName": "source.erpc"

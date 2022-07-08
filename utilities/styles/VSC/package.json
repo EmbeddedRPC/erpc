@@ -3,7 +3,7 @@
     "name": "erpc-code-style",
     "displayName": "ERPC code style",
     "description": "Formatting code relevant to eRPC language",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/EmbeddedRPC/erpc.git"

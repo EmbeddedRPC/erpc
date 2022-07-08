@@ -31,6 +31,17 @@ template example:
 
 --
 
+### 1.1.0
+
+Minor fixes
+
+- Added missing keywords
+- Improved comments detection
+- Improved annotations detection
+- Added union support
+- Improved parsing types
+- Improved parsing functions
+
 ### 1.0.0
 
 Initial release
