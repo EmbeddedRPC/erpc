@@ -67,7 +67,7 @@
         },
         "comments": {
             "name": "comment.line.erpc",
-            "match": "\\\\.*"
+            "match": "//.*"
         },
         "multilineCommentsDocument": {
             "name": "comment.block.erpc",
