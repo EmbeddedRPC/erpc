@@ -223,8 +223,12 @@ void stopSecondSide()
 
 int32_t getResultFromSecondSide()
 {
-    increaseWaitQuit();
     return isTestPassing;
+}
+
+void testCasesAreDone(void)
+{
+    increaseWaitQuit();
 }
 
 void quitFirstInterfaceServer()
