@@ -194,6 +194,7 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
     erpc_assert((m_pos != NULL) && ("Data buffer wasn't set to MessageBuffer." != NULL));
+    erpc_assert(m_pos == (m_buffer->get() + m_buffer->getUsed()));
 
     erpc_status_t err = kErpcStatus_Success;
 
