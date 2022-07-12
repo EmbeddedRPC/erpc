@@ -343,17 +343,21 @@ void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
 
     if (isStatusOk())
     {
-        if (m_cursor.getRemaining() >= *length)
+        if (m_cursor.getRemainingUsed() < *length)
+        {
+            m_status = kErpcStatus_Fail;
+        }
+        else if (m_cursor.getRemaining() < *length)
+        {
+            m_status = kErpcStatus_BufferOverrun;
+        }
+        else
         {
             // Return current pointer into buffer.
             *value = m_cursor.get();
 
             // Skip over data.
             m_cursor += (uint16_t)*length;
-        }
-        else
-        {
-            m_status = kErpcStatus_BufferOverrun;
         }
     }
     if (!isStatusOk())
