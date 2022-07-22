@@ -127,7 +127,7 @@ const uint8_t &MessageBuffer::Cursor::operator[](int index) const
 
 MessageBuffer::Cursor &MessageBuffer::Cursor::operator+=(uint16_t n)
 {
-    erpc_assert((uint16_t)(m_pos - m_buffer->get()) + n <= m_buffer->getLength());
+    erpc_assert((uint32_t)(m_pos - m_buffer->get()) + n <= m_buffer->getLength());
 
     m_pos += n;
 
@@ -136,7 +136,7 @@ MessageBuffer::Cursor &MessageBuffer::Cursor::operator+=(uint16_t n)
 
 MessageBuffer::Cursor &MessageBuffer::Cursor::operator-=(uint16_t n)
 {
-    erpc_assert((m_pos - n) >= m_buffer->get());
+    erpc_assert(((uintptr_t)m_pos >= n) && (m_pos - n) >= m_buffer->get());
 
     m_pos -= n;
 
