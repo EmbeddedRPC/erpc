@@ -20,6 +20,13 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
+void MessageBuffer::setUsed(uint16_t used)
+{
+    erpc_assert(used <= m_len);
+
+    m_used = used;
+}
+
 erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
 {
     erpc_status_t err = kErpcStatus_Success;
@@ -102,7 +109,56 @@ void MessageBuffer::Cursor::set(MessageBuffer *buffer)
     // erpc_assert(buffer->get() && "Data buffer wasn't set to MessageBuffer.");
     // receive function should return err if it couldn't set data buffer.
     m_pos = buffer->get();
-    m_remaining = buffer->getLength();
+}
+
+uint8_t &MessageBuffer::Cursor::operator[](int index)
+{
+    erpc_assert(((m_pos + index) >= m_buffer->get()) && ((uint16_t)(m_pos - m_buffer->get()) + index <= m_buffer->getLength()));
+
+    return m_pos[index];
+}
+
+const uint8_t &MessageBuffer::Cursor::operator[](int index) const
+{
+    erpc_assert(((m_pos + index) >= m_buffer->get()) && ((uint16_t)(m_pos - m_buffer->get()) + index <= m_buffer->getLength()));
+
+    return m_pos[index];
+}
+
+MessageBuffer::Cursor &MessageBuffer::Cursor::operator+=(uint16_t n)
+{
+    erpc_assert((uint32_t)(m_pos - m_buffer->get()) + n <= m_buffer->getLength());
+
+    m_pos += n;
+
+    return *this;
+}
+
+MessageBuffer::Cursor &MessageBuffer::Cursor::operator-=(uint16_t n)
+{
+    erpc_assert(((uintptr_t)m_pos >= n) && (m_pos - n) >= m_buffer->get());
+
+    m_pos -= n;
+
+    return *this;
+}
+
+MessageBuffer::Cursor &MessageBuffer::Cursor::operator++(void)
+{
+    erpc_assert((uint16_t)(m_pos - m_buffer->get()) < m_buffer->getLength());
+
+    ++m_pos;
+
+    return *this;
+}
+
+MessageBuffer::Cursor &MessageBuffer::Cursor::operator--(void)
+{
+    erpc_assert(m_pos > m_buffer->get());
+
+    --m_pos;
+
+    return *this;
 }
 
 erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
@@ -117,7 +173,11 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
         {
             err = kErpcStatus_MemoryError;
         }
-        else if (length > m_remaining)
+        else if (length > getRemainingUsed())
+        {
+            err = kErpcStatus_Fail;
+        }
+        else if (length > getRemaining())
         {
             err = kErpcStatus_BufferOverrun;
         }
@@ -125,7 +185,6 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
         {
             (void)memcpy(data, m_pos, length);
             m_pos += length;
-            m_remaining -= length;
         }
     }
 
@@ -135,6 +194,7 @@ erpc_status_t MessageBuffer::Cursor::read(void *data, uint32_t length)
 erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
 {
     erpc_assert((m_pos != NULL) && ("Data buffer wasn't set to MessageBuffer." != NULL));
+    erpc_assert(m_pos == (m_buffer->get() + m_buffer->getUsed()));
 
     erpc_status_t err = kErpcStatus_Success;
 
@@ -144,7 +204,7 @@ erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
         {
             err = kErpcStatus_MemoryError;
         }
-        else if (length > m_remaining)
+        else if (length > getRemaining())
         {
             err = kErpcStatus_BufferOverrun;
         }
@@ -152,7 +212,6 @@ erpc_status_t MessageBuffer::Cursor::write(const void *data, uint32_t length)
         {
             (void)memcpy(m_pos, data, length);
             m_pos += length;
-            m_remaining -= length;
             m_buffer->setUsed(m_buffer->getUsed() + length);
         }
     }

@@ -119,7 +119,7 @@ public:
      *
      * @param[in] used Length of used space of buffer.
      */
-    void setUsed(uint16_t used) { m_used = used; }
+    void setUsed(uint16_t used);
 
     /*!
      * @brief This function read data from local buffer.
@@ -197,7 +197,6 @@ public:
         Cursor(void)
         : m_buffer(NULL)
         , m_pos(NULL)
-        , m_remaining(0)
         {
         }
 
@@ -208,10 +207,9 @@ public:
          *
          * @param[in] buffer MessageBuffer for sending/receiving.
          */
-        Cursor(MessageBuffer *buffer)
+        explicit Cursor(MessageBuffer *buffer)
         : m_buffer(buffer)
         , m_pos(buffer->get())
-        , m_remaining(buffer->getLength())
         {
         }
 
@@ -245,7 +243,14 @@ public:
          *
          * @return Remaining free space in current buffer.
          */
-        uint16_t getRemaining(void) const { return m_remaining; }
+        uint16_t getRemaining(void) const { return m_buffer->getLength() - (uint16_t)(m_pos - m_buffer->get()); }
+
+        /*!
+         * @brief Return remaining space from used of current buffer.
+         *
+         * @return Remaining space from used of current buffer.
+         */
+        uint16_t getRemainingUsed(void) const { return m_buffer->getUsed() - (uint16_t)(m_pos - m_buffer->get()); }
 
         /*!
          * @brief Read data from current buffer.
@@ -284,14 +289,14 @@ public:
          *
          * @param[in] index Index in buffer.
          */
-        uint8_t &operator[](int index) { return m_pos[index]; }
+        uint8_t &operator[](int index);
 
         /*!
          * @brief Array operator return value of buffer at given index.
          *
          * @param[in] index Index in buffer.
          */
-        const uint8_t &operator[](int index) const { return m_pos[index]; }
+        const uint8_t &operator[](int index) const;
 
         /*!
          * @brief Sum operator return local buffer.
@@ -300,12 +305,7 @@ public:
          *
          * @return Current cursor instance.
          */
-        Cursor &operator+=(uint16_t n)
-        {
-            m_pos += n;
-            m_remaining -= n;
-            return *this;
-        }
+        Cursor &operator+=(uint16_t n);
 
         /*!
          * @brief Substract operator return local buffer.
@@ -314,41 +314,25 @@ public:
          *
          * @return Current cursor instance.
          */
-        Cursor &operator-=(uint16_t n)
-        {
-            m_pos -= n;
-            m_remaining += n;
-            return *this;
-        }
+        Cursor &operator-=(uint16_t n);
 
         /*!
          * @brief Sum +1 operator.
          *
          * @return Current cursor instance.
          */
-        Cursor &operator++(void)
-        {
-            ++m_pos;
-            --m_remaining;
-            return *this;
-        }
+        Cursor &operator++(void);
 
         /*!
          * @brief Substract -1 operator.
          *
          * @return Current cursor instance.
          */
-        Cursor &operator--(void)
-        {
-            --m_pos;
-            ++m_remaining;
-            return *this;
-        }
+        Cursor &operator--(void);
 
     private:
         MessageBuffer *m_buffer; /*!< Buffer for reading or writing data. */
         uint8_t *m_pos;          /*!< Position in buffer, where it last write/read */
-        uint16_t m_remaining;    /*!< Remaining space in buffer. */
     };
 
 private:
