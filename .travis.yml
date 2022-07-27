@@ -3,9 +3,9 @@ sudo: required
 dist: xenial
 compiler:
 - gcc
-- clang
+#- clang
 os:
-- linux
+#- linux
 - osx
 osx_image: xcode11.6 # OS X 10.15.5
 before_install:
