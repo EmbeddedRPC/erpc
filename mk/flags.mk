@@ -45,8 +45,9 @@ endif
 # Add boost library search path.
 # This is the defualt installation location by home brew.
 ifeq "$(is_darwin)" "1"
-    LDFLAGS += -L/usr/local/lib
-    INCLUDES += /usr/local/opt/flex/include
+    LDFLAGS += -L $(BOOST_ROOT)/lib
+    LDFLAGS += -L$(FLEX_ROOT)/lib
+    INCLUDES += $(FLEX_ROOT)/include
 endif
 
 # Need to pass the -U option to GNU ar to turn off deterministic mode, or
