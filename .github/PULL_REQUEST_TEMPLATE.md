@@ -36,6 +36,7 @@ If applicable, add screenshots to help explain your problem.
 - [ ] I read Contribution details and did appropriate actions.
 - [ ] PR code is tested.
 - [ ] PR code is formatted.
+- [ ] Allow edits from maintainers pull request option is set (recommended).
 
 **Additional context**
 <!--
