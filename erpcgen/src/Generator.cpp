@@ -607,3 +607,19 @@ data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
     }
     return fns;
 }
+
+Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope *scope, DataType::data_type_t datatype)
+{
+    datatype_vector_t vector;
+
+    for(Symbol *symbol: scope->getSymbolsOfType(Symbol::kTypenameSymbol))
+    {
+        DataType *dataType = dynamic_cast<DataType*>(symbol);
+        if (dataType->getDataType() == datatype)
+        {
+            vector.push_back(dataType);
+        }
+    }
+
+    return vector;
+}

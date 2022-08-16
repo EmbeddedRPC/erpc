@@ -198,7 +198,7 @@ void SymbolScope::addSymbol(Symbol *sym, int32_t pos)
     if (hasSymbol(sym->getName()) && sym->getName() != "")
     {
         Symbol *existing = getSymbol(sym->getName());
-        if (existing->isBuiltin())
+        if (existing->isDatatypeSymbol() && dynamic_cast<DataType *>(existing)->isBuiltin())
         {
             throw semantic_error(format_string("line %d: attempted redefinition of builtin symbol '%s'",
                                                sym->getFirstLine(), sym->getName().c_str()));

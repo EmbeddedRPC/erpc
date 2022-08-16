@@ -1157,8 +1157,17 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
     }
     else /* function type */
     {
-        FunctionType *func =
-            dynamic_cast<FunctionType *>(m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol).back());
+        FunctionType *func = nullptr;
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+        {
+            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
+            assert(datatype);
+
+            if (datatype->isFunction())
+            {
+                func = dynamic_cast<FunctionType *>(datatype);
+            }
+        }
         assert(func);
         func->getParameters().getScope().setParent(m_globals);
 
@@ -1185,26 +1194,31 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
     if (m_currentInterface)
     {
         fun = m_currentInterface->getFunctions().back();
-        SymbolScope::symbol_vector_t vfunType = m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol);
-        for (Symbol *funSymbol : vfunType)
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
         {
-            funType = dynamic_cast<FunctionType *>(funSymbol);
-            assert(funType);
-            FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
-            if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
+            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
+            assert(datatype);
+
+            if (datatype->isFunction())
             {
-                if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
+                funType = dynamic_cast<FunctionType *>(datatype);
+                assert(funType);
+                FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+                if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
                 {
-                    throw syntax_error(format_string("line %d: Function definition contains more parameters than "
-                                                     "function type definition from %d.\n",
-                                                     fun->getFirstLine(), funType->getFirstLine())
-                                           .c_str());
+                    if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
+                    {
+                        throw syntax_error(format_string("line %d: Function definition contains more parameters than "
+                                                         "function type definition from %d.\n",
+                                                         fun->getFirstLine(), funType->getFirstLine())
+                                               .c_str());
+                    }
+                    else
+                    {
+                        callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
+                    }
+                    break;
                 }
-                else
-                {
-                    callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
-                }
-                break;
             }
         }
     }
@@ -1403,13 +1417,13 @@ Value *SymbolScanner::getValueFromSymbol(Token &tok)
         if (nullptr != sym)
         {
             Value *newVal;
-            if (Symbol::kConstSymbol == sym->getSymbolType())
+            if (sym->isConstSymbol())
             {
                 ConstType *constVar = dynamic_cast<ConstType *>(sym);
                 assert(constVar);
                 newVal = constVar->getValue()->clone();
             }
-            else if (Symbol::kEnumMemberSymbol == sym->getSymbolType())
+            else if (sym->isEnumMemberSymbol())
             {
                 EnumMember *enumVar = dynamic_cast<EnumMember *>(sym);
                 assert(enumVar);

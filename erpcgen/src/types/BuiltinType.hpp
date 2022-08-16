@@ -69,19 +69,12 @@ public:
     _builtin_type getBuiltinType() const { return m_builtinType; }
 
     /*!
-     * @brief This function return "true" value for identify builtin type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isBuiltin() const { return true; }
-
-    /*!
      * @brief This function return "true" value for identify scalar type.
      *
      * @retval true When builtin type is integer, float or boolean.
      * @retval false When builtin type isn't integer, float or boolean.
      */
-    virtual bool isScalar() const { return (isInt() || isFloat() || isBool()) && !(isString() || isBinary()); }
+    virtual bool isScalar() const override { return (isInt() || isFloat() || isBool()) && !(isString() || isBinary()); }
 
     /*!
      * @brief This function return "true" value for identify int type.
@@ -89,7 +82,7 @@ public:
      * @retval true When builtin type is int.
      * @retval false When builtin type isn't int.
      */
-    virtual bool isInt() const { return kInt8Type <= m_builtinType && m_builtinType <= kUInt64Type; }
+    virtual bool isInt() const override { return ((kInt8Type <= m_builtinType) && (m_builtinType <= kUInt64Type)); }
 
     /*!
      * @brief This function return "true" value for identify float type.
@@ -97,7 +90,7 @@ public:
      * @retval true When builtin type is float.
      * @retval false When builtin type isn't float.
      */
-    virtual bool isFloat() const { return m_builtinType == kFloatType || m_builtinType == kDoubleType; }
+    virtual bool isFloat() const override { return ((m_builtinType == kFloatType) || (m_builtinType == kDoubleType)); }
 
     /*!
      * @brief This function return "true" value for identify bool type.
@@ -105,7 +98,7 @@ public:
      * @retval true When builtin type is bool.
      * @retval false When builtin type isn't bool.
      */
-    virtual bool isBool() const { return m_builtinType == kBoolType; }
+    virtual bool isBool() const override { return m_builtinType == kBoolType; }
 
     /*!
      * @brief This function return true/false value for identify string type.
@@ -113,7 +106,7 @@ public:
      * @retval true When builtin type is string or ustring.
      * @retval false When builtin type isn't string or ustring.
      */
-    virtual bool isString() const { return m_builtinType == kStringType || m_builtinType == kUStringType; }
+    virtual bool isString() const override { return ((m_builtinType == kStringType) || (m_builtinType == kUStringType)); }
 
     /*!
      * @brief This function return true/false value for identify ustring type.
@@ -121,7 +114,7 @@ public:
      * @retval true When builtin type is ustring.
      * @retval false When builtin type isn't ustring.
      */
-    virtual bool isUString() const { return m_builtinType == kUStringType; }
+    virtual bool isUString() const override { return m_builtinType == kUStringType; }
 
     /*!
      * @brief This function return true/false value for identify binary type.
@@ -129,7 +122,7 @@ public:
      * @retval true When builtin type is binary.
      * @retval false When builtin type isn't binary.
      */
-    virtual bool isBinary() const { return m_builtinType == kBinaryType; }
+    virtual bool isBinary() const override { return m_builtinType == kBinaryType; }
 
 protected:
     _builtin_type m_builtinType; /*!< Builtin type of current object. */

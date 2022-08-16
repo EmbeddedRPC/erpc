@@ -56,13 +56,6 @@ public:
     void setElementType(DataType *elementType) { m_elementType = elementType; }
 
     /*!
-     * @brief This function return "true" value for identify array type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isArray() const { return true; }
-
-    /*!
      * @brief This function returns description about the array.
      *
      * @return String description about array.

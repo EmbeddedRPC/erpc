@@ -40,19 +40,12 @@ public:
      *
      * @param[in] tok Given token.
      */
-    FunctionType(const Token &tok)
+    explicit FunctionType(const Token &tok)
     : FunctionBase()
-    , DataType(tok, DataType::kFunctionType, Symbol::kFunctionTypeSymbol)
+    , DataType(tok, kFunctionType)
     , m_callbackFuns()
     {
     }
-
-    /*!
-     * @brief This function return "true" value as default for identify function type.
-     *
-     * @retval true Always return false.
-     */
-    virtual bool isFunction() const { return true; }
 
     /*!
      * @brief This function returns description about the interface function.

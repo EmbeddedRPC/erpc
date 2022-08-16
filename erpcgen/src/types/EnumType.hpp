@@ -37,8 +37,8 @@ public:
      *
      * @param[in] tok Given token.
      */
-    EnumType(const Token &tok)
-    : DataType(tok, kEnumType, kEnumTypeSymbol)
+    explicit EnumType(const Token &tok)
+    : DataType(tok, kEnumType)
     {
     }
 
@@ -48,7 +48,7 @@ public:
      * This function set DataType with default name.
      */
     EnumType()
-    : DataType("", kEnumType, kEnumTypeSymbol)
+    : DataType("", kEnumType)
     {
     }
 
@@ -74,13 +74,6 @@ public:
      * @return Enum member.
      */
     EnumMember *getMember(std::string name);
-
-    /*!
-     * @brief This function return "true" value for identify enum type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isEnum() const { return true; }
 
     /*!
      * @brief This function returns the next value to use for an enum member

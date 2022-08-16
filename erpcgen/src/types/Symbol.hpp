@@ -40,16 +40,7 @@ public:
         kProgramSymbol,
         kStructMemberSymbol,
         kTypenameSymbol,
-        kUnionCaseMemberSymbol,
-
-        kAliasTypeSymbol,
-        kArrayTypeSymbol,
-        kBuiltinTypeSymbol,
-        kEnumTypeSymbol,
-        kFunctionTypeSymbol,
-        kListTypeSymbol,
-        kStructTypeSymbol,
-        kUnionTypeSymbol
+        kUnionCaseMemberSymbol
     };
 
     /*!
@@ -59,7 +50,7 @@ public:
      *
      * @param[in] symType Enum symbol type.
      */
-    Symbol(symbol_type_t symType)
+    explicit Symbol(symbol_type_t symType)
     : m_symbolType(symType)
     , m_name()
     , m_location()
@@ -132,6 +123,70 @@ public:
     void setName(const std::string &newName) { m_name = newName; }
 
     /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is ConstSymbol.
+     * @retval false When symbol isn't ConstSymbol.
+     */
+    bool isConstSymbol() const { return (m_symbolType == kConstSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is EnumMemberSymbol.
+     * @retval false When symbol isn't EnumMemberSymbol.
+     */
+    bool isEnumMemberSymbol() const { return (m_symbolType == kEnumMemberSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is FunctionSymbol.
+     * @retval false When symbol isn't FunctionSymbol.
+     */
+    bool isFunctionSymbol() const { return (m_symbolType == kFunctionSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is InterfaceSymbol.
+     * @retval false When symbol isn't InterfaceSymbol.
+     */
+    bool isInterfaceSymbol() const { return (m_symbolType == kInterfaceSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is ProgramSymbol.
+     * @retval false When symbol isn't ProgramSymbol.
+     */
+    bool isProgramSymbol() const { return (m_symbolType == kProgramSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is StructMemberSymbol.
+     * @retval false When symbol isn't StructMemberSymbol.
+     */
+    bool isStructMemberSymbol() const { return (m_symbolType == kStructMemberSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is TypenameSymbol.
+     * @retval false When symbol isn't TypenameSymbol.
+     */
+    bool isDatatypeSymbol() const { return (m_symbolType == kTypenameSymbol); }
+
+    /*!
+     * @brief This function is testing symbol type.
+     *
+     * @retval true When symbol is UnionCaseMemberSymbol.
+     * @retval false When symbol isn't UnionCaseMemberSymbol.
+     */
+    bool isUnionCaseSymbol() const { return (m_symbolType == kUnionCaseMemberSymbol); }
+
+    /*!
      * @brief This function returns location for symbol.
      *
      * @returns Return location for symbol.
@@ -158,13 +213,6 @@ public:
      * @returns Return last line from location of symbol.
      */
     int getLastLine() const { return m_location.m_lastLine; }
-
-    /*!
-     * @brief This function return "false" value as default for identify builtin type.
-     *
-     * @returns Always return false.
-     */
-    virtual bool isBuiltin() const { return false; }
 
     /*!
      * @brief This function returns description about the symbol (symbol name).

@@ -40,7 +40,7 @@ public:
      * @param[in] discriminatorName Discriminator name.
      */
     UnionType(const std::string &name, const std::string &discriminatorName)
-    : DataType(name, kUnionType, kUnionTypeSymbol)
+    : DataType(name, kUnionType)
     , m_discriminator(discriminatorName)
     , m_members("(union)")
     , m_parentStruct(nullptr)
@@ -57,7 +57,7 @@ public:
      * @param[in] discriminatorName Discriminator name.
      */
     UnionType(const Token &tok, const std::string &discriminatorName)
-    : DataType(tok, kUnionType, kUnionTypeSymbol)
+    : DataType(tok, kUnionType)
     , m_discriminator(discriminatorName)
     , m_members("(union)")
     , m_parentStruct(nullptr)
@@ -95,13 +95,6 @@ public:
      * @see std::string ListType::getDescription() const
      */
     virtual std::string getDescription() const;
-
-    /*!
-     * @brief This function return "true" value for identify union type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isUnion() const { return true; }
 
     /*!
      * @brief This function return "true" value for identify non-encapsulated discriminated union

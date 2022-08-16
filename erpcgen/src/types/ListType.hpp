@@ -33,7 +33,7 @@ public:
      *
      * @param[in] elementType Given data type.
      */
-    ListType(DataType *elementType)
+    explicit ListType(DataType *elementType)
     : DataType("(list)", kListType)
     , m_elementType(elementType)
     , m_lengthVariableName("")
@@ -53,13 +53,6 @@ public:
      * @param[in] elementType Element data type.
      */
     void setElementType(DataType *elementType) { m_elementType = elementType; }
-
-    /*!
-     * @brief This function return "true" value for identify list type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isList() const { return true; }
 
     /*!
      * @brief This function returns description about the list.
