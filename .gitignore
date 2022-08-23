@@ -106,3 +106,4 @@ tags
 format-files-to-commit.rb
 language\.settings\.xml
 *.vsix
+null.d

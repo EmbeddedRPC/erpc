@@ -186,6 +186,7 @@ int main(int argc, char **argv)
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
+    erpc_client_t client;
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
@@ -197,7 +198,7 @@ int main(int argc, char **argv)
     message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 
-    erpc_client_init(transport, message_buffer_factory);
+    client = erpc_client_init(transport, message_buffer_factory);
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -207,7 +208,7 @@ int main(int argc, char **argv)
        time the rpmsg is deinitilaized yet => hardfault */
     env_sleep_msec(10000);
 #endif
-    erpc_client_deinit();
+    erpc_client_deinit(client);
 
     return i;
 }

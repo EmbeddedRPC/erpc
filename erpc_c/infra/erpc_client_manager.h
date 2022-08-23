@@ -13,8 +13,6 @@
 
 #ifdef __cplusplus
 #include "erpc_client_server_common.hpp"
-#include "erpc_codec.hpp"
-#include "erpc_config_internal.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_server.hpp"
 #include "erpc_threading.h"
@@ -31,6 +29,9 @@ extern "C" {
 
 typedef void (*client_error_handler_t)(erpc_status_t err,
                                        uint32_t functionID); /*!< eRPC error handler function type. */
+
+//! @brief Opaque client object type.
+typedef struct ClientType *erpc_client_t;
 
 #ifdef __cplusplus
 }
@@ -60,9 +61,6 @@ public:
      */
     ClientManager(void)
     : ClientServerCommon()
-    , m_messageFactory(NULL)
-    , m_codecFactory(NULL)
-    , m_transport(NULL)
     , m_sequence(0)
     , m_errorHandler(NULL)
 #if ERPC_NESTED_CALLS
@@ -76,29 +74,6 @@ public:
      * @brief ClientManager destructor
      */
     virtual ~ClientManager(void) {}
-
-    /*!
-     * @brief This function sets message buffer factory to use.
-     *
-     * @param[in] factory Message buffer factory to use.
-     */
-    void setMessageBufferFactory(MessageBufferFactory *factory) { m_messageFactory = factory; }
-
-    /*!
-     * @brief This function sets codec factory to use.
-     *
-     * @param[in] factory Codec factory to use.
-     */
-    void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
-
-    /*!
-     * @brief This function sets transport layer to use.
-     *
-     * It also set messageBufferFactory to the same as in transport layer.
-     *
-     * @param[in] transport Transport layer to use.
-     */
-    void setTransport(Transport *transport);
 
     /*!
      * @brief This function creates request context.
@@ -155,9 +130,6 @@ public:
 #endif
 
 protected:
-    MessageBufferFactory *m_messageFactory; //!< Message buffer factory to use.
-    CodecFactory *m_codecFactory;           //!< Codec to use.
-    Transport *m_transport;                 //!< Transport layer to use.
     uint32_t m_sequence;                    //!< Sequence number.
     client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
 #if ERPC_NESTED_CALLS

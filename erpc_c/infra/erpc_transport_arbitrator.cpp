@@ -51,6 +51,12 @@ void TransportArbitrator::setCrc16(Crc16 *crcImpl)
     m_sharedTransport->setCrc16(crcImpl);
 }
 
+Crc16 *TransportArbitrator::getCrc16(void)
+{
+    erpc_assert(m_sharedTransport != NULL);
+    return m_sharedTransport->getCrc16();
+}
+
 bool TransportArbitrator::hasMessage(void)
 {
     erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));

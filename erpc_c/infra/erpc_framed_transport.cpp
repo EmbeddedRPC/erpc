@@ -40,6 +40,11 @@ void FramedTransport::setCrc16(Crc16 *crcImpl)
     m_crcImpl = crcImpl;
 }
 
+Crc16 *FramedTransport::getCrc16(void)
+{
+    return m_crcImpl;
+}
+
 erpc_status_t FramedTransport::receive(MessageBuffer *message)
 {
     Header h;

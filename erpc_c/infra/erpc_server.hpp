@@ -12,7 +12,6 @@
 #define _EMBEDDED_RPC__SERVER_H_
 
 #include "erpc_client_server_common.hpp"
-#include "erpc_codec.hpp"
 #include "erpc_config_internal.h"
 #if ERPC_NESTED_CALLS
 #include "erpc_client_manager.h"
@@ -110,9 +109,6 @@ public:
      */
     Server(void)
     : ClientServerCommon()
-    , m_messageFactory(NULL)
-    , m_codecFactory(NULL)
-    , m_transport(NULL)
     , m_firstService(NULL)
     {
     }
@@ -121,29 +117,6 @@ public:
      * @brief Server destructor
      */
     virtual ~Server(void) {}
-
-    /*!
-     * @brief Set MessageBufferFactory to use.
-     *
-     * @param[in] factory MessageBufferFactory to use.
-     */
-    void setMessageBufferFactory(MessageBufferFactory *factory) { m_messageFactory = factory; }
-
-    /*!
-     * @brief Set CodecFactory to use.
-     *
-     * @param[in] factory CodecFactory to use.
-     */
-    void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
-
-    /*!
-     * @brief This function sets transport layer to use.
-     *
-     * It also set messageBufferFactory to the same as in transport layer.
-     *
-     * @param[in] transport Transport layer to use.
-     */
-    void setTransport(Transport *transport);
 
     /*!
      * @brief Add service.
@@ -170,10 +143,7 @@ public:
     virtual void stop(void) = 0;
 
 protected:
-    MessageBufferFactory *m_messageFactory; /*!< Contains MessageBufferFactory to use. */
-    CodecFactory *m_codecFactory;           /*!< Contains CodecFactory to use. */
-    Transport *m_transport;                 /*!< Transport layer used to send and receive data. */
-    Service *m_firstService;                /*!< Contains pointer to first service. */
+    Service *m_firstService; /*!< Contains pointer to first service. */
 
     /*!
      * @brief Process message.
