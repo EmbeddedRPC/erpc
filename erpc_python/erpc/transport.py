@@ -10,8 +10,21 @@
 import struct
 import socket
 import threading
+import time
+import signal 
+
 from .crc16 import Crc16
 from .client import RequestError
+
+################################################################################
+
+class TimeOutException(Exception):
+    pass
+
+def timeout_handler(sig, frame):
+    raise TimeOutException()
+
+################################################################################
 
 try:
     import serial
@@ -119,12 +132,16 @@ class ConnectionClosed(Exception):
     pass
 
 class TCPTransport(FramedTransport):
-    def __init__(self, host, port, isServer):
+    def __init__(self, host, port, isServer, timeout=0):
         super(TCPTransport, self).__init__()
         self._host = host
         self._port = port
         self._isServer = isServer
         self._sock = None
+        self._timeout_seconds = timeout
+        
+        # Recogni: Insert a signal handler to handle timeouts.
+        signal.signal(signal.SIGALRM, timeout_handler)
 
         if self._isServer:
             self._serverThread = threading.Thread(target=self._serve)
@@ -163,7 +180,16 @@ class TCPTransport(FramedTransport):
             remaining = count
             result = bytearray()
             while remaining:
-                data = self._sock.recv(remaining)
+                # Recogni: Set a recv timeout based on the transport (in seconds),
+                #          and clear it once we get data.
+                if self._timeout_seconds > 0:
+                    signal.alarm(self._timeout_seconds)
+                try:
+                    data = self._sock.recv(remaining)
+                except TimeOutException:
+                    raise RequestError("request timeout (%d) hit" % self._timeout_seconds)
+                signal.alarm(0)
+                
                 if len(data) == 0:
                     self.close()
                     raise ConnectionClosed()
