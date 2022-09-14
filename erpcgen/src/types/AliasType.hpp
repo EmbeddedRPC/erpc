@@ -35,7 +35,7 @@ public:
      * @param[in] elementType Given data type.
      */
     AliasType(std::string name, DataType *elementType)
-    : DataType(name, kAliasType, kAliasTypeSymbol)
+    : DataType(name, kAliasType)
     , m_elementType(elementType)
     {
     }
@@ -49,17 +49,10 @@ public:
      * @param[in] elementType Given data type.
      */
     AliasType(const Token &tok, DataType *elementType)
-    : DataType(tok, kAliasType, kAliasTypeSymbol)
+    : DataType(tok, kAliasType)
     , m_elementType(elementType)
     {
     }
-
-    /*!
-     * @brief This function return "true" value for identify alias type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isAlias() const { return true; }
 
     /*!
      * @brief This function return element data type.

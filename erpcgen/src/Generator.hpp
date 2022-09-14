@@ -50,6 +50,8 @@ public:
         kPython
     }; /*!< Type of generator. */
 
+    typedef std::vector<DataType *> datatype_vector_t; /*!< Vector of data types. */
+
     /*!
      * @brief Constructor.
      *
@@ -333,6 +335,16 @@ protected:
      * @return empty string if annotation is not found else string value.
      */
     std::string getAnnStringValue(Symbol *symbol, std::string name);
+
+    /*!
+     * @brief This function returns vector of data types from scope.
+     *
+     * @param[in] scope Scope with symbols.
+     * @param[in] datatype Datatype type.
+     *
+     * @return datatype_vector_t vector of data types.
+     */
+    datatype_vector_t getDataTypesFromSymbolScope(SymbolScope *scope, DataType::data_type_t datatype);
 
 private:
     /*!

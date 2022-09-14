@@ -38,8 +38,8 @@ public:
      *
      * @param[in] name Given name.
      */
-    StructType(const std::string &name)
-    : DataType(name, kStructType, kStructTypeSymbol)
+    explicit StructType(const std::string &name)
+    : DataType(name, kStructType)
     {
     }
 
@@ -50,8 +50,8 @@ public:
      *
      * @param[in] tok Given token.
      */
-    StructType(const Token &tok)
-    : DataType(tok, kStructType, kStructTypeSymbol)
+    explicit StructType(const Token &tok)
+    : DataType(tok, kStructType)
     {
     }
 
@@ -78,13 +78,6 @@ public:
      * @return Vector of struct members.
      */
     member_vector_t &getMembers() { return m_members; }
-
-    /*!
-     * @brief This function return "true" value for identify struct type.
-     *
-     * @retval true Always return true.
-     */
-    virtual bool isStruct() const { return true; }
 
     /*!
      * @brief @brief This function returns description about the struct.

@@ -35,7 +35,7 @@ public:
      *
      * @param[in] tok Given token.
      */
-    Program(const Token &tok)
+    explicit Program(const Token &tok)
     : Symbol(kProgramSymbol, tok)
     {
     }

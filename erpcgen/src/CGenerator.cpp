@@ -373,7 +373,7 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
 
 void CGenerator::transformAliases()
 {
-    for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kAliasType))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
@@ -448,14 +448,14 @@ void CGenerator::generate()
     }
 
     // check if structure/function parameters annotations are valid.
-    for (Symbol *symbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    for (Symbol *symbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
     {
         FunctionType *functionType = dynamic_cast<FunctionType *>(symbol);
         assert(functionType);
         scanStructForAnnotations(&functionType->getParameters(), true);
     }
 
-    for (Symbol *symbol : m_globals->getSymbolsOfType(Symbol::kStructTypeSymbol))
+    for (Symbol *symbol : getDataTypesFromSymbolScope(m_globals, DataType::kStructType))
     {
         StructType *structType = dynamic_cast<StructType *>(symbol);
         assert(structType);
@@ -605,7 +605,7 @@ void CGenerator::makeEnumsTemplateData()
     Log::info("Enums:\n");
     data_list enums;
     int n = 0;
-    for (auto it : m_globals->getSymbolsOfType(DataType::kEnumTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kEnumType))
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
@@ -661,11 +661,11 @@ void CGenerator::makeAliasesTemplateData()
     int n = 0;
 
     // All existing type declarations
-    SymbolScope::symbol_vector_t aliasTypeVector = m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol);
+    datatype_vector_t aliasTypeVector = getDataTypesFromSymbolScope(m_globals, DataType::kAliasType);
 
     /* type definitions of structures */
     int i = 0;
-    for (auto it : m_globals->getSymbolsOfType(DataType::kStructTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kStructType))
     {
         StructType *structType = dynamic_cast<StructType *>(it);
         assert(structType);
@@ -677,7 +677,7 @@ void CGenerator::makeAliasesTemplateData()
     }
 
     /* type definitions of non-encapsulated unions */
-    for (auto it : m_globals->getSymbolsOfType(DataType::kUnionTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kUnionType))
     {
         UnionType *unionType = dynamic_cast<UnionType *>(it);
         assert(unionType);
@@ -690,7 +690,7 @@ void CGenerator::makeAliasesTemplateData()
 
     /* type definitions of functions and table of functions */
     data_list functions;
-    for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    for (auto functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
     {
         FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
         assert(functionType);
@@ -840,7 +840,7 @@ void CGenerator::makeAliasesTemplateData()
 
 AliasType *CGenerator::getAliasType(DataType *dataType)
 {
-    for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kAliasType))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
@@ -866,10 +866,13 @@ void CGenerator::makeSymbolsDeclarationTemplateData()
     for (auto it = m_globals->begin(); it != m_globals->end(); ++it)
     {
         data_map info;
-
-        switch ((*it)->getSymbolType())
+        if ((*it)->isDatatypeSymbol())
         {
-            case DataType::kStructTypeSymbol: {
+            DataType *dataType = dynamic_cast<DataType *>(*it);
+            assert(dataType);
+
+            if (dataType->isStruct())
+            {
                 StructType *structType = dynamic_cast<StructType *>(*it);
                 assert(structType);
 
@@ -877,10 +880,9 @@ void CGenerator::makeSymbolsDeclarationTemplateData()
 
                 Log::info("%s\n", structType->getDescription().c_str());
                 m_symbolsTemplate.push_back(info);
-                break;
             }
-
-            case DataType::kUnionTypeSymbol: {
+            else if (dataType->isUnion())
+            {
                 UnionType *unionType = dynamic_cast<UnionType *>(*it);
                 assert(unionType);
 
@@ -888,11 +890,7 @@ void CGenerator::makeSymbolsDeclarationTemplateData()
 
                 Log::info("%s\n", unionType->getDescription().c_str());
                 m_symbolsTemplate.push_back(info);
-                break;
             }
-
-            default:
-                break;
         }
     }
 
@@ -931,10 +929,14 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
         const set<_param_direction> dirs = group->getSymbolDirections(symbol);
         if (dirs.size())
         {
-            switch (symbol->getSymbolType())
+            if (symbol->isDatatypeSymbol())
             {
-                case DataType::kStructTypeSymbol: {
-                    StructType *structType = dynamic_cast<StructType *>(symbol);
+                DataType *datatype = dynamic_cast<DataType *>(symbol);
+                assert(datatype);
+
+                if (datatype->isStruct())
+                {
+                    StructType *structType = dynamic_cast<StructType *>(datatype);
                     assert(structType);
 
                     Log::info("%s\n", structType->getDescription().c_str());
@@ -948,7 +950,7 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
                         info = getSymbolTemplateByName(name);
                         if (info.empty())
                         {
-                            break;
+                            continue;
                         }
 
                         // get struct definition info
@@ -967,10 +969,10 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
 
                         names.insert(name);
                     }
-                    break;
                 }
-                case DataType::kUnionTypeSymbol: {
-                    UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                else if (datatype->isUnion())
+                {
+                    UnionType *unionType = dynamic_cast<UnionType *>(datatype);
                     assert(unionType);
 
                     Log::info("%s\n", unionType->getDescription().c_str());
@@ -983,7 +985,7 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
                         info = getSymbolTemplateByName(name);
                         if (info.empty())
                         {
-                            break;
+                            continue;
                         }
 
                         // get union info
@@ -1002,10 +1004,7 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
 
                         names.insert(name);
                     }
-                    break;
                 }
-                default:
-                    break;
             }
         }
     }
@@ -1748,11 +1747,13 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<_param_
                                      data_list &toClient, data_list &toServer, data_map &dataMap)
 {
     _direction direction = kIn;
-    switch (symbolType->getSymbolType())
+    if (symbolType->isDatatypeSymbol())
     {
-        case Symbol::kStructTypeSymbol:
-        case Symbol::kUnionTypeSymbol:
-        case Symbol::kFunctionTypeSymbol: {
+        const DataType *dataType = dynamic_cast<const DataType *>(symbolType);
+        assert(dataType);
+
+        if (dataType->isStruct() || dataType->isFunction() || dataType->isUnion())
+        {
             bool in = directions.count(kInDirection);
             bool out = directions.count(kOutDirection);
             bool inOut = directions.count(kInoutDirection);
@@ -1774,33 +1775,37 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<_param_
                 // ToDo: shared pointer.
                 direction = kNone;
             }
-
-            break;
         }
-        case Symbol::kStructMemberSymbol: {
-            const StructMember *structMember = dynamic_cast<const StructMember *>(symbolType);
-            assert(structMember);
-            switch (structMember->getDirection())
-            {
-                case kOutDirection:
-                case kInoutDirection: {
-                    direction = kInOut;
-                    break;
-                }
-                case kInDirection: {
-                    direction = kIn;
-                    break;
-                }
-                default: {
-                    throw internal_error("Unsupported direction type of structure member.");
-                }
-            }
-            break;
-        }
-        default: {
-            throw internal_error(format_string("Symbol: %s is not structure or function parameter.",
+        else
+        {
+            throw internal_error(format_string("Symbol: %s is not structure or function or union parameter.",
                                                symbolType->getDescription().c_str()));
         }
+    }
+    else if (symbolType->isStructMemberSymbol())
+    {
+        const StructMember *structMember = dynamic_cast<const StructMember *>(symbolType);
+        assert(structMember);
+        switch (structMember->getDirection())
+        {
+            case kOutDirection:
+            case kInoutDirection: {
+                direction = kInOut;
+                break;
+            }
+            case kInDirection: {
+                direction = kIn;
+                break;
+            }
+            default: {
+                throw internal_error("Unsupported direction type of structure member.");
+            }
+        }
+    }
+    else
+    {
+        throw internal_error(format_string("Symbol: %s is not structure, union, function or structmember parameter.",
+                                           symbolType->getDescription().c_str()));
     }
 
     switch (direction)

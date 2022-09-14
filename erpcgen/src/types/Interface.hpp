@@ -38,7 +38,7 @@ public:
      *
      * @param[in] tok Given token.
      */
-    Interface(const Token &tok)
+    explicit Interface(const Token &tok)
     : Symbol(kInterfaceSymbol, tok)
     , m_scope()
     , m_uniqueId(s_idCounter++)

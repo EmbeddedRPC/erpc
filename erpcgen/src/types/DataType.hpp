@@ -29,7 +29,7 @@ public:
     /*!
      *  @brief Supported data types.
      */
-    enum _data_type
+    enum data_type_t
     {
         kAliasType,
         kArrayType,
@@ -49,7 +49,7 @@ public:
      *
      * @param[in] dataType Given data type.
      */
-    DataType(_data_type dataType)
+    explicit DataType(data_type_t dataType)
     : Symbol(kTypenameSymbol)
     , m_dataType(dataType)
     {
@@ -63,27 +63,11 @@ public:
      * @param[in] dataType Given data type.
      * @param[in] name Given name for symbol.
      */
-    DataType(const std::string &name, _data_type dataType)
+    DataType(const std::string &name, data_type_t dataType)
     : Symbol(kTypenameSymbol, name)
     , m_dataType(dataType)
     {
     }
-
-    /*!
-     * @brief Constructor.
-     *
-     * This function set data type to given data type, symbol name to given name and symbol type to given symbol type.
-     *
-     * @param[in] name Given name for symbol.
-     * @param[in] dataType Given data type.
-     * @param[in] symbolType Given symbol type for symbol.
-     */
-    DataType(const std::string &name, _data_type dataType, symbol_type_t symbolType)
-    : Symbol(symbolType, name)
-    , m_dataType(dataType)
-    {
-    }
-
     /*!
      * @brief Constructor.
      *
@@ -93,8 +77,8 @@ public:
      * @param[in] dataType Given data type.
      * @param[in] symbolType Given symbol type for symbol.
      */
-    DataType(const Token &tok, _data_type dataType, symbol_type_t symbolType)
-    : Symbol(symbolType, tok)
+    DataType(const Token &tok, data_type_t dataType)
+    : Symbol(kTypenameSymbol, tok)
     , m_dataType(dataType)
     {
     }
@@ -104,7 +88,7 @@ public:
      *
      * @return Data type of current object.
      */
-    _data_type getDataType() const { return m_dataType; }
+    data_type_t getDataType() const { return m_dataType; }
 
     /*!
      * @brief This function returns pointer to true data type instead of alias.
@@ -126,18 +110,20 @@ public:
     DataType *getTrueContainerDataType();
 
     /*!
-     * @brief This function return "false" value as default for identify alias type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is AliasType.
+     * @retval false When data type isn't AliasType.
      */
-    virtual bool isAlias() const { return false; }
+    bool isAlias() const { return (m_dataType == kAliasType); }
 
     /*!
-     * @brief This function return "false" value as default for identify array type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is ArrayType.
+     * @retval false When data type isn't ArrayType.
      */
-    virtual bool isArray() const { return false; }
+    bool isArray() const { return (m_dataType == kArrayType); }
 
     /*!
      * @brief This function return "false" value as default for identify binary type.
@@ -154,32 +140,36 @@ public:
     virtual bool isBool() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify builtin type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is BuiltinType.
+     * @retval false When data type isn't BuiltinType.
      */
-    virtual bool isBuiltin() const { return false; }
+    bool isBuiltin() const { return (m_dataType == kBuiltinType); }
 
     /*!
-     * @brief This function return "false" value as default for identify enum type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is EnumTyp.
+     * @retval false When data type isn't EnumTyp.
      */
-    virtual bool isEnum() const { return false; }
+    bool isEnum() const { return (m_dataType == kEnumType); }
 
     /*!
-     * @brief This function return "false" value as default for identify function type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is FunctionType.
+     * @retval false When data type isn't FunctionType.
      */
-    virtual bool isFunction() const { return false; }
+    bool isFunction() const { return (m_dataType == kFunctionType); }
 
     /*!
-     * @brief This function return "false" value as default for identify list type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is ListType.
+     * @retval false When data type isn't ListType.
      */
-    virtual bool isList() const { return false; }
+    bool isList() const { return (m_dataType == kListType); }
 
     /*!
      * @brief This function return "false" value as default for identify scalar builtin type.
@@ -187,6 +177,20 @@ public:
      * @retval false Always return false;
      */
     virtual bool isScalar() const { return false; }
+
+    /*!
+     * @brief This function return "true" value for identify int type.
+     *
+     * @retval false Always return false;
+     */
+    virtual bool isInt() const { return false; }
+
+    /*!
+     * @brief This function return "true" value for identify float type.
+     *
+     * @retval false Always return false;
+     */
+    virtual bool isFloat() const { return false; }
 
     /*!
      * @brief This function return "false" value as default for identify string type.
@@ -203,28 +207,31 @@ public:
     virtual bool isUString() const { return false; }
 
     /*!
-     * @brief This function return "false" value as default for identify struct type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is StructType.
+     * @retval false When data type isn't StructType.
      */
-    virtual bool isStruct() const { return false; }
+    bool isStruct() const { return (m_dataType == kStructType); }
 
     /*!
-     * @brief This function return "false" value as default for identify union type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is UnionType.
+     * @retval false When data type isn't UnionType.
      */
-    virtual bool isUnion() const { return false; }
+    bool isUnion() const { return (m_dataType == kUnionType); }
 
     /*!
-     * @brief This function return "false" value as default for identify void type.
+     * @brief This function is testing data type.
      *
-     * @retval false Always return false.
+     * @retval true When data type is VoidType.
+     * @retval false When data type isn't VoidType.
      */
-    virtual bool isVoid() const { return false; }
+    bool isVoid() const { return (m_dataType == kVoidType); }
 
 protected:
-    _data_type m_dataType; /*!< Data type of current object */
+    data_type_t m_dataType; /*!< Data type of current object */
 };
 
 } // namespace erpcgen

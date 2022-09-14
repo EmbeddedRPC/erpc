@@ -38,7 +38,7 @@ public:
      *
      * @param[in] name Group name.
      */
-    Group(const std::string name)
+    explicit Group(const std::string name)
     : m_name(name)
     {
     }
