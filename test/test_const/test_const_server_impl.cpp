@@ -51,17 +51,13 @@ void remove_services(erpc::SimpleServer *server)
 #ifdef __cplusplus
 extern "C" {
 #endif
-void add_services_to_server() {}
-void remove_services_from_server() {}
+void add_services_to_server(erpc_server_t server) {}
+void remove_services_from_server(erpc_server_t server) {}
 
-void remove_common_services_from_server(erpc_service_t service)
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
 {
-    erpc_remove_service_from_server(service);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_remove_service_from_server(server, service);
     destroy_Common_service(service);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_Common_service();
-#endif
 }
 #ifdef __cplusplus
 }

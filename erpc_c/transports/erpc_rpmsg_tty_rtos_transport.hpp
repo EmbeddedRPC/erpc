@@ -124,6 +124,13 @@ public:
      */
     virtual void setCrc16(Crc16 *crcImpl);
 
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void);
+
 protected:
     uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */
     rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */

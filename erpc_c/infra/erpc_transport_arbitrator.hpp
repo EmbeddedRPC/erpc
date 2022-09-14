@@ -61,11 +61,25 @@ public:
     void setSharedTransport(Transport *shared) { m_sharedTransport = shared; }
 
     /*!
+     * @brief This function returns shared client/server transport.
+     *
+     * @return Transport * Returns shared client/server transport.
+     */
+    Transport *getSharedTransport(void) { return m_sharedTransport; }
+
+    /*!
      * @brief This function set codec.
      *
      * @param[in] codec Codec.
      */
     void setCodec(Codec *codec) { m_codec = codec; }
+
+    /*!
+     * @brief This function get codec.
+     *
+     * @return Codec * Pointer to codec used within transport.
+     */
+    Codec *getCodec(void) { return m_codec; }
 
     /*!
      * @brief Prototype for receiving message.
@@ -120,6 +134,13 @@ public:
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
     virtual void setCrc16(Crc16 *crcImpl) override;
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void) override;
 
     /*!
      * @brief Check if the underlying shared transport has a message

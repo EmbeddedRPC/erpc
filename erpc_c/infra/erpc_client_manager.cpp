@@ -24,11 +24,6 @@ bool nestingDetection = false;
 #endif
 #endif
 
-void ClientManager::setTransport(Transport *transport)
-{
-    m_transport = transport;
-}
-
 RequestContext ClientManager::createRequest(bool isOneway)
 {
     // Create codec to read and write the request.

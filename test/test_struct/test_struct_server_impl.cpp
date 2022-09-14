@@ -217,35 +217,26 @@ extern "C" {
 #endif
 erpc_service_t service1 = NULL;
 erpc_service_t service2 = NULL;
-void add_services_to_server()
+void add_services_to_server(erpc_server_t server)
 {
     service1 = create_ArithmeticService1_service();
     service2 = create_ArithmeticService2_service();
-    erpc_add_service_to_server(service1);
-    erpc_add_service_to_server(service2);
+    erpc_add_service_to_server(server, service1);
+    erpc_add_service_to_server(server, service2);
 }
 
-void remove_services_from_server()
+void remove_services_from_server(erpc_server_t server)
 {
-    erpc_remove_service_from_server(service1);
-    erpc_remove_service_from_server(service2);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_remove_service_from_server(server, service1);
+    erpc_remove_service_from_server(server, service2);
     destroy_ArithmeticService1_service(service1);
     destroy_ArithmeticService2_service(service2);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_ArithmeticService1_service();
-    destroy_ArithmeticService2_service();
-#endif
 }
 
-void remove_common_services_from_server(erpc_service_t service)
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
 {
-    erpc_remove_service_from_server(service);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_remove_service_from_server(server, service);
     destroy_Common_service(service);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_Common_service();
-#endif
 }
 #ifdef __cplusplus
 }

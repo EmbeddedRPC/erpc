@@ -9,6 +9,7 @@
  */
 
 #include "erpc_server_setup.h"
+
 #include "erpc_basic_codec.hpp"
 #include "erpc_crc16.hpp"
 #include "erpc_manually_constructed.hpp"
@@ -23,11 +24,9 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 
 // global server variables
-ERPC_MANUALLY_CONSTRUCTED(SimpleServer, s_server);
-extern SimpleServer *g_server;
-SimpleServer *g_server = NULL;
-ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
-ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(SimpleServer, s_server);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(Crc16, s_crc16);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -36,123 +35,175 @@ ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 erpc_server_t erpc_server_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory)
 {
     erpc_assert(transport != NULL);
+    erpc_assert(message_buffer_factory != NULL);
 
     Transport *castedTransport;
+    BasicCodecFactory *codecFactory;
+    Crc16 *crc16;
+    SimpleServer *simpleServer;
 
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_codecFactory.isUsed() || s_crc16.isUsed() || s_server.isUsed())
+    {
+        simpleServer = NULL;
+    }
+    else
+    {
+        // Init factories.
+        s_codecFactory.construct();
+        codecFactory = s_codecFactory.get();
+
+        s_crc16.construct();
+        crc16 = s_crc16.get();
+
+        // Init the client manager.
+        s_server.construct();
+        simpleServer = s_server.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
     // Init factories.
-    s_codecFactory.construct();
+    codecFactory = new BasicCodecFactory();
 
-    // Init server with the provided transport.
-    s_server.construct();
-    castedTransport = reinterpret_cast<Transport *>(transport);
-    s_crc16.construct();
-    castedTransport->setCrc16(s_crc16.get());
-    s_server->setTransport(castedTransport);
-    s_server->setCodecFactory(s_codecFactory);
-    s_server->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
-    g_server = s_server;
-    return reinterpret_cast<erpc_server_t>(g_server);
+    crc16 = new Crc16();
+
+    // Init the client manager.
+    simpleServer = new SimpleServer();
+
+    if ((codecFactory == NULL) || (crc16 == NULL) || (simpleServer == NULL))
+    {
+        if (codecFactory != NULL)
+        {
+            delete codecFactory;
+        }
+        if (crc16 != NULL)
+        {
+            delete crc16;
+        }
+        if (simpleServer != NULL)
+        {
+            delete simpleServer;
+        }
+        simpleServer = NULL;
+    }
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    if (simpleServer != NULL)
+    {
+        // Init server with the provided transport.
+        castedTransport = reinterpret_cast<Transport *>(transport);
+        castedTransport->setCrc16(crc16);
+        simpleServer->setTransport(castedTransport);
+        simpleServer->setCodecFactory(codecFactory);
+        simpleServer->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
+    }
+
+    return reinterpret_cast<erpc_server_t>(simpleServer);
 }
 
-void erpc_server_deinit(void)
+void erpc_server_deinit(erpc_server_t server)
 {
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)server;
+    erpc_assert(server == s_server.get());
     s_crc16.destroy();
     s_codecFactory.destroy();
     s_server.destroy();
-    g_server = NULL;
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(server != NULL);
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    delete simpleServer->getCodecFactory();
+    delete simpleServer->getTransport()->getCrc16();
+    delete simpleServer;
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
 }
 
-void erpc_add_service_to_server(void *service)
+void erpc_add_service_to_server(erpc_server_t server, void *service)
 {
-    if ((g_server != NULL) && (service != NULL))
-    {
-        g_server->addService(static_cast<erpc::Service *>(service));
-    }
+    erpc_assert(server != NULL);
+
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->addService(static_cast<erpc::Service *>(service));
 }
 
-void erpc_remove_service_from_server(void *service)
+void erpc_remove_service_from_server(erpc_server_t server, void *service)
 {
-    if ((g_server != NULL) && (service != NULL))
-    {
-        g_server->removeService(static_cast<erpc::Service *>(service));
-    }
+    erpc_assert(server != NULL);
+    erpc_assert(service != NULL);
+
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->removeService(static_cast<erpc::Service *>(service));
 }
 
-void erpc_server_set_crc(uint32_t crcStart)
+void erpc_server_set_crc(erpc_server_t server, uint32_t crcStart)
 {
-    s_crc16->setCrcStart(crcStart);
+    erpc_assert(server != NULL);
+
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->getTransport()->getCrc16()->setCrcStart(crcStart);
 }
 
-erpc_status_t erpc_server_run(void)
+erpc_status_t erpc_server_run(erpc_server_t server)
 {
-    erpc_status_t status;
+    erpc_assert(server != NULL);
 
-    if (g_server == NULL)
-    {
-        status = kErpcStatus_Fail;
-    }
-    else
-    {
-        status = g_server->run();
-    }
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
 
-    return status;
+    return simpleServer->run();
 }
 
-erpc_status_t erpc_server_poll(void)
+erpc_status_t erpc_server_poll(erpc_server_t server)
 {
-    erpc_status_t status;
+    erpc_assert(server != NULL);
 
-    if (g_server == NULL)
-    {
-        status = kErpcStatus_Fail;
-    }
-    else
-    {
-        status = g_server->poll();
-    }
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
 
-    return status;
+    return simpleServer->poll();
 }
 
-void erpc_server_stop(void)
+void erpc_server_stop(erpc_server_t server)
 {
-    if (g_server != NULL)
-    {
-        g_server->stop();
-    }
+    erpc_assert(server != NULL);
+
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->stop();
 }
 
 #if ERPC_MESSAGE_LOGGING
-bool erpc_server_add_message_logger(erpc_transport_t transport)
+bool erpc_server_add_message_logger(erpc_server_t server, erpc_transport_t transport)
 {
-    bool retVal;
+    erpc_assert(server != NULL);
 
-    if (g_server == NULL)
-    {
-        retVal = false;
-    }
-    else
-    {
-        retVal = g_server->addMessageLogger(reinterpret_cast<Transport *>(transport));
-    }
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
 
-    return retVal;
+    return simpleServer->addMessageLogger(reinterpret_cast<Transport *>(transport));
 }
 #endif
 
 #if ERPC_PRE_POST_ACTION
-void erpc_client_add_pre_cb_action(pre_post_action_cb preCB)
+void erpc_client_add_pre_cb_action(erpc_server_t server, pre_post_action_cb preCB)
 {
-    erpc_assert(g_server != NULL);
+    erpc_assert(server != NULL);
 
-    g_server->addPreCB(preCB);
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->addPreCB(preCB);
 }
 
-void erpc_client_add_post_cb_action(pre_post_action_cb postCB)
+void erpc_client_add_post_cb_action(erpc_server_t server, pre_post_action_cb postCB)
 {
-    erpc_assert(g_server) != NULL;
+    erpc_assert(server) != NULL;
 
-    g_server->addPostCB(postCB);
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+
+    simpleServer->addPostCB(postCB);
 }
 #endif

@@ -77,6 +77,11 @@ void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
     m_crcImpl = crcImpl;
 }
 
+Crc16 *RPMsgTTYRTOSTransport::getCrc16(void)
+{
+    return m_crcImpl;
+}
+
 erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
                                           uint32_t rpmsg_link_id)
 {

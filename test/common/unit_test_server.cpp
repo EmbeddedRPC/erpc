@@ -41,6 +41,7 @@ int main(int argc, const char *argv[]);
 
 int MyAlloc::allocated_ = 0;
 erpc_service_t service_common = NULL;
+erpc_server_t server;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -83,6 +84,7 @@ int main(int argc, const char *argv[])
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
+
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_remote_init(101, 100, (void *)startupData, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID,
                                                       SignalReady, NULL);
@@ -96,22 +98,22 @@ int main(int argc, const char *argv[])
 #endif
 
     /* Init server */
-    erpc_server_init(transport, message_buffer_factory);
+    server = erpc_server_init(transport, message_buffer_factory);
 
     /* Add test services. This function call erpc_add_service_to_server for all necessary services. */
-    add_services_to_server();
+    add_services_to_server(server);
 
     /* Add common service */
-    add_common_service();
+    add_common_service(server);
 
 #if defined(MU)
     SignalReady();
 #endif
     /* Add run server */
-    erpc_server_run();
+    erpc_server_run(server);
 
     /* Deinit server */
-    erpc_server_deinit();
+    erpc_server_deinit(server);
 
     return 0;
 }
@@ -120,10 +122,10 @@ int main(int argc, const char *argv[])
 // Server helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
-void add_common_service()
+void add_common_service(erpc_server_t server)
 {
     service_common = create_Common_service();
-    erpc_add_service_to_server(service_common);
+    erpc_add_service_to_server(server, service_common);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,12 +135,12 @@ void add_common_service()
 void quit()
 {
     /* removing common services from the server */
-    remove_common_services_from_server(service_common);
+    remove_common_services_from_server(server, service_common);
 
     /* removing individual test services from the server */
-    remove_services_from_server();
+    remove_services_from_server(server);
 
-    erpc_server_stop();
+    erpc_server_stop(server);
 }
 
 int32_t getServerAllocated()

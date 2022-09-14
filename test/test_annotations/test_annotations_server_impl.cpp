@@ -70,30 +70,22 @@ void remove_services(erpc::SimpleServer *server)
 extern "C" {
 #endif
 erpc_service_t service_test = NULL;
-void add_services_to_server()
+void add_services_to_server(erpc_server_t server)
 {
     service_test = create_AnnotateTest_service();
-    erpc_add_service_to_server(service_test);
+    erpc_add_service_to_server(server, service_test);
 }
 
-void remove_services_from_server()
+void remove_services_from_server(erpc_server_t server)
 {
-    erpc_remove_service_from_server(service_test);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    destroy_AnnotateTest_service((erpc_service_t *)service_test);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_AnnotateTest_service();
-#endif
+    erpc_remove_service_from_server(server, service_test);
+    destroy_AnnotateTest_service(service_test);
 }
 
-void remove_common_services_from_server(erpc_service_t service)
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
 {
-    erpc_remove_service_from_server(service);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    destroy_Common_service((erpc_service_t *)service);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_Common_service();
-#endif
+    erpc_remove_service_from_server(server, service);
+    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

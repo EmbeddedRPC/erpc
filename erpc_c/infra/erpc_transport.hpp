@@ -85,6 +85,13 @@ public:
      * @param[in] crcImpl Object containing crc-16 compute function.
      */
     virtual void setCrc16(Crc16 *crcImpl) { (void)crcImpl; }
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16() { return NULL; }
 };
 
 /*!

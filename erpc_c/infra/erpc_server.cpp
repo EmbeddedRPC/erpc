@@ -21,11 +21,6 @@ extern bool nestingDetection;
 bool nestingDetection = false;
 #endif
 
-void Server::setTransport(Transport *transport)
-{
-    m_transport = transport;
-}
-
 void Server::addService(Service *service)
 {
     if (m_firstService == NULL)

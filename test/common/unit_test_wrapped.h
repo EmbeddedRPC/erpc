@@ -16,10 +16,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void add_services_to_server();
-void remove_services_from_server();
-void remove_common_services_from_server(erpc_service_t service);
-void add_common_service();
+void add_services_to_server(erpc_server_t server);
+void remove_services_from_server(erpc_server_t server);
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service);
+void add_common_service(erpc_server_t server);
 #ifdef __cplusplus
 }
 #endif

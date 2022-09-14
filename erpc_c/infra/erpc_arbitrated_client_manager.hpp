@@ -58,6 +58,13 @@ public:
      */
     void setArbitrator(TransportArbitrator *arbitrator);
 
+    /*!
+     * @brief Gets the transport arbitrator instance.
+     *
+     * @return TransportArbitrator * Transport arbitrator instance.
+     */
+    TransportArbitrator *getArbitrator(void) { return m_arbitrator; };
+
 protected:
     TransportArbitrator *m_arbitrator; //!< Optional transport arbitrator. May be NULL.
 

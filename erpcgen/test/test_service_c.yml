@@ -10,39 +10,36 @@ idl: |
 
 test_server.h:
     - erpc_service_t create_ErrorTest_service(void);
-
-    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
     - void destroy_ErrorTest_service(erpc_service_t service);
-    - "#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC"
-    - void destroy_ErrorTest_service(void);
-    - "#else"
-    - "#warning \"Unknown eRPC allocation policy!\""
-    - "#endif"
 
 test_server.cpp:
     - ERPC_MANUALLY_CONSTRUCTED_STATIC(ErrorTest_service, s_ErrorTest_service);
-    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
-    - erpc_service_t create_ErrorTest_service()
+    - erpc_service_t create_ErrorTest_service(void)
     - "{"
-    - return new (nothrow) ErrorTest_service();
+    - erpc_service_t service;
+    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
+    - service = new (nothrow) ErrorTest_service();
+    - "#else"
+    - if (s_ErrorTest_service.isUsed())
+    - "{"
+    - service = NULL;
+    - "}"
+    - else
+    - "{"
+    - s_ErrorTest_service.construct();
+    - service = s_ErrorTest_service.get();
+    - "}"
+    - "#endif"
+    - return service;
     - "}"
     - void destroy_ErrorTest_service(erpc_service_t service)
     - "{"
-    - if (service)
-    - "{"
+    - "#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC"
+    - erpc_assert(service != NULL);
     - delete (ErrorTest_service *)service;
-    - "}"
-    - "}"
-    - "#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC"
-    - erpc_service_t create_ErrorTest_service()
-    - "{"
-    - s_ErrorTest_service.construct();
-    - return s_ErrorTest_service.get();
-    - "}"
-    - void destroy_ErrorTest_service()
-    - "{"
-    - s_ErrorTest_service.destroy();
-    - "}"
     - "#else"
-    - "#warning \"Unknown eRPC allocation policy!\""
+    - (void)service;
+    - erpc_assert(service == s_ErrorTest_service.get());
+    - s_ErrorTest_service.destroy();
     - "#endif"
+    - "}"
