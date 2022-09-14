@@ -257,9 +257,15 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
     const string &name = tok.getStringValue();
+
     if (enumMemberHasValue(node))
     {
         Value *enumValue = node->getChild(1)->getChild(0)->getTokenValue();
+        if (enumValue->getType() == kStringValue)
+        {
+            enumValue = getValueFromSymbol(node->getChild(1)->getChild(0)->getToken());
+        }
+
         if (enumValue->getType() == kIntegerValue)
         {
             assert(dynamic_cast<IntegerValue *>(enumValue));
@@ -273,7 +279,7 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     }
     EnumMember *member = new EnumMember(tok, m_currentEnum->getNextValue());
 
-    Log::debug("enum member: %s\n", name.c_str());
+    Log::debug("enum member: %s = %d\n", name.c_str(), member->getValue());
 
     m_currentEnum->addMember(member);
     addGlobalSymbol(member);
@@ -302,7 +308,8 @@ bool SymbolScanner::enumMemberHasValue(AstNode *enumMember)
         {
             return false;
         }
-        return kIntegerValue == val->getType();
+
+        return true;
     }
     return false;
 }
