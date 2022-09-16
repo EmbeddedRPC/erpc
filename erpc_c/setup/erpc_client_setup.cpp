@@ -29,6 +29,8 @@ using namespace erpc;
 
 // global client variables
 ERPC_MANUALLY_CONSTRUCTED_STATIC(ClientManager, s_client);
+ClientManager *g_client;
+#pragma weak g_client
 ERPC_MANUALLY_CONSTRUCTED_STATIC(BasicCodecFactory, s_codecFactory);
 ERPC_MANUALLY_CONSTRUCTED_STATIC(Crc16, s_crc16);
 
@@ -102,6 +104,8 @@ erpc_client_t erpc_client_init(erpc_transport_t transport, erpc_mbf_t message_bu
         client->setCodecFactory(codecFactory);
         client->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
     }
+
+    g_client = client;
 
     return reinterpret_cast<erpc_client_t>(client);
 }
