@@ -31,6 +31,9 @@ using namespace erpc;
 
 // global client variables
 ERPC_MANUALLY_CONSTRUCTED_STATIC(ArbitratedClientManager, s_client);
+ClientManager *g_client;
+#pragma weak g_client
+
 ERPC_MANUALLY_CONSTRUCTED_STATIC(BasicCodecFactory, s_codecFactory);
 ERPC_MANUALLY_CONSTRUCTED_STATIC(TransportArbitrator, s_arbitrator);
 ERPC_MANUALLY_CONSTRUCTED_STATIC(BasicCodec, s_codec);
@@ -142,6 +145,8 @@ erpc_client_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t
 
         *arbitrator = reinterpret_cast<erpc_transport_t>(transportArbitrator);
     }
+
+    g_client = dynamic_cast<ClientManager *>(client);
 
     return reinterpret_cast<erpc_client_t>(client);
 }
