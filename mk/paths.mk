@@ -26,8 +26,12 @@ TEST_ROOT :=  $(ERPC_ROOT)/test
 
 ifeq "$(is_mingw)" "1"
     BOOST_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/boost_1_67_0
-else
+else ifneq "$(is_darwin)" "1"
     BOOST_ROOT ?= /usr/local/opt/boost
+else
+    ifndef BOOST_ROOT
+        BOOST_ROOT := $(shell brew --prefix boost)
+    endif
 endif
 
 TARGET_OUTPUT_ROOT = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/$(APP_NAME)
@@ -54,13 +58,31 @@ ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
 LD := $(CXX)
 PYTHON ?= python
 ifeq (, $(shell which $(PYTHON)))
-    PYTHON= python3
+    PYTHON=python3
+    ifeq (, $(shell which $(PYTHON)))
+        $(error "No python found. Please install python3.")
+    endif
+else
+    ifneq (3, $(shell $(PYTHON) --version | cut -c 8-8))
+        ifeq (, $(shell which python3))
+            $(error "Please install python3.")
+        else
+            PYTHON=python3
+        endif
+    endif
 endif
 
 # Tool paths. Use different paths for OS X.
 ifeq "$(is_darwin)" "1"
-    FLEX ?= /usr/local/opt/flex/bin/flex
-    BISON ?= /usr/local/opt/bison/bin/bison
+    ifndef FLEX_ROOT
+        FLEX_ROOT := $(shell brew --prefix flex)
+    endif
+    ifndef BISON_ROOT
+        BISON_ROOT := $(shell brew --prefix bison)
+    endif
+
+    FLEX ?= $(FLEX_ROOT)/bin/flex
+    BISON ?= $(BISON_ROOT)/bin/bison
 else ifeq "$(is_linux)" "1"
     FLEX ?= /usr/bin/flex
     BISON ?= /usr/bin/bison
@@ -70,12 +92,6 @@ else ifeq "$(is_cygwin)" "1"
 else ifeq "$(is_mingw)" "1"
     FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
     BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
-endif
-ifeq (, $(shell which $(PYTHON)))
-    $(error "No python found")
-endif
-ifneq (3, $(shell $(PYTHON) --version | cut -c 8-8))
-    $(error "Please install and use Python3")
 endif
 
 ifeq "$(is_mingw)" "1"

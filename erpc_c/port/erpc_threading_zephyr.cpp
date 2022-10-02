@@ -54,7 +54,7 @@ void Thread::start(void *arg)
 {
     m_arg = arg;
 
-    erpc_assert(m_stack && "Set stack address");
+    erpc_assert((m_stack != NULL) && ("Set stack address" != NULL));
     k_thread_create(&m_thread, m_stack, m_stackSize, threadEntryPointStub, this, NULL, NULL, m_priority, 0, K_NO_WAIT);
 }
 
@@ -84,7 +84,7 @@ void Thread::threadEntryPoint(void)
 void *Thread::threadEntryPointStub(void *arg1, void *arg2, void *arg3)
 {
     Thread *_this = reinterpret_cast<Thread *>(arg1);
-    erpc_assert(_this && "Reinterpreting 'void *arg1' to 'Thread *' failed.");
+    erpc_assert((_this != NULL) && ("Reinterpreting 'void *arg1' to 'Thread *' failed." != NULL));
     k_thread_custom_data_set(arg1);
     _this->threadEntryPoint();
 

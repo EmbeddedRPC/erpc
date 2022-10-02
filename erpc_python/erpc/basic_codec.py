@@ -9,15 +9,21 @@
 import struct
 from .codec import (MessageType, MessageInfo, Codec, CodecError)
 
+
 class BasicCodec(Codec):
-    ## Version of this codec.
+    """Version of this codec.
+
+    Args:
+        Codec (code.Codec): Inherit and implement codec interface functions.
+    """
+
     BASIC_CODEC_VERSION = 1
 
     def start_write_message(self, msgInfo):
         header = (self.BASIC_CODEC_VERSION << 24) \
-                        | ((msgInfo.service & 0xff) << 16) \
-                        | ((msgInfo.request & 0xff) << 8) \
-                        | (msgInfo.type.value & 0xff)
+            | ((msgInfo.service & 0xff) << 16) \
+            | ((msgInfo.request & 0xff) << 8) \
+            | (msgInfo.type.value & 0xff)
         self.write_uint32(header)
         self.write_uint32(msgInfo.sequence)
 
@@ -74,9 +80,15 @@ class BasicCodec(Codec):
     def write_null_flag(self, flag):
         self.write_uint8(1 if flag else 0)
 
-    ##
-    # @return 4-tuple of msgType, service, request, sequence.
     def start_read_message(self):
+        """ Returns 4-tuple of msgType, service, request, sequence.
+
+        Raises:
+            CodecError: Raise this error when unsupported codec version doesn't match.
+
+        Returns:
+            codec.MessageInfo: 4-tuple of msgType, service, request, sequence.
+        """
         header = self.read_uint32()
         sequence = self.read_uint32()
         version = header >> 24
@@ -134,18 +146,21 @@ class BasicCodec(Codec):
         self._cursor += length
         return data
 
-    ##
-    # @return Int of list length.
     def start_read_list(self):
+        """ Function which should be called on list de-serialization.
+
+        Returns:
+            int: Int of list length.
+        """
         return self.read_uint32()
 
-    ##
-    # @return Int of union discriminator.
     def start_read_union(self):
+        """ Function which should be called on union de-serialization.
+
+        Returns:
+            int: Int of union discriminator.
+        """
         return self.read_int32()
 
     def read_null_flag(self):
         return self.read_uint8()
-
-
-

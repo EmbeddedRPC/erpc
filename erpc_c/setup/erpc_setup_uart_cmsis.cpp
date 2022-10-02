@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 #include "erpc_transport_setup.h"
-#include "erpc_uart_cmsis_transport.h"
+#include "erpc_uart_cmsis_transport.hpp"
 
 using namespace erpc;
 

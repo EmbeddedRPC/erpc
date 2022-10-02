@@ -6,14 +6,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_arbitrated_client_manager.h"
-#include "erpc_basic_codec.h"
-#include "erpc_simple_server.h"
-#include "erpc_tcp_transport.h"
-#include "erpc_transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.hpp"
+#include "erpc_basic_codec.hpp"
+#include "erpc_simple_server.hpp"
+#include "erpc_tcp_transport.hpp"
+#include "erpc_transport_arbitrator.hpp"
 
-#include "Logging.h"
-#include "myAlloc.h"
+#include "Logging.hpp"
+#include "myAlloc.hpp"
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
 #include "unit_test.h"
@@ -188,9 +188,12 @@ void stopSecondSide()
 
 int32_t getResultFromSecondSide()
 {
-    increaseWaitQuit();
-
     return isTestPassing;
+}
+
+void testCasesAreDone(void)
+{
+    increaseWaitQuit();
 }
 
 void quitFirstInterfaceServer()

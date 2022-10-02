@@ -8,9 +8,9 @@
  */
 
 #include "erpc_config_internal.h"
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 #include "erpc_mbf_setup.h"
-#include "erpc_message_buffer.h"
+#include "erpc_message_buffer.hpp"
 
 #include <new>
 
@@ -35,7 +35,7 @@ public:
 
     virtual void dispose(MessageBuffer *buf)
     {
-        erpc_assert(buf);
+        erpc_assert(buf != NULL);
         if (buf->get() != NULL)
         {
             delete[] buf->get();

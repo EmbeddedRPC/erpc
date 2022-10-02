@@ -9,7 +9,7 @@
 class Crc16(object):
     POLY = 0x1021
 
-    def __init__(self, crcStart = 0xEF4A):
+    def __init__(self, crcStart=0xEF4A):
         self._crcStart = crcStart
         self._table = [self.compute_table(i) for i in range(256)]
 

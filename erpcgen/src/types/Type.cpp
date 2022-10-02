@@ -7,27 +7,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "AliasType.h"
-#include "Annotation.h"
-#include "ArrayType.h"
-#include "DataType.h"
-#include "EnumMember.h"
-#include "EnumType.h"
-#include "Function.h"
-#include "FunctionType.h"
-#include "Group.h"
-#include "Interface.h"
-#include "ListType.h"
-#include "Logging.h"
-#include "ParseErrors.h"
-#include "StructMember.h"
-#include "StructType.h"
-#include "Symbol.h"
-#include "SymbolScope.h"
-#include "UnionCase.h"
-#include "UnionType.h"
+#include "AliasType.hpp"
+#include "Annotation.hpp"
+#include "ArrayType.hpp"
+#include "DataType.hpp"
+#include "EnumMember.hpp"
+#include "EnumType.hpp"
+#include "Function.hpp"
+#include "FunctionType.hpp"
+#include "Group.hpp"
+#include "Interface.hpp"
+#include "ListType.hpp"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
+#include "StructMember.hpp"
+#include "StructType.hpp"
+#include "Symbol.hpp"
+#include "SymbolScope.hpp"
+#include "UnionCase.hpp"
+#include "UnionType.hpp"
 #include "annotations.h"
-#include "cpptempl.h"
+#include "cpptempl.hpp"
 
 #include <cstring>
 
@@ -198,7 +198,7 @@ void SymbolScope::addSymbol(Symbol *sym, int32_t pos)
     if (hasSymbol(sym->getName()) && sym->getName() != "")
     {
         Symbol *existing = getSymbol(sym->getName());
-        if (existing->isBuiltin())
+        if (existing->isDatatypeSymbol() && dynamic_cast<DataType *>(existing)->isBuiltin())
         {
             throw semantic_error(format_string("line %d: attempted redefinition of builtin symbol '%s'",
                                                sym->getFirstLine(), sym->getName().c_str()));

@@ -8,18 +8,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "SymbolScanner.h"
+#include "SymbolScanner.hpp"
 
-#include "ErpcLexer.h"
-#include "Logging.h"
+#include "ErpcLexer.hpp"
+#include "Logging.hpp"
 #include "annotations.h"
-#include "smart_ptr.h"
-#include "types/ArrayType.h"
-#include "types/BuiltinType.h"
-#include "types/ConstType.h"
-#include "types/FunctionType.h"
-#include "types/ListType.h"
-#include "types/VoidType.h"
+#include "smart_ptr.hpp"
+#include "types/ArrayType.hpp"
+#include "types/BuiltinType.hpp"
+#include "types/ConstType.hpp"
+#include "types/FunctionType.hpp"
+#include "types/ListType.hpp"
+#include "types/VoidType.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -257,9 +257,15 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     AstNode *ident = (*node)[0];
     const Token &tok = ident->getToken();
     const string &name = tok.getStringValue();
+
     if (enumMemberHasValue(node))
     {
         Value *enumValue = node->getChild(1)->getChild(0)->getTokenValue();
+        if (enumValue->getType() == kStringValue)
+        {
+            enumValue = getValueFromSymbol(node->getChild(1)->getChild(0)->getToken());
+        }
+
         if (enumValue->getType() == kIntegerValue)
         {
             assert(dynamic_cast<IntegerValue *>(enumValue));
@@ -273,7 +279,7 @@ AstNode *SymbolScanner::handleEnumMember(AstNode *node, bottom_up)
     }
     EnumMember *member = new EnumMember(tok, m_currentEnum->getNextValue());
 
-    Log::debug("enum member: %s\n", name.c_str());
+    Log::debug("enum member: %s = %d\n", name.c_str(), member->getValue());
 
     m_currentEnum->addMember(member);
     addGlobalSymbol(member);
@@ -302,7 +308,8 @@ bool SymbolScanner::enumMemberHasValue(AstNode *enumMember)
         {
             return false;
         }
-        return kIntegerValue == val->getType();
+
+        return true;
     }
     return false;
 }
@@ -1157,8 +1164,17 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
     }
     else /* function type */
     {
-        FunctionType *func =
-            dynamic_cast<FunctionType *>(m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol).back());
+        FunctionType *func = nullptr;
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+        {
+            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
+            assert(datatype);
+
+            if (datatype->isFunction())
+            {
+                func = dynamic_cast<FunctionType *>(datatype);
+            }
+        }
         assert(func);
         func->getParameters().getScope().setParent(m_globals);
 
@@ -1185,26 +1201,31 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
     if (m_currentInterface)
     {
         fun = m_currentInterface->getFunctions().back();
-        SymbolScope::symbol_vector_t vfunType = m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol);
-        for (Symbol *funSymbol : vfunType)
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
         {
-            funType = dynamic_cast<FunctionType *>(funSymbol);
-            assert(funType);
-            FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
-            if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
+            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
+            assert(datatype);
+
+            if (datatype->isFunction())
             {
-                if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
+                funType = dynamic_cast<FunctionType *>(datatype);
+                assert(funType);
+                FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+                if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
                 {
-                    throw syntax_error(format_string("line %d: Function definition contains more parameters than "
-                                                     "function type definition from %d.\n",
-                                                     fun->getFirstLine(), funType->getFirstLine())
-                                           .c_str());
+                    if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
+                    {
+                        throw syntax_error(format_string("line %d: Function definition contains more parameters than "
+                                                         "function type definition from %d.\n",
+                                                         fun->getFirstLine(), funType->getFirstLine())
+                                               .c_str());
+                    }
+                    else
+                    {
+                        callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
+                    }
+                    break;
                 }
-                else
-                {
-                    callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
-                }
-                break;
             }
         }
     }
@@ -1403,13 +1424,13 @@ Value *SymbolScanner::getValueFromSymbol(Token &tok)
         if (nullptr != sym)
         {
             Value *newVal;
-            if (Symbol::kConstSymbol == sym->getSymbolType())
+            if (sym->isConstSymbol())
             {
                 ConstType *constVar = dynamic_cast<ConstType *>(sym);
                 assert(constVar);
                 newVal = constVar->getValue()->clone();
             }
-            else if (Symbol::kEnumMemberSymbol == sym->getSymbolType())
+            else if (sym->isEnumMemberSymbol())
             {
                 EnumMember *enumVar = dynamic_cast<EnumMember *>(sym);
                 assert(enumVar);

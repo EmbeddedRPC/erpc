@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-@include("myAlloc.h")
+@c:include("myAlloc.hpp")
 @output_dir("erpc_outputs")
 program test;
 

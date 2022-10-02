@@ -8,8 +8,9 @@
 from __future__ import print_function
 
 import threading
-from .server import (Service, Server)
+from .server import Server
 from .client import RequestError
+
 
 class SimpleServer(Server):
     def __init__(self, transport=None, codecClass=None):
@@ -29,14 +30,15 @@ class SimpleServer(Server):
 
     def _receive_request(self):
         msg = self.transport.receive()
-        
+
         codec = self.codec_class()
         codec.buffer = msg
-        
+
         self._process_request(codec)
 
         if len(codec.buffer):
             self.transport.send(codec.buffer)
+
 
 class ServerThread(SimpleServer):
     def __init__(self, transport, codecClass):
@@ -46,4 +48,3 @@ class ServerThread(SimpleServer):
 
     def start(self):
         self._thread.start()
-

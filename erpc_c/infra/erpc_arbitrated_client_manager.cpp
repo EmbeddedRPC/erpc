@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_arbitrated_client_manager.h"
-#include "erpc_transport_arbitrator.h"
+#include "erpc_arbitrated_client_manager.hpp"
+#include "erpc_transport_arbitrator.hpp"
 
 #if ERPC_THREADS_IS(NONE)
 #error "Arbitrator code does not work in no-threading configuration."
@@ -40,7 +40,7 @@ void ArbitratedClientManager::performClientRequest(RequestContext &request)
     erpc_status_t err;
     TransportArbitrator::client_token_t token = 0;
 
-    erpc_assert(m_arbitrator && "arbitrator not set");
+    erpc_assert((m_arbitrator != NULL) && ("arbitrator not set" != NULL));
 
     // Set up the client receive before we send the request, so if the reply is sent
     // before we get to the clientReceive() call below the arbitrator already has the buffer.
@@ -55,7 +55,7 @@ void ArbitratedClientManager::performClientRequest(RequestContext &request)
         if (request.getCodec()->isStatusOk() == true)
         {
             token = m_arbitrator->prepareClientReceive(request);
-            if (!token)
+            if (token == 0U)
             {
                 request.getCodec()->updateStatus(kErpcStatus_Fail);
             }

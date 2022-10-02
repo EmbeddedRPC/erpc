@@ -21,12 +21,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "app_core1.h"
-#include "board.h"
-#include "mcmgr.h"
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
 #endif
+#include "app_core1.h"
+#include "board.h"
+#include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, char **argv);
 #endif
@@ -51,6 +51,7 @@ mcmgr_status_t status;
 volatile int stopTest = 0;
 extern const uint32_t erpc_generated_crc;
 erpc_service_t service = NULL;
+erpc_server_t server;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -67,7 +68,7 @@ void runServer(void *arg)
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     erpc_status_t err;
-    err = erpc_server_run();
+    err = erpc_server_run(server);
     increaseWaitQuit();
 
     if (err != kErpcStatus_Success)
@@ -150,6 +151,7 @@ void runInit(void *arg)
     erpc_transport_t transportClient;
     erpc_transport_t transportServer;
     erpc_mbf_t message_buffer_factory;
+    erpc_client_t client;
 
 #if defined(RPMSG)
     // RPMsg-Lite transport layer initialization
@@ -164,20 +166,20 @@ void runInit(void *arg)
 #endif
 
     // eRPC client side initialization
-    transportServer = erpc_arbitrated_client_init(transportClient, message_buffer_factory);
+    client = erpc_arbitrated_client_init(transportClient, message_buffer_factory, &transportServer);
 
     // eRPC server side initialization
-    erpc_server_t server = erpc_server_init(transportServer, message_buffer_factory);
+    server = erpc_server_init(transportServer, message_buffer_factory);
 
-    erpc_arbitrated_client_set_crc(erpc_generated_crc);
+    erpc_arbitrated_client_set_crc(client, erpc_generated_crc);
 
     // adding server to client for nested calls.
-    erpc_arbitrated_client_set_server(server);
-    erpc_arbitrated_client_set_server_thread_id((void *)g_serverTask);
+    erpc_arbitrated_client_set_server(client, server);
+    erpc_arbitrated_client_set_server_thread_id(client, (void *)g_serverTask);
 
     // adding the service to the server
     service = create_FirstInterface_service();
-    erpc_add_service_to_server(service);
+    erpc_add_service_to_server(server, service);
 
 #if defined(MU)
     SignalReady();
@@ -223,18 +225,22 @@ void stopSecondSide()
 
 int32_t getResultFromSecondSide()
 {
-    increaseWaitQuit();
     return isTestPassing;
+}
+
+void testCasesAreDone(void)
+{
+    increaseWaitQuit();
 }
 
 void quitFirstInterfaceServer()
 {
     /* removing the service from the server */
-    erpc_remove_service_from_server(service);
-    destroy_FirstInterface_service((erpc_service_t *)service);
+    erpc_remove_service_from_server(server, service);
+    destroy_FirstInterface_service(service);
 
     // Stop server part
-    erpc_server_stop();
+    erpc_server_stop(server);
 }
 
 void whenReady()

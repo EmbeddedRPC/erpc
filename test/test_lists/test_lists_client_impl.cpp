@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016 - 2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -460,7 +460,7 @@ TEST(test_list, testLengthAnnotation)
     uint32_t length = 5;
     int32_t *list = (int32_t *)erpc_malloc(length * sizeof(int32_t));
     int32_t *list_ptr = list;
-    for (int i = 0; i < length; ++i)
+    for (unsigned int i = 0; i < length; ++i)
     {
         *list_ptr = i + 1;
         ++list_ptr;

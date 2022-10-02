@@ -44,7 +44,7 @@ void *operator new[](std::size_t count, const std::nothrow_t &tag) THROW
     return p;
 }
 
-void operator delete(void *ptr)THROW
+void operator delete(void *ptr) THROW
 {
     erpc_free(ptr);
 }
@@ -62,7 +62,10 @@ void *erpc_malloc(size_t size)
 
 void erpc_free(void *ptr)
 {
-    _mem_free(ptr);
+    if (ptr != NULL)
+    {
+        erpc_assert(_mem_free(ptr) == MQX_OK);
+    }
 }
 
 /* Provide function for pure virtual call to avoid huge demangling code being linked in ARM GCC */

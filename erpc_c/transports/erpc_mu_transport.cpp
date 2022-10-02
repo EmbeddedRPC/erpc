@@ -7,11 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_mu_transport.h"
-
+#include "erpc_mu_transport.hpp"
 #include "erpc_config_internal.h"
 
+extern "C" {
 #include "board.h"
+}
 
 using namespace erpc;
 

@@ -137,6 +137,26 @@ test.h:
       - '} {name}'
 
 ---
+name: enum values
+desc:
+idl: |
+  const uint8 five=5;
+  enum MyEnum {
+    A = 0,
+    B = five,
+    C,
+    D= 1*five,
+    E = 2*five,
+  }
+test.h:
+  # named enums get a typedef
+  - A = 0
+  - B = 5
+  - C = 6
+  - D = 5
+  - E = 10
+
+---
 name: py basic enum
 desc:
 params:

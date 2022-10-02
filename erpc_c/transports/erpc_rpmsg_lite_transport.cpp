@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2015-2021, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2022 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include "erpc_rpmsg_lite_transport.h"
+#include "erpc_rpmsg_lite_transport.hpp"
 
 #include "erpc_config_internal.h"
 
+extern "C" {
 #include "rpmsg_ns.h"
+}
 
 using namespace erpc;
 

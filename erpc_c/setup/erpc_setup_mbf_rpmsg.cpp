@@ -9,12 +9,14 @@
  */
 
 #include "erpc_config_internal.h"
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 #include "erpc_mbf_setup.h"
-#include "erpc_message_buffer.h"
-#include "erpc_rpmsg_lite_base_transport.h"
+#include "erpc_message_buffer.hpp"
+#include "erpc_rpmsg_lite_base_transport.hpp"
 
+extern "C" {
 #include "rpmsg_lite.h"
+}
 
 using namespace erpc;
 
@@ -62,7 +64,7 @@ public:
      */
     virtual void dispose(MessageBuffer *buf)
     {
-        erpc_assert(buf);
+        erpc_assert(buf != NULL);
         void *tmp = (void *)buf->get();
         if (tmp != NULL)
         {

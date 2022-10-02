@@ -7,18 +7,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "InterfaceDefinition.h"
+#include "InterfaceDefinition.hpp"
 
-#include "AstNode.h"
-#include "AstWalker.h"
-#include "ErpcLexer.h"
-#include "Logging.h"
-#include "SymbolScanner.h"
+#include "AstNode.hpp"
+#include "AstWalker.hpp"
+#include "ErpcLexer.hpp"
+#include "Logging.hpp"
+#include "SymbolScanner.hpp"
 #include "annotations.h"
 #include "erpcgen_parser.tab.hpp"
-#include "types/AliasType.h"
-#include "types/BuiltinType.h"
-#include "types/StructType.h"
+#include "types/AliasType.hpp"
+#include "types/BuiltinType.hpp"
+#include "types/StructType.hpp"
 
 using namespace erpcgen;
 using namespace std;

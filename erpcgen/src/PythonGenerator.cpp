@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "PythonGenerator.h"
+#include "PythonGenerator.hpp"
 
-#include "Logging.h"
-#include "ParseErrors.h"
+#include "Logging.hpp"
+#include "ParseErrors.hpp"
 #include "annotations.h"
-#include "format_string.h"
+#include "format_string.hpp"
 
 #include <algorithm>
 #include <set>
@@ -328,7 +328,7 @@ void PythonGenerator::makeEnumsTemplateData()
     Log::info("Enums:\n");
     data_list enums;
     int n = 0;
-    for (auto it : m_globals->getSymbolsOfType(DataType::kEnumTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kEnumType))
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
@@ -369,7 +369,7 @@ void PythonGenerator::makeAliasesTemplateData()
     Log::info("Type definition:\n");
     data_list aliases;
     int n = 0;
-    for (auto it : m_globals->getSymbolsOfType(DataType::kAliasTypeSymbol))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kAliasType))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
@@ -419,87 +419,93 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
     {
         data_map info;
 
-        switch (symbol->getSymbolType())
+        if (symbol->isDatatypeSymbol())
         {
-            case DataType::kStructTypeSymbol: {
-                StructType *structType = dynamic_cast<StructType *>(symbol);
-                if (structType == nullptr)
-                {
+            DataType *dataType = dynamic_cast<DataType *>(symbol);
+            assert(dataType);
+
+            switch (dataType->getDataType())
+            {
+                case DataType::kStructType: {
+                    StructType *structType = dynamic_cast<StructType *>(symbol);
+                    if (structType == nullptr)
+                    {
+                        break;
+                    }
+
+                    Log::info("%s\n", structType->getDescription().c_str());
+
+                    string name = filterName(getOutputName(structType));
+
+                    // check if template for this structure has not already been generated
+                    if (names.find(name) == names.end())
+                    {
+                        info["name"] = name;
+
+                        setTemplateComments(structType, info);
+                        setStructMembersTemplateData(structType, info);
+
+                        names.insert(name);
+                        structs.push_back(info);
+                    }
                     break;
                 }
+                case DataType::kUnionType: {
+                    UnionType *unionType = dynamic_cast<UnionType *>(symbol);
+                    if (unionType == nullptr)
+                    {
+                        break;
+                    }
 
-                Log::info("%s\n", structType->getDescription().c_str());
+                    Log::info("%s\n", unionType->getDescription().c_str());
 
-                string name = filterName(getOutputName(structType));
+                    string name = filterName(getOutputName(unionType));
+                    if (name.find('$') != string::npos)
+                    {
+                        Log::debug("%s is inside struct!\n", name.c_str());
+                        break;
+                    }
 
-                // check if template for this structure has not already been generated
-                if (names.find(name) == names.end())
-                {
-                    info["name"] = name;
+                    // check if template for this structure has not already been generated
+                    if (names.find(name) == names.end())
+                    {
+                        info["name"] = name;
+                        info["type"] = getTypeInfo(unionType);
 
-                    setTemplateComments(structType, info);
-                    setStructMembersTemplateData(structType, info);
+                        setTemplateComments(unionType, info);
+                        // setUnionMembersTemplateData(unionType, info);
 
-                    names.insert(name);
-                    structs.push_back(info);
+                        names.insert(name);
+                        unions.push_back(info);
+                    }
+                    break;
                 }
-                break;
+                case DataType::kAliasType: {
+                    AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
+                    if (aliasType == nullptr)
+                        break;
+
+                    DataType *elementDataType = aliasType->getElementType();
+                    DataType *trueDataType = elementDataType->getTrueDataType();
+                    // Only generate aliases for enums, unions and structs in Python.
+                    if (!(trueDataType->isEnum() || trueDataType->isUnion() || trueDataType->isStruct()))
+                        break;
+
+                    string realType = getOutputName(aliasType);
+                    Log::debug("%s\n", realType.c_str());
+
+                    info["name"] = filterName(realType);
+                    info["elementType"] = getTypeInfo(elementDataType);
+                    info["trueType"] = getTypeInfo(trueDataType);
+
+                    setTemplateComments(aliasType, info);
+
+                    aliases.push_back(info);
+                    break;
+                }
+                default:
+                    break;
             }
-            case DataType::kUnionTypeSymbol: {
-                UnionType *unionType = dynamic_cast<UnionType *>(symbol);
-                if (unionType == nullptr)
-                {
-                    break;
-                }
-
-                Log::info("%s\n", unionType->getDescription().c_str());
-
-                string name = filterName(getOutputName(unionType));
-                if (name.find('$') != string::npos)
-                {
-                    Log::debug("%s is inside struct!\n", name.c_str());
-                    break;
-                }
-
-                // check if template for this structure has not already been generated
-                if (names.find(name) == names.end())
-                {
-                    info["name"] = name;
-                    info["type"] = getTypeInfo(unionType);
-
-                    setTemplateComments(unionType, info);
-                    // setUnionMembersTemplateData(unionType, info);
-
-                    names.insert(name);
-                    unions.push_back(info);
-                }
-                break;
-            }
-            case DataType::kAliasTypeSymbol: {
-                AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
-                if (aliasType == nullptr)
-                    break;
-
-                DataType *elementDataType = aliasType->getElementType();
-                DataType *trueDataType = elementDataType->getTrueDataType();
-                // Only generate aliases for enums, unions and structs in Python.
-                if (!(trueDataType->isEnum() || trueDataType->isUnion() || trueDataType->isStruct()))
-                    break;
-
-                string realType = getOutputName(aliasType);
-                Log::debug("%s\n", realType.c_str());
-
-                info["name"] = filterName(realType);
-                info["elementType"] = getTypeInfo(elementDataType);
-                info["trueType"] = getTypeInfo(trueDataType);
-
-                setTemplateComments(aliasType, info);
-
-                aliases.push_back(info);
-                break;
-            }
-            default:
-                break;
         }
     }
 
@@ -569,7 +575,7 @@ void PythonGenerator::makeFunctionsTemplateData()
     /* type definitions of functions and table of functions */
     Log::info("Functions:\n");
     data_list functions;
-    for (Symbol *functionTypeSymbol : m_globals->getSymbolsOfType(Symbol::kFunctionTypeSymbol))
+    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
     {
         FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
         data_map functionInfo;
@@ -690,17 +696,18 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 data_map caseData;
                 caseData["name"] = unionCase->getCaseName();
                 caseData["value"] = unionCase->getCaseValue();
-                if (info.has("discriminatorType") && (info["discriminatorType"].get().get()->getmap()["type"]->getvalue() == "enum"))
+                if (info.has("discriminatorType") &&
+                    (info["discriminatorType"].get().get()->getmap()["type"]->getvalue() == "enum"))
                 {
                     caseData["type"] = info["discriminatorType"];
                 }
                 else if (unionCase->getCaseName() != "")
                 {
-                    for (auto it : m_globals->getSymbolsOfType(DataType::kEnumTypeSymbol))
+                    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kEnumType))
                     {
                         EnumType *enumType = dynamic_cast<EnumType *>(it);
                         assert(enumType);
-                        for (auto itMember :enumType->getMembers())
+                        for (auto itMember : enumType->getMembers())
                         {
                             if (unionCase->getCaseName() == itMember->getName())
                             {
@@ -711,12 +718,12 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                                 break;
                             }
                         }
-                        if(caseData.has("type"))
+                        if (caseData.has("type"))
                         {
                             break;
                         }
                     }
-                    if(!caseData.has("type"))
+                    if (!caseData.has("type"))
                     {
                         for (auto it : m_globals->getSymbolsOfType(DataType::kConstSymbol))
                         {

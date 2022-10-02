@@ -7,13 +7,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_spidev_master_transport.h"
+#include "erpc_spidev_master_transport.hpp"
 
-#include "erpc_message_buffer.h"
+#include "erpc_message_buffer.hpp"
 #include "erpc_spidev.h"
 #include "erpc_sysgpio.h"
 
+extern "C" {
 #include <unistd.h>
+}
 
 using namespace erpc;
 

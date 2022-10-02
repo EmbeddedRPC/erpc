@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_server.h"
+#include "erpc_server.hpp"
 
 using namespace erpc;
 
@@ -20,11 +20,6 @@ using namespace erpc;
 extern bool nestingDetection;
 bool nestingDetection = false;
 #endif
-
-void Server::setTransport(Transport *transport)
-{
-    m_transport = transport;
-}
 
 void Server::addService(Service *service)
 {

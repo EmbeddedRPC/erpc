@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include "erpc_transport_arbitrator.h"
+#include "erpc_transport_arbitrator.hpp"
 #include "erpc_config_internal.h"
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 
 #include <cstdio>
 #include <string>
@@ -46,21 +46,27 @@ TransportArbitrator::~TransportArbitrator(void)
 
 void TransportArbitrator::setCrc16(Crc16 *crcImpl)
 {
-    erpc_assert(crcImpl);
-    erpc_assert(m_sharedTransport);
+    erpc_assert(crcImpl != NULL);
+    erpc_assert(m_sharedTransport != NULL);
     m_sharedTransport->setCrc16(crcImpl);
+}
+
+Crc16 *TransportArbitrator::getCrc16(void)
+{
+    erpc_assert(m_sharedTransport != NULL);
+    return m_sharedTransport->getCrc16();
 }
 
 bool TransportArbitrator::hasMessage(void)
 {
-    erpc_assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
 
     return m_sharedTransport->hasMessage();
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 {
-    erpc_assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
 
     erpc_status_t err;
     message_type_t msgType;
@@ -141,7 +147,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 
 erpc_status_t TransportArbitrator::send(MessageBuffer *message)
 {
-    erpc_assert(m_sharedTransport && "shared transport is not set");
+    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
     return m_sharedTransport->send(message);
 }
 
@@ -158,7 +164,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
 
 erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 {
-    erpc_assert((token != 0) && "invalid client token");
+    erpc_assert((token != 0) && ("invalid client token" != NULL));
 
     // Convert token to pointer to info struct for this client receive request.
     PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);

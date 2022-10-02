@@ -29,10 +29,10 @@
  ******************************************************************************/
 
 %{
-#include "ErpcLexer.h"
-#include "AstNode.h"
-#include "Logging.h"
-#include "format_string.h"
+#include "ErpcLexer.hpp"
+#include "AstNode.hpp"
+#include "Logging.hpp"
+#include "format_string.hpp"
 
 using namespace erpcgen;
 

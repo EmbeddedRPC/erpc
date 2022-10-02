@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "Sniffer.h"
+#include "Sniffer.hpp"
 
-#include "erpc_c/infra/erpc_message_buffer.h"
+#include "erpc_c/infra/erpc_message_buffer.hpp"
 
-#include "Logging.h"
+#include "Logging.hpp"
 #include "annotations.h"
 
 #include <boost/algorithm/string.hpp>
@@ -190,7 +190,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
     erpc_status_t err;
     switch (dataType->getDataType())
     {
-        case DataType::_data_type::kAliasType: {
+        case DataType::data_type_t::kAliasType: {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             assert(aliasType);
             string parseDataInfo;
@@ -204,7 +204,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             addSpaces(parsedDataInfo, 2);
             break;
         }
-        case DataType::_data_type::kArrayType: {
+        case DataType::data_type_t::kArrayType: {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             assert(arrayType);
             uint32_t arraySize = arrayType->getElementCount();
@@ -227,7 +227,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             }
             break;
         }
-        case DataType::_data_type::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType: {
             parsedDataInfo = " value: ";
             BuiltinType *builtinType = dynamic_cast<BuiltinType *>(dataType);
             assert(builtinType);
@@ -376,7 +376,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             }
             break;
         }
-        case DataType::_data_type::kEnumType: {
+        case DataType::data_type_t::kEnumType: {
             EnumType *e = dynamic_cast<EnumType *>(dataType);
             assert(e);
             uint32_t value;
@@ -401,7 +401,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             parsedDataInfo = format_string("%s value: %s", e->getName().c_str(), enumMemberName.c_str());
             break;
         }
-        case DataType::_data_type::kFunctionType: {
+        case DataType::data_type_t::kFunctionType: {
             FunctionType *f = dynamic_cast<FunctionType *>(dataType);
             assert(f);
             int32_t value;
@@ -421,7 +421,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             }
             break;
         }
-        case DataType::_data_type::kListType: {
+        case DataType::data_type_t::kListType: {
             ListType *listType = dynamic_cast<ListType *>(dataType);
             assert(listType);
             uint32_t listSize;
@@ -451,7 +451,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             }
             break;
         }
-        case DataType::_data_type::kStructType: {
+        case DataType::data_type_t::kStructType: {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             assert(structType);
             parsedDataInfo = "struct " + structType->getName() + ":\n";
@@ -476,7 +476,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             addSpaces(parsedDataInfo, 2);
             break;
         }
-        case DataType::_data_type::kUnionType: {
+        case DataType::data_type_t::kUnionType: {
             UnionType *unionType = dynamic_cast<UnionType *>(dataType);
             assert(unionType);
             int32_t discriminator;
@@ -526,7 +526,7 @@ erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)
             addSpaces(parsedDataInfo, 2);
             break;
         }
-        case DataType::_data_type::kVoidType: {
+        case DataType::data_type_t::kVoidType: {
             parsedDataInfo = "void";
             break;
         }

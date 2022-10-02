@@ -10,27 +10,26 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "board.h"
-#include "gtest.h"
-#include "gtestListener.h"
-#include "myAlloc.h"
-#include "test_unit_test_common.h"
-
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
-#include "app_core0.h"
-#include "board.h"
-#include "fsl_debug_console.h"
-#include "mcmgr.h"
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
 #elif defined(UART)
 #include "fsl_usart_cmsis.h"
 #endif
+#include "app_core0.h"
+#include "fsl_debug_console.h"
+#include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, char **argv);
 #endif
 }
+
+#include "board.h"
+#include "gtest.h"
+#include "gtestListener.hpp"
+#include "myAlloc.hpp"
+#include "test_unit_test_common.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
@@ -187,6 +186,7 @@ int main(int argc, char **argv)
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
+    erpc_client_t client;
 #if defined(RPMSG)
     transport = erpc_transport_rpmsg_lite_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
     message_buffer_factory = erpc_mbf_rpmsg_init(transport);
@@ -198,7 +198,7 @@ int main(int argc, char **argv)
     message_buffer_factory = erpc_mbf_dynamic_init();
 #endif
 
-    erpc_client_init(transport, message_buffer_factory);
+    client = erpc_client_init(transport, message_buffer_factory);
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -208,7 +208,7 @@ int main(int argc, char **argv)
        time the rpmsg is deinitilaized yet => hardfault */
     env_sleep_msec(10000);
 #endif
-    erpc_client_deinit();
+    erpc_client_deinit(client);
 
     return i;
 }

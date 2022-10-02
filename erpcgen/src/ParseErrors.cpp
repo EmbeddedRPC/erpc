@@ -6,7 +6,7 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include "ParseErrors.h"
+#include "ParseErrors.hpp"
 
 using namespace erpcgen;
 

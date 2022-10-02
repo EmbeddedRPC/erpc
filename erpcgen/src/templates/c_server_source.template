@@ -9,7 +9,7 @@
 #include <new>
 #include "erpc_port.h"
 #endif
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 {% if empty(group.includes) == false %}
 extern "C"
 {
@@ -244,31 +244,37 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, 
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-erpc_service_t create_{$iface.serviceClassName}()
+erpc_service_t create_{$iface.serviceClassName}(void)
 {
-    return new (nothrow) {$iface.serviceClassName}();
+    erpc_service_t service;
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    service = new (nothrow) {$iface.serviceClassName}();
+#else
+    if (s_{$iface.serviceClassName}.isUsed())
+    {
+        service = NULL;
+    }
+    else
+    {
+        s_{$iface.serviceClassName}.construct();
+        service = s_{$iface.serviceClassName}.get();
+    }
+#endif
+
+    return service;
 }
 
 void destroy_{$iface.serviceClassName}(erpc_service_t service)
 {
-    if (service)
-    {
-        delete ({$iface.serviceClassName} *)service;
-    }
-}
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-erpc_service_t create_{$iface.serviceClassName}()
-{
-    s_{$iface.serviceClassName}.construct();
-    return s_{$iface.serviceClassName}.get();
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(service != NULL);
+    delete ({$iface.serviceClassName} *)service;
+#else
+    (void)service;
+    erpc_assert(service == s_{$iface.serviceClassName}.get());
+    s_{$iface.serviceClassName}.destroy();
+#endif
 }
 
-void destroy_{$iface.serviceClassName}()
-{
-    s_{$iface.serviceClassName}.destroy();
-}
-#else
-#warning "Unknown eRPC allocation policy!"
-#endif
 {% endfor -- iface %}

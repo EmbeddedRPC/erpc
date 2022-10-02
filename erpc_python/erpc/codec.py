@@ -9,16 +9,21 @@
 from enum import Enum
 from collections import namedtuple
 
+
 class MessageType(Enum):
     kInvocationMessage = 0
     kOnewayMessage = 1
     kReplyMessage = 2
     kNotificationMessage = 3
 
-MessageInfo = namedtuple('MessageInfo', ['type', 'service', 'request', 'sequence'])
+
+MessageInfo = namedtuple(
+    'MessageInfo', ['type', 'service', 'request', 'sequence'])
+
 
 class CodecError(RuntimeError):
     pass
+
 
 class Codec(object):
     def __init__(self):
@@ -88,9 +93,12 @@ class Codec(object):
     def write_null_flag(self, flag):
         raise NotImplementedError()
 
-    ##
-    # @return MessageInfo object.
     def start_read_message(self):
+        """ Returns MessageInfo object.
+
+        Returns:
+            MessageInfo: MessageInfo object.
+        """
         raise NotImplementedError()
 
     def read_bool(self):
@@ -132,19 +140,21 @@ class Codec(object):
     def read_binary(self):
         raise NotImplementedError()
 
-    ##
-    # @return Int of list length.
     def start_read_list(self):
+        """ Function which should be called on list de-serialization.
+
+        Returns:
+            int: Int of list length.
+        """
         raise NotImplementedError()
 
-    ##
-    # @return Int of union discriminator.
     def start_read_union(self):
+        """ Function which should be called on union de-serialization.
+
+        Returns:
+            int: Int of union discriminator.
+        """
         raise NotImplementedError()
 
     def read_null_flag(self):
         raise NotImplementedError()
-
-
-
-

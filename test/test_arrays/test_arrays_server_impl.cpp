@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2021 NXP
+ * Copyright 2016 - 2022 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -279,7 +279,7 @@ Array2ListType *sendReceived2ListType(Array2ListType arrayLists)
 
 AllTypes (*sendReceiveStruct(const AllTypes all_types[2]))[2]
 {
-    const AllTypes(**received_struct) = &all_types;
+    const AllTypes **received_struct = &all_types;
     AllTypes(*send_struct)[2] = (AllTypes(*)[2])erpc_malloc(sizeof(AllTypes[2]));
 
     for (uint32_t k = 0; k < 2; ++k)
@@ -407,30 +407,22 @@ void remove_services(erpc::SimpleServer *server)
 extern "C" {
 #endif
 erpc_service_t service_test = NULL;
-void add_services_to_server()
+void add_services_to_server(erpc_server_t server)
 {
     service_test = create_PointersService_service();
-    erpc_add_service_to_server(service_test);
+    erpc_add_service_to_server(server, service_test);
 }
 
-void remove_services_from_server()
+void remove_services_from_server(erpc_server_t server)
 {
-    erpc_remove_service_from_server(service_test);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_remove_service_from_server(server, service_test);
     destroy_PointersService_service(service_test);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_PointersService_service();
-#endif
 }
 
-void remove_common_services_from_server(erpc_service_t service)
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
 {
-    erpc_remove_service_from_server(service);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_remove_service_from_server(server, service);
     destroy_Common_service(service);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_Common_service();
-#endif
 }
 #ifdef __cplusplus
 }

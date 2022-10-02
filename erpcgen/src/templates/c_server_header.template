@@ -8,7 +8,7 @@
 #define {$serverGuardMacro}
 
 #ifdef __cplusplus
-#include "erpc_server.h"
+#include "erpc_server.hpp"
 #include "{$codecHeader}"
 extern "C"
 {
@@ -48,15 +48,11 @@ extern "C" {
 typedef void * erpc_service_t;
 
 {% for iface in group.interfaces %}
+/*! @brief Return {$iface.serviceClassName} service object. */
 erpc_service_t create_{$iface.serviceClassName}(void);
 
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+/*! @brief Destroy {$iface.serviceClassName} service object. */
 void destroy_{$iface.serviceClassName}(erpc_service_t service);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-void destroy_{$iface.serviceClassName}(void);
-#else
-#warning "Unknown eRPC allocation policy!"
-#endif
 
 {% endfor -- iface %}
 #ifdef __cplusplus

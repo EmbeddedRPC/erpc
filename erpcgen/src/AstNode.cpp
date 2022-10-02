@@ -7,10 +7,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "AstNode.h"
+#include "AstNode.hpp"
 
-#include "ErpcLexer.h"
-#include "format_string.h"
+#include "ErpcLexer.hpp"
+#include "format_string.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <cstdio>

@@ -6,20 +6,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_crc16.h"
-#include "erpc_tcp_transport.h"
-#include "erpc_transport.h"
+#include "erpc_crc16.hpp"
+#include "erpc_tcp_transport.hpp"
+#include "erpc_transport.hpp"
 #include "erpc_transport_setup.h"
 #include "erpc_version.h"
 
-#include "ErpcLexer.h"
-#include "InterfaceDefinition.h"
-#include "Logging.h"
-#include "SearchPath.h"
-#include "Sniffer.h"
-#include "UniqueIdChecker.h"
+#include "ErpcLexer.hpp"
+#include "InterfaceDefinition.hpp"
+#include "Logging.hpp"
+#include "SearchPath.hpp"
+#include "Sniffer.hpp"
+#include "UniqueIdChecker.hpp"
 #include "annotations.h"
-#include "options.h"
+#include "options.hpp"
 
 #include <cstdint>
 #include <cstdlib>

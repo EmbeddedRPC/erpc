@@ -126,6 +126,7 @@ test_server.cpp:
   - not: codec->read
   - if: dir in ('out', 'inout')
     then:
+      - erpc_assert(c <= 10 * sizeof(uint8_t));
       - codec->writeBinary(c, v);
   - not: codec->write
 

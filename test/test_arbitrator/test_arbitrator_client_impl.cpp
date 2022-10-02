@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "erpc_simple_server.h"
+#include "erpc_simple_server.hpp"
 
 #include "gtest.h"
 #include "test_firstInterface.h"
@@ -61,6 +61,11 @@ TEST(test_arbitrator, NestedCallTest)
 TEST(test_arbitrator, GetResultFromSecondSide)
 {
     EXPECT_TRUE(getResultFromSecondSide() == 0);
+}
+
+TEST(test_arbitrator, testCasesAreDone)
+{
+    testCasesAreDone();
 }
 
 void secondSendInt(int32_t a)

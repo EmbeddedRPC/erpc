@@ -196,7 +196,7 @@
 #endif
 
 #if !defined(erpc_assert)
-    #if ERPC_HAS_FREERTOSCONFIG_H 
+    #if ERPC_HAS_FREERTOSCONFIG_H
         #ifdef __cplusplus
             extern "C" {
         #endif
@@ -217,6 +217,11 @@
         #endif
         #define erpc_assert(condition) assert(condition)
     #endif
+#endif
+
+// Disabling endianness agnostic feature.
+#ifndef ENDIANNESS_HEADER
+    #define ENDIANNESS_HEADER "erpc_endianness_undefined.h"
 #endif
 
 /* clang-format on */
