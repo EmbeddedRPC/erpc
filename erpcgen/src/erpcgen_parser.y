@@ -18,9 +18,6 @@
 /* make it reentrant */
 %define api.pure full
 
-/* put more info in error messages */
-%define parse.error verbose
-
 /* enable location processing */
 %locations
 
