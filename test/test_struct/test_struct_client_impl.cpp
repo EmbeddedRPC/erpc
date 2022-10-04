@@ -20,35 +20,35 @@ using namespace std;
 TEST(test_struct, GetMember1)
 {
     C c = { 4, 5 };
-    EXPECT_TRUE(4 == getMember(&c));
+    EXPECT_EQ(4, getMember(&c));
 }
 
 TEST(test_struct, NestedStruct1)
 {
     C c = { 4, 5 };
     D d = { c };
-    EXPECT_TRUE(4 == sendNestedStruct(&d));
+    EXPECT_EQ(4, sendNestedStruct(&d));
 }
 
 TEST(test_struct, ReturnStruct1)
 {
     B *b;
     b = returnStruct(3.14, 2.71828);
-    EXPECT_TRUE((float)b->x == (float)3.14);
-    EXPECT_TRUE((float)b->y == (float)2.71828);
+    EXPECT_EQ((float)b->x, (float)3.14);
+    EXPECT_EQ((float)b->y, (float)2.71828);
     erpc_free(b);
 }
 
 TEST(test_struct, SendIntSizes)
 {
     F f = { (int8_t)0xFF, (int16_t)0xFFFF, (int32_t)0xFFFFFFFF, (int64_t)0xFFFFFFFFFFFFFFFF };
-    EXPECT_TRUE(0 == sendManyInts(&f));
+    EXPECT_EQ(0, sendManyInts(&f));
 }
 
 TEST(test_struct, SendUnsignedIntSizes)
 {
     G g = { 0xFF, 0xFFFF, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    EXPECT_TRUE(0 == sendManyUInts(&g));
+    EXPECT_EQ(0, sendManyUInts(&g));
 }
 
 TEST(test_struct, GetMember2)
@@ -57,8 +57,8 @@ TEST(test_struct, GetMember2)
     B b = { 3.14, 2.71828 };
     A a = { b, c };
     B *bb = getMemberTest2(&a);
-    EXPECT_TRUE((float)bb->x == (float)4.0);
-    EXPECT_TRUE((float)bb->y == (float)3.14);
+    EXPECT_EQ((float)bb->x, (float)4.0);
+    EXPECT_EQ((float)bb->y, (float)3.14);
     erpc_free(bb);
 }
 
@@ -68,7 +68,7 @@ TEST(test_struct, TestString1)
     char str[] = "Ape";
     prim8.species = &str[0];
     prim8.is_ape = false;
-    EXPECT_TRUE(checkString(&prim8) == 0);
+    EXPECT_EQ(checkString(&prim8), 0);
 }
 
 TEST(test_struct, TestReturnString1)
@@ -97,10 +97,10 @@ TEST(test_struct, TestStudent1)
     char *resultStudent = getStudentName(stud);
     EXPECT_STREQ("Donnie Darko", resultStudent);
     erpc_free(resultStudent);
-    EXPECT_TRUE(getStudentTestAverage(stud) == test_avg);
-    EXPECT_TRUE(getStudentAge(stud) == 19);
-    EXPECT_TRUE(SENIOR == 12);
-    EXPECT_TRUE(getStudentYear(stud) == SENIOR);
+    EXPECT_EQ(getStudentTestAverage(stud), test_avg);
+    EXPECT_EQ(getStudentAge(stud), 19);
+    EXPECT_EQ(SENIOR, 12);
+    EXPECT_EQ(getStudentYear(stud), SENIOR);
     erpc_free(stud);
 }
 
@@ -112,9 +112,9 @@ TEST(test_struct, TestStudent2)
     char *resultStudent = getStudentName(stud);
     EXPECT_STREQ("George Bush", resultStudent);
     erpc_free(resultStudent);
-    EXPECT_TRUE(getStudentTestAverage(stud) == 45.);
-    EXPECT_TRUE(getStudentAge(stud) == 68);
-    EXPECT_TRUE(getStudentYear(stud) == FRESHMAN);
+    EXPECT_EQ(getStudentTestAverage(stud), 45.);
+    EXPECT_EQ(getStudentAge(stud), 68);
+    EXPECT_EQ(getStudentYear(stud), FRESHMAN);
     erpc_free(stud->name);
     erpc_free(stud);
 }
@@ -209,23 +209,23 @@ TEST(test_struct, test_struct_allDirection)
 
     test_struct_allDirection(&a, &b, &e);
 
-    EXPECT_TRUE(e.number == a.number * b.number);
+    EXPECT_EQ(e.number, a.number * b.number);
 
     EXPECT_STREQ(text2, e.text);
     erpc_free(a.text);
     erpc_free(b.text);
     erpc_free(e.text);
 
-    EXPECT_TRUE(e.color == green);
+    EXPECT_EQ(e.color, green);
 
-    EXPECT_TRUE(e.c.m == a.c.m * b.c.m);
-    EXPECT_TRUE(e.c.n == a.c.n * b.c.n);
+    EXPECT_EQ(e.c.m, a.c.m * b.c.m);
+    EXPECT_EQ(e.c.n, a.c.n * b.c.n);
 
-    EXPECT_TRUE(e.list_numbers.elementsCount == 2);
+    EXPECT_EQ(e.list_numbers.elementsCount, 2);
 
     for (uint32_t i = 0; i < a.list_numbers.elementsCount; ++i)
     {
-        EXPECT_TRUE(e.list_numbers.elements[i] == a.list_numbers.elements[i] * b.list_numbers.elements[i]);
+        EXPECT_EQ(e.list_numbers.elements[i], a.list_numbers.elements[i] * b.list_numbers.elements[i]);
 
         EXPECT_STREQ(text2, e.list_text.elements[i]);
         erpc_free(a.list_text.elements[i]);
@@ -241,7 +241,7 @@ TEST(test_struct, test_struct_allDirection)
 
     for (uint32_t i = 0; i < 2; ++i)
     {
-        EXPECT_TRUE(e.array_numbers[i] == a.array_numbers[i] * b.array_numbers[i]);
+        EXPECT_EQ(e.array_numbers[i], a.array_numbers[i] * b.array_numbers[i]);
 
         EXPECT_STREQ(text2, e.array_text[i]);
         erpc_free(a.array_text[i]);
@@ -251,7 +251,7 @@ TEST(test_struct, test_struct_allDirection)
 
     for (uint8_t i = 0; i < a.binary_numbers.dataLength; ++i)
     {
-        EXPECT_TRUE(e.binary_numbers.data[i] == a.binary_numbers.data[i] * b.binary_numbers.data[i]);
+        EXPECT_EQ(e.binary_numbers.data[i], a.binary_numbers.data[i] * b.binary_numbers.data[i]);
     }
     erpc_free(a.binary_numbers.data);
     erpc_free(b.binary_numbers.data);

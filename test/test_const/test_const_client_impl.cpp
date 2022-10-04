@@ -15,13 +15,13 @@
 
 TEST(test_const, CheckConsts)
 {
-    EXPECT_TRUE(a == 3);
-    EXPECT_TRUE((float)b == (float)3.14);
+    EXPECT_EQ(a, 3);
+    EXPECT_EQ((float)b, (float)3.14);
     EXPECT_STREQ("feedbabe", c);
-    EXPECT_TRUE((float)d == (float)3.14);
-    EXPECT_TRUE(x == 11);
-    EXPECT_TRUE(y == 20);
+    EXPECT_EQ((float)d, (float)3.14);
+    EXPECT_EQ(x, 11);
+    EXPECT_EQ(y, 20);
 
-    EXPECT_TRUE(mass == 100);
-    EXPECT_TRUE(accel == (float)-9.8);
+    EXPECT_EQ(mass, 100);
+    EXPECT_EQ(accel, (float)-9.8);
 }

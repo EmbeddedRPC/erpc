@@ -32,7 +32,7 @@ TEST(test_arbitrator, FirstSendReceiveInt)
     for (int i = number - 1; i >= 0; i--)
     {
         int b = firstReceiveInt();
-        EXPECT_TRUE(i == b);
+        EXPECT_EQ(i, b);
     }
 }
 
@@ -45,7 +45,7 @@ TEST(test_arbitrator, FirstSendReceiveInt2)
     for (int i = number - 1; i >= 0; i--)
     {
         int b = firstReceiveInt();
-        EXPECT_TRUE(i == b);
+        EXPECT_EQ(i, b);
     }
 }
 
@@ -55,12 +55,12 @@ TEST(test_arbitrator, NestedCallTest)
     while (!enabled)
     {
     };
-    EXPECT_TRUE(nestedCallTest() == nestedCallsCount * 2 - 1);
+    EXPECT_EQ(nestedCallTest(), nestedCallsCount * 2 - 1);
 }
 
 TEST(test_arbitrator, GetResultFromSecondSide)
 {
-    EXPECT_TRUE(getResultFromSecondSide() == 0);
+    EXPECT_EQ(getResultFromSecondSide(), 0);
 }
 
 TEST(test_arbitrator, testCasesAreDone)

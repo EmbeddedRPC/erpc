@@ -26,9 +26,9 @@ private:
     {
         int serverAlloc = getServerAllocated();
 
-        EXPECT_TRUE(MyAlloc::allocated() == 0)
+        EXPECT_EQ(MyAlloc::allocated(), 0)
             << "Leaked (on client side) : " << MyAlloc::allocated() << " unit(s) need be freed!";
-        EXPECT_TRUE(serverAlloc == 0) << "Leaked (on server side) : " << serverAlloc << " unit(s) need be freed!";
+        EXPECT_EQ(serverAlloc, 0) << "Leaked (on server side) : " << serverAlloc << " unit(s) need be freed!";
         MyAlloc::allocated(0);
     }
 };
