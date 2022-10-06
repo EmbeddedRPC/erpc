@@ -19,14 +19,14 @@ TEST(test_typedef, SendReceiveInt)
 {
     int32type a = 10, b = 2 * a + 1, pB;
     pB = sendReceiveInt(a);
-    EXPECT_TRUE(b == pB);
+    EXPECT_EQ(b, pB);
 }
 
 TEST(test_typedef, SendReceiveEnum)
 {
     Colors a = green, pB, b = blue;
     pB = sendReceiveEnum(a);
-    EXPECT_TRUE((int32_t)b == (int32_t)pB);
+    EXPECT_EQ(b, pB);
 }
 
 TEST(test_typedef, SendReceiveStruct)
@@ -37,8 +37,8 @@ TEST(test_typedef, SendReceiveStruct)
     b->m = 2 * a->m;
     b->n = 2 + a->n;
     pB = sendReceiveStruct(a);
-    EXPECT_TRUE(b->m == pB->m);
-    EXPECT_TRUE(b->n == pB->n);
+    EXPECT_EQ(b->m, pB->m);
+    EXPECT_EQ(b->n, pB->n);
     erpc_free(a);
     erpc_free(b);
     erpc_free(pB);
@@ -62,7 +62,7 @@ TEST(test_typedef, SendReceiveListType)
     int32_t *list_p2 = received_list->elements;
     for (uint32_t i = 0; i < received_list->elementsCount; ++i)
     {
-        EXPECT_TRUE(*list_p2 / 2 == *list_p);
+        EXPECT_EQ(*list_p2 / 2, *list_p);
         ++list_p;
         ++list_p2;
     }
@@ -110,7 +110,7 @@ TEST(test_typedef, SendReceive2ListType)
         list_r = list_0_r->elements;
         for (uint32_t j = 0; j < list_0_r->elementsCount; ++j)
         {
-            EXPECT_TRUE((*list_r) / 2 == *list_s);
+            EXPECT_EQ((*list_r) / 2, *list_s);
             ++list_s;
             ++list_r;
         }

@@ -27,7 +27,7 @@ using namespace std;
     result = sendReceiveBinary(&send);
     for (uint8_t i = 0; i < result->dataLength; ++i)
     {
-        EXPECT_TRUE(send.data[i] == result->data[i]);
+        EXPECT_EQ(send.data[i] , result->data[i]);
     }
     free(send.data);
     free(result->data);
@@ -53,7 +53,7 @@ TEST(test_binary, sendBinary)
     result = receiveBinary();
     for (uint8_t i = 0; i < result->dataLength; ++i)
     {
-        EXPECT_TRUE(i == result->data[i]);
+        EXPECT_EQ(i , result->data[i]);
     }
     free(result->data);
     free(result);
@@ -80,7 +80,7 @@ TEST(test_binary, test_binary_allDirection)
 
     for (uint8_t i = 0; i < 5; ++i)
     {
-        EXPECT_TRUE(e.data[i] == a.data[i] * b.data[i]);
+        EXPECT_EQ(e.data[i], a.data[i] * b.data[i]);
     }
 
     erpc_free(a.data);
@@ -111,9 +111,9 @@ TEST(test_binary, test_binary_allDirection)
 
     for (uint8_t i = 0; i < 5; ++i)
     {
-        EXPECT_TRUE(a.data[i] == c.data[i]);
-        EXPECT_TRUE(b.data[i] == d->data[i]);
-        EXPECT_TRUE(e.data[i] == 4 * i);
+        EXPECT_EQ(a.data[i] , c.data[i]);
+        EXPECT_EQ(b.data[i] , d->data[i]);
+        EXPECT_EQ(e.data[i] , 4 * i);
     }
 
     free(a.data);

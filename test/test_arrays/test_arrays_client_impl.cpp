@@ -30,7 +30,7 @@ TEST(test_arrays, sendReceivedInt32)
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        EXPECT_TRUE(send_array[i] == (*received_array)[i]);
+        EXPECT_EQ(send_array[i], (*received_array)[i]);
     }
     erpc_free(received_array);
 }
@@ -53,7 +53,7 @@ TEST(test_arrays, sendReceived2Int32)
     {
         for (uint32_t j = 0; j < 10; ++j)
         {
-            EXPECT_TRUE(send_array[i][j] == (*received_array)[i][j]);
+            EXPECT_EQ(send_array[i][j], (*received_array)[i][j]);
         }
     }
     erpc_free(received_array);
@@ -130,7 +130,7 @@ TEST(test_arrays, sendReceivedEnum)
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        EXPECT_TRUE(send_array[i] == (*received_array)[i]);
+        EXPECT_EQ(send_array[i], (*received_array)[i]);
     }
     erpc_free(received_array);
 }
@@ -154,7 +154,7 @@ TEST(test_arrays, sendReceived2Enum)
     {
         for (uint32_t j = 0; j < 3; ++j)
         {
-            EXPECT_TRUE(send_array[i][j] == (*received_array)[i][j]);
+            EXPECT_EQ(send_array[i][j], (*received_array)[i][j]);
         }
     }
     erpc_free(received_array);
@@ -185,7 +185,7 @@ TEST(test_arrays, sendReceivedList)
         int32_t *list_r = (*received_array)[i].elements;
         for (uint32_t j = 0; j < elements_count; ++j)
         {
-            EXPECT_TRUE(*list_r == *list_s);
+            EXPECT_EQ(*list_r, *list_s);
             list_r++;
             list_s++;
         }
@@ -224,7 +224,7 @@ TEST(test_arrays, sendReceived2List)
             int32_t *list_r = (*received_array)[k][i].elements;
             for (uint32_t j = 0; j < elements_count; ++j)
             {
-                EXPECT_TRUE(*list_r == *list_s);
+                EXPECT_EQ(*list_r, *list_s);
                 list_r++;
                 list_s++;
             }
@@ -250,7 +250,7 @@ TEST(test_arrays, sendReceivedInt32Type)
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        EXPECT_TRUE(send_array[i] == (*received_array)[i]);
+        EXPECT_EQ(send_array[i], (*received_array)[i]);
     }
     erpc_free(received_array);
 }
@@ -274,7 +274,7 @@ TEST(test_arrays, sendReceived2Int32Type)
     {
         for (uint32_t j = 0; j < 10; ++j)
         {
-            EXPECT_TRUE(send_array[i][j] == (*received_array)[i][j]);
+            EXPECT_EQ(send_array[i][j], (*received_array)[i][j]);
         }
     }
     erpc_free(received_array);
@@ -351,7 +351,7 @@ TEST(test_arrays, sendReceivedEnumType)
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        EXPECT_TRUE(send_array[i] == (*received_array)[i]);
+        EXPECT_EQ(send_array[i], (*received_array)[i]);
     }
     erpc_free(received_array);
 }
@@ -375,7 +375,7 @@ TEST(test_arrays, sendReceived2EnumType)
     {
         for (uint32_t j = 0; j < 3; ++j)
         {
-            EXPECT_TRUE(send_array[i][j] == (*received_array)[i][j]);
+            EXPECT_EQ(send_array[i][j], (*received_array)[i][j]);
         }
     }
     erpc_free(received_array);
@@ -397,8 +397,8 @@ TEST(test_arrays, sendReceivedStructType)
 
     for (uint32_t i = 0; i < array_count; ++i)
     {
-        EXPECT_TRUE(send_array[i].m == (*received_array)[i].m);
-        EXPECT_TRUE(send_array[i].n == (*received_array)[i].n);
+        EXPECT_EQ(send_array[i].m, (*received_array)[i].m);
+        EXPECT_EQ(send_array[i].n, (*received_array)[i].n);
     }
     erpc_free(received_array);
 }
@@ -423,8 +423,8 @@ TEST(test_arrays, sendReceived2StructType)
     {
         for (uint32_t j = 0; j < 3; ++j)
         {
-            EXPECT_TRUE(send_array[i][j].m == (*received_array)[i][j].m);
-            EXPECT_TRUE(send_array[i][j].n == (*received_array)[i][j].n);
+            EXPECT_EQ(send_array[i][j].m, (*received_array)[i][j].m);
+            EXPECT_EQ(send_array[i][j].n, (*received_array)[i][j].n);
         }
     }
     erpc_free(received_array);
@@ -455,7 +455,7 @@ TEST(test_arrays, sendReceivedListType)
         int32_t *list_r = (*received_array)[i].elements;
         for (uint32_t j = 0; j < elements_count; ++j)
         {
-            EXPECT_TRUE(*list_r == *list_s);
+            EXPECT_EQ(*list_r, *list_s);
             list_r++;
             list_s++;
         }
@@ -494,7 +494,7 @@ TEST(test_arrays, sendReceived2ListType)
             int32_t *list_r = (*received_array)[k][i].elements;
             for (uint32_t j = 0; j < elements_count; ++j)
             {
-                EXPECT_TRUE(*list_r == *list_s);
+                EXPECT_EQ(*list_r, *list_s);
                 list_r++;
                 list_s++;
             }
@@ -545,18 +545,18 @@ TEST(test_arrays, sendReceiveStruct)
 
     for (uint32_t k = 0; k < 2; ++k)
     {
-        EXPECT_TRUE(send_struct[k].number == (*received_struct)[k].number);
+        EXPECT_EQ(send_struct[k].number, (*received_struct)[k].number);
         EXPECT_STREQ(send_struct[k].text, (*received_struct)[k].text);
         erpc_free(send_struct[k].text);
         erpc_free((*received_struct)[k].text);
-        EXPECT_TRUE(send_struct[k].color == (*received_struct)[k].color);
-        EXPECT_TRUE(send_struct[k].c.m == (*received_struct)[k].c.m);
-        EXPECT_TRUE(send_struct[k].c.n == (*received_struct)[k].c.n);
+        EXPECT_EQ(send_struct[k].color, (*received_struct)[k].color);
+        EXPECT_EQ(send_struct[k].c.m, (*received_struct)[k].c.m);
+        EXPECT_EQ(send_struct[k].c.n, (*received_struct)[k].c.n);
 
-        EXPECT_TRUE(send_struct[k].list_numbers.elementsCount == (*received_struct)[k].list_numbers.elementsCount);
+        EXPECT_EQ(send_struct[k].list_numbers.elementsCount, (*received_struct)[k].list_numbers.elementsCount);
         for (uint32_t i = 0; i < 5; ++i)
         {
-            EXPECT_TRUE(send_struct[k].list_numbers.elements[i] == (*received_struct)[k].list_numbers.elements[i]);
+            EXPECT_EQ(send_struct[k].list_numbers.elements[i], (*received_struct)[k].list_numbers.elements[i]);
             EXPECT_STREQ(send_struct[k].list_text.elements[i], (*received_struct)[k].list_text.elements[i]);
             erpc_free(send_struct[k].list_text.elements[i]);
             erpc_free((*received_struct)[k].list_text.elements[i]);
@@ -568,7 +568,7 @@ TEST(test_arrays, sendReceiveStruct)
 
         for (uint32_t i = 0; i < 5; ++i)
         {
-            EXPECT_TRUE(send_struct[k].array_numbers[i] == (*received_struct)[k].array_numbers[i]);
+            EXPECT_EQ(send_struct[k].array_numbers[i], (*received_struct)[k].array_numbers[i]);
             EXPECT_STREQ(send_struct[k].array_text[i], (*received_struct)[k].array_text[i]);
             erpc_free(send_struct[k].array_text[i]);
             erpc_free((*received_struct)[k].array_text[i]);
@@ -622,20 +622,20 @@ TEST(test_arrays, sendReceive2Struct)
     {
         for (uint32_t l = 0; l < 1; ++l)
         {
-            EXPECT_TRUE(send_struct[k][l].number == (*received_struct)[k][l].number);
+            EXPECT_EQ(send_struct[k][l].number, (*received_struct)[k][l].number);
             EXPECT_STREQ(send_struct[k][l].text, (*received_struct)[k][l].text);
             erpc_free(send_struct[k][l].text);
             erpc_free((*received_struct)[k][l].text);
-            EXPECT_TRUE(send_struct[k][l].color == (*received_struct)[k][l].color);
-            EXPECT_TRUE(send_struct[k][l].c.m == (*received_struct)[k][l].c.m);
-            EXPECT_TRUE(send_struct[k][l].c.n == (*received_struct)[k][l].c.n);
+            EXPECT_EQ(send_struct[k][l].color, (*received_struct)[k][l].color);
+            EXPECT_EQ(send_struct[k][l].c.m, (*received_struct)[k][l].c.m);
+            EXPECT_EQ(send_struct[k][l].c.n, (*received_struct)[k][l].c.n);
 
-            EXPECT_TRUE(send_struct[k][l].list_numbers.elementsCount ==
-                        (*received_struct)[k][l].list_numbers.elementsCount);
+            EXPECT_EQ(send_struct[k][l].list_numbers.elementsCount,
+                      (*received_struct)[k][l].list_numbers.elementsCount);
             for (uint32_t i = 0; i < 5; ++i)
             {
-                EXPECT_TRUE(send_struct[k][l].list_numbers.elements[i] ==
-                            (*received_struct)[k][l].list_numbers.elements[i]);
+                EXPECT_EQ(send_struct[k][l].list_numbers.elements[i],
+                          (*received_struct)[k][l].list_numbers.elements[i]);
                 EXPECT_STREQ(send_struct[k][l].list_text.elements[i], (*received_struct)[k][l].list_text.elements[i]);
                 erpc_free(send_struct[k][l].list_text.elements[i]);
                 erpc_free((*received_struct)[k][l].list_text.elements[i]);
@@ -647,7 +647,7 @@ TEST(test_arrays, sendReceive2Struct)
 
             for (uint32_t i = 0; i < 5; ++i)
             {
-                EXPECT_TRUE(send_struct[k][l].array_numbers[i] == (*received_struct)[k][l].array_numbers[i]);
+                EXPECT_EQ(send_struct[k][l].array_numbers[i], (*received_struct)[k][l].array_numbers[i]);
                 EXPECT_STREQ(send_struct[k][l].array_text[i], (*received_struct)[k][l].array_text[i]);
                 erpc_free(send_struct[k][l].array_text[i]);
                 erpc_free((*received_struct)[k][l].array_text[i]);
@@ -683,9 +683,9 @@ TEST(test_arrays, test_array_allDirection)
 
     for (uint32_t i = 0; i < 5; ++i)
     {
-        EXPECT_TRUE(a[i] == pA[i]);
-        EXPECT_TRUE(b[i] == pB[i]);
-        EXPECT_TRUE(c[i] == pC[i]);
-        EXPECT_TRUE(d[i] == pD[i]);
+        EXPECT_EQ(a[i], pA[i]);
+        EXPECT_EQ(b[i], pB[i]);
+        EXPECT_EQ(c[i], pC[i]);
+        EXPECT_EQ(d[i], pD[i]);
     }
 }

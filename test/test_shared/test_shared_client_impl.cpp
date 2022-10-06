@@ -17,7 +17,7 @@ TEST(test_shared, sendReceiveBaseSharedStruct)
     BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm;
     _sm = sendReceiveBaseSharedStruct(&sm);
-    EXPECT_TRUE(_sm == &sm);
+    EXPECT_EQ(_sm , &sm);
 }
 
 TEST(test_shared, inoutBaseSharedStruct)
@@ -25,26 +25,26 @@ TEST(test_shared, inoutBaseSharedStruct)
     BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm = &sm;
     inoutBaseSharedStruct(&_sm);
-    EXPECT_TRUE(_sm == &sm);
+    EXPECT_EQ(_sm , &sm);
 }
 
 /*TEST(test_shared, inoutStruct1)
 {
     SharedStructMember sm = {4, 5};
     pB = sendReceiveInt(a);
-    EXPECT_TRUE(b == pB);
+    EXPECT_EQ(b , pB);
 }
 
 TEST(test_shared, inoutStruct2)
 {
     Colors a = green, pB, b = blue;
     pB = sendReceiveEnum(a);
-    EXPECT_TRUE((int32_t)b == (int32_t)pB);
+    EXPECT_EQ((int32_t)b , (int32_t)pB);
 }
 
 TEST(test_shared, inoutStruct3)
 {
     Colors a = green, pB, b = blue;
     pB = sendReceiveEnum(a);
-    EXPECT_TRUE((int32_t)b == (int32_t)pB);
+    EXPECT_EQ((int32_t)b , (int32_t)pB);
 }*/

@@ -15,18 +15,18 @@
 
 TEST(test_annotations, AnnotationServiceID)
 {
-    EXPECT_TRUE(5 == kAnnotateTest_service_id);
+    EXPECT_EQ(kAnnotateTest_service_id, 5);
 }
 
 TEST(test_annotations, IncludeAnnotationCheck)
 {
-    EXPECT_TRUE(5 == addOne(4));
+    EXPECT_EQ(addOne(4), 5);
 
     includedInt_t testInt = 5;
-    EXPECT_TRUE(5 == testInt);
+    EXPECT_EQ(testInt, 5);
 }
 
 TEST(test_annotations, testIfMyIntAndConstExist)
 {
-    EXPECT_TRUE(i == testIfMyIntAndConstExist(i));
+    EXPECT_EQ(i, testIfMyIntAndConstExist(i));
 }

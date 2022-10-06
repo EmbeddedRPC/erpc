@@ -28,7 +28,7 @@ TEST(test_builtin, test_int32_in_out)
     int32_t c;
     test_int32_in(int32A);
     test_int32_out(&c);
-    EXPECT_TRUE(int32A == c);
+    EXPECT_EQ(int32A, c);
 }
 
 TEST(test_builtin, test_int32_inout)
@@ -37,7 +37,7 @@ TEST(test_builtin, test_int32_inout)
     for (int32_t i = -5; i <= 5; ++i)
     {
         test_int32_inout(&e);
-        EXPECT_TRUE(i == e);
+        EXPECT_EQ(i, e);
     }
 }
 
@@ -46,7 +46,7 @@ TEST(test_builtin, test_int32_return)
     test_int32_in(int32A);
     test_int32_in2(int32B);
     int32_t r = test_int32_return();
-    EXPECT_TRUE(int32A * int32B == r);
+    EXPECT_EQ(int32A * int32B, r);
 }
 
 TEST(test_builtin, test_int32_allDirection)
@@ -56,9 +56,9 @@ TEST(test_builtin, test_int32_allDirection)
 
     int32_t r = test_int32_allDirection(int32A, int32B, &c, &e);
 
-    EXPECT_TRUE(c == int32A);
-    EXPECT_TRUE(14 == e);
-    EXPECT_TRUE(int32A * int32B == r);
+    EXPECT_EQ(c, int32A);
+    EXPECT_EQ(14, e);
+    EXPECT_EQ(int32A * int32B, r);
 }
 
 TEST(test_builtin, test_float_inout)
@@ -66,7 +66,7 @@ TEST(test_builtin, test_float_inout)
     float a = 3.14;
     float b;
     test_float_inout(a, &b);
-    EXPECT_TRUE(a == b);
+    EXPECT_EQ(a, b);
 }
 
 TEST(test_builtin, test_double_inout)
@@ -74,7 +74,7 @@ TEST(test_builtin, test_double_inout)
     double a = 3.14;
     double b;
     test_double_inout(a, &b);
-    EXPECT_TRUE(a == b);
+    EXPECT_EQ(a, b);
 }
 
 TEST(test_builtin, test_string_in_out)
@@ -133,16 +133,16 @@ TEST(test_builtin, test_string_allDirection)
     char *r = test_string_empty(a, b, c, &d, e);
 
     EXPECT_STREQ("", c);
-    EXPECT_TRUE(d == NULL);
+    EXPECT_EQ(d , NULL);
     EXPECT_STREQ("", e);
-    EXPECT_TRUE(r == NULL);
+    EXPECT_EQ(r , NULL);
 }*/
 
 TEST(test_builtin, StringParamTest1)
 {
     const char *str = "Hello World!";
     int32_t result = sendHello(str);
-    EXPECT_TRUE(result == 0);
+    EXPECT_EQ(result, 0);
 }
 
 TEST(test_builtin, StringParamTest2)
@@ -150,7 +150,7 @@ TEST(test_builtin, StringParamTest2)
     const char *str1 = "String one.";
     const char *str2 = "String two.";
     int32_t result = sendTwoStrings(str1, str2);
-    EXPECT_TRUE(result == 0);
+    EXPECT_EQ(result, 0);
 }
 
 TEST(test_builtin, StringReturnTest1)
