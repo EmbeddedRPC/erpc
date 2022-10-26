@@ -230,7 +230,7 @@ bool Semaphore::get(uint32_t timeoutUsecs)
     return retVal;
 }
 
-int Semaphore::getCount(void) const
+int Semaphore::getCount(void)
 {
     return m_count;
 }
