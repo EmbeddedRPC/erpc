@@ -262,7 +262,7 @@ void BasicCodec::read(double *value)
 
 void BasicCodec::readPtr(uintptr_t *value)
 {
-    uint8_t ptrSize;
+    uint8_t ptrSize = ~0;
 
     read(&ptrSize);
 
