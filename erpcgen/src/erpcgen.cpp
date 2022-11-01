@@ -10,6 +10,7 @@
 #include "erpc_version.h"
 
 #include "CGenerator.h"
+#include "CPPGenerator.h"
 #include "ErpcLexer.h"
 #include "InterfaceDefinition.h"
 #include "Logging.h"
@@ -98,6 +99,7 @@ protected:
     {
         kCLanguage,
         kPythonLanguage,
+        kCPPLanguage,
     }; /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
@@ -202,6 +204,10 @@ public:
                     else if (lang == "py")
                     {
                         m_outputLanguage = kPythonLanguage;
+                    }
+                    else if (lang == "cpp")
+                    {
+                        m_outputLanguage = kCPPLanguage;
                     }
                     else
                     {
@@ -317,6 +323,9 @@ public:
                     break;
                 case kPythonLanguage:
                     PythonGenerator(&def).generate();
+                    break;
+                case kCPPLanguage:
+                    CPPGenerator(&def).generate();
                     break;
             }
         }
