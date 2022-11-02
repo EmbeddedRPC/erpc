@@ -14,8 +14,6 @@
 #include "erpc_port.h"
 #endif
 #include "{$codecHeader}"
-extern "C"
-{
 #include "{$commonHeaderName}.h"
 {% if groupNames %}
 // import callbacks declaration from other groups
@@ -23,7 +21,6 @@ extern "C"
 #include "{$outputFilename}_{$name}.h"
 {%  endfor %}
 {% endif %}
-}
 
 {$checkVersion()}
 {$>checkCrc()}
