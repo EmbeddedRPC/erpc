@@ -21,6 +21,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "erpc_version.h"
+#include "erpc_client_manager.h"
+
 {% if empty(crc16) == false %}
 #include "erpc_crc16.h"
 {% endif  -- empty(crc16) == false %}
@@ -36,6 +38,7 @@
 #define ERPC_TYPE_DEFINITIONS
 {% if not empty(enums) %}
 
+namespace {$iface.name} {
 // Enumerators data types declarations
 {%  for enum in enums %}
 {% if enum.name != "" %}
@@ -125,20 +128,18 @@ enum _{$iface.name}_ids
 class {$iface.name}_client
 {
 private:
-    const char *m_ip;
-    const int m_port;
+    ClientManager* mClient;
     
 public:
-    {$iface.name}_client(const char *ip, const int port);
+    {$iface.name}_client(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
 
 {%  for fn in iface.functions if fn.isNonExternalFunction == true %}
-    {$> fn.mlComment}
-    {$fn.prototype};{$fn.ilComment}{$loop.addNewLineIfNotLast}
+    {$fn.prototype_no_scope};{$fn.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- functions %}
 };
 //@}{$iface.ilComment}
 {% endfor -- iface %}
 
 {% endif -- genCommonTypesFile %}
-
+}
 #endif // {$commonGuardMacro}

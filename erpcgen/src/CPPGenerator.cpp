@@ -1682,7 +1682,9 @@ data_map CPPGenerator::getFunctionTemplateData(Group *group, Function *fn)
     }
 
     string proto = getFunctionPrototype(group, fn);
+    string proto_no_scope = getFunctionPrototype(group, fn, "", false);
     info["prototype"] = proto;
+    info["prototype_no_scope"] = proto_no_scope;
     info["name"] = getOutputName(fn);
     info["id"] = fn->getUniqueId();
 
@@ -1935,7 +1937,7 @@ string CPPGenerator::getFunctionServerCall(Function *fn, FunctionType *functionT
     return proto + ");";
 }
 
-string CPPGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string name)
+string CPPGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string name, bool scoped)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -1960,9 +1962,9 @@ string CPPGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::s
         }
         else /* Use function name only. */
         {
-            if (group != nullptr)
+            if (group != nullptr && scoped)
             {
-                proto += iface_group_name + "_client_t";
+                proto += iface_group_name + "_client";
                 proto += "::";
             }
             proto += functionName;

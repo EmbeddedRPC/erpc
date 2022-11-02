@@ -3,8 +3,13 @@
 
 {% endif %}
 {$commonHeader()}
-
+#include "erpc_manually_constructed.h"
 #include "erpc_client_manager.h"
+#include "erpc_mbf_setup.h"
+#include "erpc_transport_setup.h"
+#include "erpc_crc16.h"
+#include "erpc_basic_codec.h"
+
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include "erpc_port.h"
 #endif
@@ -25,8 +30,10 @@ extern "C"
 using namespace erpc;
 using namespace std;
 
-extern ClientManager *g_client;
 {$generateCrcVariable()}
+
+namespace saas {
+
 {$> setSharedMemAddresses()}
 {% if unitTest %}
 {$> callbackTable(functions)}
@@ -51,7 +58,7 @@ extern ClientManager *g_client;
 {% endif -- isNotVoid %}
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb preCB = g_client->getPreCB();
+    pre_post_action_cb preCB = mClient->getPreCB();
     if (preCB)
     {
         preCB();
@@ -60,9 +67,9 @@ extern ClientManager *g_client;
 
     // Get a new request.
 {% if !fn.isReturnValue %}
-    RequestContext request = g_client->createRequest(true);
+    RequestContext request = mClient->createRequest(true);
 {% else %}
-    RequestContext request = g_client->createRequest(false);
+    RequestContext request = mClient->createRequest(false);
 {% endif -- isReturnValue %}
 
     // Encode the request.
@@ -98,7 +105,7 @@ extern ClientManager *g_client;
 {% endif -- isSendValue %}
 {$clientIndent}    // Send message to server
 {$clientIndent}    // Codec status is checked inside this function.
-{$clientIndent}    g_client->performRequest(request);
+{$clientIndent}    mClient->performRequest(request);
 {% if fn.isReturnValue %}
 {%  if fn.needTempVariableClient %}
 
@@ -140,15 +147,15 @@ extern ClientManager *g_client;
 {% endif -- generateAllocErrorChecks %}
 
     // Dispose of the request.
-    g_client->releaseRequest(request);
+    mClient->releaseRequest(request);
 {% if generateErrorChecks %}
 
     // Invoke error handler callback function
-    g_client->callErrorHandler(err, {$functionIDName});
+    mClient->callErrorHandler(err, {$functionIDName});
 {% endif -- generateErrorChecks %}
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb postCB = g_client->getPostCB();
+    pre_post_action_cb postCB = mClient->getPostCB();
     if (postCB)
     {
         postCB();
@@ -181,8 +188,28 @@ static {$callbackType.prototype}
 
 {% endfor %}
 {% for iface in group.interfaces %}
-// {$iface.name}_client_t constructor.
-{$iface.name}_client_t::{$iface.name}_client_t(const char *ip, const int port) : m_ip(ip), m_port(port) {}
+// {$iface.name}_client constructor.
+{$iface.name}_client::{$iface.name}_client() {
+    ManuallyConstructed<ClientManager> s_client
+    ManuallyConstructed<BasicCodecFactory> s_codecFactory;
+    ManuallyConstructed<Crc16> s_crc16;
+    erpc_assert(transport);
+
+    Transport *castedTransport;
+
+    // Init factories.
+    s_codecFactory.construct();
+
+    // Init client manager with the provided transport.
+    s_client.construct();
+    castedTransport = reinterpret_cast<Transport *>(transport);
+    s_crc16.construct();
+    castedTransport->setCrc16(s_crc16.get());
+    s_client->setTransport(castedTransport);
+    s_client->setCodecFactory(s_codecFactory);
+    s_client->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
+    mClient = s_client;
+}
 {%  for fn in iface.functions %}
 
 // {$iface.name} interface {$fn.name} function client shim.
@@ -196,3 +223,4 @@ static {$callbackType.prototype}
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}
+}
