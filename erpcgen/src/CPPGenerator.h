@@ -421,6 +421,7 @@ private:
      * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
      * @param[in] name Name used for FunctionType.
+     * @param[in] scoped Whether to include class scope in the prototype.
      *
      * @return String prototype representation for given function.
      */
