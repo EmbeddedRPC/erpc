@@ -28,7 +28,7 @@ using namespace erpc;
 using namespace std;
 
 {$generateCrcVariable()}
-
+using namespace erpc;
 namespace saas {
 
 {$> setSharedMemAddresses()}
@@ -186,8 +186,8 @@ static {$callbackType.prototype}
 {% endfor %}
 {% for iface in group.interfaces %}
 // {$iface.name}_client constructor.
-{$iface.name}_client::{$iface.name}_client() {
-    ManuallyConstructed<ClientManager> s_client
+{$iface.name}_client::{$iface.name}_client(erpc_transport_t transport, erpc_mbf_t message_buffer_factory) {
+    ManuallyConstructed<ClientManager> s_client;
     ManuallyConstructed<BasicCodecFactory> s_codecFactory;
     ManuallyConstructed<Crc16> s_crc16;
     erpc_assert(transport);

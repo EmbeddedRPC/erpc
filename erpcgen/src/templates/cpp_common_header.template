@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include "erpc_version.h"
 #include "erpc_client_manager.h"
+#include "erpc_transport_setup.h"
+#include "erpc_mbf_setup.h"
 
 {% if empty(crc16) == false %}
 #include "erpc_crc16.h"
@@ -37,7 +39,7 @@
 #if !defined(ERPC_TYPE_DEFINITIONS)
 #define ERPC_TYPE_DEFINITIONS
 {% if not empty(enums) %}
-
+using namespace erpc;
 namespace {$iface.name} {
 // Enumerators data types declarations
 {%  for enum in enums %}
