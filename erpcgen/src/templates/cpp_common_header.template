@@ -1,0 +1,147 @@
+{% if mlComment != ""%}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$commonGuardMacro})
+#define {$commonGuardMacro}
+{% if usedUnionType %}
+
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+#pragma anon_unions
+#endif
+{% endif -- usedUnionType %}
+
+{% if not commonTypesFile == "" %}
+// Common types header file
+#include "{$commonTypesFile}"
+{% else %}
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "erpc_version.h"
+#include "erpc_client_manager.h"
+#include "erpc_transport_setup.h"
+#include "erpc_mbf_setup.h"
+
+{% if empty(crc16) == false %}
+#include "erpc_crc16.h"
+{% endif  -- empty(crc16) == false %}
+{% for inc in includes %}
+#include "{$inc}"
+{% endfor -- includes %}
+
+{$checkVersion()}
+{$>checkCrc()}
+{% endif -- not commonTypesFile %}
+{% if commonTypesFile == "" %}
+#if !defined(ERPC_TYPE_DEFINITIONS)
+#define ERPC_TYPE_DEFINITIONS
+{% if not empty(enums) %}
+using namespace erpc;
+namespace {$iface.name} {
+// Enumerators data types declarations
+{%  for enum in enums %}
+{% if enum.name != "" %}
+{% endif %}
+{$> enum.mlComment}
+{%   if enum.name %}typedef {% endif --enum.name  %}enum{$addIndent(" ", enum.name)}
+{
+{%   for enumMember in enum.members %}
+{$> addIndent("    ", enumMember.mlComment)}
+    {$enumMember.memberDeclaration}{$enumMember.ilComment}
+{%   endfor -- enumsMembers %}
+}{$addIndent(" ", enum.name)};{$enum.ilComment}{$loop.addNewLineIfNotLast}
+{%  endfor -- enums %}
+{% endif -- enums %}
+{% if not empty(aliases) %}
+
+// Aliases data types declarations
+{%  for alias in aliases %}
+{$> alias.mlComment}
+{%   if alias.typenameName == "" %}
+typedef {$alias.unnamedType}
+{
+{%    for mem in alias.unnamed.members %}
+    {$mem.memberDeclaration}
+{%    endfor -- alias.unnamed.members %}
+} {$alias.unnamedName};
+{%   else -- alias.typenameName %}
+typedef {$alias.typenameName};{$alias.ilComment}
+{%   endif -- alias.typenameName %}
+{%  endfor -- aliases %}
+{% endif -- aliases %}
+{% if nonExternalStructUnion %}
+
+// Structures/unions data types declarations
+{%  for us in symbols %}
+{%   if !us.isExternal %}
+{%    if us.type == "struct" %}
+{$> us.mlComment}
+struct {$us.name}
+{
+{%     for mem in us.members %}
+{$> addIndent("    ", mem.mlComment)}
+    {$mem.memberDeclaration}{$mem.ilComment}
+{$> addIndent("    ", mem.elementsCount)}
+{%     endfor %}
+};{$us.ilComment}{$loop.addNewLineIfNotLast}
+{%    else -- us.type == "union" %}
+{$> us.mlComment}
+union {$us.name}
+{
+{$ addIndent("    ", unionMembersDeclaration(us))}
+};{$us.ilComment}{$loop.addNewLineIfNotLast}
+{%    endif -- us.type == "union/struct" %}
+{%   endif -- !us.isExternal %}
+{%  endfor -- symbols %}
+
+{% endif -- nonExternalStruct || nonExternalUnion %}
+{% if not empty(consts) %}
+
+// Constant variable declarations
+{%  for c in consts %}
+{$> c.mlComment}
+extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
+{%  endfor -- consts %}
+{% endif -- consts %}
+
+#endif // ERPC_TYPE_DEFINITIONS
+{% endif -- commonTypesFile %}
+
+{% if not genCommonTypesFile %}
+{% for iface in group.interfaces %}
+/*! @brief {$iface.name} identifiers */
+enum _{$iface.name}_ids
+{
+    k{$iface.name}_service_id = {$iface.id},
+{%  for fn in iface.functions %}
+    k{$iface.name}_{$fn.name}_id = {$fn.id},
+{%  endfor %}
+};
+
+{% endfor %}
+{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
+
+{$> iface.mlComment}
+//! @name {$iface.name}
+//@{
+class {$iface.name}_client
+{
+private:
+    ClientManager* mClient;
+    
+public:
+    {$iface.name}_client(erpc_transport_t transport, erpc_mbf_t message_buffer_factory);
+
+{%  for fn in iface.functions if fn.isNonExternalFunction == true %}
+    {$fn.prototype_no_scope};{$fn.ilComment}{$loop.addNewLineIfNotLast}
+{%  endfor -- functions %}
+};
+//@}{$iface.ilComment}
+{% endfor -- iface %}
+
+{% endif -- genCommonTypesFile %}
+}
+#endif // {$commonGuardMacro}

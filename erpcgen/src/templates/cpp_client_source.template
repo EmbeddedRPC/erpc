@@ -1,0 +1,223 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+#include "erpc_manually_constructed.h"
+#include "erpc_client_manager.h"
+#include "erpc_mbf_setup.h"
+#include "erpc_transport_setup.h"
+#include "erpc_crc16.h"
+#include "erpc_basic_codec.h"
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+#include "erpc_port.h"
+#endif
+#include "{$codecHeader}"
+#include "{$commonHeaderName}.h"
+{% if groupNames %}
+// import callbacks declaration from other groups
+{%  for name in groupNames if name != group.name %}
+#include "{$outputFilename}_{$name}.h"
+{%  endfor %}
+{% endif %}
+
+{$checkVersion()}
+{$>checkCrc()}
+using namespace erpc;
+using namespace std;
+
+{$generateCrcVariable()}
+using namespace erpc;
+namespace saas {
+
+{$> setSharedMemAddresses()}
+{% if unitTest %}
+{$> callbackTable(functions)}
+{% endif %}
+{$> constantsDefinitions(consts)}
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "serial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "deserial", "def")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "deserial", "def")}
+{$> symbolHeader(group.symbolsMap.symbolsToServer, "serial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "noSharedMem")}
+{$> symbolHeader(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
+{$> symbolSource(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
+{% def clientShimCode(fn, serverIDName, functionIDName) ------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
+{% set clientIndent = "" >%}
+{% if generateErrorChecks %}
+    erpc_status_t err = kErpcStatus_Success;
+
+{% endif -- generateErrorChecks %}
+{% if fn.returnValue.type.isNotVoid %}
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
+{% endif -- isNotVoid %}
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb preCB = mClient->getPreCB();
+    if (preCB)
+    {
+        preCB();
+    }
+#endif
+
+    // Get a new request.
+{% if !fn.isReturnValue %}
+    RequestContext request = mClient->createRequest(true);
+{% else %}
+    RequestContext request = mClient->createRequest(false);
+{% endif -- isReturnValue %}
+
+    // Encode the request.
+{% if codecClass == "Codec" %}
+    {$codecClass} * codec = request.getCodec();
+{% else %}
+    {$codecClass} * codec = static_cast<{$codecClass} *>(request.getCodec());
+{% endif %}
+
+{% if generateAllocErrorChecks %}
+{%  set clientIndent = "    " >%}
+    if (codec == NULL)
+    {
+        err = kErpcStatus_MemoryError;
+    }
+    else
+    {
+{% endif -- generateErrorChecks %}
+{$clientIndent}    codec->startWriteMessage({% if not fn.isReturnValue %}kOnewayMessage{% else %}kInvocationMessage{% endif %}, {$serverIDName}, {$functionIDName}, request.getSequence());
+
+{% if fn.isSendValue %}
+{%  for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
+{%   if param.isNullable %}
+{$ addIndent(clientIndent & "    ", f_paramIsNullableEncode(param))}
+
+{%   else -- isNullable %}
+{%    if param.direction != OutDirection %}
+{$addIndent(clientIndent & "    ", param.coderCall.encode(param.coderCall))}
+
+{%    endif -- param != OutDirection %}
+{%   endif -- isNullable %}
+{%  endfor -- fn parameters %}
+{% endif -- isSendValue %}
+{$clientIndent}    // Send message to server
+{$clientIndent}    // Codec status is checked inside this function.
+{$clientIndent}    mClient->performRequest(request);
+{% if fn.isReturnValue %}
+{%  if fn.needTempVariableClient %}
+
+{$clientIndent}    int32_t _tmp_local;
+{%  endif %}
+{%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
+
+{%   if param.isNullable %}
+{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %}
+{%  set lengthNameCon = ") && (" & param.lengthName & " != NULL)" >%}
+{% else %}
+{%  set lengthNameCon = "" >%}
+{% endif %}
+{$clientIndent}    if ({% if lengthNameCon != "" %}({% endif %}{$param.nullableName} != NULL{$lengthNameCon})
+{$clientIndent}    {
+{$addIndent(clientIndent & "        ", param.coderCall.decode(param.coderCall))}
+        }
+{%   else -- notNullable %}
+{$addIndent(clientIndent & "    ", param.coderCall.decode(param.coderCall))}
+{%   endif -- isNullable %}
+{%  endfor -- fn parametersToClient %}
+{%  if fn.returnValue.type.isNotVoid %}
+
+{%   if fn.returnValue.isNullable %}
+{$clientIndent}    bool isNull;
+{$addIndent(clientIndent & "    ", f_paramIsNullableDecode(fn.returnValue))}
+{%   else -- isNullable %}
+{$> addIndent(clientIndent & "    ", allocMem(fn.returnValue.firstAlloc))}
+{$addIndent(clientIndent & "    ", fn.returnValue.coderCall.decode(fn.returnValue.coderCall))}
+{%   endif -- isNullable %}
+{%  endif -- isNotVoid %}
+{% endif -- isReturnValue %}
+{% if generateErrorChecks %}
+
+{$clientIndent}    err = codec->getStatus();
+{% endif -- generateErrorChecks %}
+{%    if generateAllocErrorChecks %}
+    }
+{% endif -- generateAllocErrorChecks %}
+
+    // Dispose of the request.
+    mClient->releaseRequest(request);
+{% if generateErrorChecks %}
+
+    // Invoke error handler callback function
+    mClient->callErrorHandler(err, {$functionIDName});
+{% endif -- generateErrorChecks %}
+
+#if ERPC_PRE_POST_ACTION
+    pre_post_action_cb postCB = mClient->getPostCB();
+    if (postCB)
+    {
+        postCB();
+    }
+#endif
+
+{% if generateErrorChecks && fn.returnValue.type.isNotVoid %}
+{%  if empty(fn.returnValue.errorReturnValue) == false && fn.returnValue.isNullReturnType == false %}
+
+    if (err != kErpcStatus_Success)
+    {
+        result = {$fn.returnValue.errorReturnValue};
+    }
+{%  endif %}
+{% endif -- generateErrorChecks %}
+
+    return{% if fn.returnValue.type.isNotVoid %} result{% endif -- isNotVoid %};
+{% enddef --------------------------------------------------------------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
+{% for callbackType in group.callbacks %}
+// Common function for serializing and deserializing callback functions of same type.
+static {$callbackType.prototype};
+
+{% endfor %}
+{% for callbackType in group.callbacks %}
+// Common function for serializing and deserializing callback functions of same type.
+static {$callbackType.prototype}
+{
+{$ clientShimCode(callbackType, "serviceID", "functionID") >}
+}
+
+{% endfor %}
+{% for iface in group.interfaces %}
+// {$iface.name}_client constructor.
+{$iface.name}_client::{$iface.name}_client(erpc_transport_t transport, erpc_mbf_t message_buffer_factory) {
+    ManuallyConstructed<ClientManager> s_client;
+    ManuallyConstructed<BasicCodecFactory> s_codecFactory;
+    ManuallyConstructed<Crc16> s_crc16;
+    erpc_assert(transport);
+
+    Transport *castedTransport;
+
+    // Init factories.
+    s_codecFactory.construct();
+
+    // Init client manager with the provided transport.
+    s_client.construct();
+    castedTransport = reinterpret_cast<Transport *>(transport);
+    s_crc16.construct();
+    castedTransport->setCrc16(s_crc16.get());
+    s_client->setTransport(castedTransport);
+    s_client->setCodecFactory(s_codecFactory);
+    s_client->setMessageBufferFactory(reinterpret_cast<MessageBufferFactory *>(message_buffer_factory));
+    mClient = s_client;
+}
+{%  for fn in iface.functions %}
+
+// {$iface.name} interface {$fn.name} function client shim.
+{$fn.prototype}
+{
+{%   if fn.isCallback %}
+    {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id{% for param in fn.parameters %}, {$param.name}{% endfor %});
+{%   else -- fn.isCallback >%}
+{$ clientShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
+{%   endif -- fn.isCallback >%}
+}
+{%  endfor -- fn %}
+{% endfor -- iface %}
+}

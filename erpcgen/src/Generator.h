@@ -47,7 +47,8 @@ public:
     enum generator_type_t
     {
         kC,
-        kPython
+        kPython,
+        kCPP,
     }; /*!< Type of generator. */
 
     /*!

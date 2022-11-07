@@ -1550,6 +1550,10 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         {
             return Annotation::kPython;
         }
+        else if (lang.compare("cpp") == 0)
+        {
+            return Annotation::kCPP;
+        }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
                                            annotation->getToken().getFirstLine(), lang.c_str())

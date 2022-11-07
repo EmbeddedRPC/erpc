@@ -32,7 +32,8 @@ public:
     {
         kAll,
         kC,
-        kPython
+        kPython,
+        kCPP,
     };
 
     /*!

@@ -5,13 +5,16 @@ erpcgen_parser.tab.hpp
 
 # templates
 c_client_source.cpp
+cpp_client_source.cpp
 c_coders.cpp
 c_common_header.cpp
+cpp_common_header.cpp
 c_server_header.cpp
 c_server_source.cpp
 c_common_functions.cpp
 c_defines.cpp
 c_crc.cpp
+cpp_crc.cpp
 py_client.cpp
 py_coders.cpp
 py_common.cpp

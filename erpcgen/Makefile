@@ -57,6 +57,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/AstWalker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/CGenerator.cpp \
+            $(ERPC_ROOT)/erpcgen/src/CPPGenerator.cpp \
 			$(ERPC_ROOT)/erpcgen/src/PythonGenerator.cpp \
 			$(ERPC_ROOT)/erpcgen/src/erpcgen.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ErpcLexer.cpp \
@@ -72,12 +73,15 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen_lexer.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
@@ -96,12 +100,15 @@ SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_header.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
 else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_client.c \
@@ -164,6 +171,11 @@ $(OBJS_ROOT)/erpcgen_parser.tab.hpp: $(ERPC_ROOT)/erpcgen/src/erpcgen_parser.y |
 $(OBJS_ROOT)/%.c: $(ERPC_ROOT)/%.template
 	@$(call printmessage,orange,Converting, $(subst $(ERPC_ROOT)/,,$<))
 	$(at)$(mkdirc) -p $(dir $@) && $(PYTHON) $(ERPC_ROOT)/$(PYTH_SCRIPT) -o $@ $<
+
+# $(OBJS_ROOT)/cpp_%.cpp: $(ERPC_ROOT)/cpp_%.template
+# 	@$(call printmessage,orange,Converting, $(subst $(ERPC_ROOT)/,,$<))
+# 	$(at)$(mkdirc) -p $(dir $@) && $(PYTHON) $(ERPC_ROOT)/$(PYTH_SCRIPT) -o $@ $<
+
 
 .PHONY: install
 install: $(MAKE_TARGET)
