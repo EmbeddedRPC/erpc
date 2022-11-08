@@ -28,8 +28,12 @@ using namespace erpc;
 using namespace std;
 
 {$generateCrcVariable()}
-using namespace erpc;
+
 namespace saas {
+
+ERPC_MANUALLY_CONSTRUCTED(ClientManager, s_client);
+ERPC_MANUALLY_CONSTRUCTED(BasicCodecFactory, s_codecFactory);
+ERPC_MANUALLY_CONSTRUCTED(Crc16, s_crc16);
 
 {$> setSharedMemAddresses()}
 {% if unitTest %}
@@ -171,6 +175,7 @@ namespace saas {
 
     return{% if fn.returnValue.type.isNotVoid %} result{% endif -- isNotVoid %};
 {% enddef --------------------------------------------------------------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
+
 {% for callbackType in group.callbacks %}
 // Common function for serializing and deserializing callback functions of same type.
 static {$callbackType.prototype};
@@ -187,9 +192,6 @@ static {$callbackType.prototype}
 {% for iface in group.interfaces %}
 // {$iface.name}_client constructor.
 {$iface.name}_client::{$iface.name}_client(erpc_transport_t transport, erpc_mbf_t message_buffer_factory) {
-    ManuallyConstructed<ClientManager> s_client;
-    ManuallyConstructed<BasicCodecFactory> s_codecFactory;
-    ManuallyConstructed<Crc16> s_crc16;
     erpc_assert(transport);
 
     Transport *castedTransport;
@@ -200,7 +202,7 @@ static {$callbackType.prototype}
     // Init client manager with the provided transport.
     s_client.construct();
     castedTransport = reinterpret_cast<Transport *>(transport);
-    s_crc16.construct();
+    s_crc16.construct(ERPC_GENERATED_CRC);
     castedTransport->setCrc16(s_crc16.get());
     s_client->setTransport(castedTransport);
     s_client->setCodecFactory(s_codecFactory);
