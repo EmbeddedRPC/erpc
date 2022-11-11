@@ -71,11 +71,11 @@ else
 {% enddef ------------------------------- BinaryType %}
 
 {% def decodeEnumType(info) ---------------- EnumType %}
-codec->read(&_tmp_local);
+codec->read(&_tmp_local_i32);
 {% if source == "client" && info.pointerScalarTypes %}
-*{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+*{$info.name} = static_cast<{$info.enumName}>(_tmp_local_i32);
 {% else %}
-{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+{$info.name} = static_cast<{$info.enumName}>(_tmp_local_i32);
 {% endif -- pointerScalarTypes %}
 {% enddef ---------------------------------- EnumType %}
 
@@ -141,18 +141,18 @@ read_{$info.typeName}_struct(codec, {$info.name});
 {% def decodeUnionParamType(info) --------------- UnionParamType %}
 {% if info.inDataContainer %}
 {%  if info.castDiscriminator %}
-read_{$info.typeName}_union(codec, &_tmp_local, &{$info.name});
+read_{$info.typeName}_union(codec, &_tmp_local_i32, &{$info.name});
 {%   if !info.isConstant %}
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%  endif -- castDiscriminator %}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
-read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
+read_{$info.typeName}_union(codec, &_tmp_local_i32, {$info.name});
 {%   if !info.isConstant %}
-{%    if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{%    if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%   endif %}
 {%  else %}
 read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
@@ -161,9 +161,9 @@ read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "
 {% enddef -------------------------- UnionParamType %}
 
 {% def decodeUnionType(info) ---------------- %}
-codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral != "" %}&{% endif %}_tmp_local{% else %}{% if info.dataLiteral != "" %}&{$info.dataLiteral}{% endif %}{$info.discriminatorName}{% endif %});
+codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral != "" %}&{% endif %}_tmp_local_i32{% else %}{% if info.dataLiteral != "" %}&{$info.dataLiteral}{% endif %}{$info.discriminatorName}{% endif %});
 {% if info.castDiscriminator %}
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {% endif -- info.castDiscriminator %}
 switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}{$info.discriminatorName})
 {
@@ -202,15 +202,15 @@ read_{$info.sharedType}_struct_shared(codec, {$info.name});
 {%  else %}
 {%   if info.inDataContainer %}
 {%    if info.castDiscriminator %}
-read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.name});
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+read_{$info.sharedType}_union_shared(codec, &_tmp_local_i32, &{$info.name});
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%    endif -- castDiscriminator %}
 {%   else -- not inDataContainer %}
 {%    if info.castDiscriminator %}
-read_{$info.sharedType}_union_shared(codec, &_tmp_local, {$info.name});
-{%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+read_{$info.sharedType}_union_shared(codec, &_tmp_local_i32, {$info.name});
+{%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%    else %}
 read_{$info.sharedType}_union_shared(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
 {%    endif  -- castDiscriminator %}
