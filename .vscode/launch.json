@@ -27,6 +27,582 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Debug Linux test_annotations_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_annotations/Linux/tcp/gcc/test_annotations_client/Debug/test_annotations_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_annotations_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_annotations/Linux/tcp/gcc/test_annotations_server/Debug/test_annotations_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_arbitrator_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_arbitrator/Linux/tcp/gcc/test_arbitrator_client/Debug/test_arbitrator_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_arbitrator_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_arbitrator/Linux/tcp/gcc/test_arbitrator_server/Debug/test_arbitrator_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_arrays_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_arrays/Linux/tcp/gcc/test_arrays_client/Debug/test_arrays_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_arrays_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_arrays/Linux/tcp/gcc/test_arrays_server/Debug/test_arrays_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_binary_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_binary/Linux/tcp/gcc/test_binary_client/Debug/test_binary_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_binary_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_binary/Linux/tcp/gcc/test_binary_server/Debug/test_binary_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_builtin_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_builtin/Linux/tcp/gcc/test_builtin_client/Debug/test_builtin_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_builtin_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_builtin/Linux/tcp/gcc/test_builtin_server/Debug/test_builtin_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_callbacks_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_callbacks/Linux/tcp/gcc/test_callbacks_client/Debug/test_callbacks_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_callbacks_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_callbacks/Linux/tcp/gcc/test_callbacks_server/Debug/test_callbacks_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_enums_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_enums/Linux/tcp/gcc/test_enums_client/Debug/test_enums_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_enums_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_enums/Linux/tcp/gcc/test_enums_server/Debug/test_enums_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_lists_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_lists/Linux/tcp/gcc/test_lists_client/Debug/test_lists_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_lists_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_lists/Linux/tcp/gcc/test_lists_server/Debug/test_lists_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_shared_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_shared/Linux/tcp/gcc/test_shared_client/Debug/test_shared_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_shared_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_shared/Linux/tcp/gcc/test_shared_server/Debug/test_shared_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_struct_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_struct/Linux/tcp/gcc/test_struct_client/Debug/test_struct_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_struct_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_struct/Linux/tcp/gcc/test_struct_server/Debug/test_struct_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_typedef_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_typedef/Linux/tcp/gcc/test_typedef_client/Debug/test_typedef_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_typedef_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_typedef/Linux/tcp/gcc/test_typedef_server/Debug/test_typedef_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_unions_client_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_unions/Linux/tcp/gcc/test_unions_client/Debug/test_unions_client_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug Linux test_unions_server_tcp_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${cwd}/test/test_unions/Linux/tcp/gcc/test_unions_server/Debug/test_unions_server_tcp_test",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${cwd}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }
