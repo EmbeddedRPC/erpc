@@ -160,7 +160,7 @@ static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.nam
 
 {%   for mem in struct.members if (shared == "def" && not mem.serializedViaMember) || (mem.noSharedMem && shared == "noSharedMem") %}
 {%    if mem.isNullable %}
-    codec->readNullFlag(&isNull);
+    codec->readNullFlag(isNull);
     if (!isNull)
     {
 {%     if source == "server" %}
@@ -256,10 +256,10 @@ static void free_{$struct.name}_struct({$struct.name} * data)
 {% def unionDeserialHeader(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 //! @brief Function to read  no shared member of shared union {$union.name}
-static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data);
+static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t & discriminator, {$union.name} * data);
 {%   else %}
 //! @brief Function to read union {$union.name}
-static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data);
+static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t & discriminator, {$union.name} * data);
 {%   endif %}
 {% enddef -- unionDeserialHeader %}
 
@@ -278,10 +278,10 @@ static void write_{$union.name}_union(erpc::{$codecClass} * codec, int32_t discr
 {% def unionDeserialSource(union, shared) %}
 {%   if union.noSharedMem && shared == "noSharedMem" %}
 // Read no shared member of shared union {$union.name} function implementation
-static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data)
+static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t & discriminator, {$union.name} * data)
 {%   else %}
 // Read union {$union.name} function implementation
-static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data)
+static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t & discriminator, {$union.name} * data)
 {%   endif %}
 {
 {%   if union.needTempVariable %}
@@ -496,7 +496,7 @@ else
 {% enddef ------------------------------- f_paramIsNullableEncode %}
 
 {% def f_paramIsNullableDecode(param) %}
-codec->readNullFlag(&isNull);
+codec->readNullFlag(isNull);
 if (!isNull)
 {
 {% if source == "server" %}

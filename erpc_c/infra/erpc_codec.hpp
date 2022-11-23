@@ -287,91 +287,91 @@ public:
      * @param[in] sequence Returned sequence number to be sure that
      *                     received message is reply for current request.
      */
-    virtual void startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence) = 0;
+    virtual void startReadMessage(message_type_t &type, uint32_t &service, uint32_t &request, uint32_t &sequence) = 0;
 
     /*!
      * @brief Prototype for read boolean value.
      *
      * @param[in] value Boolean typed value to read.
      */
-    virtual void read(bool *value) = 0;
+    virtual void read(bool &value) = 0;
 
     /*!
      * @brief Prototype for read int8_t value.
      *
      * @param[in] value int8_t typed value to read.
      */
-    virtual void read(int8_t *value) = 0;
+    virtual void read(int8_t &value) = 0;
 
     /*!
      * @brief Prototype for read int16_t value.
      *
      * @param[in] value int16_t typed value to read.
      */
-    virtual void read(int16_t *value) = 0;
+    virtual void read(int16_t &value) = 0;
 
     /*!
      * @brief Prototype for read int32_t value.
      *
      * @param[in] value int32_t typed value to read.
      */
-    virtual void read(int32_t *value) = 0;
+    virtual void read(int32_t &value) = 0;
 
     /*!
      * @brief Prototype for read int64_t value.
      *
      * @param[in] value int64_t typed value to read.
      */
-    virtual void read(int64_t *value) = 0;
+    virtual void read(int64_t &value) = 0;
 
     /*!
      * @brief Prototype for read uint8_t value.
      *
      * @param[in] value uint8_t typed value to read.
      */
-    virtual void read(uint8_t *value) = 0;
+    virtual void read(uint8_t &value) = 0;
 
     /*!
      * @brief Prototype for read uint16_t value.
      *
      * @param[in] value uint16_t typed value to read.
      */
-    virtual void read(uint16_t *value) = 0;
+    virtual void read(uint16_t &value) = 0;
 
     /*!
      * @brief Prototype for read uint32_t value.
      *
      * @param[in] value uint32_t typed value to read.
      */
-    virtual void read(uint32_t *value) = 0;
+    virtual void read(uint32_t &value) = 0;
 
     /*!
      * @brief Prototype for read uint64_t value.
      *
      * @param[in] value uint64_t typed value to read.
      */
-    virtual void read(uint64_t *value) = 0;
+    virtual void read(uint64_t &value) = 0;
 
     /*!
      * @brief Prototype for read float value.
      *
      * @param[in] value float typed value to read.
      */
-    virtual void read(float *value) = 0;
+    virtual void read(float &value) = 0;
 
     /*!
      * @brief Prototype for read double value.
      *
      * @param[in] value double typed value to read.
      */
-    virtual void read(double *value) = 0;
+    virtual void read(double &value) = 0;
 
     /*!
      * @brief Prototype for read uintptr value.
      *
      * @param[in] value uintptr typed value to read.
      */
-    virtual void readPtr(uintptr_t *value) = 0;
+    virtual void readPtr(uintptr_t &value) = 0;
 
     /*!
      * @brief Prototype for read string value.
@@ -379,7 +379,7 @@ public:
      * @param[in] length of string.
      * @param[in] value String value to read.
      */
-    virtual void readString(uint32_t *length, char **value) = 0;
+    virtual void readString(uint32_t &length, char **value) = 0;
 
     /*!
      * @brief Prototype for read binary value.
@@ -387,28 +387,28 @@ public:
      * @param[out] length of binary. 0 can be valid value or in case of error.
      * @param[out] value Binary value to read. Null in case of error.
      */
-    virtual void readBinary(uint32_t *length, uint8_t **value) = 0;
+    virtual void readBinary(uint32_t &length, uint8_t **value) = 0;
 
     /*!
      * @brief Prototype for start read list.
      *
      * @param[in] length Length of list.
      */
-    virtual void startReadList(uint32_t *length) = 0;
+    virtual void startReadList(uint32_t &length) = 0;
 
     /*!
      * @brief Prototype for start read union.
      *
      * @param[in] discriminator Discriminator of union.
      */
-    virtual void startReadUnion(int32_t *discriminator) = 0;
+    virtual void startReadUnion(int32_t &discriminator) = 0;
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
      * @param[in] isNull Null flag to read.
      */
-    virtual void readNullFlag(bool *isNull) = 0;
+    virtual void readNullFlag(bool &isNull) = 0;
 
     /*!
      * @brief Read an callback function id and return address of callback function.

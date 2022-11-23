@@ -67,7 +67,7 @@ public:
      * @param[in] value Pointer to data stream.
      * @param[in] length Size of data stream in bytes.
      */
-    virtual void writeData(const void *value, uint32_t length);
+    virtual void writeData(uint32_t length, const void *value);
 
     /*!
      * @brief Prototype for write boolean value.
@@ -219,8 +219,8 @@ public:
      * @param[out] sequence Returned sequence number to be sure that
      *                     received message is reply for current request.
      */
-    virtual void startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request,
-                                  uint32_t *sequence) override;
+    virtual void startReadMessage(message_type_t &type, uint32_t &service, uint32_t &request,
+                                  uint32_t &sequence) override;
 
     /*!
      * @brief Prototype for read data stream.
@@ -228,91 +228,91 @@ public:
      * @param[in] value Pointer to data stream to be read.
      * @param[in] length Size of data stream in bytes to be read.
      */
-    virtual void readData(void *value, uint32_t length);
+    virtual void readData(uint32_t length, void *value);
 
     /*!
      * @brief Prototype for read boolean value.
      *
      * @param[out] value Boolean typed value to read.
      */
-    virtual void read(bool *value) override;
+    virtual void read(bool &value) override;
 
     /*!
      * @brief Prototype for read int8_t value.
      *
      * @param[out] value int8_t typed value to read.
      */
-    virtual void read(int8_t *value) override;
+    virtual void read(int8_t &value) override;
 
     /*!
      * @brief Prototype for read int16_t value.
      *
      * @param[out] value int16_t typed value to read.
      */
-    virtual void read(int16_t *value) override;
+    virtual void read(int16_t &value) override;
 
     /*!
      * @brief Prototype for read int32_t value.
      *
      * @param[out] value int32_t typed value to read.
      */
-    virtual void read(int32_t *value) override;
+    virtual void read(int32_t &value) override;
 
     /*!
      * @brief Prototype for read int64_t value.
      *
      * @param[out] value int64_t typed value to read.
      */
-    virtual void read(int64_t *value) override;
+    virtual void read(int64_t &value) override;
 
     /*!
      * @brief Prototype for read uint8_t value.
      *
      * @param[out] value uint8_t typed value to read.
      */
-    virtual void read(uint8_t *value) override;
+    virtual void read(uint8_t &value) override;
 
     /*!
      * @brief Prototype for read uint16_t value.
      *
      * @param[out] value uint16_t typed value to read.
      */
-    virtual void read(uint16_t *value) override;
+    virtual void read(uint16_t &value) override;
 
     /*!
      * @brief Prototype for read uint32_t value.
      *
      * @param[out] value uint32_t typed value to read.
      */
-    virtual void read(uint32_t *value) override;
+    virtual void read(uint32_t &value) override;
 
     /*!
      * @brief Prototype for read uint64_t value.
      *
      * @param[out] value uint64_t typed value to read.
      */
-    virtual void read(uint64_t *value) override;
+    virtual void read(uint64_t &value) override;
 
     /*!
      * @brief Prototype for read float value.
      *
      * @param[out] value float typed value to read.
      */
-    virtual void read(float *value) override;
+    virtual void read(float &value) override;
 
     /*!
      * @brief Prototype for read double value.
      *
      * @param[out] value double typed value to read.
      */
-    virtual void read(double *value) override;
+    virtual void read(double &value) override;
 
     /*!
      * @brief Prototype for read uintptr value.
      *
      * @param[out] value uintptr typed value to read.
      */
-    virtual void readPtr(uintptr_t *value) override;
+    virtual void readPtr(uintptr_t &value) override;
 
     /*!
      * @brief Prototype for read string value.
@@ -320,7 +320,7 @@ public:
      * @param[out] length of string.
      * @param[out] value String value to read.
      */
-    virtual void readString(uint32_t *length, char **value) override;
+    virtual void readString(uint32_t &length, char **value) override;
 
     /*!
      * @brief Prototype for read binary value.
@@ -328,28 +328,28 @@ public:
      * @param[out] length of binary. 0 can be valid value or in case of error.
      * @param[out] value Binary value to read. Null in case of error.
      */
-    virtual void readBinary(uint32_t *length, uint8_t **value) override;
+    virtual void readBinary(uint32_t &length, uint8_t **value) override;
 
     /*!
      * @brief Prototype for start read list.
      *
      * @param[out] length Length of list.
      */
-    virtual void startReadList(uint32_t *length) override;
+    virtual void startReadList(uint32_t &length) override;
 
     /*!
      * @brief Prototype for start read union.
      *
      * @param[in] discriminator Discriminator of union.
      */
-    virtual void startReadUnion(int32_t *discriminator) override;
+    virtual void startReadUnion(int32_t &discriminator) override;
 
     /*!
      * @brief Reads a flag indicating whether the next value is null.
      *
      * @param[in] isNull Null flag to read.
      */
-    virtual void readNullFlag(bool *isNull) override;
+    virtual void readNullFlag(bool &isNull) override;
 
     /*!
      * @brief Read an callback function id and return address of callback function.

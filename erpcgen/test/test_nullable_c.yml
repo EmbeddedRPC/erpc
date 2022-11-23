@@ -23,19 +23,19 @@ test_client.cpp:
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
-      - codec->readString(&a_len, &a_local);
+      - codec->readString(a_len, &a_local);
 test_server.cpp:
   - ::bar_shim
   - char * a = NULL;
   - bool isNull;
-  - codec->readNullFlag(&isNull)
+  - codec->readNullFlag(isNull)
   - if (!isNull)
   - if: dir in ('in', 'inout')
     then:
-      - codec->readString(&a_len, &a_local)
+      - codec->readString(a_len, &a_local)
   - if: dir == 'out'
     then:
-      - not: codec->readString(&a_len, &a_local)
+      - not: codec->readString(a_len, &a_local)
   - else
   - a = NULL;
   - if: dir in ('out', 'inout')
@@ -67,19 +67,19 @@ test_client.cpp:
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
-      - codec->readString(&a_len, &a_local);
+      - codec->readString(a_len, &a_local);
 test_server.cpp:
   - ::bar_shim
   - unsigned char* a = NULL;
   - bool isNull;
-  - codec->readNullFlag(&isNull)
+  - codec->readNullFlag(isNull)
   - if (!isNull)
   - if: dir in ('in', 'inout')
     then:
-      - codec->readString(&a_len, &a_local)
+      - codec->readString(a_len, &a_local)
   - if: dir == 'out'
     then:
-      - not: codec->readString(&a_len, &a_local)
+      - not: codec->readString(a_len, &a_local)
   - else
   - a = NULL;
   - if: dir in ('out', 'inout')
@@ -217,9 +217,9 @@ test_client.cpp:
     then:
       - void read_erpc_pair_struct
       - bool isNull;
-      - codec->readNullFlag(&isNull);
+      - codec->readNullFlag(isNull);
       - if (!isNull)
-      - codec->readString(&a_len, &a_local);
+      - codec->readString(a_len, &a_local);
       - else
       - data->a = NULL;
       - data->a = 0;
@@ -228,9 +228,9 @@ test_server.cpp:
     then:
       - void read_erpc_pair_struct
       - bool isNull;
-      - codec->readNullFlag(&isNull);
+      - codec->readNullFlag(isNull);
       - if (!isNull)
-      - codec->readString(&a_len, &a_local);
+      - codec->readString(a_len, &a_local);
       - else
       - data->a = NULL;
       - data->a = 0;
@@ -258,7 +258,7 @@ idl: |
 test_client.cpp:
   - erpc_pair * result = NULL;
   - bool isNull;
-  - codec->readNullFlag(&isNull);
+  - codec->readNullFlag(isNull);
   - if (!isNull)
 
 test_server.cpp:
@@ -286,9 +286,9 @@ test_client.cpp:
   - codec->writeNullFlag
   - not: codec->write(*param2);
   - if (param1 != NULL)
-  - codec->read(param1);
+  - codec->read(*param1);
   - if (param2 != NULL)
-  - codec->read(param2);
+  - codec->read(*param2);
 
 test_server.cpp:
   - uint32_t param1;
@@ -297,11 +297,11 @@ test_server.cpp:
   - uint32_t *_param2 = NULL;
   - bool isNull;
 
-  - codec->readNullFlag(&isNull);
-  - codec->read(&param1);
+  - codec->readNullFlag(isNull);
+  - codec->read(param1);
   - _param1 = &param1;
   - _param1 = NULL;
-  - codec->readNullFlag(&isNull);
+  - codec->readNullFlag(isNull);
   - not: codec->read(
   - _param2 = &param2;
   - _param2 = NULL;
@@ -363,9 +363,9 @@ test_client.cpp:
 test_server.cpp:
   - codec->readNullFlag
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - c = lengthTemp_0;
-  - codec->read(&l[listCount0])
+  - codec->read(l[listCount0])
   - if: ann == '@nullable' and dir == 'inout'
     then:
       - codec->readNullFlag
@@ -417,7 +417,7 @@ test_client.cpp:
     else:
       - if (l != NULL)
   - codec->startReadList
-  - codec->read(&l[listCount0])
+  - codec->read(l[listCount0])
   - if: ann == '@nullable'
     then:
       - if (c != NULL)
