@@ -19,12 +19,14 @@ import textwrap
 import errno
 import shlex
 import importlib
+import typing
 from py import path
+import pathlib
 import os
-sys.path.insert(1, 'erpc_python')
-sys.path.insert(2, '../erpc_python')
-sys.path.insert(3, '../../erpc_python')
-import erpc
+sys.path.insert(1, 'erpc_python')  # nopep8
+sys.path.insert(2, '../erpc_python')  # nopep8
+sys.path.insert(3, '../../erpc_python')  # nopep8
+import erpc  # nopep8
 
 # Handle maketrans difference between Python 2 and 3.
 try:
@@ -60,16 +62,19 @@ if sys.version_info[:2] <= (3, 5):
     raise Exception("Unsupported python version")
 else:
     create_symlink = os.symlink
-    islink = lambda link: link.islink()
+    def islink(link): return link.islink()
 
-## @brief Create directory for this test run and update 'latest' link.
+
 def create_test_run_dir():
+    # @brief Create directory for this test run and update 'latest' link.
+
     # Directory to hold the test runs.
     runs = test_dir.join(RUNS_DIR_NAME)
     runs.ensure_dir()
 
     # Unique directory for this run.
-    dir = path.local.make_numbered_dir(prefix='', rootdir=runs, keep=config.RUN_KEEP_COUNT)
+    dir = path.local.make_numbered_dir(
+        prefix='', rootdir=runs, keep=config.RUN_KEEP_COUNT)
 
     # Update link to last run.
     link = runs.join(LATEST_FILE_NAME)
@@ -77,47 +82,56 @@ def create_test_run_dir():
         link.remove()
     if not link.exists():
         reldir = runs.bestrelpath(dir)
-        rellink =  cur_dir.bestrelpath(link)
+        rellink = cur_dir.bestrelpath(link)
         create_symlink(reldir, rellink)
 
     return dir
 
-## Root test runs directory.
+
+# Root test runs directory.
 runs_dir = create_test_run_dir()
 
-## @brief Add command line options.
-def pytest_addoption(parser):
+
+def pytest_addoption(parser: pytest.Parser):
+    # @brief Add command line options.
+
     group = parser.getgroup("erpcgen")
     group.addoption('--ev', '--erpcgen-verbosity', action="store", type=int, default=0, metavar="LEVEL", dest="erpcgen_verbosity",
-        help="Set verbosity level (1-3, default 0) for erpcgen output and save to erpcgen.out file in test case directory.")
+                    help="Set verbosity level (1-3, default 0) for erpcgen output and save to erpcgen.out file in test case directory.")
     group.addoption('--el', '--erpcgen-log-execs', action="store_true", dest="erpcgen_log_execs",
-        help="Print command lines of executed tools.")
+                    help="Print command lines of executed tools.")
 
-def pytest_configure(config):
+
+def pytest_configure(config: pytest.Config):
     global pytestConfig
     pytestConfig = config
 
-## @brief Generates an ErpcgenFile for valid YAML test spec files.
-#
-# Files must start with "test" and have an extension of ".yml" to be processed.
-def pytest_collect_file(parent, path):
+
+def pytest_collect_file(file_path: pathlib.Path, path: path.local, parent: pytest.Collector):
+    # @brief Generates an ErpcgenFile for valid YAML test spec files.
+    #
+    # Files must start with "test" and have an extension of ".yml" to be processed.
+
     if path.ext == ".yml" and path.basename.startswith("test"):
         if hasattr(ErpcgenFile, "from_parent"):
-            return ErpcgenFile.from_parent(parent, fspath=path)
+            return ErpcgenFile.from_parent(parent=parent, path=file_path)
         else:
-            return ErpcgenFile(path, parent)
+            return ErpcgenFile(path=file_path, parent=parent)
 
-## @brief Implements collection of erpcgen test cases from YAML files.
-#
-# An input YAML file may contain multiple test specifications as separate top level YAML
-# documents. Each test spec may be parameterized, and results in one or more test cases.
-# The ErpcgenTestSpec class is responsible for turning test specs into test cases.
+
 class ErpcgenFile(pytest.File):
+    # @brief Implements collection of erpcgen test cases from YAML files.
+    #
+    # An input YAML file may contain multiple test specifications as separate top level YAML
+    # documents. Each test spec may be parameterized, and results in one or more test cases.
+    # The ErpcgenTestSpec class is responsible for turning test specs into test cases.
+
     def collect(self):
         verbosity = self.config.getvalue("erpcgen_verbosity")
         docs = yaml.safe_load_all(self.fspath.open())
         for n, d in enumerate(docs):
-            name = d.get('name', self.fspath.purebasename + str(n)).replace(' ', '_')
+            name = d.get('name', self.fspath.purebasename +
+                         str(n)).replace(' ', '_')
             spec = ErpcgenTestSpec(name, self.fspath, d, verbosity)
             for case in spec:
                 if hasattr(ErpcgenItem, "from_parent"):
@@ -125,16 +139,18 @@ class ErpcgenFile(pytest.File):
                 else:
                     yield ErpcgenItem(case.desc, self, case)
 
-## @brief Wraps an ErpcgenTestCase as a pytest test.
+
 class ErpcgenItem(pytest.Item):
-    def __init__(self, name, parent, case):
+    # @brief Wraps an ErpcgenTestCase as a pytest test.
+
+    def __init__(self, name: str, parent: ErpcgenFile, case: "ErpcgenTestCase"):
         super(ErpcgenItem, self).__init__(name, parent)
         self.case = case
 
     def runtest(self):
         self.case.run()
 
-    def repr_failure(self, excinfo):
+    def repr_failure(self, excinfo: pytest.ExceptionInfo):
         """ called when self.runtest() raises an exception. """
         if isinstance(excinfo.value, ErpcgenTestException):
             return excinfo.value.args[0]
@@ -144,15 +160,15 @@ class ErpcgenItem(pytest.Item):
     def reportinfo(self):
         return self.fspath, 0, "test case: " + self.parent.name + '::' + self.case.desc
 
-## @brief Double standalone single open or close braces.
-def filter_braces(text):
+
+def filter_braces(text: str):
+    # @brief Double standalone single open or close braces.
+
     result = ''
     state = 0
-    brace = ''
     for c in text:
         if state == 0:
             if c == '{':
-                brace = c
                 state = 1
             elif c == '}':
                 result += '}}'
@@ -177,12 +193,14 @@ def filter_braces(text):
         result += '{{'
     return result
 
-## @brief Wraps a call to the erpcgen tool.
-#
-# An instance of this class can be used to call erpcgen more than once.
-#
-# The ERPCGEN config variable is used for the path to the erpcgen tool.
+
 class Erpcgen(object):
+    # @brief Wraps a call to the erpcgen tool.
+    #
+    # An instance of this class can be used to call erpcgen more than once.
+    #
+    # The ERPCGEN config variable is used for the path to the erpcgen tool.
+
     def __init__(self, *args, **kwargs):
         self._path = config.ERPCGEN
         self._args = args
@@ -193,22 +211,22 @@ class Erpcgen(object):
         self._include_dirs.append(str(erpc_dir.join("erpcgen").join("test")))
         self._verbosity = 0
 
-    def set_language(self, lang):
+    def set_language(self, lang: str):
         self._language = lang
 
-    def set_input(self, path):
+    def set_input(self, path: str):
         self._input = path
 
-    def set_output(self, dir):
+    def set_output(self, dir: str):
         self._output_dir = dir
 
-    def add_include_dir(self, dir):
+    def add_include_dir(self, dir: str):
         self._include_dirs.append(dir)
 
-    def set_verbosity(self, level=1):
+    def set_verbosity(self, level: int = 1):
         self._verbosity = level
 
-    def run(self, captureOutput=False):
+    def run(self, captureOutput: bool = False):
         args = [self._path]
         if self._verbosity > 0:
             args += ["-v"] * self._verbosity
@@ -226,14 +244,18 @@ class Erpcgen(object):
             print("Calling erpcgen:", " ".join(args))
 
         # Only capture stdout.
-        proc = subprocess.Popen(args, stdout=(subprocess.PIPE if captureOutput else None))
+        proc = subprocess.Popen(args, stdout=(
+            subprocess.PIPE if captureOutput else None))
         output, _ = proc.communicate()
         if proc.returncode != 0:
-            raise subprocess.CalledProcessError(proc.returncode, " ".join(args), output)
+            raise subprocess.CalledProcessError(
+                proc.returncode, " ".join(args), output)
         return output
 
-## @brief Wraps an invocation of the C/C++ compiler (i.e., gcc or clang)
+
 class CCompiler(object):
+    # @brief Wraps an invocation of the C/C++ compiler (i.e., gcc or clang)
+
     def __init__(self, cwd=None, *args):
         self._cwd = cwd
         self._args = args
@@ -267,27 +289,32 @@ class CCompiler(object):
         else:
             subprocess.check_call(args, cwd=cwd)
 
+
 class ErpcgenTestException(Exception):
     pass
+
 
 class ErpcTestException(Exception):
     pass
 
-## @brief Handles all aspects of one test case for erpcgen.
-#
-# This class is responsible for parsing a test spec dict that was read in from a YAML file. It is
-# an iterable object that will yield one or more ErpcgenTestCase instances.
-class ErpcgenTestSpec(object):
-    ## All non-filename keys in a test spec.
-    FIXED_KEYS = ('args', 'name', 'idl', 'desc', 'params', 'lang', 'jira', 'skip', 'xfail')
 
-    ## Characters not allowed in a filename.
+class ErpcgenTestSpec(object):
+    # @brief Handles all aspects of one test case for erpcgen.
+    #
+    # This class is responsible for parsing a test spec dict that was read in from a YAML file. It is
+    # an iterable object that will yield one or more ErpcgenTestCase instances.
+
+    # All non-filename keys in a test spec.
+    FIXED_KEYS = ('args', 'name', 'idl', 'desc', 'params',
+                  'lang', 'jira', 'skip', 'xfail')
+
+    # Characters not allowed in a filename.
     BAD_FN_CHARS = '/\\:\r\n\t "<>|?*.%'
 
-    ## Translation table to replace illegal filename characters.
+    # Translation table to replace illegal filename characters.
     BAD_FN_TABLE = maketrans(BAD_FN_CHARS, '_' * len(BAD_FN_CHARS))
 
-    def __init__(self, name, path, spec, verbosity=0):
+    def __init__(self, name: str, path: path.local, spec: dict[str, typing.Any], verbosity: int = 0):
         self.name = name
         self.path = path
         self.spec = spec
@@ -302,24 +329,28 @@ class ErpcgenTestSpec(object):
         self.case_names = []
         self.case_count = 0
 
-    ## @brief Set up values used to generate all test cases for this spec.
     def _prepare(self):
+        # @brief Set up values used to generate all test cases for this spec.
+
         # Get the path for this spec in the run directory.
         self.test_dir = runs_dir.join(self.path.purebasename, self.name)
 
         # Extract a dict of output file names and test patterns.
-        self.tests = {k:v for k,v in self.spec.items() if k not in self.FIXED_KEYS}
+        self.tests = {k: v for k, v in self.spec.items()
+                      if k not in self.FIXED_KEYS}
 
         # Generate parameter permutations.
         self.perms = None
         try:
             params = self.spec['params']
             if params is not None:
-                assert isinstance(params, dict), "test spec params must be a dictionary (spec {})".format(self.path)
+                assert isinstance(
+                    params, dict), "test spec params must be a dictionary (spec {})".format(self.path)
 
                 # Ensure all param values are lists.
-                for k,v in params.items():
-                    assert v is not None, "param '{}' must have at least one value (spec {})".format(k, self.path)
+                for k, v in params.items():
+                    assert v is not None, "param '{}' must have at least one value (spec {})".format(
+                        k, self.path)
                     if not isinstance(v, list):
                         params[k] = [v]
 
@@ -332,7 +363,8 @@ class ErpcgenTestSpec(object):
                 #
                 # Input:    params = [ {'foo' : [1, 2, 3]}, {'bar', ['a', 'b']} ]
                 # Output:   prod =   [ [('foo',1), ('bar':'a')], [('foo',1),('bar','b')], ...]
-                prod = itertools.product(*[[(k, v) for v in l] for k,l in params.items()])
+                prod = itertools.product(
+                    *[[(k, v) for v in l] for k, l in params.items()])
 
                 # Convert the permutations back into a list of dicts.
                 #
@@ -347,8 +379,9 @@ class ErpcgenTestSpec(object):
             # No params key. Not an error.
             pass
 
-    ## @brief Generator that yields ErpcgenTestCase objects.
     def __iter__(self):
+        # @brief Generator that yields ErpcgenTestCase objects.
+
         self._prepare()
 
         if self.perms is None:
@@ -367,10 +400,11 @@ class ErpcgenTestSpec(object):
 
                 yield ErpcgenTestCase(self, caseName, idl, tests, caseDir, perm)
 
-    ## @brief Generate a unique name for a parametrized test.
-    def _get_parametrized_name(self, perm):
+    def _get_parametrized_name(self, perm: dict[str, typing.Any]):
+        # @brief Generate a unique name for a parametrized test.
+
         name = ''
-        for n,k in enumerate(perm.keys()):
+        for n, k in enumerate(perm.keys()):
             v = perm[k]
 
             # Convert parameter value to a short string. If the value is a list or dict, then
@@ -396,28 +430,31 @@ class ErpcgenTestSpec(object):
 
         return name
 
-    ## @brief Substitute params into test patterns.
-    def _get_parametrized_tests(self, perm):
+    def _get_parametrized_tests(self, perm: dict[str, typing.Any]):
+        # @brief Substitute params into test patterns.
+
         def do_pat(pattern):
             if isinstance(pattern, list):
                 return [do_pat(p) for p in pattern if p is not None]
             elif isinstance(pattern, dict):
                 # 're' and 'not_re' regex patterns don't have braces filtered.
-                pattern = {k:(do_pat(v) if ('re' not in k) else v.format(**perm))
-                                for k,v in pattern.items()}
+                pattern = {k: (do_pat(v) if ('re' not in k) else v.format(**perm))
+                           for k, v in pattern.items()}
                 return pattern
             else:
                 return filter_braces(pattern).format(**perm)
 
-        return {filename:do_pat(patterns) for filename, patterns in self.tests.items() if patterns is not None}
+        return {filename: do_pat(patterns) for filename, patterns in self.tests.items() if patterns is not None}
 
     @property
     def desc(self):
         return self.name
 
-## @brief Base class for compile tests.
+
 class ErpcgenCompileTest(object):
-    def __init__(self, spec, name, caseDir, outDir):
+    # @brief Base class for compile tests.
+
+    def __init__(self, spec: ErpcgenTestSpec, name: str, caseDir: str, outDir: str):
         self._spec = spec
         self._name = name
         self._case_dir = caseDir
@@ -426,19 +463,21 @@ class ErpcgenCompileTest(object):
     def run(self):
         pass
 
-## @brief Tests that generated C code will compile successfully.
-#
-# An objects directory is created under the test case directory. It is used to hold the
-# .o files written by the compiler. A .c file with the main() function is also written to
-# the objects directory.
+
 class ErpcgenCCompileTest(ErpcgenCompileTest):
+    # @brief Tests that generated C code will compile successfully.
+    #
+    # An objects directory is created under the test case directory. It is used to hold the
+    # .o files written by the compiler. A .c file with the main() function is also written to
+    # the objects directory.
+
     MAIN_CODE = textwrap.dedent("""
         int main(void) {
             return 0;
         }
         """)
 
-    def __init__(self, spec, name, caseDir, outDir):
+    def __init__(self, spec: ErpcgenTestSpec, name: str, caseDir: str, outDir: str):
         super(ErpcgenCCompileTest, self).__init__(spec, name, caseDir, outDir)
         self._objs_dir = caseDir.mkdir(OBJECTS_DIR_NAME)
         self._compiler = CCompiler(self._objs_dir)
@@ -460,7 +499,8 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
                 self._compiler.add_source(self._out_dir.join(file))
 
         # Add all header includes into main code
-        headers = ['#include "'+f+'"' for f in os.listdir(str(self._out_dir)) if '.h' in f]
+        headers = ['#include "'+f +
+                   '"' for f in os.listdir(str(self._out_dir)) if '.h' in f]
         self.MAIN_CODE = '\n'.join(headers) + self.MAIN_CODE
 
         # Add both .c and .cpp copies of the main file.
@@ -472,13 +512,16 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
         # Run the compiler.
         self._compiler.run()
 
-## @brief Tests that generated Python code can be successfully compiled.
-#
-# The generated Python package is loaded. Then the modules within the package are loaded
-# successively. Loaded modules are not added into sys.modules.
+
 class ErpcgenPythonCompileTest(ErpcgenCompileTest):
+    # @brief Tests that generated Python code can be successfully compiled.
+    #
+    # The generated Python package is loaded. Then the modules within the package are loaded
+    # successively. Loaded modules are not added into sys.modules.
+
     def _load_module(self, moduleName, fileName, dir):
-        spec = importlib.util.spec_from_file_location(moduleName, os.path.join(dir, fileName))
+        spec = importlib.util.spec_from_file_location(
+            moduleName, os.path.join(dir, fileName))
         mod = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = mod
         spec.loader.exec_module(mod)
@@ -486,14 +529,16 @@ class ErpcgenPythonCompileTest(ErpcgenCompileTest):
 
     def run(self):
         # List all available packages.
-        pkgNames = [f for f in os.listdir(str(self._out_dir)) if os.path.isdir(f)]
+        pkgNames = [f for f in os.listdir(
+            str(self._out_dir)) if os.path.isdir(f)]
 
         for pkgName in pkgNames:
             # Load generated package.
             pkg = self._load_module("test", "__init__.py", self._out_dir)
 
             # Load modules in the package.
-            packageDir = os.path.join(path.local(pkg.__path__[0]), pkg.__name__)
+            packageDir = os.path.join(
+                path.local(pkg.__path__[0]), pkg.__name__)
             pkg = self._load_module("testAll", "__init__.py", packageDir)
 
             (pkg.interface is not None)
@@ -501,18 +546,20 @@ class ErpcgenPythonCompileTest(ErpcgenCompileTest):
             (pkg.client is not None)
             (pkg.server is not None)
 
-## @brief A fully parameterized test case.
-#
-# Handles actually executing the test. The values passed into the constructor are already
-# parametrized. This includes the IDL and output file test patterns.
-class ErpcgenTestCase(object):
-    ## Map of language names to compilation test classes.
-    COMPILE_TEST_CLASSES = {
-            'c' :   ErpcgenCCompileTest,
-            'py' :  ErpcgenPythonCompileTest,
-        }
 
-    def __init__(self, spec, name, idl, tests, caseDir, params):
+class ErpcgenTestCase(object):
+    # @brief A fully parameterized test case.
+    #
+    # Handles actually executing the test. The values passed into the constructor are already
+    # parametrized. This includes the IDL and output file test patterns.
+
+    # Map of language names to compilation test classes.
+    COMPILE_TEST_CLASSES = {
+        'c':   ErpcgenCCompileTest,
+        'py':  ErpcgenPythonCompileTest,
+    }
+
+    def __init__(self, spec: ErpcgenTestSpec, name: str, idl: str, tests: dict[str, typing.Any], caseDir: str, params: dict[str, typing.Any]):
         self._spec = spec
         self._name = name
         self._idl = idl
@@ -524,7 +571,8 @@ class ErpcgenTestCase(object):
         self._out_dir = caseDir.join(OUTPUT_DIR_NAME)
 
         # Create erpcgen instance.
-        erpcgen = Erpcgen(*self._spec.args,  output=str(self._out_dir), input=str(self._idl_path))
+        erpcgen = Erpcgen(*self._spec.args,
+                          output=str(self._out_dir), input=str(self._idl_path))
         if self._spec.lang is not None:
             erpcgen.set_language(self._spec.lang)
         if self._spec.verbosity:
@@ -541,7 +589,8 @@ class ErpcgenTestCase(object):
         # Run erpcgen.
         try:
             try:
-                output = self._erpcgen.run(captureOutput=(self._spec.verbosity > 0))
+                output = self._erpcgen.run(
+                    captureOutput=(self._spec.verbosity > 0))
             except subprocess.CalledProcessError as e:
                 output = e.output
                 raise
@@ -557,20 +606,22 @@ class ErpcgenTestCase(object):
 
         # Run through compiler.
         try:
-            compileTestClass = self.COMPILE_TEST_CLASSES.get(self._spec.lang, None)
+            compileTestClass = self.COMPILE_TEST_CLASSES.get(
+                self._spec.lang, None)
             if compileTestClass is not None:
-                compileTestClass(self._spec, self._name, self._case_dir, self._out_dir).run()
+                compileTestClass(self._spec, self._name,
+                                 self._case_dir, self._out_dir).run()
         except:
             traceback.print_exc()
             raise
 
-    def _get_line(self, pos):
+    def _get_line(self, pos: int):
         return self._contents.count(os.linesep, 0, pos) + 1
 
-    def _get_column(self, pos):
+    def _get_column(self, pos: int):
         return pos - self._contents.rfind(os.linesep, 0, pos)
 
-    def _test_file(self, filename, tests):
+    def _test_file(self, filename: str, tests: list[typing.Union[dict[str, typing.Any], str]]):
         # Skip files listed with no patterns.
         if tests is None:
             return
@@ -578,7 +629,8 @@ class ErpcgenTestCase(object):
         self._filename = filename
         filepath = self._out_dir.join(filename)
         if not filepath.isfile():
-            raise ErpcgenTestException("test specifies invalid file: " + filename)
+            raise ErpcgenTestException(
+                "test specifies invalid file: " + filename)
         self._contents = filepath.read()
 
         self._pos = 0
@@ -591,7 +643,7 @@ class ErpcgenTestCase(object):
         if self._not_cases:
             self._test_nots(len(self._contents))
 
-    def _test_cases(self, tests):
+    def _test_cases(self, tests: list[typing.Union[dict[str, typing.Any], str]]):
         # Skip empty pattern lists.
         if tests is None:
             return
@@ -613,23 +665,26 @@ class ErpcgenTestCase(object):
                 # Single pattern.
                 self._test_one_case(case)
 
-    def _test_if_cases(self, case):
+    def _test_if_cases(self, case: typing.Union[dict[str, typing.Any], str]):
         ifPredicate = case['if']
         thenCases = case['then']
 
         if eval(ifPredicate, self._params):
-            print("File '{}':{} matched if predicate '{}'".format(self._filename, self._get_line(self._pos), ifPredicate))
+            print("File '{}':{} matched if predicate '{}'".format(
+                self._filename, self._get_line(self._pos), ifPredicate))
             self._test_cases(thenCases)
         elif 'else' in case:
-            print("File '{}':{} taking else branch for if predicate '{}'".format(self._filename, self._get_line(self._pos), ifPredicate))
+            print("File '{}':{} taking else branch for if predicate '{}'".format(
+                self._filename, self._get_line(self._pos), ifPredicate))
             self._test_cases(case['else'])
 
-    def _test_one_case(self, case):
+    def _test_one_case(self, case: typing.Union[dict[str, typing.Any], str]):
         # Get the pattern from the case and determine if it's a regular expression.
         isRegex = False
         if isinstance(case, dict):
             if len(case) > 1:
-                raise ErpcgenTestException("regular expression pattern dict must have only one 're' key")
+                raise ErpcgenTestException(
+                    "regular expression pattern dict must have only one 're' key")
             pattern = case['re']
             isRegex = True
         else:
@@ -637,7 +692,8 @@ class ErpcgenTestCase(object):
 
         # Make sure we haven't hit the end of the file with more patterns to match.
         if self._pos >= len(self._contents):
-            raise ErpcTestException("unmatched patterns at end of file {}".format(self._filename))
+            raise ErpcTestException(
+                "unmatched patterns at end of file {}".format(self._filename))
 
         # Print a newline to break after py.test prints the test case name.
         if self._is_first:
@@ -652,17 +708,20 @@ class ErpcgenTestCase(object):
         match = rx.search(self._contents, self._pos)
 
         if not match:
-            print("File '{}':{} FAILED to find pattern '{}'".format(self._filename, self._get_line(self._pos), pattern))
-            raise ErpcgenTestException("file '{}' failed to match against pattern '{!s}' from {}. line".format(self._filename, pattern, self._get_line(self._pos)))
+            print("File '{}':{} FAILED to find pattern '{}'".format(
+                self._filename, self._get_line(self._pos), pattern))
+            raise ErpcgenTestException("file '{}' failed to match against pattern '{!s}' from {}. line".format(
+                self._filename, pattern, self._get_line(self._pos)))
         else:
             self._pos = match.end()
-            print("File '{}':{} found pattern '{}' at column {}".format(self._filename, self._get_line(self._pos), pattern, self._get_column(match.start())))
+            print("File '{}':{} found pattern '{}' at column {}".format(
+                self._filename, self._get_line(self._pos), pattern, self._get_column(match.start())))
 
         # Match not cases now that we have an end range for them.
         if self._not_cases:
             self._test_nots(match.start())
 
-    def _test_nots(self, endPos):
+    def _test_nots(self, endPos: int):
         pos = self._not_start_pos
 
         for case in self._not_cases:
@@ -679,10 +738,13 @@ class ErpcgenTestCase(object):
             rx = re.compile(pattern, re.MULTILINE)
             match = rx.search(self._contents, pos, endPos)
             if match:
-                print("File '{}':{} FAILED unexpectedly found pattern '{}'".format(self._filename, self._get_line(self._pos), pattern))
-                raise ErpcgenTestException("file '{}' unexpected matched pattern '{!s}' from at {}. line".format(self._filename, pattern, self._get_line(pos)))
+                print("File '{}':{} FAILED unexpectedly found pattern '{}'".format(
+                    self._filename, self._get_line(self._pos), pattern))
+                raise ErpcgenTestException("file '{}' unexpected matched pattern '{!s}' from at {}. line".format(
+                    self._filename, pattern, self._get_line(pos)))
             else:
-                print("File '{}':{}-{} passed negative search for '{}'".format(self._filename, self._get_line(pos), self._get_line(endPos), pattern))
+                print("File '{}':{}-{} passed negative search for '{}'".format(
+                    self._filename, self._get_line(pos), self._get_line(endPos), pattern))
 
         # Reset not cases.
         self._not_cases = []
@@ -692,20 +754,24 @@ class ErpcgenTestCase(object):
     def desc(self):
         return self._spec.desc + '::' + self._name
 
-# Verify that erpcgen and the compiler are available.
+
 def verify_tools():
-    def handle_err(e, toolName, expectedPath, envName):
+    # Verify that erpcgen and the compiler are available.
+
+    def handle_err(e: Exception, toolName: str, expectedPath: str, envName: str):
         if isinstance(e, OSError):
             if e.errno == errno.ENOENT:
                 print("Error: {} executable cannot be found.".format(toolName))
                 print("Expected {} path: {}".format(toolName, expectedPath))
-                print("To change the {} path, set the {} environment variable or create a config_local.py.".format(toolName, envName))
+                print("To change the {} path, set the {} environment variable or create a config_local.py.".format(
+                    toolName, envName))
                 print("See readme.txt for more information.")
             else:
                 print("Fatal error: OS error when verifying {} is available. [errno {}]: {}".format(toolName,
-                    e.errno, os.strerror(e.errno)))
+                                                                                                    e.errno, os.strerror(e.errno)))
         elif isinstance(e, subprocess.CalledProcessError):
-            print("Fatal error: failure when verifying {} is available (error code {}).".format(toolName, e.returncode))
+            print("Fatal error: failure when verifying {} is available (error code {}).".format(
+                toolName, e.returncode))
             print("Output:")
             print(e.output)
         sys.exit(1)
@@ -720,5 +786,6 @@ def verify_tools():
             CCompiler(None, "--version").run(captureOutput=True)
         except (OSError, subprocess.CalledProcessError) as e:
             handle_err(e, "compiler", config.CC, "CC")
+
 
 verify_tools()
