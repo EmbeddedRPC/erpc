@@ -4,20 +4,34 @@ uint32_t {$info.stringLocalName}_len;
 char * {$info.stringLocalName}_local;
 codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
-{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
-{%   if generateAllocErrorChecks == true %}
-if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
+{%  if info.stringAllocSize != info.stringLocalName + "_len" %}
+if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
 {
-    codec->updateStatus(kErpcStatus_MemoryError);
+{%   set indent = "    " >%}
+{% else %}
+{%   set indent = "" >%}
+{% endif  -- if info.stringAllocSize != info.stringLocalName + "_len" %}
+{$indent}{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
+{%   if generateAllocErrorChecks == true %}
+{$indent}if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
+{$indent}{
+{$indent}    codec->updateStatus(kErpcStatus_MemoryError);
+{$indent}}
+{$indent}else
+{$indent}{
+{%   endif -- generateAllocErrorChecks == true %}
+{%  endif -- withoutAlloc %}
+{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}        {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
+{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}        {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
+{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}
+{$indent}}
+{%  if info.stringAllocSize != info.stringLocalName + "_len" %}
 }
 else
 {
-{%   endif -- generateAllocErrorChecks == true %}
-{%  endif -- withoutAlloc %}
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}
+    codec->updateStatus(kErpcStatus_Fail);
 }
+{% endif  -- if info.stringAllocSize != info.stringLocalName + "_len" %}
 {%  endif -- withoutAlloc && generateAllocErrorChecks %}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
