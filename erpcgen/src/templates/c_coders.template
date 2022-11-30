@@ -3,7 +3,6 @@
 uint32_t {$info.stringLocalName}_len;
 char * {$info.stringLocalName}_local;
 codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
-{%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
 {%  if info.stringAllocSize != info.stringLocalName + "_len" %}
 if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
 {
@@ -11,6 +10,7 @@ if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
 {% else %}
 {%   set indent = "" >%}
 {% endif  -- if info.stringAllocSize != info.stringLocalName + "_len" %}
+{%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
 {$indent}{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {%   if generateAllocErrorChecks == true %}
 {$indent}if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
@@ -21,18 +21,18 @@ if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
 {$indent}{
 {%   endif -- generateAllocErrorChecks == true %}
 {%  endif -- withoutAlloc %}
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}        {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}        {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
+{$indent}{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
+{$indent}{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
 {%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}
 {$indent}}
+{%  endif -- withoutAlloc && generateAllocErrorChecks %}
 {%  if info.stringAllocSize != info.stringLocalName + "_len" %}
 }
 else
 {
-    codec->updateStatus(kErpcStatus_Fail);
+    codec->updateStatus(kErpcStatus_InvalidArgument);
 }
 {% endif  -- if info.stringAllocSize != info.stringLocalName + "_len" %}
-{%  endif -- withoutAlloc && generateAllocErrorChecks %}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->read({$info.name});
@@ -79,7 +79,7 @@ if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 }
 else
 {
-    codec->updateStatus(kErpcStatus_Fail);
+    codec->updateStatus(kErpcStatus_InvalidArgument);
 }
 {% endif %}
 {% enddef ------------------------------- BinaryType %}
@@ -242,7 +242,21 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 {# Encode sending data #}
 {% def encodeBuiltinType(info) -----------------  %}
 {% if info.builtinType == "kStringType" %}
-codec->writeString(strlen((const char*){$info.name}), (const char*){$info.name});
+uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
+{% if info.stringAllocSize != info.stringLocalName + "_len"  %}
+
+{% if source == "server" %}
+erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
+
+{%  else %}
+if ({$info.stringAllocSize} <  {$info.stringLocalName}_len)
+{
+    codec->updateStatus(kErpcStatus_InvalidArgument);
+}
+
+{% endif %}
+{% endif %}
+codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->write(*{$info.name});
@@ -253,8 +267,17 @@ codec->write({$info.name});
 {% enddef --------------------------------------- BuiltinType %}
 
 {% def encodeBinaryType(info) -----------------  %}
-{% if source == "server" && info.size != info.maxSize %}
+{% if info.size != info.maxSize %}
+{% if source == "server" %}
 erpc_assert({$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
+
+{%  else %}
+if ({% if info.pointerScalarTypes %}*{% endif %}{$info.size} > {$info.maxSize})
+{
+    codec->updateStatus(kErpcStatus_InvalidArgument);
+}
+
+{% endif %}
 {% endif %}
 codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
