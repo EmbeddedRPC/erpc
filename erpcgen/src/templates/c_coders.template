@@ -248,16 +248,8 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
     uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
 {% if info.stringAllocSize != info.stringLocalName & "_len"  %}
 
-{% if source == "server" %}
     erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
 
-{%  else %}
-    if ({$info.stringAllocSize} <  {$info.stringLocalName}_len)
-    {
-        codec->updateStatus(kErpcStatus_InvalidArgument);
-    }
-
-{% endif %}
 {% endif %}
     codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
 }
@@ -272,16 +264,8 @@ codec->write({$info.name});
 
 {% def encodeBinaryType(info) -----------------  %}
 {% if info.sizeTemp != info.maxSize %}
-{% if source == "server" %}
-erpc_assert({$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
+erpc_assert({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
 
-{%  else %}
-if ({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} > {$info.maxSize})
-{
-    codec->updateStatus(kErpcStatus_InvalidArgument);
-}
-
-{% endif %}
 {% endif %}
 codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
