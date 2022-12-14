@@ -246,10 +246,9 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 {% if info.builtinType == "kStringType" %}
 {
     uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
+
 {% if info.stringAllocSize != info.stringLocalName & "_len"  %}
-
     erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
-
 {% endif %}
     codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
 }
@@ -265,7 +264,6 @@ codec->write({$info.name});
 {% def encodeBinaryType(info) -----------------  %}
 {% if info.sizeTemp != info.maxSize %}
 erpc_assert({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
-
 {% endif %}
 codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}
