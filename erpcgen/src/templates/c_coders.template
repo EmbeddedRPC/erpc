@@ -249,6 +249,7 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 
 {% if info.stringAllocSize != info.stringLocalName & "_len"  %}
     erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
+
 {% endif %}
     codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
 }
