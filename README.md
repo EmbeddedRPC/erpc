@@ -6,6 +6,26 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/EmbeddedRPC/erpc/pulls)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EmbeddedRPC/erpc)
 
+- [eRPC](#erpc)
+  - [About](#about)
+  - [Releases](#releases)
+    - [Edge releases](#edge-releases)
+  - [Documentation](#documentation)
+  - [Examples](#examples)
+  - [References](#references)
+  - [Directories](#directories)
+  - [Building and installing](#building-and-installing)
+    - [Requirements](#requirements)
+      - [Windows](#windows)
+      - [Linux and Cygwin](#linux-and-cygwin)
+      - [Mac OS X](#mac-os-x)
+    - [Building](#building)
+    - [Installing for Python](#installing-for-python)
+  - [Known issues and limitations](#known-issues-and-limitations)
+  - [Code providing](#code-providing)
+
+## About
+
 eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems and heterogeneous multicore SoCs.
 
 Unlike other modern RPC systems, such as the excellent [Apache Thrift](http://thrift.apache.org), eRPC distinguishes itself by being designed for tightly coupled systems, using plain C for remote functions, and having a small code size (<5kB). It is not intended for high performance distributed systems over a network.
@@ -82,7 +102,7 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the [LICENSE f
 
 [eRPC releases](https://github.com/EmbeddedRPC/erpc/releases)
 
-### edge releases
+### Edge releases
 
 Edge releases can by found on [eRPC CircleCI](https://app.circleci.com/pipelines/github/EmbeddedRPC/erpc) webpage. Choose build of interest, then platform target and choose ARTIFACTS tab. Here you can find binary application from chosen build.
 
