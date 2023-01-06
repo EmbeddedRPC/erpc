@@ -82,6 +82,10 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the [LICENSE f
 
 [eRPC releases](https://github.com/EmbeddedRPC/erpc/releases)
 
+### edge releases
+
+Edge releases can by found on [eRPC CircleCI](https://app.circleci.com/pipelines/github/EmbeddedRPC/erpc) webpage. Choose build of interest, then platform target and choose ARTIFACTS tab. Here you can find binary application from chosen build.
+
 ## Documentation
 
 [Documentation](https://github.com/EmbeddedRPC/erpc/wiki) is in the `wiki` section.
