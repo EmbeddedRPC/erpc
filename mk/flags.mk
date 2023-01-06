@@ -60,15 +60,14 @@ else
     ARFLAGS = -rcs
 endif
 
-ifeq "$(build)" "debug"
-    DEBUG_OR_RELEASE := Debug
-    CFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
-    CXXFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
-    LDFLAGS +=
-else
+ifeq "$(build)" "release"
     DEBUG_OR_RELEASE := Release
     CFLAGS += -Os -DNDEBUG
     CXXFLAGS += -Os -DNDEBUG
+else
+    DEBUG_OR_RELEASE := Debug
+    CFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
+    CXXFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
 endif
 
 ifneq "$(is_mingw)" "1"
