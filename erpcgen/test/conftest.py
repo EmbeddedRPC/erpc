@@ -237,7 +237,8 @@ class CCompiler(object):
     def __init__(self, cwd=None, *args):
         self._cwd = cwd
         self._args = args
-        self._path = config.CC
+        self._pathCC = config.CC
+        self._pathCXX = config.CXX
         self._includes = []
         self._sources = []
 
@@ -248,24 +249,40 @@ class CCompiler(object):
         self._sources.append(path)
 
     def run(self, captureOutput=False):
-        # Enable all warnings except for unused functions.
-        args = [self._path, "-c", "-Wall", "-Werror", "-Wno-unused-function"]
-        args += self._args
+        def _run(cwd, captureOutput, pytestConfig, args, compilerType):
+            if pytestConfig and pytestConfig.getvalue("erpcgen_log_execs"):
+                print(f"Calling {compilerType} compiler:", " ".join(args))
 
+            cwd = str(cwd) if cwd is not None else None
+            if captureOutput:
+                return subprocess.check_output(args, cwd=cwd)
+            else:
+                subprocess.check_call(args, cwd=cwd)
+                return None
+
+        # Enable all warnings except for unused functions.
+        defaultArgs =  ["-c", "-Wall", "-Werror", "-Wno-unused-function"]
+        defaultArgs += self._args
+        argsCC = [self._pathCC, "-std=gnu11"] + defaultArgs
+        argsCXX = [self._pathCXX, "-std=gnu++11"] + defaultArgs
+
+        incl = []
         for i in self._includes:
-            args += ["-I", str(i)]
+            incl += ["-I", str(i)]
+
+        argsCXX+=incl
+        argsCC+=incl
 
         for s in self._sources:
-            args.append(str(s))
+            if str(s).split(".")[-1] == "cpp":
+                argsCXX.append(str(s))
+            else:
+                argsCC.append(str(s))
 
-        if pytestConfig and pytestConfig.getvalue("erpcgen_log_execs"):
-            print("Calling C/C++ compiler:", " ".join(args))
+        output = [_run(self._cwd, captureOutput, pytestConfig, argsCC, "C")]
+        output.append(_run(self._cwd, captureOutput, pytestConfig, argsCXX, "CXX"))
 
-        cwd = str(self._cwd) if self._cwd is not None else None
-        if captureOutput:
-            return subprocess.check_output(args, cwd=cwd)
-        else:
-            subprocess.check_call(args, cwd=cwd)
+        return output
 
 class ErpcgenTestException(Exception):
     pass
@@ -694,12 +711,12 @@ class ErpcgenTestCase(object):
 
 # Verify that erpcgen and the compiler are available.
 def verify_tools():
-    def handle_err(e, toolName, expectedPath, envName):
+    def handle_err(e, toolName, expectedPathCC, envNameCC, expectedPathCXX, envNameCXX):
         if isinstance(e, OSError):
             if e.errno == errno.ENOENT:
                 print("Error: {} executable cannot be found.".format(toolName))
-                print("Expected {} path: {}".format(toolName, expectedPath))
-                print("To change the {} path, set the {} environment variable or create a config_local.py.".format(toolName, envName))
+                print("Expected {} paths: {} and {}".format(toolName, expectedPathCC, expectedPathCXX))
+                print("To change the {} path, set the {} and/or {} environment variable or create a config_local.py.".format(toolName, envNameCC, envNameCXX))
                 print("See readme.txt for more information.")
             else:
                 print("Fatal error: OS error when verifying {} is available. [errno {}]: {}".format(toolName,
@@ -719,6 +736,6 @@ def verify_tools():
         try:
             CCompiler(None, "--version").run(captureOutput=True)
         except (OSError, subprocess.CalledProcessError) as e:
-            handle_err(e, "compiler", config.CC, "CC")
+            handle_err(e, "compiler", config.CC, "CC", config.CXX, "CXX")
 
 verify_tools()

@@ -36,6 +36,10 @@ if 'CC' in os.environ:
     CC = os.environ['CC']
 else:
     CC = 'gcc'
+if 'CXX' in os.environ:
+    CXX = os.environ['CXX']
+else:
+    CXX = 'g++'
 
 # Number of test runs to keep.
 RUN_KEEP_COUNT = 3
