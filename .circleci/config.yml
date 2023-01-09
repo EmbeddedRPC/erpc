@@ -3,7 +3,8 @@ version: 2.1
 jobs:
   build-linux-gcc:
     machine:
-      image: ubuntu-2004:202111-02
+      image: ubuntu-2004:202111-02 # https://circleci.com/developer/machine/image/ubuntu-2004
+    resource_class: medium
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
@@ -12,7 +13,8 @@ jobs:
           path: ./Release/Linux/erpcgen/erpcgen
   build-linux-clang:
     machine:
-      image: ubuntu-2004:202111-02
+      image: ubuntu-2004:202111-02 # https://circleci.com/developer/machine/image/ubuntu-2004
+    resource_class: medium
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
@@ -21,18 +23,24 @@ jobs:
           path: ./Release/Linux/erpcgen/erpcgen
   build-mac-gcc:
     macos:
-      xcode: 13.2.1
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    resource_class: medium
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
       - run: chmod u+x run_tests.sh && ./run_tests.sh
+      - store_artifacts:
+          path: ./Release/Darwin/erpcgen/erpcgen
   build-mac-clang:
     macos:
-      xcode: 13.2.1
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    resource_class: medium
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
       - run: chmod u+x run_tests.sh && ./run_tests.sh clang
+      - store_artifacts:
+          path: ./Release/Darwin/erpcgen/erpcgen
 
 
 workflows:
@@ -40,7 +48,5 @@ workflows:
     jobs:
       - build-linux-gcc
       - build-linux-clang
-      # - build-mac-gcc # Mac is on going, or it can be hosted on company computer.
-      # - build-mac-clang
-
-# VS Code Extension Version: 1.5.1
+      - build-mac-gcc
+      - build-mac-clang

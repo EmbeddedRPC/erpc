@@ -21,11 +21,11 @@ Linux*)
 Darwin*)
     echo "Mac os detected. Installing dependencies."
     brew update
-    brew install python3 bison flex -v -f 2>&1 && brew upgrade boost || true
-    curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | sudo python3
-    sudo pip install tornado
-    sudo pip install --user nose
-    sudo pip install pytest --upgrade --ignore-installed six
+    brew install python3 boost bison flex -v -f 2>&1
+    sudo pip3 install tornado
+    sudo pip3 install --user nose
+    sudo pip3 install pytest --upgrade --ignore-installed six
+    sudo pip3 install pyyaml
     ;;
 *)
     echo "Unknown or currently unsupported os: ${unameOut}"
