@@ -17,13 +17,15 @@ extern "C" {
 #define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
 #include "rpmsg_lite.h"
+#include "app_core1.h"
 #elif defined(UART)
-#include "fsl_usart_cmsis.h"
+#include "fsl_lpuart_cmsis.h"
+#include "app_core0.h"
 #elif defined(MU)
 #define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
-#endif
 #include "app_core1.h"
+#endif
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, const char *argv[]);
 #endif

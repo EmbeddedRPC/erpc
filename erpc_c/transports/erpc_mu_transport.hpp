@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 NXP
+ * Copyright 2017-2022 NXP
  * All rights reserved.
  *
  *
@@ -47,6 +47,27 @@ extern "C" {
 #else
 #define MU_REG_COUNT (MU_RR_COUNT) /*!< Count of MU tx/rx registers to be used by this transport layer */
 #endif                             /* ERPC_TRANSPORT_MU_USE_MCMGR */
+
+#if (defined(CPU_MIMXRT1189AVM8A_cm7) || defined(CPU_MIMXRT1189CVM8A_cm7) || defined(CPU_MIMXRT1189CVM8A_cm7) || \
+     defined(CPU_MIMXRT1189AVM8A_cm33) || defined(CPU_MIMXRT1189CVM8A_cm33) || defined(CPU_MIMXRT1189CVM8A_cm33))
+#define MU_TX_SHIFT (1UL << (MU_REG_COUNT - 1U))
+#define MU_RX_SHIFT (1UL << (MU_REG_COUNT - 1U))
+#define MU_RX_INTR_MASK (MU_RX_INTR(MU_RX_SHIFT))
+#define MU_TX_INTR_MASK (MU_TX_INTR(MU_TX_SHIFT))
+#define MU_IS_TX_EMPTY_FLAG_SET (0U != (transport->m_muBase->TCR & MU_TX_SHIFT))
+#define MU_IS_RX_FULL_FLAG_SET (0U != (transport->m_muBase->RCR & MU_RX_SHIFT))
+#define MU_SR_TX_MASK (1UL << (20U + (MU_REG_COUNT - 1U)))
+#define MU_SR_RX_MASK (1UL << (24U + (MU_REG_COUNT - 1U)))
+#else
+#define MU_TX_SHIFT (1UL << (MU_CR_TIEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))
+#define MU_RX_SHIFT (1UL << (MU_CR_RIEn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))
+#define MU_RX_INTR_MASK (MU_RX_SHIFT)
+#define MU_TX_INTR_MASK (MU_TX_SHIFT)
+#define MU_IS_TX_EMPTY_FLAG_SET (0U != (transport->m_muBase->CR & MU_TX_SHIFT))
+#define MU_IS_RX_FULL_FLAG_SET (0U != (transport->m_muBase->CR & MU_RX_SHIFT))
+#define MU_SR_TX_MASK (1UL << (MU_SR_TEn_SHIFT + MU_TR_COUNT - MU_REG_COUNT))
+#define MU_SR_RX_MASK (1UL << (MU_SR_RFn_SHIFT + MU_RR_COUNT - MU_REG_COUNT))
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,15 +197,15 @@ protected:
      */
     void tx_cb(void);
 
-    volatile bool m_newMessage; /*!< Flag used in function hasMessage() to inform server by polling function that
-                                   message is ready for receiving */
-    uint32_t m_rxMsgSize;       /*!< Size of received message - count of bytes to must be received to complete currently
-                                   received message */
-    uint32_t m_rxCntBytes;      /*!< Count of currently received bytes of message */
+    volatile bool m_newMessage;    /*!< Flag used in function hasMessage() to inform server by polling function that
+                                      message is ready for receiving */
+    volatile uint32_t m_rxMsgSize; /*!< Size of received message - count of bytes to must be received to complete
+                             currently received message */
+    uint32_t m_rxCntBytes;         /*!< Count of currently received bytes of message */
     uint32_t *volatile m_rxBuffer; /*!< Pointer to buffer to which is copied data from MU registers during receiving */
-    uint32_t m_txMsgSize;  /*!< Size of transmitted message - count of bytes to must be transmitted to send complete
-                              message */
-    uint32_t m_txCntBytes; /*!< Count of currently received bytes of message */
+    volatile uint32_t m_txMsgSize; /*!< Size of transmitted message - count of bytes to must be transmitted to send
+                             complete message */
+    uint32_t m_txCntBytes;         /*!< Count of currently received bytes of message */
     uint32_t *volatile m_txBuffer; /*!< Pointer to buffer from which is copied data to MU registers during sending */
 
 #if !ERPC_THREADS_IS(NONE)

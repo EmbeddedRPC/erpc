@@ -91,7 +91,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 *getCrc16() { return NULL; }
+    virtual Crc16 *getCrc16(void) { return NULL; }
 };
 
 /*!

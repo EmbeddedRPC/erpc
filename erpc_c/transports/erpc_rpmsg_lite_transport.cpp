@@ -43,6 +43,7 @@ RPMsgTransport::RPMsgTransport(void)
 : RPMsgBaseTransport()
 , m_dst_addr(0)
 , m_rpmsg_ept(NULL)
+, m_crcImpl(NULL)
 {
 }
 
@@ -69,6 +70,17 @@ RPMsgTransport::~RPMsgTransport(void)
             s_initialized = 0U;
         }
     }
+}
+
+void RPMsgTransport::setCrc16(Crc16 *crcImpl)
+{
+    erpc_assert(crcImpl != NULL);
+    m_crcImpl = crcImpl;
+}
+
+Crc16 *RPMsgTransport::getCrc16(void)
+{
+    return m_crcImpl;
 }
 
 erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
@@ -146,7 +158,7 @@ erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *b
                 ready_cb();
             }
 
-            rpmsg_lite_wait_for_link_up(s_rpmsg);
+            (void)rpmsg_lite_wait_for_link_up(s_rpmsg, RL_BLOCK);
 
 #if RL_USE_STATIC_API
             m_rpmsg_ept = rpmsg_lite_create_ept(s_rpmsg, src_addr, rpmsg_read_cb, this, &m_ept_context);
