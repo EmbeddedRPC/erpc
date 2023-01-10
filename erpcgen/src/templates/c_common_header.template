@@ -32,8 +32,8 @@
 {$>checkCrc()}
 {% endif -- not commonTypesFile %}
 {% if commonTypesFile == "" %}
-#if !defined(ERPC_TYPE_DEFINITIONS)
-#define ERPC_TYPE_DEFINITIONS
+#if !defined(ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeName})
+#define ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeName}
 {% if not empty(enums) %}
 
 // Enumerators data types declarations
@@ -102,7 +102,7 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- consts %}
 {% endif -- consts %}
 
-#endif // ERPC_TYPE_DEFINITIONS
+#endif // ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeName}
 {% endif -- commonTypesFile %}
 
 {% if not genCommonTypesFile %}

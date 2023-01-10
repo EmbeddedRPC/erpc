@@ -34,6 +34,9 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
 , m_globals(&(def->getGlobals()))
 , m_generatorType(generatorType)
 {
+    string scopeName = "erpcShim";
+    string scopeNamePrefix = "";
+
     m_templateData["erpcVersion"] = ERPC_VERSION;
     m_templateData["erpcVersionNumber"] = ERPC_VERSION_NUMBER;
 
@@ -75,8 +78,24 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
             m_templateData["crc16"] = m_idlCrc16;
         }
 
-        m_outputDirectory /= getAnnStringValue(m_def->getProgramSymbol(), OUTPUT_DIR_ANNOTATION);
+        m_outputDirectory /= getAnnStringValue(program, OUTPUT_DIR_ANNOTATION);
+
+        if (findAnnotation(program, SCOPE_NAME_ANNOTATION) == nullptr)
+        {
+            scopeName = program->getName();
+        }
+        else
+        {
+            scopeName = getAnnStringValue(program, SCOPE_NAME_ANNOTATION);
+        }
     }
+
+    m_templateData["scopeName"] = scopeName;
+    if (scopeName != "")
+    {
+        scopeNamePrefix = "_";
+    }
+    m_templateData["scopeNamePrefix"] = scopeNamePrefix;
 
     // get group annotation with vector of theirs interfaces
     m_groups.clear();

@@ -1,0 +1,63 @@
+---
+name: default scope
+desc: without program name and annotation
+idl: |
+  interface test {
+    bar(int32 x) -> void
+  }
+test.h:
+  - |
+    #if !defined(ERPC_TYPE_DEFINITIONS_erpcShim)
+    #define ERPC_TYPE_DEFINITIONS_erpcShim
+  - |
+    #endif // ERPC_TYPE_DEFINITIONS_erpcShim
+
+---
+name: program name based scope
+desc: scope based on program name
+idl: |
+  program test
+
+  interface test {
+    bar(int32 x) -> void
+  }
+test.h:
+  - |
+    #if !defined(ERPC_TYPE_DEFINITIONS_test)
+    #define ERPC_TYPE_DEFINITIONS_test
+  - |
+    #endif // ERPC_TYPE_DEFINITIONS_test
+
+---
+name: annotation based scope
+desc: scope based on annotation value
+idl: |
+  @scope_name("myScope")
+  program test
+
+  interface test {
+    bar(int32 x) -> void
+  }
+test.h:
+  - |
+    #if !defined(ERPC_TYPE_DEFINITIONS_myScope)
+    #define ERPC_TYPE_DEFINITIONS_myScope
+  - |
+    #endif // ERPC_TYPE_DEFINITIONS_myScope
+
+---
+name: empty scope name
+desc: scope based on annotation value ""
+idl: |
+  @scope_name("")
+  program test
+
+  interface test {
+    bar(int32 x) -> void
+  }
+test.h:
+  - |
+    #if !defined(ERPC_TYPE_DEFINITIONS)
+    #define ERPC_TYPE_DEFINITIONS
+  - |
+    #endif // ERPC_TYPE_DEFINITIONS
