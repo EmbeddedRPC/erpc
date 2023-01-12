@@ -13,15 +13,13 @@
 
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
-#if defined(RPMSG)
-#define APP_ERPC_READY_EVENT_DATA (1)
-#include "mcmgr.h"
-#include "rpmsg_lite.h"
-#include "app_core1.h"
-#elif defined(UART)
+#if defined(UART)
 #include "fsl_lpuart_cmsis.h"
 #include "app_core0.h"
-#elif defined(MU)
+#else
+#if defined(RPMSG)
+#include "rpmsg_lite.h"
+#endif
 #define APP_ERPC_READY_EVENT_DATA (1)
 #include "mcmgr.h"
 #include "app_core1.h"
