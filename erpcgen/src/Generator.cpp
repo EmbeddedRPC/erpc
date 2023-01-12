@@ -35,6 +35,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
 , m_generatorType(generatorType)
 {
     string scopeName = "erpcShim";
+    string scopeNameC;
     string scopeNamePrefix = "";
 
     m_templateData["erpcVersion"] = ERPC_VERSION;
@@ -93,8 +94,12 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     m_templateData["scopeName"] = scopeName;
     if (scopeName != "")
     {
+        scopeNameC = scopeName;
+        std::transform(scopeNameC.begin(), scopeNameC.end(), scopeNameC.begin(), ::toupper);
+
         scopeNamePrefix = "_";
     }
+    m_templateData["scopeNameC"] = scopeNameC;
     m_templateData["scopeNamePrefix"] = scopeNamePrefix;
 
     // get group annotation with vector of theirs interfaces

@@ -7,10 +7,10 @@ idl: |
   }
 test.h:
   - |
-    #if !defined(ERPC_TYPE_DEFINITIONS_erpcShim)
-    #define ERPC_TYPE_DEFINITIONS_erpcShim
+    #if !defined(ERPC_TYPE_DEFINITIONS_ERPCSHIM)
+    #define ERPC_TYPE_DEFINITIONS_ERPCSHIM
   - |
-    #endif // ERPC_TYPE_DEFINITIONS_erpcShim
+    #endif // ERPC_TYPE_DEFINITIONS_ERPCSHIM
 
 ---
 name: program name based scope
@@ -23,10 +23,10 @@ idl: |
   }
 test.h:
   - |
-    #if !defined(ERPC_TYPE_DEFINITIONS_test)
-    #define ERPC_TYPE_DEFINITIONS_test
+    #if !defined(ERPC_TYPE_DEFINITIONS_TEST)
+    #define ERPC_TYPE_DEFINITIONS_TEST
   - |
-    #endif // ERPC_TYPE_DEFINITIONS_test
+    #endif // ERPC_TYPE_DEFINITIONS_TEST
 
 ---
 name: annotation based scope
@@ -40,10 +40,10 @@ idl: |
   }
 test.h:
   - |
-    #if !defined(ERPC_TYPE_DEFINITIONS_myScope)
-    #define ERPC_TYPE_DEFINITIONS_myScope
+    #if !defined(ERPC_TYPE_DEFINITIONS_MYSCOPE)
+    #define ERPC_TYPE_DEFINITIONS_MYSCOPE
   - |
-    #endif // ERPC_TYPE_DEFINITIONS_myScope
+    #endif // ERPC_TYPE_DEFINITIONS_MYSCOPE
 
 ---
 name: empty scope name
