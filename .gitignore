@@ -52,9 +52,9 @@ Module.symvers
 patches-*
 
 # quilt's files
-patches
-series
-*.patch
+#patches
+#series
+#*.patch
 
 # cscope files
 cscope.*

@@ -1,0 +1,5 @@
+erpc (1.9.0) UNRELEASED; urgency=low
+
+  * Initial release as Debian bullseye package.
+
+ -- Florent Pirou <florent.pirou@intel.com>  Fri, 17 Jun 2022 00:00:42 +0000

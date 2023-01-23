@@ -1,0 +1,38 @@
+From a57954befc5a51b1849bd4d2127798cd165fe0d5 Mon Sep 17 00:00:00 2001
+From: florent pirou <florent.pirou@intel.com>
+Date: Wed, 15 Jun 2022 21:15:23 -0700
+Subject: [PATCH 4/4] fix: erpc_mbf_dynamic_init not available to clients
+
+some files that are relevant to Linux are missing there,
+incl. erpc_mbf_setup.h and erpc_setup_mbf_[dynamic, static].cpp sources
+https://github.com/EmbeddedRPC/erpc/issues/114
+
+Signed-off-by: florent pirou <florent.pirou@intel.com>
+---
+ erpc_c/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/erpc_c/Makefile b/erpc_c/Makefile
+index 36b172a..f5d33b3 100644
+--- a/erpc_c/Makefile
++++ b/erpc_c/Makefile
+@@ -65,6 +65,8 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
+ 			$(ERPC_C_ROOT)/port/erpc_serial.cpp \
+ 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.cpp \
+ 			$(ERPC_C_ROOT)/setup/erpc_client_setup.cpp \
++			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_dynamic.cpp \
++			$(ERPC_C_ROOT)/setup/erpc_setup_mbf_static.cpp \
+ 			$(ERPC_C_ROOT)/setup/erpc_server_setup.cpp \
+ 			$(ERPC_C_ROOT)/setup/erpc_setup_serial.cpp \
+ 			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.cpp \
+@@ -93,6 +95,7 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
+ 			$(ERPC_C_ROOT)/port/erpc_serial.h \
+ 			$(ERPC_C_ROOT)/setup/erpc_arbitrated_client_setup.h \
+ 			$(ERPC_C_ROOT)/setup/erpc_client_setup.h \
++			$(ERPC_C_ROOT)/setup/erpc_mbf_setup.h \
+ 			$(ERPC_C_ROOT)/setup/erpc_server_setup.h \
+ 			$(ERPC_C_ROOT)/setup/erpc_transport_setup.h \
+ 			$(ERPC_C_ROOT)/transports/erpc_inter_thread_buffer_transport.h \
+-- 
+2.17.1
+

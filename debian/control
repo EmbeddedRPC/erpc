@@ -1,0 +1,32 @@
+Source: erpc
+Section: libs
+Priority: extra
+Maintainer: ECI Maintainer <eci.maintainer@intel.com>
+Build-Depends: make, debhelper (>=11~),   bison, flex, libfl-dev, libboost-dev, libboost-filesystem-dev, libboost-system-dev, python-is-python3, dh-python, python3-all-dev,  python3-six, python3-setuptools, python3-pkg-resources, python3-serial, python3-yaml, pypy-enum34 
+Standards-Version: 4.1.4
+
+Package: liberpc-dev
+Section: libdevel
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends},  
+Description: EmbeddedRPC static library and development headers
+
+Package: erpc-tools
+Section: libs
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends},  
+Description: EmbeddedRPC dynamic library
+
+Package: python3-erpc
+Section: python
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ ${shlibs:Depends},
+Description: Embedded RPC system (Python 3)
+ A embedded remote procedure call (eRPC) framework that can
+ run anywhere. It enables client and server applications to communicate
+ transparently, and makes it easier to build RTOS connected systems.
+ .
+ This package contains the Python 3 bindings.
