@@ -1114,7 +1114,7 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
     listCounter = 0;
 
     structInfo["hasNullableMember"] = false;
-    structInfo["needTempVariable"] = false;
+    structInfo["needTempVariableI32"] = false;
     structInfo["genStructWrapperF"] = !isBinaryStruct(structType);
     structInfo["noSharedMem"] = (findAnnotation(structType, NO_SHARED_ANNOTATION) != nullptr);
 
@@ -1210,13 +1210,13 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
                        dataType->getName().c_str());
 
             // Subtemplate setup for read/write struct calls
-            bool needTempVariable = false;
+            bool needTempVariableI32 = false;
             member_info["coderCall"] = getEncodeDecodeCall("data->" + memberName, group, dataType, structType, true,
-                                                           member, needTempVariable, false);
+                                                           member, needTempVariableI32, false);
 
-            if (needTempVariable)
+            if (needTempVariableI32)
             {
-                structInfo["needTempVariable"] = true;
+                structInfo["needTempVariableI32"] = true;
             }
 
             member_info["serializedViaMember"] = "";
@@ -1262,10 +1262,10 @@ data_map CGenerator::getUnionDefinitionTemplateData(Group *group, UnionType *uni
                                                     bool &needUnionsServerFree)
 {
     (void)group;
-    bool needTempVariable = false;
+    bool needTempVariableI32 = false;
     unionInfo["coderCall"] =
-        getEncodeDecodeCall("data->", nullptr, unionType, nullptr, true, nullptr, needTempVariable, false);
-    unionInfo["needTempVariable"] = needTempVariable;
+        getEncodeDecodeCall("data->", nullptr, unionType, nullptr, true, nullptr, needTempVariableI32, false);
+    unionInfo["needTempVariableI32"] = needTempVariableI32;
 
     unionInfo["noSharedMem"] = (findAnnotation(unionType, NO_SHARED_ANNOTATION) != nullptr);
 
@@ -1391,8 +1391,8 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     info["isReturnValue"] = !fn->isOneway();
     info["isSendValue"] = false;
     setTemplateComments(fnSymbol, info);
-    info["needTempVariableServer"] = false;
-    info["needTempVariableClient"] = false;
+    info["needTempVariableServerI32"] = false;
+    info["needTempVariableClientI32"] = false;
     info["needNullVariableOnServer"] = false;
 
     /* Is function declared as external? */
@@ -1407,7 +1407,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     if (!trueDataType->isVoid())
     {
         string result = "result";
-        bool needTempVariable = false;
+        bool needTempVariableI32 = false;
         setCallingFreeFunctions(structMember, returnInfo, true);
         string extraPointer = getExtraPointerInReturn(dataType);
         string resultVariable = extraPointer + returnSpaceWhenNotEmpty(extraPointer) + result;
@@ -1438,10 +1438,10 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
 
         returnInfo["direction"] = getDirection(kReturn);
         returnInfo["coderCall"] =
-            getEncodeDecodeCall(result, group, dataType, nullptr, false, structMember, needTempVariable, true);
+            getEncodeDecodeCall(result, group, dataType, nullptr, false, structMember, needTempVariableI32, true);
         returnInfo["shared"] = isShared;
         resultVariable = getTypenameName(dataType, resultVariable);
-        info["needTempVariableClient"] = needTempVariable;
+        info["needTempVariableClientI32"] = needTempVariableI32;
         returnInfo["resultVariable"] = resultVariable;
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
         returnInfo["isNullReturnType"] = (!trueDataType->isScalar() && !trueDataType->isEnum());
@@ -1457,7 +1457,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     for (StructMember *param : fnParams)
     {
         data_map paramInfo;
-        bool needTempVariable = false;
+        bool needTempVariableI32 = false;
         DataType *paramType = param->getDataType();
         DataType *paramTrueType = paramType->getTrueDataType();
         string name = getOutputName(param);
@@ -1607,20 +1607,20 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
         Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(),
                    paramType->getName().c_str());
         paramInfo["coderCall"] = getEncodeDecodeCall(encodeDecodeName, group, paramType, &fn->getParameters(), false,
-                                                     param, needTempVariable, true);
+                                                     param, needTempVariableI32, true);
 
         // set parameter direction
         paramInfo["direction"] = getDirection(param->getDirection());
 
         setSymbolDataToSide(param, group->getSymbolDirections(param), paramsToClient, paramsToServer, paramInfo);
 
-        if (needTempVariable && param->getDirection() != kInDirection)
+        if (needTempVariableI32 && param->getDirection() != kInDirection)
         {
-            info["needTempVariableClient"] = true;
+            info["needTempVariableClientI32"] = true;
         }
-        if (needTempVariable && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
+        if (needTempVariableI32 && (param->getDirection() == kInDirection || param->getDirection() == kInoutDirection))
         {
-            info["needTempVariableServer"] = true;
+            info["needTempVariableServerI32"] = true;
         }
         params.push_back(paramInfo);
 

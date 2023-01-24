@@ -147,10 +147,10 @@ static void read_{$struct.name}_struct(erpc::{$codecClass} * codec, {$struct.nam
 {%   if struct.hasNullableMember %}
     bool isNull;
 {%   endif -- hasNullableMember %}
-{%   if struct.needTempVariable %}
-    int32_t _tmp_local;
+{%   if struct.needTempVariableI32 %}
+    int32_t _tmp_local_i32;
 {%   endif %}
-{%   if struct.needTempVariable || struct.hasNullableMember %}
+{%   if struct.needTempVariableI32 || struct.hasNullableMember %}
 
 {%   endif %}
     if(NULL == data)
@@ -284,8 +284,8 @@ static void read_{$union.name}_union_shared(erpc::{$codecClass} * codec, int32_t
 static void read_{$union.name}_union(erpc::{$codecClass} * codec, int32_t * discriminator, {$union.name} * data)
 {%   endif %}
 {
-{%   if union.needTempVariable %}
-    int32_t _tmp_local;
+{%   if union.needTempVariableI32 %}
+    int32_t _tmp_local_i32;
 
 {%   endif %}
     if(NULL == data)
