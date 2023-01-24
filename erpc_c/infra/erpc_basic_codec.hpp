@@ -64,8 +64,8 @@ public:
     /*!
      * @brief Prototype for write data stream.
      *
-     * @param[in] value Pointer to data stream.
      * @param[in] length Size of data stream in bytes.
+     * @param[in] value Pointer to data stream.
      */
     virtual void writeData(uint32_t length, const void *value);
 
@@ -225,8 +225,8 @@ public:
     /*!
      * @brief Prototype for read data stream.
      *
-     * @param[in] value Pointer to data stream to be read.
      * @param[in] length Size of data stream in bytes to be read.
+     * @param[in] value Pointer to data stream to be read.
      */
     virtual void readData(uint32_t length, void *value);
 
