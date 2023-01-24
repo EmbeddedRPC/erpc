@@ -46,6 +46,11 @@ extern ClientManager *g_client;
     erpc_status_t err = kErpcStatus_Success;
 
 {% endif -- generateErrorChecks %}
+{% if fn.isReturnValue %}
+{%  if fn.needTempVariableClientI32 %}
+    int32_t _tmp_local_i32;
+{%  endif %}
+{% endif %}
 {% if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
 {% endif -- isNotVoid %}
@@ -100,18 +105,14 @@ extern ClientManager *g_client;
 {$clientIndent}    // Codec status is checked inside this function.
 {$clientIndent}    g_client->performRequest(request);
 {% if fn.isReturnValue %}
-{%  if fn.needTempVariableClient %}
-
-{$clientIndent}    int32_t _tmp_local;
-{%  endif %}
 {%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 
 {%   if param.isNullable %}
-{% if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %}
-{%  set lengthNameCon = ") && (" & param.lengthName & " != NULL)" >%}
-{% else %}
-{%  set lengthNameCon = "" >%}
-{% endif %}
+{%    if ((source == "client") && (param.direction != ReturnDirection) && (empty(param.lengthName) == false)) %}
+{%     set lengthNameCon = ") && (" & param.lengthName & " != NULL)" >%}
+{%    else %}
+{%     set lengthNameCon = "" >%}
+{%    endif %}
 {$clientIndent}    if ({% if lengthNameCon != "" %}({% endif %}{$param.nullableName} != NULL{$lengthNameCon})
 {$clientIndent}    {
 {$addIndent(clientIndent & "        ", param.coderCall.decode(param.coderCall))}

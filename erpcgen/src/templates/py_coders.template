@@ -9,7 +9,7 @@
 {$name}._write({$codec}, {$info.discriminatorName}){%>%}
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
-{$codec}.write_uint32({$name}){%>%}
+{$codec}.write_int32({$name}){%>%}
 {#--------------- string ---------------#}
 {% elif info.type == "string" %}
 {$codec}.write_string({$name}){%>%}
@@ -46,7 +46,7 @@
 {$name}, {$info.discriminatorName} = {$commonPrefix}{$info.name}()._read({$codec}){%>%}
 {#--------------- enum ---------------#}
 {% elif info.type == "enum" %}
-{$name} = {$codec}.read_uint32(){%>%}
+{$name} = {$codec}.read_int32(){%>%}
 {#--------------- string ---------------#}
 {% elif info.type == "string" %}
 {$name} = {$codec}.read_string(){%>%}

@@ -236,11 +236,11 @@ test_server.cpp:
   - "{"
   - codec->updateStatus(kErpcStatus_MemoryError);
   - "}"
-  - int32_t _tmp_local;
-  - not: codec->read(_tmp_local);
-  - not: discriminator = static_cast<fruitType>(_tmp_local);
-  - read_unionType_union(codec, _tmp_local, unionVariable);
-  - discriminator = static_cast<fruitType>(_tmp_local);
+  - int32_t _tmp_local_i32;
+  - not: codec->read(_tmp_local_i32);
+  - not: discriminator = static_cast<fruitType>(_tmp_local_i32);
+  - read_unionType_union(codec, _tmp_local_i32, unionVariable);
+  - discriminator = static_cast<fruitType>(_tmp_local_i32);
   - myUnion(discriminator, unionVariable);
 
 ---
@@ -278,8 +278,8 @@ test_client.cpp:
   - write_unionType_union(codec, static_cast<int32_t>(data->discriminator), &data->unionVariable);
 
 test_server.cpp:
-  - int32_t _tmp_local;
-  - read_unionType_union(codec, _tmp_local, &data->unionVariable);
+  - int32_t _tmp_local_i32;
+  - read_unionType_union(codec, _tmp_local_i32, &data->unionVariable);
 
 #test_client.cpp:
 #    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);
