@@ -3,18 +3,22 @@ version: 2.1
 jobs:
   build-linux-gcc:
     machine:
-      image: ubuntu-2004:202111-02
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
       - run: chmod u+x run_tests.sh && ./run_tests.sh
+      - store_artifacts:
+          path: ./Release/Linux/erpcgen/erpcgen
   build-linux-clang:
     machine:
-      image: ubuntu-2004:202111-02
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
       - run: chmod u+x run_tests.sh && ./run_tests.sh clang
+      - store_artifacts:
+          path: ./Release/Linux/erpcgen/erpcgen
   build-mac-gcc:
     macos:
       xcode: 13.2.1
@@ -38,3 +42,5 @@ workflows:
       - build-linux-clang
       # - build-mac-gcc # Mac is on going, or it can be hosted on company computer.
       # - build-mac-clang
+
+# VS Code Extension Version: 1.5.1

@@ -79,10 +79,10 @@ include $(ERPC_ROOT)/mk/targets.mk
 
 ifeq "$(is_mingw)" "1"
     LIBRARIES += -L$(BOOST_ROOT)/stage/lib
-    ifeq "$(build)" "debug"
-        LIBRARIES += -lboost_system-mgw48-mt-1_57 -lboost_filesystem-mgw48-mt-1_57
-    else
+    ifeq "$(build)" "release"
         LIBRARIES += -lboost_system-mgw48-mt-d-1_57 -lboost_filesystem-mgw48-mt-d-1_57
+    else
+        LIBRARIES += -lboost_system-mgw48-mt-1_57 -lboost_filesystem-mgw48-mt-1_57
     endif
 else
     ifeq "$(is_linux)" "1"
@@ -90,7 +90,7 @@ else
     endif
 
     static_libs := NO
-    ifneq "$(build)" "debug"
+    ifeq "$(build)" "release"
         ifeq "$(is_darwin)" "1"
             static_libs := $(BOOST_ROOT)/lib/libboost_system.a $(BOOST_ROOT)/lib/libboost_filesystem.a
         endif
@@ -103,7 +103,7 @@ else
 endif
 
 # Release should be alwas static. Customers don't need install things.
-ifneq "$(build)" "debug"
+ifeq "$(build)" "release"
     # Except Darwin. Darwin has static libs defined above.
     ifeq "$(is_darwin)" ""
 #        LIBRARIES += -static

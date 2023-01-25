@@ -35,7 +35,7 @@ def isTestDir(dir):
 testClientCommand = "run-tcp-client"
 testServerCommand = "run-tcp-server"
 transportLayer = "tcp"
-target = "debug"
+target = "release"
 
 # Process command line options
 # Check for 2 or more arguments because argv[0] is the script name
