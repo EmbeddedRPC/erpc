@@ -16,9 +16,11 @@ test_client.cpp:
   - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
     then:
-      - codec->writeString(strlen((const char*)a), (const char*)a);
+      - uint32_t a_len = strlen((const char*)a);
+      - codec->writeString(a_len, (const char*)a);
   - if: dir == 'out'
     then:
+      - not: codec->writeString(a_len, (const char*)a);
       - not: codec->writeString(strlen((const char*)a), (const char*)a);
   - if: dir in ('out', 'inout')
     then:
@@ -41,7 +43,8 @@ test_server.cpp:
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
-      - codec->writeString(strlen((const char*)a), (const char*)a);
+      - uint32_t a_len = strlen((const char*)a);
+      - codec->writeString(a_len, (const char*)a);
 ---
 name: param ustring
 desc:
@@ -60,9 +63,11 @@ test_client.cpp:
   - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
     then:
-      - codec->writeString(strlen((const char*)a), (const char*)a);
+      - uint32_t a_len = strlen((const char*)a);
+      - codec->writeString(a_len, (const char*)a);
   - if: dir == 'out'
     then:
+      - not: codec->writeString(a_len, (const char*)a);
       - not: codec->writeString(strlen((const char*)a), (const char*)a);
   - if: dir in ('out', 'inout')
     then:
@@ -85,7 +90,8 @@ test_server.cpp:
   - if: dir in ('out', 'inout')
     then:
       - if (a != NULL)
-      - codec->writeString(strlen((const char*)a), (const char*)a);
+      - uint32_t a_len = strlen((const char*)a);
+      - codec->writeString(a_len, (const char*)a);
 ---
 name: in param struct
 desc:
@@ -212,7 +218,8 @@ test_client.cpp:
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - codec->writeString(strlen((const char*)data->a), (const char*)data->a);
+      - uint32_t a_len = strlen((const char*)data->a);
+      - codec->writeString(a_len, (const char*)data->a);
   - if: dir in ('out', 'inout')
     then:
       - void read_erpc_pair_struct
@@ -241,7 +248,8 @@ test_server.cpp:
       - codec->writeNullFlag(true);
       - else
       - codec->writeNullFlag(false);
-      - codec->writeString(strlen((const char*)data->a), (const char*)data->a);
+      - uint32_t a_len = strlen((const char*)data->a);
+      - codec->writeString(a_len, (const char*)data->a);
 
 ---
 name: return struct
