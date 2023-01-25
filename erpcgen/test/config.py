@@ -27,9 +27,9 @@ this_dir = path.local(__file__).dirpath()
 if 'ERPCGEN' in os.environ:
     ERPCGEN = os.environ['ERPCGEN']
 elif sys.platform == 'win32':
-    ERPCGEN = str(this_dir.join(r"..\VisualStudio_v14\Debug\erpcgen.exe"))
+    ERPCGEN = str(this_dir.join(r"..\VisualStudio_v14\Release\erpcgen.exe"))
 else:
-    ERPCGEN = str(this_dir.join("../../Debug/{}/erpcgen/erpcgen".format(os_name)))
+    ERPCGEN = str(this_dir.join("../../Release/{}/erpcgen/erpcgen".format(os_name)))
 
 # Set path to C/C++ compiler.
 if 'CC' in os.environ:
@@ -39,4 +39,3 @@ else:
 
 # Number of test runs to keep.
 RUN_KEEP_COUNT = 3
-

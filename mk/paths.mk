@@ -105,4 +105,4 @@ endif
 # Debug or Release
 # Release by default
 #-----------------------------------------------
-build ?= debug
+build ?= release
