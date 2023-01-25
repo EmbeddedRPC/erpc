@@ -12,14 +12,14 @@ import subprocess
 import sys
 import os
 
-#Folders to scan
+# Folders to scan
 folders = [
     "erpc_c",
     "erpcgen/src",
     "erpcsniffer/src",
     "test"]
 
-#Files which will be not formatted
+# Files which will be not formatted
 exceptions = [
     "test/common/gtest/gtest.h",
     "test/common/gtest/gtest.cpp",
@@ -27,12 +27,12 @@ exceptions = [
     "erpcgen/src/cpptemplate/cpptempl.cpp",
     "erpcgen/src/cpptemplate/cpptempl_test.cpp"]
 
-#For windows use "\\" instead of "/" path separators.
-if os.environ.get('OS','') == 'Windows_NT':
+# For windows use "\\" instead of "/" path separators.
+if os.environ.get('OS', '') == 'Windows_NT':
     folders = [os.path.normpath(folder) for folder in folders]
     exceptions = [os.path.normpath(e) for e in exceptions]
 
-#Files with this extensions will be formatted/
+# Files with this extensions will be formatted/
 extensions = [".h", ".hpp", ".c", ".cpp"]
 
 # Check that the clang-format is installed and matches the required version. The clang-format binary
@@ -56,10 +56,10 @@ if not clang_format_stdout.startswith("clang-format version 10.0.0"):
     print("clang-format is not the required version: 10.0.0")
     exit(1)
 
-#processing formatting
+# processing formatting
 for folder in folders:
     print('*****************************************************************************')
-    print(folder);
+    print(folder)
     for path, subdirs, files in os.walk(folder):
         for name in files:
             if any(ext in name for ext in extensions):
