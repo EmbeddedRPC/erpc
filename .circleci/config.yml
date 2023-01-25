@@ -3,8 +3,7 @@ version: 2.1
 jobs:
   build-linux-gcc:
     machine:
-      image: ubuntu-2004:202111-02 # https://circleci.com/developer/machine/image/ubuntu-2004
-    resource_class: medium
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
@@ -13,8 +12,7 @@ jobs:
           path: ./Release/Linux/erpcgen/erpcgen
   build-linux-clang:
     machine:
-      image: ubuntu-2004:202111-02 # https://circleci.com/developer/machine/image/ubuntu-2004
-    resource_class: medium
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang

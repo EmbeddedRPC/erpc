@@ -6,21 +6,24 @@ set -e
 unameOut="$(uname -s)"
 case "${unameOut}" in
 Linux*)
-    echo "Linux os detected. Installing dependencies."
-    sudo apt-get update -qq
-    sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev
+    echo "Linux os detected."
+    DEBIAN_FRONTEND=noninteractive sudo apt-get update -qq --yes
+    echo "Installing dependencies."
+    DEBIAN_FRONTEND=noninteractive sudo apt-get install python3 bison flex libboost-dev libboost-filesystem-dev libboost-system-dev --yes
     if [ "$1" = "clang" ]; then
         echo "Installing clang compiler."
-        sudo apt-get install clang
+        DEBIAN_FRONTEND=noninteractive sudo apt-get install clang
     else
         echo "Installing default gnu compiler."
-        sudo apt-get install gcc g++
+        DEBIAN_FRONTEND=noninteractive sudo apt-get install gcc g++
     fi
     sudo pip3 install -U pytest pyyaml
+    sudo apt-get autoremove --yes
     ;;
 Darwin*)
-    echo "Mac os detected. Installing dependencies."
+    echo "Mac os detected."
     brew update
+    echo "Installing dependencies."
     brew install python3 boost bison flex -v -f 2>&1
     sudo pip3 install tornado
     sudo pip3 install --user nose

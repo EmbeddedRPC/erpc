@@ -279,7 +279,7 @@ void erpc_transport_rpmsg_lite_tty_rtos_deinit(void);
  * @brief Create an Linux RPMSG endpoint transport.
  *
  * This function is using RPMSG endpoints based on this implementation:
- * github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ * github.com/nxp-mcuxpresso/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
  *
  * When local/remote address is set to '-1', then default addresses will be used.
  * When type is set to '0', then Datagram model will be used, else Stream.

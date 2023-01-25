@@ -91,7 +91,7 @@ Supported transports:
 * NXP Kinetis SPI and DSPI
 * POSIX and Windows serial port
 * TCP/IP (mostly for testing)
-* [NXP RPMsg-Lite / RPMsg TTY](https://github.com/NXPmicro/rpmsg-lite)
+* [NXP RPMsg-Lite / RPMsg TTY](https://github.com/nxp-mcuxpresso/rpmsg-lite)
 * SPIdev Linux
 * USB CDC
 * NXP Messaging Unit
@@ -126,8 +126,8 @@ To get the board list with multicore support (eRPC included) use filtering based
 
 eRPC examples use the 'erpc_' name prefix.
 
-Another way of getting NXP MCUXpressoSDK eRPC multicore and multiprocessor examples is using the [mcux-sdk](https://github.com/NXPmicro/mcux-sdk) Github repo. Follow the description how to use the West tool
-to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/NXPmicro/mcux-sdk#overview). Once done the armgcc eRPC examples can be found in
+Another way of getting NXP MCUXpressoSDK eRPC multicore and multiprocessor examples is using the [mcux-sdk](https://github.com/nxp-mcuxpresso/mcux-sdk) Github repo. Follow the description how to use the West tool
+to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/nxp-mcuxpresso/mcux-sdk#overview). Once done the armgcc eRPC examples can be found in
 
 mcuxsdk/examples/<board_name>/multicore_examples or in
 
@@ -254,4 +254,4 @@ Repository on Github contains two main branches. __Master__ and __develop__. Cod
 ---
 Copyright 2014-2016 Freescale Semiconductor, Inc.
 
-Copyright 2016-2021 NXP
+Copyright 2016-2023 NXP
