@@ -19,7 +19,6 @@ import textwrap
 import errno
 import shlex
 import importlib
-import typing
 from py import path
 import pathlib
 import os
@@ -314,7 +313,7 @@ class ErpcgenTestSpec(object):
     # Translation table to replace illegal filename characters.
     BAD_FN_TABLE = maketrans(BAD_FN_CHARS, '_' * len(BAD_FN_CHARS))
 
-    def __init__(self, name: str, path: path.local, spec: dict[str, typing.Any], verbosity: int = 0):
+    def __init__(self, name: str, path: path.local, spec, verbosity: int = 0):
         self.name = name
         self.path = path
         self.spec = spec
@@ -400,7 +399,7 @@ class ErpcgenTestSpec(object):
 
                 yield ErpcgenTestCase(self, caseName, idl, tests, caseDir, perm)
 
-    def _get_parametrized_name(self, perm: dict[str, typing.Any]):
+    def _get_parametrized_name(self, perm):
         # @brief Generate a unique name for a parametrized test.
 
         name = ''
@@ -430,7 +429,7 @@ class ErpcgenTestSpec(object):
 
         return name
 
-    def _get_parametrized_tests(self, perm: dict[str, typing.Any]):
+    def _get_parametrized_tests(self, perm):
         # @brief Substitute params into test patterns.
 
         def do_pat(pattern):
@@ -559,7 +558,7 @@ class ErpcgenTestCase(object):
         'py':  ErpcgenPythonCompileTest,
     }
 
-    def __init__(self, spec: ErpcgenTestSpec, name: str, idl: str, tests: dict[str, typing.Any], caseDir: str, params: dict[str, typing.Any]):
+    def __init__(self, spec: ErpcgenTestSpec, name: str, idl: str, tests, caseDir: str, params):
         self._spec = spec
         self._name = name
         self._idl = idl
@@ -621,7 +620,7 @@ class ErpcgenTestCase(object):
     def _get_column(self, pos: int):
         return pos - self._contents.rfind(os.linesep, 0, pos)
 
-    def _test_file(self, filename: str, tests: list[typing.Union[dict[str, typing.Any], str]]):
+    def _test_file(self, filename: str, tests):
         # Skip files listed with no patterns.
         if tests is None:
             return
@@ -643,7 +642,7 @@ class ErpcgenTestCase(object):
         if self._not_cases:
             self._test_nots(len(self._contents))
 
-    def _test_cases(self, tests: list[typing.Union[dict[str, typing.Any], str]]):
+    def _test_cases(self, tests):
         # Skip empty pattern lists.
         if tests is None:
             return
@@ -665,7 +664,7 @@ class ErpcgenTestCase(object):
                 # Single pattern.
                 self._test_one_case(case)
 
-    def _test_if_cases(self, case: typing.Union[dict[str, typing.Any], str]):
+    def _test_if_cases(self, case):
         ifPredicate = case['if']
         thenCases = case['then']
 
@@ -678,7 +677,7 @@ class ErpcgenTestCase(object):
                 self._filename, self._get_line(self._pos), ifPredicate))
             self._test_cases(case['else'])
 
-    def _test_one_case(self, case: typing.Union[dict[str, typing.Any], str]):
+    def _test_one_case(self, case):
         # Get the pattern from the case and determine if it's a regular expression.
         isRegex = False
         if isinstance(case, dict):
