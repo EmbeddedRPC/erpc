@@ -32,8 +32,8 @@ test_client.cpp:
   - static void write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data)
 
 test_server.cpp:
-  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
-  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+  - static void read_unionType_union(erpc::Codec * codec, int32_t & discriminator, unionType * data);
+  - static void read_unionType_union(erpc::Codec * codec, int32_t & discriminator, unionType * data)
 
 ---
 name: basic non-encapsulated union
@@ -152,13 +152,13 @@ test_client.cpp:
 
 
 test_server.cpp:
-  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data);
-  - static void read_unionType_union(erpc::Codec * codec, int32_t * discriminator, unionType * data)
+  - static void read_unionType_union(erpc::Codec * codec, int32_t & discriminator, unionType * data);
+  - static void read_unionType_union(erpc::Codec * codec, int32_t & discriminator, unionType * data)
   - "{"
   - if(NULL == data)
   - return;
   - codec->startReadUnion(discriminator);
-  - switch (*discriminator)
+  - switch (discriminator)
   - "{"
   - "case apple:"
   - "{"
@@ -167,14 +167,14 @@ test_server.cpp:
   - "}"
   - "case banana:"
   - "{"
-  - codec->read(&data->x);
-  - codec->read(&data->y);
+  - codec->read(data->x);
+  - codec->read(data->y);
   - break;
   - "}"
   - "case papaya:"
   - "{"
-  - codec->read(&data->x);
-  - codec->read(&data->y);
+  - codec->read(data->x);
+  - codec->read(data->y);
   - break;
   - "}"
   - "case orange:"
@@ -184,19 +184,19 @@ test_server.cpp:
   - "}"
   - "case coconut:"
   - "{"
-  - codec->read(&data->cx);
+  - codec->read(data->cx);
   - read_list_int32_1_t_struct(codec, &(data->cc));
   - break;
   - "}"
   - "case returnVal:"
   - "{"
-  - codec->read(&data->ret);
+  - codec->read(data->ret);
   - break;
   - "}"
   - "default:"
   - "{"
-  - codec->read(&data->c);
-  - codec->read(&data->blah);
+  - codec->read(data->c);
+  - codec->read(data->blah);
   - break;
   - "}"
   - "}"
@@ -237,9 +237,9 @@ test_server.cpp:
   - codec->updateStatus(kErpcStatus_MemoryError);
   - "}"
   - int32_t _tmp_local_i32;
-  - not: codec->read(&_tmp_local_i32);
+  - not: codec->read(_tmp_local_i32);
   - not: discriminator = static_cast<fruitType>(_tmp_local_i32);
-  - read_unionType_union(codec, &_tmp_local_i32, unionVariable);
+  - read_unionType_union(codec, _tmp_local_i32, unionVariable);
   - discriminator = static_cast<fruitType>(_tmp_local_i32);
   - myUnion(discriminator, unionVariable);
 
@@ -279,7 +279,7 @@ test_client.cpp:
 
 test_server.cpp:
   - int32_t _tmp_local_i32;
-  - read_unionType_union(codec, &_tmp_local_i32, &data->unionVariable);
+  - read_unionType_union(codec, _tmp_local_i32, &data->unionVariable);
 
 #test_client.cpp:
 #    - static int32_t write_unionType_union(erpc::Codec * codec, int32_t discriminator, const unionType * data);

@@ -23,9 +23,9 @@ test_client.cpp:
       - not: codec->read
 test_server.cpp:
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - c = lengthTemp_0;
-  - codec->read(&l[listCount0])
+  - codec->read(l[listCount0])
   - if: dir == 'inout'
     then:
       - not: codec->read
@@ -52,14 +52,14 @@ test_client.cpp:
     else:
      - not: codec->write
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - "*c = lengthTemp_0;"
-  - codec->read(&l[listCount0])
+  - codec->read(l[listCount0])
   - not: codec->read
 test_server.cpp:
   - if: dir == 'inout'
     then:
-      - codec->read(&c)
+      - codec->read(c)
     else:
      - not: codec->read
   - codec->startWriteList(c);
@@ -77,12 +77,12 @@ test_client.cpp:
   - codec->startWriteList(*c);
   - not: codec->write(*c)
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - "*c = lengthTemp_0;"
   - not: codec->read(c)
 test_server.cpp:
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - "c = lengthTemp_0;"
   - not: codec->read(c)
   - codec->startWriteList(c);
@@ -114,14 +114,14 @@ test_client.cpp:
   - if: dir in ('out','inout')
     then:
       - uint32_t lengthTemp_0;
-      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - codec->readBinary(lengthTemp_0, &dataTemp_0);
       - "*c = lengthTemp_0;"
   - not: codec->read
 test_server.cpp:
   - if: dir in ('in', 'inout')
     then:
       - uint32_t lengthTemp_0;
-      - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+      - codec->readBinary(lengthTemp_0, &dataTemp_0);
       - c = lengthTemp_0;
   - not: codec->read
   - if: dir in ('out', 'inout')
@@ -156,11 +156,11 @@ test_client.cpp:
 
 test_server.cpp:
   - read_Fork_struct
-  - not: codec->read(&cnt)
+  - not: codec->read(cnt)
   - uint32_t lengthTemp_0;
-  - codec->startReadList(&lengthTemp_0);
+  - codec->startReadList(lengthTemp_0);
   - data->cnt = lengthTemp_0;
-  - not: codec->read(&cnt)
+  - not: codec->read(cnt)
 
 ---
 name: other struct
@@ -182,6 +182,6 @@ test_client.cpp:
   - not: codec->write(data->cnt)
 test_server.cpp:
   - uint32_t lengthTemp_0;
-  - codec->readBinary(&lengthTemp_0, &dataTemp_0);
+  - codec->readBinary(lengthTemp_0, &dataTemp_0);
   - data->cnt = lengthTemp_0;
-  - not: codec->read(&data->cnt);
+  - not: codec->read(data->cnt);
