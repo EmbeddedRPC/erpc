@@ -49,7 +49,7 @@ int gpio_export(int gpio)
             ret = snprintf(sysgpio, SYSGPIO_LEN, "%d", gpio);
             if ((ret >= 0) && (ret < SYSGPIO_LEN))
             {
-                if (strlen(sysgpio) != write(fd, sysgpio, strlen(sysgpio)))
+                if (ret != write(fd, sysgpio, ret))
                 {
                     (void)fprintf(stderr, "Could not export gpio (%d) (%d).\r\n", gpio, errno);
                     ret = -2;
