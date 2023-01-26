@@ -17,6 +17,8 @@
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
 #include "unit_test.h"
+#include <chrono>
+#include <thread>
 
 #include <unistd.h>
 
@@ -111,6 +113,8 @@ int main(int argc, char **argv)
 
     Log::info("Intit ERPC first (client) app...\n");
 
+    std::chrono::milliseconds duration(500);
+    std::this_thread::sleep_for(duration);
     erpc_status_t err = g_transport.open();
     if (err)
     {
