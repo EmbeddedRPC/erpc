@@ -16,15 +16,17 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SYSGPIO_LEN (64U)
+
 int gpio_export(int gpio)
 {
     int fd = 0;
-    char sysgpio[64];
+    char sysgpio[SYSGPIO_LEN];
     int ret;
 
     /* Check if the gpio has already been exported */
-    ret = sprintf(sysgpio, "/sys/class/gpio/gpio%d/value", gpio);
-    if (ret >= 0)
+    ret = snprintf(sysgpio, SYSGPIO_LEN, "/sys/class/gpio/gpio%d/value", gpio);
+    if ((ret >= 0) && (ret < SYSGPIO_LEN))
     {
         fd = open(sysgpio, O_WRONLY);
         if (-1 != fd)
@@ -44,8 +46,8 @@ int gpio_export(int gpio)
         }
         else
         {
-            ret = sprintf(sysgpio, "%d", gpio);
-            if (ret >= 0)
+            ret = snprintf(sysgpio, SYSGPIO_LEN, "%d", gpio);
+            if ((ret >= 0) && (ret < SYSGPIO_LEN))
             {
                 if (strlen(sysgpio) != write(fd, sysgpio, strlen(sysgpio)))
                 {
@@ -67,11 +69,11 @@ int gpio_export(int gpio)
 int gpio_direction(int gpio, int direction)
 {
     int fd;
-    char sysgpio[64];
+    char sysgpio[SYSGPIO_LEN];
     int ret;
 
-    ret = sprintf(sysgpio, "/sys/class/gpio/gpio%d/direction", gpio);
-    if (ret >= 0)
+    ret = snprintf(sysgpio, SYSGPIO_LEN, "/sys/class/gpio/gpio%d/direction", gpio);
+    if ((ret >= 0) && (ret < SYSGPIO_LEN))
     {
         ret = ERPC_SYSGPIO_STATUS_SUCCESS;
         fd = open(sysgpio, O_WRONLY | O_SYNC);
@@ -117,12 +119,12 @@ int gpio_direction(int gpio, int direction)
 int gpio_set_edge(int gpio, char *edge)
 {
     int fd;
-    char sysgpio[64];
+    char sysgpio[SYSGPIO_LEN];
     unsigned char len;
     int ret;
 
-    ret = sprintf(sysgpio, "/sys/class/gpio/gpio%d/edge", gpio);
-    if (ret >= 0)
+    ret = snprintf(sysgpio, SYSGPIO_LEN, "/sys/class/gpio/gpio%d/edge", gpio);
+    if ((ret >= 0) && (ret < SYSGPIO_LEN))
     {
         fd = open(sysgpio, O_WRONLY | O_SYNC);
         if (-1 == fd)
@@ -153,12 +155,12 @@ int gpio_set_edge(int gpio, char *edge)
 int gpio_read(int gpio)
 {
     int fd;
-    char sysgpio[64];
+    char sysgpio[SYSGPIO_LEN];
     char in[2];
     int ret;
 
-    ret = sprintf(sysgpio, "/sys/class/gpio/gpio%d/value", gpio);
-    if (ret >= 0)
+    ret = snprintf(sysgpio, SYSGPIO_LEN, "/sys/class/gpio/gpio%d/value", gpio);
+    if ((ret >= 0) && (ret < SYSGPIO_LEN))
     {
         fd = open(sysgpio, O_RDWR | O_SYNC);
         if (-1 == fd)
@@ -189,12 +191,12 @@ int gpio_read(int gpio)
 int gpio_open(int gpio)
 {
     int fd;
-    char sysgpio[64];
+    char sysgpio[SYSGPIO_LEN];
     char in;
     int ret;
 
-    ret = sprintf(sysgpio, "/sys/class/gpio/gpio%d/value", gpio);
-    if (ret >= 0)
+    ret = snprintf(sysgpio, SYSGPIO_LEN, "/sys/class/gpio/gpio%d/value", gpio);
+    if ((ret >= 0) && (ret < SYSGPIO_LEN))
     {
         fd = open(sysgpio, O_RDWR | O_SYNC);
         if (-1 == fd)
