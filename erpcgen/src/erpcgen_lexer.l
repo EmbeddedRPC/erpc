@@ -280,8 +280,9 @@ void            { return TOK_VOID; }
 
 <*>.                                {
                                         /* all other chars produce errors */
-                                        char msg[50];
-                                        sprintf(msg, "unexpected character '%c' on line %d", yytext[0], yylineno);
+                                        const uint8_t msgLen = 50;
+                                        char msg[msgLen];
+                                        (void)snprintf(msg, msgLen, "unexpected character '%c' on line %d", yytext[0], yylineno);
                                         LexerError(msg);
                                     }
 
