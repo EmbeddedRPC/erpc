@@ -29,6 +29,7 @@
 #include "types/UnionType.hpp"
 #include "types/VoidType.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -72,14 +73,14 @@ public:
     virtual void generate() = 0;
 
 protected:
-    uint16_t m_idlCrc16;                       /*!< Storing crc16 of IDL files and erpcgen version. */
-    cpptempl::data_map m_templateData;         /*!< Data prepared for templates files. */
-    InterfaceDefinition *m_def;                /*!< Interface definitions. */
-    SymbolScope *m_globals;                    /*!< Symbol scope data. */
-    std::vector<Group *> m_groups;             /*!< List of groups. */
-    std::set<std::string> reserverdWords;      /*!< Program language reserved words. */
-    generator_type_t m_generatorType;          /*!< Type of generator. */
-    boost::filesystem::path m_outputDirectory; /*!< Output file path. */
+    uint16_t m_idlCrc16;                     /*!< Storing crc16 of IDL files and erpcgen version. */
+    cpptempl::data_map m_templateData;       /*!< Data prepared for templates files. */
+    InterfaceDefinition *m_def;              /*!< Interface definitions. */
+    SymbolScope *m_globals;                  /*!< Symbol scope data. */
+    std::vector<Group *> m_groups;           /*!< List of groups. */
+    std::set<std::string> reserverdWords;    /*!< Program language reserved words. */
+    generator_type_t m_generatorType;        /*!< Type of generator. */
+    std::filesystem::path m_outputDirectory; /*!< Output file path. */
     /*!
      * @brief This function open file
      *

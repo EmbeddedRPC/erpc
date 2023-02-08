@@ -111,6 +111,14 @@ MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 
 include $(ERPC_ROOT)/mk/targets.mk
 
+# Release should be alwas static. Customers don't need install things.
+ifeq "$(build)" "release"
+    # Except Darwin.
+    ifeq "$(is_darwin)" ""
+        LIBRARIES += -static
+    endif
+endif
+
 $(TARGET_LIB)(%): %
 	@$(call printmessage,ar,Archiving, $(?F) in $(@F))
 	$(at)mkdir -p $(dir $(@))

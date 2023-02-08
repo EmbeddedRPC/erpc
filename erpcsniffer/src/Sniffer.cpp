@@ -11,14 +11,15 @@
 #include "erpc_c/infra/erpc_message_buffer.hpp"
 
 #include "Logging.hpp"
+#include "Utils.hpp"
 #include "annotations.h"
 
-#include <boost/algorithm/string.hpp>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
+#include <filesystem>
 
 using namespace erpcgen;
 using namespace erpcsniffer;
@@ -115,23 +116,16 @@ erpc_status_t Sniffer::run()
 
 void Sniffer::openFile(ofstream &outputFileStream)
 {
-    boost::filesystem::path outputFilePath = m_outputFilePath;
-    boost::filesystem::path outputPath = outputFilePath.parent_path();
+    filesystem::path outputFilePath = m_outputFilePath;
+    filesystem::path outputPath = outputFilePath.parent_path();
 
     if (!outputPath.empty())
     {
         // TODO: do we have to create a copy of the outputDir here? Doesn't make sense...
-        boost::filesystem::path dir(outputPath);
-        if (!boost::filesystem::is_directory(dir))
+        filesystem::create_directories(outputPath);
+        if (!filesystem::is_directory(outputPath))
         {
-            // Create_directories function return false also when it create new directory.
-            // It is in case, when directory ends with slash. For these case is better use is_directory for check if
-            // directories are created.
-            boost::filesystem::create_directories(dir);
-            if (!boost::filesystem::is_directory(dir))
-            {
-                throw runtime_error(format_string("could not create directory path '%s'", outputPath.c_str()));
-            }
+            throw runtime_error(format_string("could not create directory path '%s'", outputPath.c_str()));
         }
     }
 
@@ -182,7 +176,7 @@ void Sniffer::addSpaces(string &text, uint spacesCount)
 {
     string indent = "\n";
     indent = indent.append(spacesCount, ' ');
-    boost::replace_all(text, "\n", indent);
+    replaceAll(text, "\n", indent);
 }
 
 erpc_status_t Sniffer::parseDataType(DataType *dataType, string &parsedDataInfo)

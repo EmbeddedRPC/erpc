@@ -29,6 +29,7 @@
 #include "annotations.h"
 #include "cpptempl.hpp"
 
+#include <algorithm>
 #include <cstring>
 
 using namespace erpcgen;

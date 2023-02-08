@@ -24,16 +24,6 @@ CUR_DIR := $(notdir $(CURDIR))
 OUTPUT_ROOT := $(ERPC_ROOT)
 TEST_ROOT :=  $(ERPC_ROOT)/test
 
-ifeq "$(is_mingw)" "1"
-    BOOST_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/boost_1_67_0
-else ifneq "$(is_darwin)" "1"
-    BOOST_ROOT ?= /usr/local/opt/boost
-else
-    ifndef BOOST_ROOT
-        BOOST_ROOT := $(shell brew --prefix boost)
-    endif
-endif
-
 TARGET_OUTPUT_ROOT = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/$(APP_NAME)
 MAKE_TARGET = $(TARGET_OUTPUT_ROOT)/$(APP_NAME)
 

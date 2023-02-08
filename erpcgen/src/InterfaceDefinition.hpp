@@ -14,7 +14,7 @@
 #include "types/Program.hpp"
 #include "types/SymbolScope.hpp"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ public:
      *
      * @return Return output directory path.
      */
-    boost::filesystem::path getOutputDirectory() { return m_outputDirectory; }
+    std::filesystem::path getOutputDirectory() { return m_outputDirectory; }
 
     /*!
      * @brief This function returns output file name.
@@ -161,14 +161,14 @@ public:
 
 private:
     /* Instance Variables */
-    AstNode *m_ast;                            /*!< Root of AstNode tree. */
-    SymbolScope m_globals;                     /*!< Symbol scope data. */
-    Program *m_program;                        /*!< Program symbol.*/
-    std::string m_programName;                 /*!< Program name set via parsed file. */
-    std::string m_outputFilename;              /*!< Output file name. */
-    boost::filesystem::path m_outputDirectory; /*!< Output file path. */
-    codec_t m_codec;                           /*!< Used codec type. */
-    uint16_t m_idlCrc16;                       /*!< Crc16 of IDL files. */
+    AstNode *m_ast;                          /*!< Root of AstNode tree. */
+    SymbolScope m_globals;                   /*!< Symbol scope data. */
+    Program *m_program;                      /*!< Program symbol.*/
+    std::string m_programName;               /*!< Program name set via parsed file. */
+    std::string m_outputFilename;            /*!< Output file name. */
+    std::filesystem::path m_outputDirectory; /*!< Output file path. */
+    codec_t m_codec;                         /*!< Used codec type. */
+    uint16_t m_idlCrc16;                     /*!< Crc16 of IDL files. */
 
     /* Private Functions */
     /*!
