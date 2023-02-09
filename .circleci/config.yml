@@ -20,8 +20,8 @@ jobs:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
       - run: chmod u+x run_tests.sh && ./run_tests.sh clang
-      - store_artifacts:
-          path: ./Release/Linux/erpcgen/erpcgen
+      # - store_artifacts:
+      #     path: ./Release/Linux/erpcgen/erpcgen
   build-mac-gcc:
     macos:
       xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
@@ -40,8 +40,8 @@ jobs:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
       - run: chmod u+x run_tests.sh && ./run_tests.sh clang
-      - store_artifacts:
-          path: ./Release/Darwin/erpcgen/erpcgen
+      # - store_artifacts:
+      #     path: ./Release/Darwin/erpcgen/erpcgen
   build-windows-mingw:
     executor:
       name: win/default
@@ -50,8 +50,21 @@ jobs:
       - checkout
       - run: powershell.exe .\install_dependencies.ps1
       - run: powershell.exe .\mingw64\bin\mingw32-make erpcgen
+      # - store_artifacts:
+      #     path: ./Release/MINGW64/erpcgen/erpcgen.exe
+  build-windows-VS:
+    executor:
+      name: win/default
+      size: large
+    steps:
+      - checkout
+      - run:
+          name: Install VS buuildtools
+          no_output_timeout: 60m
+          command: powershell.exe .\install_dependencies.ps1 VS
+      - run: powershell.exe  "& 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe' .\erpcgen\VisualStudio_v14\erpcgen.sln /property:Configuration=Release"
       - store_artifacts:
-          path: ./Release/MINGW64/erpcgen/erpcgen.exe
+          path: ./erpcgen/VisualStudio_v14/Release/erpcgen.exe
 
 workflows:
   build-workflow:
@@ -61,3 +74,4 @@ workflows:
       - build-mac-gcc
       - build-mac-clang
       - build-windows-mingw
+      - build-windows-VS

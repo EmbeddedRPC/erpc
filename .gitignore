@@ -111,3 +111,4 @@ boost.7z
 boost*/
 mingw.7z
 mingw64/
+vs_BuildTools*
