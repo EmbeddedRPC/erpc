@@ -120,8 +120,4 @@ else
     endif
 endif
 
-ifeq "$(is_linux)" "1"
-    LIBRARIES += -lpthread -lrt
-endif
-
 include $(ERPC_ROOT)/mk/targets.mk

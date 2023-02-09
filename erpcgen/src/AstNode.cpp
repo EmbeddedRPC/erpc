@@ -10,9 +10,9 @@
 #include "AstNode.hpp"
 
 #include "ErpcLexer.hpp"
+#include "Utils.hpp"
 #include "format_string.hpp"
 
-#include <boost/algorithm/string.hpp>
 #include <cstdio>
 
 using namespace erpcgen;
@@ -195,8 +195,8 @@ string AstNode::getDescription() const
     const token_loc_t &loc = tok.getLocation();
     if (val && tok.getToken() == TOK_ML_COMMENT)
     {
-        boost::replace_all(valToString, "\r\n", " ");
-        boost::replace_all(valToString, "\n", " ");
+        replaceAll(valToString, "\r\n", " ");
+        replaceAll(valToString, "\n", " ");
         if (valToString.size() > 55)
         {
             valToString = valToString.substr(0, 25) + " ... " + valToString.substr(valToString.size() - 20, 20);

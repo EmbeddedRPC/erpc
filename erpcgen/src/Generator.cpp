@@ -16,9 +16,9 @@
 #include "annotations.h"
 #include "format_string.hpp"
 
-#include <boost/filesystem.hpp>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -162,17 +162,10 @@ void Generator::openFile(ofstream &fileOutputStream, const string &fileName)
     if (!m_outputDirectory.empty())
     {
         // TODO: do we have to create a copy of the outputDir here? Doesn't make sense...
-        boost::filesystem::path dir(m_outputDirectory);
-        if (!boost::filesystem::is_directory(dir))
+        std::filesystem::create_directories(m_outputDirectory);
+        if (!std::filesystem::is_directory(m_outputDirectory))
         {
-            // Create_directories function return false also when it create new directory.
-            // It is in case, when directory ends with slash. For these case is better use is_directory for check if
-            // directories are created.
-            boost::filesystem::create_directories(dir);
-            if (!boost::filesystem::is_directory(dir))
-            {
-                throw runtime_error(format_string("could not create directory path '%s'", m_outputDirectory.c_str()));
-            }
+            throw runtime_error(format_string("could not create directory path '%s'", m_outputDirectory.c_str()));
         }
     }
     string filePathWithName = (m_outputDirectory / fileName).string();
@@ -612,9 +605,9 @@ Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope 
 {
     datatype_vector_t vector;
 
-    for(Symbol *symbol: scope->getSymbolsOfType(Symbol::kTypenameSymbol))
+    for (Symbol *symbol : scope->getSymbolsOfType(Symbol::kTypenameSymbol))
     {
-        DataType *dataType = dynamic_cast<DataType*>(symbol);
+        DataType *dataType = dynamic_cast<DataType *>(symbol);
         if (dataType->getDataType() == datatype)
         {
             vector.push_back(dataType);

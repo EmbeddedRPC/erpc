@@ -1719,7 +1719,7 @@ data_map CGenerator::getFunctionTypeTemplateData(Group *group, FunctionType *fn)
     {
         if (structMember->getName().empty())
         {
-            structMember->setName("param" + boost::lexical_cast<std::string>(j++));
+            structMember->setName("param" + std::to_string(j++));
         }
     }
 

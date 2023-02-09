@@ -28,9 +28,9 @@ else
     MARCH ?=    # -m32 or -m64
 endif
 
-CXXFLAGS += -std=gnu++11 -Wunused-variable -Wno-deprecated-register -Wno-narrowing -Werror $(MARCH)
+CXXFLAGS += -std=gnu++17 -Wunused-variable -Wno-deprecated-register -Wno-narrowing -Werror $(MARCH)
 #CXXFLAGS += -Wall -Wextra -Wshadow -pedantic-errors
-CFLAGS   += -std=gnu11 -Werror $(MARCH)
+CFLAGS   += -std=gnu17 -Werror $(MARCH)
 YYFLAGS  += -Wno-other # --debug --verbose
 LLFLAGS  +=
 LDFLAGS += $(MARCH)
@@ -44,10 +44,8 @@ ifeq "$(CXX)" "g++"
 endif
 endif
 
-# Add boost library search path.
 # This is the defualt installation location by home brew.
 ifeq "$(is_darwin)" "1"
-    LDFLAGS += -L $(BOOST_ROOT)/lib
     LDFLAGS += -L$(FLEX_ROOT)/lib
     INCLUDES += $(FLEX_ROOT)/include
 endif
@@ -76,6 +74,10 @@ endif
 
 ifneq "$(is_cygwin)" "1"
     LIBRARIES += -lstdc++
+endif
+
+ifeq "$(is_linux)" "1"
+    LIBRARIES += -lpthread -lrt
 endif
 
 LIBRARIES += -lm

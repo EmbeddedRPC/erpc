@@ -188,7 +188,6 @@ Install these packages:
 
 * bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
-* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.65.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter 3.6+ work
 * gcc-7: GNU C compiler (recommended version)
@@ -197,7 +196,6 @@ Install these packages:
 Mandatory for case, when build for different architecture is needed
 
 * gcc-multilib, g++-multilib
-* boost libraries: for target architecture like libboost-filesystem-dev:i386 libboost-system-dev:i386
 
 #### Mac OS X
 
@@ -205,7 +203,6 @@ Install these packages with [homebrew](http://brew.sh/):
 
 * bison: GNU yacc-compatible parser generator (version 3.7.3 is recommended)
 * flex: A fast lexical analyzer generator (version 2.6.4 is recommended)
-* boost: Boost C++ libraries (version 1.74 is recommended)
 
 ### Building
 

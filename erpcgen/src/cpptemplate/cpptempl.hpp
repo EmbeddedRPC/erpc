@@ -42,13 +42,13 @@
 #define NOTHROW
 #endif // NOTHROW
 
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 
 namespace cpptempl {
 
@@ -249,7 +249,9 @@ void data_ptr::operator=(const data_list &data);
 template <typename T>
 void data_ptr::operator=(const T &data)
 {
-    this->operator=(boost::lexical_cast<std::string>(data));
+    std::ostringstream ss;
+    ss << data;
+    this->operator=(ss.str());
 }
 
 // Custom exception class for library errors
@@ -316,7 +318,9 @@ inline data_ptr make_data(data_map &&val)
 template <typename T>
 data_ptr make_data(const T &val)
 {
-    return data_ptr(boost::lexical_cast<std::string>(val));
+    std::ostringstream ss;
+    ss << val;
+    return data_ptr(ss.str());
 }
 
 void dump_data(data_ptr data);

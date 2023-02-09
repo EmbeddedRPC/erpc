@@ -26,19 +26,30 @@
 #endif
 
 #include "cpptempl.hpp"
-#include <cctype>
-#include <sstream>
-#include <algorithm>
-#include <stack>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <cassert>
-#include <cstdlib>
 
-namespace cpptempl
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <cassert>
+#include <cctype>
+#include <cstdlib>
+#include <sstream>
+#include <stack>
+#include <functional>
+
+namespace cpptempl {
+
+void replaceAll(std::string &str, const std::string &from, const std::string &to)
 {
-namespace impl
-{
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+}
+
+namespace impl {
 // Types of tokens in control statements.
 enum TokenType
 {
@@ -365,7 +376,7 @@ void create_id_token(token_vector &tokens, const std::string &s);
 int append_string_escape(std::string &str, std::function<char(unsigned)> peek);
 token_vector tokenize_statement(const std::string &text);
 inline size_t count_newlines(const std::string &text);
-}
+} // namespace impl
 
 // This allows inclusion of the cpptempl::impl declarations into the unit test
 // without also bringing in the implementation.
@@ -564,7 +575,8 @@ int DataValue::getint() const
 void DataValue::dump(int indent)
 {
     (void)indent;
-    std::string text = boost::algorithm::replace_all_copy(getvalue(), "\n", "\\n");
+    std::string text = getvalue();
+    replaceAll(text, "\n", "\\n");
     std::cout << "\"" << text << "\"" << std::endl;
 }
 // data list
@@ -691,7 +703,7 @@ void TemplateException::set_line_if_missing(size_t line)
     if (!m_line)
     {
         m_line = line;
-        m_reason = std::string("Line ") + boost::lexical_cast<std::string>(line) + ": " + m_reason;
+        m_reason = std::string("Line ") + std::to_string(line) + ": " + m_reason;
     }
 }
 
@@ -736,8 +748,7 @@ void dump_data(data_ptr data)
     data->dump();
 }
 
-namespace impl
-{
+namespace impl {
 std::string indent(int level)
 {
     std::string result;
@@ -883,10 +894,7 @@ token_vector tokenize_statement(const std::string &text)
     bool is_hex_literal = false;
 
     // closure to get the next char without advancing
-    auto peek = [&](unsigned n)
-    {
-        return i + n < text.size() ? text[i + n] : 0;
-    };
+    auto peek = [&](unsigned n) { return i + n < text.size() ? text[i + n] : 0; };
 
     for (; i < text.size(); ++i)
     {
@@ -1155,10 +1163,10 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
                         {
                             resultValue += '\n';
                         }
-						if (line.size() > 0 && line[0] != '\r' && line[0] != '\n')
-						{
-							resultValue += params[0]->getvalue() + line;
-						}
+                        if (line.size() > 0 && line[0] != '\r' && line[0] != '\n')
+                        {
+                            resultValue += params[0]->getvalue() + line;
+                        }
                     }
                     result = resultValue;
                 }
@@ -1174,19 +1182,13 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
             else if (path == "upper")
             {
                 std::string s = params[0]->getvalue();
-                std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c)
-                               {
-                                   return std::toupper(c);
-                               });
+                std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
                 result = s;
             }
             else if (path == "lower")
             {
                 std::string s = params[0]->getvalue();
-                std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c)
-                               {
-                                   return std::tolower(c);
-                               });
+                std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
                 result = s;
             }
         }
@@ -1243,14 +1245,12 @@ data_ptr ExprParser::parse_factor()
             m_tok.next();
             result = false;
             break;
-        case INT_LITERAL_TOKEN:
-        {
+        case INT_LITERAL_TOKEN: {
             const Token *literal = m_tok.match(INT_LITERAL_TOKEN, "expected int literal");
             return new DataInt((int)std::strtol(literal->get_value().c_str(), NULL, 0));
             break;
         }
-        case KEY_PATH_TOKEN:
-        {
+        case KEY_PATH_TOKEN: {
             const Token *path = m_tok.match(KEY_PATH_TOKEN, "expected key path");
 
             data_list params;
@@ -2017,8 +2017,7 @@ void TemplateParser::parse_stmt()
                 break;
 
             case ELIF_TOKEN:
-            case ELSE_TOKEN:
-            {
+            case ELSE_TOKEN: {
                 auto current_if = dynamic_cast<NodeIf *>(m_current_node.get());
                 if (!current_if)
                 {
@@ -2115,13 +2114,13 @@ void TemplateParser::check_omit_eol(size_t pos, bool force_omit)
 } // namespace impl
 
 /************************************************************************
-* parse
-*
-*  1. tokenizes template
-*  2. parses tokens into tree
-*  3. resolves template
-*  4. returns converted text
-************************************************************************/
+ * parse
+ *
+ *  1. tokenizes template
+ *  2. parses tokens into tree
+ *  3. resolves template
+ *  4. returns converted text
+ ************************************************************************/
 std::string parse(const std::string &templ_text, data_map &data)
 {
     return DataTemplate(templ_text).eval(data);
