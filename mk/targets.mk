@@ -134,8 +134,7 @@ endif
 .PHONY: clean
 clean::
 	@echo "Cleaning $(APP_NAME)"
-	$(warning "$(at)$(rmc) $(OBJECTS_ALL) $(OBJECTS_DIRS) $(MAKE_TARGET)")
-	$(at)$(POWERSHELL) $(rmc) $(OBJECTS_ALL) $(OBJECTS_DIRS) $(MAKE_TARGET)
+	$(at)$(rmc) $(OBJECTS_ALL) $(OBJECTS_DIRS) $(MAKE_TARGET)
 
 # Include dependency files.
 -include $(OBJECTS_ALL:.o=.d)

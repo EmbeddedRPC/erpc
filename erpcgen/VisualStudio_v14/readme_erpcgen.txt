@@ -12,7 +12,8 @@ Requirements
 2. Win flex-bison
 
     Direct link to the latests win flex-bison release download:
-        [https://sourceforge.net/projects/winflexbison]
+        [https://sourceforge.net/projects/winflexbison/files/win_flex_bison3-latest.zip/download]
+
 
     Extract win flex-bison zip contents directly into the erpc/erpcgen/VisualStudio_v14 directory
     (not into a subdirectory).

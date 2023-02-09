@@ -41,8 +41,8 @@ all: cpptempl_test
 .PHONY: clean
 clean:
 	@echo "Cleaning output..."
-	@rm -rf *.o
-	@rm -rf *.d
+	@$(rmc) *.o
+	@$(rmc) *.d
 	@rm -f $(TARGET)
 
 .PHONY: test testv

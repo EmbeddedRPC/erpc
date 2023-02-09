@@ -36,6 +36,6 @@ test-serial: all
 
 clean::
 	@echo "Cleaning test results..."
-	@rm -rf results
+	@$(rmc) results
 
 include $(ERPC_ROOT)/mk/subdirs.mk

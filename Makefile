@@ -71,18 +71,21 @@ test-serial: $(TESTDIR)
 .PHONY: fresh
 fresh: clean all
 
-define clean_fun
-	$(warning "$(at)$(POWERSHELL) "if (Test-Path $(1)) { $(rmc) $(1) }"")
-	$(at)$(POWERSHELL) 'if (Test-Path $(1)) { $(rmc) $(1) }'
-endef
+# define clean_fun
+# 	$(warning "$(at)$(POWERSHELL) "if (Test-Path $(1)) { $(rmc) $(1) }"")
+# 	$(at)$(POWERSHELL) 'if (Test-Path $(1)) { $(rmc) $(1) }'
+# endef
 
 # Target to clean everything.
 .PHONY: clean
 clean::
 	@echo "Deleting output directories..."
-	@$(call clean_fun,Debug,)
-	@$(call clean_fun,Release,)
-	@$(call clean_fun,erpc_outputs,)
+	@$(rmc) Debug Release
+	@$(rmc) out*.*
+	@$(rmc) erpc_outputs
+# 	@$(call clean_fun,Debug,)
+# 	@$(call clean_fun,Release,)
+# 	@$(call clean_fun,erpc_outputs,)
 	@echo "done."
 
 # Process subdirs

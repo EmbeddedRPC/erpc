@@ -29,6 +29,8 @@ win_bison.exe
 win_flex.exe
 README.txt
 .vs
+changelog.md
+README.md
 
 #boost libraries
 boost_*

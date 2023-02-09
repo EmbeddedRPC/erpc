@@ -45,7 +45,7 @@ INCLUDES += $(ERPC_ROOT) \
 			$(OBJS_ROOT)
 
 ifeq "$(is_mingw)" "1"
-INCLUDES += $(ERPC_ROOT)/windows
+INCLUDES += $(VISUAL_STUDIO_ROOT)
 endif
 
 SOURCES += 	$(OBJS_ROOT)/erpcgen_parser.tab.cpp \
@@ -103,8 +103,8 @@ $(OBJS_ROOT)/erpcgen_parser.tab.hpp: $(ERPC_ROOT)/erpcgen/src/erpcgen_parser.y |
 .PHONY: install
 install: $(MAKE_TARGET)
 	@$(call printmessage,c,Installing, erpcsniffer in $(BIN_INSTALL_DIR))
-	$(at)mkdir -p $(BIN_INSTALL_DIR)
+	$(at)$(mkdirc) -p $(BIN_INSTALL_DIR)
 	$(at)install $(MAKE_TARGET) $(BIN_INSTALL_DIR)
 
 clean::
-	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
+	$(at)$(rmc) $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
