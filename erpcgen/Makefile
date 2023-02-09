@@ -112,7 +112,9 @@ ifeq "$(build)" "release"
     endif
 endif
 
+ifeq "$(is_mingw)" "1"
 CXXFLAGS += -DBOOST_FILESYSTEM_VERSION=4
+endif
 
 # Run flex
 $(OBJS_ROOT)/erpcgen_lexer.cpp: $(ERPC_ROOT)/erpcgen/src/erpcgen_lexer.l $(OBJS_ROOT)/erpcgen_parser.tab.hpp | $(OBJECTS_DIRS)

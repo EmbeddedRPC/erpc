@@ -27,6 +27,7 @@ TEST_ROOT :=  $(ERPC_ROOT)/test
 ifeq "$(is_mingw)" "1"
     VISUAL_STUDIO_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14
     MINGW64 ?= $(ERPC_ROOT)/mingw64
+    export PATH := $(MINGW64):$(MINGW64)/bin:$(PATH)
     CC = gcc
     CXX = g++
 endif
@@ -94,7 +95,7 @@ else ifeq "$(is_mingw)" "1"
 endif
 
 ifeq "$(is_mingw)" "1"
-    MAKE := mingw32-make
+    MAKE := $(MINGW64)/bin/mingw32-make
     POWERSHELL ?= powershell
     mkdirc = $(POWERSHELL) mkdir -Force
     rmc = $(POWERSHELL) rm -Recurse -Force -ErrorAction Ignore

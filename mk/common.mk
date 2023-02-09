@@ -61,7 +61,6 @@ ifeq "$(os_name)" ""
     os_name := $(shell powershell [System.Environment]::OSVersion.Version)
     ifneq "$(os_name)" ""
         is_mingw := 1
-        os_name = MINGW
     endif
 else
     # Set to 1 if running on Darwin.
@@ -76,7 +75,11 @@ else
     # Set to 1 if running on Linux.
     is_linux := $(and $(findstring Linux,$(os_name)),1)
 
-    is_mingw := 0
+    is_mingw := $(and $(findstring MSYS_NT,$(os_name)),1)
+endif
+
+ifeq "$(is_mingw)" "1"
+    os_name = MINGW64
 endif
 
 #-------------------------------------------------------------------------------
