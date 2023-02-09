@@ -47,7 +47,9 @@ INC_INSTALL_DIR = $(PREFIX)/include/erpc
 ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
 LD := $(CXX)
 PYTHON ?= python
-ifeq (, $(shell which $(PYTHON)))
+ifeq "$(is_mingw)" "1"
+    PYTHON=..\opt\bin\python3
+else ifeq (, $(shell which $(PYTHON)))
     PYTHON=python3
     ifeq (, $(shell which $(PYTHON)))
         $(error "No python found. Please install python3.")
@@ -85,9 +87,12 @@ else ifeq "$(is_mingw)" "1"
 endif
 
 ifeq "$(is_mingw)" "1"
-    mkdirc = C:\MinGW\msys\1.0\bin\mkdir.exe
-    CC+=gcc
+    MAKE := mingw32-make
+    POWERSHELL ?= powershell
+    mkdirc = $(POWERSHELL) mkdir -Force
+    rmc = rm -Recurse -Force -ErrorAction Ignore
 else
+    rmc = rm -rf
     mkdirc = mkdir
 endif
 
