@@ -64,6 +64,9 @@
 //! Do not free memory for a parameter in the server shim.
 #define RETAIN_ANNOTATION "retain"
 
+//! Scope name for erpc shim code
+#define SCOPE_NAME_ANNOTATION "scope_name"
+
 //! Data handled through shared memory area
 #define SHARED_ANNOTATION "shared"
 
