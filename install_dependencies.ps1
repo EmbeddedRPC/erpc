@@ -22,8 +22,11 @@ Set-Location "..\..\"
 
 if ($args[0] -eq "VS")
 {
-    # winget install --id=Microsoft.VisualStudio.2019.BuildTools  -e
-    # & 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe' .\erpcgen\VisualStudio_v14\erpcgen.sln /property:Configuration=Release
+    $URLBuildtools="https://download.visualstudio.microsoft.com/download/pr/33d686db-3937-4a19-bb3c-be031c5d69bf/66d85abf1020496b07c59aba176def5127352f2fbdd3c4c4143738ab7dfcb459/vs_BuildTools.exe"
+    $PathBuildtools="vs_BuildTools.exe"
+    Remove-Item -ErrorAction Ignore $PathBuildtools
+    Invoke-WebRequest -URI $URLBuildtools -OutFile $PathBuildtools
+    Start-Process $PathBuildtools -ArgumentList "--quiet --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --wait"  -Wait
 }
 else
 {
