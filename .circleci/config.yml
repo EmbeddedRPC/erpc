@@ -65,7 +65,6 @@ jobs:
       - run: powershell.exe  "& 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe' .\erpcgen\VisualStudio_v14\erpcgen.sln /property:Configuration=Release"
       - store_artifacts:
           path: ./erpcgen/VisualStudio_v14/Release/erpcgen.exe
-
 workflows:
   build-workflow:
     jobs:
