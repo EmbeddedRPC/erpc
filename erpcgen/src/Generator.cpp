@@ -16,6 +16,7 @@
 #include "annotations.h"
 #include "format_string.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
