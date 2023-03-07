@@ -24,6 +24,14 @@ CUR_DIR := $(notdir $(CURDIR))
 OUTPUT_ROOT := $(ERPC_ROOT)
 TEST_ROOT :=  $(ERPC_ROOT)/test
 
+ifeq "$(is_mingw)" "1"
+    VISUAL_STUDIO_ROOT ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14
+    MINGW64 ?= $(ERPC_ROOT)/mingw64
+    export PATH := $(MINGW64):$(MINGW64)/bin:$(PATH)
+    CC = gcc
+    CXX = g++
+endif
+
 TARGET_OUTPUT_ROOT = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/$(APP_NAME)
 MAKE_TARGET = $(TARGET_OUTPUT_ROOT)/$(APP_NAME)
 
@@ -45,9 +53,11 @@ INC_INSTALL_DIR = $(PREFIX)/include/erpc
 # ----------------------------------------------
 
 ERPCGEN ?= $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/erpcgen/erpcgen
-LD := $(CXX)
+LD = $(CXX)
 PYTHON ?= python
-ifeq (, $(shell which $(PYTHON)))
+ifeq "$(is_mingw)" "1"
+    PYTHON=$(MINGW64)/opt/bin/python3
+else ifeq (, $(shell which $(PYTHON)))
     PYTHON=python3
     ifeq (, $(shell which $(PYTHON)))
         $(error "No python found. Please install python3.")
@@ -80,14 +90,17 @@ else ifeq "$(is_cygwin)" "1"
     FLEX ?= /bin/flex
     BISON ?= /bin/bison
 else ifeq "$(is_mingw)" "1"
-    FLEX ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_flex.exe
-    BISON ?= $(ERPC_ROOT)/erpcgen/VisualStudio_v14/win_bison.exe
+    FLEX ?= $(VISUAL_STUDIO_ROOT)/win_flex.exe
+    BISON ?= $(VISUAL_STUDIO_ROOT)/win_bison.exe
 endif
 
 ifeq "$(is_mingw)" "1"
-    mkdirc = C:\MinGW\msys\1.0\bin\mkdir.exe
-    CC+=gcc
+    MAKE := $(MINGW64)/bin/mingw32-make
+    POWERSHELL ?= powershell
+    mkdirc = $(POWERSHELL) mkdir -Force
+    rmc = $(POWERSHELL) rm -Recurse -Force -ErrorAction Ignore
 else
+    rmc = rm -rf
     mkdirc = mkdir
 endif
 

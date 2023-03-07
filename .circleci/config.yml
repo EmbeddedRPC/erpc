@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@5.0 # The Windows orb gives you everything you need to start using the
+
 jobs:
   build-linux-gcc:
     machine:
@@ -39,7 +42,16 @@ jobs:
       - run: chmod u+x run_tests.sh && ./run_tests.sh clang
       - store_artifacts:
           path: ./Release/Darwin/erpcgen/erpcgen
-
+  build-windows-mingw:
+    executor:
+      name: win/default
+      size: large
+    steps:
+      - checkout
+      - run: powershell.exe .\install_dependencies.ps1
+      - run: powershell.exe .\mingw64\bin\mingw32-make erpcgen
+      - store_artifacts:
+          path: ./Release/MINGW64/erpcgen/erpcgen.exe
 
 workflows:
   build-workflow:
@@ -48,3 +60,4 @@ workflows:
       - build-linux-clang
       - build-mac-gcc
       - build-mac-clang
+      - build-windows-mingw

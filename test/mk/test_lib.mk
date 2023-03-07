@@ -56,5 +56,5 @@ include $(ERPC_ROOT)/mk/targets.mk
 
 $(TARGET_LIB)(%): %
 	@$(call printmessage,ar,Archiving, $(?F) in $(@F))
-	$(at)mkdir -p $(dir $(@))
+	$(at)$(mkdirc) -p $(dir $(@))
 	$(AR) $(ARFLAGS) $@ $?

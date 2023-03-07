@@ -109,8 +109,8 @@ clean: clean_serial clean_tcp
 
 clean_tcp:
 	@echo Cleaning $(TEST_NAME)_tcp...
-	@rm -rf $(UT_OUTPUT_DIR)/$(os_name)/tcp
+	@$(rmc) $(UT_OUTPUT_DIR)/$(os_name)/tcp
 
 clean_serial:
 	@echo Cleaning $(TEST_NAME)_serial...
-	@rm -rf $(UT_OUTPUT_DIR)/$(os_name)/serial
+	@$(rmc) $(UT_OUTPUT_DIR)/$(os_name)/serial
