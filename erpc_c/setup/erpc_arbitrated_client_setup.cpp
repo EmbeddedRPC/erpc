@@ -224,7 +224,7 @@ void erpc_arbitrated_client_deinit(erpc_client_t client)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     (void)client;
-    erpc_assert(client == s_client.get());
+    erpc_assert(reinterpret_cast<ArbitratedClientManager *>(client) == s_client.get());
     s_codecFactory.destroy();
     s_crc16.destroy();
     s_codec.destroy();

@@ -106,7 +106,7 @@ void erpc_server_deinit(erpc_server_t server)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     (void)server;
-    erpc_assert(server == s_server.get());
+    erpc_assert(reinterpret_cast<SimpleServer *>(server) == s_server.get());
     s_crc16.destroy();
     s_codecFactory.destroy();
     s_server.destroy();
