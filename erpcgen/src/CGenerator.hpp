@@ -34,7 +34,7 @@ public:
      *
      * @param[in] def Contains all Symbols parsed from IDL files.
      */
-    CGenerator(InterfaceDefinition *def);
+    explicit CGenerator(InterfaceDefinition *def);
 
     /*!
      * @brief This function is destructor of CGenerator class.
@@ -48,7 +48,7 @@ public:
      *
      * This code call all necessary functions for prepare output code and parse it into output files.
      */
-    virtual void generate();
+    virtual void generate() override;
 
 private:
     enum _direction
@@ -89,7 +89,7 @@ private:
      * @param[in] fileNameExtension Extension for file name (for example for case that each interface will be generated
      * in its set of output files).
      */
-    void generateOutputFiles(const std::string &fileNameExtension);
+    void generateOutputFiles(const std::string &fileNameExtension) override;
 
     /*!
      * @brief This function generate output common types header file.
@@ -157,14 +157,14 @@ private:
      *
      * @return Pointer to given or new DataType.
      */
-    DataType *findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType);
+    DataType *findChildDataType(std::set<DataType *> &dataTypes, DataType *dataType) override;
 
     /*!
      * @brief This function transform binary data type to list and set annotation to it.
      *
      * @param[in] structMember Structure member, Function parameter or Union member.
      */
-    void setBinaryList(StructMember *structMember);
+    void setBinaryList(StructMember *structMember) override;
 
     /*!
      * @brief This function returns function base template data.
@@ -190,7 +190,7 @@ private:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
 
     /*!
      * @brief This function returns function type (callbacks type) template data.
@@ -212,7 +212,7 @@ private:
      * @param[in] symbol Pointer to symbol.
      * @param[inout] symbolInfo Data map, which contains information about symbol.
      */
-    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo);
+    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo) override;
 
     /*!
      * @brief This function sets const template data.
@@ -234,7 +234,7 @@ private:
      *
      * @return Data map with group symbols templates.
      */
-    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group);
+    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group) override;
 
     /*!
      * @brief This function sets group callbacks template data.
@@ -424,7 +424,7 @@ private:
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string name = "");
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string name = "");
 
     /*!
      * @brief This function return interface function representation called by server side.
@@ -542,7 +542,7 @@ private:
      *
      * @return Erpc_alloc function or empty.
      */
-    cpptempl::data_map firstAllocOnServerWhenIsNeed(std::string name, StructMember *structMember);
+    cpptempl::data_map firstAllocOnServerWhenIsNeed(const std::string &name, StructMember *structMember);
 
     /*!
      * @brief This function call first erpc_alloc on client side return statement if it is need.
@@ -554,7 +554,7 @@ private:
      *
      * @return Erpc_alloc function or empty.
      */
-    cpptempl::data_map firstAllocOnReturnWhenIsNeed(std::string name, DataType *dataType);
+    cpptempl::data_map firstAllocOnReturnWhenIsNeed(const std::string &name, DataType *dataType);
 
     /*!
      * @brief This function return call for alloc space based on given data type.
@@ -577,7 +577,7 @@ private:
      * @param[in,out] toServer List of data types designed for server direction.
      * @param[in] dataMap Map with information about structure or function parameter.
      */
-    void setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> directions,
+    void setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> &directions,
                              cpptempl::data_list &toClient, cpptempl::data_list &toServer, cpptempl::data_map &dataMap);
 
     /*!
@@ -670,7 +670,7 @@ private:
      * @retval true When structure is used as a wrapper for binary type.
      * @retval false When structure is not used as a wrapper for binary type.
      */
-    bool isBinaryList(ListType *listType);
+    bool isBinaryList(const ListType *listType);
 
     /*!
      * @brief This function returns true when structure is used as a wrapper for list type.
@@ -680,7 +680,7 @@ private:
      * @retval true When structure is used as a wrapper for list type.
      * @retval false When structure is not used as a wrapper for list type.
      */
-    bool isListStruct(StructType *structType);
+    bool isListStruct(const StructType *structType);
 
     /*!
      * @brief This function returns true when "retain" annotation wasn't set.

@@ -253,7 +253,7 @@ public:
      *
      * @param[in] options Options, which can be used.
      */
-    void printUsage(Options &options)
+    void printUsage(const Options &options)
     {
         options.usage(cout, "files...");
         printf(k_usageText);

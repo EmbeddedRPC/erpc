@@ -34,7 +34,7 @@ public:
     /*!
      * @brief MessageLogger constructor.
      */
-    MessageLogger(Transport *transport)
+    explicit MessageLogger(Transport *transport)
     : m_next(NULL)
     , m_transport(transport){};
 

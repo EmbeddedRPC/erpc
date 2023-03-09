@@ -71,7 +71,7 @@ public:
      * @see Token::Token(int token, Value * value, const token_loc_t & loc)
      * @see Token::Token(const Token & other)
      */
-    Token(int token)
+    explicit Token(int token)
     : m_token(token)
     , m_value()
     , m_location()
@@ -131,7 +131,7 @@ public:
      * @see Token::Token(int token, Value * value)
      * @see Token::Token(int token, Value * value, const token_loc_t & loc)
      */
-    Token(const Token &other);
+    explicit Token(const Token &other);
 
     /*!
      * @brief This function copy data from one token to other token with using

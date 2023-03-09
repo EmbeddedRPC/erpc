@@ -81,11 +81,11 @@ public:
 
     virtual ~OptIterRwd(void);
 
-    virtual const char *curr(void) = 0;
+    virtual const char *curr(void) override = 0;
 
-    virtual void next(void) = 0;
+    virtual void next(void) override = 0;
 
-    virtual const char *operator()(void) = 0;
+    virtual const char *operator()(void) override = 0;
 
     //! rewind() resets the "current-element" to the first one in the "list"
     virtual void rewind(void) = 0;
@@ -102,7 +102,7 @@ private:
     const char *const *av; // arg vector
 
 public:
-    OptArgvIter(const char *const argv[])
+    explicit OptArgvIter(const char *const argv[])
     : ndx(0)
     , ac(-1)
     , av(argv)
@@ -118,13 +118,13 @@ public:
 
     virtual ~OptArgvIter(void);
 
-    virtual const char *curr(void);
+    virtual const char *curr(void) override;
 
-    virtual void next(void);
+    virtual void next(void) override;
 
-    virtual const char *operator()(void);
+    virtual const char *operator()(void) override;
 
-    virtual void rewind(void);
+    virtual void rewind(void) override;
 
     //! index returns the current index to use for argv[]
     int index(void) { return ndx; }
@@ -144,17 +144,17 @@ private:
     static const char *default_delims; // default delimiters = whitespace
 
 public:
-    OptStrTokIter(const char *tokens, const char *delimiters = 0);
+    explicit OptStrTokIter(const char *tokens, const char *delimiters = 0);
 
     virtual ~OptStrTokIter(void);
 
-    virtual const char *curr(void);
+    virtual const char *curr(void) override;
 
-    virtual void next(void);
+    virtual void next(void) override;
 
-    virtual const char *operator()(void);
+    virtual const char *operator()(void) override;
 
-    virtual void rewind(void);
+    virtual void rewind(void) override;
 
     //! delimiters() with NO arguments returns the current set of delimiters,
     //! If an argument is given then it is used as the new set of delimiters.
@@ -189,15 +189,15 @@ private:
 public:
     static const unsigned MAX_LINE_LEN;
 
-    OptIstreamIter(std::istream &input);
+    explicit OptIstreamIter(std::istream &input);
 
     virtual ~OptIstreamIter(void);
 
-    virtual const char *curr(void);
+    virtual const char *curr(void) override;
 
-    virtual void next(void);
+    virtual void next(void) override;
 
-    virtual const char *operator()(void);
+    virtual const char *operator()(void) override;
 };
 
 //! \brief parse command-line options

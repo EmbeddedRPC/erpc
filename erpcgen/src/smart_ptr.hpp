@@ -74,6 +74,13 @@ public:
         return *this;
     }
 
+    //! To allow setting the pointer directly. Equivalent to a call to set().
+    smart_ptr<T> &operator=(ptr_type p)
+    {
+        set(p);
+        return *this;
+    }
+
     //! Destructor. If an object (pointer) has been set, it will be deleted.
     //! Deletes the object using safe_delete().
     virtual ~smart_ptr() { safe_delete(); }
@@ -132,13 +139,6 @@ public:
 
     //! Returns a boolean indicating whether the object has a pointer set or not.
     operator bool() const { return _p != nullptr; }
-
-    //! To allow setting the pointer directly. Equivalent to a call to set().
-    smart_ptr<T> &operator=(ptr_type p)
-    {
-        set(p);
-        return *this;
-    }
 
     //! Another operator to allow you to treat the object just like a pointer.
     ptr_type operator->() { return _p; }

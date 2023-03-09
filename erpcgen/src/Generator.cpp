@@ -169,7 +169,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     }
 }
 
-Group *Generator::getGroupByName(string name)
+Group *Generator::getGroupByName(const string &name)
 {
     for (Group *group : m_groups)
     {
@@ -591,22 +591,22 @@ Annotation::program_lang_t Generator::getAnnotationLang()
     throw internal_error("Unsupported generator type specified for annotation.");
 }
 
-Annotation *Generator::findAnnotation(Symbol *symbol, string name)
+Annotation *Generator::findAnnotation(Symbol *symbol, const string &name)
 {
     return symbol->findAnnotation(name, getAnnotationLang());
 }
 
-vector<Annotation *> Generator::getAnnotations(Symbol *symbol, string name)
+vector<Annotation *> Generator::getAnnotations(Symbol *symbol, const string &name)
 {
     return symbol->getAnnotations(name, getAnnotationLang());
 }
 
-Value *Generator::getAnnValue(Symbol *symbol, string name)
+Value *Generator::getAnnValue(Symbol *symbol, const string &name)
 {
     return symbol->getAnnValue(name, getAnnotationLang());
 }
 
-string Generator::getAnnStringValue(Symbol *symbol, string name)
+string Generator::getAnnStringValue(Symbol *symbol, const string &name)
 {
     return symbol->getAnnStringValue(name, getAnnotationLang());
 }

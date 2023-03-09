@@ -38,7 +38,7 @@ public:
      *
      * @param[in] name Group name.
      */
-    explicit Group(const std::string name)
+    explicit Group(const std::string &name)
     : m_name(name)
     {
     }
@@ -126,7 +126,7 @@ private:
     symbol_directions_map_t m_symbolDirections; /*!< Map of symbol's directions. */
     symbols_list_t m_symbols;                   /*!< Vector of symbols in order of their IDL definition. */
     cpptempl::data_map m_template;              /*!< Data map with group template. */
-    std::string m_name;                         /*!< Group name. */
+    const std::string m_name;                   /*!< Group name. */
 };
 
 } // namespace erpcgen

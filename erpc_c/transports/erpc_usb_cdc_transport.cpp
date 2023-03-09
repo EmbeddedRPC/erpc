@@ -6,8 +6,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cstdio>
 #include "erpc_usb_cdc_transport.hpp"
+
+#include <cstdio>
 
 using namespace erpc;
 
@@ -28,7 +29,7 @@ static serial_read_handle_t s_serialReadHandle = &s_serialReadHandleBuffer[0]; /
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static void ERPC_SerialManagerTxCallback(void *callbackParam, serial_manager_callback_message_t *message,
+static void ERPC_SerialManagerTxCallback(const void *callbackParam, const serial_manager_callback_message_t *message,
                                          serial_manager_status_t status)
 {
     UsbCdcTransport *transport = s_usbcdc_instance;
@@ -45,7 +46,7 @@ static void ERPC_SerialManagerTxCallback(void *callbackParam, serial_manager_cal
     }
 }
 
-static void ERPC_SerialManagerRxCallback(void *callbackParam, serial_manager_callback_message_t *message,
+static void ERPC_SerialManagerRxCallback(const void *callbackParam, const serial_manager_callback_message_t *message,
                                          serial_manager_status_t status)
 {
     UsbCdcTransport *transport = s_usbcdc_instance;

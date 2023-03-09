@@ -76,7 +76,7 @@ protected:
      *
      * @param[in] request Request context to perform.
      */
-    virtual void performClientRequest(RequestContext &request);
+    virtual void performClientRequest(RequestContext &request) override;
 
     //! @brief This method is not used with this class.
     void setTransport(Transport *transport) { (void)transport; }

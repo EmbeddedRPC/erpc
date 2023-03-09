@@ -99,7 +99,7 @@ public:
     /*!
      * @brief Constructor.
      */
-    IntegerValue(int_type_t type = kSigned)
+    explicit IntegerValue(int_type_t type = kSigned)
     : Value(kIntegerValue)
     , m_value(0)
     , m_intType(type)
@@ -111,7 +111,7 @@ public:
      *
      * @param[in] value IntegerValue value.
      */
-    IntegerValue(uint64_t value, int_type_t type = kSigned)
+    explicit IntegerValue(uint64_t value, int_type_t type = kSigned)
     : Value(kIntegerValue)
     , m_value(value)
     , m_intType(type)
@@ -135,14 +135,14 @@ public:
      *
      * @return IntegerValue type name.
      */
-    virtual std::string getTypeName() const { return "integer"; }
+    virtual std::string getTypeName() const override { return "integer"; }
 
     /*!
      * @brief Get IntegerValue type size.
      *
      * @return IntegerValue type size.
      */
-    virtual size_t getSize() const { return sizeof(m_value); }
+    virtual size_t getSize() const override { return sizeof(m_value); }
 
     /*!
      * @brief This function returns value.
@@ -186,7 +186,7 @@ public:
      *
      * @return IntegerValue type string representation.
      */
-    virtual std::string toString() const
+    virtual std::string toString() const override
     {
         if (m_intType == kUnsigned)
             return format_string("%uU", (uint32_t)m_value);
@@ -203,7 +203,7 @@ public:
      *
      * @return Cloned IntegerValue.
      */
-    virtual Value *clone() const { return new IntegerValue(*this); }
+    virtual Value *clone() const override { return new IntegerValue(*this); }
 
 protected:
     uint64_t m_value;     //!< The integer value.
@@ -230,7 +230,7 @@ public:
      *
      * @param[in] value FloatValue value.
      */
-    FloatValue(double value)
+    explicit FloatValue(double value)
     : Value(kFloatValue)
     , m_value(value)
     {
@@ -241,7 +241,7 @@ public:
      *
      * @param[in] value FloatValue value.
      */
-    FloatValue(float value)
+    explicit FloatValue(float value)
     : Value(kFloatValue)
     , m_value(value)
     {
@@ -252,7 +252,7 @@ public:
      *
      * @param[in] other FloatValue to copy.
      */
-    FloatValue(const FloatValue &other)
+    explicit FloatValue(const FloatValue &other)
     : Value(kFloatValue)
     , m_value(other.m_value)
     {
@@ -276,14 +276,14 @@ public:
      *
      * @return FloatValue type name.
      */
-    virtual std::string getTypeName() const { return "float"; }
+    virtual std::string getTypeName() const override { return "float"; }
 
     /*!
      * @brief Get FloatValue type size.
      *
      * @return FloatValue type size.
      */
-    virtual size_t getSize() const { return sizeof(m_value); }
+    virtual size_t getSize() const override { return sizeof(m_value); }
 
     /*!
      * @brief This function returns value.
@@ -337,14 +337,14 @@ public:
      *
      * @return FloatValue type string representation.
      */
-    virtual std::string toString() const { return format_string("%g", m_value); }
+    virtual std::string toString() const override { return format_string("%g", m_value); }
 
     /*!
      * @brief Clone FloatValue.
      *
      * @return Cloned FloatValue.
      */
-    virtual Value *clone() const { return new FloatValue(*this); }
+    virtual Value *clone() const override { return new FloatValue(*this); }
 
 protected:
     double m_value; //!< The double value.
@@ -372,7 +372,7 @@ public:
      *
      * @param[in] value StringValue value.
      */
-    StringValue(const std::string &value)
+    explicit StringValue(const std::string &value)
     : Value(kStringValue)
     , m_value(value)
     {
@@ -383,7 +383,7 @@ public:
      *
      * @param[in] value StringValue value.
      */
-    StringValue(const std::string *value)
+    explicit StringValue(const std::string *value)
     : Value(kStringValue)
     , m_value(*value)
     {
@@ -405,14 +405,14 @@ public:
      *
      * @return StringValue type name.
      */
-    virtual std::string getTypeName() const { return "string"; }
+    virtual std::string getTypeName() const override { return "string"; }
 
     /*!
      * @brief Get StringValue type size.
      *
      * @return StringValue type size.
      */
-    virtual size_t getSize() const { return m_value.size(); }
+    virtual size_t getSize() const override { return m_value.size(); }
 
     /*!
      * @brief Get StringValue value.
@@ -500,14 +500,14 @@ public:
      *
      * @return StringValue type string representation.
      */
-    virtual std::string toString() const { return m_value; }
+    virtual std::string toString() const override { return m_value; }
 
     /*!
      * @brief Clone StringValue.
      *
      * @return Cloned StringValue.
      */
-    virtual Value *clone() const { return new StringValue(*this); }
+    virtual Value *clone() const override { return new StringValue(*this); }
 
 protected:
     std::string m_value; //!< The string value.

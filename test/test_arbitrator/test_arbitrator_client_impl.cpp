@@ -18,7 +18,7 @@
 
 #define number 15
 #define nestedCallsCount 10
-int i = 0;
+int j = 0;
 int numbers[number];
 volatile bool enabled = false;
 SecondInterface_service *svc;
@@ -70,14 +70,14 @@ TEST(test_arbitrator, testCasesAreDone)
 
 void secondSendInt(int32_t a)
 {
-    numbers[i] = a;
-    i++;
+    numbers[j] = a;
+    j++;
 }
 
 int32_t secondReceiveInt()
 {
-    i--;
-    return numbers[i];
+    j--;
+    return numbers[j];
 }
 
 int32_t callFirstSide()

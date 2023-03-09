@@ -171,7 +171,7 @@ int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin)
     return 0;
 }
 
-int serial_write(int fd, char *buf, int size)
+int serial_write(int fd, const char *buf, int size)
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
@@ -207,7 +207,6 @@ int serial_read(int fd, char *buf, int size)
 {
 #ifdef _WIN32
     HANDLE hCom = (HANDLE)fd;
-    unsigned long bread = 0;
     char temp[RX_BUF_BYTES] = { 0 };
     DWORD errors;
     DWORD bytesToRead = 0;
@@ -262,7 +261,7 @@ int serial_read(int fd, char *buf, int size)
     return bytesToRead;
 #else
     int len = 0;
-    int ret = 0;
+    int ret;
     int timeout = 0;
 
     while (len < size)

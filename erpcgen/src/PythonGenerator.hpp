@@ -33,7 +33,7 @@ public:
      *
      * @param[in] def Contains all Symbols parsed from IDL files.
      */
-    PythonGenerator(InterfaceDefinition *def);
+    explicit PythonGenerator(InterfaceDefinition *def);
 
     /*!
      * @brief This function is destructor of PythonGenerator class.
@@ -47,7 +47,7 @@ public:
      *
      * This code call all necessary functions for prepare output code and parse it into output files.
      */
-    virtual void generate();
+    virtual void generate() override;
 
 protected:
     std::string m_suffixStrip; //!< String to remove from suffixes of names.
@@ -67,7 +67,7 @@ protected:
      *
      * @param[in] fileName Name for output files.
      */
-    void generateOutputFiles(const std::string &fileName);
+    void generateOutputFiles(const std::string &fileName) override;
 
     /*!
      * @brief This function generate output common module.
@@ -121,7 +121,7 @@ protected:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn);
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -129,7 +129,7 @@ protected:
      * @param[in] symbol Pointer to symbol.
      * @param[inout] symbolInfo Data map, which contains information about symbol.
      */
-    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo);
+    void setTemplateComments(Symbol *symbol, cpptempl::data_map &symbolInfo) override;
 
     /*!
      * @brief This function return interface function prototype.
@@ -166,7 +166,7 @@ protected:
      *
      * @return Data map with group symbols templates.
      */
-    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group);
+    cpptempl::data_map makeGroupSymbolsTemplateData(Group *group) override;
 
     /*!
      * @brief This function return enum members template data.

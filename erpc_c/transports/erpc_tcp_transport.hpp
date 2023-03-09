@@ -38,7 +38,7 @@ public:
      *
      * @param[in] isServer True when this transport is used for server side application.
      */
-    TCPTransport(bool isServer);
+    explicit TCPTransport(bool isServer);
 
     /*!
      * @brief Constructor.

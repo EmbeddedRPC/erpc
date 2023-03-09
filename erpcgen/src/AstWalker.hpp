@@ -53,7 +53,7 @@ public:
      *
      * @param[in] inputFile Parsed file name.
      */
-    AstWalker(std::string inputFile)
+    explicit AstWalker(const std::string &inputFile)
     : m_fileName(inputFile)
     {
     }

@@ -128,7 +128,7 @@ public:
      *
      * @return Case description.
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief This function returns union member declaration.
