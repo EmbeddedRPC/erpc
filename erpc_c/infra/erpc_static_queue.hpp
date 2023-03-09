@@ -42,7 +42,7 @@ public:
         m_capacity = elementCount;
         m_head = 0;
         m_tail = 0;
-        m_storage = { { 0 } };
+        (void)memset(m_storage, 0, sizeof(m_storage));
     }
 
     /*!

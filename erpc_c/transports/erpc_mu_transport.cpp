@@ -250,7 +250,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
 
         m_txMsgSize = message->getUsed();
         m_txCntBytes = 0;
-        m_txBuffer = reinterpret_cast<uint8_t *>(message->get());
+        m_txBuffer = reinterpret_cast<uint32_t *>(message->get());
 
         MU_SendMsgNonBlocking(m_muBase, 0, m_txMsgSize);
 
