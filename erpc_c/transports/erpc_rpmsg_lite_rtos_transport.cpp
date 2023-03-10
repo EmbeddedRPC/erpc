@@ -259,7 +259,7 @@ erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 
     ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     erpc_assert(buf != NULL);
-    message->set((uint8_t *)buf, length);
+    message->set(reinterpret_cast<uint8_t *>(buf), length);
     message->setUsed(length);
 
     return (ret_val != RL_SUCCESS) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;

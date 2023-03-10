@@ -34,6 +34,7 @@ InterfaceDefinition::InterfaceDefinition()
 , m_programName("")
 , m_outputFilename("")
 , m_codec(kNotSpecified)
+, m_idlCrc16(0)
 {
     init();
 }

@@ -243,7 +243,7 @@ public:
      *
      * @return An index into the annotation list
      */
-    Annotation *findAnnotation(std::string name, Annotation::program_lang_t lang);
+    Annotation *findAnnotation(const std::string &name, Annotation::program_lang_t lang);
 
     /*!
      * @brief Find annotations matching name in the annotation list
@@ -253,7 +253,7 @@ public:
      *
      * @return A vector of matching annotations
      */
-    std::vector<Annotation *> getAnnotations(std::string name, Annotation::program_lang_t lang);
+    std::vector<Annotation *> getAnnotations(const std::string &name, Annotation::program_lang_t lang);
 
     /*!
      * @brief Return all Symbol annotations.
@@ -270,7 +270,7 @@ public:
      *
      * @return NULL if annotation is not found else value object.
      */
-    Value *getAnnValue(const std::string annName, Annotation::program_lang_t lang);
+    Value *getAnnValue(const std::string &annName, Annotation::program_lang_t lang);
 
     /*!
      * @brief This function search and returns string for given annotation name.
@@ -280,7 +280,7 @@ public:
      *
      * @return empty string if annotation is not found else string value.
      */
-    std::string getAnnStringValue(const std::string annName, Annotation::program_lang_t lang);
+    std::string getAnnStringValue(const std::string &annName, Annotation::program_lang_t lang);
 
     /*!
      * @brief This function returns multiline comment for this symbol declared in IDL file.
@@ -294,7 +294,7 @@ public:
      *
      * @param[in] comment Multiline comment for symbol.
      */
-    void setMlComment(std::string comment) { m_mlComment = comment; }
+    void setMlComment(const std::string &comment) { m_mlComment = comment; }
 
     /*!
      * @brief This function returns inline comment for this symbol declared in IDL file.
@@ -308,7 +308,7 @@ public:
      *
      * @param[in] comment Inline comment for symbol.
      */
-    void setIlComment(std::string comment) { m_ilComment = comment; }
+    void setIlComment(const std::string &comment) { m_ilComment = comment; }
 
 protected:
     symbol_type_t m_symbolType;            /*!< Symbol type. */

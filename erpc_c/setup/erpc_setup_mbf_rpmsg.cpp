@@ -35,7 +35,7 @@ public:
      *
      * @param [in] rpmsg Pointer to instance of RPMSG lite.
      */
-    RPMsgMessageBufferFactory(struct rpmsg_lite_instance *rpmsg) { m_rpmsg = rpmsg; }
+    explicit RPMsgMessageBufferFactory(struct rpmsg_lite_instance *rpmsg) { m_rpmsg = rpmsg; }
 
     /*!
      * @brief Destructor
@@ -54,7 +54,7 @@ public:
         buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, RL_BLOCK);
 
         erpc_assert(NULL != buf);
-        return MessageBuffer((uint8_t *)buf, size);
+        return MessageBuffer(reinterpret_cast<uint8_t *>(buf), size);
     }
 
     /*!
@@ -65,7 +65,7 @@ public:
     virtual void dispose(MessageBuffer *buf)
     {
         erpc_assert(buf != NULL);
-        void *tmp = (void *)buf->get();
+        void *tmp = reinterpret_cast<void *>(buf->get());
         if (tmp != NULL)
         {
             int32_t ret;

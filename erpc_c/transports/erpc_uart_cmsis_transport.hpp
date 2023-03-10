@@ -10,8 +10,9 @@
 #ifndef _EMBEDDED_RPC__UART_TRANSPORT_H_
 #define _EMBEDDED_RPC__UART_TRANSPORT_H_
 
-#include <cstdlib>
 #include "erpc_config_internal.h"
+
+#include <cstdlib>
 #if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
@@ -45,7 +46,7 @@ public:
      *
      * @param[in] uartDrv Cmsis uart.
      */
-    UartTransport(ARM_DRIVER_USART *uartDrv);
+    explicit UartTransport(ARM_DRIVER_USART *uartDrv);
 
     /*!
      * @brief Destructor.

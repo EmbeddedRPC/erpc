@@ -74,7 +74,7 @@ public:
 #endif
 
         uint8_t *buf;
-        buf = (uint8_t *)m_buffers[idx];
+        buf = reinterpret_cast<uint8_t *>(m_buffers[idx]);
 
         erpc_assert(NULL != buf);
         return MessageBuffer(buf, ERPC_DEFAULT_BUFFER_SIZE);
@@ -95,7 +95,7 @@ public:
 #if !ERPC_THREADS_IS(NONE)
             m_semaphore.get();
 #endif
-            while ((idx < ERPC_DEFAULT_BUFFERS_COUNT) && (tmp != (uint8_t *)m_buffers[idx]))
+            while ((idx < ERPC_DEFAULT_BUFFERS_COUNT) && (tmp != reinterpret_cast<uint8_t *>(m_buffers[idx])))
             {
                 idx++;
             }

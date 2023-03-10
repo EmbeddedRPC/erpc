@@ -69,7 +69,7 @@ int spidev_set_wordbits(int fd, unsigned char bits)
     return retVal;
 }
 
-int spidev_transfer(int fd, unsigned char *tx_buf, unsigned char *rx_buf, unsigned int len)
+int spidev_transfer(int fd, const unsigned char *tx_buf, unsigned char *rx_buf, unsigned int len)
 {
     int retVal = ERPC_SPIDEV_STATUS_SUCCESS;
     struct spi_ioc_transfer spi_message;

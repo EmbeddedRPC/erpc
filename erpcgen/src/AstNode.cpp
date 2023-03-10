@@ -141,7 +141,7 @@ void AstNode::appendChild(AstNode *node)
     m_children.push_back(node);
 }
 
-size_t AstNode::getIndexOfChild(AstNode *child)
+size_t AstNode::getIndexOfChild(const AstNode *child)
 {
     size_t n = 0;
     for (auto i : m_children)

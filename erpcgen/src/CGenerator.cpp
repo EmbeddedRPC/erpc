@@ -1544,7 +1544,6 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             paramInfo["nullableName"] = nullableName;
             if (paramTrueType->isScalar() || paramTrueType->isEnum())
             {
-                string nullVariable = "_" + nullableName;
                 paramInfo["nullVariable"] = getTypenameName(paramTrueType, "*_" + nullableName);
             }
 
@@ -1743,7 +1742,7 @@ data_map CGenerator::getFunctionTypeTemplateData(Group *group, FunctionType *fn)
     return info;
 }
 
-void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<_param_direction> directions,
+void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<_param_direction> &directions,
                                      data_list &toClient, data_list &toServer, data_map &dataMap)
 {
     _direction direction = kIn;
@@ -1955,7 +1954,7 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
     return proto + ");";
 }
 
-string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string name)
+string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const std::string name)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -2439,7 +2438,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             break;
         }
         case DataType::kBuiltinType: {
-            getEncodeDecodeBuiltin(group, (BuiltinType *)t, templateData, structType, structMember, isFunctionParam);
+            getEncodeDecodeBuiltin(group, dynamic_cast<BuiltinType *>(t), templateData, structType, structMember,
+                                   isFunctionParam);
             break;
         }
         case DataType::kEnumType: {
@@ -2831,7 +2831,7 @@ string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     return result;
 }
 
-data_map CGenerator::firstAllocOnReturnWhenIsNeed(string name, DataType *dataType)
+data_map CGenerator::firstAllocOnReturnWhenIsNeed(const string &name, DataType *dataType)
 {
     DataType *trueDataType = dataType->getTrueDataType();
     if ((trueDataType->isArray() || trueDataType->isStruct() || trueDataType->isUnion()) &&
@@ -2844,7 +2844,7 @@ data_map CGenerator::firstAllocOnReturnWhenIsNeed(string name, DataType *dataTyp
     return r;
 }
 
-data_map CGenerator::firstAllocOnServerWhenIsNeed(string name, StructMember *structMember)
+data_map CGenerator::firstAllocOnServerWhenIsNeed(const string &name, StructMember *structMember)
 {
     DataType *dataType = structMember->getDataType();
     DataType *trueDataType = dataType->getTrueDataType();
@@ -3164,10 +3164,10 @@ bool CGenerator::containsByrefParamToFree(DataType *dataType, set<DataType *> &d
     return false;
 }
 
-bool CGenerator::isListStruct(StructType *structType)
+bool CGenerator::isListStruct(const StructType *structType)
 {
     // if structure is transformed list<> to struct{list<>}
-    for (StructType *structList : m_structListTypes)
+    for (const StructType *structList : m_structListTypes)
     {
         if (structType == structList)
         {
@@ -3194,11 +3194,11 @@ bool CGenerator::isBinaryStruct(StructType *structType)
     return false;
 }
 
-bool CGenerator::isBinaryList(ListType *listType)
+bool CGenerator::isBinaryList(const ListType *listType)
 {
 
     // If list is same as in s_listBinaryTypes.
-    for (ListType *list : m_listBinaryTypes)
+    for (const ListType *list : m_listBinaryTypes)
     {
         if (listType == list)
         {

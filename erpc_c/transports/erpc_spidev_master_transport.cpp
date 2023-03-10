@@ -196,7 +196,8 @@ erpc_status_t SpidevMasterTransport::underlyingSend(const uint8_t *data, uint32_
     SpidevMasterTransport_WaitForSlaveReadyGpio();
 #endif
 
-    if (ERPC_SPIDEV_STATUS_SUCCESS != spidev_transfer(m_spidevHandle, (unsigned char *)data, NULL, size))
+    if (ERPC_SPIDEV_STATUS_SUCCESS !=
+        spidev_transfer(m_spidevHandle, reinterpret_cast<const unsigned char *>(data), NULL, size))
     {
         status = kErpcStatus_SendFailed;
     }

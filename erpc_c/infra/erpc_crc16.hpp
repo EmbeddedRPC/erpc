@@ -34,7 +34,7 @@ public:
      *
      * @param[in] crcStart Start value for crc function.
      */
-    Crc16(uint32_t crcStart);
+    explicit Crc16(uint32_t crcStart);
 
     /*!
      * @brief Constructor.

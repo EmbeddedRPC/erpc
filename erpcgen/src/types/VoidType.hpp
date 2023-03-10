@@ -49,7 +49,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
      */
-    virtual std::string getDescription() const { return "<void>"; }
+    virtual std::string getDescription() const override { return "<void>"; }
 };
 
 } // namespace erpcgen

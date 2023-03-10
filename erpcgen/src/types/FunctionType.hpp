@@ -61,7 +61,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief Returns list of callback functions.

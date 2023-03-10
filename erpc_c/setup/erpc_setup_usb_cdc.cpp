@@ -28,9 +28,10 @@ erpc_transport_t erpc_transport_usb_cdc_init(void *serialHandle, void *serialCon
 {
     erpc_transport_t transport;
 
-    s_usb_transport.construct((serial_handle_t)serialHandle, (serial_manager_config_t *)serialConfig,
-                              (serial_port_usb_cdc_config_t *)usbCdcConfig, (uint8_t *)usbRingBuffer,
-                              (uint32_t)usbRingBufferLength);
+    s_usb_transport.construct(
+        reinterpret_cast<serial_handle_t>(serialHandle), reinterpret_cast<serial_manager_config_t *>(serialConfig),
+        reinterpret_cast<serial_port_usb_cdc_config_t *>(usbCdcConfig), reinterpret_cast<uint8_t *>(usbRingBuffer),
+        reinterpret_cast<uint32_t>(usbRingBufferLength));
     if (s_usb_transport->init() == kErpcStatus_Success)
     {
         transport = reinterpret_cast<erpc_transport_t>(s_usb_transport.get());

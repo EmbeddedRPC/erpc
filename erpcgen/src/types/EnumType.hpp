@@ -73,7 +73,7 @@ public:
      *
      * @return Enum member.
      */
-    EnumMember *getMember(std::string name);
+    EnumMember *getMember(const std::string &name);
 
     /*!
      * @brief This function returns the next value to use for an enum member
@@ -103,7 +103,7 @@ public:
      * @see std::string ListType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
 protected:
     member_vector_t m_members;   /*!< Vector of enum members. */

@@ -901,7 +901,7 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
         for (auto childCase = childrenNode->begin(); childCase != childrenNode->end(); ++childCase)
         {
             assert(TOK_EXPR == (*childCase)->getToken().getToken());
-            Token caseIdTok = (*childCase)->getChild(0)->getToken();
+            Token &caseIdTok = (*childCase)->getChild(0)->getToken();
             /* If the case value is an identifier, record the name and find the true value */
             if (caseIdTok.isIdentifierTok())
             {
@@ -1365,7 +1365,7 @@ bool SymbolScanner::containsStructEnumDeclaration(const AstNode *typeNode)
 
 DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
 {
-    const Token typeToken = typeNode->getToken();
+    const Token &typeToken = typeNode->getToken();
     switch (typeToken.getToken())
     {
         case TOK_ARRAY:
@@ -1380,7 +1380,6 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
         case TOK_UNION: {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
-            break;
         }
         default:
             throw internal_error(format_string("unexpected token type %s on line %d", typeToken.getTokenName(),
@@ -1524,7 +1523,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
             const Token &nameTok = annotation_name->getToken();
             Value *annValue = getAnnotationValue(annotation);
 
-            Annotation ann = Annotation(nameTok, annValue, annLang);
+            Annotation ann(nameTok, annValue, annLang);
 
             symbol->addAnnotation(ann);
 

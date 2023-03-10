@@ -25,7 +25,7 @@ ERPC_MANUALLY_CONSTRUCTED(DspiMasterTransport, s_transport);
 
 erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
 {
-    s_transport.construct((SPI_Type *)baseAddr, baudRate, srcClock_Hz);
+    s_transport.construct(reinterpret_cast<SPI_Type *>(baseAddr), baudRate, srcClock_Hz);
     (void)s_transport->init();
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

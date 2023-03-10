@@ -39,7 +39,7 @@ public:
      *
      * @param[in] globals Global symbol scope variable.
      */
-    SymbolScanner(SymbolScope *globals)
+    explicit SymbolScanner(SymbolScope *globals)
     : m_globals(globals)
     , m_currentInterface(nullptr)
     , m_currentStruct(nullptr)
@@ -58,7 +58,7 @@ public:
      * @param[in] globals Global symbol scope variable.
      * @param[in] fileName name of IDL from which AST was built.
      */
-    SymbolScanner(SymbolScope *globals, std::string fileName)
+    SymbolScanner(SymbolScope *globals, const std::string &fileName)
     : AstWalker(fileName)
     , m_globals(globals)
     , m_currentInterface(nullptr)
@@ -101,7 +101,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual void handleRoot(AstNode *node, bottom_up);
+    virtual void handleRoot(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle program.
@@ -112,7 +112,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleProgram(AstNode *node, top_down);
+    virtual AstNode *handleProgram(AstNode *node, top_down) override;
 
     /*!
      * @brief This function start handle program.
@@ -123,7 +123,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleProgram(AstNode *node, bottom_up);
+    virtual AstNode *handleProgram(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function handles a constant definition
@@ -134,7 +134,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleConst(AstNode *node, bottom_up);
+    virtual AstNode *handleConst(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle type.
@@ -148,7 +148,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleType(AstNode *node, top_down);
+    virtual AstNode *handleType(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle type.
@@ -161,7 +161,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleType(AstNode *node, bottom_up);
+    virtual AstNode *handleType(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function end handle enum.
@@ -174,7 +174,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleEnum(AstNode *node, top_down);
+    virtual AstNode *handleEnum(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle enum.
@@ -187,7 +187,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleEnum(AstNode *node, bottom_up);
+    virtual AstNode *handleEnum(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function end handle enum member.
@@ -200,7 +200,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleEnumMember(AstNode *node, bottom_up);
+    virtual AstNode *handleEnumMember(AstNode *node, bottom_up) override;
 
     /*!
      * @brief Check to see if enum member is assigned a value by the user
@@ -220,7 +220,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleExpr(AstNode *node, bottom_up);
+    virtual AstNode *handleExpr(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function end handle binary operator.
@@ -239,7 +239,7 @@ protected:
      * @see AstNode * SymbolScanner::handleExpr()
      * @see AstNode * SymbolScanner::handleUnaryOp()
      */
-    virtual AstNode *handleBinaryOp(AstNode *node, bottom_up);
+    virtual AstNode *handleBinaryOp(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function end handle unary operator.
@@ -258,7 +258,7 @@ protected:
      * @see AstNode * SymbolScanner::handleExpr()
      * @see AstNode * SymbolScanner::handleBinaryOp()
      */
-    virtual AstNode *handleUnaryOp(AstNode *node, bottom_up);
+    virtual AstNode *handleUnaryOp(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle struct.
@@ -274,7 +274,7 @@ protected:
      *
      * @exception semantic_error Thrown if an given node has not children and is not alias (type definition).
      */
-    virtual AstNode *handleStruct(AstNode *node, top_down);
+    virtual AstNode *handleStruct(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle struct.
@@ -287,7 +287,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleStruct(AstNode *node, bottom_up);
+    virtual AstNode *handleStruct(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function end handle struct member.
@@ -301,7 +301,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleStructMember(AstNode *node, bottom_up);
+    virtual AstNode *handleStructMember(AstNode *node, bottom_up) override;
 
     // TODO: Update doxygen for union functions
     /*!
@@ -315,7 +315,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleUnion(AstNode *node, top_down);
+    virtual AstNode *handleUnion(AstNode *node, top_down) override;
 
     /*!
      * @brief Handles Union data type while traversing down the AST
@@ -328,7 +328,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleUnion(AstNode *node, bottom_up);
+    virtual AstNode *handleUnion(AstNode *node, bottom_up) override;
 
     /*!
      * @brief
@@ -339,7 +339,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleUnionCase(AstNode *node, top_down);
+    virtual AstNode *handleUnionCase(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle struct member.
@@ -352,7 +352,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleUnionCase(AstNode *node, bottom_up);
+    virtual AstNode *handleUnionCase(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle interface.
@@ -368,7 +368,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleInterface(AstNode *node, top_down);
+    virtual AstNode *handleInterface(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle interface.
@@ -381,7 +381,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleInterface(AstNode *node, bottom_up);
+    virtual AstNode *handleInterface(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle function.
@@ -395,7 +395,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleFunction(AstNode *node, top_down);
+    virtual AstNode *handleFunction(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle function.
@@ -408,7 +408,7 @@ protected:
      *
      * @see rest of AstNode handle functions
      */
-    virtual AstNode *handleFunction(AstNode *node, bottom_up);
+    virtual AstNode *handleFunction(AstNode *node, bottom_up) override;
 
     /*!
      * @brief This function start handle function parameter.
@@ -424,7 +424,7 @@ protected:
      *
      * @exception semantic_error Thrown if given ast node has not child with token type TOK_IN, TOK_OUT, TOK_INOUT.
      */
-    virtual AstNode *handleParam(AstNode *node, top_down);
+    virtual AstNode *handleParam(AstNode *node, top_down) override;
 
     /*!
      * @brief This function end handle function parameter.
@@ -437,7 +437,7 @@ protected:
      *
      * @exception semantic_error Thrown if given ast node has not child with token type TOK_IN, TOK_OUT, TOK_INOUT.
      */
-    virtual AstNode *handleParam(AstNode *node, bottom_up);
+    virtual AstNode *handleParam(AstNode *node, bottom_up) override;
 
     /*!
      * @brief set parameter direction: in, out, inout

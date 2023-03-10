@@ -8,6 +8,7 @@
  */
 
 #include "erpc_mu_transport.hpp"
+
 #include "erpc_config_internal.h"
 
 extern "C" {
@@ -209,7 +210,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
 
         m_rxMsgSize = 0;
         m_rxCntBytes = 0;
-        m_rxBuffer = (uint32_t *)message->get();
+        m_rxBuffer = reinterpret_cast<uint32_t *>(message->get());
 
         // enable the MU rx full irq
         MU_EnableInterrupts(m_muBase, MU_RX_INTR_MASK);
@@ -234,7 +235,7 @@ erpc_status_t MUTransport::receive(MessageBuffer *message)
 erpc_status_t MUTransport::send(MessageBuffer *message)
 {
     erpc_status_t status;
-    uint8_t i = 0;
+    uint8_t i;
     uint32_t tx;
 
     if (message == NULL)
@@ -249,7 +250,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
 
         m_txMsgSize = message->getUsed();
         m_txCntBytes = 0;
-        m_txBuffer = (uint32_t *)message->get();
+        m_txBuffer = reinterpret_cast<uint32_t *>(message->get());
 
         MU_SendMsgNonBlocking(m_muBase, 0, m_txMsgSize);
 

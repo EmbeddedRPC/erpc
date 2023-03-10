@@ -102,7 +102,7 @@ public:
      * @see std::string ListType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief This function set direction type for parameter.

@@ -329,7 +329,8 @@ inline static int isEndOpts(const char *token)
 // See if an argument is an option
 inline static int isOption(unsigned flags, const char *arg)
 {
-    return (((*arg != '\0') || (arg[1] != '\0')) && ((*arg == '-') || ((flags & Options::PLUS) && (*arg == '+'))));
+    return ((arg != nullptr) && ((*arg != '\0') || (arg[1] != '\0')) &&
+            ((*arg == '-') || ((flags & Options::PLUS) && (*arg == '+'))));
 }
 
 // See if we should be parsing only options or if we also need to

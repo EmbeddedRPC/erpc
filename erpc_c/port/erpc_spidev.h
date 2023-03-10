@@ -20,7 +20,7 @@ int spidev_open(const char *port);
 int spidev_set_mode(int fd, unsigned char mode);
 int spidev_set_speed(int fd, unsigned int speed_hz);
 int spidev_set_wordbits(int fd, unsigned char bits);
-int spidev_transfer(int fd, unsigned char *tx_buf, unsigned char *rx_buf, unsigned int len);
+int spidev_transfer(int fd, const unsigned char *tx_buf, unsigned char *rx_buf, unsigned int len);
 int spidev_close(int fd);
 
 #if __cplusplus
