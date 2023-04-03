@@ -60,11 +60,11 @@ if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 {% else %}
 {%   set indent = "" >%}
 {% endif %}
+{$indent}if ({$info.sizeTemp} > 0)
+{$indent}{
 {% if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = (uint8_t *) erpc_malloc({$info.maxSize} * sizeof(uint8_t));
 {%  if generateAllocErrorChecks == true %}
-{$indent}if ({$info.sizeTemp} > 0)
-{$indent}{
 {$indent}    if ({$info.name} == NULL)
 {$indent}    {
 {$indent}        codec->updateStatus(kErpcStatus_MemoryError);
@@ -73,12 +73,18 @@ if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 {$indent}    {
 {$indent}        memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
 {$indent}    }
-{$indent}}
 {%  else -- generateAllocErrorChecks == true %}
-{$indent}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{$indent}    memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
 {%  endif -- generateAllocErrorChecks == true %}
 {% else %}
-{$indent}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{$indent}    memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{% endif %}
+{$indent}}
+{% if source == "server" || info.useMallocOnClientSide == true %}
+{$indent}else
+{$indent}{
+{$indent}    {$info.name} = NULL;
+{$indent}}
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
 }
