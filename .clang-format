@@ -1,14 +1,14 @@
-#https://releases.llvm.org/5.0.2/tools/clang/docs/ClangFormatStyleOptions.html
+#https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
+AllowShortBlocksOnASingleLine: "Never"
 AllowShortFunctionsOnASingleLine: "Inline"
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: "Never"
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: true
 BasedOnStyle: "Google"
 #BinPackParameters : false
-BreakBeforeBinaryOperators: false
+BreakBeforeBinaryOperators: "None"
 BreakBeforeBraces: "Custom"
 BreakBeforeTernaryOperators: false
 ColumnLimit: 120
@@ -20,13 +20,12 @@ IndentWrappedFunctionNames: false
 IndentWidth: 4
 Language: "Cpp"
 MaxEmptyLinesToKeep: 1
-PointerBindsToType: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: "ControlStatements"
 SpacesBeforeTrailingComments: 1
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
-Standard: "Cpp03"
+Standard: "c++11"
 TabWidth: 1
 UseTab: "Never"
 AccessModifierOffset: -4
@@ -35,8 +34,8 @@ AlignEscapedNewlines: "Left"
 AlignOperands: true
 AllowShortCaseLabelsOnASingleLine: false
 AlwaysBreakAfterReturnType: "None"
-AlwaysBreakTemplateDeclarations: true
-BreakBeforeInheritanceComma: false
+AlwaysBreakTemplateDeclarations: "Yes"
+BreakInheritanceList: "BeforeComma"
 BreakConstructorInitializers: "BeforeComma"
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -53,8 +52,9 @@ SpaceInEmptyParentheses: false
 SpacesInSquareBrackets: false
 KeepEmptyLinesAtTheStartOfBlocks: true
 BraceWrapping:
+  AfterCaseLabel: true
   AfterClass: true
-  AfterControlStatement: true
+  AfterControlStatement: "Always"
   AfterEnum: true
   AfterFunction: true
   AfterNamespace: false
@@ -69,3 +69,4 @@ IncludeCategories:
     Priority: 10
   - Regex: '^"erpc_' # erpc public includes
     Priority: 1
+CommentPragmas: "#"

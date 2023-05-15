@@ -193,7 +193,8 @@ public:
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
 
-                case 'g': {
+                case 'g':
+                {
                     string lang = optarg;
                     if (lang == "c")
                     {
@@ -211,7 +212,8 @@ public:
                     break;
                 }
 
-                case 'c': {
+                case 'c':
+                {
                     string codec = optarg;
                     if (codec.compare("basic") == 0)
                     {

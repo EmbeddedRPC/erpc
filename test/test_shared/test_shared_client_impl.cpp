@@ -17,7 +17,7 @@ TEST(test_shared, sendReceiveBaseSharedStruct)
     BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm;
     _sm = sendReceiveBaseSharedStruct(&sm);
-    EXPECT_EQ(_sm , &sm);
+    EXPECT_EQ(_sm, &sm);
 }
 
 TEST(test_shared, inoutBaseSharedStruct)
@@ -25,7 +25,7 @@ TEST(test_shared, inoutBaseSharedStruct)
     BaseSharedStruct sm = { 4, 5 };
     BaseSharedStruct *_sm = &sm;
     inoutBaseSharedStruct(&_sm);
-    EXPECT_EQ(_sm , &sm);
+    EXPECT_EQ(_sm, &sm);
 }
 
 /*TEST(test_shared, inoutStruct1)

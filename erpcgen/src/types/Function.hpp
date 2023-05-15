@@ -114,7 +114,9 @@ class FunctionType;
  *
  * The function's parameters are represented by a StructType object.
  */
-class Function : public FunctionBase, public Symbol
+class Function
+: public FunctionBase
+, public Symbol
 {
 public:
     /*!

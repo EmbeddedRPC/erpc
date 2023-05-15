@@ -9,6 +9,7 @@
  */
 
 #include "erpc_rpmsg_lite_rtos_transport.hpp"
+
 #include "erpc_config_internal.h"
 
 extern "C" {

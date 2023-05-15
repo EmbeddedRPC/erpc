@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_transport_arbitrator.hpp"
+
 #include "erpc_config_internal.h"
 #include "erpc_manually_constructed.hpp"
 

@@ -17,9 +17,9 @@
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
 #include "unit_test.h"
+
 #include <chrono>
 #include <thread>
-
 #include <unistd.h>
 
 using namespace erpc;

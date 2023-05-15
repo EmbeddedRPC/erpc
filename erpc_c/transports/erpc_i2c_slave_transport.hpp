@@ -9,8 +9,9 @@
 #ifndef _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
 #define _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
 
-#include "<cstdlib>"
 #include "erpc_config_internal.h"
+
+#include "<cstdlib>"
 #if ERPC_THREADS
 #include "erpc_threading.h"
 #endif

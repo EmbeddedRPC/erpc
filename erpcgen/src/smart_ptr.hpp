@@ -37,7 +37,7 @@ struct smart_ptr_delete_array
  *
  * This class only supports the single-owner paradigm.
  */
-template <typename T, class delete_policy = smart_ptr_delete<T> >
+template <typename T, class delete_policy = smart_ptr_delete<T>>
 class smart_ptr
 {
 public:
@@ -159,10 +159,10 @@ protected:
 
 //! @brief Version of smart_ptr that uses delete [].
 template <typename T>
-using smart_array_ptr = smart_ptr<T, smart_ptr_delete_array<T> >;
+using smart_array_ptr = smart_ptr<T, smart_ptr_delete_array<T>>;
 
 //! @brief Version of smart_ptr that uses free().
 template <typename T>
-using smart_free_ptr = smart_ptr<T, smart_ptr_free<T> >;
+using smart_free_ptr = smart_ptr<T, smart_ptr_free<T>>;
 
 #endif // _smart_ptr_h_

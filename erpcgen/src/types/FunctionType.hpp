@@ -28,7 +28,9 @@ namespace erpcgen {
  *
  * The function's parameters are represented by a StructType object.
  */
-class FunctionType : public FunctionBase, public DataType
+class FunctionType
+: public FunctionBase
+, public DataType
 {
 public:
     typedef std::vector<Function *> c_function_list_t; /*!< List type of callback functions. */

@@ -79,14 +79,16 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     {
         switch (*in)
         {
-            case '\\': {
+            case '\\':
+            {
                 // start of an escape sequence
                 char c = *++in;
                 switch (c)
                 {
                     case 0: // end of the string, bail
                         break;
-                    case 'x': {
+                    case 'x':
+                    {
                         // start of a hex char escape sequence
 
                         // read high and low nibbles, checking for end of string

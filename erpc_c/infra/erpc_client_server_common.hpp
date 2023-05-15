@@ -10,8 +10,8 @@
 #ifndef _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 #define _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 
-#include "erpc_config_internal.h"
 #include "erpc_codec.hpp"
+#include "erpc_config_internal.h"
 #if ERPC_MESSAGE_LOGGING
 #include "erpc_message_loggers.hpp"
 #endif
@@ -100,21 +100,21 @@ public:
      *
      * @param[in] factory Message buffer factory to use.
      */
-    void setMessageBufferFactory(MessageBufferFactory *factory) { m_messageFactory = factory; }
+    void setMessageBufferFactory(MessageBufferFactory * factory) { m_messageFactory = factory; }
 
     /*!
      * @brief This function sets codec factory to use.
      *
      * @param[in] factory Codec factory to use.
      */
-    void setCodecFactory(CodecFactory *factory) { m_codecFactory = factory; }
+    void setCodecFactory(CodecFactory * factory) { m_codecFactory = factory; }
 
     /*!
      * @brief This function sets codec factory to use.
      *
      * @return CodecFactory * Codec factory to use.
      */
-    CodecFactory * getCodecFactory(void) { return m_codecFactory; }
+    CodecFactory *getCodecFactory(void) { return m_codecFactory; }
 
     /*!
      * @brief This function sets transport layer to use.
@@ -123,14 +123,14 @@ public:
      *
      * @param[in] transport Transport layer to use.
      */
-    void setTransport(Transport *transport) { m_transport = transport; }
+    void setTransport(Transport * transport) { m_transport = transport; }
 
     /*!
      * @brief This function gets transport instance.
      *
      * @return Transport * Pointer to transport instance.
      */
-    Transport * getTransport(void) { return m_transport; }
+    Transport *getTransport(void) { return m_transport; }
 
 protected:
     MessageBufferFactory *m_messageFactory; //!< Message buffer factory to use.

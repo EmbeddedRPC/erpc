@@ -15,8 +15,8 @@
 #include "erpc_transport.hpp"
 
 extern "C" {
-#include "rpmsg_lite.h"
 #include "rpmsg_env_specific.h"
+#include "rpmsg_lite.h"
 }
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC

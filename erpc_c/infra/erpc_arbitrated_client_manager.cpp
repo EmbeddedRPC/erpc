@@ -9,6 +9,7 @@
  */
 
 #include "erpc_arbitrated_client_manager.hpp"
+
 #include "erpc_transport_arbitrator.hpp"
 
 #if ERPC_THREADS_IS(NONE)

@@ -9,6 +9,7 @@
  */
 
 #include "erpc_message_buffer.hpp"
+
 #include "erpc_config_internal.h"
 
 #include <cstring>

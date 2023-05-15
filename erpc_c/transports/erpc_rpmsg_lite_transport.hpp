@@ -10,8 +10,8 @@
 #ifndef _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 
-#include "erpc_crc16.hpp"
 #include "erpc_config_internal.h"
+#include "erpc_crc16.hpp"
 #include "erpc_message_buffer.hpp"
 #include "erpc_rpmsg_lite_base_transport.hpp"
 #include "erpc_static_queue.hpp"
@@ -132,7 +132,7 @@ public:
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true: false); }
+    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true : false); }
 
 protected:
     /*!

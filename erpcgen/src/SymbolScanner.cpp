@@ -1377,7 +1377,8 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
         case TOK_LIST:
             return createListType(typeNode);
 
-        case TOK_UNION: {
+        case TOK_UNION:
+        {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
         }

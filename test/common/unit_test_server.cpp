@@ -14,15 +14,19 @@
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #if defined(UART)
+/* clang-format off */
 #include "fsl_lpuart_cmsis.h"
 #include "app_core0.h"
+/* clang-format on */
 #else
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
 #endif
 #define APP_ERPC_READY_EVENT_DATA (1)
+/* clang-format off */
 #include "mcmgr.h"
 #include "app_core1.h"
+/* clang-format on */
 #endif
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(int argc, const char *argv[]);

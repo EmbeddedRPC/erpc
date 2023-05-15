@@ -73,10 +73,10 @@ void Thread::start(void *arg)
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     if (m_stackPtr != NULL)
     {
-        m_task =
-            xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
-                              (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
-                              this, m_priority, m_stackPtr, &m_staticTask);
+        m_task = xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                                   (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) /
+                                                            sizeof(uint32_t)), // Round up number of words.
+                                   this, m_priority, m_stackPtr, &m_staticTask);
         taskCreated = true;
     }
 #endif
@@ -84,10 +84,10 @@ void Thread::start(void *arg)
 #if configSUPPORT_DYNAMIC_ALLOCATION
     if (m_stackPtr == NULL)
     {
-        if (pdPASS ==
-            xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
-                        (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
-                        this, m_priority, &m_task))
+        if (pdPASS == xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                                  (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) /
+                                                           sizeof(uint32_t)), // Round up number of words.
+                                  this, m_priority, &m_task))
         {
             taskCreated = true;
         }

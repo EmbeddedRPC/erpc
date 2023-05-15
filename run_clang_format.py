@@ -23,7 +23,8 @@ folders = [
 exceptions = [
     "test/common/gtest/gtest.h",
     "test/common/gtest/gtest.cpp",
-    "erpcgen/src/cpptemplate/cpptempl.h",
+    "erpc_c/port/erpc_serial.cpp",
+    "erpcgen/src/cpptemplate/cpptempl.hpp",
     "erpcgen/src/cpptemplate/cpptempl.cpp",
     "erpcgen/src/cpptemplate/cpptempl_test.cpp"]
 
@@ -52,7 +53,7 @@ if cf.returncode != 0:
         clang_format_stderr.decode('utf-8')))
     exit(1)
 clang_format_stdout = clang_format_stdout.decode("utf-8")
-if not clang_format_stdout.startswith("clang-format version 10.0.0"):
+if "clang-format version 10.0.0" not in clang_format_stdout:
     print("clang-format is not the required version: 10.0.0")
     exit(1)
 
