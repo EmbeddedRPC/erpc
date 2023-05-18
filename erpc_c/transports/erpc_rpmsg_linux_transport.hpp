@@ -34,6 +34,13 @@ public:
     virtual ~RPMsgLinuxTransport(void);
 
     /*!
+     * @brief This function returns rpmsg endpoint object.
+     *
+     * @return RPMsgEndpoint * Rpmsg endpoint.
+     */
+    RPMsgEndpoint *getRpmsgEndpoint(void){ return m_endPoint; }
+
+    /*!
      * @brief This function initializes Linux environment for sending and receiving messages.
      *
      * @retval kErpcStatus_Success When environment was set successfully.
