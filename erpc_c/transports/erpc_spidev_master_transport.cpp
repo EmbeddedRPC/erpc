@@ -108,7 +108,7 @@ SpidevMasterTransport::~SpidevMasterTransport(void)
 
 erpc_status_t SpidevMasterTransport::init(void)
 {
-    erpc_status_t status;
+    erpc_status_t status = kErpcStatus_Success;
 
     /* Initialize the SPI device */
     /* Open SPI device file descriptor */
