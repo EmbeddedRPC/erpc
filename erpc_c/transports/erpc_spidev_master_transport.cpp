@@ -217,7 +217,7 @@ erpc_status_t SpidevMasterTransport::underlyingReceive(uint8_t *data, uint32_t s
 
     if (ERPC_SPIDEV_STATUS_SUCCESS != spidev_transfer(m_spidevHandle, NULL, data, size))
     {
-        status = kErpcStatus_SendFailed;
+        status = kErpcStatus_ReceiveFailed;
     }
 
     return status;
