@@ -40,68 +40,6 @@ extern "C" {
 //! @name Transport setup
 //@{
 
-//! @name CMSIS UART transport setup
-//@{
-
-/*!
- * @brief Create a CMSIS UART transport.
- *
- * Create a CMSIS UART transport instance, to be used on both the server
- * and the client side.
- *
- * @param[in] uartDrv CMSIS USART driver structure address (Driver Control Block).
- *
- * @return Return NULL or erpc_transport_t instance pointer.
- */
-erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
-//@}
-
-//! @name Host PC serial port transport setup
-//@{
-
-/*!
- * @brief Create a host PC serial port transport.
- *
- * Create a host PC serial port transport instance.
- *
- * @param[in] portName Port name.
- * @param[in] baudRate Baud rate.
- *
- * @return Return NULL or erpc_transport_t instance pointer.
- */
-erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate);
-//@}
-
-//! @name SPI transport setup
-//@{
-
-/*!
- * @brief Create a SPI master transport.
- *
- * Create SPI master transport instance, to be used at master core.
- *
- * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
- * @param[in] baudRate SPI baud rate.
- * @param[in] srcClock_Hz SPI source clock in Hz.
- *
- * @return Return NULL or erpc_transport_t instance pointer.
- */
-erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
-
-/*!
- * @brief Create a SPI slave transport.
- *
- * Create SPI slave transport instance, to be used at slave core.
- *
- * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
- * @param[in] baudRate SPI baud rate.
- * @param[in] srcClock_Hz SPI source clock in Hz.
- *
- * @return Return NULL or erpc_transport_t instance pointer.
- */
-erpc_transport_t erpc_transport_spi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
-//@}
-
 //! @name DSPI transport setup
 //@{
 
@@ -119,6 +57,13 @@ erpc_transport_t erpc_transport_spi_slave_init(void *baseAddr, uint32_t baudRate
 erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
 /*!
+ * @brief Deinitialize DSPI master transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_dspi_master_deinit(erpc_transport_t transport);
+
+/*!
  * @brief Create a DSPI slave transport.
  *
  * Create DSPI slave transport instance, to be used at slave core.
@@ -130,22 +75,39 @@ erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRa
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+/*!
+ * @brief Deinitialize DSPI slave transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_dspi_slave_deinit(erpc_transport_t transport);
+
 //@}
 
-//! @name SPIdev transport setup
+//! @name I2C transport setup
 //@{
 
 /*!
- * @brief Create a SPIdev transport.
+ * @brief Create an I2C slave transport.
  *
- * Create SPIdev master transport instance, to be used at master core.
+ * Create I2C slave transport instance, to be used at slave core.
  *
- * @param[in] spidev SPI device name.
- * @param[in] speed_Hz SPI clock speed in Hz.
+ * @param[in] baseAddr Base address of I2C peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz I2C source clock in Hz.
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_spidev_master_init(const char *spidev, uint32_t speed_Hz);
+erpc_transport_t erpc_transport_i2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+/*!
+ * @brief Deinitialize I2C slave transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_i2c_slave_deinit(erpc_transport_t transport);
+
 //@}
 
 //! @name MU transport setup
@@ -162,6 +124,45 @@ erpc_transport_t erpc_transport_spidev_master_init(const char *spidev, uint32_t 
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_mu_init(void *baseAddr);
+
+/*!
+ * @brief Deinitialize MU transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_mu_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name Linux RPMSG endpoint setup
+//@{
+
+/*!
+ * @brief Create an Linux RPMSG endpoint transport.
+ *
+ * This function is using RPMSG endpoints based on this implementation:
+ * github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ *
+ * When local/remote address is set to '-1', then default addresses will be used.
+ * When type is set to '0', then Datagram model will be used, else Stream.
+ *
+ * @param[in] local_addr Local endpoint address.
+ * @param[in] type Datagram (0) or Stream (1).
+ * @param[in] remote_addr Remote endpoint address.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
+
+/*!
+ * @brief Deinitialize an Linux RPMSG endpoint transport.
+ *
+ * This function deinitialize the Linux RPMSG endpoint transport.
+ *
+ * @param[in] transport Transport which was returned from init function.
+ */
+void erpc_transport_rpmsg_linux_deinit(erpc_transport_t transport);
+
 //@}
 
 //! @name RPMsg-Lite transport setup
@@ -180,6 +181,13 @@ erpc_transport_t erpc_transport_mu_init(void *baseAddr);
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_rpmsg_lite_master_init(uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id);
+
+/*!
+ * @brief Deinitialize RPMsg-Lite transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_rpmsg_lite_master_deinit(erpc_transport_t transport);
 
 /*!
  * @brief Create an RPMsg-Lite transport.
@@ -205,6 +213,13 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32
                                                        char *nameservice_name);
 
 /*!
+ * @brief Deinitialize RPMsg-Lite transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_rpmsg_lite_remote_deinit(erpc_transport_t transport);
+
+/*!
  * @brief Create an RPMsg-Lite RTOS transport.
  *
  * Create RPMsg-Lite RTOS transport instance, to be used at master core.
@@ -218,6 +233,13 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32
  */
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(uint32_t src_addr, uint32_t dst_addr,
                                                             uint32_t rpmsg_link_id);
+
+/*!
+ * @brief Deinitialize RPMsg-Lite RTOS transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_rpmsg_lite_rtos_master_deinit(erpc_transport_t transport);
 
 /*!
  * @brief Create an RPMsg-Lite RTOS transport.
@@ -240,6 +262,13 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(uint32_t src_addr, u
 erpc_transport_t erpc_transport_rpmsg_lite_rtos_remote_init(uint32_t src_addr, uint32_t dst_addr, void *start_address,
                                                             uint32_t rpmsg_link_id, rpmsg_ready_cb ready,
                                                             char *nameservice_name);
+
+/*!
+ * @brief Deinitialize RPMsg-Lite RTOS transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_rpmsg_lite_rtos_remote_deinit(erpc_transport_t transport);
 
 /*!
  * @brief Create an RPMsg-Lite TTY transport.
@@ -267,37 +296,104 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(uint32_t src_add
 /*!
  * @brief Deinitialize an RPMSG lite tty rtos transport.
  *
- * This function deinitializes the RPMSG lite tty rtos transport.
+ * This function deinitialize the RPMSG lite tty rtos transport.
+ *
+ * @param[in] transport Transport which was returned from init function.
  */
-void erpc_transport_rpmsg_lite_tty_rtos_deinit(void);
+void erpc_transport_rpmsg_lite_tty_rtos_remote_deinit(erpc_transport_t transport);
 //@}
 
-//! @name Linux RPMSG endpoint setup
+//! @name Host PC serial port transport setup
 //@{
 
 /*!
- * @brief Create an Linux RPMSG endpoint transport.
+ * @brief Create a host PC serial port transport.
  *
- * This function is using RPMSG endpoints based on this implementation:
- * github.com/nxp-mcuxpresso/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ * Create a host PC serial port transport instance.
  *
- * When local/remote address is set to '-1', then default addresses will be used.
- * When type is set to '0', then Datagram model will be used, else Stream.
- *
- * @param[in] local_addr Local endpoint address.
- * @param[in] type Datagram (0) or Stream (1).
- * @param[in] remote_addr Remote endpoint address.
+ * @param[in] portName Port name.
+ * @param[in] baudRate Baud rate.
  *
  * @return Return NULL or erpc_transport_t instance pointer.
  */
-erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr);
+erpc_transport_t erpc_transport_serial_init(const char *portName, long baudRate);
 
 /*!
- * @brief Deinitialize an Linux RPMSG endpoint transport.
+ * @brief Deinitialize a host PC serial port transport.
  *
- * This function deinitializes the Linux RPMSG endpoint transport.
+ * @param[in] transport Transport which was initialized with init function.
  */
-void erpc_transport_rpmsg_linux_deinit(void);
+void erpc_transport_serial_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name SPI transport setup
+//@{
+
+/*!
+ * @brief Create a SPI master transport.
+ *
+ * Create SPI master transport instance, to be used at master core.
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+/*!
+ * @brief Deinitialize SPI master transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_spi_master_deinit(erpc_transport_t transport);
+
+/*!
+ * @brief Create a SPI slave transport.
+ *
+ * Create SPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of SPI peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz SPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+/*!
+ * @brief Deinitialize SPI slave transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_spi_slave_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name SPIdev transport setup
+//@{
+
+/*!
+ * @brief Create a SPIdev transport.
+ *
+ * Create SPIdev master transport instance, to be used at master core.
+ *
+ * @param[in] spidev SPI device name.
+ * @param[in] speed_Hz SPI clock speed in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_spidev_master_init(const char *spidev, uint32_t speed_Hz);
+
+/*!
+ * @brief Deinitialize SPIdev transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_spidev_master_deinit(erpc_transport_t transport);
+
 //@}
 
 //! @name TCP transport setup
@@ -327,9 +423,41 @@ erpc_transport_t erpc_transport_tcp_init(const char *host, uint16_t port, bool i
  * socket or select() shoudl be used
  * For client, close server connection
  *
- * @return Return TRUE if listen/connection successful
+ * @param[in] transport Transport which was returned from init function.
  */
-void erpc_transport_tcp_close(void);
+void erpc_transport_tcp_close(erpc_transport_t transport);
+
+/*!
+ * @brief Deinitialize TCP transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_tcp_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name CMSIS UART transport setup
+//@{
+
+/*!
+ * @brief Create a CMSIS UART transport.
+ *
+ * Create a CMSIS UART transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] uartDrv CMSIS USART driver structure address (Driver Control Block).
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
+
+/*!
+ * @brief Deinitialize CMSIS UART transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_cmsis_uart_deinit(erpc_transport_t transport);
+
 //@}
 
 //! @name USB CDC transport setup
@@ -354,23 +482,14 @@ void erpc_transport_tcp_close(void);
  */
 erpc_transport_t erpc_transport_usb_cdc_init(void *serialHandle, void *serialConfig, void *usbCdcConfig,
                                              uint8_t *usbRingBuffer, uint32_t usbRingBufferLength);
-//@}
-
-//! @name I2C transport setup
-//@{
 
 /*!
- * @brief Create an I2C slave transport.
+ * @brief Deinitialize USB CDC transport.
  *
- * Create I2C slave transport instance, to be used at slave core.
- *
- * @param[in] baseAddr Base address of I2C peripheral used in this transport layer.
- * @param[in] baudRate SPI baud rate.
- * @param[in] srcClock_Hz I2C source clock in Hz.
- *
- * @return Return NULL or erpc_transport_t instance pointer.
+ * @param[in] transport Transport which was initialized with init function.
  */
-erpc_transport_t erpc_transport_i2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+void erpc_transport_usb_cdc_deinit(erpc_transport_t transport);
+
 //@}
 
 //@}

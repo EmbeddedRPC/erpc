@@ -17,7 +17,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-ERPC_MANUALLY_CONSTRUCTED(SpiMasterTransport, s_transport);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(SpiMasterTransport, s_spiTransport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -25,7 +25,42 @@ ERPC_MANUALLY_CONSTRUCTED(SpiMasterTransport, s_transport);
 
 erpc_transport_t erpc_transport_spi_master_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
 {
-    s_transport.construct(reinterpret_cast<SPI_Type *>(baseAddr), baudRate, srcClock_Hz);
-    (void)s_transport->init();
-    return reinterpret_cast<erpc_transport_t>(s_transport.get());
+    SpiMasterTransport *spiTransport;
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_spiTransport.isUsed())
+    {
+        spiTransport = NULL;
+    }
+    else
+    {
+        s_spiTransport.construct(reinterpret_cast<SPI_Type *>(baseAddr), baudRate, srcClock_Hz);
+        spiTransport = s_spiTransport.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    spiTransport = new SpiMasterTransport(reinterpret_cast<SPI_Type *>(baseAddr), baudRate, srcClock_Hz);
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    if (spiTransport != NULL)
+    {
+        (void)spiTransport->init();
+    }
+
+    return reinterpret_cast<erpc_transport_t>(spiTransport);
+}
+
+void erpc_transport_spi_master_deinit(erpc_transport_t transport)
+{
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)transport;
+    s_spiTransport.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(transport != NULL);
+
+    SpiMasterTransport *spiTransport = reinterpret_cast<SpiMasterTransport *>(transport);
+
+    delete spiTransport;
+#endif
 }
