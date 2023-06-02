@@ -53,8 +53,8 @@ if cf.returncode != 0:
         clang_format_stderr.decode('utf-8')))
     exit(1)
 clang_format_stdout = clang_format_stdout.decode("utf-8")
-if "clang-format version 10.0.0" not in clang_format_stdout:
-    print("clang-format is not the required version: 10.0.0")
+if "clang-format version 16.0.0" not in clang_format_stdout:
+    print("clang-format is not the required version: 16.0.0")
     exit(1)
 
 # processing formatting
