@@ -49,7 +49,7 @@ erpc_transport_t erpc_transport_rpmsg_lite_remote_init(uint32_t src_addr, uint32
 
     transport = reinterpret_cast<erpc_transport_t>(rpmsgTransport);
 
-    if (usbTransport != NULL)
+    if (rpmsgTransport != NULL)
     {
         if (rpmsgTransport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready, nameservice_name) !=
             kErpcStatus_Success)
