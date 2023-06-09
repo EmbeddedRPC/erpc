@@ -12,6 +12,10 @@
 #include "erpc_framed_transport.hpp"
 #include "erpc_threading.h"
 
+#if defined(__MINGW32__)
+#include <winsock2.h>
+#endif
+
 /*!
  * @addtogroup tcp_transport
  * @{
@@ -85,7 +89,11 @@ protected:
     bool m_isServer;       /*!< If true then server is using transport, else client. */
     const char *m_host;    /*!< Specify the host name or IP address of the computer. */
     uint16_t m_port;       /*!< Specify the listening port number. */
+#if defined(__MINGW32__)
+    SOCKET m_socket;          /*!< Socket number. */
+#else
     int m_socket;          /*!< Socket number. */
+#endif
     Thread m_serverThread; /*!< Pointer to server thread. */
     bool m_runServer;      /*!< Thread is executed while this is true. */
 

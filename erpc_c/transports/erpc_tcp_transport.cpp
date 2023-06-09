@@ -17,8 +17,14 @@ extern "C" {
 #include <err.h>
 #endif
 #include <errno.h>
+#if defined(__MINGW32__)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <ws2def.h>
+#else
 #include <netdb.h>
 #include <netinet/tcp.h>
+#endif
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -39,6 +45,12 @@ using namespace erpc;
 #define TCP_DEBUG_ERR(_msg_)
 #endif
 
+#if defined(__MINGW32__)
+#ifndef AI_NUMERICSERV
+#define AI_NUMERICSERV              0x00000008  // Servicename must be a numeric port number
+#endif
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,20 +59,36 @@ TCPTransport::TCPTransport(bool isServer)
 : m_isServer(isServer)
 , m_host(NULL)
 , m_port(0)
+#if defined(__MINGW32__)
+, m_socket(INVALID_SOCKET)
+#else
 , m_socket(-1)
+#endif
 , m_serverThread(serverThreadStub)
 , m_runServer(true)
 {
+#if defined(__MINGW32__)
+    WSADATA ws;
+    WSAStartup(MAKEWORD(2, 2), &ws);
+#endif
 }
 
 TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer)
 : m_isServer(isServer)
 , m_host(host)
 , m_port(port)
+#if defined(__MINGW32__)
+, m_socket(INVALID_SOCKET)
+#else
 , m_socket(-1)
+#endif
 , m_serverThread(serverThreadStub)
 , m_runServer(true)
 {
+#if defined(__MINGW32__)
+    WSADATA ws;
+    WSAStartup(MAKEWORD(2, 2), &ws);
+#endif
 }
 
 TCPTransport::~TCPTransport(void) {}
@@ -96,10 +124,18 @@ erpc_status_t TCPTransport::connectClient(void)
     char portString[8];
     struct addrinfo *res0;
     int result, set;
+#if defined(__MINGW32__)
+    SOCKET sock = INVALID_SOCKET;
+#else
     int sock = -1;
+#endif
     struct addrinfo *res;
 
+#if defined(__MINGW32__)
+    if (m_socket != INVALID_SOCKET)
+#else
     if (m_socket != -1)
+#endif
     {
         TCP_DEBUG_PRINT("%s", "socket already connected\n");
     }
@@ -138,7 +174,11 @@ erpc_status_t TCPTransport::connectClient(void)
             {
                 // Create the socket.
                 sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+#if defined(__MINGW32__)
+                if (sock == INVALID_SOCKET)
+#else
                 if (sock < 0)
+#endif
                 {
                     continue;
                 }
@@ -146,8 +186,13 @@ erpc_status_t TCPTransport::connectClient(void)
                 // Attempt to connect.
                 if (connect(sock, res->ai_addr, res->ai_addrlen) < 0)
                 {
+#if defined(__MINGW32__)
+                    closesocket(sock);
+                    sock = INVALID_SOCKET;
+#else
                     ::close(sock);
                     sock = -1;
+#endif
                     continue;
                 }
 
@@ -159,7 +204,11 @@ erpc_status_t TCPTransport::connectClient(void)
             freeaddrinfo(res0);
 
             // Check if we were able to open a connection.
+#if defined(__MINGW32__)
+            if (sock == INVALID_SOCKET)
+#else
             if (sock < 0)
+#endif
             {
                 // TODO check EADDRNOTAVAIL:
                 TCP_DEBUG_ERR("connecting failed");
@@ -170,9 +219,17 @@ erpc_status_t TCPTransport::connectClient(void)
         if (status == kErpcStatus_Success)
         {
             set = 1;
+#if defined(__MINGW32__)
+            if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&set, sizeof(int)) < 0)
+#else
             if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&set, sizeof(int)) < 0)
+#endif
             {
+#if defined(__MINGW32__)
+                closesocket(sock);
+#else
                 ::close(sock);
+#endif
                 TCP_DEBUG_ERR("setsockopt failed");
                 status = kErpcStatus_Fail;
             }
@@ -187,9 +244,17 @@ erpc_status_t TCPTransport::connectClient(void)
             // Disable SIGPIPE for this socket. This will cause write() to return an EPIPE statusor if the
             // other side has disappeared instead of our process receiving a SIGPIPE.
             set = 1;
+#if defined(__MINGW32__)
+            if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (const char *)&set, sizeof(int)) < 0)
+#else
             if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int)) < 0)
+#endif
             {
+#if defined(__MINGW32__)
+                closesocket(sock);
+#else
                 ::close(sock);
+#endif
                 TCP_DEBUG_ERR("setsockopt failed");
                 status = kErpcStatus_Fail;
             }
@@ -199,7 +264,9 @@ erpc_status_t TCPTransport::connectClient(void)
         {
 #else
             // globally disable the SIGPIPE signal
+#if !defined(__MINGW32__)
             signal(SIGPIPE, SIG_IGN);
+#endif
 #endif // defined(SO_NOSIGPIPE)
             m_socket = sock;
         }
@@ -215,11 +282,19 @@ erpc_status_t TCPTransport::close(bool stopServer)
         m_runServer = false;
     }
 
+#if defined(__MINGW32__)
+    if (m_socket != INVALID_SOCKET)
+    {
+        closesocket(m_socket);
+        m_socket = INVALID_SOCKET;
+    }
+#else
     if (m_socket != -1)
     {
         ::close(m_socket);
         m_socket = -1;
     }
+#endif
 
     return kErpcStatus_Success;
 }
@@ -230,7 +305,11 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
     erpc_status_t status = kErpcStatus_Success;
 
     // Block until we have a valid connection.
+#if defined(__MINGW32__)
+    while (m_socket == INVALID_SOCKET)
+#else
     while (m_socket <= 0)
+#endif
     {
         // Sleep 10 ms.
         Thread::sleep(10000);
@@ -239,7 +318,11 @@ erpc_status_t TCPTransport::underlyingReceive(uint8_t *data, uint32_t size)
     // Loop until all requested data is received.
     while (size > 0U)
     {
+#if defined(__MINGW32__)
+        length = recv(m_socket, (char *)data, size, 0);
+#else
         length = read(m_socket, data, size);
+#endif
 
         // Length will be zero if the connection is closed.
         if (length > 0)
@@ -271,7 +354,11 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
     erpc_status_t status = kErpcStatus_Success;
     ssize_t result;
 
+#if defined(__MINGW32__)
+    if (m_socket == INVALID_SOCKET)
+#else
     if (m_socket <= 0)
+#endif
     {
         // we should not pretend to have a succesful Send or we create a deadlock
         status = kErpcStatus_ConnectionFailure;
@@ -281,7 +368,11 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
         // Loop until all data is sent.
         while (size > 0U)
         {
+#if defined(__MINGW32__)
+            result = ::send(m_socket, (const char *)data, size, 0);
+#else
             result = write(m_socket, data, size);
+#endif
             if (result >= 0)
             {
                 size -= result;
@@ -310,7 +401,11 @@ erpc_status_t TCPTransport::underlyingSend(const uint8_t *data, uint32_t size)
 void TCPTransport::serverThread(void)
 {
     int yes = 1;
+#if defined(__MINGW32__)
+    SOCKET serverSocket;
+#else
     int serverSocket;
+#endif
     int result;
     struct sockaddr incomingAddress;
     socklen_t incomingAddressLength;
@@ -322,7 +417,11 @@ void TCPTransport::serverThread(void)
 
     // Create socket.
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+#if defined(__MINGW32__)
+    if (serverSocket == INVALID_SOCKET)
+#else
     if (serverSocket < 0)
+#endif
     {
         TCP_DEBUG_ERR("failed to create server socket");
     }
@@ -335,7 +434,11 @@ void TCPTransport::serverThread(void)
         serverAddress.sin_port = htons(m_port);
 
         // Turn on reuse address option.
-        result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+#if defined(__MINGW32__)
+        result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, (const char *)&yes, sizeof(yes));
+#else
+        result = setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, (const void *)&yes, sizeof(yes));
+#endif
         if (result < 0)
         {
             TCP_DEBUG_ERR("setsockopt failed");
@@ -373,13 +476,21 @@ void TCPTransport::serverThread(void)
                 incomingAddressLength = sizeof(struct sockaddr);
                 // we should use select() otherwise we can't end the server properly
                 incomingSocket = accept(serverSocket, &incomingAddress, &incomingAddressLength);
+#if defined(__MINGW32__)
+                if (incomingSocket != INVALID_SOCKET)
+#else
                 if (incomingSocket > 0)
+#endif
                 {
                     // Successfully accepted a connection.
                     m_socket = incomingSocket;
                     // should be inherited from accept() socket but it's not always ...
                     yes = 1;
+#if defined(__MINGW32__)
+                    setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&yes, sizeof(yes));
+#else
                     setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void *)&yes, sizeof(yes));
+#endif
                 }
                 else
                 {
@@ -387,7 +498,11 @@ void TCPTransport::serverThread(void)
                 }
             }
         }
+#if defined(__MINGW32__)
+        closesocket(serverSocket);
+#else
         ::close(serverSocket);
+#endif
     }
 }
 
