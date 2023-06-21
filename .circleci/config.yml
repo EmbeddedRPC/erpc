@@ -49,7 +49,8 @@ jobs:
     steps:
       - checkout
       - run: powershell.exe .\install_dependencies.ps1
-      - run: powershell.exe .\mingw64\bin\mingw32-make erpcgen
+      - run: .\mingw64\bin\mingw32-make all
+      - run: .\mingw64\opt\bin\python3.exe .\test\run_unit_tests.py -m"..\\..\\mingw64\\bin\\mingw32-make"
       # - store_artifacts:
       #     path: ./Release/MINGW64/erpcgen/erpcgen.exe
   build-windows-VS:

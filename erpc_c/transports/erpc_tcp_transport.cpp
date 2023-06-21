@@ -13,29 +13,33 @@
 #include <string>
 
 extern "C" {
+// Set this to 1 to enable debug logging.
+// TODO fix issue with the transport not working on Linux if debug logging is disabled.
+//#define TCP_TRANSPORT_DEBUG_LOG (1)
+
+#if TCP_TRANSPORT_DEBUG_LOG
 #if ERPC_HAS_POSIX
+#if defined(__MINGW32__)
+#error Missing implementation for mingw.
+#endif
 #include <err.h>
+#endif
 #endif
 #include <errno.h>
 #if defined(__MINGW32__)
-#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <ws2def.h>
 #else
 #include <netdb.h>
 #include <netinet/tcp.h>
+#include <sys/socket.h>
 #endif
 #include <signal.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 }
 
 using namespace erpc;
-
-// Set this to 1 to enable debug logging.
-// TODO fix issue with the transport not working on Linux if debug logging is disabled.
-//#define TCP_TRANSPORT_DEBUG_LOG (1)
 
 #if TCP_TRANSPORT_DEBUG_LOG
 #define TCP_DEBUG_PRINT(_fmt_, ...) printf(_fmt_, ##__VA_ARGS__)

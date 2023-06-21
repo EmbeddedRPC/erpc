@@ -30,6 +30,14 @@ UT_OUTPUT_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)
 TCP_CLIENT_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(CLIENT_NAME)/$(DEBUG_OR_RELEASE)/$(CLIENT_NAME)_tcp_test
 TCP_SERVER_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(SERVER_NAME)/$(DEBUG_OR_RELEASE)/$(SERVER_NAME)_tcp_test
 
+test_server_serial = test_server_serial
+test_client_serial = test_client_serial
+clean_serial = clean_serial
+ifeq "$(is_mingw)" "1"
+	test_server_serial =
+	test_client_serial =
+	clean_serial =
+endif
 
 .PHONY: all
 all: test_lib test_client test_server
@@ -50,7 +58,7 @@ test-serial: test_lib test_client_serial test_server_serial
 fresh: clean all
 
 .PHONY: test_client
-test_client: test_client_tcp test_client_serial
+test_client: test_client_tcp $(test_client_serial)
 
 .PHONY: test_client_tcp
 test_client_tcp: erpcgen
@@ -67,7 +75,7 @@ else
 endif
 
 .PHONY: test_server
-test_server: test_server_tcp test_server_serial
+test_server: test_server_tcp $(test_server_serial)
 
 .PHONY: test_server_tcp
 test_server_tcp: erpcgen
@@ -105,7 +113,7 @@ run-erpcgen-common: erpcgen
 
 #cleans only output directories related to this unit test
 .PHONY: clean clean_serial clean_tcp
-clean: clean_serial clean_tcp
+clean: $(clean_serial) clean_tcp
 
 clean_tcp:
 	@echo Cleaning $(TEST_NAME)_tcp...

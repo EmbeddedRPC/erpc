@@ -75,7 +75,11 @@ else
     # Set to 1 if running on Linux.
     is_linux := $(and $(findstring Linux,$(os_name)),1)
 
-    is_mingw := $(and $(findstring MSYS_NT,$(os_name)),1)
+    # Set to 1 if running on Windows under Mingw.
+    is_mingw := $(and $(findstring MINGW,$(os_name)),1)
+    ifeq "$(is_mingw)" ""
+        is_mingw := $(and $(findstring MSYS_NT,$(os_name)),1)
+    endif
 endif
 
 ifeq "$(is_mingw)" "1"

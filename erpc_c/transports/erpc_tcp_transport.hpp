@@ -9,12 +9,12 @@
 #ifndef _EMBEDDED_RPC__TCP_TRANSPORT_H_
 #define _EMBEDDED_RPC__TCP_TRANSPORT_H_
 
-#include "erpc_framed_transport.hpp"
-#include "erpc_threading.h"
-
 #if defined(__MINGW32__)
 #include <winsock2.h>
 #endif
+
+#include "erpc_framed_transport.hpp"
+#include "erpc_threading.h"
 
 /*!
  * @addtogroup tcp_transport

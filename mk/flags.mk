@@ -68,10 +68,6 @@ else
     CXXFLAGS += -g3 -O0 -DDEBUG -DYYDEBUG=1
 endif
 
-ifneq "$(is_mingw)" "1"
-    LIBRARIES += -lc
-endif
-
 ifneq "$(is_cygwin)" "1"
     LIBRARIES += -lstdc++
 endif
@@ -81,3 +77,9 @@ ifeq "$(is_linux)" "1"
 endif
 
 LIBRARIES += -lm
+
+ifeq "$(is_mingw)" "1"
+    LIBRARIES += -pthread -lws2_32
+else
+    LIBRARIES += -lc
+endif
