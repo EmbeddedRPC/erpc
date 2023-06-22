@@ -75,7 +75,6 @@ for dir in testDirs:
     print(bcolors.BLUE + "\nRunning " + bcolors.ORANGE + dir + bcolors.BLUE +" unit tests with "
             + bcolors.ORANGE + transportLayer + bcolors.BLUE + " transport layer." + bcolors.ENDC)
     os.chdir(dir)
-    print(os.getcwd())
     subprocess.Popen([make, build, testServerCommand])
     testsExitStatus += subprocess.call([make, build, testClientCommand])
     os.chdir('..')
