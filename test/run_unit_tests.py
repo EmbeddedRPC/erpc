@@ -16,6 +16,7 @@ import subprocess
 import re
 import os
 import sys
+import time
 
 #define output text colour class
 class bcolors:
@@ -76,6 +77,7 @@ for dir in testDirs:
             + bcolors.ORANGE + transportLayer + bcolors.BLUE + " transport layer." + bcolors.ENDC)
     os.chdir(dir)
     subprocess.Popen([make, build, testServerCommand])
+    time.sleep(0.1)
     testsExitStatus += subprocess.call([make, build, testClientCommand])
     os.chdir('..')
 
