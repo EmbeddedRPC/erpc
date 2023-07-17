@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2022 NXP
  * Copyright 2019 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -130,6 +130,23 @@ erpc_transport_t erpc_transport_dspi_master_init(void *baseAddr, uint32_t baudRa
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_dspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name LPSPI transport setup
+//@{
+
+/*!
+ * @brief Create a LPSPI slave transport.
+ *
+ * Create LPSPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of LPSPI peripheral used in this transport layer.
+ * @param[in] baudRate LPSPI baud rate.
+ * @param[in] srcClock_Hz LPSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_lpspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 //@}
 
 //! @name SPIdev transport setup
@@ -371,6 +388,23 @@ erpc_transport_t erpc_transport_usb_cdc_init(void *serialHandle, void *serialCon
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_i2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+//@}
+
+//! @name LPI2C transport setup
+//@{
+
+/*!
+ * @brief Create an LPI2C slave transport.
+ *
+ * Create LPI2C slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of LPI2C peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz LPI2C source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_lpi2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 //@}
 
 //@}
