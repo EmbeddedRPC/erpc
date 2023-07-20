@@ -467,7 +467,8 @@ private:
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "", const std::string &name = "", bool interfaceClass = false);
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
+                                     const std::string &name = "", bool interfaceClass = false);
 
     /*!
      * @brief This function return interface function representation called by server side.
@@ -477,7 +478,7 @@ private:
      *
      * @return String representation for given function.
      */
-    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr, std::string = "");
+    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr, const std::string = "");
 
     /*!
      * @brief This function return name with guard.

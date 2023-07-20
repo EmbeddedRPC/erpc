@@ -1968,7 +1968,7 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
     }
 }
 
-string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType, std::string prefix)
+string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType, const std::string prefix)
 {
     string proto = "";
     if (!fn->getReturnType()->isVoid() && prefix.length() > 0)
