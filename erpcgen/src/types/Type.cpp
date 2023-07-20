@@ -514,6 +514,14 @@ void Interface::addFunction(Function *func)
     m_functions.push_back(func);
 }
 
+void Interface::addFunctionType(FunctionType *func)
+{
+    assert(func);
+
+    m_scope.addSymbol(func);
+    m_functionTypes.push_back(func);
+}
+
 string Interface::getDescription() const
 {
     string fns;

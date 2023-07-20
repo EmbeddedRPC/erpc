@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 NXP
+ * Copyright 2023 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *

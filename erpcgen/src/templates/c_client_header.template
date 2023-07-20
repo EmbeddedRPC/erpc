@@ -61,6 +61,8 @@ enum _{$iface.name}_ids
 {% for iface in group.interfaces %}
 void init{$iface.clientClassName}(erpc_client_t client);
 
+void deinit{$iface.clientClassName}(void);
+
 {% endfor -- iface %}
 #ifdef __cplusplus
 }

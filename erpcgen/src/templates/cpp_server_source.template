@@ -24,9 +24,6 @@ extern bool nestingDetection;
 
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
-{% if unitTest %}
-{$> callbackTable(functions)}
-{% endif %}
 {$> constantsDefinitions(consts)}
 {$> symbolHeader(group.symbolsMap.symbolsToServer, "deserial", "def")}
 {$> symbolSource(group.symbolsMap.symbolsToServer, "deserial", "def")}

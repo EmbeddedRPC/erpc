@@ -10,14 +10,14 @@ program test
 
 import "../common/unit_test_common.erpc"
 
-oneway callback1_t(int32 a, int32 b)
-oneway callback2_t(int32, int32)
-callback3_t(int32 arg1, int32 arg2) -> int32
-
 @c:include("test_core1.h")
 @group("core0")
 interface ClientCore0Services
 {
+    type oneway callback1_t(int32 a, int32 b)
+    type callback3_t(int32 arg1, int32 arg2) -> int32
+    type oneway callback2_t(int32, int32)
+
     myFun(in callback1_t pCallback1_in, out callback1_t pCallback1_out) -> int32
 
     myFun2(ClientCore1Services::callback2_t pCallback2_in, out ClientCore1Services::callback2_t pCallback2_out) -> void
@@ -38,5 +38,7 @@ interface ClientCore0Services
 @group("core1")
 interface ClientCore1Services
 {
+    type oneway callback2_t(int32, int32)
+
     callback2_t callback2(param1, param2);
 }

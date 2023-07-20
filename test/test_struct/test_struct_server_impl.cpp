@@ -339,6 +339,8 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc2);
     /* Delete unused service
      */
+    delete svc1->getHandler();
+    delete svc2->getHandler();
     delete svc1;
     delete svc2;
 }

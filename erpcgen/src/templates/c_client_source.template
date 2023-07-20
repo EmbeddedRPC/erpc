@@ -3,6 +3,8 @@
 {$mlComment}
 
 {% endif %}
+{$commonHeader()}
+
 #include "{$clientCHeaderName}"
 #include "{$clientCppHeaderName}"
 #include "erpc_manually_constructed.hpp"
@@ -27,7 +29,11 @@ static const {$cb.name} _{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in c
 {% endfor %}
 
 {% for iface in group.interfaces %}
-static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+{$iface.clientClassName} *s_{$iface.clientClassName} = nullptr;
+#else
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.clientClassName}, s_{$iface.clientClassName});
+#endif
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
@@ -72,6 +78,25 @@ static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
 
 void init{$iface.clientClassName}(erpc_client_t client)
 {
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(s_{$iface.clientClassName} == nullptr);
+    s_{$iface.clientClassName} = new {$iface.clientClassName}(reinterpret_cast<ClientManager *>(client));
+#else
+    erpc_assert(!s_{$iface.clientClassName}.isUsed());
     s_{$iface.clientClassName}.construct(reinterpret_cast<ClientManager *>(client));
+#endif
+}
+
+void deinit{$iface.clientClassName}(void)
+{
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    if (s_{$iface.clientClassName} != nullptr)
+    {
+        delete s_{$iface.clientClassName};
+        s_{$iface.clientClassName} = nullptr;
+    }
+#else
+    s_{$iface.clientClassName}.destroy();
+#endif
 }
 {% endfor -- iface %}

@@ -1,3 +1,11 @@
+/*
+ * Copyright 2023 ACRIOS Systems s.r.o.
+ * All rights reserved.
+ *
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include "erpc_utils.hpp"
 
 bool erpc::findIndexOfFunction(const arrayOfFunctionPtr_t sourceArrayOfFunctionPtr, uint16_t sourceArrayLength,

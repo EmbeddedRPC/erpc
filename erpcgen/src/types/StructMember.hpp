@@ -45,16 +45,14 @@ public:
      *
      * @param[in] name Given name.
      * @param[in] dataType Given data type.
-     * @param[in] ifaceScope Scope name.
      */
-    StructMember(const std::string &name, DataType *dataType, const std::string &ifaceScope = "")
+    StructMember(const std::string &name, DataType *dataType)
     : Symbol(kStructMemberSymbol, name)
     , m_dataType(dataType)
     , m_paramDirection()
     , m_containList()
     , m_containString()
     , m_byref(false)
-    , m_ifaceScope(ifaceScope)
     {
     }
 
@@ -65,16 +63,14 @@ public:
      *
      * @param[in] tok Given token.
      * @param[in] dataType Given data type.
-     * @param[in] ifaceScope Scope name.
      */
-    StructMember(const Token &tok, DataType *dataType, const std::string &ifaceScope = "")
+    StructMember(const Token &tok, DataType *dataType)
     : Symbol(kStructMemberSymbol, tok)
     , m_dataType(dataType)
     , m_paramDirection()
     , m_containList()
     , m_containString()
     , m_byref(false)
-    , m_ifaceScope(ifaceScope)
     {
     }
 
@@ -168,15 +164,12 @@ public:
      */
     void setByref(bool byref) { m_byref = byref; }
 
-    std::string getIfaceScope() { return m_ifaceScope; }
-
 protected:
     DataType *m_dataType;              /*!< Struct member data type. */
     _param_direction m_paramDirection; /*!< Direction in which is member used. */
     bool m_containList;                /*!< True when member contains list type */
     bool m_containString;              /*!< True when member contains string type */
     bool m_byref;                      /*!< True when member is byref type */
-    std::string m_ifaceScope;          /*!< In case of callback type interface scope can be set */
 };
 
 } // namespace erpcgen

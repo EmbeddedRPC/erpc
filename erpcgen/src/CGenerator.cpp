@@ -142,9 +142,6 @@ void CGenerator::generateClientCppSourceFile(string fileName)
     fileName += "_client.cpp";
     m_templateData["clientCppSourceName"] = fileName;
 
-    // TODO: temporary workaround for tests
-    m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_client.cpp") == 0 ? false : true);
-
     generateOutputFile(fileName, "cpp_client_source", m_templateData, kCppClientSource);
 }
 
@@ -160,9 +157,6 @@ void CGenerator::generateServerCppSourceFile(string fileName)
 {
     fileName += "_server.cpp";
     m_templateData["serverCppSourceName"] = fileName;
-
-    // TODO: temporary workaround for tests
-    m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_server.cpp") == 0 ? false : true);
 
     generateOutputFile(fileName, "cpp_server_source", m_templateData, kCppServerSource);
 }
@@ -180,9 +174,6 @@ void CGenerator::generateClientCSourceFile(string fileName)
     fileName = "c_" + fileName + "_client.cpp";
     m_templateData["clientCSourceName"] = fileName;
 
-    // TODO: temporary workaround for tests
-    m_templateData["unitTest"] = (fileName.compare("c_test_unit_test_common_client.cpp") == 0 ? false : true);
-
     generateOutputFile(fileName, "c_client_source", m_templateData, kCClientSource);
 }
 
@@ -198,9 +189,6 @@ void CGenerator::generateServerCSourceFile(string fileName)
 {
     fileName = "c_" + fileName + "_server.cpp";
     m_templateData["serverCSourceName"] = fileName;
-
-    // TODO: temporary workaround for tests
-    m_templateData["unitTest"] = (fileName.compare("c_test_unit_test_common_server.cpp") == 0 ? false : true);
 
     generateOutputFile(fileName, "c_server_source", m_templateData, kCServerSource);
 }
@@ -524,13 +512,6 @@ void CGenerator::generate()
     }
 
     // check if structure/function parameters annotations are valid.
-    for (Symbol *symbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
-    {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(symbol);
-        assert(functionType);
-        scanStructForAnnotations(&functionType->getParameters(), true);
-    }
-
     for (Symbol *symbol : getDataTypesFromSymbolScope(m_globals, DataType::kStructType))
     {
         StructType *structType = dynamic_cast<StructType *>(symbol);
@@ -545,6 +526,11 @@ void CGenerator::generate()
         for (Function *function : interface->getFunctions())
         {
             scanStructForAnnotations(&function->getParameters(), true);
+        }
+
+        for (FunctionType *functionType : interface->getFunctionTypes())
+        {
+            scanStructForAnnotations(&functionType->getParameters(), true);
         }
     }
 
@@ -1082,8 +1068,8 @@ data_map CGenerator::getStructDeclarationTemplateData(StructType *structType)
 
         DataType *trueDataType = member->getDataType()->getTrueDataType();
         // Check if member is byRef type. Add "*" for type and allocate space for data on server side.
-        if (member->isByref() &&
-            (trueDataType->isStruct() || trueDataType->isUnion() || trueDataType->isScalar() || trueDataType->isEnum() || trueDataType->isFunction()))
+        if (member->isByref() && (trueDataType->isStruct() || trueDataType->isUnion() || trueDataType->isScalar() ||
+                                  trueDataType->isEnum() || trueDataType->isFunction()))
         {
             memberName = "*" + memberName;
         }
@@ -1364,14 +1350,16 @@ void CGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 bool CGenerator::isServerNullParam(StructMember *param)
 {
     DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
-    return (!paramTrueDataType->isScalar() && !paramTrueDataType->isEnum() && !paramTrueDataType->isArray() && !paramTrueDataType->isFunction());
+    return (!paramTrueDataType->isScalar() && !paramTrueDataType->isEnum() && !paramTrueDataType->isArray() &&
+            !paramTrueDataType->isFunction());
 }
 
 bool CGenerator::isPointerParam(StructMember *param)
 {
     DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
     return (isServerNullParam(param) ||
-            ((paramTrueDataType->isScalar() || paramTrueDataType->isEnum() || paramTrueDataType->isFunction()) && param->getDirection() != kInDirection));
+            ((paramTrueDataType->isScalar() || paramTrueDataType->isEnum() || paramTrueDataType->isFunction()) &&
+             param->getDirection() != kInDirection));
 }
 
 bool CGenerator::isNullableParam(StructMember *param)
@@ -1448,7 +1436,8 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
         info["needTempVariableClientI32"] = needTempVariableI32;
         returnInfo["resultVariable"] = resultVariable;
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
-        returnInfo["isNullReturnType"] = (!trueDataType->isScalar() && !trueDataType->isEnum() && !trueDataType->isFunction());
+        returnInfo["isNullReturnType"] =
+            (!trueDataType->isScalar() && !trueDataType->isEnum() && !trueDataType->isFunction());
     }
     info["returnValue"] = returnInfo;
 
@@ -1584,6 +1573,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             }
         }
 
+        string ifaceScope = "";
         if (paramTrueType->isFunction())
         {
             FunctionType *funType = dynamic_cast<FunctionType *>(paramTrueType);
@@ -1591,6 +1581,10 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             {
                 info["needTempVariableServerU16"] = true;
                 info["needTempVariableClientU16"] = true;
+            }
+            if (funType->getInterface() != fn->getInterface())
+            {
+                ifaceScope = funType->getInterface()->getName();
             }
         }
 
@@ -1630,7 +1624,6 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
 
         paramInfo["variable"] = getTypenameName(paramType, name);
         paramInfo["name"] = name;
-        string ifaceScope = param->getIfaceScope();
         if (ifaceScope != "")
         {
             externalInterfacesList.push_back(ifaceScope);
@@ -2000,14 +1993,15 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
             DataType *trueDataType = it->getDataType()->getTrueDataType();
 
             /* Builtin types and function types. */
-            if (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) && it->getDirection() != kInDirection &&
-                findAnnotation(it, NULLABLE_ANNOTATION))
+            if (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) &&
+                it->getDirection() != kInDirection && findAnnotation(it, NULLABLE_ANNOTATION))
             {
                 // On server side is created new variable for handle null : "_" + name
                 proto += "_";
             }
-            else if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) ||
-                                                              (findAnnotation(it, SHARED_ANNOTATION))))
+            else if ((it->getDirection() != kInDirection) &&
+                     (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) ||
+                      (findAnnotation(it, SHARED_ANNOTATION))))
 
             {
                 if (prefix != "")
@@ -2165,10 +2159,13 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
 
             if (interfaceClass)
             {
-                string ifaceScope = it->getIfaceScope();
-                if (ifaceScope != "")
+                if (trueDataType->isFunction())
                 {
-                    proto += ifaceScope + "_interface::";
+                    FunctionType *funcType = dynamic_cast<FunctionType *>(trueDataType);
+                    if (fn->getInterface() != funcType->getInterface())
+                    {
+                        proto += funcType->getInterface()->getName() + "_interface::";
+                    }
                 }
             }
 
@@ -2958,7 +2955,8 @@ data_map CGenerator::firstAllocOnServerWhenIsNeed(const string &name, StructMemb
         }
         else if (structMember->getDirection() == kOutDirection)
         {
-            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray() && !trueDataType->isFunction())
+            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray() &&
+                !trueDataType->isFunction())
             {
                 return allocateCall(name, structMember);
             }

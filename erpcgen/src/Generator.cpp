@@ -685,11 +685,11 @@ void Generator::getCallbacksTemplateData(const Interface *iface, data_list &call
             DataType *datatype = param->getDataType()->getTrueDataType();
             if (datatype->isFunction())
             {
-                if (param->getIfaceScope() != "")
-                {
-                    interfacesNames.push_back(param->getIfaceScope());
-                }
                 FunctionType *funType = dynamic_cast<FunctionType *>(datatype);
+                if (funType->getInterface() != iface)
+                {
+                    interfacesNames.push_back(funType->getInterface()->getName());
+                }
                 if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), funType->getName()) ==
                      callbackTypesNames.end()))
                 {
@@ -699,23 +699,13 @@ void Generator::getCallbacksTemplateData(const Interface *iface, data_list &call
             }
         }
     }
-
-    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
+    for (auto functionType : iface->getFunctionTypes())
     {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        assert(functionType);
-
-        for (auto fun : functionType->getCallbackFuns())
+        if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), functionType->getName()) ==
+                callbackTypesNames.end()))
         {
-            if (fun->getInterface() == iface)
-            {
-                if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), functionType->getName()) ==
-                     callbackTypesNames.end()))
-                {
-                    callbackTypes.push_back(functionType);
-                    callbackTypesNames.push_back(functionType->getName());
-                }
-            }
+            callbackTypes.push_back(functionType);
+            callbackTypesNames.push_back(functionType->getName());
         }
     }
 

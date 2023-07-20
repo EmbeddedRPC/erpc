@@ -497,7 +497,7 @@ protected:
      *
      * @exception internal_error Thrown if given ast node has not token type: TOK_IDENT, TOK_LIST, TOK_ARRAY.
      */
-    DataType *lookupDataType(const AstNode *typeNode, std::string *ifaceName = nullptr);
+    DataType *lookupDataType(const AstNode *typeNode);
 
     /*!
      * @brief This function returns pointer to new list object.

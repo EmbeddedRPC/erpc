@@ -161,7 +161,7 @@ public:
      * @brief Returns information if object is free or is used.
      *
      * @return true Object is constructed and used.
-     * @return false Object wasn't constructor or it is destructed and free.
+     * @return false Object wasn't constructed or it was destructed already.
      */
     bool isUsed(void) { return m_isConstructed; }
 

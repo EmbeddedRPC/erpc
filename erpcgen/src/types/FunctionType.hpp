@@ -39,9 +39,10 @@ public:
      * This function set symbol token to given token.
      *
      * @param[in] tok Given token.
+     * @param[in] m_interface Parent interface.
      */
-    explicit FunctionType(const Token &tok)
-    : FunctionBase()
+    explicit FunctionType(const Token &tok, Interface *interface)
+    : FunctionBase(interface)
     , DataType(tok, kFunctionType)
     , m_callbackFuns()
     {

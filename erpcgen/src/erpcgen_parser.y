@@ -211,6 +211,8 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> function_return_type
 %type <m_ast> function_type_base_def
 %type <m_ast> function_type_def
+%type <m_ast> function_cb_type_def
+%type <m_ast> function_cb_type_list
 %type <m_ast> ident
 %type <m_ast> ident_opt
 %type <m_ast> int_const_expr
@@ -341,11 +343,6 @@ definition_base :   const_def
                         {
                             $$ = $interface_def;
                         }
-                |
-                    function_type_def
-                        {
-                            $$ = $function_type_def;
-                        }
                 ;
 
 import_stmt     :   TOK_IMPORT TOK_STRING_LITERAL
@@ -453,7 +450,7 @@ interface_def   :   TOK_INTERFACE[iface] ident[name] '{' function_def_list_opt[f
                 ;
 
 function_def_list_opt
-                :   function_def_list
+                :     function_def_list
                         {
                             $$ = $function_def_list;
                         }
@@ -467,7 +464,12 @@ function_def_list_opt
  * TOK_CHILDREN -> ( function_def* )
  */
 function_def_list
-                :   function_def
+                :   function_cb_type_list function_def
+                        {
+                            $function_cb_type_list->appendChild($function_def);
+                            $$ = $function_cb_type_list;
+                        }
+                | function_def
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild($function_def);
@@ -479,13 +481,39 @@ function_def_list
                         }
                 ;
 
-function_def    :   doxy_ml_comment_opt annotation_list_opt function_type_base_def comma_semi_opt doxy_il_comment_opt
+function_cb_type_def
+                :   doxy_ml_comment_opt annotation_list_opt TOK_TYPE function_type_def comma_semi_opt doxy_il_comment_opt
                         {
-                            $$ = $function_type_base_def;
+                            $$ = $function_type_def;
+                            $$->appendChild(new AstNode(*$TOK_TYPE));
                             $$->appendChild($annotation_list_opt);
                             $$->appendChild($doxy_ml_comment_opt);
                             $$->appendChild($doxy_il_comment_opt);
                         }
+                ;
+
+function_cb_type_list
+                :   function_cb_type_def
+                        {
+                            $$ = new AstNode(Token(TOK_CHILDREN));
+                            $$->appendChild($function_cb_type_def);
+                        }
+                |   function_cb_type_list[fun_type_list] function_cb_type_def
+                        {
+                            $fun_type_list->appendChild($function_cb_type_def);
+                            $$ = $fun_type_list;
+                        }
+                ;
+
+function_def    :   doxy_ml_comment_opt annotation_list_opt function_type_base_def comma_semi_opt doxy_il_comment_opt
+                        {
+                            $$ = $function_type_base_def;
+                            $$->appendChild(NULL);  /* Compatibility with function type definition */
+                            $$->appendChild($annotation_list_opt);
+                            $$->appendChild($doxy_ml_comment_opt);
+                            $$->appendChild($doxy_il_comment_opt);
+                        }
+                ;
 
 function_type_base_def
                 :   function_type_def

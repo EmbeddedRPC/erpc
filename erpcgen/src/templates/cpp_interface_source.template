@@ -1,3 +1,9 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
 #include "{$interfaceCppHeaderName}"
 
 {$checkVersion()}
