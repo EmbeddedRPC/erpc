@@ -55,26 +55,66 @@ int32_t callSecondSide()
 }
 }
 
-class FirstInterface_server : public FirstInterface_interface
+class FirstInterface_server: public FirstInterface_interface
 {
-public:
-    void whenReady(void){};
+    public:
 
-    void firstSendInt(int32_t a) { firstSendInt(a); }
+        void whenReady(void)
+        {
+            ::whenReady();
+        }
 
-    int32_t firstReceiveInt(void) { return firstReceiveInt(); }
+        void firstSendInt(int32_t a)
+        {
+            ::firstSendInt(a);
+        }
 
-    void stopSecondSide(void) { stopSecondSide(); }
+        int32_t firstReceiveInt(void)
+        {
+            int32_t result;
+            result = ::firstReceiveInt();
 
-    int32_t getResultFromSecondSide(void) { return getResultFromSecondSide(); }
+            return result;
+        }
 
-    void testCasesAreDone(void) { testCasesAreDone(); }
+        void stopSecondSide(void)
+        {
+            ::stopSecondSide();
+        }
 
-    void quitFirstInterfaceServer(void) { quitFirstInterfaceServer(); }
+        int32_t getResultFromSecondSide(void)
+        {
+            int32_t result;
+            result = ::getResultFromSecondSide();
 
-    int32_t nestedCallTest(void) { return nestedCallTest(); }
+            return result;
+        }
 
-    int32_t callSecondSide(void) { return callSecondSide(); }
+        void testCasesAreDone(void)
+        {
+            ::testCasesAreDone();
+        }
+
+        void quitFirstInterfaceServer(void)
+        {
+            ::quitFirstInterfaceServer();
+        }
+
+        int32_t nestedCallTest(void)
+        {
+            int32_t result;
+            result = ::nestedCallTest();
+
+            return result;
+        }
+
+        int32_t callSecondSide(void)
+        {
+            int32_t result;
+            result = ::callSecondSide();
+
+            return result;
+        }
 };
 
 void add_services(erpc::SimpleServer *server)

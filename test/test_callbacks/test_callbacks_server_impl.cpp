@@ -29,17 +29,15 @@ callback2_t *cb2 = NULL;
 
 int32_t myFun(const callback1_t pCallback1_in, callback1_t *pCallback1_out)
 {
-    cb1 = NULL;
     pCallback1_in(1, 2);
-    *pCallback1_out = (callback1_t)cb1;
+    *pCallback1_out = pCallback1_in;
     return 0;
 }
 
 void myFun2(const callback2_t pCallback2_in, callback2_t *pCallback2_out)
 {
-    cb2 = NULL;
     pCallback2_in(1, 2);
-    *pCallback2_out = (callback2_t)cb2;
+    *pCallback2_out = pCallback2_in;
 }
 
 void callback1a(int32_t a, int32_t b)
@@ -238,11 +236,7 @@ void add_services_to_server(erpc_server_t server)
 void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
     destroy_ClientCore0Services_service(service_test);
-#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
-    destroy_ClientCore0Services_service();
-#endif
 }
 #ifdef __cplusplus
 }

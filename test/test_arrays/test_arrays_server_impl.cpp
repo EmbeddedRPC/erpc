@@ -377,113 +377,174 @@ void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5
 
 void testFunction(){};
 
-class PointersService_server:public PointersService_interface
+class PointersService_server: public PointersService_interface
 {
     public:
-         int32_t (* sendReceivedInt32(const int32_t arrayNumbers[12]))[12]
-         {
-            return sendReceivedInt32(arrayNumbers);
-         }
 
-         int32_t (* sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
-         {
-            return sendReceived2Int32(arrayNumbers);
-         }
+        int32_t (* sendReceivedInt32(const int32_t arrayNumbers[12]))[12]
+        {
+            int32_t (* result)[12] = NULL;
+            result = ::sendReceivedInt32(arrayNumbers);
 
-         char * (* sendReceivedString(char * arrayStrings[12]))[12]
-         {
-            return sendReceivedString(arrayStrings);
-         }
+            return result;
+        }
 
-         char * (* sendReceived2String(char * arrayStrings[3][5]))[3][5]
-         {
-            return sendReceived2String(arrayStrings);
-         }
+        int32_t (* sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
+        {
+            int32_t (* result)[12][10] = NULL;
+            result = ::sendReceived2Int32(arrayNumbers);
 
-         enumColor (* sendReceivedEnum(const enumColor arrayEnums[3]))[3]
-         {
-            return sendReceivedEnum(arrayEnums);
-         }
+            return result;
+        }
 
-         enumColor (* sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
-         {
-            return sendReceived2Enum(arrayEnums);
-         }
+        char * (* sendReceivedString(char * arrayStrings[12]))[12]
+        {
+            char * (* result)[12] = NULL;
+            result = ::sendReceivedString(arrayStrings);
 
-         list_int32_1_t (* sendReceivedList(const list_int32_1_t arrayLists[2]))[2]
-         {
-            return sendReceivedList(arrayLists);
-         }
+            return result;
+        }
 
-         list_int32_1_t (* sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
-         {
-            return sendReceived2List(arrayLists);
-         }
+        char * (* sendReceived2String(char * arrayStrings[3][5]))[3][5]
+        {
+            char * (* result)[3][5] = NULL;
+            result = ::sendReceived2String(arrayStrings);
 
-         ArrayIntType * sendReceivedInt32Type(const ArrayIntType arrayNumbers)
-         {
-            return sendReceivedInt32Type(arrayNumbers);
-         }
+            return result;
+        }
 
-         Array2IntType * sendReceived2Int32Type(Array2IntType arrayNumbers)
-         {
-            return sendReceived2Int32Type(arrayNumbers);
-         }
+        enumColor (* sendReceivedEnum(const enumColor arrayEnums[3]))[3]
+        {
+            enumColor (* result)[3] = NULL;
+            result = ::sendReceivedEnum(arrayEnums);
 
-         ArrayStringType * sendReceivedStringType(ArrayStringType arrayStrings)
-         {
-            return sendReceivedStringType(arrayStrings);
-         }
+            return result;
+        }
 
-         Array2StringType * sendReceived2StringType(Array2StringType arrayStrings)
-         {
-            return sendReceived2StringType(arrayStrings);
-         }
+        enumColor (* sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
+        {
+            enumColor (* result)[3][3] = NULL;
+            result = ::sendReceived2Enum(arrayEnums);
 
-         ArrayEnumType * sendReceivedEnumType(const ArrayEnumType arrayEnums)
-         {
-            return sendReceivedEnumType(arrayEnums);
-         }
+            return result;
+        }
 
-         Array2EnumType * sendReceived2EnumType(Array2EnumType arrayEnums)
-         {
-            return sendReceived2EnumType(arrayEnums);
-         }
+        list_int32_1_t (* sendReceivedList(const list_int32_1_t arrayLists[2]))[2]
+        {
+            list_int32_1_t (* result)[2] = NULL;
+            result = ::sendReceivedList(arrayLists);
 
-         ArrayStructType * sendReceivedStructType(const ArrayStructType arrayStructs)
-         {
-            return sendReceivedStructType(arrayStructs);
-         }
+            return result;
+        }
 
-         Array2StructType * sendReceived2StructType(Array2StructType arrayStructs)
-         {
-            return sendReceived2StructType(arrayStructs);
-         }
+        list_int32_1_t (* sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
+        {
+            list_int32_1_t (* result)[2][2] = NULL;
+            result = ::sendReceived2List(arrayLists);
 
-         ArrayListType * sendReceivedListType(const ArrayListType arrayLists)
-         {
-            return sendReceivedListType(arrayLists);
-         }
+            return result;
+        }
 
-         Array2ListType * sendReceived2ListType(Array2ListType arrayLists)
-         {
-            return sendReceived2ListType(arrayLists);
-         }
+        ArrayIntType * sendReceivedInt32Type(const ArrayIntType arrayNumbers)
+        {
+            ArrayIntType * result = NULL;
+            result = ::sendReceivedInt32Type(arrayNumbers);
 
-         AllTypes (* sendReceiveStruct(const AllTypes arrayStructs[2]))[2]
-         {
-            return sendReceiveStruct(arrayStructs);
-         }
+            return result;
+        }
 
-         AllTypes (* sendReceive2Struct(AllTypes arrayStructs[1][1]))[1][1]
-         {
-            return sendReceive2Struct(arrayStructs);
-         }
+        Array2IntType * sendReceived2Int32Type(Array2IntType arrayNumbers)
+        {
+            Array2IntType * result = NULL;
+            result = ::sendReceived2Int32Type(arrayNumbers);
 
-         void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5], int32_t d[5])
-         {
-            test_array_allDirection(a,b,c,d);
-         }
+            return result;
+        }
+
+        ArrayStringType * sendReceivedStringType(ArrayStringType arrayStrings)
+        {
+            ArrayStringType * result = NULL;
+            result = ::sendReceivedStringType(arrayStrings);
+
+            return result;
+        }
+
+        Array2StringType * sendReceived2StringType(Array2StringType arrayStrings)
+        {
+            Array2StringType * result = NULL;
+            result = ::sendReceived2StringType(arrayStrings);
+
+            return result;
+        }
+
+        ArrayEnumType * sendReceivedEnumType(const ArrayEnumType arrayEnums)
+        {
+            ArrayEnumType * result = NULL;
+            result = ::sendReceivedEnumType(arrayEnums);
+
+            return result;
+        }
+
+        Array2EnumType * sendReceived2EnumType(Array2EnumType arrayEnums)
+        {
+            Array2EnumType * result = NULL;
+            result = ::sendReceived2EnumType(arrayEnums);
+
+            return result;
+        }
+
+        ArrayStructType * sendReceivedStructType(const ArrayStructType arrayStructs)
+        {
+            ArrayStructType * result = NULL;
+            result = ::sendReceivedStructType(arrayStructs);
+
+            return result;
+        }
+
+        Array2StructType * sendReceived2StructType(Array2StructType arrayStructs)
+        {
+            Array2StructType * result = NULL;
+            result = ::sendReceived2StructType(arrayStructs);
+
+            return result;
+        }
+
+        ArrayListType * sendReceivedListType(const ArrayListType arrayLists)
+        {
+            ArrayListType * result = NULL;
+            result = ::sendReceivedListType(arrayLists);
+
+            return result;
+        }
+
+        Array2ListType * sendReceived2ListType(Array2ListType arrayLists)
+        {
+            Array2ListType * result = NULL;
+            result = ::sendReceived2ListType(arrayLists);
+
+            return result;
+        }
+
+        AllTypes (* sendReceiveStruct(const AllTypes arrayStructs[2]))[2]
+        {
+            AllTypes (* result)[2] = NULL;
+            result = ::sendReceiveStruct(arrayStructs);
+
+            return result;
+        }
+
+        AllTypes (* sendReceive2Struct(AllTypes arrayStructs[1][1]))[1][1]
+        {
+            AllTypes (* result)[1][1] = NULL;
+            result = ::sendReceive2Struct(arrayStructs);
+
+            return result;
+        }
+
+        void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5], int32_t d[5])
+        {
+            ::test_array_allDirection(a, b, c, d);
+        }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

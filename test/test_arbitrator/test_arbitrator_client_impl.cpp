@@ -109,18 +109,40 @@ void enableFirstSide()
     enabled = true;
 }
 
-class SecondInterface_server:public SecondInterface_interface
+class SecondInterface_server: public SecondInterface_interface
 {
     public:
-        void secondSendInt(int32_t a){secondSendInt(a);}
 
-        int32_t secondReceiveInt(void){return secondReceiveInt();}
+        void secondSendInt(int32_t a)
+        {
+            ::secondSendInt(a);
+        }
 
-        void quitSecondInterfaceServer(void){quitSecondInterfaceServer();}
+        int32_t secondReceiveInt(void)
+        {
+            int32_t result;
+            result = ::secondReceiveInt();
 
-        void enableFirstSide(void) {enableFirstSide();}
+            return result;
+        }
 
-        int32_t callFirstSide(void) {return callFirstSide();}
+        void quitSecondInterfaceServer(void)
+        {
+            ::quitSecondInterfaceServer();
+        }
+
+        void enableFirstSide(void)
+        {
+            ::enableFirstSide();
+        }
+
+        int32_t callFirstSide(void)
+        {
+            int32_t result;
+            result = ::callFirstSide();
+
+            return result;
+        }
 };
 
 void add_services(erpc::SimpleServer *server)

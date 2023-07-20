@@ -39,27 +39,34 @@ myInt testIfMyIntAndConstExist(myInt a)
     return a;
 }
 
-class AnnotateTest_server:public AnnotateTest_interface
+class AnnotateTest_server: public AnnotateTest_interface
 {
     public:
+
         int32_t add(int32_t a, int32_t b)
         {
-           return add(a,b);
+            int32_t result;
+            result = ::add(a, b);
+
+            return result;
         }
 
-        void testIfFooStructExist(const fooStruct *a)
+        void testIfFooStructExist(const fooStruct * a)
         {
-            testIfFooStructExist(a);
+            ::testIfFooStructExist(a);
         }
 
         void testIfMyEnumExist(myEnum a)
         {
-            testIfMyEnumExist(a);
+            ::testIfMyEnumExist(a);
         }
 
         myInt testIfMyIntAndConstExist(myInt a)
         {
-            return testIfMyIntAndConstExist(a);
+            myInt result;
+            result = ::testIfMyIntAndConstExist(a);
+
+            return result;
         }
 };
 

@@ -105,17 +105,21 @@ int32_t getServerAllocated()
     return result;
 }
 
-class Common_server:public Common_interface
+class Common_server: public Common_interface
 {
     public:
-        void quit()
+
+        void quit(void)
         {
-            quit();
+            ::quit();
         }
 
-        int32_t getServerAllocated()
+        int32_t getServerAllocated(void)
         {
-            return getServerAllocated();
+            int32_t result;
+            result = ::getServerAllocated();
+
+            return result;
         }
 };
 
