@@ -667,7 +667,7 @@ string Sniffer::getDataTypeName(DataType *dataType)
     }
 }
 
-string Sniffer::getPrototype(erpcgen::Function *function)
+string Sniffer::getPrototype(Function *function)
 {
     string prototype = getDataTypeName(function->getReturnType());
     if (function->isOneway())

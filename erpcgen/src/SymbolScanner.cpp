@@ -1414,7 +1414,7 @@ DataType *SymbolScanner::createArrayType(const AstNode *typeNode)
     return array;
 }
 
-Value *SymbolScanner::getValueFromSymbol(Token &tok)
+Value *SymbolScanner::getValueFromSymbol(const Token &tok)
 {
     if (tok.getValue() != nullptr)
     {

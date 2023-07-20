@@ -308,9 +308,9 @@ public:
         Cursor &operator+=(uint16_t n);
 
         /*!
-         * @brief Substract operator return local buffer.
+         * @brief Subtract operator return local buffer.
          *
-         * @param[in] n Substracting with n.
+         * @param[in] n Subtracting with n.
          *
          * @return Current cursor instance.
          */
@@ -324,7 +324,7 @@ public:
         Cursor &operator++(void);
 
         /*!
-         * @brief Substract -1 operator.
+         * @brief Subtract -1 operator.
          *
          * @return Current cursor instance.
          */

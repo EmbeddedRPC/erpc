@@ -263,7 +263,7 @@ protected:
      *
      * @param[in] c Checked character.
      */
-    bool checkWhitspaceChar(char c);
+    bool checkWhitespaceChar(char c);
 
     /*!
      * Stores reserved words for Python program language.

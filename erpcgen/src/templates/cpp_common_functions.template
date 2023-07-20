@@ -516,3 +516,7 @@ else
     {% if source == "server" && !empty(param.nullVariable) %}_{% endif %}{$param.nullableName} = NULL;
 }
 {% enddef ------------------------------- f_paramIsNullableDecode %}
+
+{% def getFunctionDeclarationMacroName() %}
+ERPC_FUNCTIONS_DEFINITIONS{% if group.name %}_{% endif %}{$upper(group.name)}{%>%}
+{% enddef ------------------------------- getFunctionDeclarationMacroName%}

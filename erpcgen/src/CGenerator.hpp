@@ -106,63 +106,56 @@ private:
     void generateInterfaceCppHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output client header file.
+     * @brief This function generate output client header file for cpp.
      *
      * @param[in] fileName Name for output client header file.
      */
     void generateClientCppHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output client source file.
+     * @brief This function generate output client source file for cpp.
      *
      * @param[in] fileName Name for output client source file.
      */
     void generateClientCppSourceFile(std::string fileName);
 
     /*!
-     * @brief This function generate output server header file.
+     * @brief This function generate output server header file for cpp.
      *
      * @param[in] fileName Name for output server header file.
      */
     void generateServerCppHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output server source file.
+     * @brief This function generate output server source file for cpp.
      *
      * @param[in] fileName Name for output server source file.
      */
     void generateServerCppSourceFile(std::string fileName);
 
     /*!
-     * @brief This function generate output interface header file.
-     *
-     * @param[in] fileName Name for output interface header file.
-     */
-    void generateInterfaceCHeaderFile(std::string fileName);
-
-    /*!
-     * @brief This function generate output client header file.
+     * @brief This function generate output client header file for C.
      *
      * @param[in] fileName Name for output client header file.
      */
     void generateClientCHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output client source file.
+     * @brief This function generate output client source file for C.
      *
      * @param[in] fileName Name for output client source file.
      */
     void generateClientCSourceFile(std::string fileName);
 
     /*!
-     * @brief This function generate output server header file.
+     * @brief This function generate output server header file for C.
      *
      * @param[in] fileName Name for output server header file.
      */
     void generateServerCHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output server source file.
+     * @brief This function generate output server source file for C.
      *
      * @param[in] fileName Name for output server source file.
      */

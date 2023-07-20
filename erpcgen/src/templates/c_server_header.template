@@ -14,6 +14,9 @@ extern "C"
 {
 #endif
 
+#if !defined({$getFunctionDeclarationMacroName()})
+#define {$getFunctionDeclarationMacroName()}
+
 typedef void * erpc_service_t;
 
 {% for iface in group.interfaces %}
@@ -39,6 +42,8 @@ enum _{$iface.name}_ids
 
 {% endfor -- iface %}
 
+#endif // {$getFunctionDeclarationMacroName()}
+
 {% for iface in group.interfaces %}
 /*! @brief Return {$iface.serviceClassName} service object. */
 erpc_service_t create_{$iface.serviceClassName}(void);
@@ -52,4 +57,4 @@ void destroy_{$iface.serviceClassName}(erpc_service_t service);
 }
 #endif
 
-#endif // {$clientCGuardMacro}
+#endif // {$serverCGuardMacro}

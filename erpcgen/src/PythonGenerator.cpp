@@ -941,7 +941,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type comme
     return result;
 }
 
-bool PythonGenerator::checkWhitspaceChar(char c)
+bool PythonGenerator::checkWhitespaceChar(char c)
 {
     if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
     {
@@ -961,7 +961,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     {
         char c = result[i];
 
-        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitespaceChar(result[i + 1])) || !checkWhitespaceChar(c))
         {
             break;
         }
@@ -975,7 +975,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
-        if (!checkWhitspaceChar(c))
+        if (!checkWhitespaceChar(c))
         {
             break;
         }

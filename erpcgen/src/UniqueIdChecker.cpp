@@ -26,7 +26,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void UniqueIdChecker::makeIdsUnique(erpcgen::InterfaceDefinition &def)
+void UniqueIdChecker::makeIdsUnique(InterfaceDefinition &def)
 {
     initUsedInterfaceIds(def.getGlobals().getSymbolsOfType(Symbol::kInterfaceSymbol));
 

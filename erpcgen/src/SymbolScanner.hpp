@@ -458,7 +458,7 @@ protected:
      * @exception syntax_error Thrown, when token value is null or when symbol is not defined in global symbol scope.
      * @exception semantic_error Thrown, when symbol type is not constant or enum member.
      */
-    Value *getValueFromSymbol(Token &tok);
+    Value *getValueFromSymbol(const Token &tok);
 
     /*!
      * @brief This function returns the data type for a constant variable
