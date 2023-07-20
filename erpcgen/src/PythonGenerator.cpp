@@ -173,7 +173,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, In
 {
     (void)group;
     data_map info;
-    string proto = getFunctionPrototype(fn);
+    string proto = getFunctionPrototype(nullptr, fn);
 
     info["name"] = getOutputName(fn);
     info["prototype"] = proto;
@@ -266,12 +266,22 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, In
     return info;
 }
 
-string PythonGenerator::getFunctionPrototype(Function *fn)
+string PythonGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const string &interfaceName,
+                                             const string &name, bool interfaceClass)
 {
-    string proto = getOutputName(fn);
+    FunctionType *functionType = dynamic_cast<FunctionType *>(fn);
+    if (functionType)
+    {
+        return ""; /*Todo: implement*/
+    }
+    Function *function = dynamic_cast<Function *>(fn);
+
+    assert(function);
+
+    string proto = getOutputName(function);
     proto += "(self";
 
-    auto params = fn->getParameters().getMembers();
+    auto params = function->getParameters().getMembers();
     if (params.size())
     {
         for (auto it : params)

@@ -100,6 +100,7 @@
       <Command>python.exe ..\bin\txt_to_c.py --output .\cpp_coders.cpp ..\src\templates\cpp_coders.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_interface_header.cpp ..\src\templates\cpp_interface_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_source.cpp ..\src\templates\cpp_interface_source.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_client_header.cpp ..\src\templates\cpp_client_header.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_client_source.cpp ..\src\templates\cpp_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_server_source.cpp ..\src\templates\cpp_server_source.template
@@ -146,6 +147,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
       <Command>python.exe ..\bin\txt_to_c.py --output .\cpp_coders.cpp ..\src\templates\cpp_coders.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_interface_header.cpp ..\src\templates\cpp_interface_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_source.cpp ..\src\templates\cpp_interface_source.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_client_header.cpp ..\src\templates\cpp_client_header.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_client_source.cpp ..\src\templates\cpp_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\cpp_server_source.cpp ..\src\templates\cpp_server_source.template
@@ -245,6 +247,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="c_common_header.cpp" />
     <ClCompile Include="c_crc.cpp" />
     <ClCompile Include="cpp_interface_header.cpp" />
+    <ClCompile Include="cpp_interface_source.cpp" />
     <ClCompile Include="cpp_client_header.cpp" />
     <ClCompile Include="cpp_client_source.cpp" />
     <ClCompile Include="cpp_server_header.cpp" />

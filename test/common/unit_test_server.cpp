@@ -128,6 +128,12 @@ void add_common_service(erpc_server_t server)
     erpc_add_service_to_server(server, service_common);
 }
 
+void remove_common_services_from_server(erpc_service_t service)
+{
+    erpc_remove_service_from_server(service);
+    destroy_Common_service(service);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////

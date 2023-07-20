@@ -10,7 +10,7 @@
 #endif
 #include "{$codecHeader}"
 #include "{$clientCppHeaderName}"
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
 extern "C"
 {
 {% if groupNames %}
@@ -27,9 +27,6 @@ using namespace erpc;
 using namespace std;
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
-{% if unitTest %}
-{$> callbackTable(functions)}
-{% endif %}
 {$> constantsDefinitions(consts)}
 {$> symbolHeader(group.symbolsMap.symbolsToServer, "serial", "def")}
 {$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "def")}
@@ -50,6 +47,9 @@ using namespace std;
 {%  if fn.needTempVariableClientI32 %}
     int32_t _tmp_local_i32;
 {%  endif %}
+{% endif %}
+{% if fn.needTempVariableClientU16 %}
+    uint16_t _tmp_local_u16;
 {% endif %}
 {% if fn.returnValue.type.isNotVoid %}
     {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
@@ -180,22 +180,22 @@ static {$callbackType.prototype}
 {$ clientShimCode("m_clientManager", callbackType, "serviceID", "functionID") >}
 }
 {% endfor %}
-
 {% for iface in group.interfaces %}
+
 {$iface.clientClassName}::{$iface.clientClassName}(ClientManager *manager)
 :m_clientManager(manager)
 {
 };
-{%  for fn in iface.functions %}
+{% for fn in iface.functions %}
 
 // {$iface.name} interface {$fn.name} function client shim.
 {$fn.prototypeCpp}
 {
-{%   if fn.isCallback %}
+{%  if fn.isCallback %}
     {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(m_clientManager, m_serviceId, {$getClassFunctionIdName(fn)}{% for param in fn.parameters %}, {$param.pureName}{% endfor %});
-{%   else -- fn.isCallback >%}
+{%  else -- fn.isCallback >%}
 {$ clientShimCode("m_clientManager", fn, "m_serviceId", getClassFunctionIdName(fn)) >}
-{%   endif -- fn.isCallback >%}
+{%  endif -- fn.isCallback >%}
 }
-{%  endfor -- fn %}
+{% endfor -- fn %}
 {% endfor -- iface %}

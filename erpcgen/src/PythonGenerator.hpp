@@ -134,11 +134,14 @@ protected:
     /*!
      * @brief This function return interface function prototype.
      *
+     * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
+     * @param[in] name Name used for FunctionType.
+     * @param[in] interfaceClass interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Function *fn);
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "", const std::string &name = "", bool interfaceClass = false);
 
     /*!
      * @brief This function sets const template data.

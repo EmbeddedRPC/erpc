@@ -12,8 +12,8 @@
 
 #include "Logging.hpp"
 #include "gtest.h"
-#include "gtestListener.h"
-#include "myAlloc.h"
+#include "gtestListener.hpp"
+#include "myAlloc.hpp"
 #include "c_test_unit_test_common_client.h"
 #include "unit_test_wrapped.h"
 

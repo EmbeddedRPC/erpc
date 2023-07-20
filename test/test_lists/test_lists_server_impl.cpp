@@ -8,13 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "test_server.hpp"
+#include "c_test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
 
 PointersService_service *svc;
 
@@ -309,6 +312,112 @@ int32_t sendGapAdvertisingData(const gapAdvertisingData_t *ad)
     return 33;
 }
 
+class PointersService_server: public PointersService_interface
+{
+    public:
+
+        list_int32_1_t * sendReceivedInt32(const list_int32_1_t * listNumbers)
+        {
+            list_int32_1_t * result = NULL;
+            result = ::sendReceivedInt32(listNumbers);
+
+            return result;
+        }
+
+        list_int32_2_t * sendReceived2Int32(const list_int32_2_t * listNumbers)
+        {
+            list_int32_2_t * result = NULL;
+            result = ::sendReceived2Int32(listNumbers);
+
+            return result;
+        }
+
+        list_enumColor_1_t * sendReceivedEnum(const list_enumColor_1_t * listColors)
+        {
+            list_enumColor_1_t * result = NULL;
+            result = ::sendReceivedEnum(listColors);
+
+            return result;
+        }
+
+        list_enumColor_2_t * sendReceived2Enum(const list_enumColor_2_t * listColors)
+        {
+            list_enumColor_2_t * result = NULL;
+            result = ::sendReceived2Enum(listColors);
+
+            return result;
+        }
+
+        list_C_1_t * sendReceivedStruct(const list_C_1_t * listColors)
+        {
+            list_C_1_t * result = NULL;
+            result = ::sendReceivedStruct(listColors);
+
+            return result;
+        }
+
+        list_C_2_t * sendReceived2Struct(const list_C_2_t * listColors)
+        {
+            list_C_2_t * result = NULL;
+            result = ::sendReceived2Struct(listColors);
+
+            return result;
+        }
+
+        list_string_1_t * sendReceivedString(const list_string_1_t * listNumbers)
+        {
+            list_string_1_t * result = NULL;
+            result = ::sendReceivedString(listNumbers);
+
+            return result;
+        }
+
+        list_string_2_t * sendReceived2String(const list_string_2_t * listNumbers)
+        {
+            list_string_2_t * result = NULL;
+            result = ::sendReceived2String(listNumbers);
+
+            return result;
+        }
+
+        void test_list_allDirection(const list_uint32_1_t * a, const list_uint32_1_t * b, list_uint32_1_t * e)
+        {
+            ::test_list_allDirection(a, b, e);
+        }
+
+        int32_t testLengthAnnotation(const int32_t * myList, uint32_t len)
+        {
+            int32_t result;
+            result = ::testLengthAnnotation(myList, len);
+
+            return result;
+        }
+
+        int32_t testLengthAnnotationInStruct(const listStruct * s)
+        {
+            int32_t result;
+            result = ::testLengthAnnotationInStruct(s);
+
+            return result;
+        }
+
+        listStruct * returnSentStructLengthAnnotation(const listStruct * s)
+        {
+            listStruct * result = NULL;
+            result = ::returnSentStructLengthAnnotation(s);
+
+            return result;
+        }
+
+        int32_t sendGapAdvertisingData(const gapAdvertisingData_t * ad)
+        {
+            int32_t result;
+            result = ::sendGapAdvertisingData(ad);
+
+            return result;
+        }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +426,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new PointersService_service();
+    svc = new PointersService_service(new PointersService_server());
 
     // add services
     server->addService(svc);
@@ -354,11 +463,6 @@ void remove_services_from_server(erpc_server_t server)
     destroy_PointersService_service(service_test);
 }
 
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

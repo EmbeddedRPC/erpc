@@ -29,6 +29,8 @@ all: $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp $(ERPC_OUT_DIR)
 $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp
 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_arbitrator_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp
 $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp
+$(ERPC_OUT_DIR)/c_$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp
+$(ERPC_OUT_DIR)/c_$(ERPC_NAME)_secondInterface_server.cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp
 
 # Run erpcgen for C.
 $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp: $(IDL_FILE)

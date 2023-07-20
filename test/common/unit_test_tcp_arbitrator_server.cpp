@@ -13,8 +13,8 @@
 #include "erpc_transport_arbitrator.hpp"
 
 #include "Logging.hpp"
+#include "c_test_secondInterface_server.h"
 #include "myAlloc.hpp"
-#include "c_test_firstInterface_server.h"
 #include "unit_test.h"
 
 #include <unistd.h>
@@ -180,6 +180,7 @@ int main(int argc, char **argv)
     return isTestPassing;
 }
 
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;
@@ -206,6 +207,7 @@ void quitFirstInterfaceServer()
 void whenReady()
 {
     waitClient++;
+}
 }
 
 int testClient()

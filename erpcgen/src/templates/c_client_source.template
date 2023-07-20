@@ -5,20 +5,65 @@
 {% endif %}
 #include "{$clientCHeaderName}"
 #include "{$clientCppHeaderName}"
-#include "erpc_manually_constructed.h"
+#include "erpc_manually_constructed.hpp"
+{% set utils = false >%}
+{% for iface in group.interfaces %}
+{%  if (count(iface.callbacksAll) > 0) && (utils == false) %}
+#include "erpc_utils.hpp"
+{%   set utils = true >%}
+{%  endif %}
+{% endfor %}
 
 using namespace erpc;
+using namespace std;
+{% for iface in group.interfaces %}
+{%  if count(iface.callbacksAll) > 0 %}
+
+{%   for cb in iface.callbacksAll %}
+static const {$cb.name} _{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in cb.callbacks %}{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
+{%   endfor %}
+{%  endif %}
+{% endfor %}
 
 {% for iface in group.interfaces %}
 static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
 {% endfor -- iface %}
-
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 
 {$fn.prototype}
 {
-    {% if fn.returnValue.type.isNotVoid %}return {% endif %}s_{$iface.clientClassName}->{$fn.name}({% for param in fn.parameters %}{% if !loop.first %}, {% endif %}{$param.pureName}{% endfor %});
+{% if count(fn.callbackParameters) > 0 %}
+    uint16_t _fnIndex;
+{%  for cb in fn.callbackParameters%}
+    {% if cb.interface != ""%}{$cb.interface}{% else %}{$iface.interfaceClassName}{% endif %}::{$cb.type} _{$cb.name} = NULL;
+{%  endfor %}
+{% endif%}
+{% if fn.returnValue.type.isNotVoid %}
+    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
+{% endif %}
+{% if count(fn.callbackParameters) > 0 %}
+{% for cb in fn.callbackParameters if cb.in %}
+
+    if (findIndexOfFunction((arrayOfFunctionPtr_t)_{$cb.type}, sizeof(_{$cb.type})/sizeof({$cb.type}), (functionPtr_t){$cb.name}, _fnIndex))
+    {
+        {% if cb.interface != ""%}{$cb.interface}{% else %}{$iface.interfaceClassName}{% endif %}::get_callbackAddress_{$cb.type}(_fnIndex, &_{$cb.name});
+    }
+{% endfor %}
+
+{%endif%}
+    {% if fn.returnValue.type.isNotVoid %}result = {% endif %}s_{$iface.clientClassName}->{$fn.name}({% for param in fn.parameters %}{% if !loop.first %}, {% endif %}{$param.pureNameC}{% endfor %});
+{% for cb in fn.callbackParameters if cb.out %}
+
+    if ({% if cb.interface != ""%}{$cb.interface}{% else %}{$iface.interfaceClassName}{% endif %}::get_callbackIdx_{$cb.type}(&_{$cb.name}, _fnIndex))
+    {
+        *{$cb.name}=_{$cb.type}[_fnIndex];
+    }
+{% endfor %}
+{% if fn.returnValue.type.isNotVoid %}
+
+    return result;
+{% endif %}
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}

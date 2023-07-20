@@ -8,13 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "test_server.hpp"
+#include "c_test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
 
 PointersService_service *svc;
 
@@ -374,16 +377,125 @@ void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5
 
 void testFunction(){};
 
+class PointersService_server:public PointersService_interface
+{
+    public:
+         int32_t (* sendReceivedInt32(const int32_t arrayNumbers[12]))[12]
+         {
+            return sendReceivedInt32(arrayNumbers);
+         }
+
+         int32_t (* sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
+         {
+            return sendReceived2Int32(arrayNumbers);
+         }
+
+         char * (* sendReceivedString(char * arrayStrings[12]))[12]
+         {
+            return sendReceivedString(arrayStrings);
+         }
+
+         char * (* sendReceived2String(char * arrayStrings[3][5]))[3][5]
+         {
+            return sendReceived2String(arrayStrings);
+         }
+
+         enumColor (* sendReceivedEnum(const enumColor arrayEnums[3]))[3]
+         {
+            return sendReceivedEnum(arrayEnums);
+         }
+
+         enumColor (* sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
+         {
+            return sendReceived2Enum(arrayEnums);
+         }
+
+         list_int32_1_t (* sendReceivedList(const list_int32_1_t arrayLists[2]))[2]
+         {
+            return sendReceivedList(arrayLists);
+         }
+
+         list_int32_1_t (* sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
+         {
+            return sendReceived2List(arrayLists);
+         }
+
+         ArrayIntType * sendReceivedInt32Type(const ArrayIntType arrayNumbers)
+         {
+            return sendReceivedInt32Type(arrayNumbers);
+         }
+
+         Array2IntType * sendReceived2Int32Type(Array2IntType arrayNumbers)
+         {
+            return sendReceived2Int32Type(arrayNumbers);
+         }
+
+         ArrayStringType * sendReceivedStringType(ArrayStringType arrayStrings)
+         {
+            return sendReceivedStringType(arrayStrings);
+         }
+
+         Array2StringType * sendReceived2StringType(Array2StringType arrayStrings)
+         {
+            return sendReceived2StringType(arrayStrings);
+         }
+
+         ArrayEnumType * sendReceivedEnumType(const ArrayEnumType arrayEnums)
+         {
+            return sendReceivedEnumType(arrayEnums);
+         }
+
+         Array2EnumType * sendReceived2EnumType(Array2EnumType arrayEnums)
+         {
+            return sendReceived2EnumType(arrayEnums);
+         }
+
+         ArrayStructType * sendReceivedStructType(const ArrayStructType arrayStructs)
+         {
+            return sendReceivedStructType(arrayStructs);
+         }
+
+         Array2StructType * sendReceived2StructType(Array2StructType arrayStructs)
+         {
+            return sendReceived2StructType(arrayStructs);
+         }
+
+         ArrayListType * sendReceivedListType(const ArrayListType arrayLists)
+         {
+            return sendReceivedListType(arrayLists);
+         }
+
+         Array2ListType * sendReceived2ListType(Array2ListType arrayLists)
+         {
+            return sendReceived2ListType(arrayLists);
+         }
+
+         AllTypes (* sendReceiveStruct(const AllTypes arrayStructs[2]))[2]
+         {
+            return sendReceiveStruct(arrayStructs);
+         }
+
+         AllTypes (* sendReceive2Struct(AllTypes arrayStructs[1][1]))[1][1]
+         {
+            return sendReceive2Struct(arrayStructs);
+         }
+
+         void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5], int32_t d[5])
+         {
+            test_array_allDirection(a,b,c,d);
+         }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
 
 void add_services(erpc::SimpleServer *server)
 {
-    // define services to add on heap
-    // allocate on heap so service doesn't go out of scope at end of method
-    svc = new PointersService_service();
-
+    /* Define services to add using dynamic memory allocation
+     * Exapmle:ArithmeticService_service * svc = new ArithmeticService_service();
+     */
+    svc =  new PointersService_service(new PointersService_server());
     // add services
     server->addService(svc);
 }
@@ -400,6 +512,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -417,12 +530,6 @@ void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
     destroy_PointersService_service(service_test);
-}
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

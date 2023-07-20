@@ -7,11 +7,17 @@
  */
 
 #include "gtest.h"
-#include "test.h"
+#include "c_test_client.h"
+#include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(erpc_client_t client)
+{
+    initEnumsService_client(client);
+}
 
 enumColor enumColorA = green;
 enumColor enumColorB = red;

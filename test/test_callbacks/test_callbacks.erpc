@@ -18,9 +18,9 @@ callback3_t(int32 arg1, int32 arg2) -> int32
 @group("core0")
 interface ClientCore0Services
 {
-    myFun(in callback1_t pCallback1_in, out callback1_t pCallback1_out) -> void
+    myFun(in callback1_t pCallback1_in, out callback1_t pCallback1_out) -> int32
 
-    myFun2(callback2_t pCallback2_in, out callback2_t pCallback2_out) -> void
+    myFun2(ClientCore1Services::callback2_t pCallback2_in, out ClientCore1Services::callback2_t pCallback2_out) -> void
 
     myFun3(callback3_t callback, in int32 arg1, in int32 arg2) -> int32
 
@@ -29,17 +29,14 @@ interface ClientCore0Services
     callback3_t my_mul;
     callback3_t my_div;
 
-    @c:include("callbacks1.h")
     callback1_t callback1a;
 
 
-    @c:include("callbacks1.h")
     callback1_t callback1b(param1, param2);
 }
 
 @group("core1")
 interface ClientCore1Services
 {
-    @c:include("callbacks2.h")
     callback2_t callback2(param1, param2);
 }

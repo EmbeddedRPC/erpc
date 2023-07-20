@@ -12,7 +12,7 @@
 #include "erpc_client_manager.h"
 
 namespace erpc {
-{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
+{% for iface in group.interfaces %}
 
 class {$iface.clientClassName}: public {$iface.interfaceClassName}
 {
@@ -23,7 +23,7 @@ class {$iface.clientClassName}: public {$iface.interfaceClassName}
 {% if fn.mlComment %}
         {$fn.mlComment}
 {% endif %}
-        virtual {$fn.prototype};
+        virtual {$fn.prototypeInterface};
 {% endfor -- fn %}
 
     protected:

@@ -155,6 +155,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %token <m_token> TOK_ML_COMMENT   "doxygen ml. comment"
 %token <m_token> TOK_IL_COMMENT   "doxygen il. comment"
 %token <m_token> TOK_PROGRAM      "program"
+%token <m_token> TOK_IFACE_SCOPE  "::"
 %token END       0                "end of file"
 
 // virtual tokens used for AST
@@ -225,6 +226,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> program
 %type <m_ast> root_def
 %type <m_ast> simple_data_type
+%type <m_ast> simple_data_type_scope
 %type <m_ast> string_literal
 %type <m_ast> struct_def
 %type <m_ast> struct_data_type
@@ -592,7 +594,7 @@ param_list_in   :   param_def_in
 /*
  * TOK_PARAM -> ( ident simple_data_type ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
-param_def       :   param_dir[dir] simple_data_type[datatype] ident_opt[name] annotation_list_opt[annotations]
+param_def       :   param_dir[dir] simple_data_type_scope[datatype] ident_opt[name] annotation_list_opt[annotations]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
                             $$->appendChild($name);
@@ -603,7 +605,7 @@ param_def       :   param_dir[dir] simple_data_type[datatype] ident_opt[name] an
                         }
                 ;
 
-param_def_in    :   param_dir_in[dir] simple_data_type[datatype] ident_opt[name] annotation_list_opt[annotations]
+param_def_in    :   param_dir_in[dir] simple_data_type_scope[datatype] ident_opt[name] annotation_list_opt[annotations]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
                             $$->appendChild($name);
@@ -892,6 +894,19 @@ union_member
                         }
                 ;
 
+simple_data_type_scope
+                :   ident TOK_IFACE_SCOPE typename
+                        {
+                            $$ = new AstNode(Token(TOK_IFACE_SCOPE));
+                            $$->appendChild($ident);
+                            $$->appendChild($typename);
+                        }
+                |   simple_data_type
+                        {
+                            $$ = $simple_data_type;
+                        }
+                ;
+
 simple_data_type
                 :   list_type
                         {
@@ -905,7 +920,6 @@ simple_data_type
                         {
                             $$ = $typename;
                         }
-
                 ;
 
 data_type       :   simple_data_type

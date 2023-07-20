@@ -218,6 +218,8 @@ int main(int argc, char **argv)
     }
 }
 
+extern "C"
+{
 void stopSecondSide()
 {
     ++stopTest;
@@ -263,4 +265,5 @@ int testClient()
         }
     }
     return 0;
+}
 }

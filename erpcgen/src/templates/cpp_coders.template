@@ -209,9 +209,17 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.disc
 
 {% def decodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-codec->readCallback((funPtr)({$info.callbacks}), (funPtr *)(&{$info.name}));
+// codec->read(_tmp_local_u16);
+// if (!get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {$info.cbParamOutName}))
+//{
+//    codec->updateStatus(kErpcStatus_UnknownCallback);
+//}
 {% else -- info.callbacksCount == 1 %}
-codec->readCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount}, (funPtr *)(&{$info.name}));
+codec->read(_tmp_local_u16);
+if (!{% if param.isFunction %}{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{% endif %}get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {% if param.direction == InDirection %}&{% endif %}{$info.cbParamOutName}))
+{
+    codec->updateStatus(kErpcStatus_UnknownCallback);
+}
 {% endif -- info.callbacksCount == 1 %}
 {% enddef -------------------------- FunctionType %}
 
@@ -340,9 +348,11 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 
 {% def encodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-codec->writeCallback((funPtr)({$info.callbacks}), (funPtr)({$info.name}));
+// (void)get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16); - Ignored because only one callback exists.
+// codec->write(_tmp_local_u16);
 {% else -- info.callbacksCount == 1 %}
-codec->writeCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount}, (funPtr)({$info.name}));
+(void){% if param.isFunction %}{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{% endif %}get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
+codec->write(_tmp_local_u16);
 {% endif -- info.callbacksCount == 1 %}
 {% enddef -------------------------- FunctionType %}
 

@@ -238,10 +238,19 @@ protected:
      */
     virtual void generateOutputFiles(const std::string &fileNameExtension) = 0;
 
+    /**
+     * @brief Function return common fileName part for group generated files.
+     *
+     * @param group Pointer to a group.
+     * @return string Common filename part of group generated files.
+     */
+    std::string getGroupCommonFileName(Group *group);
+
     /*!
      * @brief This function generates output files for defined interfaces.
      *
      * @param[in] group Pointer to a group.
+     * @param[out] commonFilesFilename Common filename part of group generated files.
      */
     void generateGroupOutputFiles(Group *group);
 
@@ -347,6 +356,19 @@ protected:
      */
     datatype_vector_t getDataTypesFromSymbolScope(SymbolScope *scope, DataType::data_type_t datatype);
 
+    /*!
+     * @brief This function return interface function prototype.
+     *
+     * @param[in] group Group to which function belongs.
+     * @param[in] fn Function for prototyping.
+     * @param[in] name Name used for FunctionType.
+     * @param[in] interfaceClass interfaceClass specific.
+     *
+     * @return String prototype representation for given function.
+     */
+    virtual std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
+                                             const std::string &name = "", bool interfaceClass = false) = 0;
+
 private:
     /*!
      * @brief This function return interface functions list.
@@ -359,6 +381,9 @@ private:
      * @return Contains interface functions data.
      */
     cpptempl::data_list getFunctionsTemplateData(Group *group, Interface *iface);
+
+    void getCallbacksTemplateData(const Interface *iface, cpptempl::data_list &callbackTypesInt,
+                                  cpptempl::data_list &callbackTypesExt, cpptempl::data_list &callbackTypesAll);
 };
 
 } // namespace erpcgen

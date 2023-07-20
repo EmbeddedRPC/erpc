@@ -15,6 +15,7 @@
 #include "format_string.hpp"
 
 #include <algorithm>
+#include <list>
 #include <set>
 #include <sstream>
 
@@ -32,6 +33,7 @@ static const char *const kIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHI
 // Templates strings converted from text files by txt_to_c.py.
 extern const char *const kCCommonHeader;
 extern const char *const kCppInterfaceHeader;
+extern const char *const kCppInterfaceSource;
 extern const char *const kCppClientHeader;
 extern const char *const kCppClientSource;
 extern const char *const kCppServerHeader;
@@ -79,6 +81,7 @@ void CGenerator::generateOutputFiles(const string &fileName)
     generateCommonCHeaderFiles(fileName);
 
     generateInterfaceCppHeaderFile(fileName);
+    generateInterfaceCppSourceFile(fileName);
 
     generateClientCppHeaderFile(fileName);
     generateClientCppSourceFile(fileName);
@@ -107,6 +110,13 @@ void CGenerator::generateInterfaceCppHeaderFile(string fileName)
     m_templateData["interfaceCppGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["interfaceCppHeaderName"] = fileName;
     generateOutputFile(fileName, "cpp_interface_header", m_templateData, kCppInterfaceHeader);
+}
+
+void CGenerator::generateInterfaceCppSourceFile(string fileName)
+{
+    fileName += "_interface.cpp";
+    m_templateData["interfaceCppSourceName"] = fileName;
+    generateOutputFile(fileName, "cpp_interface_source", m_templateData, kCppInterfaceSource);
 }
 
 void CGenerator::generateClientCppHeaderFile(string fileName)
@@ -187,10 +197,10 @@ void CGenerator::generateServerCSourceFile(string fileName)
 
 void CGenerator::generateCrcFile()
 {
-    string filenName = "erpc_crc16.hpp";
-    m_templateData["crcGuardMacro"] = generateIncludeGuardName(filenName);
-    m_templateData["crcHeaderName"] = filenName;
-    generateOutputFile(filenName, "c_crc", m_templateData, kCCrc);
+    string fileName = "erpc_crc16.hpp";
+    m_templateData["crcGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["crcHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_crc", m_templateData, kCCrc);
 }
 
 void CGenerator::parseSubtemplates()
@@ -545,6 +555,21 @@ void CGenerator::generate()
     // for common header, only C specific
     makeSymbolsDeclarationTemplateData();
 
+    data_list interfacesFilesList;
+    string commonFilesFilename;
+    for (Group *group : m_groups)
+    {
+        commonFilesFilename = getGroupCommonFileName(group);
+        for (auto iface : group->getInterfaces())
+        {
+            data_map interfaceFile;
+            interfaceFile["interfaceName"] = iface->getName();
+            interfaceFile["interfaceCommonFileName"] = commonFilesFilename;
+            interfacesFilesList.push_back(interfaceFile);
+        }
+    }
+    m_templateData["interfacesFiles"] = interfacesFilesList;
+
     for (Group *group : m_groups)
     {
         data_map groupTemplate;
@@ -727,81 +752,6 @@ void CGenerator::makeAliasesTemplateData()
             aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
         }
     }
-
-    /* type definitions of functions and table of functions */
-    data_list functions;
-    for (auto functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
-    {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        assert(functionType);
-        data_map functionInfo;
-
-        // aware of external function definitions
-        if (!findAnnotation(functionType, EXTERNAL_ANNOTATION))
-        {
-            AliasType *a = new AliasType(getFunctionPrototype(nullptr, functionType), functionType);
-            a->setMlComment(functionType->getMlComment());
-            a->setIlComment(functionType->getIlComment());
-
-            /* Function type definition need be inserted after all parameters types definitions. */
-            DataType *callbackParamType = functionType->getReturnStructMemberType()->getDataType();
-            for (StructMember *callbackParam : functionType->getParameters().getMembers())
-            {
-                DataType *callbackParamDataType = callbackParam->getDataType();
-                if (!callbackParamType || callbackParamDataType->getFirstLine() > callbackParamType->getFirstLine())
-                {
-                    callbackParamType = callbackParamDataType;
-                }
-            }
-            if (!callbackParamType || !callbackParamType->isAlias())
-            {
-                /* order isn't important */
-                aliasTypeVector.insert(aliasTypeVector.begin() + i++, a);
-            }
-            else
-            {
-                /* skip structure, unions and functions type definitions */
-                for (unsigned int aliasTypesIt = i; aliasTypesIt < aliasTypeVector.size(); ++aliasTypesIt)
-                {
-                    if (callbackParamType == aliasTypeVector[aliasTypesIt])
-                    {
-                        // Add aliases in IDL declaration order.
-                        unsigned int nextIt = aliasTypesIt + 1;
-                        while (nextIt < aliasTypeVector.size())
-                        {
-                            AliasType *nextAlias = dynamic_cast<AliasType *>(aliasTypeVector[nextIt]);
-                            assert(nextAlias);
-                            if (nextAlias->getElementType()->isFunction())
-                            {
-                                ++nextIt;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        aliasTypeVector.insert(aliasTypeVector.begin() + nextIt, a);
-                        break;
-                    }
-                }
-            }
-        }
-
-        /* Table template data. */
-        data_list callbacks;
-        for (Function *fun : functionType->getCallbackFuns())
-        {
-            data_map callbacksInfo;
-            callbacksInfo["name"] = fun->getName();
-            callbacks.push_back(callbacksInfo);
-        }
-        functionInfo["callbacks"] = callbacks;
-        /* Function type name. */
-        functionInfo["name"] = functionType->getName();
-        functions.push_back(functionInfo);
-    }
-    m_templateData["functions"] = functions;
 
     for (auto it : aliasTypeVector)
     {
@@ -1423,6 +1373,8 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
 {
     data_map info;
     Symbol *fnSymbol = dynamic_cast<Symbol *>(fn);
+    data_list externalInterfacesDataList;
+    list<string> externalInterfacesList;
 
     // reset list numbering.
     listCounter = 0;
@@ -1433,6 +1385,8 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     setTemplateComments(fnSymbol, info);
     info["needTempVariableServerI32"] = false;
     info["needTempVariableClientI32"] = false;
+    info["needTempVariableServerU16"] = false;
+    info["needTempVariableClientU16"] = false;
     info["needNullVariableOnServer"] = false;
 
     /* Is function declared as external? */
@@ -1620,13 +1574,36 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             }
         }
 
+        if (paramTrueType->isFunction())
+        {
+            FunctionType *funType = dynamic_cast<FunctionType *>(paramTrueType);
+            if (funType->getCallbackFuns().size() > 1)
+            {
+                info["needTempVariableServerU16"] = true;
+                info["needTempVariableClientU16"] = true;
+            }
+        }
+
         paramInfo["mallocServer"] = firstAllocOnServerWhenIsNeed(name, param);
         setCallingFreeFunctions(param, paramInfo, false);
 
         // Use shared memory feature instead of serializing/deserializing data.
         bool isShared = (isPointerParam(param) && findAnnotation(param, SHARED_ANNOTATION) != nullptr);
+
+        string pureCName = "";
+        if ((param->getDirection() != kInDirection) && paramTrueType->isFunction())
+        {
+            pureCName += "&";
+        }
+        if (paramTrueType->isFunction())
+        {
+            pureCName += "_";
+        }
+        pureCName += name;
+
         paramInfo["shared"] = isShared;
         paramInfo["pureName"] = name;
+        paramInfo["pureNameC"] = pureCName;
         string encodeDecodeName;
         if (isShared)
         {
@@ -1643,6 +1620,13 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
 
         paramInfo["variable"] = getTypenameName(paramType, name);
         paramInfo["name"] = name;
+        string ifaceScope = param->getIfaceScope();
+        if (ifaceScope != "")
+        {
+            externalInterfacesList.push_back(ifaceScope);
+        }
+        paramInfo["ifaceScope"] = ifaceScope;
+        paramInfo["isFunction"] = paramTrueType->isFunction();
 
         Log::debug("Calling EncodeDecode param %s with paramType %s.\n", param->getName().c_str(),
                    paramType->getName().c_str());
@@ -1672,6 +1656,11 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             paramsToFree.push_back(paramInfo);
         }
     }
+    externalInterfacesList.unique();
+    for (auto externalInterface : externalInterfacesList)
+    {
+        externalInterfacesDataList.push_back(externalInterface);
+    }
     if (paramsToClient.size() > 0)
     {
         info["isReturnValue"] = true;
@@ -1684,6 +1673,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     info["paramsToFree"] = paramsToFree;
     info["parametersToClient"] = paramsToClient;
     info["parametersToServer"] = paramsToServer;
+    info["externalInterfaces"] = externalInterfacesDataList;
 
     return info;
 }
@@ -1699,9 +1689,9 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interfa
     if (fn->getFunctionType())
     {
         int similarFunctions = 0;
-        for (Interface *interface : group->getInterfaces())
+        for (Interface *_interface : group->getInterfaces())
         {
-            for (Function *function : interface->getFunctions())
+            for (Function *function : _interface->getFunctions())
             {
                 if (fn->getFunctionType() == function->getFunctionType())
                 {
@@ -1719,6 +1709,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interfa
     if (useCommonFunction)
     {
         std::string callbackFName = getOutputName(fn->getFunctionType());
+        info["callbackFNameNoGroup"] = callbackFName;
         if (!group->getName().empty())
         {
             callbackFName += "_" + group->getName();
@@ -1732,18 +1723,38 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interfa
         info["isCallback"] = false;
         string serverProto = getFunctionServerCall(fn, nullptr, "m_handler->");
         info["serverPrototype"] = serverProto;
-        string serverProtoC = getFunctionServerCall(fn);
-        info["serverPrototypeC"] = serverProtoC;
         info["serviceId"] = "";
     }
+    string serverProtoC = getFunctionServerCall(fn);
+    info["serverPrototypeC"] = serverProtoC;
 
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
     if (interface != nullptr)
     {
-        string protoCpp = getFunctionPrototype(group, fn, interface->getName() + "_client");
+        string protoCpp = getFunctionPrototype(group, fn, interface->getName() + "_client", "", true);
         info["prototypeCpp"] = protoCpp;
+        string protoInterface = getFunctionPrototype(group, fn, "", "", true);
+        info["prototypeInterface"] = protoInterface;
     }
+
+    data_list callbackParameters;
+    for (auto parameter : fn->getParameters().getMembers())
+    {
+        if (parameter->getDataType()->isFunction())
+        {
+            data_map paramData;
+            FunctionType *funType = dynamic_cast<FunctionType *>(parameter->getDataType());
+            paramData["name"] = parameter->getName();
+            paramData["type"] = funType->getName();
+            paramData["interface"] = funType->getCallbackFuns()[0]->getInterface()->getName() + "_interface";
+            paramData["in"] = ((parameter->getDirection() == kInDirection));
+            paramData["out"] = ((parameter->getDirection() == kOutDirection));
+            callbackParameters.push_back(paramData);
+        }
+    }
+    info["callbackParameters"] = callbackParameters;
+
     info["name"] = getOutputName(fn);
     info["id"] = fn->getUniqueId();
 
@@ -1989,7 +2000,10 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
                                                               (findAnnotation(it, SHARED_ANNOTATION))))
 
             {
-                proto += "&";
+                if (prefix != "")
+                {
+                    proto += "&";
+                }
             }
             proto += getOutputName(it);
 
@@ -2003,18 +2017,20 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
     return proto + ");";
 }
 
-string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string interfaceName, std::string name)
+string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName,
+                                        const std::string &name, bool interfaceClass)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
+    string ifaceVar = interfaceName;
     if (proto == "*")
     {
         proto += " ";
     }
 
-    if (interfaceName != "")
+    if (ifaceVar != "")
     {
-        interfaceName += "::";
+        ifaceVar += "::";
     }
 
     Symbol *symbol = dynamic_cast<Symbol *>(fn);
@@ -2026,16 +2042,16 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::str
         string functionName = getOutputName(symbol);
         if (funType) /* Need add '(*name)' for function type definition. */
         {
-            proto += "(*" + functionName + ")";
+            proto += "(" + ifaceVar + "*" + functionName + ")";
         }
         else /* Use function name only. */
         {
-            proto += interfaceName + functionName;
+            proto += ifaceVar + functionName;
         }
     }
     else
     {
-        proto += interfaceName + name;
+        proto += ifaceVar + name;
     }
 
     proto += "(";
@@ -2135,6 +2151,15 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::str
                                           "inout and out parameters in the same application",
                                           it->getLocation().m_firstLine));
                     }
+                }
+            }
+
+            if (interfaceClass)
+            {
+                string ifaceScope = it->getIfaceScope();
+                if (ifaceScope != "")
+                {
+                    proto += ifaceScope + "_interface::";
                 }
             }
 
@@ -2339,7 +2364,7 @@ void CGenerator::getEncodeDecodeBuiltin(Group *group, BuiltinType *t, data_map &
 }
 
 data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataType *t, StructType *structType,
-                                         bool inDataContainer, StructMember *structMember, bool &needTempVariable,
+                                         bool inDataContainer, StructMember *structMember, bool &needTempVariableI32,
                                          bool isFunctionParam)
 {
     // prepare data for template
@@ -2410,7 +2435,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                             templateData["sharedType"] = "union";
                             if (setDiscriminatorTemp(u, structType, structMember, isFunctionParam, templateData))
                             {
-                                needTempVariable = true;
+                                needTempVariableI32 = true;
                             }
 
                             break;
@@ -2456,7 +2481,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             AliasType *aliasType = dynamic_cast<AliasType *>(t);
             assert(aliasType);
             return getEncodeDecodeCall(name, group, aliasType->getElementType(), structType, inDataContainer,
-                                       structMember, needTempVariable, isFunctionParam);
+                                       structMember, needTempVariableI32, isFunctionParam);
         }
         case DataType::kArrayType: {
             static uint8_t arrayCounter;
@@ -2479,7 +2504,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             templateData["forLoopCount"] = format_string("arrayCount%d", arrayCounter);
             templateData["protoNext"] =
                 getEncodeDecodeCall(format_string("%s[arrayCount%d]", arrayName.c_str(), arrayCounter++), group,
-                                    elementType, structType, true, structMember, needTempVariable, isFunctionParam);
+                                    elementType, structType, true, structMember, needTempVariableI32, isFunctionParam);
             templateData["size"] = format_string("%dU", arrayType->getElementCount());
             templateData["sizeTemp"] = format_string("%dU", arrayType->getElementCount());
             templateData["isElementArrayType"] = trueElementType->isArray();
@@ -2497,7 +2522,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             break;
         }
         case DataType::kEnumType: {
-            needTempVariable = true;
+            needTempVariableI32 = true;
             templateData["decode"] = m_templateData["decodeEnumType"];
             templateData["encode"] = m_templateData["encodeEnumType"];
             string typeName = getOutputName(t);
@@ -2516,6 +2541,15 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             assert(funType);
             const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
             templateData["callbacksCount"] = callbacks.size();
+            templateData["cbTypeName"] = funType->getName();
+            if (structMember->getDirection() == kInDirection)
+            {
+                templateData["cbParamOutName"] = name;
+            }
+            else
+            {
+                templateData["cbParamOutName"] = name.substr(1, name.length());
+            }
             if (callbacks.size() > 1)
             {
                 templateData["callbacks"] = "_" + funType->getName();
@@ -2677,7 +2711,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             templateData["size"] = size;
             templateData["useBinaryCoder"] = isBinaryList(listType);
             templateData["protoNext"] = getEncodeDecodeCall(nextName, group, elementType, structType, true,
-                                                            structMember, needTempVariable, isFunctionParam);
+                                                            structMember, needTempVariableI32, isFunctionParam);
             break;
         }
         case DataType::kStructType: {
@@ -2708,7 +2742,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             // set discriminator name
             if (setDiscriminatorTemp(unionType, structType, structMember, isFunctionParam, templateData))
             {
-                needTempVariable = true;
+                needTempVariableI32 = true;
             }
 
             /* NonEncapsulated unions as a function/structure param/member. */
@@ -2803,7 +2837,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                             caseMembers.push_back(memberData);
                             if (casesNeedTempVariable)
                             {
-                                needTempVariable = true;
+                                needTempVariableI32 = true;
                             }
                         }
                     }
@@ -3009,8 +3043,7 @@ void CGenerator::setCallingFreeFunctions(Symbol *symbol, data_map &info, bool re
     {
         if (!returnType)
         {
-            if (trueDataType->isStruct() || trueDataType->isUnion() ||
-                (trueDataType->isFunction() && ((structMember->getDirection() == kOutDirection))))
+            if (trueDataType->isStruct() || trueDataType->isUnion())
             {
                 string name = getOutputName(structMember, false);
                 firstFreeingCall1["firstFreeingCall"] = m_templateData["freeData"];
@@ -3278,7 +3311,7 @@ void CGenerator::setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol)
 bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember,
                                       bool isFunctionParam, data_map &templateData)
 {
-    bool needTempVariable = false;
+    bool needTempVariableI32 = false;
     if (structType)
     {
         string discriminatorName;
@@ -3329,7 +3362,7 @@ bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structTy
         }
         else
         {
-            needTempVariable = true;
+            needTempVariableI32 = true;
             templateData["castDiscriminator"] = true;
             templateData["discriminatorType"] = disType->getName();
         }
@@ -3341,7 +3374,7 @@ bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structTy
         templateData["dataLiteral"] = "";
         templateData["castDiscriminator"] = false;
     }
-    return needTempVariable;
+    return needTempVariableI32;
 }
 
 string CGenerator::getScalarTypename(DataType *dataType)

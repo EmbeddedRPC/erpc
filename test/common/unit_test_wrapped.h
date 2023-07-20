@@ -10,6 +10,7 @@
 #define _EMBEDDED_RPC__UNIT_TEST_WRAPPED_H_
 
 #include "erpc_client_manager.h"
+#include "erpc_server_setup.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Function Prototypes

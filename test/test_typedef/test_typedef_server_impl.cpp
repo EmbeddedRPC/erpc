@@ -8,13 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "test_server.hpp"
+#include "c_test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
 
 TypedefService_service *svc;
 
@@ -129,6 +132,59 @@ MultiListArray arrayNumbers, uint32_t arrayNumbers_1_count, uint32_t arrayNumber
 }*/
 /* end typedef unit tests */
 
+class TypedefService_server: public TypedefService_interface
+{
+    public:
+
+        int32type sendReceiveInt(int32type a)
+        {
+            int32type result;
+            result = ::sendReceiveInt(a);
+
+            return result;
+        }
+
+        Colors sendReceiveEnum(Colors a)
+        {
+            Colors result;
+            result = ::sendReceiveEnum(a);
+
+            return result;
+        }
+
+        B * sendReceiveStruct(const B * a)
+        {
+            B * result = NULL;
+            result = ::sendReceiveStruct(a);
+
+            return result;
+        }
+
+        ListType * sendReceiveListType(const ListType * listNumbers)
+        {
+            ListType * result = NULL;
+            result = ::sendReceiveListType(listNumbers);
+
+            return result;
+        }
+
+        ListType2 * sendReceive2ListType(const ListType2 * listNumbers)
+        {
+            ListType2 * result = NULL;
+            result = ::sendReceive2ListType(listNumbers);
+
+            return result;
+        }
+
+        newString sendReceiveString(newString hello)
+        {
+            newString result = NULL;
+            result = ::sendReceiveString(hello);
+
+            return result;
+        }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +193,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new TypedefService_service();
+    svc = new TypedefService_service(new TypedefService_server());
 
     // add services
     server->addService(svc);
@@ -174,11 +230,6 @@ void remove_services_from_server(erpc_server_t server)
     destroy_TypedefService_service(service_test);
 }
 
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

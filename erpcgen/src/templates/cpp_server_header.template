@@ -9,7 +9,7 @@
 
 #include "{$interfaceCppHeaderName}"
 
-#include "erpc_server.h"
+#include "erpc_server.hpp"
 #include "{$codecHeader}"
 
 {$checkVersion()}

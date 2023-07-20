@@ -110,12 +110,6 @@ void remove_services_from_server(erpc_server_t server)
     erpc_remove_service_from_server(server, service_test);
     destroy_AnnotateTest_service(service_test);
 }
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

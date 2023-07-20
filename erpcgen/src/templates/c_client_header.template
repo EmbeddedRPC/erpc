@@ -9,6 +9,17 @@
 
 #include "{$commonCHeaderName}"
 #include "erpc_client_manager.h"
+{% for iface in group.interfaces %}
+{%  for fn in iface.functions %}
+{%   for externalInterface in fn.externalInterfaces %}
+{%    for interfaceFile in interfacesFiles %}
+{%     if externalInterface == interfaceFile.interfaceName %}
+#include "c_{$interfaceFile.interfaceCommonFileName}_client.h"
+{%     endif %}
+{%    endfor -- interfacesFiles %}
+{%   endfor -- externalInterface %}
+{%  endfor -- fn %}
+{% endfor -- iface %}
 
 #ifdef __cplusplus
 extern "C"
@@ -19,6 +30,10 @@ extern "C"
 #define {$getFunctionDeclarationMacroName()}
 
 {% for iface in group.interfaces %}
+{%  for cb in iface.callbacksInt%}
+typedef {$cb.typenameName};
+{%  endfor %}
+
 /*! @brief {$iface.name} identifiers */
 enum _{$iface.name}_ids
 {
@@ -39,9 +54,9 @@ enum _{$iface.name}_ids
 {%  endfor -- functions %}
 //@}{$iface.ilComment}
 
+{% endfor -- iface %}
 #endif // {$getFunctionDeclarationMacroName()}
 
-{% endfor -- iface %}
 {% for iface in group.interfaces %}
 void init{$iface.clientClassName}(erpc_client_t client);
 

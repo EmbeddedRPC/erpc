@@ -72,6 +72,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen_lexer.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \
@@ -93,6 +94,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \

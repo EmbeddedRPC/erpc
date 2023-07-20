@@ -106,6 +106,13 @@ private:
     void generateInterfaceCppHeaderFile(std::string fileName);
 
     /*!
+     * @brief This function generate output interface source file.
+     *
+     * @param[in] fileName Name for output interface source file.
+     */
+    void generateInterfaceCppSourceFile(std::string fileName);
+
+    /*!
      * @brief This function generate output client header file for cpp.
      *
      * @param[in] fileName Name for output client header file.
@@ -456,11 +463,11 @@ private:
      * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
      * @param[in] name Name used for FunctionType.
+     * @param[in] interfaceClass interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string interfaceName = "",
-                                     std::string name = "");
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "", const std::string &name = "", bool interfaceClass = false);
 
     /*!
      * @brief This function return interface function representation called by server side.
@@ -516,13 +523,13 @@ private:
      * @param[in] structType Structure holdings structure members.
      * @param[in] inDataContainer Is inside data container (struct, list, array).
      * @param[in] structMember Null for return.
-     * @param[out] needTempVariable Return true, when data type contains enum, function, union type.
+     * @param[out] needTempVariableI32 Return true, when data type contains enum, function, union type.
      * @param[in] isFunctionParam True for function param else false (structure member).
      *
      * @return Template data for decode or encode data type.
      */
     cpptempl::data_map getEncodeDecodeCall(const std::string &name, Group *group, DataType *t, StructType *structType,
-                                           bool inDataContainer, StructMember *structMember, bool &needTempVariable,
+                                           bool inDataContainer, StructMember *structMember, bool &needTempVariableI32,
                                            bool isFunctionParam);
 
     /*!

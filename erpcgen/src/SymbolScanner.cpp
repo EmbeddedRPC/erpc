@@ -1260,13 +1260,14 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
         /* Extract param data type. */
         AstNode *typeNode = (*node)[1];
         assert(typeNode);
-        DataType *dataType = lookupDataType(typeNode);
+        string ifaceName("");
+        DataType *dataType = lookupDataType(typeNode, &ifaceName);
 
         /* Extract param name. */
         if (ident)
         {
             Token &tok = ident->getToken();
-            param = new StructMember(tok, dataType);
+            param = new StructMember(tok, dataType, ifaceName);
         }
         else if (m_currentInterface && !funType) // Functions need param names. Types of functions don't.
         {
@@ -1363,7 +1364,7 @@ bool SymbolScanner::containsStructEnumDeclaration(const AstNode *typeNode)
     return (typeToken.getToken() == TOK_ENUM || typeToken.getToken() == TOK_STRUCT);
 }
 
-DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
+DataType *SymbolScanner::lookupDataType(const AstNode *typeNode, string *ifaceName)
 {
     const Token &typeToken = typeNode->getToken();
     switch (typeToken.getToken())
@@ -1380,6 +1381,17 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
         case TOK_UNION: {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
+        }
+        case TOK_IFACE_SCOPE: {
+            AstNode *iface = typeNode->getChild(0);
+            AstNode *type = typeNode->getChild(1);
+            if (ifaceName == nullptr)
+            {
+                throw internal_error(format_string("String object is nullptr. Expected not null value.", typeToken.getTokenName(),
+                                                typeToken.getLocation().m_firstLine));
+            }
+            *ifaceName = iface->getToken().getStringValue();
+            return lookupDataTypeByName(type->getToken(), m_globals);
         }
         default:
             throw internal_error(format_string("unexpected token type %s on line %d", typeToken.getTokenName(),

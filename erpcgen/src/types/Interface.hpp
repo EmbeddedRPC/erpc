@@ -67,7 +67,7 @@ public:
      *
      * @return Interface functions vector.
      */
-    function_vector_t &getFunctions() { return m_functions; }
+    const function_vector_t &getFunctions() const{ return m_functions; }
 
     /*!
      * @brief This function get unique id of interface.

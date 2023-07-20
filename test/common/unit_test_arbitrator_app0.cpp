@@ -279,6 +279,8 @@ int main(int argc, char **argv)
     }
 }
 
+extern "C"
+{
 void quitSecondInterfaceServer()
 {
     /* removing the service from the server */
@@ -288,4 +290,5 @@ void quitSecondInterfaceServer()
     // Stop server part
     erpc_server_stop(server);
     increaseWaitQuit();
+}
 }

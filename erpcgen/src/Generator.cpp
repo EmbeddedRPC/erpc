@@ -17,6 +17,7 @@
 #include "format_string.hpp"
 
 #include <algorithm>
+#include <list>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
@@ -439,6 +440,13 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         /* Has interface function declared as non-external? */
         data_list functions = getFunctionsTemplateData(group, iface);
         ifaceInfo["functions"] = functions;
+        data_list callbacksInt;
+        data_list callbacksExt;
+        data_list callbacksAll;
+        getCallbacksTemplateData(iface, callbacksInt, callbacksExt, callbacksAll);
+        ifaceInfo["callbacksInt"] = callbacksInt;
+        ifaceInfo["callbacksExt"] = callbacksExt;
+        ifaceInfo["callbacksAll"] = callbacksAll;
         ifaceInfo["isNonExternalInterface"] = false;
         for (unsigned int i = 0; i < functions.size(); ++i)
         {
@@ -458,19 +466,29 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
     return interfaces;
 }
 
-void Generator::generateGroupOutputFiles(Group *group)
+string Generator::getGroupCommonFileName(Group *group)
 {
-    // generate output files only for groups with interfaces or for IDLs with no interfaces at all
+    string fileName = "";
     if (!group->getInterfaces().empty() || (m_groups.size() == 1 && group->getName() == ""))
     {
         string groupName = group->getName();
-        string fileName = stripExtension(m_def->getOutputFilename());
+        fileName = stripExtension(m_def->getOutputFilename());
         m_templateData["outputFilename"] = fileName;
         if (groupName != "")
         {
             fileName += "_" + groupName;
         }
         Log::info("File name %s\n", fileName.c_str());
+    }
+    return fileName;
+}
+
+void Generator::generateGroupOutputFiles(Group *group)
+{
+    // generate output files only for groups with interfaces or for IDLs with no interfaces at all
+    if (!group->getInterfaces().empty() || (m_groups.size() == 1 && group->getName() == ""))
+    {
+        string fileName = getGroupCommonFileName(group);
 
         // group templates
         m_templateData["group"] = group->getTemplate();
@@ -642,4 +660,100 @@ Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope 
     }
 
     return vector;
+}
+
+void Generator::getCallbacksTemplateData(const Interface *iface, data_list &callbackTypesInt,
+                                         data_list &callbackTypesExt, data_list &callbackTypesAll)
+{
+    list<FunctionType *> callbackTypes;
+    list<string> interfacesNames;
+    list<string> callbackTypesNames;
+    interfacesNames.push_back(iface->getName());
+    for (auto function : iface->getFunctions())
+    {
+        for (auto param : function->getParameters().getMembers())
+        {
+            DataType *datatype = param->getDataType()->getTrueDataType();
+            if (datatype->isFunction())
+            {
+                if (param->getIfaceScope() != "")
+                {
+                    interfacesNames.push_back(param->getIfaceScope());
+                }
+                FunctionType *funType = dynamic_cast<FunctionType *>(datatype);
+                if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), funType->getName()) ==
+                     callbackTypesNames.end()))
+                {
+                    callbackTypes.push_back(funType);
+                    callbackTypesNames.push_back(funType->getName());
+                }
+            }
+        }
+    }
+
+    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
+    {
+        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
+        assert(functionType);
+
+        for (auto fun : functionType->getCallbackFuns())
+        {
+            if (fun->getInterface() == iface)
+            {
+                if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), functionType->getName()) ==
+                     callbackTypesNames.end()))
+                {
+                    callbackTypes.push_back(functionType);
+                    callbackTypesNames.push_back(functionType->getName());
+                }
+            }
+        }
+    }
+
+    for (auto functionType : callbackTypes)
+    {
+        data_list functionsInt;
+        data_list functionsExt;
+        data_list functionsAll;
+        for (auto fun : functionType->getCallbackFuns())
+        {
+            if ((std::find(interfacesNames.begin(), interfacesNames.end(), fun->getInterface()->getName()) !=
+                 interfacesNames.end()))
+            {
+                data_map function;
+                function["name"] = fun->getName();
+                if (fun->getInterface() == iface)
+                {
+                    functionsInt.push_back(function);
+                }
+                else
+                {
+                    functionsExt.push_back(function);
+                }
+                functionsAll.push_back(function);
+            }
+        }
+        if (!functionsAll.empty())
+        {
+            data_map callbackType;
+            callbackType["name"] = functionType->getName();
+            AliasType aliasTypeInterface(getFunctionPrototype(nullptr, functionType, iface->getName() + "_interface"),
+                                         functionType);
+            AliasType aliasType(getFunctionPrototype(nullptr, functionType), functionType);
+            callbackType["typenameName"] = getOutputName(&aliasType);
+            callbackType["interfaceTypenameName"] = getOutputName(&aliasTypeInterface);
+            if (!functionsInt.empty())
+            {
+                callbackType["callbacks"] = functionsInt;
+                callbackTypesInt.push_back(callbackType);
+            }
+            if (!functionsExt.empty())
+            {
+                callbackType["callbacks"] = functionsExt;
+                callbackTypesExt.push_back(callbackType);
+            }
+            callbackType["callbacks"] = functionsAll;
+            callbackTypesAll.push_back(callbackType);
+        }
+    }
 }

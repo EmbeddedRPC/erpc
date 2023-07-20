@@ -75,7 +75,7 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
 #-------------------------------
 IDL_FILE = $(CUR_DIR).erpc
 
-ifneq "$(TEST_NAME)" "test_arbitrator"
+ifeq (,$(filter $(TEST_NAME),test_arbitrator test_callbacks))
 
     INCLUDES += $(ERPC_ROOT)/test/common/config
 
@@ -109,11 +109,15 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
     LIBRARIES += -ltest
     LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
 else
+ifeq (,$(filter $(TEST_NAME),test_arbitrator))
+    INCLUDES += $(ERPC_ROOT)/test/common/config
+else
+    INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
+endif
+
     ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
 
     include $(ERPC_ROOT)/test/mk/erpc_src.mk
-
-    INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
 
     ifeq "$(TYPE)" "CLIENT"
         include $(TEST_ROOT)/$(TEST_NAME)/client.mk

@@ -346,7 +346,7 @@ static void free_{$union.name}_union(int32_t discriminator, {$union.name} * data
 {% if functionsTypes %}
 {%  for f in functionsTypes %}
 {%   if count(f.callbacks) > 1 %}
-static const {$f.name} _{$f.name}[] = { {%    for c in f.callbacks %}{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
+// static const {$f.name} _{$f.name}[] = { {%    for c in f.callbacks %}{$c.interfaceName}{% if source == "client" %}_client{% endif %}::{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
 {%   endif -- f.callbacks.size() %}
 {%  endfor -- functionsTypes %}
 {%  endif -- functionsTypes %}

@@ -156,7 +156,6 @@ int main(int argc, char **argv)
     add_services(&g_server);
     g_client->setServer(&g_server);
     erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
-    initInterfaces_common(client);
     initInterfaces(client);
 
     int i = -1;
@@ -194,6 +193,8 @@ int main(int argc, char **argv)
     return i;
 }
 
+extern "C"
+{
 void quitSecondInterfaceServer()
 {
     // removing SecondInterface service from the server
@@ -202,8 +203,4 @@ void quitSecondInterfaceServer()
     g_server.stop();
     increaseWaitQuit();
 }
-
-void initInterfaces_common(erpc_client_t client)
-{
-    initCommon_client(client);
 }

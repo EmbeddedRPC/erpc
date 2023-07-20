@@ -173,6 +173,9 @@
     <ClCompile Include="cpp_interface_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpp_interface_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cpp_client_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

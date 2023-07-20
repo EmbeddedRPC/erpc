@@ -8,13 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_ArithmeticService_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_ArithmeticService_server.h"
+#include "test_ArithmeticService_server.hpp"
+#include "c_test_unit_test_common_server.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
 
 ArithmeticService1_service *svc1;
 ArithmeticService2_service *svc2;
@@ -179,6 +182,133 @@ bool testSendingByrefMembers(const StructWithByrefMembers *s)
     return false;
 }
 
+class ArithmeticService1_server: public ArithmeticService1_interface
+{
+    public:
+
+        int32_t getMember(const C * c)
+        {
+            int32_t result;
+            result = ::getMember(c);
+
+            return result;
+        }
+
+        B * returnStruct(float a, float b)
+        {
+            B * result = NULL;
+            result = ::returnStruct(a, b);
+
+            return result;
+        }
+
+        B * getMemberTest2(const A * a)
+        {
+            B * result = NULL;
+            result = ::getMemberTest2(a);
+
+            return result;
+        }
+
+        int32_t sendNestedStruct(const D * d)
+        {
+            int32_t result;
+            result = ::sendNestedStruct(d);
+
+            return result;
+        }
+
+        int32_t checkString(const primate * p)
+        {
+            int32_t result;
+            result = ::checkString(p);
+
+            return result;
+        }
+
+        stringStruct * returnStrings(void)
+        {
+            stringStruct * result = NULL;
+            result = ::returnStrings();
+
+            return result;
+        }
+};
+
+class ArithmeticService2_server: public ArithmeticService2_interface
+{
+    public:
+
+        int32_t sendManyInts(const F * f)
+        {
+            int32_t result;
+            result = ::sendManyInts(f);
+
+            return result;
+        }
+
+        int32_t sendManyUInts(const G * g)
+        {
+            int32_t result;
+            result = ::sendManyUInts(g);
+
+            return result;
+        }
+
+        char * getStudentName(const student * stud)
+        {
+            char * result = NULL;
+            result = ::getStudentName(stud);
+
+            return result;
+        }
+
+        float getStudentTestAverage(const student * stud)
+        {
+            float result;
+            result = ::getStudentTestAverage(stud);
+
+            return result;
+        }
+
+        int32_t getStudentYear(const student * stud)
+        {
+            int32_t result;
+            result = ::getStudentYear(stud);
+
+            return result;
+        }
+
+        int32_t getStudentAge(const student * stud)
+        {
+            int32_t result;
+            result = ::getStudentAge(stud);
+
+            return result;
+        }
+
+        student * createStudent(const char * name, const float test_scores[3], school_year_t year, int32_t age)
+        {
+            student * result = NULL;
+            result = ::createStudent(name, test_scores, year, age);
+
+            return result;
+        }
+
+        void test_struct_allDirection(const AllTypes * a, const AllTypes * b, AllTypes * e)
+        {
+            ::test_struct_allDirection(a, b, e);
+        }
+
+        bool testSendingByrefMembers(const StructWithByrefMembers * s)
+        {
+            bool result;
+            result = ::testSendingByrefMembers(s);
+
+            return result;
+        }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,8 +317,8 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc1 = new ArithmeticService1_service();
-    svc2 = new ArithmeticService2_service();
+    svc1 = new ArithmeticService1_service(new ArithmeticService1_server());
+    svc2 = new ArithmeticService2_service(new ArithmeticService2_server());
 
     // add services
     server->addService(svc1);
@@ -233,11 +363,6 @@ void remove_services_from_server(erpc_server_t server)
     destroy_ArithmeticService2_service(service2);
 }
 
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

@@ -11,7 +11,7 @@
 #define _EMBEDDED_RPC__GTESTLISTENER_H_
 
 #include "gtest.h"
-#include "myAlloc.h"
+#include "myAlloc.hpp"
 #include "c_test_unit_test_common_client.h"
 
 ////////////////////////////////////////////////////////////////////////////////

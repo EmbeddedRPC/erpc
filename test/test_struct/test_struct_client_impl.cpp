@@ -7,7 +7,8 @@
  */
 
 #include "gtest.h"
-#include "test_ArithmeticService.h"
+#include "c_test_ArithmeticService_client.h"
+#include "unit_test_wrapped.h"
 
 #include <string.h>
 
@@ -16,6 +17,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(erpc_client_t client)
+{
+    initArithmeticService1_client(client);
+    initArithmeticService2_client(client);
+}
 
 TEST(test_struct, GetMember1)
 {
