@@ -92,18 +92,18 @@ private:
     void generateOutputFiles(const std::string &fileNameExtension) override;
 
     /*!
-     * @brief This function generate header file output with common standard code.
+     * @brief This function generate header file output with common eRPC code.
      *
-     * @param[in] fileName Name for common standard header file output.
+     * @param[in] fileName Name for common eRPC header file output.
      */
-    void generateCommonStandardCHeaderFiles(std::string fileName);
+    void generateCommonCHeaderFiles(std::string fileName);
 
     /*!
      * @brief This function generate header file output with common eRPC code.
      *
      * @param[in] fileName Name for common eRPC header file output.
      */
-    void generateCommonErpcCHeaderFiles(std::string fileName);
+    void generateCommonCppHeaderFiles(std::string fileName);
 
     /*!
      * @brief This function generate output interface header file.
@@ -253,7 +253,7 @@ private:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn);
+    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn) override;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -476,7 +476,7 @@ private:
      * @return String prototype representation for given function.
      */
     std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
-                                     const std::string &name = "", bool insideInterfaceCall = false);
+                                     const std::string &name = "", bool insideInterfaceCall = false) override;
 
     /*!
      * @brief This function return interface function representation called by server side.

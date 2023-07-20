@@ -11,15 +11,6 @@
 #include "{$codecHeader}"
 #include "{$clientCppHeaderName}"
 #include "erpc_manually_constructed.hpp"
-extern "C"
-{
-{% if groupNames %}
-// import callbacks declaration from other groups
-{%  for name in groupNames if name != group.name %}
-#include "{$outputFilename}_{$name}_common_erpc.h"
-{%  endfor %}
-{% endif %}
-}
 
 {$checkVersion()}
 {$>checkCrc()}
@@ -187,7 +178,11 @@ static {$cb.callbacksData.prototype}
 {$iface.clientClassName}::{$iface.clientClassName}(ClientManager *manager)
 :m_clientManager(manager)
 {
-};
+}
+
+{$iface.clientClassName}::~{$iface.clientClassName}()
+{
+}
 {% for fn in iface.functions %}
 
 // {$iface.name} interface {$fn.name} function client shim.

@@ -7,7 +7,7 @@
 #if !defined({$interfaceCppGuardMacro})
 #define {$interfaceCppGuardMacro}
 
-#include "{$commonStandardCHeaderName}"
+#include "{$commonCppHeaderName}"
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 {%   for externalInterface in fn.externalInterfaces %}
@@ -20,7 +20,6 @@
 {%  endfor -- fn %}
 {% endfor -- iface %}
 {$fillNamespaceBegin()}
-#include "{$commonErpcCHeaderName}"
 {% for iface in group.interfaces %}
 
 // Abstract base class for {$iface.name}
@@ -37,6 +36,8 @@ class {$iface.interfaceClassName}
 {% for fn in iface.functions %}
         static const uint8_t {$getClassFunctionIdName(fn)} = {$fn.id};
 {% endfor -- fn %}
+
+        virtual ~{$iface.interfaceClassName}(void);
 {% for fn in iface.functions if fn.isNonExternalFunction == true %}
 
 {% if fn.mlComment %}

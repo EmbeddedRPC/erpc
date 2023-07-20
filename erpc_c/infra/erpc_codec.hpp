@@ -16,7 +16,7 @@
 #include "erpc_transport.hpp"
 
 #include <cstring>
-#include <stdint.h>
+#include <cstdint>
 
 /*!
  * @addtogroup infra_codec

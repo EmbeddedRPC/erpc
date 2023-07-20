@@ -156,7 +156,7 @@ protected:
      * @return String prototype representation for given function.
      */
     std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
-                                     const std::string &name = "", bool insideInterfaceCall = false);
+                                     const std::string &name = "", bool insideInterfaceCall = false) override;
 
     /*!
      * @brief This function sets const template data.

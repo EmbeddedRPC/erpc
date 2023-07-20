@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
-using namespace erpcshim;
+using namespace erpcShim;
 
 class MyMessageBufferFactory : public MessageBufferFactory
 {
@@ -45,7 +45,7 @@ MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 SimpleServer g_server;
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 Common_service *svc_common;
 
@@ -92,8 +92,8 @@ void quit()
 
 int32_t getServerAllocated()
 {
-    int result = MyAlloc::allocated();
-    MyAlloc::allocated(0);
+    int result = ::MyAlloc::allocated();
+    ::MyAlloc::allocated(0);
     return result;
 }
 

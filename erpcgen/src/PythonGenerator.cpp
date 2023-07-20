@@ -122,6 +122,7 @@ void PythonGenerator::generate()
     m_templateData["structs"] = empty;
     m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
+    m_templateData["functions"] = empty;
 
     parseSubtemplates();
 
@@ -625,9 +626,9 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             else
             {
-                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in "
-                                                   "IDL is missing function definition, which can be passed there.")
-                                         .c_str());
+                throw semantic_error(
+                    "Function has function type parameter (callback parameter), but in "
+                    "IDL is missing function definition, which can be passed there.");
             }
             break;
         }
@@ -669,7 +670,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 StructMember *discriminatorMember = dynamic_cast<StructMember *>(discriminatorSym);
                 if (!discriminatorMember)
                 {
-                    throw internal_error(format_string("union discriminator is not a struct member"));
+                    throw internal_error("union discriminator is not a struct member");
                 }
                 info["discriminatorType"] = getTypeInfo(discriminatorMember->getDataType());
             }

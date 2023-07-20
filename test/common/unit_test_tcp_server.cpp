@@ -17,7 +17,7 @@
 #include "unit_test.h"
 
 using namespace erpc;
-using namespace erpcshim;
+using namespace erpcShim;
 
 class MyMessageBufferFactory : public MessageBufferFactory
 {
@@ -45,7 +45,7 @@ SimpleServer g_server;
 
 Crc16 g_crc16;
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 Common_service *svc_common;
 
@@ -101,8 +101,8 @@ void quit()
 
 int32_t getServerAllocated()
 {
-    int result = MyAlloc::allocated();
-    MyAlloc::allocated(0);
+    int result = ::MyAlloc::allocated();
+    ::MyAlloc::allocated(0);
     return result;
 }
 

@@ -17,10 +17,10 @@
 #include "format_string.hpp"
 
 #include <algorithm>
-#include <list>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
+#include <list>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -39,6 +39,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     string scopeName = "erpcShim";
     string scopeNameC;
     string scopeNamePrefix = "";
+    string namespaceVal = scopeName;
 
     m_templateData["erpcVersion"] = ERPC_VERSION;
     m_templateData["erpcVersionNumber"] = ERPC_VERSION_NUMBER;
@@ -92,13 +93,9 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
             scopeName = getAnnStringValue(program, SCOPE_NAME_ANNOTATION);
         }
 
-        if (findAnnotation(m_def->getProgramSymbol(), NAMESPACE_ANNOTATION) != nullptr)
+        if (findAnnotation(program, NAMESPACE_ANNOTATION) != nullptr)
         {
-            m_templateData["namespace"] = getAnnStringValue(m_def->getProgramSymbol(), NAMESPACE_ANNOTATION);
-        }
-        else
-        {
-            m_templateData["namespace"] = "erpcshim";
+            namespaceVal = getAnnStringValue(program, NAMESPACE_ANNOTATION);
         }
     }
 
@@ -112,6 +109,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     }
     m_templateData["scopeNameC"] = scopeNameC;
     m_templateData["scopeNamePrefix"] = scopeNamePrefix;
+    m_templateData["namespace"] = namespaceVal;
 
     // get group annotation with vector of theirs interfaces
     m_groups.clear();
@@ -595,10 +593,8 @@ string Generator::getOutputName(Symbol *symbol, bool check)
         auto it = reserverdWords.find(annName);
         if (it != reserverdWords.end())
         {
-            throw semantic_error(
-                format_string("line %d: Wrong symbol name '%s'. Cannot use program language reserved words.", line,
-                              annName.c_str())
-                    .c_str());
+            throw semantic_error(format_string(
+                "line %d: Wrong symbol name '%s'. Cannot use program language reserved words.", line, annName.c_str()));
         }
     }
 
@@ -701,7 +697,7 @@ void Generator::getCallbacksTemplateData(Group *group, const Interface *iface, d
     for (auto functionType : iface->getFunctionTypes())
     {
         if ((std::find(callbackTypesNames.begin(), callbackTypesNames.end(), functionType->getName()) ==
-                callbackTypesNames.end()))
+             callbackTypesNames.end()))
         {
             callbackTypes.push_back(functionType);
             callbackTypesNames.push_back(functionType->getName());
@@ -736,7 +732,8 @@ void Generator::getCallbacksTemplateData(Group *group, const Interface *iface, d
             data_map callbackType;
             callbackType["name"] = functionType->getName();
             callbackType["typenameName"] = getFunctionPrototype(nullptr, functionType);
-            callbackType["interfaceTypenameName"] = getFunctionPrototype(nullptr, functionType, iface->getName() + "_interface");
+            callbackType["interfaceTypenameName"] =
+                getFunctionPrototype(nullptr, functionType, iface->getName() + "_interface");
             if (!functionsInt.empty())
             {
                 callbackType["callbacks"] = functionsInt;

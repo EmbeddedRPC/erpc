@@ -27,8 +27,8 @@ CLIENT_NAME = $(TEST_NAME)_client
 SERVER_NAME = $(TEST_NAME)_server
 ERPCGEN_PATH = $(ERPC_ROOT)/$(BUILD_TYPE)/$(os_name)/erpcgen/erpcgen
 UT_OUTPUT_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)
-TCP_CLIENT_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(CLIENT_NAME)/$(DEBUG_OR_RELEASE)/$(CLIENT_NAME)_tcp_test
-TCP_SERVER_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/gcc/$(SERVER_NAME)/$(DEBUG_OR_RELEASE)/$(SERVER_NAME)_tcp_test
+TCP_CLIENT_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/$(CC)/$(CLIENT_NAME)/$(DEBUG_OR_RELEASE)/$(CLIENT_NAME)_tcp_test
+TCP_SERVER_PATH = $(UT_OUTPUT_DIR)/$(os_name)/tcp/$(CC)/$(SERVER_NAME)/$(DEBUG_OR_RELEASE)/$(SERVER_NAME)_tcp_test
 
 
 .PHONY: all

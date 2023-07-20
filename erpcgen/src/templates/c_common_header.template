@@ -4,8 +4,8 @@
 {% endif %}
 {$commonHeader()}
 
-#if !defined({$commonErpcCGuardMacro})
-#define {$commonErpcCGuardMacro}
+#if !defined({$commonGuardMacro})
+#define {$commonGuardMacro}
 {% if usedUnionType %}
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
@@ -13,12 +13,28 @@
 #endif
 {% endif -- usedUnionType %}
 
-#ifdef __cplusplus
+{% for inc in includes %}
+#include "{$inc}"
+{% endfor -- includes %}
+
+{% if cCommonHeaderFile %}
+#if defined(__cplusplus)
 extern "C"
 {
 #endif
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+{% else %}
+#include <cstdbool>
+#include <cstddef>
+#include <cstdint>
+{% endif %}
 
 #include "erpc_version.h"
+{% if empty(crc16) == false %}
+#include "{$crcHeaderName}"
+{% endif  -- empty(crc16) == false %}
 
 {$checkVersion()}
 {$>checkCrc()}
@@ -93,8 +109,11 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 
 #endif // ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
 
+{% if cCommonHeaderFile %}
 #if defined(__cplusplus)
 }
-#endif // __cplusplus
+#endif
+{% else %}
+{% endif %}
 
-#endif // {$commonErpcCGuardMacro}
+#endif // {$commonGuardMacro}

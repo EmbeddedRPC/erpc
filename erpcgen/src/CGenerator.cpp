@@ -31,8 +31,8 @@ using namespace std;
 static const char *const kIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
 // Templates strings converted from text files by txt_to_c.py.
-extern const char *const kCCommonStandardHeader;
-extern const char *const kCCommonErpcHeader;
+extern const char *const kCCommonHeader;
+extern const char *const kCppCommonHeader;
 extern const char *const kCppInterfaceHeader;
 extern const char *const kCppInterfaceSource;
 extern const char *const kCppClientHeader;
@@ -79,8 +79,8 @@ CGenerator::CGenerator(InterfaceDefinition *def)
 
 void CGenerator::generateOutputFiles(const string &fileName)
 {
-    generateCommonStandardCHeaderFiles(fileName);
-    generateCommonErpcCHeaderFiles(fileName);
+    generateCommonCHeaderFiles(fileName);
+    generateCommonCppHeaderFiles(fileName);
 
     generateInterfaceCppHeaderFile(fileName);
     generateInterfaceCppSourceFile(fileName);
@@ -98,20 +98,22 @@ void CGenerator::generateOutputFiles(const string &fileName)
     generateServerCSourceFile(fileName);
 }
 
-void CGenerator::generateCommonStandardCHeaderFiles(string fileName)
+void CGenerator::generateCommonCHeaderFiles(string fileName)
 {
-    fileName += "_common_standard.h";
-    m_templateData["commonStandardCGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonStandardCHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_common_standard_header", m_templateData, kCCommonStandardHeader);
+    fileName += "_common.h";
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonCHeaderName"] = fileName;
+    m_templateData["cCommonHeaderFile"] = true;
+    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
 }
 
-void CGenerator::generateCommonErpcCHeaderFiles(string fileName)
+void CGenerator::generateCommonCppHeaderFiles(string fileName)
 {
-    fileName += "_common_erpc.h";
-    m_templateData["commonErpcCGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonErpcCHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_common_erpc_header", m_templateData, kCCommonErpcHeader);
+    fileName += "_common.hpp";
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonCppHeaderName"] = fileName;
+    m_templateData["cCommonHeaderFile"] = false;
+    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
 }
 
 void CGenerator::generateInterfaceCppHeaderFile(string fileName)
@@ -478,7 +480,7 @@ void CGenerator::generate()
     }
     /* Generate file with shim code version. */
     m_templateData["versionGuardMacro"] =
-        generateIncludeGuardName(format_string("erpc_generated_shim_code_crc_%d", m_idlCrc16).c_str());
+        generateIncludeGuardName(format_string("erpc_generated_shim_code_crc_%d", m_idlCrc16));
 
     m_templateData["generateInfraErrorChecks"] = generateInfraErrorChecks;
     m_templateData["generateAllocErrorChecks"] = generateAllocErrorChecks;
@@ -596,7 +598,7 @@ void CGenerator::makeConstTemplateData()
             if (nullptr == constVarValue)
             {
                 throw semantic_error(
-                    format_string("line %d: Const pointing to null Value object.", constVar->getLastLine()).c_str());
+                    format_string("line %d: Const pointing to null Value object.", constVar->getLastLine()));
             }
 
             /* Use char[] for constants. */
@@ -617,8 +619,7 @@ void CGenerator::makeConstTemplateData()
                 if (constVarValue->getType() != kIntegerValue)
                 {
                     throw semantic_error(format_string("line %d: Const enum pointing to non-integer Value object.",
-                                                       constVar->getLastLine())
-                                             .c_str());
+                                                       constVar->getLastLine()));
                 }
 
                 EnumType *constEnum = dynamic_cast<EnumType *>(constVarType);
@@ -635,9 +636,8 @@ void CGenerator::makeConstTemplateData()
                 if (value.compare("") == 0)
                 {
                     value = "(" + constVarType->getName() + ") " + constVarValue->toString();
-                    Log::warning(format_string("Enum value '%s' is not pointing to any '%s' variable \n",
-                                               constVarValue->toString().c_str(), constVarType->getName().c_str())
-                                     .c_str());
+                    Log::warning("Enum value '%s' is not pointing to any '%s' variable \n",
+                                 constVarValue->toString().c_str(), constVarType->getName().c_str());
                 }
             }
             else
@@ -1104,8 +1104,7 @@ data_map CGenerator::getStructDefinitionTemplateData(Group *group, StructType *s
         {
             throw syntax_error(
                 format_string("line %d: Struct member shall use byref option. Member is using forward declared type.",
-                              member->getFirstLine())
-                    .c_str());
+                              member->getFirstLine()));
         }
         // Handle nullable annotation
         bool isNullable =
@@ -1693,7 +1692,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
 
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
-    string protoCpp = getFunctionPrototype(group, fn, fn->getInterface()->getName() + "_client", "", true);
+    string protoCpp = getFunctionPrototype(group, fn, getOutputName(fn->getInterface()) + "_client", "", true);
     info["prototypeCpp"] = protoCpp;
     string protoInterface = getFunctionPrototype(group, fn, "", "", true);
     info["prototypeInterface"] = protoInterface;
@@ -2520,11 +2519,11 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             }
             else
             {
-                throw semantic_error(format_string("line %d: Function has function type parameter (callback "
-                                                   "parameter), but in IDL is missing function definition, which can "
-                                                   "be passed there.",
-                                                   structMember->getFirstLine())
-                                         .c_str());
+                throw semantic_error(
+                    format_string("line %d: Function has function type parameter (callback "
+                                  "parameter), but in IDL is missing function definition, which can "
+                                  "be passed there.",
+                                  structMember->getFirstLine()));
             }
             templateData["encode"] = m_templateData["encodeFunctionType"];
             templateData["decode"] = m_templateData["decodeFunctionType"];

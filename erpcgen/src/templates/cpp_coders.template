@@ -5,7 +5,7 @@
     char * {$info.stringLocalName}_local;
     codec->readString({$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if info.stringAllocSize != info.stringLocalName & "_len" %}
-    if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
+    if (({$info.stringAllocSize} >= 0) && ({$info.stringLocalName}_len <= static_cast<uint32_t>({$info.stringAllocSize})))
     {
 {%   set indent = "    " >%}
 {% else %}
@@ -261,7 +261,8 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
     uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
 
 {% if info.stringAllocSize != info.stringLocalName & "_len"  %}
-    erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
+    erpc_assert({$info.stringAllocSize} >= 0);
+    erpc_assert({$info.stringLocalName}_len <= static_cast<uint32_t>({$info.stringAllocSize}));
 
 {% endif %}
     codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});

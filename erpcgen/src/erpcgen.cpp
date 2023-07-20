@@ -98,19 +98,19 @@ protected:
     {
         kCLanguage,
         kPythonLanguage,
-    }; /*!< Generated outputs format. */
+    };                                      /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
 
-    int m_argc;                           /*!< Number of command line arguments. */
-    char **m_argv;                        /*!< String value for each command line argument. */
-    StdoutLogger *m_logger;               /*!< Singleton logger instance. */
-    verbose_type_t m_verboseType;         /*!< Which type of log is need to set (warning, info, debug). */
-    const char *m_outputFilePath;         /*!< Path to the output file. */
-    const char *m_ErpcFile;               /*!< ERPC file. */
-    string_vector_t m_positionalArgs;     /*!< Positional arguments. */
-    languages_t m_outputLanguage;         /*!< Output language we're generating. */
-    InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
+    int m_argc;                             /*!< Number of command line arguments. */
+    char **m_argv;                          /*!< String value for each command line argument. */
+    StdoutLogger *m_logger;                 /*!< Singleton logger instance. */
+    verbose_type_t m_verboseType;           /*!< Which type of log is need to set (warning, info, debug). */
+    const char *m_outputFilePath;           /*!< Path to the output file. */
+    const char *m_ErpcFile;                 /*!< ERPC file. */
+    string_vector_t m_positionalArgs;       /*!< Positional arguments. */
+    languages_t m_outputLanguage;           /*!< Output language we're generating. */
+    InterfaceDefinition::codec_t m_codec;   /*!< Used codec type. */
 
 public:
     /*!
@@ -205,7 +205,7 @@ public:
                     }
                     else
                     {
-                        Log::error(format_string("error: unknown language %s", lang.c_str()).c_str());
+                        Log::error("error: unknown language %s", lang.c_str());
                         return 1;
                     }
                     break;
@@ -219,7 +219,7 @@ public:
                     }
                     else
                     {
-                        Log::error(format_string("error: unknown codec type %s", codec.c_str()).c_str());
+                        Log::error("error: unknown codec type %s", codec.c_str());
                         return 1;
                     }
                     break;

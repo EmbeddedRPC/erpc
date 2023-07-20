@@ -11,7 +11,7 @@ idl: |
     bar({dir} string a @nullable @max_length(8)) -> void
   }
 test_client.cpp:
-  - re: void bar\(\w*\s*char \* a\)
+  - re: void foo_client::bar\(\w*\s*char \* a\)
   - if (a == NULL)
   - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
@@ -58,7 +58,7 @@ idl: |
     bar({dir} ustring a @nullable @max_length(8)) -> void
   }
 test_client.cpp:
-  - re: void bar\(\w*\s*unsigned\s*char\s*\* a\)
+  - re: void foo_client::bar\(\w*\s*unsigned\s*char\s*\* a\)
   - if (a == NULL)
   - codec->writeNullFlag(true)
   - if: dir in ('in', 'inout')
@@ -113,11 +113,12 @@ idl: |
   interface foo {
     bar(Vector v @nullable) -> void
   }
-test.h:
+test_common.h:
   - '{type[1]} v[3]'
+c_test_client.h:
   - void bar(const Vector * v);
 test_client.cpp:
-  - re: void bar\(const Vector \* v\)
+  - re: void foo_client::bar\(const Vector \* v\)
   - if (v == NULL)
   - writeNullFlag(true)
   - "{"
@@ -152,7 +153,7 @@ test_client.cpp:
   - writeNullFlag(false)
   - write_list_bool_1_t_struct
   - '}'
-  - void bar(const erpc_pair * s)
+  - void foo_client::bar(const erpc_pair * s)
   - write_erpc_pair_struct
 test_server.cpp:
   - void read_erpc_pair_struct
@@ -182,7 +183,7 @@ test_client.cpp:
   - writeNullFlag(false)
   - write_binary_t_struct
   - '}'
-  - void bar(const erpc_pair * s)
+  - void foo_client::bar(const erpc_pair * s)
   - write_erpc_pair_struct
 test_server.cpp:
   - void read_erpc_pair_struct
@@ -339,9 +340,9 @@ idl: |
 test_client.cpp:
   - if: dir == 'inout'
     then:
-      - void bar(const bool * l, uint32_t * c)
+      - void foo_client::bar(const bool * l, uint32_t * c)
     else:
-      - void bar(const bool * l, uint32_t c)
+      - void foo_client::bar(const bool * l, uint32_t c)
   - if: dir == 'inout' and ann == '@nullable'
     then:
       - if ((l == NULL) || (c == NULL))
@@ -404,7 +405,7 @@ idl: |
   }
 
 test_client.cpp:
-  - void bar(bool * l, uint32_t * c)
+  - void foo_client::bar(bool * l, uint32_t * c)
   - if: ann == '@nullable'
     then:
       - if ((l == NULL) || (c == NULL))

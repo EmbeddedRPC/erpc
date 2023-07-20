@@ -13,6 +13,9 @@ using namespace std;
 {$usingNamespace() >}
 
 {% for iface in group.interfaces -- service subclass method impl %}
+{$iface.interfaceClassName}::~{$iface.interfaceClassName}(void)
+{
+}
 {%  for cb in iface.callbacksInt %}
 {$iface.interfaceClassName}::{$cb.name} {$iface.interfaceClassName}::_{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in cb.callbacks %}&{$iface.interfaceClassName}::{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
 {%  endfor %}

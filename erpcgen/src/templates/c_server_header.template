@@ -7,8 +7,7 @@
 #if !defined({$serverCGuardMacro})
 #define {$serverCGuardMacro}
 
-#include "{$commonStandardCHeaderName}"
-#include "{$commonErpcCHeaderName}"
+#include "{$commonCHeaderName}"
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 {%   for externalInterface in fn.externalInterfaces %}
@@ -21,7 +20,7 @@
 {%  endfor -- fn %}
 {% endfor -- iface %}
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 extern "C"
 {
 #endif
@@ -69,7 +68,7 @@ void destroy_{$iface.serviceClassName}(erpc_service_t service);
 
 {% endfor -- iface %}
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 }
 #endif
 

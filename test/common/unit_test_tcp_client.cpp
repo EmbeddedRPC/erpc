@@ -48,7 +48,7 @@ ClientManager *g_client;
 
 Crc16 g_crc16;
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set up global fixture

@@ -17,7 +17,7 @@
 #include <string.h>
 
 using namespace erpc;
-using namespace erpcshim;
+using namespace erpcShim;
 
 BuiltinServices_service *svc;
 

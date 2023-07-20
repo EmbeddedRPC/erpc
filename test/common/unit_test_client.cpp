@@ -84,7 +84,7 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 #if defined(RPMSG)
 #define APP_ERPC_READY_EVENT_DATA (1)

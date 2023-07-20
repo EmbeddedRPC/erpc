@@ -45,7 +45,7 @@ UNIT_OUT_DIR = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/
 ERPC_NAME ?= test
 ERPC_NAME_APP ?= $(ERPC_NAME)
 
-TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/gcc/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
+TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/$(CC)/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
 RPC_OBJS_ROOT = $(TEST_DIR)
 TARGET_OUTPUT_ROOT = $(RPC_OBJS_ROOT)
 
@@ -81,6 +81,8 @@ ifeq (,$(filter $(TEST_NAME),test_arbitrator test_callbacks))
 
     SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
                 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_interface.cpp \
+                $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_interface.cpp \
                 $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
                 $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
                 $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
@@ -93,7 +95,7 @@ all: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAM
 # Define dependency.
 $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp
-$(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
+$(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_interface.cpp $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_interface.cpp $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
 
 # Run erpcgen for C.
 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(IDL_FILE)

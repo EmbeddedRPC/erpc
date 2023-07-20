@@ -7,8 +7,7 @@
 #if !defined({$clientCGuardMacro})
 #define {$clientCGuardMacro}
 
-#include "{$commonStandardCHeaderName}"
-#include "{$commonErpcCHeaderName}"
+#include "{$commonCHeaderName}"
 #include "erpc_client_manager.h"
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
@@ -22,7 +21,7 @@
 {%  endfor -- fn %}
 {% endfor -- iface %}
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 extern "C"
 {
 #endif
@@ -64,7 +63,7 @@ void init{$iface.clientClassName}(erpc_client_t client);
 void deinit{$iface.clientClassName}(void);
 
 {% endfor -- iface %}
-#ifdef __cplusplus
+#if defined(__cplusplus)
 }
 #endif
 

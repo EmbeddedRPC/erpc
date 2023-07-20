@@ -39,7 +39,7 @@ int main(int argc, const char *argv[]);
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 erpc_service_t service_common = NULL;
 erpc_server_t server;
 
@@ -151,7 +151,7 @@ void quit()
 
 int32_t getServerAllocated()
 {
-    int result = MyAlloc::allocated();
-    MyAlloc::allocated(0);
+    int result = ::MyAlloc::allocated();
+    ::MyAlloc::allocated(0);
     return result;
 }

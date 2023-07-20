@@ -45,8 +45,7 @@ void SymbolScanner::handleRoot(AstNode *node, bottom_up)
             forwardTypes += format_string("type name %s: line %d", it->first.c_str(), it->second->getFirstLine());
         }
         throw syntax_error(format_string("Missing type definitions for one or more forward type declarations: %s",
-                                         forwardTypes.c_str())
-                               .c_str());
+                                         forwardTypes.c_str()));
     }
 }
 
@@ -643,9 +642,8 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
     AstNode *structNameNode = (*node)[0];
     if (!structNameNode && m_currentAlias == nullptr)
     {
-        throw semantic_error(
-            format_string("line %d: illegal anonymous struct definition at file level", node->getToken().getFirstLine())
-                .c_str());
+        throw semantic_error(format_string("line %d: illegal anonymous struct definition at file level",
+                                           node->getToken().getFirstLine()));
     }
 
     // Create the struct symbol.
@@ -667,10 +665,10 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
             }
             else
             {
-                throw syntax_error(format_string("line %d: Structure definition type name didn't match data type of "
-                                                 "forward declaration from line %d.",
-                                                 tok.getFirstLine(), forwardDecl->second->getFirstLine())
-                                       .c_str());
+                throw syntax_error(
+                    format_string("line %d: Structure definition type name didn't match data type of "
+                                  "forward declaration from line %d.",
+                                  tok.getFirstLine(), forwardDecl->second->getFirstLine()));
             }
         }
         else
@@ -823,10 +821,10 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
             }
             else
             {
-                throw syntax_error(format_string("line %d: Union definition type name didn't match data type of "
-                                                 "forward declaration from line %d.",
-                                                 tok->getFirstLine(), forwardDecl->second->getFirstLine())
-                                       .c_str());
+                throw syntax_error(
+                    format_string("line %d: Union definition type name didn't match data type of "
+                                  "forward declaration from line %d.",
+                                  tok->getFirstLine(), forwardDecl->second->getFirstLine()));
             }
         }
         else
@@ -1059,8 +1057,8 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
                         {
                             throw syntax_error(
                                 format_string("line %d, Callback name %s doesn't exists in interface %s.\n",
-                                              funcType->getLocation().m_firstLine, funcType->getName(),
-                                              funcType->getInterface()->getName()));
+                                              funcType->getLocation().m_firstLine, funcType->getName().c_str(),
+                                              funcType->getInterface()->getName().c_str()));
                         }
                     }
                 }
@@ -1255,10 +1253,10 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
             {
                 if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
                 {
-                    throw syntax_error(format_string("line %d: Function definition contains more parameters than "
-                                                     "function type definition from %d.\n",
-                                                     fun->getFirstLine(), funType->getFirstLine())
-                                           .c_str());
+                    throw syntax_error(
+                        format_string("line %d: Function definition contains more parameters than "
+                                      "function type definition from %d.\n",
+                                      fun->getFirstLine(), funType->getFirstLine()));
                 }
                 else
                 {
@@ -1326,7 +1324,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
                     if (dataType == nullptr)
                     {
                         throw syntax_error(format_string("line %d: Callback name %s doesn't exists.\n",
-                                                         type->getToken().getFirstLine(), functionTypeName));
+                                                         type->getToken().getFirstLine(), functionTypeName.c_str()));
                     }
                     break;
                 }
@@ -1662,8 +1660,7 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
-                                           annotation->getToken().getFirstLine(), lang.c_str())
-                                 .c_str());
+                                           annotation->getToken().getFirstLine(), lang.c_str()));
     }
 
     return Annotation::kAll;
@@ -1840,8 +1837,7 @@ void SymbolScanner::addForwardDeclaration(DataType *dataType)
     {
         throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                            dataType->getFirstLine(), dataType->getName().c_str(),
-                                           symbol->getFirstLine())
-                                 .c_str());
+                                           symbol->getFirstLine()));
     }
 
     auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
@@ -1851,8 +1847,7 @@ void SymbolScanner::addForwardDeclaration(DataType *dataType)
         {
             throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                                dataType->getFirstLine(), dataType->getName().c_str(),
-                                               findDataTypeIT->second->getFirstLine())
-                                     .c_str());
+                                               findDataTypeIT->second->getFirstLine()));
         }
         else
         {
@@ -1871,8 +1866,7 @@ void SymbolScanner::removeForwardDeclaration(DataType *dataType)
         {
             throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                                dataType->getFirstLine(), dataType->getName().c_str(),
-                                               findDataTypeIT->second->getFirstLine())
-                                     .c_str());
+                                               findDataTypeIT->second->getFirstLine()));
         }
         m_forwardDeclarations.erase(findDataTypeIT);
     }
@@ -1885,8 +1879,7 @@ void SymbolScanner::addGlobalSymbol(Symbol *symbol)
     {
         throw semantic_error(format_string("line %d: Declaring symbol '%s' already declared here '%d'",
                                            symbol->getFirstLine(), symbol->getName().c_str(),
-                                           findDataTypeIT->second->getFirstLine())
-                                 .c_str());
+                                           findDataTypeIT->second->getFirstLine()));
     }
     m_globals->addSymbol(symbol);
 }

@@ -31,22 +31,27 @@ idl: |
     oneway functionName2(S a @name(m))
   }
 
-test.h:
+test_common.h:
   - enum EnumName
   - D
   - struct StructName StructName
   - StructName type
   - struct StructName
   - int32_t d
+
+c_test_client.h:
   - function(const StructName * m)
 
 test_client.cpp:
   - write_StructName_struct
   - write_StructName_struct
   - data->d
-  - void function(const StructName * m)
+  - void I_client::function(const StructName * m)
   - write_StructName_struct(codec, m)
-  - void functionName2(const StructName * m)
+  - void I_client::functionName2(const StructName * m)
+
+c_test_server.h:
+  - function(const StructName * m)
 
 test_server.cpp:
   - read_StructName_struct
@@ -58,5 +63,7 @@ test_server.cpp:
   - function(m);
   - erpc_free(m);
   - functionName2(m);
+
+c_test_server.cpp:
+  - ERPC_MANUALLY_CONSTRUCTED_STATIC(I_service, s_I_service);
   - create_I_service
-  - s_I_service

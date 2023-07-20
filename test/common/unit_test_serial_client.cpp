@@ -43,7 +43,7 @@ MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 ClientManager *g_client;
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set up global fixture

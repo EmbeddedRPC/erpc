@@ -23,9 +23,9 @@
 class {$iface.serviceClassName} : public erpc::Service
 {
 public:
-    {$iface.serviceClassName}({$iface.interfaceClassName} *_{$iface.interfaceClassName})
-    : m_handler(_{$iface.interfaceClassName})
-    , erpc::Service({$iface.interfaceClassName}::m_serviceId) {}
+    {$iface.serviceClassName}({$iface.interfaceClassName} *_{$iface.interfaceClassName});
+
+    virtual ~{$iface.serviceClassName}();
 
     /*! @brief return service interface handler. */
     {$iface.interfaceClassName}* getHandler(void);

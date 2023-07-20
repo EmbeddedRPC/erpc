@@ -21,11 +21,6 @@ using namespace erpc;
 using namespace std;
 {$usingNamespace() >}
 {% for iface in group.interfaces %}
-
-ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
-ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serverClassName}, s_{$iface.serverClassName});
-{% endfor -- iface %}
-{% for iface in group.interfaces %}
 {%  if count(iface.callbacksAll) > 0 %}
 
 {%   for cb in iface.callbacksAll %}
@@ -38,6 +33,8 @@ static const {$cb.name} _{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in c
 class {$iface.serverClassName}: public {$iface.interfaceClassName}
 {
     public:
+        virtual ~{$iface.serverClassName}() {};
+
 {%  for fn in iface.functions %}
 
         {$fn.prototypeInterface}
@@ -76,6 +73,9 @@ class {$iface.serverClassName}: public {$iface.interfaceClassName}
         }
 {%  endfor -- fn %}
 };
+
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serverClassName}, s_{$iface.serverClassName});
 
 erpc_service_t create_{$iface.serviceClassName}(void)
 {

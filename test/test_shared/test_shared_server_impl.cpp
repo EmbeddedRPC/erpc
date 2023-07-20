@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
-using namespace erpcshim;
+using namespace erpcShim;
 
 SharedService_service *svc;
 

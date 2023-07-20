@@ -196,6 +196,16 @@ static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfa
 {% endfor %}
 {% for iface in group.interfaces -- service subclass method impl %}
 
+{$iface.serviceClassName}::{$iface.serviceClassName}({$iface.interfaceClassName} *_{$iface.interfaceClassName})
+    : erpc::Service({$iface.interfaceClassName}::m_serviceId)
+    , m_handler(_{$iface.interfaceClassName})
+{
+}
+
+{$iface.serviceClassName}::~{$iface.serviceClassName}()
+{
+}
+
 // return service interface handler.
 {$iface.interfaceClassName}* {$iface.serviceClassName}::getHandler(void)
 {
