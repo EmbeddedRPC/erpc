@@ -1,0 +1,48 @@
+{% if mlComment != ""%}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$serverCppGuardMacro})
+#define {$serverCppGuardMacro}
+
+#include "{$interfaceCppHeaderName}"
+
+#include "erpc_server.h"
+#include "{$codecHeader}"
+
+{$checkVersion()}
+{$>checkCrc()}
+
+namespace erpc {
+{% for iface in group.interfaces %}
+
+/*!
+ * @brief Service subclass for {$iface.name}.
+ */
+class {$iface.serviceClassName} : public Service
+{
+public:
+    {$iface.serviceClassName}({$iface.interfaceClassName} *_{$iface.interfaceClassName})
+    : m_handler(_{$iface.interfaceClassName})
+    , Service({$iface.interfaceClassName}::m_serviceId) {}
+
+    /*! @brief return service interface handler. */
+    {$iface.interfaceClassName}* getHandler(void);
+
+    /*! @brief Call the correct server shim based on method unique ID. */
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory);
+
+private:
+    {$iface.interfaceClassName} *m_handler;
+{%  for fn in iface.functions %}
+    /*! @brief Server shim for {$fn.name} of {$iface.name} interface. */
+    erpc_status_t {$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);{$loop.addNewLineIfNotLast}
+{%  endfor -- fn %}
+};
+{% endfor -- iface %}
+
+} // namespace erpc
+
+#endif // {$serverCppGuardMacro}

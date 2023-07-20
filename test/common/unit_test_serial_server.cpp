@@ -12,7 +12,8 @@
 
 #include "Logging.hpp"
 #include "myAlloc.hpp"
-#include "test_unit_test_common_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 
 #include <stdlib.h>

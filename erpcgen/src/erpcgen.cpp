@@ -66,7 +66,6 @@ const char k_usageText[] =
 \n\
 Available languages (use with -g option):\n\
   c    C/C++\n\
-  cpp  C++\n\
   py   Python\n\
 \n\
 Available codecs (use with --c option):\n\
@@ -98,7 +97,6 @@ protected:
     enum languages_t
     {
         kCLanguage,
-        kCppLanguage,
         kPythonLanguage,
     }; /*!< Generated outputs format. */
 
@@ -200,10 +198,6 @@ public:
                     if (lang == "c")
                     {
                         m_outputLanguage = kCLanguage;
-                    }
-                    else if (lang == "cpp")
-                    {
-                        m_outputLanguage = kCppLanguage;
                     }
                     else if (lang == "py")
                     {
@@ -320,9 +314,6 @@ public:
             {
                 case kCLanguage:
                     CGenerator(&def).generate();
-                case kCppLanguage:
-                    CGenerator(&def).generateCpp();
-                    break;
                 case kPythonLanguage:
                     PythonGenerator(&def).generate();
                     break;

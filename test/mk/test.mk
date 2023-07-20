@@ -81,6 +81,8 @@ ifneq "$(TEST_NAME)" "test_arbitrator"
 
     SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
                 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
                 $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
                 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
@@ -91,7 +93,7 @@ all: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAM
 # Define dependency.
 $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp
-$(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
+$(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
 
 # Run erpcgen for C.
 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(IDL_FILE)

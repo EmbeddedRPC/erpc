@@ -842,7 +842,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type comme
 {
     (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
-    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
+    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", "/*", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
 
     string result = stripWhitespace(comment);
@@ -870,7 +870,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type comme
     // Check if we failed to find a matching comment begin.
     if (kCommentBegins[i] == 0)
     {
-        throw internal_error("unable to convert Doxygen comment");
+        throw internal_error("Unable to convert Doxygen comment in:" + result);
     }
 
     // Search for a matching comment end to strip. There may not be a comment end.

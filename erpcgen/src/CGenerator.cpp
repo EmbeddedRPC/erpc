@@ -31,13 +31,17 @@ static const char *const kIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHI
 
 // Templates strings converted from text files by txt_to_c.py.
 extern const char *const kCCommonHeader;
-extern const char *const kCInterfaceHeader;
+extern const char *const kCppInterfaceHeader;
+extern const char *const kCppClientHeader;
+extern const char *const kCppClientSource;
+extern const char *const kCppServerHeader;
+extern const char *const kCppServerSource;
+extern const char *const kCppCoders;
+extern const char *const kCppCommonFunctions;
 extern const char *const kCClientHeader;
 extern const char *const kCClientSource;
 extern const char *const kCServerHeader;
 extern const char *const kCServerSource;
-extern const char *const kCCoders;
-extern const char *const kCCommonFunctions;
 extern const char *const kCCrc;
 
 // number which makes list temporary variables unique.
@@ -48,7 +52,6 @@ static uint8_t listCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 CGenerator::CGenerator(InterfaceDefinition *def)
 : Generator(def, kC)
-, m_generateC(true)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -71,77 +74,113 @@ CGenerator::CGenerator(InterfaceDefinition *def)
     initCReservedWords();
 }
 
-void CGenerator::generateCpp(void)
-{
-    m_generateC=false;
-    this->generate();
-}
-
 void CGenerator::generateOutputFiles(const string &fileName)
 {
-    generateCommonHeaderFiles(fileName);
+    generateCommonCHeaderFiles(fileName);
 
-    generateInterfaceHeaderFile(fileName);
+    generateInterfaceCppHeaderFile(fileName);
 
-    generateClientHeaderFile(fileName);
-    generateClientSourceFile(fileName);
+    generateClientCppHeaderFile(fileName);
+    generateClientCppSourceFile(fileName);
 
-    generateServerHeaderFile(fileName);
-    generateServerSourceFile(fileName);
+    generateServerCppHeaderFile(fileName);
+    generateServerCppSourceFile(fileName);
+
+    generateClientCHeaderFile(fileName);
+    generateClientCSourceFile(fileName);
+
+    generateServerCHeaderFile(fileName);
+    generateServerCSourceFile(fileName);
 }
 
-void CGenerator::generateCommonHeaderFiles(string fileName)
+void CGenerator::generateCommonCHeaderFiles(string fileName)
 {
     fileName += "_common.h";
-    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonHeaderName"] = fileName;
+    m_templateData["commonCGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonCHeaderName"] = fileName;
     generateOutputFile(fileName , "c_common_header", m_templateData, kCCommonHeader);
 }
 
-void CGenerator::generateInterfaceHeaderFile(string fileName)
+void CGenerator::generateInterfaceCppHeaderFile(string fileName)
 {
-    fileName += "_interface.h";
-    m_templateData["interfaceGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["interfaceHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_interface_header", m_templateData, kCInterfaceHeader);
+    fileName += "_interface.hpp";
+    m_templateData["interfaceCppGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["interfaceCppHeaderName"] = fileName;
+    generateOutputFile(fileName, "cpp_interface_header", m_templateData, kCppInterfaceHeader);
 }
 
-void CGenerator::generateClientHeaderFile(string fileName)
+void CGenerator::generateClientCppHeaderFile(string fileName)
 {
-    fileName += "_client.h";
-    m_templateData["clientGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["clientHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_client_header", m_templateData, kCClientHeader);
+    fileName += "_client.hpp";
+    m_templateData["clientCppGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["clientCppHeaderName"] = fileName;
+    generateOutputFile(fileName, "cpp_client_header", m_templateData, kCppClientHeader);
 }
 
-void CGenerator::generateClientSourceFile(string fileName)
+void CGenerator::generateClientCppSourceFile(string fileName)
 {
-    m_templateData["source"] = "client";
     fileName += "_client.cpp";
-    m_templateData["clientSourceName"] = fileName;
+    m_templateData["clientCppSourceName"] = fileName;
 
     // TODO: temporary workaround for tests
     m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_client.cpp") == 0 ? false : true);
 
-    generateOutputFile(fileName, "c_client_source", m_templateData, kCClientSource);
+    generateOutputFile(fileName, "cpp_client_source", m_templateData, kCppClientSource);
 }
 
-void CGenerator::generateServerHeaderFile(string fileName)
+void CGenerator::generateServerCppHeaderFile(string fileName)
 {
-    fileName += "_server.h";
-    m_templateData["serverGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["serverHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_server_header", m_templateData, kCServerHeader);
+    fileName += "_server.hpp";
+    m_templateData["serverCppGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["serverCppHeaderName"] = fileName;
+    generateOutputFile(fileName, "cpp_server_header", m_templateData, kCppServerHeader);
 }
 
-void CGenerator::generateServerSourceFile(string fileName)
+void CGenerator::generateServerCppSourceFile(string fileName)
 {
-    m_templateData["source"] = "server";
     fileName += "_server.cpp";
-    m_templateData["serverSourceName"] = fileName;
+    m_templateData["serverCppSourceName"] = fileName;
 
     // TODO: temporary workaround for tests
     m_templateData["unitTest"] = (fileName.compare("test_unit_test_common_server.cpp") == 0 ? false : true);
+
+    generateOutputFile(fileName, "cpp_server_source", m_templateData, kCppServerSource);
+}
+
+void CGenerator::generateClientCHeaderFile(string fileName)
+{
+    fileName ="c_"+fileName+ "_client.h";
+    m_templateData["clientCGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["clientCHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_client_header", m_templateData, kCClientHeader);
+}
+
+void CGenerator::generateClientCSourceFile(string fileName)
+{
+    fileName ="c_"+fileName+ "_client.cpp";
+    m_templateData["clientCSourceName"] = fileName;
+
+    // TODO: temporary workaround for tests
+    m_templateData["unitTest"] = (fileName.compare("c_test_unit_test_common_client.cpp") == 0 ? false : true);
+
+    generateOutputFile(fileName, "c_client_source", m_templateData, kCClientSource);
+}
+
+void CGenerator::generateServerCHeaderFile(string fileName)
+{
+    fileName ="c_"+fileName+ "_server.h";
+    m_templateData["serverCGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["serverCHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_server_header", m_templateData, kCServerHeader);
+}
+
+void CGenerator::generateServerCSourceFile(string fileName)
+{
+    fileName ="c_"+fileName+ "_server.cpp";
+    m_templateData["serverCSourceName"] = fileName;
+
+    // TODO: temporary workaround for tests
+    m_templateData["unitTest"] = (fileName.compare("c_test_unit_test_common_server.cpp") == 0 ? false : true);
 
     generateOutputFile(fileName, "c_server_source", m_templateData, kCServerSource);
 }
@@ -156,12 +195,12 @@ void CGenerator::generateCrcFile()
 
 void CGenerator::parseSubtemplates()
 {
-    string templateName = "c_coders";
+    string templateName = "cpp_coders";
     try
     {
-        parse(kCCoders, m_templateData);
-        templateName = "c_common_functions";
-        parse(kCCommonFunctions, m_templateData);
+        parse(kCppCoders, m_templateData);
+        templateName = "cpp_common_functions";
+        parse(kCppCommonFunctions, m_templateData);
     }
     catch (TemplateException &e)
     {
@@ -1923,8 +1962,9 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
     string proto = "";
     if (!fn->getReturnType()->isVoid() && prefix.length()>0)
     {
-        proto += "result = "+prefix;
+        proto += "result = ";
     }
+    proto += prefix;
     proto += getOutputName(fn);
     proto += "(";
 

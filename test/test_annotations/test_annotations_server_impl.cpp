@@ -8,8 +8,10 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "test_server.hpp"
+#include "c_test_unit_test_common_server.h"
+#include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 

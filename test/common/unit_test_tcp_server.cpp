@@ -12,7 +12,8 @@
 
 #include "Logging.hpp"
 #include "myAlloc.hpp"
-#include "test_unit_test_common_server.h"
+#include "test_unit_test_common_server.hpp"
+#include "c_test_unit_test_common_server.h"
 #include "unit_test.h"
 
 using namespace erpc;

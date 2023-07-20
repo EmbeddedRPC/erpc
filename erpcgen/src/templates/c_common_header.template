@@ -4,8 +4,8 @@
 {% endif %}
 {$commonHeader()}
 
-#if !defined({$commonGuardMacro})
-#define {$commonGuardMacro}
+#if !defined({$commonCGuardMacro})
+#define {$commonCGuardMacro}
 {% if usedUnionType %}
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
@@ -107,4 +107,4 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 }
 #endif // __cplusplus
 
-#endif // {$commonGuardMacro}
+#endif // {$commonCGuardMacro}

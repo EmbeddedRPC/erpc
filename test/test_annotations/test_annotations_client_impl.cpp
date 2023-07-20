@@ -8,7 +8,7 @@
 
 #include "gtest.h"
 #include "unit_test_wrapped.h"
-#include "test_client.h"
+#include "c_test_client.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

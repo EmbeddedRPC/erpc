@@ -50,13 +50,6 @@ public:
      */
     virtual void generate() override;
 
-    /*!
-     * @brief This function generate set flag to generate C++ code only.
-     *
-     * This code call all necessary functions to prepare C++ output code and parse it into output files.
-     */
-    void generateCpp(void);
-
 private:
     enum _direction
     {
@@ -65,8 +58,6 @@ private:
         kInOut,
         kNone
     };
-
-    bool m_generateC;                      /*!< When true additional C code is generated. Otherwise only Cpp. */
 
     cpptempl::data_list m_symbolsTemplate; /*!< List of all symbol templates */
 
@@ -105,42 +96,77 @@ private:
      *
      * @param[in] fileName Name for output client source file.
      */
-    void generateCommonHeaderFiles(std::string fileName);
+    void generateCommonCHeaderFiles(std::string fileName);
 
     /*!
      * @brief This function generate output interface header file.
      *
      * @param[in] fileName Name for output interface header file.
      */
-    void generateInterfaceHeaderFile(std::string fileName);
+    void generateInterfaceCppHeaderFile(std::string fileName);
 
     /*!
      * @brief This function generate output client header file.
      *
      * @param[in] fileName Name for output client header file.
      */
-    void generateClientHeaderFile(std::string fileName);
+    void generateClientCppHeaderFile(std::string fileName);
 
     /*!
      * @brief This function generate output client source file.
      *
      * @param[in] fileName Name for output client source file.
      */
-    void generateClientSourceFile(std::string fileName);
+    void generateClientCppSourceFile(std::string fileName);
 
     /*!
      * @brief This function generate output server header file.
      *
      * @param[in] fileName Name for output server header file.
      */
-    void generateServerHeaderFile(std::string fileName);
+    void generateServerCppHeaderFile(std::string fileName);
 
     /*!
      * @brief This function generate output server source file.
      *
      * @param[in] fileName Name for output server source file.
      */
-    void generateServerSourceFile(std::string fileName);
+    void generateServerCppSourceFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output interface header file.
+     *
+     * @param[in] fileName Name for output interface header file.
+     */
+    void generateInterfaceCHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client header file.
+     *
+     * @param[in] fileName Name for output client header file.
+     */
+    void generateClientCHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client source file.
+     *
+     * @param[in] fileName Name for output client source file.
+     */
+    void generateClientCSourceFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output server header file.
+     *
+     * @param[in] fileName Name for output server header file.
+     */
+    void generateServerCHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output server source file.
+     *
+     * @param[in] fileName Name for output server source file.
+     */
+    void generateServerCSourceFile(std::string fileName);
 
     /*!
      * @brief This function generate output crc16 source file.
