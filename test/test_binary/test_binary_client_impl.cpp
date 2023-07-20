@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "gtest.h"
 #include "c_test_client.h"
+#include "gtest.h"
 #include "unit_test_wrapped.h"
 
 using namespace std;

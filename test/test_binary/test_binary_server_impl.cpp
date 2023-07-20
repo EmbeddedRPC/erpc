@@ -73,24 +73,20 @@ void test_binary_allDirectionLength(const uint8_t *a, const binary_t *b, binary_
     free((void *)a);
     free((void *)b);
 }*/
-class Binary_server: public Binary_interface
+class Binary_server : public Binary_interface
 {
-    public:
+public:
+    void sendBinary(const binary_t *a) { ::sendBinary(a); }
 
-        void sendBinary(const binary_t * a)
-        {
-            ::sendBinary(a);
-        }
+    void test_binary_allDirection(const binary_t *a, const binary_t *b, binary_t *e)
+    {
+        ::test_binary_allDirection(a, b, e);
+    }
 
-        void test_binary_allDirection(const binary_t * a, const binary_t * b, binary_t * e)
-        {
-            ::test_binary_allDirection(a, b, e);
-        }
-
-        void test_binary_allDirectionLength(const uint8_t * a, const binary_t * b, binary_t * d, uint32_t p1)
-        {
-            ::test_binary_allDirectionLength(a, b, d, p1);
-        }
+    void test_binary_allDirectionLength(const uint8_t *a, const binary_t *b, binary_t *d, uint32_t p1)
+    {
+        ::test_binary_allDirectionLength(a, b, d, p1);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

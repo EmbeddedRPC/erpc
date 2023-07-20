@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -79,61 +79,48 @@ enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, 
     return a;
 }
 
-class EnumsService_server: public EnumsService_interface
+class EnumsService_server : public EnumsService_interface
 {
-    public:
+public:
+    void test_enumColor_in(enumColor a) { ::test_enumColor_in(a); }
 
-        void test_enumColor_in(enumColor a)
-        {
-            ::test_enumColor_in(a);
-        }
+    void test_enumColor_in2(enumColor b) { ::test_enumColor_in2(b); }
 
-        void test_enumColor_in2(enumColor b)
-        {
-            ::test_enumColor_in2(b);
-        }
+    void test_enumColor_out(enumColor *c) { ::test_enumColor_out(c); }
 
-        void test_enumColor_out(enumColor * c)
-        {
-            ::test_enumColor_out(c);
-        }
+    void test_enumColor_inout(enumColor *e) { ::test_enumColor_inout(e); }
 
-        void test_enumColor_inout(enumColor * e)
-        {
-            ::test_enumColor_inout(e);
-        }
+    enumColor test_enumColor_return(void)
+    {
+        enumColor result;
+        result = ::test_enumColor_return();
 
-        enumColor test_enumColor_return(void)
-        {
-            enumColor result;
-            result = ::test_enumColor_return();
+        return result;
+    }
 
-            return result;
-        }
+    enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor *c, enumColor *e)
+    {
+        enumColor result;
+        result = ::test_enumColor_allDirection(a, b, c, e);
 
-        enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor * c, enumColor * e)
-        {
-            enumColor result;
-            result = ::test_enumColor_allDirection(a, b, c, e);
+        return result;
+    }
 
-            return result;
-        }
+    enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 *c, enumColor2 *e)
+    {
+        enumColor2 result;
+        result = ::test_enumColor2_allDirection(a, b, c, e);
 
-        enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 * c, enumColor2 * e)
-        {
-            enumColor2 result;
-            result = ::test_enumColor2_allDirection(a, b, c, e);
+        return result;
+    }
 
-            return result;
-        }
+    enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, enumErrorCode *c, enumErrorCode *e)
+    {
+        enumErrorCode result;
+        result = ::test_enumErrorCode_allDirection(a, b, c, e);
 
-        enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, enumErrorCode * c, enumErrorCode * e)
-        {
-            enumErrorCode result;
-            result = ::test_enumErrorCode_allDirection(a, b, c, e);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

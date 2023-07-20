@@ -146,8 +146,6 @@ void PythonGenerator::generate()
 
     makeEnumsTemplateData();
 
-    makeFunctionsTemplateData();
-
     for (Group *group : m_groups)
     {
         data_map groupTemplate;
@@ -169,7 +167,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
     symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
 }
 
-data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, Interface *interface)
+data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
     (void)group;
     data_map info;
@@ -267,7 +265,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, In
 }
 
 string PythonGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const string &interfaceName,
-                                             const string &name, bool interfaceClass)
+                                             const string &name, bool insideInterfaceCall)
 {
     FunctionType *functionType = dynamic_cast<FunctionType *>(fn);
     if (functionType)
@@ -580,32 +578,6 @@ void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, data_
     member_info["discriminator"] = getAnnStringValue(member, DISCRIMINATOR_ANNOTATION);
 
     setTemplateComments(member, member_info);
-}
-
-void PythonGenerator::makeFunctionsTemplateData()
-{
-    /* type definitions of functions and table of functions */
-    Log::info("Functions:\n");
-    data_list functions;
-    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
-    {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        data_map functionInfo;
-
-        /* Table template data. */
-        data_list callbacks;
-        for (Function *fun : functionType->getCallbackFuns())
-        {
-            data_map callbacksInfo;
-            callbacksInfo["name"] = fun->getName();
-            callbacks.push_back(callbacksInfo);
-        }
-        functionInfo["callbacks"] = callbacks;
-        /* Function type name. */
-        functionInfo["name"] = functionType->getName();
-        functions.push_back(functionInfo);
-    }
-    m_templateData["functions"] = functions;
 }
 
 data_map PythonGenerator::getTypeInfo(DataType *t)

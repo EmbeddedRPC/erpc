@@ -314,6 +314,7 @@ public:
             {
                 case kCLanguage:
                     CGenerator(&def).generate();
+                    break;
                 case kPythonLanguage:
                     PythonGenerator(&def).generate();
                     break;

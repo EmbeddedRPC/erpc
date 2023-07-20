@@ -18,6 +18,8 @@ extern "C"
 {
 #endif
 
+#include "erpc_version.h"
+
 {$checkVersion()}
 {$>checkCrc()}
 

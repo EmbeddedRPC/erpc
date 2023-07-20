@@ -239,7 +239,7 @@ private:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, Interface *interface = nullptr) override;
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
 
     /*!
      * @brief This function returns function type (callbacks type) template data.
@@ -469,23 +469,24 @@ private:
      *
      * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
-     * @param[in] name Name used for FunctionType.
-     * @param[in] interfaceClass interfaceClass specific.
+     * @param[in] interfaceName Interface name used for function declaration.
+     * @param[in] name Name used for shared code in case of function type.
+     * @param[in] insideInterfaceCall interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
     std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
-                                     const std::string &name = "", bool interfaceClass = false);
+                                     const std::string &name = "", bool insideInterfaceCall = false);
 
     /*!
      * @brief This function return interface function representation called by server side.
      *
      * @param[in] fn Function for interface function representation.
-     * @param[in] functionType Inside FunctionType common shim code server call need use FunctionType parameters names.
+     * @param[in] isCCall C and C++ code is similar, but not same.
      *
      * @return String representation for given function.
      */
-    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr, const std::string = "");
+    std::string getFunctionServerCall(Function *fn, bool isCCall = false);
 
     /*!
      * @brief This function return name with guard.

@@ -103,7 +103,7 @@ extern bool nestingDetection;
 {$serverIndent}    nestingDetection = true;
 #endif
 {% if serverIDName == "serviceID" %}
-{%  for callbackFunction in callbackType.functions %}
+{%  for callbackFunction in fn.functions %}
 {$serverIndent}    {% if loop.first == false %}else {% endif %}if (({$serverIDName} == {$callbackFunction.serviceId}) && ({$functionIDName} == {$callbackFunction.id}))
 {$serverIndent}    {
 {$serverIndent}        m_handler->{$callbackFunction.serverPrototype}
@@ -190,10 +190,7 @@ static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfa
 // Common function for serializing and deserializing callback functions of same type.
 static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
 {
-{%   for callbackType in group.callbacks %}
-{%    set callbackInfo = callbackType >%}
-{%   endfor %}
-{$ serverShimCode(iface, "m_handler", callbackInfo, "serviceID", "functionID") >}
+{$ serverShimCode(iface, "m_handler", cb.callbacksData, "serviceID", "functionID") >}
 }
 {%  endfor %}
 {% endfor %}

@@ -153,123 +153,92 @@ char *returnHello()
     return hello;
 }
 
-class BuiltinServices_server: public BuiltinServices_interface
+class BuiltinServices_server : public BuiltinServices_interface
 {
-    public:
+public:
+    void test_int32_in(int32_t a) { ::test_int32_in(a); }
 
-        void test_int32_in(int32_t a)
-        {
-            ::test_int32_in(a);
-        }
+    void test_int32_in2(int32_t b) { ::test_int32_in2(b); }
 
-        void test_int32_in2(int32_t b)
-        {
-            ::test_int32_in2(b);
-        }
+    void test_int32_out(int32_t *c) { ::test_int32_out(c); }
 
-        void test_int32_out(int32_t * c)
-        {
-            ::test_int32_out(c);
-        }
+    void test_int32_inout(int32_t *e) { ::test_int32_inout(e); }
 
-        void test_int32_inout(int32_t * e)
-        {
-            ::test_int32_inout(e);
-        }
+    int32_t test_int32_return(void)
+    {
+        int32_t result;
+        result = ::test_int32_return();
 
-        int32_t test_int32_return(void)
-        {
-            int32_t result;
-            result = ::test_int32_return();
+        return result;
+    }
 
-            return result;
-        }
+    int32_t test_int32_allDirection(int32_t a, int32_t b, int32_t *c, int32_t *e)
+    {
+        int32_t result;
+        result = ::test_int32_allDirection(a, b, c, e);
 
-        int32_t test_int32_allDirection(int32_t a, int32_t b, int32_t * c, int32_t * e)
-        {
-            int32_t result;
-            result = ::test_int32_allDirection(a, b, c, e);
+        return result;
+    }
 
-            return result;
-        }
+    void test_float_inout(float a, float *b) { ::test_float_inout(a, b); }
 
-        void test_float_inout(float a, float * b)
-        {
-            ::test_float_inout(a, b);
-        }
+    void test_double_inout(double a, double *b) { ::test_double_inout(a, b); }
 
-        void test_double_inout(double a, double * b)
-        {
-            ::test_double_inout(a, b);
-        }
+    void test_string_in(const char *a) { ::test_string_in(a); }
 
-        void test_string_in(const char * a)
-        {
-            ::test_string_in(a);
-        }
+    void test_string_in2(const char *b) { ::test_string_in2(b); }
 
-        void test_string_in2(const char * b)
-        {
-            ::test_string_in2(b);
-        }
+    void test_string_out(char *c) { ::test_string_out(c); }
 
-        void test_string_out(char * c)
-        {
-            ::test_string_out(c);
-        }
+    void test_string_inout(char *e) { ::test_string_inout(e); }
 
-        void test_string_inout(char * e)
-        {
-            ::test_string_inout(e);
-        }
+    char *test_string_return(void)
+    {
+        char *result = NULL;
+        result = ::test_string_return();
 
-        char * test_string_return(void)
-        {
-            char * result = NULL;
-            result = ::test_string_return();
+        return result;
+    }
 
-            return result;
-        }
+    char *test_string_allDirection(const char *a, const char *b, char *c, char *e)
+    {
+        char *result = NULL;
+        result = ::test_string_allDirection(a, b, c, e);
 
-        char * test_string_allDirection(const char * a, const char * b, char * c, char * e)
-        {
-            char * result = NULL;
-            result = ::test_string_allDirection(a, b, c, e);
+        return result;
+    }
 
-            return result;
-        }
+    char *test_string_empty(const char *a, const char *b, char *c, char *e)
+    {
+        char *result = NULL;
+        result = ::test_string_empty(a, b, c, e);
 
-        char * test_string_empty(const char * a, const char * b, char * c, char * e)
-        {
-            char * result = NULL;
-            result = ::test_string_empty(a, b, c, e);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t sendHello(const char *str)
+    {
+        int32_t result;
+        result = ::sendHello(str);
 
-        int32_t sendHello(const char * str)
-        {
-            int32_t result;
-            result = ::sendHello(str);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t sendTwoStrings(const char *myStr1, const char *myStr2)
+    {
+        int32_t result;
+        result = ::sendTwoStrings(myStr1, myStr2);
 
-        int32_t sendTwoStrings(const char * myStr1, const char * myStr2)
-        {
-            int32_t result;
-            result = ::sendTwoStrings(myStr1, myStr2);
+        return result;
+    }
 
-            return result;
-        }
+    char *returnHello(void)
+    {
+        char *result = NULL;
+        result = ::returnHello();
 
-        char * returnHello(void)
-        {
-            char * result = NULL;
-            result = ::returnHello();
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -11,10 +11,10 @@
 #include "erpc_transport_setup.h"
 
 #include "board.h"
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "gtestListener.h"
 #include "myAlloc.h"
-#include "c_test_unit_test_common_client.h"
 #include "unit_test_wrapped.h"
 
 #if (defined(RPMSG) || defined(UART) || defined(MU))

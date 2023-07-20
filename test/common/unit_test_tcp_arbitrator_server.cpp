@@ -11,12 +11,12 @@
 #include "erpc_simple_server.hpp"
 #include "erpc_tcp_transport.hpp"
 #include "erpc_transport_arbitrator.hpp"
-#include "unit_test_wrapped.h"
 
 #include "Logging.hpp"
 #include "c_test_secondInterface_server.h"
 #include "myAlloc.hpp"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #include <unistd.h>
 

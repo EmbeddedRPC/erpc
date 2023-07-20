@@ -16,7 +16,7 @@
 // Function Prototypes
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef void * erpc_service_t;
+typedef void *erpc_service_t;
 #ifdef __cplusplus
 extern "C" {
 #endif

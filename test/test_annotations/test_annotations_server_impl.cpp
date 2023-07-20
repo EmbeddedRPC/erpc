@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
@@ -40,35 +40,28 @@ myInt testIfMyIntAndConstExist(myInt a)
     return a;
 }
 
-class AnnotateTest_server: public AnnotateTest_interface
+class AnnotateTest_server : public AnnotateTest_interface
 {
-    public:
+public:
+    int32_t add(int32_t a, int32_t b)
+    {
+        int32_t result;
+        result = ::add(a, b);
 
-        int32_t add(int32_t a, int32_t b)
-        {
-            int32_t result;
-            result = ::add(a, b);
+        return result;
+    }
 
-            return result;
-        }
+    void testIfFooStructExist(const fooStruct *a) { ::testIfFooStructExist(a); }
 
-        void testIfFooStructExist(const fooStruct * a)
-        {
-            ::testIfFooStructExist(a);
-        }
+    void testIfMyEnumExist(myEnum a) { ::testIfMyEnumExist(a); }
 
-        void testIfMyEnumExist(myEnum a)
-        {
-            ::testIfMyEnumExist(a);
-        }
+    myInt testIfMyIntAndConstExist(myInt a)
+    {
+        myInt result;
+        result = ::testIfMyIntAndConstExist(a);
 
-        myInt testIfMyIntAndConstExist(myInt a)
-        {
-            myInt result;
-            result = ::testIfMyIntAndConstExist(a);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

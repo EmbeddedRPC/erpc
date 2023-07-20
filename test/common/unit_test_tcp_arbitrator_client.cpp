@@ -13,11 +13,11 @@
 #include "erpc_transport_arbitrator.hpp"
 
 #include "Logging.hpp"
-#include "gtest.h"
 #include "c_test_firstInterface_client.h"
 #include "c_test_unit_test_common_client.h"
-#include "unit_test_wrapped.h"
+#include "gtest.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #include <chrono>
 #include <thread>
@@ -193,8 +193,7 @@ int main(int argc, char **argv)
     return i;
 }
 
-extern "C"
-{
+extern "C" {
 void quitSecondInterfaceServer()
 {
     // removing SecondInterface service from the server

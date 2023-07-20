@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -313,110 +313,109 @@ int32_t sendGapAdvertisingData(const gapAdvertisingData_t *ad)
     return 33;
 }
 
-class PointersService_server: public PointersService_interface
+class PointersService_server : public PointersService_interface
 {
-    public:
+public:
+    list_int32_1_t *sendReceivedInt32(const list_int32_1_t *listNumbers)
+    {
+        list_int32_1_t *result = NULL;
+        result = ::sendReceivedInt32(listNumbers);
 
-        list_int32_1_t * sendReceivedInt32(const list_int32_1_t * listNumbers)
-        {
-            list_int32_1_t * result = NULL;
-            result = ::sendReceivedInt32(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    list_int32_2_t *sendReceived2Int32(const list_int32_2_t *listNumbers)
+    {
+        list_int32_2_t *result = NULL;
+        result = ::sendReceived2Int32(listNumbers);
 
-        list_int32_2_t * sendReceived2Int32(const list_int32_2_t * listNumbers)
-        {
-            list_int32_2_t * result = NULL;
-            result = ::sendReceived2Int32(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    list_enumColor_1_t *sendReceivedEnum(const list_enumColor_1_t *listColors)
+    {
+        list_enumColor_1_t *result = NULL;
+        result = ::sendReceivedEnum(listColors);
 
-        list_enumColor_1_t * sendReceivedEnum(const list_enumColor_1_t * listColors)
-        {
-            list_enumColor_1_t * result = NULL;
-            result = ::sendReceivedEnum(listColors);
+        return result;
+    }
 
-            return result;
-        }
+    list_enumColor_2_t *sendReceived2Enum(const list_enumColor_2_t *listColors)
+    {
+        list_enumColor_2_t *result = NULL;
+        result = ::sendReceived2Enum(listColors);
 
-        list_enumColor_2_t * sendReceived2Enum(const list_enumColor_2_t * listColors)
-        {
-            list_enumColor_2_t * result = NULL;
-            result = ::sendReceived2Enum(listColors);
+        return result;
+    }
 
-            return result;
-        }
+    list_C_1_t *sendReceivedStruct(const list_C_1_t *listColors)
+    {
+        list_C_1_t *result = NULL;
+        result = ::sendReceivedStruct(listColors);
 
-        list_C_1_t * sendReceivedStruct(const list_C_1_t * listColors)
-        {
-            list_C_1_t * result = NULL;
-            result = ::sendReceivedStruct(listColors);
+        return result;
+    }
 
-            return result;
-        }
+    list_C_2_t *sendReceived2Struct(const list_C_2_t *listColors)
+    {
+        list_C_2_t *result = NULL;
+        result = ::sendReceived2Struct(listColors);
 
-        list_C_2_t * sendReceived2Struct(const list_C_2_t * listColors)
-        {
-            list_C_2_t * result = NULL;
-            result = ::sendReceived2Struct(listColors);
+        return result;
+    }
 
-            return result;
-        }
+    list_string_1_t *sendReceivedString(const list_string_1_t *listNumbers)
+    {
+        list_string_1_t *result = NULL;
+        result = ::sendReceivedString(listNumbers);
 
-        list_string_1_t * sendReceivedString(const list_string_1_t * listNumbers)
-        {
-            list_string_1_t * result = NULL;
-            result = ::sendReceivedString(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    list_string_2_t *sendReceived2String(const list_string_2_t *listNumbers)
+    {
+        list_string_2_t *result = NULL;
+        result = ::sendReceived2String(listNumbers);
 
-        list_string_2_t * sendReceived2String(const list_string_2_t * listNumbers)
-        {
-            list_string_2_t * result = NULL;
-            result = ::sendReceived2String(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    void test_list_allDirection(const list_uint32_1_t *a, const list_uint32_1_t *b, list_uint32_1_t *e)
+    {
+        ::test_list_allDirection(a, b, e);
+    }
 
-        void test_list_allDirection(const list_uint32_1_t * a, const list_uint32_1_t * b, list_uint32_1_t * e)
-        {
-            ::test_list_allDirection(a, b, e);
-        }
+    int32_t testLengthAnnotation(const int32_t *myList, uint32_t len)
+    {
+        int32_t result;
+        result = ::testLengthAnnotation(myList, len);
 
-        int32_t testLengthAnnotation(const int32_t * myList, uint32_t len)
-        {
-            int32_t result;
-            result = ::testLengthAnnotation(myList, len);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t testLengthAnnotationInStruct(const listStruct *s)
+    {
+        int32_t result;
+        result = ::testLengthAnnotationInStruct(s);
 
-        int32_t testLengthAnnotationInStruct(const listStruct * s)
-        {
-            int32_t result;
-            result = ::testLengthAnnotationInStruct(s);
+        return result;
+    }
 
-            return result;
-        }
+    listStruct *returnSentStructLengthAnnotation(const listStruct *s)
+    {
+        listStruct *result = NULL;
+        result = ::returnSentStructLengthAnnotation(s);
 
-        listStruct * returnSentStructLengthAnnotation(const listStruct * s)
-        {
-            listStruct * result = NULL;
-            result = ::returnSentStructLengthAnnotation(s);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t sendGapAdvertisingData(const gapAdvertisingData_t *ad)
+    {
+        int32_t result;
+        result = ::sendGapAdvertisingData(ad);
 
-        int32_t sendGapAdvertisingData(const gapAdvertisingData_t * ad)
-        {
-            int32_t result;
-            result = ::sendGapAdvertisingData(ad);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

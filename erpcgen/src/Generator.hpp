@@ -201,11 +201,24 @@ protected:
      *
      * @param[in] group Pointer to a group.
      * @param[in] fn From this are set interface function template data.
-     * @param[in] fnIndex Function index.
      *
      * @return Contains interface function data.
      */
-    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, Interface *interface = nullptr) = 0;
+    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) = 0;
+
+    /*!
+     * @brief This function returns function type (callbacks type) template data.
+     *
+     * This function returns function type (callbacks type) template data with all data, which
+     * are necessary for generating output code for output files. Shim code is generating
+     * common function for serialization/deserialization of data.
+     *
+     * @param[in] group Group to which function belongs.
+     * @param[in] fn From this are set function type template data.
+     *
+     * @return Contains interface function data.
+     */
+    virtual cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn) = 0;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -250,7 +263,6 @@ protected:
      * @brief This function generates output files for defined interfaces.
      *
      * @param[in] group Pointer to a group.
-     * @param[out] commonFilesFilename Common filename part of group generated files.
      */
     void generateGroupOutputFiles(Group *group);
 
@@ -361,13 +373,14 @@ protected:
      *
      * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
-     * @param[in] name Name used for FunctionType.
-     * @param[in] interfaceClass interfaceClass specific.
+     * @param[in] interfaceName Interface name used for function declaration.
+     * @param[in] name Name used for shared code in case of function type.
+     * @param[in] insideInterfaceCall interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
     virtual std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
-                                             const std::string &name = "", bool interfaceClass = false) = 0;
+                                             const std::string &name = "", bool insideInterfaceCall = false) = 0;
 
 private:
     /*!
@@ -382,7 +395,16 @@ private:
      */
     cpptempl::data_list getFunctionsTemplateData(Group *group, Interface *iface);
 
-    void getCallbacksTemplateData(const Interface *iface, cpptempl::data_list &callbackTypesInt,
+    /*!
+     * @brief Get the Callbacks template data and dived them to the interface scope list.
+     *
+     * @param[in] group Group to which callbacks belongs.
+     * @param[in] iface Use callbacks belongs to this interface.
+     * @param[out] callbackTypesInt Template data for current interface scope callbacks
+     * @param[out] callbackTypesExt Template data for others interface scope callbacks
+     * @param[out] callbackTypesAll Template data of all callbacks.
+     */
+    void getCallbacksTemplateData(Group *group, const Interface *iface, cpptempl::data_list &callbackTypesInt,
                                   cpptempl::data_list &callbackTypesExt, cpptempl::data_list &callbackTypesAll);
 };
 

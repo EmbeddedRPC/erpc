@@ -169,19 +169,20 @@ using namespace std;
 
     return{% if fn.returnValue.type.isNotVoid %} result{% endif -- isNotVoid %};
 {% enddef --------------------------------------------------------------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
-{% for callbackType in group.callbacks %}
-// Common function for serializing and deserializing callback functions of same type.
-static {$callbackType.prototype};
+{% for iface in group.interfaces %}
+{%  for cb in iface.callbacksInt %}
 
-{% endfor %}
-{% for callbackType in group.callbacks %}
 // Common function for serializing and deserializing callback functions of same type.
-static {$callbackType.prototype}
+static {$cb.callbacksData.prototype};
+{% endfor %}
+{%  for cb in iface.callbacksInt %}
+
+// Common function for serializing and deserializing callback functions of same type.
+static {$cb.callbacksData.prototype}
 {
-{$ clientShimCode("m_clientManager", callbackType, "serviceID", "functionID") >}
+{$ clientShimCode("m_clientManager", cb.callbacksData, "serviceID", "functionID") >}
 }
 {% endfor %}
-{% for iface in group.interfaces %}
 
 {$iface.clientClassName}::{$iface.clientClassName}(ClientManager *manager)
 :m_clientManager(manager)

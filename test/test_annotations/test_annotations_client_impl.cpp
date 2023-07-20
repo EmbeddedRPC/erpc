@@ -6,9 +6,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "c_test_client.h"
 #include "gtest.h"
 #include "unit_test_wrapped.h"
-#include "c_test_client.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code

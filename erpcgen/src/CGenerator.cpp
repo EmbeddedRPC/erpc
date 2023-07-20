@@ -490,7 +490,6 @@ void CGenerator::generate()
     m_templateData["structs"] = empty;
     m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
-    m_templateData["functions"] = empty;
 
     m_templateData["nonExternalStructUnion"] = false;
 
@@ -573,7 +572,6 @@ void CGenerator::generate()
         groupTemplate["includes"] = makeGroupIncludesTemplateData(group);
         groupTemplate["symbolsMap"] = makeGroupSymbolsTemplateData(group);
         groupTemplate["interfaces"] = makeGroupInterfacesTemplateData(group);
-        groupTemplate["callbacks"] = makeGroupCallbacksTemplateData(group);
         group->setTemplate(groupTemplate);
 
         generateGroupOutputFiles(group);
@@ -1000,43 +998,6 @@ data_map CGenerator::makeGroupSymbolsTemplateData(Group *group)
     symbolsTemplate["symbolsServerFree"] = symbolsServerFree;
 
     return symbolsTemplate;
-}
-
-data_list CGenerator::makeGroupCallbacksTemplateData(Group *group)
-{
-    data_list functionTypes;
-    std::map<FunctionType *, int> functionTypeMap;
-
-    // need go trough functions instead of group symbols.
-    for (Interface *interface : group->getInterfaces())
-    {
-        for (Function *function : interface->getFunctions())
-        {
-            FunctionType *functionType = function->getFunctionType();
-            if (functionType)
-            {
-                bool isPresent = (functionTypeMap.find(functionType) != functionTypeMap.end());
-                if (isPresent)
-                {
-                    ++functionTypeMap[functionType];
-                }
-                else
-                {
-                    functionTypeMap[functionType] = 1;
-                }
-            }
-        }
-    }
-
-    for (std::map<FunctionType *, int>::iterator it = functionTypeMap.begin(); it != functionTypeMap.end(); ++it)
-    {
-        if (it->second > 1)
-        {
-            functionTypes.push_back(getFunctionTypeTemplateData(group, it->first));
-        }
-    }
-
-    return functionTypes;
 }
 
 data_map CGenerator::getStructDeclarationTemplateData(StructType *structType)
@@ -1681,7 +1642,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     return info;
 }
 
-data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interface *interface)
+data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
     data_map info;
 
@@ -1724,22 +1685,18 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interfa
     else
     {
         info["isCallback"] = false;
-        string serverProto = getFunctionServerCall(fn, nullptr, "m_handler->");
-        info["serverPrototype"] = serverProto;
+        info["serverPrototype"] = getFunctionServerCall(fn);
         info["serviceId"] = "";
     }
-    string serverProtoC = getFunctionServerCall(fn);
+    string serverProtoC = getFunctionServerCall(fn, true);
     info["serverPrototypeC"] = serverProtoC;
 
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
-    if (interface != nullptr)
-    {
-        string protoCpp = getFunctionPrototype(group, fn, interface->getName() + "_client", "", true);
-        info["prototypeCpp"] = protoCpp;
-        string protoInterface = getFunctionPrototype(group, fn, "", "", true);
-        info["prototypeInterface"] = protoInterface;
-    }
+    string protoCpp = getFunctionPrototype(group, fn, fn->getInterface()->getName() + "_client", "", true);
+    info["prototypeCpp"] = protoCpp;
+    string protoInterface = getFunctionPrototype(group, fn, "", "", true);
+    info["prototypeInterface"] = protoInterface;
 
     data_list callbackParameters;
     for (auto parameter : fn->getParameters().getMembers())
@@ -1794,7 +1751,7 @@ data_map CGenerator::getFunctionTypeTemplateData(Group *group, FunctionType *fn)
     {
         data_map functionInfo = getFunctionTemplateData(group, function);
         // set serverPrototype function with parameters of common function.
-        string serverProto = getFunctionServerCall(function, fn);
+        string serverProto = getFunctionServerCall(function, true);
         functionInfo["serverPrototype"] = serverProto;
         functionInfos.push_back(functionInfo);
     }
@@ -1971,18 +1928,23 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
     }
 }
 
-string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType, const std::string prefix)
+string CGenerator::getFunctionServerCall(Function *fn, bool isCCall)
 {
     string proto = "";
-    if (!fn->getReturnType()->isVoid() && prefix.length() > 0)
+    if (!isCCall)
     {
-        proto += "result = ";
+        if (!fn->getReturnType()->isVoid())
+        {
+            proto += "result = ";
+        }
+        proto += "m_handler->";
     }
-    proto += prefix;
     proto += getOutputName(fn);
     proto += "(";
 
-    auto params = (functionType) ? functionType->getParameters().getMembers() : fn->getParameters().getMembers();
+    FunctionType *funcType = fn->getFunctionType();
+
+    auto params = (funcType) ? funcType->getParameters().getMembers() : fn->getParameters().getMembers();
 
     if (params.size())
     {
@@ -2004,7 +1966,7 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
                       (findAnnotation(it, SHARED_ANNOTATION))))
 
             {
-                if (prefix != "")
+                if (!isCCall)
                 {
                     proto += "&";
                 }
@@ -2022,7 +1984,7 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
 }
 
 string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName,
-                                        const std::string &name, bool interfaceClass)
+                                        const string &name, bool insideInterfaceCall)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
@@ -2037,12 +1999,11 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
         ifaceVar += "::";
     }
 
-    Symbol *symbol = dynamic_cast<Symbol *>(fn);
-    assert(symbol);
-
     FunctionType *funType = dynamic_cast<FunctionType *>(fn);
     if (name.empty())
     {
+        Symbol *symbol = dynamic_cast<Symbol *>(fn);
+        assert(symbol);
         string functionName = getOutputName(symbol);
         if (funType) /* Need add '(*name)' for function type definition. */
         {
@@ -2157,7 +2118,7 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
                 }
             }
 
-            if (interfaceClass)
+            if (insideInterfaceCall)
             {
                 if (trueDataType->isFunction())
                 {

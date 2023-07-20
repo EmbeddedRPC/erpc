@@ -8,12 +8,12 @@
 
 #include "erpc_simple_server.hpp"
 
-#include "gtest.h"
 #include "c_test_firstInterface_client.h"
 #include "c_test_secondInterface_server.h"
+#include "gtest.h"
 #include "test_secondInterface_server.hpp"
-#include "unit_test_wrapped.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
@@ -109,40 +109,30 @@ void enableFirstSide()
     enabled = true;
 }
 
-class SecondInterface_server: public SecondInterface_interface
+class SecondInterface_server : public SecondInterface_interface
 {
-    public:
+public:
+    void secondSendInt(int32_t a) { ::secondSendInt(a); }
 
-        void secondSendInt(int32_t a)
-        {
-            ::secondSendInt(a);
-        }
+    int32_t secondReceiveInt(void)
+    {
+        int32_t result;
+        result = ::secondReceiveInt();
 
-        int32_t secondReceiveInt(void)
-        {
-            int32_t result;
-            result = ::secondReceiveInt();
+        return result;
+    }
 
-            return result;
-        }
+    void quitSecondInterfaceServer(void) { ::quitSecondInterfaceServer(); }
 
-        void quitSecondInterfaceServer(void)
-        {
-            ::quitSecondInterfaceServer();
-        }
+    void enableFirstSide(void) { ::enableFirstSide(); }
 
-        void enableFirstSide(void)
-        {
-            ::enableFirstSide();
-        }
+    int32_t callFirstSide(void)
+    {
+        int32_t result;
+        result = ::callFirstSide();
 
-        int32_t callFirstSide(void)
-        {
-            int32_t result;
-            result = ::callFirstSide();
-
-            return result;
-        }
+        return result;
+    }
 };
 
 void add_services(erpc::SimpleServer *server)

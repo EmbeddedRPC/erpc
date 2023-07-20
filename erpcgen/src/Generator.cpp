@@ -452,9 +452,8 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
         data_list callbacksInt;
         data_list callbacksExt;
         data_list callbacksAll;
-        getCallbacksTemplateData(iface, callbacksInt, callbacksExt, callbacksAll);
+        getCallbacksTemplateData(group, iface, callbacksInt, callbacksExt, callbacksAll);
         ifaceInfo["callbacksInt"] = callbacksInt;
-        ifaceInfo["callbacksExt"] = callbacksExt;
         ifaceInfo["callbacksAll"] = callbacksAll;
         ifaceInfo["isNonExternalInterface"] = false;
         for (unsigned int i = 0; i < functions.size(); ++i)
@@ -647,7 +646,7 @@ data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
     int j = 0;
     for (auto fit : iface->getFunctions())
     {
-        data_map function = getFunctionTemplateData(group, fit, iface);
+        data_map function = getFunctionTemplateData(group, fit);
         fns.push_back(function);
 
         Log::info("    %d: (%d) %s\n", j, fit->getUniqueId(), function["prototype"]->getvalue().c_str());
@@ -671,7 +670,7 @@ Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope 
     return vector;
 }
 
-void Generator::getCallbacksTemplateData(const Interface *iface, data_list &callbackTypesInt,
+void Generator::getCallbacksTemplateData(Group *group, const Interface *iface, data_list &callbackTypesInt,
                                          data_list &callbackTypesExt, data_list &callbackTypesAll)
 {
     list<FunctionType *> callbackTypes;
@@ -736,14 +735,12 @@ void Generator::getCallbacksTemplateData(const Interface *iface, data_list &call
         {
             data_map callbackType;
             callbackType["name"] = functionType->getName();
-            AliasType aliasTypeInterface(getFunctionPrototype(nullptr, functionType, iface->getName() + "_interface"),
-                                         functionType);
-            AliasType aliasType(getFunctionPrototype(nullptr, functionType), functionType);
-            callbackType["typenameName"] = getOutputName(&aliasType);
-            callbackType["interfaceTypenameName"] = getOutputName(&aliasTypeInterface);
+            callbackType["typenameName"] = getFunctionPrototype(nullptr, functionType);
+            callbackType["interfaceTypenameName"] = getFunctionPrototype(nullptr, functionType, iface->getName() + "_interface");
             if (!functionsInt.empty())
             {
                 callbackType["callbacks"] = functionsInt;
+                callbackType["callbacksData"] = getFunctionTypeTemplateData(group, functionType);
                 callbackTypesInt.push_back(callbackType);
             }
             if (!functionsExt.empty())

@@ -8,8 +8,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -33,22 +33,18 @@ BaseSharedStruct *sendReceiveBaseSharedStruct(const BaseSharedStruct *s)
 void inoutBaseSharedStruct(BaseSharedStruct **s) {}
 /* end typedef unit tests */
 
-class SharedService_server: public SharedService_interface
+class SharedService_server : public SharedService_interface
 {
-    public:
+public:
+    BaseSharedStruct *sendReceiveBaseSharedStruct(const BaseSharedStruct *a)
+    {
+        BaseSharedStruct *result = NULL;
+        result = ::sendReceiveBaseSharedStruct(a);
 
-        BaseSharedStruct * sendReceiveBaseSharedStruct(const BaseSharedStruct * a)
-        {
-            BaseSharedStruct * result = NULL;
-            result = ::sendReceiveBaseSharedStruct(a);
+        return result;
+    }
 
-            return result;
-        }
-
-        void inoutBaseSharedStruct(BaseSharedStruct ** a)
-        {
-            ::inoutBaseSharedStruct(a);
-        }
+    void inoutBaseSharedStruct(BaseSharedStruct **a) { ::inoutBaseSharedStruct(a); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

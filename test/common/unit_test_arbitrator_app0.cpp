@@ -12,11 +12,11 @@
 #include "erpc_transport_setup.h"
 
 #include "FreeRTOS.h"
+#include "c_test_firstInterface_client.h"
+#include "c_test_secondInterface_server.h"
 #include "gtest.h"
 #include "semphr.h"
 #include "task.h"
-#include "c_test_firstInterface_client.h"
-#include "c_test_secondInterface_server.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus
@@ -279,8 +279,7 @@ int main(int argc, char **argv)
     }
 }
 
-extern "C"
-{
+extern "C" {
 void quitSecondInterfaceServer()
 {
     /* removing the service from the server */

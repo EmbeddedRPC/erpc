@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_ArithmeticService_server.h"
-#include "test_ArithmeticService_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_ArithmeticService_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -183,131 +183,129 @@ bool testSendingByrefMembers(const StructWithByrefMembers *s)
     return false;
 }
 
-class ArithmeticService1_server: public ArithmeticService1_interface
+class ArithmeticService1_server : public ArithmeticService1_interface
 {
-    public:
+public:
+    int32_t getMember(const C *c)
+    {
+        int32_t result;
+        result = ::getMember(c);
 
-        int32_t getMember(const C * c)
-        {
-            int32_t result;
-            result = ::getMember(c);
+        return result;
+    }
 
-            return result;
-        }
+    B *returnStruct(float a, float b)
+    {
+        B *result = NULL;
+        result = ::returnStruct(a, b);
 
-        B * returnStruct(float a, float b)
-        {
-            B * result = NULL;
-            result = ::returnStruct(a, b);
+        return result;
+    }
 
-            return result;
-        }
+    B *getMemberTest2(const A *a)
+    {
+        B *result = NULL;
+        result = ::getMemberTest2(a);
 
-        B * getMemberTest2(const A * a)
-        {
-            B * result = NULL;
-            result = ::getMemberTest2(a);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t sendNestedStruct(const D *d)
+    {
+        int32_t result;
+        result = ::sendNestedStruct(d);
 
-        int32_t sendNestedStruct(const D * d)
-        {
-            int32_t result;
-            result = ::sendNestedStruct(d);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t checkString(const primate *p)
+    {
+        int32_t result;
+        result = ::checkString(p);
 
-        int32_t checkString(const primate * p)
-        {
-            int32_t result;
-            result = ::checkString(p);
+        return result;
+    }
 
-            return result;
-        }
+    stringStruct *returnStrings(void)
+    {
+        stringStruct *result = NULL;
+        result = ::returnStrings();
 
-        stringStruct * returnStrings(void)
-        {
-            stringStruct * result = NULL;
-            result = ::returnStrings();
-
-            return result;
-        }
+        return result;
+    }
 };
 
-class ArithmeticService2_server: public ArithmeticService2_interface
+class ArithmeticService2_server : public ArithmeticService2_interface
 {
-    public:
+public:
+    int32_t sendManyInts(const F *f)
+    {
+        int32_t result;
+        result = ::sendManyInts(f);
 
-        int32_t sendManyInts(const F * f)
-        {
-            int32_t result;
-            result = ::sendManyInts(f);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t sendManyUInts(const G *g)
+    {
+        int32_t result;
+        result = ::sendManyUInts(g);
 
-        int32_t sendManyUInts(const G * g)
-        {
-            int32_t result;
-            result = ::sendManyUInts(g);
+        return result;
+    }
 
-            return result;
-        }
+    char *getStudentName(const student *stud)
+    {
+        char *result = NULL;
+        result = ::getStudentName(stud);
 
-        char * getStudentName(const student * stud)
-        {
-            char * result = NULL;
-            result = ::getStudentName(stud);
+        return result;
+    }
 
-            return result;
-        }
+    float getStudentTestAverage(const student *stud)
+    {
+        float result;
+        result = ::getStudentTestAverage(stud);
 
-        float getStudentTestAverage(const student * stud)
-        {
-            float result;
-            result = ::getStudentTestAverage(stud);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t getStudentYear(const student *stud)
+    {
+        int32_t result;
+        result = ::getStudentYear(stud);
 
-        int32_t getStudentYear(const student * stud)
-        {
-            int32_t result;
-            result = ::getStudentYear(stud);
+        return result;
+    }
 
-            return result;
-        }
+    int32_t getStudentAge(const student *stud)
+    {
+        int32_t result;
+        result = ::getStudentAge(stud);
 
-        int32_t getStudentAge(const student * stud)
-        {
-            int32_t result;
-            result = ::getStudentAge(stud);
+        return result;
+    }
 
-            return result;
-        }
+    student *createStudent(const char *name, const float test_scores[3], school_year_t year, int32_t age)
+    {
+        student *result = NULL;
+        result = ::createStudent(name, test_scores, year, age);
 
-        student * createStudent(const char * name, const float test_scores[3], school_year_t year, int32_t age)
-        {
-            student * result = NULL;
-            result = ::createStudent(name, test_scores, year, age);
+        return result;
+    }
 
-            return result;
-        }
+    void test_struct_allDirection(const AllTypes *a, const AllTypes *b, AllTypes *e)
+    {
+        ::test_struct_allDirection(a, b, e);
+    }
 
-        void test_struct_allDirection(const AllTypes * a, const AllTypes * b, AllTypes * e)
-        {
-            ::test_struct_allDirection(a, b, e);
-        }
+    bool testSendingByrefMembers(const StructWithByrefMembers *s)
+    {
+        bool result;
+        result = ::testSendingByrefMembers(s);
 
-        bool testSendingByrefMembers(const StructWithByrefMembers * s)
-        {
-            bool result;
-            result = ::testSendingByrefMembers(s);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

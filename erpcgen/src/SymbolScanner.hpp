@@ -487,7 +487,6 @@ protected:
      * Created data type depends on given node token.
      *
      * @param[in] typeNode Node, which data type is searched.
-     * @param[out] ifaceName In case of returned type is function type determine interface it belongs to.
      *
      * @return Return new data type.
      *

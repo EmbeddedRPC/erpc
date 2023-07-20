@@ -11,8 +11,8 @@
 #include "erpc_simple_server.hpp"
 
 #include "Logging.hpp"
-#include "myAlloc.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "myAlloc.hpp"
 #include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 
@@ -97,22 +97,18 @@ int32_t getServerAllocated()
     return result;
 }
 
-class Common_server: public Common_interface
+class Common_server : public Common_interface
 {
-    public:
+public:
+    void quit(void) { ::quit(); }
 
-        void quit(void)
-        {
-            ::quit();
-        }
+    int32_t getServerAllocated(void)
+    {
+        int32_t result;
+        result = ::getServerAllocated();
 
-        int32_t getServerAllocated(void)
-        {
-            int32_t result;
-            result = ::getServerAllocated();
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

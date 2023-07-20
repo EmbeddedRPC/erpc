@@ -12,10 +12,10 @@
 #include "erpc_transport_setup.h"
 
 #include "FreeRTOS.h"
-#include "semphr.h"
-#include "task.h"
 #include "c_test_firstInterface_server.h"
 #include "c_test_secondInterface_client.h"
+#include "semphr.h"
+#include "task.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus
@@ -218,8 +218,7 @@ int main(int argc, char **argv)
     }
 }
 
-extern "C"
-{
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;

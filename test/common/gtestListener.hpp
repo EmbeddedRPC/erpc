@@ -10,9 +10,9 @@
 #ifndef _EMBEDDED_RPC__GTESTLISTENER_H_
 #define _EMBEDDED_RPC__GTESTLISTENER_H_
 
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "myAlloc.hpp"
-#include "c_test_unit_test_common_client.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes

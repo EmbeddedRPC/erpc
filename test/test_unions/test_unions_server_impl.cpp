@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -211,41 +211,40 @@ InnerList *testInnerList(const InnerList *il)
     return newList;
 }
 
-class ArithmeticService_server: public ArithmeticService_interface
+class ArithmeticService_server : public ArithmeticService_interface
 {
-    public:
+public:
+    gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
+    {
+        gapGenericEvent_t *result = NULL;
+        result = ::testGenericCallback(event);
 
-        gapGenericEvent_t * testGenericCallback(const gapGenericEvent_t * event)
-        {
-            gapGenericEvent_t * result = NULL;
-            result = ::testGenericCallback(event);
+        return result;
+    }
 
-            return result;
-        }
+    foo *sendMyFoo(const foo *f)
+    {
+        foo *result = NULL;
+        result = ::sendMyFoo(f);
 
-        foo * sendMyFoo(const foo * f)
-        {
-            foo * result = NULL;
-            result = ::sendMyFoo(f);
+        return result;
+    }
 
-            return result;
-        }
+    foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
+    {
+        foo *result = NULL;
+        result = ::sendMyUnion(discriminator, unionVariable);
 
-        foo * sendMyUnion(fruit discriminator, const unionType * unionVariable)
-        {
-            foo * result = NULL;
-            result = ::sendMyUnion(discriminator, unionVariable);
+        return result;
+    }
 
-            return result;
-        }
+    InnerList *testInnerList(const InnerList *il)
+    {
+        InnerList *result = NULL;
+        result = ::testInnerList(il);
 
-        InnerList * testInnerList(const InnerList * il)
-        {
-            InnerList * result = NULL;
-            result = ::testInnerList(il);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

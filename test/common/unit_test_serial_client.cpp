@@ -11,10 +11,10 @@
 #include "erpc_serial_transport.hpp"
 
 #include "Logging.hpp"
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "gtestListener.hpp"
 #include "myAlloc.hpp"
-#include "c_test_unit_test_common_client.h"
 #include "unit_test_wrapped.h"
 
 using namespace erpc;

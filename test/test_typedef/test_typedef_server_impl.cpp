@@ -9,8 +9,8 @@
 #include "erpc_server_setup.h"
 
 #include "c_test_server.h"
-#include "test_server.hpp"
 #include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
@@ -133,57 +133,56 @@ MultiListArray arrayNumbers, uint32_t arrayNumbers_1_count, uint32_t arrayNumber
 }*/
 /* end typedef unit tests */
 
-class TypedefService_server: public TypedefService_interface
+class TypedefService_server : public TypedefService_interface
 {
-    public:
+public:
+    int32type sendReceiveInt(int32type a)
+    {
+        int32type result;
+        result = ::sendReceiveInt(a);
 
-        int32type sendReceiveInt(int32type a)
-        {
-            int32type result;
-            result = ::sendReceiveInt(a);
+        return result;
+    }
 
-            return result;
-        }
+    Colors sendReceiveEnum(Colors a)
+    {
+        Colors result;
+        result = ::sendReceiveEnum(a);
 
-        Colors sendReceiveEnum(Colors a)
-        {
-            Colors result;
-            result = ::sendReceiveEnum(a);
+        return result;
+    }
 
-            return result;
-        }
+    B *sendReceiveStruct(const B *a)
+    {
+        B *result = NULL;
+        result = ::sendReceiveStruct(a);
 
-        B * sendReceiveStruct(const B * a)
-        {
-            B * result = NULL;
-            result = ::sendReceiveStruct(a);
+        return result;
+    }
 
-            return result;
-        }
+    ListType *sendReceiveListType(const ListType *listNumbers)
+    {
+        ListType *result = NULL;
+        result = ::sendReceiveListType(listNumbers);
 
-        ListType * sendReceiveListType(const ListType * listNumbers)
-        {
-            ListType * result = NULL;
-            result = ::sendReceiveListType(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    ListType2 *sendReceive2ListType(const ListType2 *listNumbers)
+    {
+        ListType2 *result = NULL;
+        result = ::sendReceive2ListType(listNumbers);
 
-        ListType2 * sendReceive2ListType(const ListType2 * listNumbers)
-        {
-            ListType2 * result = NULL;
-            result = ::sendReceive2ListType(listNumbers);
+        return result;
+    }
 
-            return result;
-        }
+    newString sendReceiveString(newString hello)
+    {
+        newString result = NULL;
+        result = ::sendReceiveString(hello);
 
-        newString sendReceiveString(newString hello)
-        {
-            newString result = NULL;
-            result = ::sendReceiveString(hello);
-
-            return result;
-        }
+        return result;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

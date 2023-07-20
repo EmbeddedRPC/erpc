@@ -24,9 +24,7 @@ int i = 0;
 int numbers[number];
 FirstInterface_service *svc;
 
-
-extern "C"
-{
+extern "C" {
 void initInterfaces(erpc_client_t client)
 {
     initSecondInterface_client(client);
@@ -55,66 +53,50 @@ int32_t callSecondSide()
 }
 }
 
-class FirstInterface_server: public FirstInterface_interface
+class FirstInterface_server : public FirstInterface_interface
 {
-    public:
+public:
+    void whenReady(void) { ::whenReady(); }
 
-        void whenReady(void)
-        {
-            ::whenReady();
-        }
+    void firstSendInt(int32_t a) { ::firstSendInt(a); }
 
-        void firstSendInt(int32_t a)
-        {
-            ::firstSendInt(a);
-        }
+    int32_t firstReceiveInt(void)
+    {
+        int32_t result;
+        result = ::firstReceiveInt();
 
-        int32_t firstReceiveInt(void)
-        {
-            int32_t result;
-            result = ::firstReceiveInt();
+        return result;
+    }
 
-            return result;
-        }
+    void stopSecondSide(void) { ::stopSecondSide(); }
 
-        void stopSecondSide(void)
-        {
-            ::stopSecondSide();
-        }
+    int32_t getResultFromSecondSide(void)
+    {
+        int32_t result;
+        result = ::getResultFromSecondSide();
 
-        int32_t getResultFromSecondSide(void)
-        {
-            int32_t result;
-            result = ::getResultFromSecondSide();
+        return result;
+    }
 
-            return result;
-        }
+    void testCasesAreDone(void) { ::testCasesAreDone(); }
 
-        void testCasesAreDone(void)
-        {
-            ::testCasesAreDone();
-        }
+    void quitFirstInterfaceServer(void) { ::quitFirstInterfaceServer(); }
 
-        void quitFirstInterfaceServer(void)
-        {
-            ::quitFirstInterfaceServer();
-        }
+    int32_t nestedCallTest(void)
+    {
+        int32_t result;
+        result = ::nestedCallTest();
 
-        int32_t nestedCallTest(void)
-        {
-            int32_t result;
-            result = ::nestedCallTest();
+        return result;
+    }
 
-            return result;
-        }
+    int32_t callSecondSide(void)
+    {
+        int32_t result;
+        result = ::callSecondSide();
 
-        int32_t callSecondSide(void)
-        {
-            int32_t result;
-            result = ::callSecondSide();
-
-            return result;
-        }
+        return result;
+    }
 };
 
 void add_services(erpc::SimpleServer *server)
