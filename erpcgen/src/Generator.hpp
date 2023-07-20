@@ -49,7 +49,7 @@ public:
     {
         kC,
         kPython
-    }; /*!< Type of generator. */
+    };                                                 /*!< Type of generator. */
 
     typedef std::vector<DataType *> datatype_vector_t; /*!< Vector of data types. */
 
@@ -205,7 +205,7 @@ protected:
      *
      * @return Contains interface function data.
      */
-    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) = 0;
+    virtual cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, Interface *interface = nullptr) = 0;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones

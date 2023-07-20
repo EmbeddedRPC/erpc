@@ -10,6 +10,13 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 
+#include "board.h"
+#include "gtest.h"
+#include "gtestListener.h"
+#include "myAlloc.h"
+#include "test_unit_test_common_client.h"
+#include "unit_test_wrapped.h"
+
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #if defined(RPMSG)
@@ -24,12 +31,6 @@ extern "C" {
 int main(int argc, char **argv);
 #endif
 }
-
-#include "board.h"
-#include "gtest.h"
-#include "gtestListener.hpp"
-#include "myAlloc.hpp"
-#include "test_unit_test_common.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
@@ -199,6 +200,8 @@ int main(int argc, char **argv)
 #endif
 
     client = erpc_client_init(transport, message_buffer_factory);
+    initInterfaces_common();
+    initInterfaces();
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -211,4 +214,9 @@ int main(int argc, char **argv)
     erpc_client_deinit(client);
 
     return i;
+}
+
+void initInterfaces_common(void)
+{
+    initInterfacesClient_unit_test_common();
 }

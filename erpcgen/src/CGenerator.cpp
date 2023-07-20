@@ -31,8 +31,10 @@ static const char *const kIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHI
 
 // Templates strings converted from text files by txt_to_c.py.
 extern const char *const kCCommonHeader;
-extern const char *const kCServerHeader;
+extern const char *const kCInterfaceHeader;
+extern const char *const kCClientHeader;
 extern const char *const kCClientSource;
+extern const char *const kCServerHeader;
 extern const char *const kCServerSource;
 extern const char *const kCCoders;
 extern const char *const kCCommonFunctions;
@@ -46,6 +48,7 @@ static uint8_t listCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 CGenerator::CGenerator(InterfaceDefinition *def)
 : Generator(def, kC)
+,    m_generateC(true)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -68,8 +71,17 @@ CGenerator::CGenerator(InterfaceDefinition *def)
     initCReservedWords();
 }
 
+void CGenerator::generateCpp(void)
+{
+    m_generateC=false;
+    this->generate();
+}
+
 void CGenerator::generateOutputFiles(const string &fileName)
 {
+    generateInterfaceHeaderFile(fileName);
+
+    generateClientHeaderFile(fileName);
     generateClientSourceFile(fileName);
 
     generateServerHeaderFile(fileName);
@@ -95,6 +107,22 @@ void CGenerator::generateCommonHeaderFiles(const string &fileName)
     m_templateData["genCommonTypesFile"] = false;
 
     generateOutputFile(fileName + ".h", "c_common_header", m_templateData, kCCommonHeader);
+}
+
+void CGenerator::generateInterfaceHeaderFile(string fileName)
+{
+    fileName += "_interface.h";
+    m_templateData["interfaceGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["interfaceHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_interface_header", m_templateData, kCInterfaceHeader);
+}
+
+void CGenerator::generateClientHeaderFile(string fileName)
+{
+    fileName += "_client.h";
+    m_templateData["clientGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["clientHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_client_header", m_templateData, kCClientHeader);
 }
 
 void CGenerator::generateClientSourceFile(string fileName)
@@ -1586,6 +1614,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
         // Use shared memory feature instead of serializing/deserializing data.
         bool isShared = (isPointerParam(param) && findAnnotation(param, SHARED_ANNOTATION) != nullptr);
         paramInfo["shared"] = isShared;
+        paramInfo["pureName"] = name;
         string encodeDecodeName;
         if (isShared)
         {
@@ -1647,7 +1676,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     return info;
 }
 
-data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
+data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interface *interface)
 {
     data_map info;
 
@@ -1689,13 +1718,20 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn)
     else
     {
         info["isCallback"] = false;
-        string serverProto = getFunctionServerCall(fn);
+        string serverProto = getFunctionServerCall(fn, nullptr, "m_handler->");
         info["serverPrototype"] = serverProto;
+        string serverProtoC = getFunctionServerCall(fn);
+        info["serverPrototypeC"] = serverProtoC;
         info["serviceId"] = "";
     }
 
     string proto = getFunctionPrototype(group, fn);
     info["prototype"] = proto;
+    if (interface != nullptr)
+    {
+        string protoCpp = getFunctionPrototype(group, fn, interface->getName()+"_client::"+fn->getName());
+        info["prototypeCpp"] = protoCpp;
+    }
     info["name"] = getOutputName(fn);
     info["id"] = fn->getUniqueId();
 
@@ -1909,12 +1945,12 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
     }
 }
 
-string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType)
+string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType, std::string prefix)
 {
     string proto = "";
-    if (!fn->getReturnType()->isVoid())
+    if (!fn->getReturnType()->isVoid() && prefix.length()>0)
     {
-        proto += "result = ";
+        proto += "result = "+prefix;
     }
     proto += getOutputName(fn);
     proto += "(";
@@ -1987,15 +2023,16 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
+    // TODO: Fix callback support
     // add interface id and function id parameters for common callbacks shim code function
-    if (!name.empty())
-    {
-        proto += "uint32_t serviceID, uint32_t functionID";
-        if (params.size() > 0)
-        {
-            proto += ", ";
-        }
-    }
+    // if (!name.empty())
+    // {
+    //     proto += "ClientManager *m_clientManager, uint32_t serviceID, uint32_t functionID";
+    //     if (params.size() > 0)
+    //     {
+    //         proto += ", ";
+    //     }
+    // }
 
     if (params.size())
     {

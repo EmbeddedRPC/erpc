@@ -79,25 +79,6 @@ int main(int argc, const char *argv[])
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Server helper functions
-////////////////////////////////////////////////////////////////////////////////
-void add_common_service(SimpleServer *server)
-{
-    svc_common = new Common_service();
-
-    server->addService(svc_common);
-}
-
-void remove_common_service(SimpleServer *server)
-{
-    server->removeService(svc_common);
-    delete svc_common;
-}
-
-extern "C" void erpc_add_service_to_server(void *service) {}
-extern "C" void erpc_remove_service_from_server(void *service) {}
-
-////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////
 void quit()
@@ -113,6 +94,41 @@ int32_t getServerAllocated()
     MyAlloc::allocated(0);
     return result;
 }
+
+class Common_server:public Common_interface
+{
+    public:
+        void quit()
+        {
+            quit();
+        }
+
+        int32_t getServerAllocated()
+        {
+            return getServerAllocated();
+        }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Server helper functions
+////////////////////////////////////////////////////////////////////////////////
+void add_common_service(SimpleServer *server)
+{
+    svc_common = new Common_service(new Common_server());
+
+    server->addService(svc_common);
+}
+
+void remove_common_service(SimpleServer *server)
+{
+    server->removeService(svc_common);
+    delete svc_common->getHandler();
+    delete svc_common;
+}
+
+extern "C" void erpc_add_service_to_server(void *service) {}
+extern "C" void erpc_remove_service_from_server(void *service) {}
+
 ////////////////////////////////////////////////////////////////////////////////
 // EOF
 ////////////////////////////////////////////////////////////////////////////////

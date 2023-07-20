@@ -430,6 +430,9 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
 
         // TODO: for C only?
         ifaceInfo["serviceClassName"] = getOutputName(iface) + "_service";
+        ifaceInfo["clientClassName"] = getOutputName(iface) + "_client";
+        ifaceInfo["serverClassName"] = getOutputName(iface) + "_server";
+        ifaceInfo["interfaceClassName"] = getOutputName(iface) + "_interface";
 
         Log::info("%d: (%d) %s\n", n++, iface->getUniqueId(), iface->getName().c_str());
 
@@ -618,7 +621,7 @@ data_list Generator::getFunctionsTemplateData(Group *group, Interface *iface)
     int j = 0;
     for (auto fit : iface->getFunctions())
     {
-        data_map function = getFunctionTemplateData(group, fit);
+        data_map function = getFunctionTemplateData(group, fit, iface);
         fns.push_back(function);
 
         Log::info("    %d: (%d) %s\n", j, fit->getUniqueId(), function["prototype"]->getvalue().c_str());

@@ -12,9 +12,10 @@
 
 #include "Logging.hpp"
 #include "gtest.h"
-#include "gtestListener.hpp"
-#include "myAlloc.hpp"
-#include "test_unit_test_common.h"
+#include "gtestListener.h"
+#include "myAlloc.h"
+#include "test_unit_test_common_client.h"
+#include "unit_test_wrapped.h"
 
 using namespace erpc;
 
@@ -69,6 +70,8 @@ int main(int argc, char **argv)
     g_client->setMessageBufferFactory(&g_msgFactory);
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);
+    initInterfaces_common();
+    initInterfaces();
 
     int ret = RUN_ALL_TESTS();
     quit();
@@ -76,6 +79,11 @@ int main(int argc, char **argv)
     free(g_client);
 
     return ret;
+}
+
+void initInterfaces_common(void)
+{
+    initInterfacesClient_unit_test_common();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -30,6 +30,7 @@ extern bool nestingDetection;
 
 {% for iface in group.interfaces %}
 ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serverClassName}, s_{$iface.serverClassName});
 
 {% endfor -- iface %}
 {$generateCrcVariable()}
@@ -203,6 +204,12 @@ static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t func
 {% endfor %}
 {% for iface in group.interfaces -- service subclass method impl %}
 
+// return service interface handler.
+{$iface.interfaceClassName}* {$iface.serviceClassName}::getHandler(void)
+{
+    return m_handler;
+}
+
 // Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
 {
@@ -244,6 +251,17 @@ erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, 
 {% endfor -- iface %}
 {% for iface in group.interfaces %}
 
+class {$iface.serverClassName}: public {$iface.interfaceClassName}
+{
+    public:
+{%  for fn in iface.functions %}
+        {$fn.prototype}
+        {
+            {% if fn.returnValue.type.isNotVoid %}return {% endif%}{$fn.serverPrototypeC}
+        }
+{%  endfor -- fn %}
+};
+
 erpc_service_t create_{$iface.serviceClassName}(void)
 {
     erpc_service_t service;
@@ -268,8 +286,11 @@ erpc_service_t create_{$iface.serviceClassName}(void)
 void destroy_{$iface.serviceClassName}(erpc_service_t service)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    erpc_assert(service != NULL);
-    delete ({$iface.serviceClassName} *)service;
+    if (service)
+    {
+        delete ({$iface.serverClassName} *)((({$iface.serviceClassName} *)service)->getHandler());
+        delete ({$iface.serviceClassName} *)service;
+    }
 #else
     (void)service;
     erpc_assert(service == s_{$iface.serviceClassName}.get());

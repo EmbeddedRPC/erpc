@@ -1,0 +1,45 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$clientGuardMacro})
+#define {$clientGuardMacro}
+
+#if defined(__cplusplus)
+
+#include "{$interfaceHeaderName}"
+#include "erpc_client_manager.h"
+
+namespace erpc {
+{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
+
+class {$iface.clientClassName}: public {$iface.interfaceClassName}
+{
+    public:
+        {$iface.clientClassName}(ClientManager *manager);
+{% for fn in iface.functions if fn.isNonExternalFunction == true %}
+
+{% if fn.mlComment %}
+        {$fn.mlComment}
+{% endif %}
+        virtual {$fn.prototype};
+{% endfor -- fn %}
+
+    protected:
+        ClientManager *m_clientManager;
+};
+{% endfor -- iface %}
+
+} // namespace erpc
+
+extern "C"
+{
+#endif // __cplusplus
+void initInterfacesClient{%if group.name%}_{$group.name}{%endif%}(void);
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // {$clientGuardMacro}

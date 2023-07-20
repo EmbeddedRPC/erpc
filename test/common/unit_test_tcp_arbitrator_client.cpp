@@ -16,10 +16,11 @@
 #include "gtest.h"
 #include "test_firstInterface.h"
 #include "test_secondInterface.h"
-#include "unit_test.h"
+#include "unit_test_client.h"
+#include "unit_test_wrapped.h"
+
 #include <chrono>
 #include <thread>
-
 #include <unistd.h>
 
 using namespace erpc;
@@ -154,6 +155,8 @@ int main(int argc, char **argv)
 
     add_services(&g_server);
     g_client->setServer(&g_server);
+    initInterfaces_common();
+    initInterfaces();
 
     int i = -1;
     err = (erpc_status_t)-1;
@@ -197,4 +200,9 @@ void quitSecondInterfaceServer()
     // Stop server part
     g_server.stop();
     increaseWaitQuit();
+}
+
+void initInterfaces_common(void)
+{
+    initInterfacesClient_unit_test_common();
 }

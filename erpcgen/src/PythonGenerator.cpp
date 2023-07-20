@@ -169,7 +169,7 @@ void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
     symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
 }
 
-data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
+data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn, Interface *interface)
 {
     (void)group;
     data_map info;

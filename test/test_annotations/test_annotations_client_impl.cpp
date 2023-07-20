@@ -8,10 +8,17 @@
 
 #include "gtest.h"
 #include "test.h"
+#include "unit_test_wrapped.h"
+#include "test_client.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(void)
+{
+    initInterfacesClient();
+}
 
 TEST(test_annotations, AnnotationServiceID)
 {

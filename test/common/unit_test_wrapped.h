@@ -13,9 +13,13 @@
 // Function Prototypes
 ////////////////////////////////////////////////////////////////////////////////
 
+typedef void * erpc_service_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
+void initInterfaces(void);
+void initInterfaces_common(void);
+
 void add_services_to_server(erpc_server_t server);
 void remove_services_from_server(erpc_server_t server);
 void remove_common_services_from_server(erpc_server_t server, erpc_service_t service);

@@ -9,9 +9,10 @@
 #include "erpc_port.h"
 #endif
 #include "{$codecHeader}"
+#include "{$clientHeaderName}"
+#include "erpc_manually_constructed.h"
 extern "C"
 {
-#include "{$commonHeaderName}.h"
 {% if groupNames %}
 // import callbacks declaration from other groups
 {%  for name in groupNames if name != group.name %}
@@ -40,7 +41,12 @@ extern ClientManager *g_client;
 {$> symbolSource(group.symbolsMap.symbolsToServer, "serial", "noSharedMem")}
 {$> symbolHeader(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
 {$> symbolSource(group.symbolsMap.symbolsToClient, "deserial", "noSharedMem")}
-{% def clientShimCode(fn, serverIDName, functionIDName) ------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
+
+{% for iface in group.interfaces %}
+static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
+{% endfor -- iface %}
+
+{% def clientShimCode(client, fn, serverIDName, functionIDName) ------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
 {% set clientIndent = "" >%}
 {% if generateErrorChecks %}
     erpc_status_t err = kErpcStatus_Success;
@@ -56,7 +62,7 @@ extern ClientManager *g_client;
 {% endif -- isNotVoid %}
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb preCB = g_client->getPreCB();
+    pre_post_action_cb preCB = {$client}->getPreCB();
     if (preCB)
     {
         preCB();
@@ -65,9 +71,9 @@ extern ClientManager *g_client;
 
     // Get a new request.
 {% if !fn.isReturnValue %}
-    RequestContext request = g_client->createRequest(true);
+    RequestContext request = {$client}->createRequest(true);
 {% else %}
-    RequestContext request = g_client->createRequest(false);
+    RequestContext request = {$client}->createRequest(false);
 {% endif -- isReturnValue %}
 
     // Encode the request.
@@ -103,7 +109,7 @@ extern ClientManager *g_client;
 {% endif -- isSendValue %}
 {$clientIndent}    // Send message to server
 {$clientIndent}    // Codec status is checked inside this function.
-{$clientIndent}    g_client->performRequest(request);
+{$clientIndent}    {$client}->performRequest(request);
 {% if fn.isReturnValue %}
 {%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 
@@ -141,15 +147,15 @@ extern ClientManager *g_client;
 {% endif -- generateAllocErrorChecks %}
 
     // Dispose of the request.
-    g_client->releaseRequest(request);
+    {$client}->releaseRequest(request);
 {% if generateErrorChecks %}
 
     // Invoke error handler callback function
-    g_client->callErrorHandler(err, {$functionIDName});
+    {$client}->callErrorHandler(err, {$functionIDName});
 {% endif -- generateErrorChecks %}
 
 #if ERPC_PRE_POST_ACTION
-    pre_post_action_cb postCB = g_client->getPostCB();
+    pre_post_action_cb postCB = {$client}->getPostCB();
     if (postCB)
     {
         postCB();
@@ -177,21 +183,40 @@ static {$callbackType.prototype};
 // Common function for serializing and deserializing callback functions of same type.
 static {$callbackType.prototype}
 {
-{$ clientShimCode(callbackType, "serviceID", "functionID") >}
+{$ clientShimCode("m_clientManager", callbackType, "serviceID", "functionID") >}
 }
-
 {% endfor %}
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 
-// {$iface.name} interface {$fn.name} function client shim.
 {$fn.prototype}
 {
+    {% if fn.returnValue.type.isNotVoid %}return {% endif %}s_{$iface.clientClassName}->{$fn.name}({% for param in fn.parameters %}{% if !loop.first %}, {% endif %}{$param.pureName}{% endfor %});
+}
+{%  endfor -- fn %}
+{% endfor -- iface %}
+
+{% for iface in group.interfaces %}
+{$iface.clientClassName}::{$iface.clientClassName}(ClientManager *manager)
+:m_clientManager(manager)
+{
+};
+{%  for fn in iface.functions %}
+
+// {$iface.name} interface {$fn.name} function client shim.
+{$fn.prototypeCpp}
+{
 {%   if fn.isCallback %}
-    {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id{% for param in fn.parameters %}, {$param.name}{% endfor %});
+    {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(m_clientManager, k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id{% for param in fn.parameters %}, {$param.pureName}{% endfor %});
 {%   else -- fn.isCallback >%}
-{$ clientShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
+{$ clientShimCode("m_clientManager", fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
 {%   endif -- fn.isCallback >%}
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}
+
+void initInterfacesClient{%if group.name%}_{$group.name}{%endif%}(void){
+{% for iface in group.interfaces %}
+    s_{$iface.clientClassName}.construct(g_client);
+{% endfor -- iface %}
+}

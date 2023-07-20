@@ -121,7 +121,7 @@ protected:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, Interface *interface = nullptr) override;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones

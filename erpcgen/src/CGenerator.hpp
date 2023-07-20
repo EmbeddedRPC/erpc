@@ -50,6 +50,13 @@ public:
      */
     virtual void generate() override;
 
+    /*!
+     * @brief This function generate set flag to generate C++ code only.
+     *
+     * This code call all necessary functions to prepare C++ output code and parse it into output files.
+     */
+    void generateCpp(void);
+
 private:
     enum _direction
     {
@@ -59,14 +66,16 @@ private:
         kNone
     };
 
+    bool m_generateC;                      /*!< When true additional C code is generated. Otherwise only Cpp. */
+
     cpptempl::data_list m_symbolsTemplate; /*!< List of all symbol templates */
 
     std::vector<ListType *>
-        m_listBinaryTypes; /*!<
-                            * Contains binary types transformed to list<uint8>.
-                            * More ListType are present when @length annotation is used for binary type.
-                            * If binary without @length is used then it is placed on first place in this vector.
-                            */
+        m_listBinaryTypes;                       /*!<
+                                                  * Contains binary types transformed to list<uint8>.
+                                                  * More ListType are present when @length annotation is used for binary type.
+                                                  * If binary without @length is used then it is placed on first place in this vector.
+                                                  */
 
     std::vector<StructType *> m_structListTypes; /*!<
                                                   * Contains list types transformed to struct{list<>}.
@@ -104,6 +113,20 @@ private:
      * @param[in] fileName Name for output client source file.
      */
     void generateCommonHeaderFiles(const std::string &fileName);
+
+    /*!
+     * @brief This function generate output interface header file.
+     *
+     * @param[in] fileName Name for output interface header file.
+     */
+    void generateInterfaceHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client header file.
+     *
+     * @param[in] fileName Name for output client header file.
+     */
+    void generateClientHeaderFile(std::string fileName);
 
     /*!
      * @brief This function generate output client source file.
@@ -190,7 +213,7 @@ private:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
+    cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn, Interface *interface = nullptr) override;
 
     /*!
      * @brief This function returns function type (callbacks type) template data.
@@ -434,7 +457,7 @@ private:
      *
      * @return String representation for given function.
      */
-    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr);
+    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr, std::string = "");
 
     /*!
      * @brief This function return name with guard.

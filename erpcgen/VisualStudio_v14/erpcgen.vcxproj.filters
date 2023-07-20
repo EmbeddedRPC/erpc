@@ -164,13 +164,19 @@
     <ClCompile Include="..\src\cpptemplate\cpptempl.cpp">
       <Filter>Source Files\cpptemplate</Filter>
     </ClCompile>
-    <ClCompile Include="c_client_source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="c_coders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_common_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_interface_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_server_header.cpp">
