@@ -16,7 +16,7 @@ extern "C"
 {% if groupNames %}
 // import callbacks declaration from other groups
 {%  for name in groupNames if name != group.name %}
-#include "{$outputFilename}_{$name}.h"
+#include "{$outputFilename}_{$name}_common.h"
 {%  endfor %}
 {% endif %}
 }

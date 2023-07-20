@@ -48,7 +48,7 @@ static uint8_t listCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 CGenerator::CGenerator(InterfaceDefinition *def)
 : Generator(def, kC)
-,    m_generateC(true)
+, m_generateC(true)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -79,6 +79,8 @@ void CGenerator::generateCpp(void)
 
 void CGenerator::generateOutputFiles(const string &fileName)
 {
+    generateCommonHeaderFiles(fileName);
+
     generateInterfaceHeaderFile(fileName);
 
     generateClientHeaderFile(fileName);
@@ -86,27 +88,14 @@ void CGenerator::generateOutputFiles(const string &fileName)
 
     generateServerHeaderFile(fileName);
     generateServerSourceFile(fileName);
-
-    generateCommonHeaderFiles(fileName);
 }
 
-void CGenerator::generateTypesHeaderFile()
+void CGenerator::generateCommonHeaderFiles(string fileName)
 {
-    string typesHeaderFileName = m_templateData["commonTypesFile"]->getvalue();
-
-    m_templateData["commonGuardMacro"] = generateIncludeGuardName(typesHeaderFileName);
-    m_templateData["genCommonTypesFile"] = true;
-    m_templateData["commonTypesFile"] = "";
-
-    generateOutputFile(typesHeaderFileName, "c_common_header", m_templateData, kCCommonHeader);
-}
-
-void CGenerator::generateCommonHeaderFiles(const string &fileName)
-{
-    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName + ".h");
-    m_templateData["genCommonTypesFile"] = false;
-
-    generateOutputFile(fileName + ".h", "c_common_header", m_templateData, kCCommonHeader);
+    fileName += "_common.h";
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonHeaderName"] = fileName;
+    generateOutputFile(fileName , "c_common_header", m_templateData, kCCommonHeader);
 }
 
 void CGenerator::generateInterfaceHeaderFile(string fileName)
@@ -517,16 +506,6 @@ void CGenerator::generate()
     // for common header, only C specific
     makeSymbolsDeclarationTemplateData();
 
-    // check if types header annotation is used
-    if (m_def->hasProgramSymbol())
-    {
-        m_templateData["commonTypesFile"] = getAnnStringValue(program, TYPES_HEADER_ANNOTATION);
-    }
-    else
-    {
-        m_templateData["commonTypesFile"] = "";
-    }
-
     for (Group *group : m_groups)
     {
         data_map groupTemplate;
@@ -538,12 +517,6 @@ void CGenerator::generate()
         group->setTemplate(groupTemplate);
 
         generateGroupOutputFiles(group);
-    }
-
-    // generate types header if used
-    if (!m_templateData["commonTypesFile"]->getvalue().empty())
-    {
-        generateTypesHeaderFile();
     }
 }
 

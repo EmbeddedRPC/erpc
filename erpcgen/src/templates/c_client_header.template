@@ -7,9 +7,10 @@
 #if !defined({$clientGuardMacro})
 #define {$clientGuardMacro}
 
+#include "{$interfaceHeaderName}"
+
 #if defined(__cplusplus)
 
-#include "{$interfaceHeaderName}"
 #include "erpc_client_manager.h"
 
 namespace erpc {

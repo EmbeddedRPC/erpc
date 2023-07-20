@@ -471,7 +471,6 @@ void Generator::generateGroupOutputFiles(Group *group)
             fileName += "_" + groupName;
         }
         Log::info("File name %s\n", fileName.c_str());
-        m_templateData["commonHeaderName"] = fileName;
 
         // group templates
         m_templateData["group"] = group->getTemplate();

@@ -7,15 +7,11 @@
 #if !defined({$serverGuardMacro})
 #define {$serverGuardMacro}
 
+#include "{$interfaceHeaderName}"
+
 #ifdef __cplusplus
 #include "erpc_server.hpp"
 #include "{$codecHeader}"
-#include "{$interfaceHeaderName}"
-extern "C"
-{
-#include <stdint.h>
-#include <stdbool.h>
-}
 
 {$checkVersion()}
 {$>checkCrc()}
@@ -52,8 +48,6 @@ private:
 
 
 extern "C" {
-#else
-#include "{$commonHeaderName}.h"
 #endif // __cplusplus
 
 typedef void * erpc_service_t;

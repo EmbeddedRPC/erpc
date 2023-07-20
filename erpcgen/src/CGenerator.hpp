@@ -101,18 +101,11 @@ private:
     void generateOutputFiles(const std::string &fileNameExtension) override;
 
     /*!
-     * @brief This function generate output common types header file.
-     *
-     * @param[in] fileName Name for output client source file.
-     */
-    void generateTypesHeaderFile();
-
-    /*!
      * @brief This function generate output common header file.
      *
      * @param[in] fileName Name for output client source file.
      */
-    void generateCommonHeaderFiles(const std::string &fileName);
+    void generateCommonHeaderFiles(std::string fileName);
 
     /*!
      * @brief This function generate output interface header file.

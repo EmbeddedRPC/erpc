@@ -7,7 +7,6 @@
  */
 
 #include "gtest.h"
-#include "test.h"
 #include "unit_test_wrapped.h"
 #include "test_client.h"
 

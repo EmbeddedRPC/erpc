@@ -76,7 +76,4 @@
 //! Shared memory area end address
 #define SHARED_MEMORY_END_ANNOTATION "shared_memory_end"
 
-//! Place all types definitions (e.g. typedef, structs, etc.) into one file
-#define TYPES_HEADER_ANNOTATION "types_header"
-
 #endif /* _EMBEDDED_RPC__ANNOTATIONS_H_ */
