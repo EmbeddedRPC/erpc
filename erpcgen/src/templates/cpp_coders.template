@@ -209,11 +209,7 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.disc
 
 {% def decodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-// codec->read(_tmp_local_u16);
-// if (!get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {$info.cbParamOutName}))
-//{
-//    codec->updateStatus(kErpcStatus_UnknownCallback);
-//}
+{% if param.direction != InDirection %}*{% endif %}{$info.name} = &{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{$info.callbacks};
 {% else -- info.callbacksCount == 1 %}
 codec->read(_tmp_local_u16);
 if (!{% if param.isFunction %}{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{% endif %}get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {% if param.direction == InDirection %}&{% endif %}{$info.cbParamOutName}))
@@ -348,10 +344,11 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 
 {% def encodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-// (void)get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16); - Ignored because only one callback exists.
+/* No need to serialize code for {$info.name} when only one cb exists. */
+// (void){% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
 // codec->write(_tmp_local_u16);
 {% else -- info.callbacksCount == 1 %}
-(void){% if param.isFunction %}{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{% endif %}get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
+(void){% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
 codec->write(_tmp_local_u16);
 {% endif -- info.callbacksCount == 1 %}
 {% enddef -------------------------- FunctionType %}

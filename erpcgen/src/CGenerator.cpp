@@ -1073,7 +1073,7 @@ data_map CGenerator::getStructDeclarationTemplateData(StructType *structType)
         DataType *trueDataType = member->getDataType()->getTrueDataType();
         // Check if member is byRef type. Add "*" for type and allocate space for data on server side.
         if (member->isByref() &&
-            (trueDataType->isStruct() || trueDataType->isUnion() || trueDataType->isScalar() || trueDataType->isEnum()))
+            (trueDataType->isStruct() || trueDataType->isUnion() || trueDataType->isScalar() || trueDataType->isEnum() || trueDataType->isFunction()))
         {
             memberName = "*" + memberName;
         }
@@ -1354,14 +1354,14 @@ void CGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 bool CGenerator::isServerNullParam(StructMember *param)
 {
     DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
-    return (!paramTrueDataType->isScalar() && !paramTrueDataType->isEnum() && !paramTrueDataType->isArray());
+    return (!paramTrueDataType->isScalar() && !paramTrueDataType->isEnum() && !paramTrueDataType->isArray() && !paramTrueDataType->isFunction());
 }
 
 bool CGenerator::isPointerParam(StructMember *param)
 {
     DataType *paramTrueDataType = param->getDataType()->getTrueDataType();
     return (isServerNullParam(param) ||
-            ((paramTrueDataType->isScalar() || paramTrueDataType->isEnum()) && param->getDirection() != kInDirection));
+            ((paramTrueDataType->isScalar() || paramTrueDataType->isEnum() || paramTrueDataType->isFunction()) && param->getDirection() != kInDirection));
 }
 
 bool CGenerator::isNullableParam(StructMember *param)
@@ -1438,7 +1438,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
         info["needTempVariableClientI32"] = needTempVariableI32;
         returnInfo["resultVariable"] = resultVariable;
         returnInfo["errorReturnValue"] = getErrorReturnValue(fn);
-        returnInfo["isNullReturnType"] = (!trueDataType->isScalar() && !trueDataType->isEnum());
+        returnInfo["isNullReturnType"] = (!trueDataType->isScalar() && !trueDataType->isEnum() && !trueDataType->isFunction());
     }
     info["returnValue"] = returnInfo;
 
@@ -1536,7 +1536,7 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
             // Special case when scalar variables are @nullable
             string nullableName = getOutputName(param);
             paramInfo["nullableName"] = nullableName;
-            if (paramTrueType->isScalar() || paramTrueType->isEnum())
+            if (paramTrueType->isScalar() || paramTrueType->isEnum() || paramTrueType->isFunction())
             {
                 paramInfo["nullVariable"] = getTypenameName(paramTrueType, "*_" + nullableName);
             }
@@ -1990,13 +1990,13 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
             DataType *trueDataType = it->getDataType()->getTrueDataType();
 
             /* Builtin types and function types. */
-            if (((trueDataType->isScalar()) || trueDataType->isEnum()) && it->getDirection() != kInDirection &&
+            if (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) && it->getDirection() != kInDirection &&
                 findAnnotation(it, NULLABLE_ANNOTATION))
             {
                 // On server side is created new variable for handle null : "_" + name
                 proto += "_";
             }
-            else if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum()) ||
+            else if ((it->getDirection() != kInDirection) && (((trueDataType->isScalar()) || trueDataType->isEnum() || trueDataType->isFunction()) ||
                                                               (findAnnotation(it, SHARED_ANNOTATION))))
 
             {
@@ -2080,8 +2080,7 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
             /* Add '*' to data types. */
             if (((trueDataType->isBuiltin() || trueDataType->isEnum()) &&
                  (it->getDirection() != kInDirection && !trueDataType->isString())) ||
-                (trueDataType->isFunction() &&
-                 (it->getDirection() == kOutDirection || it->getDirection() == kInoutDirection)))
+                (trueDataType->isFunction() && (it->getDirection() != kInDirection)))
             {
                 paramSignature = "* " + paramSignature;
             }
@@ -2449,7 +2448,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
     // Check if member is byRef type. Add "*" for type and allocate space for data on server side.
     if (structMember && structMember->isByref() && !isFunctionParam &&
-        (t->isStruct() || t->isUnion() || t->isScalar() || t->isEnum()))
+        (t->isStruct() || t->isUnion() || t->isScalar() || t->isEnum() || t->isFunction()))
     {
         templateData["freeingCall2"] = m_templateData["freeData"];
         templateData["memberAllocation"] = allocateCall(name, t);
@@ -2462,13 +2461,13 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
     templateData["name"] = localName;
 
-    if (t->isScalar() || t->isEnum())
+    if (t->isScalar() || t->isEnum() || t->isFunction())
     {
         templateData["pointerScalarTypes"] = false;
         if (!inDataContainer && structMember && structMember->getDirection() != kInDirection)
         {
             DataType *trueDataType = t->getTrueDataType();
-            if (trueDataType->isScalar() || trueDataType->isEnum())
+            if (trueDataType->isScalar() || trueDataType->isEnum() || t->isFunction())
             {
                 templateData["pointerScalarTypes"] = true;
             }
@@ -2542,14 +2541,7 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
             templateData["callbacksCount"] = callbacks.size();
             templateData["cbTypeName"] = funType->getName();
-            if (structMember->getDirection() == kInDirection)
-            {
-                templateData["cbParamOutName"] = name;
-            }
-            else
-            {
-                templateData["cbParamOutName"] = name.substr(1, name.length());
-            }
+            templateData["cbParamOutName"] = name;
             if (callbacks.size() > 1)
             {
                 templateData["callbacks"] = "_" + funType->getName();
@@ -2886,7 +2878,7 @@ string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     if (structMemberDir == kOutDirection) // between out and inout can be differences in future. Maybe not.
     {
         if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() &&
-            !trueDataType->isArray())
+            !trueDataType->isArray() && !trueDataType->isFunction())
         {
             result = "*";
         }
@@ -2898,7 +2890,7 @@ string CGenerator::getExtraDirectionPointer(StructMember *structMember)
     else if (structMemberDir == kInoutDirection)
     {
         if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() &&
-            !trueDataType->isArray())
+            !trueDataType->isArray() && !trueDataType->isFunction())
         {
             result = "*";
         }
@@ -2942,7 +2934,7 @@ data_map CGenerator::firstAllocOnServerWhenIsNeed(const string &name, StructMemb
         if (structMemberDir == kInoutDirection)
         {
             if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isList() &&
-                !trueDataType->isArray())
+                !trueDataType->isArray() && !trueDataType->isFunction())
             {
                 return allocateCall(name, structMember);
             }
@@ -2956,7 +2948,7 @@ data_map CGenerator::firstAllocOnServerWhenIsNeed(const string &name, StructMemb
         }
         else if (structMember->getDirection() == kOutDirection)
         {
-            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray())
+            if (!trueDataType->isBuiltin() && !trueDataType->isEnum() && !trueDataType->isArray() && !trueDataType->isFunction())
             {
                 return allocateCall(name, structMember);
             }
