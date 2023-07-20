@@ -11,6 +11,7 @@
 #include "erpc_simple_server.hpp"
 #include "erpc_tcp_transport.hpp"
 #include "erpc_transport_arbitrator.hpp"
+#include "unit_test_wrapped.h"
 
 #include "Logging.hpp"
 #include "c_test_secondInterface_server.h"
@@ -145,6 +146,8 @@ int main(int argc, char **argv)
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
     g_client->setServer(&g_server);
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces(client);
 
     err = (erpc_status_t)-1;
 

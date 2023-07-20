@@ -88,7 +88,7 @@ extern bool nestingDetection;
 {% endif -- isSendValue %}
 {% for param in fn.parametersToClient %}
 {%  if !param.shared %}
-{%   if param.isNullable == false && param.direction == OutDirection && empty(param.mallocServer) == false && param.isFunction == false %}
+{%   if param.isNullable == false && param.direction == OutDirection && empty(param.mallocServer) == false %}
 {$> addIndent("    ", allocMem(param.mallocServer))}
 
 {%   endif -- !param.isNullable && param.direction == OutDirection %}

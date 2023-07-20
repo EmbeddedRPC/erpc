@@ -212,7 +212,7 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.disc
 {% if param.direction != InDirection %}*{% endif %}{$info.name} = &{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{$info.callbacks};
 {% else -- info.callbacksCount == 1 %}
 codec->read(_tmp_local_u16);
-if (!{% if param.isFunction %}{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{% endif %}get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {% if param.direction == InDirection %}&{% endif %}{$info.cbParamOutName}))
+if (!{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {% if param.direction == InDirection %}&{% endif %}{$info.cbParamOutName}))
 {
     codec->updateStatus(kErpcStatus_UnknownCallback);
 }
