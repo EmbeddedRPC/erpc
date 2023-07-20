@@ -9,7 +9,8 @@ cpp_client_header.cpp
 cpp_server_header.cpp
 cpp_server_source.cpp
 cpp_coders.cpp
-c_common_header.cpp
+c_common_standard_header.cpp
+c_common_erpc_header.cpp
 c_client_source.cpp
 c_client_header.cpp
 c_server_header.cpp

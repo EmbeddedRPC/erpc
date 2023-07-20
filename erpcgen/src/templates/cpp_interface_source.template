@@ -3,8 +3,8 @@
 {$checkVersion()}
 {$>checkCrc()}
 
-using namespace erpc;
 using namespace std;
+{$usingNamespace() >}
 
 {% for iface in group.interfaces -- service subclass method impl %}
 {%  for cb in iface.callbacksInt %}

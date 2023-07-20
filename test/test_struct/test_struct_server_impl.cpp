@@ -18,6 +18,7 @@
 #include <string.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 ArithmeticService1_service *svc1;
 ArithmeticService2_service *svc2;

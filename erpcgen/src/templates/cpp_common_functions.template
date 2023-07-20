@@ -32,6 +32,28 @@ extern const uint32_t erpc_generated_crc = {$crc16};
 {% endif  -- empty(crc16) == false %}
 {% enddef --checkCrc %}
 
+{# ---------------- namespace ---------------- #}
+{% def fillNamespaceBegin() %}
+{% if empty(namespace) == false %}
+
+namespace {$namespace}
+{
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
+{% def fillNamespaceEnd() %}
+{% if empty(namespace) == false %}
+} // {$namespace}
+
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
+{% def usingNamespace() %}
+{% if empty(namespace) == false %}
+using namespace {$namespace};
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
 {# ---------------- constantsDefinitions ---------------- #}
 {% def constantsDefinitions(consts) %}
 {% if not empty(consts) %}

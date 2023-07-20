@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 Binary_service *svc;
 

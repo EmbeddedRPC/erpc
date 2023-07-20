@@ -16,6 +16,7 @@
 
 using namespace erpc;
 using namespace std;
+{$usingNamespace() >}
 {% for iface in group.interfaces %}
 {%  if count(iface.callbacksAll) > 0 %}
 

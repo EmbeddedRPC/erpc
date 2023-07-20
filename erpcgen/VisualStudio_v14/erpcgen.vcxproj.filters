@@ -167,7 +167,10 @@
     <ClCompile Include="cpp_coders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="c_common_header.cpp">
+    <ClCompile Include="c_common_standard_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_common_erpc_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cpp_interface_header.cpp">

@@ -7,7 +7,8 @@
 #if !defined({$serverCGuardMacro})
 #define {$serverCGuardMacro}
 
-#include "{$commonCHeaderName}"
+#include "{$commonStandardCHeaderName}"
+#include "{$commonErpcCHeaderName}"
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 {%   for externalInterface in fn.externalInterfaces %}

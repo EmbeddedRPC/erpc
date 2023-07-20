@@ -7,7 +7,8 @@
  */
 
 #include "gtest.h"
-#include "test_common.h"
+#include "test_common_standard.h"
+#include "test_common_erpc.h"
 #include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////

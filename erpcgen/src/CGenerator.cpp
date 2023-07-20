@@ -31,7 +31,8 @@ using namespace std;
 static const char *const kIdentifierChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
 // Templates strings converted from text files by txt_to_c.py.
-extern const char *const kCCommonHeader;
+extern const char *const kCCommonStandardHeader;
+extern const char *const kCCommonErpcHeader;
 extern const char *const kCppInterfaceHeader;
 extern const char *const kCppInterfaceSource;
 extern const char *const kCppClientHeader;
@@ -78,7 +79,8 @@ CGenerator::CGenerator(InterfaceDefinition *def)
 
 void CGenerator::generateOutputFiles(const string &fileName)
 {
-    generateCommonCHeaderFiles(fileName);
+    generateCommonStandardCHeaderFiles(fileName);
+    generateCommonErpcCHeaderFiles(fileName);
 
     generateInterfaceCppHeaderFile(fileName);
     generateInterfaceCppSourceFile(fileName);
@@ -96,12 +98,20 @@ void CGenerator::generateOutputFiles(const string &fileName)
     generateServerCSourceFile(fileName);
 }
 
-void CGenerator::generateCommonCHeaderFiles(string fileName)
+void CGenerator::generateCommonStandardCHeaderFiles(string fileName)
 {
-    fileName += "_common.h";
-    m_templateData["commonCGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonCHeaderName"] = fileName;
-    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
+    fileName += "_common_standard.h";
+    m_templateData["commonStandardCGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonStandardCHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_common_standard_header", m_templateData, kCCommonStandardHeader);
+}
+
+void CGenerator::generateCommonErpcCHeaderFiles(string fileName)
+{
+    fileName += "_common_erpc.h";
+    m_templateData["commonErpcCGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonErpcCHeaderName"] = fileName;
+    generateOutputFile(fileName, "c_common_erpc_header", m_templateData, kCCommonErpcHeader);
 }
 
 void CGenerator::generateInterfaceCppHeaderFile(string fileName)

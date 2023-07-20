@@ -7,8 +7,7 @@
 #if !defined({$interfaceCppGuardMacro})
 #define {$interfaceCppGuardMacro}
 
-#include "{$commonCHeaderName}"
-
+#include "{$commonStandardCHeaderName}"
 {% for iface in group.interfaces %}
 {%  for fn in iface.functions %}
 {%   for externalInterface in fn.externalInterfaces %}
@@ -20,8 +19,8 @@
 {%   endfor -- externalInterface %}
 {%  endfor -- fn %}
 {% endfor -- iface %}
-
-namespace erpc {
+{$fillNamespaceBegin()}
+#include "{$commonErpcCHeaderName}"
 {% for iface in group.interfaces %}
 
 // Abstract base class for {$iface.name}
@@ -56,7 +55,5 @@ private:
 {% endfor %}
 };
 {% endfor -- iface %}
-
-} // namespace erpc
-
+{$fillNamespaceEnd()}
 #endif // {$interfaceCppGuardMacro}

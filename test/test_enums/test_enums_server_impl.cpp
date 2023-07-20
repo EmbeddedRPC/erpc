@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 EnumsService_service *svc;
 

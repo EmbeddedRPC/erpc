@@ -1,0 +1,35 @@
+{% if mlComment != ""%}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$commonStandardCGuardMacro})
+#define {$commonStandardCGuardMacro}
+
+#ifdef __cplusplus
+
+{% for inc in includes %}
+#include "{$inc}"
+{% endfor -- includes %}
+
+extern "C"
+{
+#endif
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "erpc_version.h"
+{% if empty(crc16) == false %}
+#include "{$crcHeaderName}"
+{% endif  -- empty(crc16) == false %}
+
+{$checkVersion()}
+{$>checkCrc()}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // {$commonStandardCGuardMacro}

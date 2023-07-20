@@ -16,6 +16,7 @@
 {$>checkCrc()}
 using namespace erpc;
 using namespace std;
+{$usingNamespace() >}
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;

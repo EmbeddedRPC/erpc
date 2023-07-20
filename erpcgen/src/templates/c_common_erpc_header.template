@@ -4,31 +4,19 @@
 {% endif %}
 {$commonHeader()}
 
-#if !defined({$commonCGuardMacro})
-#define {$commonCGuardMacro}
+#if !defined({$commonErpcCGuardMacro})
+#define {$commonErpcCGuardMacro}
 {% if usedUnionType %}
 
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 #pragma anon_unions
 #endif
 {% endif -- usedUnionType %}
+
 #ifdef __cplusplus
-
-{% for inc in includes %}
-#include "{$inc}"
-{% endfor -- includes %}
-
 extern "C"
 {
 #endif
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include "erpc_version.h"
-{% if empty(crc16) == false %}
-#include "{$crcHeaderName}"
-{% endif  -- empty(crc16) == false %}
 
 {$checkVersion()}
 {$>checkCrc()}
@@ -107,4 +95,4 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 }
 #endif // __cplusplus
 
-#endif // {$commonCGuardMacro}
+#endif // {$commonErpcCGuardMacro}

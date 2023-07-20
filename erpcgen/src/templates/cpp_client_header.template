@@ -10,14 +10,13 @@
 #include "{$interfaceCppHeaderName}"
 
 #include "erpc_client_manager.h"
+{$fillNamespaceBegin()>}
 
-namespace erpc {
 {% for iface in group.interfaces %}
-
 class {$iface.clientClassName}: public {$iface.interfaceClassName}
 {
     public:
-        {$iface.clientClassName}(ClientManager *manager);
+        {$iface.clientClassName}(erpc::ClientManager *manager);
 {% for fn in iface.functions if fn.isNonExternalFunction == true %}
 
 {% if fn.mlComment %}
@@ -27,10 +26,9 @@ class {$iface.clientClassName}: public {$iface.interfaceClassName}
 {% endfor -- fn %}
 
     protected:
-        ClientManager *m_clientManager;
+        erpc::ClientManager *m_clientManager;
 };
+
 {% endfor -- iface %}
-
-} // namespace erpc
-
+{$fillNamespaceEnd()}
 #endif // {$clientCppGuardMacro}

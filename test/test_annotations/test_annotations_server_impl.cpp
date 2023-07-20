@@ -18,6 +18,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 AnnotateTest_service *svc;
 

@@ -14,7 +14,7 @@
 #include "gtest.h"
 #include "gtestListener.h"
 #include "myAlloc.h"
-#include "test_unit_test_common_client.h"
+#include "c_test_unit_test_common_client.h"
 #include "unit_test_wrapped.h"
 
 #if (defined(RPMSG) || defined(UART) || defined(MU))

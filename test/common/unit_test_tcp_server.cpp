@@ -17,6 +17,7 @@
 #include "unit_test.h"
 
 using namespace erpc;
+using namespace erpcshim;
 
 class MyMessageBufferFactory : public MessageBufferFactory
 {

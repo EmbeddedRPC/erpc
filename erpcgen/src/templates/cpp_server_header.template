@@ -14,35 +14,33 @@
 
 {$checkVersion()}
 {$>checkCrc()}
+{$fillNamespaceBegin()>}
 
-namespace erpc {
 {% for iface in group.interfaces %}
-
 /*!
  * @brief Service subclass for {$iface.name}.
  */
-class {$iface.serviceClassName} : public Service
+class {$iface.serviceClassName} : public erpc::Service
 {
 public:
     {$iface.serviceClassName}({$iface.interfaceClassName} *_{$iface.interfaceClassName})
     : m_handler(_{$iface.interfaceClassName})
-    , Service({$iface.interfaceClassName}::m_serviceId) {}
+    , erpc::Service({$iface.interfaceClassName}::m_serviceId) {}
 
     /*! @brief return service interface handler. */
     {$iface.interfaceClassName}* getHandler(void);
 
     /*! @brief Call the correct server shim based on method unique ID. */
-    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory);
+    virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, erpc::Codec * codec, erpc::MessageBufferFactory *messageFactory);
 
 private:
     {$iface.interfaceClassName} *m_handler;
 {%  for fn in iface.functions %}
     /*! @brief Server shim for {$fn.name} of {$iface.name} interface. */
-    erpc_status_t {$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);{$loop.addNewLineIfNotLast}
+    erpc_status_t {$fn.name}_shim(erpc::{$codecClass} * codec, erpc::MessageBufferFactory *messageFactory, uint32_t sequence);{$loop.addNewLineIfNotLast}
 {%  endfor -- fn %}
 };
+
 {% endfor -- iface %}
-
-} // namespace erpc
-
+{$fillNamespaceEnd()}
 #endif // {$serverCppGuardMacro}

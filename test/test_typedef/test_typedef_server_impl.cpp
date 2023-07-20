@@ -18,6 +18,7 @@
 #include <string.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 TypedefService_service *svc;
 

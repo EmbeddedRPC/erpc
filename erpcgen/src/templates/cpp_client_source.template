@@ -16,7 +16,7 @@ extern "C"
 {% if groupNames %}
 // import callbacks declaration from other groups
 {%  for name in groupNames if name != group.name %}
-#include "{$outputFilename}_{$name}_common.h"
+#include "{$outputFilename}_{$name}_common_erpc.h"
 {%  endfor %}
 {% endif %}
 }
@@ -25,6 +25,7 @@ extern "C"
 {$>checkCrc()}
 using namespace erpc;
 using namespace std;
+{$usingNamespace() >}
 {$generateCrcVariable()}
 {$> setSharedMemAddresses()}
 {$> constantsDefinitions(consts)}

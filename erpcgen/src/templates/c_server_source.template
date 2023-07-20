@@ -14,6 +14,7 @@
 
 using namespace erpc;
 using namespace std;
+{$usingNamespace() >}
 {% for iface in group.interfaces %}
 
 ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});

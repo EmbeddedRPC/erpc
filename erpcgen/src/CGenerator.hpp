@@ -92,11 +92,18 @@ private:
     void generateOutputFiles(const std::string &fileNameExtension) override;
 
     /*!
-     * @brief This function generate output common header file.
+     * @brief This function generate header file output with common standard code.
      *
-     * @param[in] fileName Name for output client source file.
+     * @param[in] fileName Name for common standard header file output.
      */
-    void generateCommonCHeaderFiles(std::string fileName);
+    void generateCommonStandardCHeaderFiles(std::string fileName);
+
+    /*!
+     * @brief This function generate header file output with common eRPC code.
+     *
+     * @param[in] fileName Name for common eRPC header file output.
+     */
+    void generateCommonErpcCHeaderFiles(std::string fileName);
 
     /*!
      * @brief This function generate output interface header file.

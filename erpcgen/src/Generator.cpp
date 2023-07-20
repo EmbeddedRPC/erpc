@@ -91,6 +91,15 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
         {
             scopeName = getAnnStringValue(program, SCOPE_NAME_ANNOTATION);
         }
+
+        if (findAnnotation(m_def->getProgramSymbol(), NAMESPACE_ANNOTATION) != nullptr)
+        {
+            m_templateData["namespace"] = getAnnStringValue(m_def->getProgramSymbol(), NAMESPACE_ANNOTATION);
+        }
+        else
+        {
+            m_templateData["namespace"] = "erpcshim";
+        }
     }
 
     m_templateData["scopeName"] = scopeName;

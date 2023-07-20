@@ -40,6 +40,9 @@
 //! Specify the symbol name.
 #define NAME_ANNOTATION "name"
 
+//! Specify the namespace of program code.
+#define NAMESPACE_ANNOTATION "namespace"
+
 //! Turn off error checking code for allocations in generated output
 #define NO_ALLOC_ERRORS_ANNOTATION "no_alloc_errors"
 

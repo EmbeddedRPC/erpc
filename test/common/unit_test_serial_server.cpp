@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 using namespace erpc;
+using namespace erpcshim;
 
 class MyMessageBufferFactory : public MessageBufferFactory
 {
