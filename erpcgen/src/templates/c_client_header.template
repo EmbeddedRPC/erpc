@@ -8,6 +8,7 @@
 #define {$clientCGuardMacro}
 
 #include "{$commonCHeaderName}"
+#include "erpc_client_manager.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -41,9 +42,10 @@ enum _{$iface.name}_ids
 #endif // {$getFunctionDeclarationMacroName()}
 
 {% endfor -- iface %}
+{% for iface in group.interfaces %}
+void init{$iface.clientClassName}(erpc_client_t client);
 
-void initInterfacesClient{%if group.name%}_{$group.name}{%endif%}(void);
-
+{% endfor -- iface %}
 #ifdef __cplusplus
 }
 #endif

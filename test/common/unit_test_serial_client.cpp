@@ -70,8 +70,9 @@ int main(int argc, char **argv)
     g_client->setMessageBufferFactory(&g_msgFactory);
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);
-    initInterfaces_common();
-    initInterfaces();
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int ret = RUN_ALL_TESTS();
     quit();
@@ -81,9 +82,9 @@ int main(int argc, char **argv)
     return ret;
 }
 
-void initInterfaces_common(void)
+void initInterfaces_common(erpc_client_t client)
 {
-    initInterfacesClient_unit_test_common();
+    initCommon_client(client);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

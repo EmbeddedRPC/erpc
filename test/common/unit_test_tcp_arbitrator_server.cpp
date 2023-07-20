@@ -14,8 +14,7 @@
 
 #include "Logging.hpp"
 #include "myAlloc.hpp"
-#include "test_firstInterface.h"
-#include "test_secondInterface.h"
+#include "c_test_firstInterface_server.h"
 #include "unit_test.h"
 
 #include <unistd.h>

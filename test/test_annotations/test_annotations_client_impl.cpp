@@ -14,9 +14,9 @@
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
 
-void initInterfaces(void)
+void initInterfaces(erpc_client_t client)
 {
-    initInterfacesClient();
+    initAnnotateTest_client(client);
 }
 
 TEST(test_annotations, AnnotationServiceID)

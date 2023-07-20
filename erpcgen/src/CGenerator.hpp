@@ -459,7 +459,8 @@ private:
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string name = "");
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, std::string interfaceName = "",
+                                     std::string name = "");
 
     /*!
      * @brief This function return interface function representation called by server side.

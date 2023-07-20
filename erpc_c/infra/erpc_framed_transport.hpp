@@ -114,7 +114,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 *getCrc16() override;
+    virtual Crc16 * getCrc16(void) override { return m_crcImpl; }
 
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */

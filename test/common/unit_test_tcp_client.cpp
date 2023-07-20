@@ -91,8 +91,9 @@ int main(int argc, char **argv)
 #if USE_MESSAGE_LOGGING
     g_client->addMessageLogger(&g_messageLogger);
 #endif // USE_MESSAGE_LOGGING
-    initInterfaces_common();
-    initInterfaces();
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int ret = RUN_ALL_TESTS();
     quit();
@@ -103,10 +104,9 @@ int main(int argc, char **argv)
     return ret;
 }
 
-
-void initInterfaces_common(void)
+void initInterfaces_common(erpc_client_t client)
 {
-    initInterfacesClient_unit_test_common();
+    initCommon_client(client);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

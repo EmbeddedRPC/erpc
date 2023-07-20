@@ -14,8 +14,8 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
+#include "c_test_firstInterface_server.h"
+#include "c_test_secondInterface_client.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus

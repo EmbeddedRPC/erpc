@@ -9,8 +9,6 @@
 
 using namespace erpc;
 
-extern ClientManager *g_client;
-
 {% for iface in group.interfaces %}
 static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
 {% endfor -- iface %}
@@ -24,9 +22,10 @@ static ManuallyConstructed<{$iface.clientClassName}> s_{$iface.clientClassName};
 }
 {%  endfor -- fn %}
 {% endfor -- iface %}
-
-void initInterfacesClient{%if group.name%}_{$group.name}{%endif%}(void){
 {% for iface in group.interfaces %}
-    s_{$iface.clientClassName}.construct(g_client);
-{% endfor -- iface %}
+
+void init{$iface.clientClassName}(erpc_client_t client)
+{
+    s_{$iface.clientClassName}.construct(reinterpret_cast<ClientManager *>(client));
 }
+{% endfor -- iface %}

@@ -15,8 +15,8 @@
 #include "gtest.h"
 #include "semphr.h"
 #include "task.h"
-#include "test_firstInterface.h"
-#include "test_secondInterface_server.h"
+#include "c_test_firstInterface_client.h"
+#include "c_test_secondInterface_server.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus

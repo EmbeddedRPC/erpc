@@ -98,7 +98,7 @@ void CGenerator::generateCommonCHeaderFiles(string fileName)
     fileName += "_common.h";
     m_templateData["commonCGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["commonCHeaderName"] = fileName;
-    generateOutputFile(fileName , "c_common_header", m_templateData, kCCommonHeader);
+    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
 }
 
 void CGenerator::generateInterfaceCppHeaderFile(string fileName)
@@ -149,7 +149,7 @@ void CGenerator::generateServerCppSourceFile(string fileName)
 
 void CGenerator::generateClientCHeaderFile(string fileName)
 {
-    fileName ="c_"+fileName+ "_client.h";
+    fileName = "c_" + fileName + "_client.h";
     m_templateData["clientCGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["clientCHeaderName"] = fileName;
     generateOutputFile(fileName, "c_client_header", m_templateData, kCClientHeader);
@@ -157,7 +157,7 @@ void CGenerator::generateClientCHeaderFile(string fileName)
 
 void CGenerator::generateClientCSourceFile(string fileName)
 {
-    fileName ="c_"+fileName+ "_client.cpp";
+    fileName = "c_" + fileName + "_client.cpp";
     m_templateData["clientCSourceName"] = fileName;
 
     // TODO: temporary workaround for tests
@@ -168,7 +168,7 @@ void CGenerator::generateClientCSourceFile(string fileName)
 
 void CGenerator::generateServerCHeaderFile(string fileName)
 {
-    fileName ="c_"+fileName+ "_server.h";
+    fileName = "c_" + fileName + "_server.h";
     m_templateData["serverCGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["serverCHeaderName"] = fileName;
     generateOutputFile(fileName, "c_server_header", m_templateData, kCServerHeader);
@@ -176,7 +176,7 @@ void CGenerator::generateServerCHeaderFile(string fileName)
 
 void CGenerator::generateServerCSourceFile(string fileName)
 {
-    fileName ="c_"+fileName+ "_server.cpp";
+    fileName = "c_" + fileName + "_server.cpp";
     m_templateData["serverCSourceName"] = fileName;
 
     // TODO: temporary workaround for tests
@@ -1741,7 +1741,7 @@ data_map CGenerator::getFunctionTemplateData(Group *group, Function *fn, Interfa
     info["prototype"] = proto;
     if (interface != nullptr)
     {
-        string protoCpp = getFunctionPrototype(group, fn, interface->getName()+"_client::"+fn->getName());
+        string protoCpp = getFunctionPrototype(group, fn, interface->getName() + "_client");
         info["prototypeCpp"] = protoCpp;
     }
     info["name"] = getOutputName(fn);
@@ -1770,7 +1770,7 @@ data_map CGenerator::getFunctionTypeTemplateData(Group *group, FunctionType *fn)
         }
     }
 
-    string proto = getFunctionPrototype(group, fn, name);
+    string proto = getFunctionPrototype(group, fn, "", name);
     info = getFunctionBaseTemplateData(group, fn);
     info["prototype"] = proto;
     info["name"] = name;
@@ -1960,7 +1960,7 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
 string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionType, std::string prefix)
 {
     string proto = "";
-    if (!fn->getReturnType()->isVoid() && prefix.length()>0)
+    if (!fn->getReturnType()->isVoid() && prefix.length() > 0)
     {
         proto += "result = ";
     }
@@ -2003,13 +2003,18 @@ string CGenerator::getFunctionServerCall(Function *fn, FunctionType *functionTyp
     return proto + ");";
 }
 
-string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const std::string name)
+string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, std::string interfaceName, std::string name)
 {
     DataType *dataTypeReturn = fn->getReturnType();
     string proto = getExtraPointerInReturn(dataTypeReturn);
     if (proto == "*")
     {
         proto += " ";
+    }
+
+    if (interfaceName != "")
+    {
+        interfaceName += "::";
     }
 
     Symbol *symbol = dynamic_cast<Symbol *>(fn);
@@ -2025,27 +2030,26 @@ string CGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const st
         }
         else /* Use function name only. */
         {
-            proto += functionName;
+            proto += interfaceName + functionName;
         }
     }
     else
     {
-        proto += name;
+        proto += interfaceName + name;
     }
 
     proto += "(";
 
     auto params = fn->getParameters().getMembers();
-    // TODO: Fix callback support
     // add interface id and function id parameters for common callbacks shim code function
-    // if (!name.empty())
-    // {
-    //     proto += "ClientManager *m_clientManager, uint32_t serviceID, uint32_t functionID";
-    //     if (params.size() > 0)
-    //     {
-    //         proto += ", ";
-    //     }
-    // }
+    if (!name.empty())
+    {
+        proto += "ClientManager *m_clientManager, uint32_t serviceID, uint32_t functionID";
+        if (params.size() > 0)
+        {
+            proto += ", ";
+        }
+    }
 
     if (params.size())
     {

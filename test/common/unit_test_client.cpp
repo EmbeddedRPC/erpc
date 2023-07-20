@@ -200,8 +200,8 @@ int main(int argc, char **argv)
 #endif
 
     client = erpc_client_init(transport, message_buffer_factory);
-    initInterfaces_common();
-    initInterfaces();
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     return i;
 }
 
-void initInterfaces_common(void)
+void initInterfaces_common(erpc_client_t client)
 {
-    initInterfacesClient_unit_test_common();
+    initCommon_client(client);
 }

@@ -18,7 +18,7 @@ class {$iface.interfaceClassName}
     public:
         static const uint8_t m_serviceId = {$iface.id};
 {% for fn in iface.functions %}
-        static const uint8_t m_{$fn.name)}Id = {$fn.id};
+        static const uint8_t {$getClassFunctionIdName(fn)} = {$fn.id};
 {% endfor -- fn %}
 {% for fn in iface.functions if fn.isNonExternalFunction == true %}
 

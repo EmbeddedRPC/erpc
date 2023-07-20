@@ -5,7 +5,6 @@
 {% endif %}
 {$commonHeader()}
 
-#include "erpc_client_manager.h"
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include "erpc_port.h"
 #endif
@@ -193,9 +192,9 @@ static {$callbackType.prototype}
 {$fn.prototypeCpp}
 {
 {%   if fn.isCallback %}
-    {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(m_clientManager, m_serviceId, m_{$fn.name}Id{% for param in fn.parameters %}, {$param.pureName}{% endfor %});
+    {% if fn.returnValue.type.isNotVoid %}return {% endif %}{$fn.callbackFName}(m_clientManager, m_serviceId, {$getClassFunctionIdName(fn)}{% for param in fn.parameters %}, {$param.pureName}{% endfor %});
 {%   else -- fn.isCallback >%}
-{$ clientShimCode("m_clientManager", fn, "m_serviceId", "m_" & fn.name & "Id") >}
+{$ clientShimCode("m_clientManager", fn, "m_serviceId", getClassFunctionIdName(fn)) >}
 {%   endif -- fn.isCallback >%}
 }
 {%  endfor -- fn %}

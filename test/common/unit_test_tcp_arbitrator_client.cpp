@@ -14,10 +14,10 @@
 
 #include "Logging.hpp"
 #include "gtest.h"
-#include "test_firstInterface.h"
-#include "test_secondInterface.h"
-#include "unit_test_client.h"
+#include "c_test_firstInterface_client.h"
+#include "c_test_unit_test_common_client.h"
 #include "unit_test_wrapped.h"
+#include "unit_test.h"
 
 #include <chrono>
 #include <thread>
@@ -155,8 +155,9 @@ int main(int argc, char **argv)
 
     add_services(&g_server);
     g_client->setServer(&g_server);
-    initInterfaces_common();
-    initInterfaces();
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int i = -1;
     err = (erpc_status_t)-1;
@@ -202,7 +203,7 @@ void quitSecondInterfaceServer()
     increaseWaitQuit();
 }
 
-void initInterfaces_common(void)
+void initInterfaces_common(erpc_client_t client)
 {
-    initInterfacesClient_unit_test_common();
+    initCommon_client(client);
 }

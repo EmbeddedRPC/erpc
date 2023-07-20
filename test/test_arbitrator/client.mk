@@ -16,7 +16,9 @@
 #-------------------------------------------------------------------------------
 
 SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp \
-            $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp\
+            $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_firstInterface_$(APP_TYPE).cpp \
+            $(ERPC_OUT_DIR)/$(ERPC_NAME)_secondInterface_server.cpp \
+            $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_secondInterface_server.cpp \
             $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
             $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_arbitrator_$(APP_TYPE).cpp
 

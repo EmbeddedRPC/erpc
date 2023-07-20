@@ -8,8 +8,9 @@
 
 #include "erpc_simple_server.hpp"
 
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
+#include "c_test_firstInterface_server.h"
+#include "c_test_secondInterface_client.h"
+#include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
@@ -19,6 +20,11 @@
 int i = 0;
 int numbers[number];
 FirstInterface_service *svc;
+
+void initInterfaces(erpc_client_t client)
+{
+    initSecondInterface_client(client);
+}
 
 void firstSendInt(int32_t a)
 {

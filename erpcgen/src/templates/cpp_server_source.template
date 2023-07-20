@@ -136,7 +136,7 @@ extern bool nestingDetection;
 {$serverIndent}    codec->reset();
 
 {$serverIndent}    // Build response message.
-{$serverIndent}    codec->startWriteMessage(kReplyMessage, m_handler->m_serviceId, m_handler->m_{$fn.name}Id, sequence);
+{$serverIndent}    codec->startWriteMessage(kReplyMessage, m_handler->m_serviceId, m_handler->{$getClassFunctionIdName(fn)}, sequence);
 {%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 
 {%   if param.isNullable %}
@@ -216,7 +216,7 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
     switch (methodId)
     {
 {%  for fn in iface.functions %}
-        case m_handler->m_{$fn.name}Id:
+        case m_handler->{$getClassFunctionIdName(fn)}:
         {
             erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, sequence);
             break;
