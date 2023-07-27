@@ -98,7 +98,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
 protected:
     SymbolScope m_scope;           /*!< Scope which interface belongs to. */

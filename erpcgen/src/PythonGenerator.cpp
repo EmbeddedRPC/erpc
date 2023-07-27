@@ -15,6 +15,8 @@
 #include "format_string.hpp"
 
 #include <algorithm>
+#include <cstring>
+#include <filesystem>
 #include <set>
 #include <sstream>
 
@@ -52,9 +54,9 @@ PythonGenerator::PythonGenerator(InterfaceDefinition *def)
 void PythonGenerator::generateOutputFiles(const string &fileName)
 {
     // Make sure the package folder is created.
-    boost::filesystem::path dir(fileName);
+    filesystem::path dir(fileName);
     dir = m_outputDirectory / dir;
-    boost::filesystem::create_directories(dir);
+    filesystem::create_directories(dir);
 
     generateInitFile(fileName);
     generateCommonFile(fileName);

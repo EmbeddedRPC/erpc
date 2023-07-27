@@ -64,7 +64,7 @@ extern "C" {
 
 int serial_setup(int fd, speed_t speed);
 int serial_set_read_timeout(int fd, uint8_t vtime, uint8_t vmin);
-int serial_write(int fd, char *buf, int size);
+int serial_write(int fd, const char *buf, int size);
 int serial_read(int fd, char *buf, int size);
 int serial_open(const char *port);
 int serial_close(int fd);

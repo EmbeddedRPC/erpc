@@ -34,7 +34,7 @@ public:
      * @param[in] name Name.
      * @param[in] elementType Given data type.
      */
-    AliasType(std::string name, DataType *elementType)
+    AliasType(const std::string &name, DataType *elementType)
     : DataType(name, kAliasType)
     , m_elementType(elementType)
     {
@@ -84,7 +84,7 @@ public:
      * @see std::string ListType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
 protected:
     DataType *m_elementType; /*!< Alias element data type. */

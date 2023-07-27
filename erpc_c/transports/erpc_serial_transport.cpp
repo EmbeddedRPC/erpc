@@ -96,13 +96,13 @@ erpc_status_t SerialTransport::init(uint8_t vtime, uint8_t vmin)
 
 erpc_status_t SerialTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
-    uint32_t bytesWritten = serial_write(m_serialHandle, (char *)data, size);
+    uint32_t bytesWritten = serial_write(m_serialHandle, reinterpret_cast<const char *>(data), size);
 
     return (size != bytesWritten) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
 erpc_status_t SerialTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    uint32_t bytesRead = serial_read(m_serialHandle, (char *)data, size);
+    uint32_t bytesRead = serial_read(m_serialHandle, reinterpret_cast<char *>(data), size);
 
     return (size != bytesRead) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }

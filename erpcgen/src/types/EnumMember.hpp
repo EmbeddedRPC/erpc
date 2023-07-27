@@ -48,7 +48,7 @@ public:
      *
      * @param[in] tok Token, which contains name and location.
      */
-    EnumMember(const Token &tok)
+    explicit EnumMember(const Token &tok)
     : Symbol(kEnumMemberSymbol, tok)
     , m_value(-1)
     , m_valueSet(false)
@@ -95,7 +95,7 @@ public:
      * @see std::string ListType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
 protected:
     IntegerValue m_value; /*!< Integer value of enum member. */

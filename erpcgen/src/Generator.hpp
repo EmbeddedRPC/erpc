@@ -29,6 +29,7 @@
 #include "types/UnionType.hpp"
 #include "types/VoidType.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -72,14 +73,14 @@ public:
     virtual void generate() = 0;
 
 protected:
-    uint16_t m_idlCrc16;                       /*!< Storing crc16 of IDL files and erpcgen version. */
-    cpptempl::data_map m_templateData;         /*!< Data prepared for templates files. */
-    InterfaceDefinition *m_def;                /*!< Interface definitions. */
-    SymbolScope *m_globals;                    /*!< Symbol scope data. */
-    std::vector<Group *> m_groups;             /*!< List of groups. */
-    std::set<std::string> reserverdWords;      /*!< Program language reserved words. */
-    generator_type_t m_generatorType;          /*!< Type of generator. */
-    boost::filesystem::path m_outputDirectory; /*!< Output file path. */
+    uint16_t m_idlCrc16;                     /*!< Storing crc16 of IDL files and erpcgen version. */
+    cpptempl::data_map m_templateData;       /*!< Data prepared for templates files. */
+    InterfaceDefinition *m_def;              /*!< Interface definitions. */
+    SymbolScope *m_globals;                  /*!< Symbol scope data. */
+    std::vector<Group *> m_groups;           /*!< List of groups. */
+    std::set<std::string> reserverdWords;    /*!< Program language reserved words. */
+    generator_type_t m_generatorType;        /*!< Type of generator. */
+    std::filesystem::path m_outputDirectory; /*!< Output file path. */
     /*!
      * @brief This function open file
      *
@@ -265,7 +266,7 @@ protected:
      *
      * @return Pointer to a group with specified name.
      */
-    Group *getGroupByName(std::string name);
+    Group *getGroupByName(const std::string &name);
 
     /*!
      * @brief This function returns information if member data type symbol is using forward declared type.
@@ -304,7 +305,7 @@ protected:
      *
      * @return An index into the annotation list
      */
-    Annotation *findAnnotation(Symbol *symbol, std::string name);
+    Annotation *findAnnotation(Symbol *symbol, const std::string &name);
 
     /*!
      * @brief Find annotations matching name in the annotation list
@@ -314,7 +315,7 @@ protected:
      *
      * @return A vector of matching annotations
      */
-    std::vector<Annotation *> getAnnotations(Symbol *symbol, std::string name);
+    std::vector<Annotation *> getAnnotations(Symbol *symbol, const std::string &name);
 
     /*!
      * @brief This function search and returns Value object for given annotation name.
@@ -324,7 +325,7 @@ protected:
      *
      * @return NULL if annotation is not found else value object.
      */
-    Value *getAnnValue(Symbol *symbol, std::string name);
+    Value *getAnnValue(Symbol *symbol, const std::string &name);
 
     /*!
      * @brief This function search and returns string for given annotation name.
@@ -334,7 +335,7 @@ protected:
      *
      * @return empty string if annotation is not found else string value.
      */
-    std::string getAnnStringValue(Symbol *symbol, std::string name);
+    std::string getAnnStringValue(Symbol *symbol, const std::string &name);
 
     /*!
      * @brief This function returns vector of data types from scope.

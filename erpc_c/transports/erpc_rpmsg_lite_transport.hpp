@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  *
@@ -150,7 +150,7 @@ protected:
      */
     static int32_t rpmsg_read_cb(void *payload, uint32_t payload_len, uint32_t src, void *priv);
 
-    StaticQueue<MessageBuffer, ERPC_DEFAULT_BUFFERS_COUNT>
+    StaticQueue<MessageBuffer, 2U * ERPC_DEFAULT_BUFFERS_COUNT>
         m_messageQueue; /*!< Received messages. Queue of messages with buffers filled in rpmsg callback. */
 
     uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */

@@ -188,7 +188,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string ListType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief This function sets FunctionType (callback type).

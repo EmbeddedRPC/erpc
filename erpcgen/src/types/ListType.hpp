@@ -68,7 +68,7 @@ public:
      * @see std::string ArrayType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief This function set variable name. This variable is used in generated file to store size of list.

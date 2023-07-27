@@ -53,7 +53,7 @@ public:
      * @see AstNode::AstNode(Token * token, AstNode * parent)
      * @see AstNode::AstNode(const AstNode & other)
      */
-    AstNode(const Token &token)
+    explicit AstNode(const Token &token)
     : m_token(token)
     , m_parent(nullptr)
     {
@@ -148,7 +148,7 @@ public:
      *
      * @param[in] token Pointer to given token.
      */
-    void setToken(Token &token) { m_token = token; }
+    void setToken(const Token &token) { m_token = token; }
 
     /*!
      * @brief This function returns value of token of this node.
@@ -304,7 +304,7 @@ public:
      * @see size_t AstNode::getIndex()
      * @see AstNode * getChild()
      */
-    size_t getIndexOfChild(AstNode *child);
+    size_t getIndexOfChild(const AstNode *child);
 
     /*!
      * @brief This function return index of current node in parent's list of children.
@@ -401,7 +401,7 @@ public:
      *
      * @param[in] root Pointer to root node.
      */
-    AstPrinter(AstNode *root)
+    explicit AstPrinter(AstNode *root)
     : m_root(root)
     , m_depth(0)
     {

@@ -156,7 +156,7 @@ public:
      *
      * @see Symbol * SymbolScope::addSymbol()
      */
-    int32_t getSymbolPos(Symbol *sym);
+    int32_t getSymbolPos(const Symbol *sym);
 
     /*!
      * @brief Return boolean representation about existence of parent.

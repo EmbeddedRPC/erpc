@@ -1,29 +1,45 @@
 {% def decodeBuiltinType(info) --------------- BuiltinType %}
 {% if info.builtinType == "kStringType" %}
-uint32_t {$info.stringLocalName}_len;
-char * {$info.stringLocalName}_local;
-codec->readString(&{$info.stringLocalName}_len, &{$info.stringLocalName}_local);
+{
+    uint32_t {$info.stringLocalName}_len;
+    char * {$info.stringLocalName}_local;
+    codec->readString({$info.stringLocalName}_len, &{$info.stringLocalName}_local);
+{%  if info.stringAllocSize != info.stringLocalName & "_len" %}
+    if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
+    {
+{%   set indent = "    " >%}
+{% else %}
+{%   set indent = "" >%}
+{% endif  -- if info.stringAllocSize != info.stringLocalName & "_len" %}
 {%  if ((source == "client" && info.withoutAlloc == false) or source == "server") %}
-{$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
+{$indent}    {$info.name} = ({$info.builtinTypeName}) erpc_malloc(({$info.stringAllocSize} + 1) * sizeof(char));
 {%   if generateAllocErrorChecks == true %}
-if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
-{
-    codec->updateStatus(kErpcStatus_MemoryError);
-}
-else
-{
+{$indent}    if (({$info.name} == NULL) || ({$info.stringLocalName}_local == NULL))
+{$indent}    {
+{$indent}        codec->updateStatus(kErpcStatus_MemoryError);
+{$indent}    }
+{$indent}    else
+{$indent}    {
 {%   endif -- generateAllocErrorChecks == true %}
 {%  endif -- withoutAlloc %}
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
-{%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
+{$indent}    {%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}memcpy({$info.name}, {$info.stringLocalName}_local, {$info.stringLocalName}_len);
+{$indent}    {%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}    {%  endif -- withoutAlloc %}({$info.name})[{$info.stringLocalName}_len] = 0;
 {%  if (((source == "client" && info.withoutAlloc == false) or source == "server") && generateAllocErrorChecks == true) %}
-}
+    {$indent}}
 {%  endif -- withoutAlloc && generateAllocErrorChecks %}
+{%  if info.stringAllocSize != info.stringLocalName & "_len" %}
+    }
+    else
+    {
+        codec->updateStatus(kErpcStatus_InvalidArgument);
+    }
+{% endif  -- if info.stringAllocSize != info.stringLocalName & "_len" %}
+}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
-codec->read({$info.name});
+codec->read(*{$info.name});
 {%  else %}
-codec->read(&{$info.name});
+codec->read({$info.name});
 {%  endif -- pointerScalarTypes %}
 {% endif -- builtinType %}
 {% enddef ------------------------------- BuiltinType %}
@@ -33,7 +49,7 @@ codec->read(&{$info.name});
 uint32_t {$info.sizeTemp};
 {% endif %}
 uint8_t * {$info.dataTemp};
-codec->readBinary(&{$info.sizeTemp}, &{$info.dataTemp});
+codec->readBinary({$info.sizeTemp}, &{$info.dataTemp});
 {% if info.hasLengthVariable && not info.constantVariable %}
 {%  if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {% endif %}
@@ -44,38 +60,47 @@ if (({$info.sizeTemp} <= {$info.maxSize}) && ({$info.dataTemp} != NULL))
 {% else %}
 {%   set indent = "" >%}
 {% endif %}
+{$indent}if ({$info.sizeTemp} > 0)
+{$indent}{
 {% if source == "server" || info.useMallocOnClientSide == true %}
 {$indent}{$info.name} = (uint8_t *) erpc_malloc({$info.maxSize} * sizeof(uint8_t));
 {%  if generateAllocErrorChecks == true %}
-{$indent}if (({$info.name} == NULL) && ({$info.sizeTemp} > 0))
-{$indent}{
-{$indent}    codec->updateStatus(kErpcStatus_MemoryError);
-{$indent}}
-{$indent}else
-{$indent}{
-{$indent}    memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
-{$indent}}
+{$indent}    if ({$info.name} == NULL)
+{$indent}    {
+{$indent}        codec->updateStatus(kErpcStatus_MemoryError);
+{$indent}    }
+{$indent}    else
+{$indent}    {
+{$indent}        memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{$indent}    }
 {%  else -- generateAllocErrorChecks == true %}
-{$indent}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{$indent}    memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
 {%  endif -- generateAllocErrorChecks == true %}
 {% else %}
-{$indent}memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{$indent}    memcpy({$info.name}, {$info.dataTemp}, {$info.sizeTemp});
+{% endif %}
+{$indent}}
+{% if source == "server" || info.useMallocOnClientSide == true %}
+{$indent}else
+{$indent}{
+{$indent}    {$info.name} = NULL;
+{$indent}}
 {% endif %}
 {% if info.maxSize != info.sizeTemp %}
 }
 else
 {
-    codec->updateStatus(kErpcStatus_Fail);
+    codec->updateStatus(kErpcStatus_InvalidArgument);
 }
 {% endif %}
 {% enddef ------------------------------- BinaryType %}
 
 {% def decodeEnumType(info) ---------------- EnumType %}
-codec->read(&_tmp_local);
+codec->read(_tmp_local_i32);
 {% if source == "client" && info.pointerScalarTypes %}
-*{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+*{$info.name} = static_cast<{$info.enumName}>(_tmp_local_i32);
 {% else %}
-{$info.name} = static_cast<{$info.enumName}>(_tmp_local);
+{$info.name} = static_cast<{$info.enumName}>(_tmp_local_i32);
 {% endif -- pointerScalarTypes %}
 {% enddef ---------------------------------- EnumType %}
 
@@ -86,7 +111,7 @@ codec->read(&_tmp_local);
 {%  if info.hasLengthVariable %}
 uint32_t {$info.sizeTemp};
 {%  endif %}
-codec->startReadList(&{$info.sizeTemp});
+codec->startReadList({$info.sizeTemp});
 {%  if info.hasLengthVariable && not info.constantVariable %}
 {%   if info.pointerScalarTypes && source == "client" %}*{% endif %}{$info.size} = {$info.sizeTemp};
 {%  endif %}
@@ -141,31 +166,31 @@ read_{$info.typeName}_struct(codec, {$info.name});
 {% def decodeUnionParamType(info) --------------- UnionParamType %}
 {% if info.inDataContainer %}
 {%  if info.castDiscriminator %}
-read_{$info.typeName}_union(codec, &_tmp_local, &{$info.name});
+read_{$info.typeName}_union(codec, _tmp_local_i32, &{$info.name});
 {%   if !info.isConstant %}
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%   endif %}
 {%  else %}
-read_{$info.typeName}_union(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
+read_{$info.typeName}_union(codec, {$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%  endif -- castDiscriminator %}
 {% else -- not inDataContainer %}
 {%  if info.castDiscriminator %}
-read_{$info.typeName}_union(codec, &_tmp_local, {$info.name});
+read_{$info.typeName}_union(codec, _tmp_local_i32, {$info.name});
 {%   if !info.isConstant %}
-{%    if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{%    if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%   endif %}
 {%  else %}
-read_{$info.typeName}_union(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
+read_{$info.typeName}_union(codec, {% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}, {$info.name});
 {%  endif  -- castDiscriminator %}
 {% endif -- inDataContainer %}
 {% enddef -------------------------- UnionParamType %}
 
 {% def decodeUnionType(info) ---------------- %}
-codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral != "" %}&{% endif %}_tmp_local{% else %}{% if info.dataLiteral != "" %}&{$info.dataLiteral}{% endif %}{$info.discriminatorName}{% endif %});
+codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral == "" %}*{% endif %}_tmp_local_i32{% else %}{% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.discriminatorName}{% endif %});
 {% if info.castDiscriminator %}
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {% endif -- info.castDiscriminator %}
-switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% else %}*{% endif %}{$info.discriminatorName})
+switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.discriminatorName})
 {
 {% for case in info.cases %}
     {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{%  endif %}:
@@ -191,7 +216,7 @@ codec->readCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount}, 
 {% enddef -------------------------- FunctionType %}
 
 {% def decodeSharedType(info) %}
-codec->readPtr(reinterpret_cast<uintptr_t *>({% if not ((info.funcParam == true && info.InoutOutDirection == true) && source == "client") %}&{%  endif %}{$info.name}));
+codec->readPtr(reinterpret_cast<uintptr_t &>({% if ((info.funcParam == true && info.InoutOutDirection == true) && source == "client") %}*{%  endif %}{$info.name}));
 {% if info.sharedType != "" %}
 {%  if info.sharedType == "struct" %}
 {%   if info.inDataContainer %}
@@ -202,17 +227,17 @@ read_{$info.sharedType}_struct_shared(codec, {$info.name});
 {%  else %}
 {%   if info.inDataContainer %}
 {%    if info.castDiscriminator %}
-read_{$info.sharedType}_union_shared(codec, &_tmp_local, &{$info.name});
-{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+read_{$info.sharedType}_union_shared(codec, _tmp_local_i32, &{$info.name});
+{$info.dataLiteral}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%    else %}
-read_{$info.sharedType}_union_shared(codec, &{$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
+read_{$info.sharedType}_union_shared(codec, {$info.dataLiteral}{$info.discriminatorName}, &{$info.name});
 {%    endif -- castDiscriminator %}
 {%   else -- not inDataContainer %}
 {%    if info.castDiscriminator %}
-read_{$info.sharedType}_union_shared(codec, &_tmp_local, {$info.name});
-{%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local);
+read_{$info.sharedType}_union_shared(codec, _tmp_local_i32, {$info.name});
+{%     if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName} = static_cast<{$info.discriminatorType}>(_tmp_local_i32);
 {%    else %}
-read_{$info.sharedType}_union_shared(codec, {% if info.discrimPtr == false || source != "client" %}&{% endif %}{$info.discriminatorName}, {$info.name});
+read_{$info.sharedType}_union_shared(codec, {% if info.discrimPtr == true && source == "client" %}*{% endif %}{$info.discriminatorName}, {$info.name});
 {%    endif  -- castDiscriminator %}
 {%   endif -- inDataContainer %}
 {%  endif %}
@@ -228,7 +253,15 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
 {# Encode sending data #}
 {% def encodeBuiltinType(info) -----------------  %}
 {% if info.builtinType == "kStringType" %}
-codec->writeString(strlen((const char*){$info.name}), (const char*){$info.name});
+{
+    uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
+
+{% if info.stringAllocSize != info.stringLocalName & "_len"  %}
+    erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
+
+{% endif %}
+    codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
+}
 {% else %}
 {%  if source == "client" && info.pointerScalarTypes %}
 codec->write(*{$info.name});
@@ -239,8 +272,8 @@ codec->write({$info.name});
 {% enddef --------------------------------------- BuiltinType %}
 
 {% def encodeBinaryType(info) -----------------  %}
-{% if source == "server" && info.size != info.maxSize %}
-erpc_assert({$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
+{% if info.sizeTemp != info.maxSize %}
+erpc_assert({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size} <= {$info.maxSize} * sizeof({$info.mallocSizeType}));
 {% endif %}
 codec->writeBinary({% if source == "client" && info.pointerScalarTypes %}*{% endif %}{$info.size}, {$info.name});
 {% enddef --------------------------------------- BinaryType %}

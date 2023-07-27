@@ -253,7 +253,7 @@ public:
      *
      * @param[in] options Options, which can be used.
      */
-    void printUsage(Options &options)
+    void printUsage(const Options &options)
     {
         options.usage(cout, "files...");
         printf(k_usageText);
@@ -307,7 +307,7 @@ public:
             UniqueIdChecker uniqueIdCheck;
             uniqueIdCheck.makeIdsUnique(def);
 
-            boost::filesystem::path filePath(m_ErpcFile);
+            std::filesystem::path filePath(m_ErpcFile);
             def.setProgramInfo(filePath.filename().generic_string(), m_outputFilePath, m_codec);
 
             switch (m_outputLanguage)

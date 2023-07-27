@@ -28,7 +28,7 @@ erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv)
 {
     erpc_transport_t transport;
 
-    s_transport.construct((ARM_DRIVER_USART *)uartDrv);
+    s_transport.construct(reinterpret_cast<ARM_DRIVER_USART *>(uartDrv));
     if (s_transport->init() == kErpcStatus_Success)
     {
         transport = reinterpret_cast<erpc_transport_t>(s_transport.get());

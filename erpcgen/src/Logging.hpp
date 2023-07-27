@@ -197,7 +197,7 @@ public:
         //!
         //! Saves the current logging output level of the global logger,
         //! as managed by the Log class, and sets the new level to \a level.
-        SetOutputLevel(Logger::log_level_t level)
+        explicit SetOutputLevel(Logger::log_level_t level)
         : m_logger(Log::getLogger())
         , m_saved(Logger::kInfo)
         {
@@ -246,7 +246,7 @@ protected:
     Logger::log_level_t m_stderrLevel;
 
     //! \brief Logs the message to stdout.
-    virtual void _log(Logger::log_level_t level, const char *msg);
+    virtual void _log(Logger::log_level_t level, const char *msg) override;
 };
 
 #endif // _Logging_h_

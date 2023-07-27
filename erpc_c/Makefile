@@ -111,9 +111,17 @@ MAKE_TARGET = $(TARGET_LIB)($(OBJECTS_ALL))
 
 include $(ERPC_ROOT)/mk/targets.mk
 
+# Release should be alwas static. Customers don't need install things.
+ifeq "$(build)" "release"
+    # Except Darwin.
+    ifeq "$(is_darwin)" ""
+        LIBRARIES += -static
+    endif
+endif
+
 $(TARGET_LIB)(%): %
 	@$(call printmessage,ar,Archiving, $(?F) in $(@F))
-	$(at)mkdir -p $(dir $(@))
+	$(at)$(mkdirc) -p $(dir $(@))
 	$(AR) $(ARFLAGS) $@ $?
 
 .PHONY: install
@@ -122,17 +130,17 @@ install: install_headers install_lib
 .PHONY: install_headers
 install_headers: $(HEADERS) |  $(INC_INSTALL_DIR)
 	@$(call printmessage,c,Installing, headers in $(INC_INSTALL_DIR))
-	$(at)mkdir -p $(INC_INSTALL_DIR)
+	$(at)$(mkdirc) -p $(INC_INSTALL_DIR)
 	$(at)install $(?) $(INC_INSTALL_DIR)
 
 $(INC_INSTALL_DIR):
-	$(at)mkdir -p $(INC_INSTALL_DIR)
+	$(at)$(mkdirc) -p $(INC_INSTALL_DIR)
 
 .PHONY: install_lib
 install_lib: $(TARGET_LIB)
 	@$(call printmessage,c,Installing, $(subst $(LIBS_ROOT)/,,$<) in $(LIB_INSTALL_DIR))
-	$(at)mkdir -p $(LIB_INSTALL_DIR)
+	$(at)$(mkdirc) -p $(LIB_INSTALL_DIR)
 	$(at)install $(TARGET_LIB) $(LIB_INSTALL_DIR)
 
 clean::
-	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
+	$(at)$(rmc) $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c

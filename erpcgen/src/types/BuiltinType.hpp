@@ -106,7 +106,10 @@ public:
      * @retval true When builtin type is string or ustring.
      * @retval false When builtin type isn't string or ustring.
      */
-    virtual bool isString() const override { return ((m_builtinType == kStringType) || (m_builtinType == kUStringType)); }
+    virtual bool isString() const override
+    {
+        return ((m_builtinType == kStringType) || (m_builtinType == kUStringType));
+    }
 
     /*!
      * @brief This function return true/false value for identify ustring type.

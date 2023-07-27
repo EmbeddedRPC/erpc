@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 NXP
+ * Copyright 2021-2023 NXP
  * All rights reserved.
  *
  *
@@ -9,7 +9,7 @@
 #ifndef _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
 #define _EMBEDDED_RPC__I2C_SLAVE_TRANSPORT_H_
 
-#include "<cstdlib>"
+#include <cstdlib>
 #include "erpc_config_internal.h"
 #if ERPC_THREADS
 #include "erpc_threading.h"

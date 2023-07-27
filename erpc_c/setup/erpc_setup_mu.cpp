@@ -25,6 +25,6 @@ ERPC_MANUALLY_CONSTRUCTED(MUTransport, s_transport);
 erpc_transport_t erpc_transport_mu_init(void *baseAddr)
 {
     s_transport.construct();
-    (void)s_transport->init((MU_Type *)baseAddr);
+    (void)s_transport->init(reinterpret_cast<MU_Type *>(baseAddr));
     return reinterpret_cast<erpc_transport_t>(s_transport.get());
 }

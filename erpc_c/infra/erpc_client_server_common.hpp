@@ -32,7 +32,7 @@
 namespace erpc {
 
 /*!
- * @brief Common class inheritand by client and server class.
+ * @brief Common class inherited by client and server class.
  *
  * @ingroup infra_utility
  */

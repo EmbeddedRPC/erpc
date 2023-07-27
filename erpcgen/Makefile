@@ -37,12 +37,10 @@ INCLUDES += $(ERPC_ROOT) \
 			$(ERPC_ROOT)/erpcgen/src/cpptemplate \
 			$(ERPC_ROOT)/erpcgen/src/types \
 			$(ERPC_ROOT)/erpc_c/infra \
-			$(OBJS_ROOT) \
-			$(BOOST_ROOT)/include
+			$(OBJS_ROOT)
 
 ifeq "$(is_mingw)" "1"
-INCLUDES += $(ERPC_ROOT)/windows \
-			$(BOOST_ROOT)
+INCLUDES += $(VISUAL_STUDIO_ROOT)
 endif
 
 SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
@@ -65,6 +63,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/SymbolScanner.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Token.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ParseErrors.cpp \
+			$(ERPC_ROOT)/erpcgen/src/Utils.cpp \
 			$(ERPC_ROOT)/erpcgen/src/types/Type.cpp \
 			$(ERPC_ROOT)/erpc_c/infra/erpc_crc16.cpp
 
@@ -86,15 +85,6 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 
-ifeq "$(is_mingw)" "1"
-SOURCES +=  $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_client_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_header.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_server_source.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_coders.cpp \
-            $(ERPC_ROOT)/erpcgen/VisualStudio_v14/c_common_functions.cpp \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_crc.cpp
-else
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
@@ -109,40 +99,14 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
-endif
 
 OBJECT_DEP := $(OBJS_ROOT)/erpcgen_lexer.cpp
 
 include $(ERPC_ROOT)/mk/targets.mk
 
-ifeq "$(is_mingw)" "1"
-    LIBRARIES += -L$(BOOST_ROOT)/stage/lib
-    ifeq "$(build)" "debug"
-        LIBRARIES += -lboost_system-mgw48-mt-1_57 -lboost_filesystem-mgw48-mt-1_57
-    else
-        LIBRARIES += -lboost_system-mgw48-mt-d-1_57 -lboost_filesystem-mgw48-mt-d-1_57
-    endif
-else
-    ifeq "$(is_linux)" "1"
-        LIBRARIES += -lpthread -lrt
-    endif
-
-    static_libs := NO
-    ifneq "$(build)" "debug"
-        ifeq "$(is_darwin)" "1"
-            static_libs := $(BOOST_ROOT)/lib/libboost_system.a $(BOOST_ROOT)/lib/libboost_filesystem.a
-        endif
-    endif
-    ifneq "$(static_libs)" "NO"
-        LIBRARIES += $(static_libs)
-    else
-        LIBRARIES += -lboost_system -lboost_filesystem
-    endif
-endif
-
 # Release should be alwas static. Customers don't need install things.
-ifneq "$(build)" "debug"
-    # Except Darwin. Darwin has static libs defined above.
+ifeq "$(build)" "release"
+    # Except Darwin.
     ifeq "$(is_darwin)" ""
         LIBRARIES += -static
     endif
@@ -168,8 +132,8 @@ $(OBJS_ROOT)/%.c: $(ERPC_ROOT)/%.template
 .PHONY: install
 install: $(MAKE_TARGET)
 	@$(call printmessage,c,Installing, erpcgen in $(BIN_INSTALL_DIR))
-	$(at)mkdir -p $(BIN_INSTALL_DIR)
+	$(at)$(mkdirc) -p $(BIN_INSTALL_DIR)
 	$(at)install $(MAKE_TARGET) $(BIN_INSTALL_DIR)
 
 clean::
-	$(at)rm -rf $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c
+	$(at)$(rmc) $(OBJS_ROOT)/*.cpp $(OBJS_ROOT)/*.hpp $(OBJS_ROOT)/*.c

@@ -99,7 +99,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
         m_codec->setBuffer(*message);
 
         // Parse the message header.
-        m_codec->startReadMessage(&msgType, &service, &requestNumber, &sequence);
+        m_codec->startReadMessage(msgType, service, requestNumber, sequence);
         err = m_codec->getStatus();
         if (err != kErpcStatus_Success)
         {
@@ -196,9 +196,12 @@ TransportArbitrator::PendingClientInfo *TransportArbitrator::addPendingClient(vo
         m_clientFreeList = m_clientFreeList->m_next;
     }
 
-    // Add to active list.
-    info->m_next = m_clientList;
-    m_clientList = info;
+    if (info != NULL)
+    {
+        // Add to active list.
+        info->m_next = m_clientList;
+        m_clientList = info;
+    }
 
     return info;
 }

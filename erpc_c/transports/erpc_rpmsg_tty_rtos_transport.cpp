@@ -9,6 +9,7 @@
  */
 
 #include "erpc_rpmsg_tty_rtos_transport.hpp"
+
 #include "erpc_config_internal.h"
 #include "erpc_framed_transport.hpp"
 
@@ -265,11 +266,11 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
 
     if (ret_val == RL_SUCCESS)
     {
-        (void)memcpy((uint8_t *)&h, buf, sizeof(h));
-        message->set(&((uint8_t *)buf)[sizeof(h)], length - sizeof(h));
+        (void)memcpy(reinterpret_cast<uint8_t *>(&h), buf, sizeof(h));
+        message->set(&(reinterpret_cast<uint8_t *>(buf))[sizeof(h)], length - sizeof(h));
 
         /* Verify CRC. */
-        computedCrc = m_crcImpl->computeCRC16(&((uint8_t *)buf)[sizeof(h)], h.m_messageSize);
+        computedCrc = m_crcImpl->computeCRC16(&(reinterpret_cast<uint8_t *>(buf))[sizeof(h)], h.m_messageSize);
         if (computedCrc != h.m_crc)
         {
             status = kErpcStatus_CrcCheckFailed;

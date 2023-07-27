@@ -170,7 +170,7 @@ void ClientManager::verifyReply(RequestContext &request)
     request.getCodec()->reset();
 
     // Extract the reply header.
-    request.getCodec()->startReadMessage(&msgType, &service, &requestNumber, &sequence);
+    request.getCodec()->startReadMessage(msgType, service, requestNumber, sequence);
 
     if (request.getCodec()->isStatusOk() == true)
     {

@@ -55,7 +55,7 @@ protected:
      * @param[in] __arg Exception error message.
      * @param[in] errorName Exception error name.
      */
-    explicit erpc_error(const std::string &__arg, std::string errorName)
+    explicit erpc_error(const std::string &__arg, const std::string &errorName)
     : std::runtime_error(__arg)
     , m_message(__arg)
     , m_errName(errorName)

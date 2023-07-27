@@ -16,9 +16,10 @@
 #include "annotations.h"
 #include "format_string.hpp"
 
-#include <boost/filesystem.hpp>
+#include <algorithm>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 
 using namespace erpcgen;
 using namespace cpptempl;
@@ -34,6 +35,10 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
 , m_globals(&(def->getGlobals()))
 , m_generatorType(generatorType)
 {
+    string scopeName = "erpcShim";
+    string scopeNameC;
+    string scopeNamePrefix = "";
+
     m_templateData["erpcVersion"] = ERPC_VERSION;
     m_templateData["erpcVersionNumber"] = ERPC_VERSION_NUMBER;
 
@@ -75,8 +80,28 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
             m_templateData["crc16"] = m_idlCrc16;
         }
 
-        m_outputDirectory /= getAnnStringValue(m_def->getProgramSymbol(), OUTPUT_DIR_ANNOTATION);
+        m_outputDirectory /= getAnnStringValue(program, OUTPUT_DIR_ANNOTATION);
+
+        if (findAnnotation(program, SCOPE_NAME_ANNOTATION) == nullptr)
+        {
+            scopeName = program->getName();
+        }
+        else
+        {
+            scopeName = getAnnStringValue(program, SCOPE_NAME_ANNOTATION);
+        }
     }
+
+    m_templateData["scopeName"] = scopeName;
+    if (scopeName != "")
+    {
+        scopeNameC = scopeName;
+        std::transform(scopeNameC.begin(), scopeNameC.end(), scopeNameC.begin(), ::toupper);
+
+        scopeNamePrefix = "_";
+    }
+    m_templateData["scopeNameC"] = scopeNameC;
+    m_templateData["scopeNamePrefix"] = scopeNamePrefix;
 
     // get group annotation with vector of theirs interfaces
     m_groups.clear();
@@ -144,7 +169,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     }
 }
 
-Group *Generator::getGroupByName(string name)
+Group *Generator::getGroupByName(const string &name)
 {
     for (Group *group : m_groups)
     {
@@ -162,17 +187,10 @@ void Generator::openFile(ofstream &fileOutputStream, const string &fileName)
     if (!m_outputDirectory.empty())
     {
         // TODO: do we have to create a copy of the outputDir here? Doesn't make sense...
-        boost::filesystem::path dir(m_outputDirectory);
-        if (!boost::filesystem::is_directory(dir))
+        std::filesystem::create_directories(m_outputDirectory);
+        if (!std::filesystem::is_directory(m_outputDirectory))
         {
-            // Create_directories function return false also when it create new directory.
-            // It is in case, when directory ends with slash. For these case is better use is_directory for check if
-            // directories are created.
-            boost::filesystem::create_directories(dir);
-            if (!boost::filesystem::is_directory(dir))
-            {
-                throw runtime_error(format_string("could not create directory path '%s'", m_outputDirectory.c_str()));
-            }
+            throw runtime_error(format_string("could not create directory path '%s'", m_outputDirectory.c_str()));
         }
     }
     string filePathWithName = (m_outputDirectory / fileName).string();
@@ -573,22 +591,22 @@ Annotation::program_lang_t Generator::getAnnotationLang()
     throw internal_error("Unsupported generator type specified for annotation.");
 }
 
-Annotation *Generator::findAnnotation(Symbol *symbol, string name)
+Annotation *Generator::findAnnotation(Symbol *symbol, const string &name)
 {
     return symbol->findAnnotation(name, getAnnotationLang());
 }
 
-vector<Annotation *> Generator::getAnnotations(Symbol *symbol, string name)
+vector<Annotation *> Generator::getAnnotations(Symbol *symbol, const string &name)
 {
     return symbol->getAnnotations(name, getAnnotationLang());
 }
 
-Value *Generator::getAnnValue(Symbol *symbol, string name)
+Value *Generator::getAnnValue(Symbol *symbol, const string &name)
 {
     return symbol->getAnnValue(name, getAnnotationLang());
 }
 
-string Generator::getAnnStringValue(Symbol *symbol, string name)
+string Generator::getAnnStringValue(Symbol *symbol, const string &name)
 {
     return symbol->getAnnStringValue(name, getAnnotationLang());
 }
@@ -612,9 +630,9 @@ Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope 
 {
     datatype_vector_t vector;
 
-    for(Symbol *symbol: scope->getSymbolsOfType(Symbol::kTypenameSymbol))
+    for (Symbol *symbol : scope->getSymbolsOfType(Symbol::kTypenameSymbol))
     {
-        DataType *dataType = dynamic_cast<DataType*>(symbol);
+        DataType *dataType = dynamic_cast<DataType *>(symbol);
         if (dataType->getDataType() == datatype)
         {
             vector.push_back(dataType);

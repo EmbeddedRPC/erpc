@@ -59,7 +59,7 @@ public:
      *
      * @param[in] token  Token contains annotation name and location in parsed file.
      */
-    Annotation(const Token &token)
+    explicit Annotation(const Token &token)
     : m_name(token.getStringValue())
     , m_value(nullptr)
     , m_location(token.getLocation())
@@ -74,7 +74,7 @@ public:
      *
      * @param[in] a Source annotation.
      */
-    Annotation(const Annotation &a)
+    explicit Annotation(const Annotation &a)
     : m_name(a.m_name)
     , m_value(a.m_value)
     , m_location(a.m_location)

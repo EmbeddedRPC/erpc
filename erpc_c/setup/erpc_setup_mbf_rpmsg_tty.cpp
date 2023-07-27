@@ -38,7 +38,7 @@ public:
      *
      * @param [in] rpmsg Pointer to instance of RPMSG lite.
      */
-    RPMsgTTYMessageBufferFactory(struct rpmsg_lite_instance *rpmsg) { m_rpmsg = rpmsg; }
+    explicit RPMsgTTYMessageBufferFactory(struct rpmsg_lite_instance *rpmsg) { m_rpmsg = rpmsg; }
 
     /*!
      * @brief Destructor
@@ -57,7 +57,7 @@ public:
         buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, TIMEOUT_MS);
 
         erpc_assert(NULL != buf);
-        return MessageBuffer(&((uint8_t *)buf)[sizeof(FramedTransport::Header)],
+        return MessageBuffer(&(reinterpret_cast<uint8_t *>(buf))[sizeof(FramedTransport::Header)],
                              size - sizeof(FramedTransport::Header));
     }
 
@@ -69,11 +69,12 @@ public:
     virtual void dispose(MessageBuffer *buf)
     {
         erpc_assert(buf != NULL);
-        void *tmp = (void *)buf->get();
+        void *tmp = reinterpret_cast<void *>(buf->get());
         if (tmp != NULL)
         {
             int32_t ret;
-            ret = rpmsg_lite_release_rx_buffer(m_rpmsg, (void *)(((uint8_t *)tmp) - sizeof(FramedTransport::Header)));
+            ret = rpmsg_lite_release_rx_buffer(
+                m_rpmsg, reinterpret_cast<void *>(reinterpret_cast<uint8_t *>(tmp) - sizeof(FramedTransport::Header)));
             if (ret != RL_SUCCESS)
             {
                 // error

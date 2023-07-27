@@ -6,6 +6,26 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/EmbeddedRPC/erpc/pulls)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EmbeddedRPC/erpc)
 
+- [eRPC](#erpc)
+  - [About](#about)
+  - [Releases](#releases)
+    - [Edge releases](#edge-releases)
+  - [Documentation](#documentation)
+  - [Examples](#examples)
+  - [References](#references)
+  - [Directories](#directories)
+  - [Building and installing](#building-and-installing)
+    - [Requirements](#requirements)
+      - [Windows](#windows)
+      - [Linux and Cygwin](#linux-and-cygwin)
+      - [Mac OS X](#mac-os-x)
+    - [Building](#building)
+    - [Installing for Python](#installing-for-python)
+  - [Known issues and limitations](#known-issues-and-limitations)
+  - [Code providing](#code-providing)
+
+## About
+
 eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems and heterogeneous multicore SoCs.
 
 Unlike other modern RPC systems, such as the excellent [Apache Thrift](http://thrift.apache.org), eRPC distinguishes itself by being designed for tightly coupled systems, using plain C for remote functions, and having a small code size (<5kB). It is not intended for high performance distributed systems over a network.
@@ -81,6 +101,10 @@ eRPC is available with an unrestrictive BSD 3-clause license. See the [LICENSE f
 ## Releases
 
 [eRPC releases](https://github.com/EmbeddedRPC/erpc/releases)
+
+### Edge releases
+
+Edge releases can by found on [eRPC CircleCI](https://app.circleci.com/pipelines/github/EmbeddedRPC/erpc) webpage. Choose build of interest, then platform target and choose ARTIFACTS tab. Here you can find binary application from chosen build.
 
 ## Documentation
 
@@ -164,7 +188,6 @@ Install these packages:
 
 * bison: GNU yacc-compatible parser generator
 * flex: A fast lexical analyzer generator
-* libboost-dev, libboost-filesystem-dev, libboost-system-dev: Boost C++ libraries (Linux needs to use libboost version 1.65.0)
 * make: the GNU version of the 'make' utility
 * python: Python language interpreter 3.6+ work
 * gcc-7: GNU C compiler (recommended version)
@@ -173,7 +196,6 @@ Install these packages:
 Mandatory for case, when build for different architecture is needed
 
 * gcc-multilib, g++-multilib
-* boost libraries: for target architecture like libboost-filesystem-dev:i386 libboost-system-dev:i386
 
 #### Mac OS X
 
@@ -181,7 +203,6 @@ Install these packages with [homebrew](http://brew.sh/):
 
 * bison: GNU yacc-compatible parser generator (version 3.7.3 is recommended)
 * flex: A fast lexical analyzer generator (version 2.6.4 is recommended)
-* boost: Boost C++ libraries (version 1.74 is recommended)
 
 ### Building
 

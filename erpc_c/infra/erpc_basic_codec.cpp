@@ -36,7 +36,7 @@ void BasicCodec::startWriteMessage(message_type_t type, uint32_t service, uint32
     write(sequence);
 }
 
-void BasicCodec::writeData(const void *value, uint32_t length)
+void BasicCodec::writeData(uint32_t length, const void *value)
 {
     if (isStatusOk())
     {
@@ -49,73 +49,73 @@ void BasicCodec::write(bool value)
     // Make sure the bool is a single byte.
     uint8_t v = (uint8_t)value;
 
-    writeData(&v, sizeof(v));
+    writeData(sizeof(v), &v);
 }
 
 void BasicCodec::write(int8_t value)
 {
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(int16_t value)
 {
     ERPC_WRITE_AGNOSTIC_16(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(int32_t value)
 {
     ERPC_WRITE_AGNOSTIC_32(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(int64_t value)
 {
     ERPC_WRITE_AGNOSTIC_64(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(uint8_t value)
 {
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(uint16_t value)
 {
     ERPC_WRITE_AGNOSTIC_16(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(uint32_t value)
 {
     ERPC_WRITE_AGNOSTIC_32(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(uint64_t value)
 {
     ERPC_WRITE_AGNOSTIC_64(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(float value)
 {
     ERPC_WRITE_AGNOSTIC_FLOAT(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::write(double value)
 {
     ERPC_WRITE_AGNOSTIC_DOUBLE(value);
 
-    writeData(&value, sizeof(value));
+    writeData(sizeof(value), &value);
 }
 
 void BasicCodec::writePtr(uintptr_t value)
@@ -126,7 +126,7 @@ void BasicCodec::writePtr(uintptr_t value)
 
     ERPC_WRITE_AGNOSTIC_PTR(value);
 
-    writeData(&value, ptrSize);
+    writeData(ptrSize, &value);
 }
 
 void BasicCodec::writeString(uint32_t length, const char *value)
@@ -140,7 +140,7 @@ void BasicCodec::writeBinary(uint32_t length, const uint8_t *value)
     // Write the blob length as a u32.
     write(length);
 
-    writeData(value, length);
+    writeData(length, value);
 }
 
 void BasicCodec::startWriteList(uint32_t length)
@@ -191,11 +191,11 @@ void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
     }
 }
 
-void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint32_t *request, uint32_t *sequence)
+void BasicCodec::startReadMessage(message_type_t &type, uint32_t &service, uint32_t &request, uint32_t &sequence)
 {
     uint32_t header;
 
-    read(&header);
+    read(header);
 
     if (((header >> 24) & 0xffU) != kBasicCodecVersion)
     {
@@ -204,15 +204,15 @@ void BasicCodec::startReadMessage(message_type_t *type, uint32_t *service, uint3
 
     if (isStatusOk())
     {
-        *service = ((header >> 16) & 0xffU);
-        *request = ((header >> 8) & 0xffU);
-        *type = static_cast<message_type_t>(header & 0xffU);
+        service = ((header >> 16) & 0xffU);
+        request = ((header >> 8) & 0xffU);
+        type = static_cast<message_type_t>(header & 0xffU);
 
         read(sequence);
     }
 }
 
-void BasicCodec::readData(void *value, uint32_t length)
+void BasicCodec::readData(uint32_t length, void *value)
 {
     if (isStatusOk())
     {
@@ -220,134 +220,134 @@ void BasicCodec::readData(void *value, uint32_t length)
     }
 }
 
-void BasicCodec::read(bool *value)
+void BasicCodec::read(bool &value)
 {
     uint8_t v = 0;
 
-    readData(&v, sizeof(v));
+    readData(sizeof(v), &v);
     if (isStatusOk())
     {
-        *value = (bool)v;
+        value = (bool)v;
     }
 }
 
-void BasicCodec::read(int8_t *value)
+void BasicCodec::read(int8_t &value)
 {
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
 }
 
-void BasicCodec::read(int16_t *value)
+void BasicCodec::read(int16_t &value)
 {
-    readData(value, sizeof(*value));
-    if (isStatusOk())
-    {
-        ERPC_READ_AGNOSTIC_16(*value);
-    }
-}
-
-void BasicCodec::read(int32_t *value)
-{
-    readData(value, sizeof(*value));
-    if (isStatusOk())
-    {
-        ERPC_READ_AGNOSTIC_32(*value);
-    }
-}
-
-void BasicCodec::read(int64_t *value)
-{
-    readData(value, sizeof(*value));
-    if (isStatusOk())
-    {
-        ERPC_READ_AGNOSTIC_64(*value);
-    }
-}
-
-void BasicCodec::read(uint8_t *value)
-{
-    readData(value, sizeof(*value));
-}
-
-void BasicCodec::read(uint16_t *value)
-{
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_16(*value);
     }
 }
 
-void BasicCodec::read(uint32_t *value)
+void BasicCodec::read(int32_t &value)
 {
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_32(*value);
     }
 }
 
-void BasicCodec::read(uint64_t *value)
+void BasicCodec::read(int64_t &value)
 {
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_64(*value);
     }
 }
 
-void BasicCodec::read(float *value)
+void BasicCodec::read(uint8_t &value)
 {
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
+}
+
+void BasicCodec::read(uint16_t &value)
+{
+    readData(sizeof(value), &value);
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_16(*value);
+    }
+}
+
+void BasicCodec::read(uint32_t &value)
+{
+    readData(sizeof(value), &value);
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_32(*value);
+    }
+}
+
+void BasicCodec::read(uint64_t &value)
+{
+    readData(sizeof(value), &value);
+    if (isStatusOk())
+    {
+        ERPC_READ_AGNOSTIC_64(*value);
+    }
+}
+
+void BasicCodec::read(float &value)
+{
+    readData(sizeof(value), &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_FLOAT(*value);
     }
 }
 
-void BasicCodec::read(double *value)
+void BasicCodec::read(double &value)
 {
-    readData(value, sizeof(*value));
+    readData(sizeof(value), &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_DOUBLE(*value);
     }
 }
 
-void BasicCodec::readPtr(uintptr_t *value)
+void BasicCodec::readPtr(uintptr_t &value)
 {
     uint8_t ptrSize;
 
-    read(&ptrSize);
+    read(ptrSize);
 
-    if (ptrSize > sizeof(*value))
+    if (ptrSize > sizeof(value))
     {
         updateStatus(kErpcStatus_BadAddressScale);
     }
 
-    readData(value, ptrSize);
+    readData(ptrSize, &value);
     if (isStatusOk())
     {
         ERPC_READ_AGNOSTIC_PTR(*value);
     }
 }
 
-void BasicCodec::readString(uint32_t *length, char **value)
+void BasicCodec::readString(uint32_t &length, char **value)
 {
     readBinary(length, reinterpret_cast<uint8_t **>(value));
 }
 
-void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
+void BasicCodec::readBinary(uint32_t &length, uint8_t **value)
 {
     // Read length first as u32.
     read(length);
 
     if (isStatusOk())
     {
-        if (m_cursor.getRemainingUsed() < *length)
+        if (m_cursor.getRemainingUsed() < length)
         {
             m_status = kErpcStatus_Fail;
         }
-        else if (m_cursor.getRemaining() < *length)
+        else if (m_cursor.getRemaining() < length)
         {
             m_status = kErpcStatus_BufferOverrun;
         }
@@ -357,41 +357,41 @@ void BasicCodec::readBinary(uint32_t *length, uint8_t **value)
             *value = m_cursor.get();
 
             // Skip over data.
-            m_cursor += (uint16_t)*length;
+            m_cursor += (uint16_t)length;
         }
     }
     if (!isStatusOk())
     {
-        *length = 0;
+        length = 0;
         *value = NULL;
     }
 }
 
-void BasicCodec::startReadList(uint32_t *length)
+void BasicCodec::startReadList(uint32_t &length)
 {
     // Read list length as u32.
     read(length);
 
     if (!isStatusOk())
     {
-        *length = 0;
+        length = 0;
     }
 }
 
-void BasicCodec::startReadUnion(int32_t *discriminator)
+void BasicCodec::startReadUnion(int32_t &discriminator)
 {
     // Read union discriminator as u32.
     read(discriminator);
 }
 
-void BasicCodec::readNullFlag(bool *isNull)
+void BasicCodec::readNullFlag(bool &isNull)
 {
     uint8_t flag;
 
-    read(&flag);
+    read(flag);
     if (isStatusOk())
     {
-        *isNull = (flag == (uint8_t)kIsNull);
+        isNull = (flag == (uint8_t)kIsNull);
     }
 }
 
@@ -402,7 +402,7 @@ void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, f
     erpc_assert(callbacksCount > 1U);
 
     // callbacks = callbacks table
-    read(&_tmp_local);
+    read(_tmp_local);
     if (isStatusOk())
     {
         if (_tmp_local < callbacksCount)

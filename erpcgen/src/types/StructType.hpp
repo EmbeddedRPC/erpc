@@ -93,7 +93,7 @@ public:
      * @see std::string ListType::getDescription() const
      * @see std::string UnionType::getDescription() const
      */
-    virtual std::string getDescription() const;
+    virtual std::string getDescription() const override;
 
     /*!
      * @brief This function return true, when has member, which contains list type.

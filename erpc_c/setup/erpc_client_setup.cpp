@@ -183,9 +183,9 @@ void erpc_client_deinit(erpc_client_t client)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     (void)client;
-    erpc_assert(client == s_client.get());
+    erpc_assert(reinterpret_cast<ClientManager *>(client) == s_client.get());
     s_codecFactory.destroy();
-    crc16.destroy();
+    s_crc16.destroy();
     s_client.destroy();
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
     erpc_assert(client != NULL);
