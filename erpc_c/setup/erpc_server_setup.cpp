@@ -200,7 +200,7 @@ void erpc_client_add_pre_cb_action(erpc_server_t server, pre_post_action_cb preC
 
 void erpc_client_add_post_cb_action(erpc_server_t server, pre_post_action_cb postCB)
 {
-    erpc_assert(server) != NULL;
+    erpc_assert(server != NULL);
 
     SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
 
