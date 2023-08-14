@@ -179,7 +179,7 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
                 ready_cb();
             }
 
-            (void)rpmsg_lite_wait_for_link_up(s_rpmsg, RL_BLOCK);
+            static_cast<void>(rpmsg_lite_wait_for_link_up(s_rpmsg, RL_BLOCK));
 
 #if RL_USE_STATIC_API
             m_rpmsg_queue = rpmsg_queue_create(s_rpmsg, m_queue_stack, &m_queue_context);
@@ -257,32 +257,63 @@ erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
     erpc_status_t status = kErpcStatus_Success;
     FramedTransport::Header h;
     char *buf = NULL;
+    char *buf2 = NULL;
     uint32_t length = 0;
     int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     uint16_t computedCrc;
 
     erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
-    erpc_assert(buf != NULL);
 
     if (ret_val == RL_SUCCESS)
     {
-        (void)memcpy(reinterpret_cast<uint8_t *>(&h), buf, sizeof(h));
-        message->set(&(reinterpret_cast<uint8_t *>(buf))[sizeof(h)], length - sizeof(h));
-
-        /* Verify CRC. */
-        computedCrc = m_crcImpl->computeCRC16(&(reinterpret_cast<uint8_t *>(buf))[sizeof(h)], h.m_messageSize);
-        if (computedCrc != h.m_crc)
+        erpc_assert(buf != NULL);
+        if (length < sizeof(h))
         {
-            status = kErpcStatus_CrcCheckFailed;
+            status = kErpcStatus_ReceiveFailed;
+        }
+        if (status == kErpcStatus_Success)
+        {
+            static_cast<void>(memcpy(reinterpret_cast<uint8_t *>(&h), buf, sizeof(h)));
+            /* If header and body is sent in two packets, we need call receive again to get body part. */
+            if (length == sizeof(h))
+            {
+                ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf2, &length, RL_BLOCK);
+                if (ret_val == RL_SUCCESS)
+                {
+                    erpc_assert(buf2 != NULL);
+                    erpc_assert((length + sizeof(h)) <= ERPC_DEFAULT_BUFFER_SIZE);
+                    static_cast<void>(memcpy(&buf[sizeof(h)], buf2, length));
+                }
+                static_cast<void>(rpmsg_lite_release_rx_buffer(s_rpmsg, buf2));
+            }
+            else
+            {
+                length -= sizeof(h); /* offset for MessageBuffer */
+            }
+            buf = &buf[sizeof(h)]; /* offset for MessageBuffer */
+        }
+    }
+    if (status == kErpcStatus_Success)
+    {
+        if (ret_val == RL_SUCCESS)
+        {
+            message->set(reinterpret_cast<uint8_t *>(buf), length);
+
+            /* Verify CRC. */
+            computedCrc = m_crcImpl->computeCRC16(reinterpret_cast<uint8_t *>(buf), h.m_messageSize);
+            if (computedCrc != h.m_crc)
+            {
+                status = kErpcStatus_CrcCheckFailed;
+            }
+            else
+            {
+                message->setUsed(h.m_messageSize);
+            }
         }
         else
         {
-            message->setUsed(h.m_messageSize);
+            status = kErpcStatus_ReceiveFailed;
         }
-    }
-    else
-    {
-        status = kErpcStatus_ReceiveFailed;
     }
 
     return status;
@@ -303,7 +334,7 @@ erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
     h.m_crc = m_crcImpl->computeCRC16(buf, used);
     h.m_messageSize = used;
 
-    (void)memcpy(&buf[-sizeof(h)], (uint8_t *)&h, sizeof(h));
+    static_cast<void>(memcpy(&buf[-sizeof(h)], (uint8_t *)&h, sizeof(h)));
 
     ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, &buf[-sizeof(h)], used + sizeof(h));
     if (ret_val == RL_SUCCESS)
