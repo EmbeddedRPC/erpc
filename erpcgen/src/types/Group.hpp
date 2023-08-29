@@ -30,7 +30,7 @@ class Group
 public:
     typedef std::vector<Interface *> interface_list_t; /*!< Vector of interfaces belongs to group. */
     typedef std::vector<Symbol *> symbols_list_t;      /*!< Vector of symbols belongs to group. */
-    typedef std::map<Symbol *, std::set<_param_direction> >
+    typedef std::map<Symbol *, std::set<param_direction_t> >
         symbol_directions_map_t; /*!< Map symbol with direction in which is used in current group. */
 
     /*!
@@ -70,7 +70,7 @@ public:
      * @param[in] symbol Symbol for which direction should be added.
      * @param[in] dir Direction of the symbol.
      */
-    void addDirToSymbolsMap(Symbol *symbol, _param_direction dir);
+    void addDirToSymbolsMap(Symbol *symbol, param_direction_t dir);
 
     /*!
      * @brief This function returns set with symbol directions.
@@ -79,7 +79,7 @@ public:
      *
      * @return Set with symbol directions.
      */
-    const std::set<_param_direction> getSymbolDirections(Symbol *symbol) const;
+    const std::set<param_direction_t> getSymbolDirections(Symbol *symbol) const;
 
     /*!
      * @brief This function returns vector with symbols.

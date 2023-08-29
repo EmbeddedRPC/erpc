@@ -28,7 +28,7 @@ namespace erpcgen {
 class Annotation
 {
 public:
-    enum program_lang_t
+    enum class program_lang_t
     {
         kAll,
         kC,
@@ -63,7 +63,7 @@ public:
     : m_name(token.getStringValue())
     , m_value(nullptr)
     , m_location(token.getLocation())
-    , m_lang(kAll)
+    , m_lang(program_lang_t::kAll)
     {
     }
 

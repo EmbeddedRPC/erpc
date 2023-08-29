@@ -127,7 +127,7 @@ public:
      */
     Function(const Token &tok, Interface *interface)
     : FunctionBase()
-    , Symbol(kFunctionSymbol, tok)
+    , Symbol(symbol_type_t::kFunctionSymbol, tok)
     , m_uniqueId(++s_idCounter)
     , m_interface(interface)
     , m_functionType(nullptr)
@@ -145,7 +145,7 @@ public:
      */
     Function(const Token &tok, Interface *interface, uint32_t uniqueId)
     : FunctionBase()
-    , Symbol(kFunctionSymbol, tok)
+    , Symbol(symbol_type_t::kFunctionSymbol, tok)
     , m_uniqueId(uniqueId)
     , m_interface(interface)
     , m_functionType(nullptr)

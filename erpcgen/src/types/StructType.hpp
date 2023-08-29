@@ -39,7 +39,7 @@ public:
      * @param[in] name Given name.
      */
     explicit StructType(const std::string &name)
-    : DataType(name, kStructType)
+    : DataType(name, data_type_t::kStructType)
     {
     }
 
@@ -51,7 +51,7 @@ public:
      * @param[in] tok Given token.
      */
     explicit StructType(const Token &tok)
-    : DataType(tok, kStructType)
+    : DataType(tok, data_type_t::kStructType)
     {
     }
 

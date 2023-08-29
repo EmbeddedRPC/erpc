@@ -1165,7 +1165,7 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
     else /* function type */
     {
         FunctionType *func = nullptr;
-        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
         {
             DataType *datatype = dynamic_cast<DataType *>(funSymbol);
             assert(datatype);
@@ -1201,7 +1201,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
     if (m_currentInterface)
     {
         fun = m_currentInterface->getFunctions().back();
-        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
         {
             DataType *datatype = dynamic_cast<DataType *>(funSymbol);
             assert(datatype);
@@ -1298,19 +1298,19 @@ AstNode *SymbolScanner::handleParam(AstNode *node, bottom_up)
 void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directionNode)
 {
     /* Extract parameter direction: in/out/inout/out byref. */
-    _param_direction param_direction;
+    param_direction_t param_direction;
     if (nullptr != directionNode)
     {
         switch (directionNode->getToken().getToken())
         {
             case TOK_IN:
-                param_direction = kInDirection;
+                param_direction = param_direction_t::kInDirection;
                 break;
             case TOK_OUT:
-                param_direction = kOutDirection;
+                param_direction = param_direction_t::kOutDirection;
                 break;
             case TOK_INOUT:
-                param_direction = kInoutDirection;
+                param_direction = param_direction_t::kInoutDirection;
                 break;
             default:
                 delete param;
@@ -1321,7 +1321,7 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
     }
     else /* if no direction specified, default case is an 'in' variable */
     {
-        param_direction = kInDirection;
+        param_direction = param_direction_t::kInDirection;
     }
     param->setDirection(param_direction);
 }
@@ -1499,7 +1499,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
     {
         for (auto annotation : *childNode)
         {
-            Log::SetOutputLevel logLevel(Logger::kDebug);
+            Log::SetOutputLevel logLevel(Logger::log_level_t::kDebug);
 
             // name can be optional for struct/enum
             string nameOfType;
@@ -1564,11 +1564,11 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         string lang = annotation_value->getToken().getValue()->toString();
         if (lang.compare("c") == 0)
         {
-            return Annotation::kC;
+            return Annotation::program_lang_t::kC;
         }
         else if (lang.compare("py") == 0)
         {
-            return Annotation::kPython;
+            return Annotation::program_lang_t::kPython;
         }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
@@ -1576,7 +1576,7 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
                                  .c_str());
     }
 
-    return Annotation::kAll;
+    return Annotation::program_lang_t::kAll;
 }
 
 void SymbolScanner::checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol)
@@ -1645,7 +1645,8 @@ void SymbolScanner::scanStructForAnnotations()
             Symbol *disSymbol;
             if (unionType->isNonEncapsulatedUnion())
             {
-                string discrimintorName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION, Annotation::kAll);
+                string discrimintorName =
+                    structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION, Annotation::program_lang_t::kAll);
                 if (discrimintorName.empty())
                 {
                     throw syntax_error(format_string("Missing discriminator for union variable %s on line %d",

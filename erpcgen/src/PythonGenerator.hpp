@@ -235,7 +235,7 @@ protected:
     std::string filterName(const std::string &name);
 
     //! @brief Possible Doxygen comment styles.
-    enum comment_type
+    enum class comment_type_t
     {
         kMultilineComment, //!< Leading multi-line comment
         kInlineComment,    //!< Trailing inline comment.
@@ -249,7 +249,7 @@ protected:
      *
      * @return Python form of the provided comment.
      */
-    std::string convertComment(const std::string &comment, comment_type commentType);
+    std::string convertComment(const std::string &comment, comment_type_t commentType);
 
     /*!
      * @brief Strip leading and trailing whitespace.

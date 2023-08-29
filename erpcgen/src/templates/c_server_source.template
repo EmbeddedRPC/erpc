@@ -139,7 +139,7 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceCla
 {$serverIndent}    codec->reset();
 
 {$serverIndent}    // Build response message.
-{$serverIndent}    codec->startWriteMessage(kReplyMessage, {$serverIDName}, {$functionIDName}, sequence);
+{$serverIndent}    codec->startWriteMessage(message_type_t::kReplyMessage, {$serverIDName}, {$functionIDName}, sequence);
 {%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
 
 {%   if param.isNullable %}

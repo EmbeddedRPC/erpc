@@ -132,7 +132,7 @@ int _sys_read(FILEHANDLE fh, unsigned char *buf, unsigned len, int mode)
         else
             // LOG_Push((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to terminal
             // DbgConsole_SendData((uint8_t *)(&buf[pos - 1]), 1); // Echo normal char to terminal
-            DbgConsole_Putchar(buf[pos-1]); // Echo normal char to terminal
+            DbgConsole_Putchar(buf[pos - 1]); // Echo normal char to terminal
 
     } while (buf[pos - 1] != '\r');
 

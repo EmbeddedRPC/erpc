@@ -23,14 +23,11 @@ class PathSearcher
 {
 public:
     //!
-    enum _target_type
+    enum class target_type_t
     {
         kFindFile,
         kFindDirectory
     }; /*!< Type of searched item. */
-
-    //!
-    typedef enum _target_type target_type_t; /*!< Type of searched item. */
 
 protected:
     //! Global search object singleton.
