@@ -44,7 +44,7 @@ class {$iface.name}Client(interface.I{$iface.name}):
         request = self._clientManager.create_request({% if fn.isOneway %}isOneway=True{% endif %})
         codec = request.codec
         codec.start_write_message(erpc.codec.MessageInfo(
-                type=erpc.codec.MessageType.{% if fn.isReturnValue %}message_type_t::kInvocationMessage{% else %}message_type_t::kOnewayMessage{% endif %},
+                type=erpc.codec.MessageType.{% if fn.isReturnValue %}kInvocationMessage{% else %}kOnewayMessage{% endif %},
                 service=self.SERVICE_ID,
                 request=self.{$upper(fn.name)}_ID,
                 sequence=request.sequence))
