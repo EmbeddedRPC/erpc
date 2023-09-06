@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 NXP
+ * Copyright 2017-2023 NXP
  * All rights reserved.
  *
  *
@@ -48,8 +48,7 @@ extern "C" {
 #define MU_REG_COUNT (MU_RR_COUNT) /*!< Count of MU tx/rx registers to be used by this transport layer */
 #endif                             /* ERPC_TRANSPORT_MU_USE_MCMGR */
 
-#if (defined(CPU_MIMXRT1189AVM8A_cm7) || defined(CPU_MIMXRT1189CVM8A_cm7) || defined(CPU_MIMXRT1189CVM8A_cm7) || \
-     defined(CPU_MIMXRT1189AVM8A_cm33) || defined(CPU_MIMXRT1189CVM8A_cm33) || defined(CPU_MIMXRT1189CVM8A_cm33))
+#if (defined(MIMXRT1187_cm7_SERIES) ||  defined(MIMXRT1187_cm33_SERIES) || defined(MIMXRT1189_cm7_SERIES) ||  defined(MIMXRT1189_cm33_SERIES))
 #define MU_TX_SHIFT (1UL << (MU_REG_COUNT - 1U))
 #define MU_RX_SHIFT (1UL << (MU_REG_COUNT - 1U))
 #define MU_RX_INTR_MASK (MU_RX_INTR(MU_RX_SHIFT))

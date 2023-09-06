@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2022 NXP
  * Copyright 2019 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -110,6 +110,57 @@ void erpc_transport_i2c_slave_deinit(erpc_transport_t transport);
 
 //@}
 
+//! @name LPI2C transport setup
+//@{
+
+/*!
+ * @brief Create an LPI2C slave transport.
+ *
+ * Create LPI2C slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of LPI2C peripheral used in this transport layer.
+ * @param[in] baudRate SPI baud rate.
+ * @param[in] srcClock_Hz LPI2C source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_lpi2c_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+/*!
+ * @brief Deinitialize LPI2C slave transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_lpi2c_slave_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name LPSPI transport setup
+//@{
+
+/*!
+ * @brief Create a LPSPI slave transport.
+ *
+ * Create LPSPI slave transport instance, to be used at slave core.
+ *
+ * @param[in] baseAddr Base address of LPSPI peripheral used in this transport layer.
+ * @param[in] baudRate LPSPI baud rate.
+ * @param[in] srcClock_Hz LPSPI source clock in Hz.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_lpspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
+
+
+/*!
+ * @brief Deinitialize LPSPI slave transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_lpspi_slave_deinit(erpc_transport_t transport);
+
+//@}
+
 //! @name MU transport setup
 //@{
 
@@ -141,7 +192,7 @@ void erpc_transport_mu_deinit(erpc_transport_t transport);
  * @brief Create an Linux RPMSG endpoint transport.
  *
  * This function is using RPMSG endpoints based on this implementation:
- * github.com/NXPmicro/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
+ * github.com/nxp-mcuxpresso/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .
  *
  * When local/remote address is set to '-1', then default addresses will be used.
  * When type is set to '0', then Datagram model will be used, else Stream.
