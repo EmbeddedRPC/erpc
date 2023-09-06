@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -85,15 +85,7 @@ erpc_status_t UartTransport::init(void)
         status = (*m_uartDrv).PowerControl(ARM_POWER_FULL); /* Enable Receiver and Transmitter lines */
         if (status == ARM_DRIVER_OK)
         {
-            status = m_uartDrv->Control(ARM_USART_CONTROL_TX, 1);
-            if (status == ARM_DRIVER_OK)
-            {
-                status = m_uartDrv->Control(ARM_USART_CONTROL_RX, 1);
-                if (status == ARM_DRIVER_OK)
-                {
-                    erpcStatus = kErpcStatus_Success;
-                }
-            }
+            erpcStatus = kErpcStatus_Success;
         }
     }
 
