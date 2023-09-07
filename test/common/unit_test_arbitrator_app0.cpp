@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2022 NXP
+ * Copyright 2016 - 2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -30,7 +30,7 @@ extern "C" {
 #include "fsl_debug_console.h"
 #include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
-int main(int argc, char **argv);
+int main(void);
 #endif
 #ifdef __cplusplus
 }
@@ -113,18 +113,6 @@ void runClient(void *arg)
     increaseWaitQuit();
 
     vTaskSuspend(NULL);
-}
-
-/*!
- * @brief Application-specific implementation of the SystemInitHook() weak function.
- */
-void SystemInitHook(void)
-{
-    /* Initialize MCMGR - low level multicore management library. Call this
-       function as close to the reset entry as possible to allow CoreUp event
-       triggering. The SystemInitHook() weak function overloading is used in this
-       application. */
-    MCMGR_EarlyInit();
 }
 
 void runInit(void *arg)
@@ -245,9 +233,13 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
  * end of reused snippet
  ***********************************************************************************/
 
-int main(int argc, char **argv)
+int main(void)
 {
-    ::testing::InitGoogleTest(&argc, argv);
+    int fake_argc = 1;
+    const auto fake_arg0 = "dummy";
+    char* fake_argv0 = const_cast<char*>(fake_arg0);
+    char** fake_argv = &fake_argv0;
+    ::testing::InitGoogleTest(&fake_argc, fake_argv);
     BOARD_InitHardware();
 
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();

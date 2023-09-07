@@ -23,8 +23,8 @@ using namespace erpc;
 
 #define number 15
 #define nestedCallsCount 10
-int j = 0;
-int numbers[number];
+volatile int j = 0;
+volatile int numbers[number];
 volatile bool enabled = false;
 SecondInterface_service *svc;
 

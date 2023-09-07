@@ -25,7 +25,7 @@ jobs:
   build-mac-gcc:
     macos:
       xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
-    resource_class: medium
+    resource_class: macos.x86.medium.gen2
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
@@ -35,7 +35,7 @@ jobs:
   build-mac-clang:
     macos:
       xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
-    resource_class: medium
+    resource_class: macos.x86.medium.gen2
     steps:
       - checkout
       - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang

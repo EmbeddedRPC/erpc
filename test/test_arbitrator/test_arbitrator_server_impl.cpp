@@ -20,8 +20,8 @@
 using namespace erpc;
 
 #define number 15
-int i = 0;
-int numbers[number];
+volatile int i = 0;
+volatile int numbers[number];
 FirstInterface_service *svc;
 
 extern "C" {

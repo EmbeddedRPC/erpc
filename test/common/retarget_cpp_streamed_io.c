@@ -200,9 +200,9 @@ long _sys_flen(FILEHANDLE fh)
  * name. Returns 0 on failure. maxlen is the maximum name length
  * allowed.
  */
-int _sys_tmpnam(char *name, int sig, unsigned maxlen)
+void _sys_tmpnam(char *name, int sig, unsigned maxlen)
 {
-    return 0; // fail, not supported
+    return; // fail, not supported
 }
 
 /*
