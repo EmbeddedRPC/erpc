@@ -24,7 +24,7 @@ jobs:
       #     path: ./Release/Linux/erpcgen/erpcgen
   build-mac-gcc:
     macos:
-      xcode: 14.3.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
     resource_class: macos.x86.medium.gen2
     steps:
       - checkout
@@ -34,7 +34,7 @@ jobs:
           path: ./Release/Darwin/erpcgen/erpcgen
   build-mac-clang:
     macos:
-      xcode: 14.3.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
     resource_class: macos.x86.medium.gen2
     steps:
       - checkout
