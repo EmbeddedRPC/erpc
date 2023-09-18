@@ -31,7 +31,7 @@ idl: |
     oneway functionName2(S a @name(m))
   }
 
-test_common.h:
+c_test_common.h:
   - enum EnumName
   - D
   - struct StructName StructName

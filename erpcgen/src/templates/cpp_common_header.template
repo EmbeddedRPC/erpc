@@ -17,19 +17,9 @@
 #include "{$inc}"
 {% endfor -- includes %}
 
-{% if cCommonHeaderFile %}
-#if defined(__cplusplus)
-extern "C"
-{
-#endif
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-{% else %}
 #include <cstdbool>
 #include <cstddef>
 #include <cstdint>
-{% endif %}
 
 #include "erpc_version.h"
 {% if empty(crc16) == false %}
@@ -41,18 +31,19 @@ extern "C"
 
 #if !defined(ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC})
 #define ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
+{$fillNamespaceBegin()}
 {% if not empty(enums) %}
 
 // Enumerators data types declarations
 {%  for enum in enums %}
 {$> enum.mlComment}
-{%   if enum.name %}typedef {% endif --enum.name  %}enum{$addIndent(" ", enum.name)}
+enum{%   if enum.name %} class{% endif --enum.name  %}{$addIndent(" ", enum.name)}
 {
 {%   for enumMember in enum.members %}
 {$> addIndent("    ", enumMember.mlComment)}
     {$enumMember.memberDeclaration}{$enumMember.ilComment}
 {%   endfor -- enumsMembers %}
-}{$addIndent(" ", enum.name)};{$enum.ilComment}{$loop.addNewLineIfNotLast}
+};{$enum.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- enums %}
 {% endif -- enums %}
 {% if not empty(aliases) %}
@@ -61,7 +52,7 @@ extern "C"
 {%  for alias in aliases %}
 {$> alias.mlComment}
 {%   if alias.forwardDecl != "" %}
-typedef {$alias.forwardDecl};{$alias.ilComment}
+{$alias.forwardDeclCpp};{$alias.ilComment}
 {%   elif alias.typenameName == "" %}
 typedef {$alias.unnamedType}
 {
@@ -108,14 +99,8 @@ union {$us.name}
 extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 {%  endfor -- consts %}
 {% endif -- consts %}
+{$fillNamespaceEnd()}
 
 #endif // ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
-
-{% if cCommonHeaderFile %}
-#if defined(__cplusplus)
-}
-#endif
-{% else %}
-{% endif %}
 
 #endif // {$commonGuardMacro}

@@ -38,21 +38,25 @@ extern const uint32_t erpc_generated_crc = {$crc16};
 
 namespace {$namespace}
 {
-{% endif  -- empty(crc16) == false %}
-{% enddef --checkCrc %}
+{% endif %}
+{% enddef %}
 
 {% def fillNamespaceEnd() %}
 {% if empty(namespace) == false %}
 } // {$namespace}
 
-{% endif  -- empty(crc16) == false %}
-{% enddef --checkCrc %}
+{% endif %}
+{% enddef %}
 
 {% def usingNamespace() %}
 {% if empty(namespace) == false %}
 using namespace {$namespace};
-{% endif  -- empty(crc16) == false %}
-{% enddef --checkCrc %}
+{% endif %}
+{% enddef %}
+
+{% def prefixNamespace() %}
+{% if empty(namespace) == false >%}{$namespace}::{% endif >%}
+{% enddef %}
 
 {# ---------------- constantsDefinitions ---------------- #}
 {% def constantsDefinitions(consts) %}
@@ -425,7 +429,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 {
 {%if info.needCaseEmptyFreeingCall %}{% for case in info.cases %}
 {%  if case.needCaseFreeingCall == false %}
-    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{% if case.caseCast != "" %}static_cast<{$case.caseCast}>({%  endif %}{$case.name}{% if case.caseCast != "" %}){%  endif %}{% else %}{$case.value}{% endif %}:
 {%  endif %}
 {% endfor -- cases %}
     {
@@ -433,7 +437,7 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
     }{%    endif -- needCaseEmptyFreeingCall %}
 {% for case in info.cases %}
 {%  if case.needCaseFreeingCall == true %}
-    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+    {%   if case.name != "default" %}case {% endif %}{% if case.name != "" %}{% if case.caseCast != "" %}static_cast<{$case.caseCast}>({%  endif %}{$case.name}{% if case.caseCast != "" %}){%  endif %}{% else %}{$case.value}{% endif %}:
     {
 {%   for member in case.members %}
 {%    if member.isNeedFreeingCall %}

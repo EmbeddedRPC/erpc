@@ -2,7 +2,7 @@
 name: extern c empty
 desc: do the extern "C" blocks get produced for empty input
 idl: ""
-test_common.h:
+c_test_common.h:
   - |
     #if defined(__cplusplus)
     extern "C" {
@@ -19,7 +19,7 @@ idl: |
   interface Foo {
     foofn() -> void
   }
-test_common.h:
+c_test_common.h:
   - |
     #if defined(__cplusplus)
     extern "C" {

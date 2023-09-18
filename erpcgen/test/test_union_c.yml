@@ -21,7 +21,7 @@ idl: |
     myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
   }
 
-test_common.h:
+c_test_common.h:
  - not: typedef union unionType unionType;
  - not: union unionType
  - not: int32 x;
@@ -72,7 +72,7 @@ idl: |
     myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
   }
 
-test_common.h:
+c_test_common.h:
   - typedef union unionType unionType;
   - union unionType
   - "{"
@@ -108,35 +108,35 @@ test_client.cpp:
   - codec->startWriteUnion(discriminator);
   - switch (discriminator)
   - "{"
-  - "case apple:"
+  - "case static_cast<int32_t>(fruitType::apple):"
   - "{"
   - write_foobar_struct(codec, &(data->myFoobar));
   - break;
   - "}"
-  - "case banana:"
+  - "case static_cast<int32_t>(fruitType::banana):"
   - "{"
   - codec->write(data->x);
   - codec->write(data->y);
   - break;
   - "}"
-  - "case papaya:"
+  - "case static_cast<int32_t>(fruitType::papaya):"
   - "{"
   - codec->write(data->x);
   - codec->write(data->y);
   - break;
   - "}"
-  - "case orange:"
+  - "case static_cast<int32_t>(fruitType::orange):"
   - "{"
   - write_list_int32_1_t_struct(codec, &(data->a));
   - break;
   - "}"
-  - "case coconut:"
+  - "case static_cast<int32_t>(fruitType::coconut):"
   - "{"
   - codec->write(data->cx);
   - write_list_int32_1_t_struct(codec, &(data->cc));
   - break;
   - "}"
-  - "case returnVal:"
+  - "case static_cast<int32_t>(fruitType::returnVal):"
   - "{"
   - codec->write(data->ret);
   - break;
@@ -164,35 +164,35 @@ test_server.cpp:
   - codec->startReadUnion(discriminator);
   - switch (discriminator)
   - "{"
-  - "case apple:"
+  - "case static_cast<int32_t>(fruitType::apple):"
   - "{"
   - read_foobar_struct(codec, &(data->myFoobar));
   - break;
   - "}"
-  - "case banana:"
+  - "case static_cast<int32_t>(fruitType::banana):"
   - "{"
   - codec->read(data->x);
   - codec->read(data->y);
   - break;
   - "}"
-  - "case papaya:"
+  - "case static_cast<int32_t>(fruitType::papaya):"
   - "{"
   - codec->read(data->x);
   - codec->read(data->y);
   - break;
   - "}"
-  - "case orange:"
+  - "case static_cast<int32_t>(fruitType::orange):"
   - "{"
   - read_list_int32_1_t_struct(codec, &(data->a));
   - break;
   - "}"
-  - "case coconut:"
+  - "case static_cast<int32_t>(fruitType::coconut):"
   - "{"
   - codec->read(data->cx);
   - read_list_int32_1_t_struct(codec, &(data->cc));
   - break;
   - "}"
-  - "case returnVal:"
+  - "case static_cast<int32_t>(fruitType::returnVal):"
   - "{"
   - codec->read(data->ret);
   - break;
@@ -209,25 +209,25 @@ test_server.cpp:
   - "{"
   - switch (discriminator)
   - "{"
-  - "case banana:"
+  - "case static_cast<int32_t>(fruitType::banana):"
   - not: "break;"
-  - "case papaya:"
-  - "case returnVal:"
+  - "case static_cast<int32_t>(fruitType::papaya):"
+  - "case static_cast<int32_t>(fruitType::returnVal):"
   - "default:"
   - "{"
   - "break;"
   - "}"
-  - "case apple:"
+  - "case static_cast<int32_t>(fruitType::apple):"
   - "{"
   - free_foobar_struct(&data->myFoobar);
   - break;
   - "}"
-  - "case orange:"
+  - "case static_cast<int32_t>(fruitType::orange):"
   - "{"
   - free_list_int32_1_t_struct(&data->a);
   - break;
   - "}"
-  - "case coconut:"
+  - "case static_cast<int32_t>(fruitType::coconut):"
   - "{"
   - free_list_int32_1_t_struct(&data->cc);
   - break;
@@ -272,7 +272,7 @@ idl: |
     myUnion(structType structVariable) -> void
   }
 
-test_common.h:
+c_test_common.h:
   - struct structType
   - fruitType discriminator
   - unionType unionVariable

@@ -15,7 +15,7 @@ idl: |
   const int32 a = 2
   const int32 b = a * two + three -1
 
-test_common.h:
+c_test_common.h:
   # named enums get a typedef
   - if: name
     then:

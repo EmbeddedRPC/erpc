@@ -98,22 +98,13 @@ void CGenerator::generateOutputFiles(const string &fileName)
     generateServerCSourceFile(fileName);
 }
 
-void CGenerator::generateCommonCHeaderFiles(string fileName)
-{
-    fileName += "_common.h";
-    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
-    m_templateData["commonCHeaderName"] = fileName;
-    m_templateData["cCommonHeaderFile"] = true;
-    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
-}
-
 void CGenerator::generateCommonCppHeaderFiles(string fileName)
 {
     fileName += "_common.hpp";
     m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
     m_templateData["commonCppHeaderName"] = fileName;
     m_templateData["cCommonHeaderFile"] = false;
-    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
+    generateOutputFile(fileName, "cpp_common_header", m_templateData, kCppCommonHeader);
 }
 
 void CGenerator::generateInterfaceCppHeaderFile(string fileName)
@@ -161,6 +152,15 @@ void CGenerator::generateServerCppSourceFile(string fileName)
     m_templateData["serverCppSourceName"] = fileName;
 
     generateOutputFile(fileName, "cpp_server_source", m_templateData, kCppServerSource);
+}
+
+void CGenerator::generateCommonCHeaderFiles(string fileName)
+{
+    fileName = "c_" + fileName + "_common.h";
+    m_templateData["commonGuardMacro"] = generateIncludeGuardName(fileName);
+    m_templateData["commonCHeaderName"] = fileName;
+    m_templateData["cCommonHeaderFile"] = true;
+    generateOutputFile(fileName, "c_common_header", m_templateData, kCCommonHeader);
 }
 
 void CGenerator::generateClientCHeaderFile(string fileName)
@@ -760,19 +760,20 @@ void CGenerator::makeAliasesTemplateData()
 
             if (elementDataType->getName() != "")
             {
-                string realType;
+                string realTypeC;
+                string realTypeCpp;
                 if (elementDataType->isFunction())
                 {
-                    realType = getOutputName(aliasType);
+                    realTypeC = getOutputName(aliasType);
                     aliasInfo["name"] = elementDataType->getName();
                 }
                 else
                 {
-                    realType = getTypenameName(elementDataType, getOutputName(aliasType));
+                    realTypeC = getTypenameName(elementDataType, getOutputName(aliasType));
                     aliasInfo["name"] = getOutputName(aliasType);
                 }
 
-                Log::info("%s\n", realType.c_str());
+                Log::info("%s\n", realTypeC.c_str());
 
                 /* For case typedef struct/union */
                 if (elementDataType->getName() == aliasType->getName() ||
@@ -780,18 +781,31 @@ void CGenerator::makeAliasesTemplateData()
                 {
                     if (elementDataType->isStruct())
                     {
-                        realType = "struct " + realType;
+                        realTypeC = "struct " + realTypeC;
+                        realTypeCpp = "struct " + aliasType->getName();
                     }
                     else
                     {
-                        realType = "union " + realType;
+                        realTypeC = "union " + realTypeC;
+                        realTypeCpp = "union " + aliasType->getName();
                     }
                 }
 
-                aliasInfo["typenameName"] = realType;
+                if (elementDataType->getName() == aliasType->getName())
+                {
+                    aliasInfo["forwardDecl"] = realTypeC;
+                    aliasInfo["forwardDeclCpp"] = realTypeCpp;
+                    aliasInfo["typenameName"] = "";
+                }
+                else
+                {
+                    aliasInfo["typenameName"] = realTypeC;
+                    aliasInfo["forwardDecl"] = "";
+                }
             }
             else
             {
+                aliasInfo["forwardDecl"] = "";
                 aliasInfo["typenameName"] = "";
                 aliasInfo["unnamedName"] = getOutputName(aliasType);
                 switch (elementDataType->getDataType())
@@ -1351,11 +1365,18 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
     info["isNonExternalFunction"] = !findAnnotation(fnSymbol, EXTERNAL_ANNOTATION);
 
     // Get return value info
-    data_map returnInfo;
-    returnInfo["type"] = getTypeInfo(fn->getReturnType(), true);
-    StructMember *structMember = fn->getReturnStructMemberType();
     DataType *dataType = fn->getReturnType();
     DataType *trueDataType = dataType->getTrueDataType();
+    data_map returnInfo;
+    returnInfo["type"] = getTypeInfo(dataType, true);
+    StructMember *structMember = fn->getReturnStructMemberType();
+    // TODO: in case we want distinguish cpp and c type macro
+    // std::string retypeName = "";
+    // if (dataType->isArray())
+    // {
+    //     retypeName = "*";
+    // }
+    // returnInfo["typename"] = getTypenameName(dataType, retypeName);
     if (!trueDataType->isVoid())
     {
         string result = "result";
@@ -1568,6 +1589,29 @@ data_map CGenerator::getFunctionBaseTemplateData(Group *group, FunctionBase *fn)
         paramInfo["shared"] = isShared;
         paramInfo["pureName"] = name;
         paramInfo["pureNameC"] = pureCName;
+        // TODO: in case we want distinguish cpp and c type macro
+        // std::string retypeParamName = "";
+        // bool isDoubleArray = false;
+        // if (paramType->isArray())
+        // {
+        //     ArrayType *paramArrayType = dynamic_cast<ArrayType *>(paramType);
+        //     retypeParamName = getTypenameName(paramArrayType->getElementType(), "*");
+        //     isDoubleArray = paramArrayType->getElementType()->isArray();
+        // }
+        // else
+        // {
+        //     retypeParamName = getTypenameName(paramType, "");
+        // }
+        // if (!paramType->getTrueContainerDataType()->isBuiltin() || paramType->isAlias())
+        // {
+        //     retypeParamName = m_templateData["namespace"].get().get()->getvalue() + "::" + retypeParamName;
+        // }
+        // if ((param->getDirection() == kInDirection) && (isDoubleArray == false) &&
+        // (!paramType->getTrueContainerDataType()->isString()))
+        // {
+        //     retypeParamName = "const " + retypeParamName;
+        // }
+        // paramInfo["typename"] =  retypeParamName;
         string encodeDecodeName;
         if (isShared)
         {
@@ -1885,6 +1929,10 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
                 assert(integerValue);
                 return (integerValue->getValue()) ? "true" : "false";
             }
+        }
+        else if (dataType->isEnum())
+        {
+            return fn->getReturnType()->getName() + "::" + returnVal->toString();
         }
         return returnVal->toString();
     }
@@ -2747,7 +2795,39 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                 for (auto unionCase : unionType->getCases())
                 {
                     data_map caseData;
-                    caseData["name"] = unionCase->getCaseName();
+                    DataType *caseDataType = unionCase->getCaseDataType();
+                    std::string caseName;
+                    caseData["caseCast"] = "";
+                    if (caseDataType == nullptr)
+                    {
+                        caseName = "";
+                    }
+                    else
+                    {
+                        if (unionType->isNonEncapsulatedUnion())
+                        {
+                            caseData["caseCast"] = "int32_t";
+                        }
+                        else
+                        {
+                            DataType *disType = getDiscriminatorType(unionType, structType, structMember);
+                            if (disType != nullptr)
+                            {
+                                std::string disName;
+                                if (disType->isBuiltin())
+                                {
+                                    disName = getBuiltinTypename(dynamic_cast<BuiltinType *>(disType));
+                                }
+                                else
+                                {
+                                    disName = disType->getName();
+                                }
+                                caseData["caseCast"] = (disName == caseDataType->getName()) ? "" : disName;
+                            }
+                        }
+                        caseName = caseDataType->getName() + "::";
+                    }
+                    caseData["name"] = caseName + unionCase->getCaseName();
                     caseData["value"] = unionCase->getCaseValue();
                     // if current case need call free function, default false
                     caseData["needCaseFreeingCall"] = false;
@@ -3335,6 +3415,37 @@ bool CGenerator::setDiscriminatorTemp(UnionType *unionType, StructType *structTy
         templateData["castDiscriminator"] = false;
     }
     return needTempVariableI32;
+}
+
+DataType *CGenerator::getDiscriminatorType(UnionType *unionType, StructType *structType, StructMember *structMember)
+{
+    DataType *retVal = nullptr;
+
+    if (structType)
+    {
+        string discriminatorName;
+        Symbol *disSymbol;
+
+        if (unionType->isNonEncapsulatedUnion())
+        {
+            discriminatorName = getAnnStringValue(structMember, DISCRIMINATOR_ANNOTATION);
+            disSymbol = m_globals->getSymbol(discriminatorName, false);
+            ConstType *constType = dynamic_cast<ConstType *>(disSymbol);
+            assert(constType);
+            retVal = constType->getDataType();
+        }
+        else
+        {
+            discriminatorName = unionType->getDiscriminatorName();
+            disSymbol = structType->getScope().getSymbol(discriminatorName);
+            assert(disSymbol);
+            StructMember *disMember = dynamic_cast<StructMember *>(disSymbol);
+            assert(disMember);
+            retVal = disMember->getDataType();
+        }
+    }
+
+    return retVal;
 }
 
 string CGenerator::getScalarTypename(DataType *dataType)

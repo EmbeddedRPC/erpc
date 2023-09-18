@@ -193,7 +193,7 @@ codec->startReadUnion({% if info.castDiscriminator %}{% if info.dataLiteral == "
 switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.discriminatorName})
 {
 {% for case in info.cases %}
-    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{%  endif %}:
+    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{% if case.caseCast != "" %}static_cast<{$case.caseCast}>({%  endif %}{$case.name}{% if case.caseCast != "" %}){%  endif %}{% else %}{$case.value}{%  endif %}:
     {
 {%  for member in case.members %}
 {% if source == "server" %}
@@ -332,7 +332,7 @@ codec->startWriteUnion({% if info.castDiscriminator %}static_cast<int32_t>({% en
 switch ({$info.dataLiteral}{$info.discriminatorName})
 {
 {% for case in info.cases %}
-    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{$case.name}{% else %}{$case.value}{% endif %}:
+    {% if case.name != "default" %}case {% endif %}{% if case.name != "" %}{% if case.caseCast != "" %}static_cast<{$case.caseCast}>({%  endif %}{$case.name}{% if case.caseCast != "" %}){%  endif %}{% else %}{$case.value}{% endif %}:
     {
 {%  for member in case.members %}
 {$> addIndent("        ", member.coderCall.encode(member.coderCall))}

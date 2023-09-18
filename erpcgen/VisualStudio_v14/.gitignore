@@ -4,6 +4,7 @@ erpcgen_parser.tab.cpp
 erpcgen_parser.tab.hpp
 
 # templates
+cpp_common_header.cpp
 cpp_client_source.cpp
 cpp_client_header.cpp
 cpp_server_header.cpp

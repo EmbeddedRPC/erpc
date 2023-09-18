@@ -19,7 +19,7 @@ idl:
     myFun(in forwardStruct s) -> void
   }
 
-test_common.h:
+c_test_common.h:
   - typedef struct struct2 struct2;
   - typedef struct forwardStruct forwardStruct;
 
@@ -63,7 +63,7 @@ idl: |
   {
     myFun(in forwardUnion u @discriminator(discriminator), unionCases discriminator) -> void
   }
-test_common.h:
+c_test_common.h:
   - typedef struct structure structure;
   - typedef union forwardUnion forwardUnion;
 

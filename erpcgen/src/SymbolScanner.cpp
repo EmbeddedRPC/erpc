@@ -920,7 +920,24 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
                 caseIdIntValue = (uint32_t) dynamic_cast<IntegerValue *>(caseIdValue)->getValue();
                 const string caseIdName = caseIdTok.getStringValue();
                 Log::debug("union case id name: %s\n", caseIdName.c_str());
-                newCase = new UnionCase(caseIdName, caseIdIntValue);
+                DataType *caseDataType = nullptr;
+                for (Symbol *enumSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+                {
+                    if (enumSymbol->isDatatypeSymbol())
+                    {
+                        DataType *datatype = dynamic_cast<DataType *>(enumSymbol);
+                        if (datatype->isEnum())
+                        {
+                            EnumType *enumType = dynamic_cast<EnumType *>(enumSymbol);
+                            EnumMember *enumMember = enumType->getMember(caseIdName);
+                            if (enumMember != nullptr)
+                            {
+                                caseDataType = enumType;
+                            }
+                        }
+                    }
+                }
+                newCase = new UnionCase(caseDataType, caseIdName, caseIdIntValue);
                 delete caseIdValue;
             }
             /* If there is no identifier, simply record the case value */
