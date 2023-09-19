@@ -12,10 +12,11 @@
 # then run
 # $./run_unit_tests.py [tcp]
 # to run this script with optional transport layer argument
-from subprocess import call
+import subprocess
 import re
 import os
 import sys
+import time
 
 #define output text colour class
 class bcolors:
@@ -36,6 +37,7 @@ testClientCommand = "run-tcp-client"
 testServerCommand = "run-tcp-server"
 transportLayer = "tcp"
 target = "release"
+make = "make"
 
 # Process command line options
 # Check for 2 or more arguments because argv[0] is the script name
@@ -52,6 +54,8 @@ if len(sys.argv) >= 2:
             target = "debug"
         elif arg == "-r":
             target = "release"
+        elif "-m" in arg:
+            make = arg[2:]
         else:
             print("Invalid argument/s. Options are: tcp, -r, -d\n")
             sys.exit(1)
@@ -72,8 +76,9 @@ for dir in testDirs:
     print(bcolors.BLUE + "\nRunning " + bcolors.ORANGE + dir + bcolors.BLUE +" unit tests with "
             + bcolors.ORANGE + transportLayer + bcolors.BLUE + " transport layer." + bcolors.ENDC)
     os.chdir(dir)
-    call(["make", build, testServerCommand])
-    testsExitStatus += call(["make", build, testClientCommand])
+    subprocess.Popen([make, build, testServerCommand])
+    time.sleep(0.1)
+    testsExitStatus += subprocess.call([make, build, testClientCommand])
     os.chdir('..')
 
 # For completeness, change back to erpc/ directory

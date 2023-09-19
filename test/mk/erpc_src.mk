@@ -46,6 +46,8 @@ SOURCES +=  $(UT_COMMON_SRC)/addOne.cpp \
             $(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.cpp \
             $(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
             $(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
-            $(ERPC_C_ROOT)/port/erpc_serial.cpp \
-            $(ERPC_C_ROOT)/transports/erpc_serial_transport.cpp \
             $(ERPC_C_ROOT)/transports/erpc_tcp_transport.cpp
+ifeq "$(is_mingw)" ""
+    SOURCES += $(ERPC_C_ROOT)/transports/erpc_serial_transport.cpp \
+               $(ERPC_C_ROOT)/port/erpc_serial.cpp
+endif
