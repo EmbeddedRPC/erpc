@@ -51,7 +51,7 @@ public:
     virtual void generate() override;
 
 private:
-    enum _direction
+    enum class direction_t
     {
         kIn,
         kOut,
@@ -577,7 +577,7 @@ private:
      * @param[in,out] toServer List of data types designed for server direction.
      * @param[in] dataMap Map with information about structure or function parameter.
      */
-    void setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> &directions,
+    void setSymbolDataToSide(const Symbol *symbolType, const std::set<param_direction_t> &directions,
                              cpptempl::data_list &toClient, cpptempl::data_list &toServer, cpptempl::data_map &dataMap);
 
     /*!
@@ -726,7 +726,7 @@ private:
      *
      * @return String representation for given direction.
      */
-    std::string getDirection(_param_direction direction);
+    std::string getDirection(param_direction_t direction);
 
     /*!
      * @brief This function returns information if function parameter on server side need be initialized to NULL.

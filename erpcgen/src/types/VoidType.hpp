@@ -32,7 +32,7 @@ public:
      * This function set name to "(void)".
      */
     VoidType()
-    : DataType("(void)", kVoidType)
+    : DataType("(void)", data_type_t::kVoidType)
     {
     }
 

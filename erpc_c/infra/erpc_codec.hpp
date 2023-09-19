@@ -32,13 +32,13 @@ namespace erpc {
 /*!
  * @brief Types of messages that can be encoded.
  */
-typedef enum _message_type
+enum class message_type_t
 {
     kInvocationMessage = 0,
     kOnewayMessage,
     kReplyMessage,
     kNotificationMessage
-} message_type_t;
+};
 
 typedef void *funPtr;          // Pointer to functions
 typedef funPtr *arrayOfFunPtr; // Pointer to array of functions

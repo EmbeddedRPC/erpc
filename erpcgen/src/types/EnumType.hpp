@@ -38,7 +38,7 @@ public:
      * @param[in] tok Given token.
      */
     explicit EnumType(const Token &tok)
-    : DataType(tok, kEnumType)
+    : DataType(tok, data_type_t::kEnumType)
     {
     }
 
@@ -48,7 +48,7 @@ public:
      * This function set DataType with default name.
      */
     EnumType()
-    : DataType("", kEnumType)
+    : DataType("", data_type_t::kEnumType)
     {
     }
 

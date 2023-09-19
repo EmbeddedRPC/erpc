@@ -27,7 +27,7 @@ namespace erpc {
 /*!
  * @brief Values of the uint8 flag prefixing nullable values.
  */
-enum _null_flag
+enum class null_flag_t
 {
     kNotNull = 0,
     kIsNull

@@ -99,7 +99,7 @@ vector<Annotation *> Symbol::getAnnotations(const string &name, Annotation::prog
     for (unsigned int i = 0; i < m_annotations.size(); ++i)
     {
         if (m_annotations[i].getName() == name &&
-            (m_annotations[i].getLang() == lang || m_annotations[i].getLang() == Annotation::kAll))
+            (m_annotations[i].getLang() == lang || m_annotations[i].getLang() == Annotation::program_lang_t::kAll))
         {
             anList.push_back(&m_annotations[i]);
         }
@@ -398,13 +398,13 @@ void Group::addInterface(Interface *iface)
     m_interfaces.push_back(iface);
 }
 
-void Group::addDirToSymbolsMap(Symbol *symbol, _param_direction dir)
+void Group::addDirToSymbolsMap(Symbol *symbol, param_direction_t dir)
 {
     Log::info("Adding direction %d for symbol \"%s\"\n", dir, symbol->getName().c_str());
     auto it = m_symbolDirections.find(symbol);
     if (it == m_symbolDirections.end())
     {
-        set<_param_direction> directions;
+        set<param_direction_t> directions;
         directions.insert(dir);
         m_symbolDirections[symbol] = directions;
 
@@ -424,9 +424,9 @@ void Group::setTemplate(cpptempl::data_map groupTemplate)
     m_template = groupTemplate;
 }
 
-const set<_param_direction> Group::getSymbolDirections(Symbol *symbol) const
+const set<param_direction_t> Group::getSymbolDirections(Symbol *symbol) const
 {
-    set<_param_direction> directions;
+    set<param_direction_t> directions;
     auto it = m_symbolDirections.find(symbol);
     if (it != m_symbolDirections.end())
     {
@@ -477,12 +477,12 @@ DataType *DataType::getTrueContainerDataType()
     DataType *trueDataType = this->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::kListType: {
+        case DataType::data_type_t::kListType: {
             ListType *l = dynamic_cast<ListType *>(trueDataType);
             assert(l);
             return l->getElementType()->getTrueContainerDataType();
         }
-        case DataType::kArrayType: {
+        case DataType::data_type_t::kArrayType: {
             ArrayType *a = dynamic_cast<ArrayType *>(trueDataType);
             assert(a);
             return a->getElementType()->getTrueContainerDataType();

@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     // create logger instance
     StdoutLogger m_logger;
 
-    m_logger.setFilterLevel(Logger::kInfo);
+    m_logger.setFilterLevel(Logger::log_level_t::kInfo);
 
     Log::setLogger(&m_logger);
 

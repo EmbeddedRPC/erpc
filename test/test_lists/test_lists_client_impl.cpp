@@ -52,7 +52,7 @@ TEST(test_list, sendReceiveZeroSize)
 
     received_list = sendReceivedInt32(&send_list);
 
-    EXPECT_EQ(received_list->elementsCount , 0);
+    EXPECT_EQ(received_list->elementsCount, 0);
 
     erpc_free(received_list->elements);
     erpc_free(received_list);
@@ -88,7 +88,7 @@ TEST(test_list, SendReceived2Int32)
         list_r = list_int32_1_t_r->elements;
         for (uint32_t j = 0; j < list_int32_1_t_r->elementsCount; ++j)
         {
-            EXPECT_EQ((*list_r) / 2 , *list_s);
+            EXPECT_EQ((*list_r) / 2, *list_s);
             ++list_s;
             ++list_r;
         }

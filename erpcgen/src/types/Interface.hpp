@@ -39,7 +39,7 @@ public:
      * @param[in] tok Given token.
      */
     explicit Interface(const Token &tok)
-    : Symbol(kInterfaceSymbol, tok)
+    : Symbol(symbol_type_t::kInterfaceSymbol, tok)
     , m_scope()
     , m_uniqueId(s_idCounter++)
     {

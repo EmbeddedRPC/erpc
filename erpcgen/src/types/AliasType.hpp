@@ -35,7 +35,7 @@ public:
      * @param[in] elementType Given data type.
      */
     AliasType(const std::string &name, DataType *elementType)
-    : DataType(name, kAliasType)
+    : DataType(name, data_type_t::kAliasType)
     , m_elementType(elementType)
     {
     }
@@ -49,7 +49,7 @@ public:
      * @param[in] elementType Given data type.
      */
     AliasType(const Token &tok, DataType *elementType)
-    : DataType(tok, kAliasType)
+    : DataType(tok, data_type_t::kAliasType)
     , m_elementType(elementType)
     {
     }

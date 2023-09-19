@@ -42,7 +42,7 @@ public:
      */
     explicit FunctionType(const Token &tok)
     : FunctionBase()
-    , DataType(tok, kFunctionType)
+    , DataType(tok, data_type_t::kFunctionType)
     , m_callbackFuns()
     {
     }
