@@ -41,6 +41,7 @@ transportLayer = "tcp"
 target = "release"
 compilerC = ""
 compilerCpp = ""
+make = "make"
 
 # Process command line options
 # Check for 2 or more arguments because argv[0] is the script name
@@ -63,6 +64,8 @@ if len(sys.argv) >= 2:
         elif arg == "gcc":
             compilerC = "gcc"
             compilerCpp = "gcc++"
+        elif "-m" in arg:
+            make = arg[2:]
         else:
             print("Invalid argument/s. Options are: tcp, -r, -d\n")
             sys.exit(1)
@@ -80,8 +83,8 @@ testDirs = filter(isTestDir, dirs)
 build = "build=" + target
 testsExitStatus = 0
 
-clientCmd = ["make", build, testClientCommand]
-serverCmd = ["make", build, testServerCommand]
+clientCmd = [make, build, testClientCommand]
+serverCmd = [make, build, testServerCommand]
 compilerParamC = ""
 compilerParamCpp = ""
 if compilerC != "":

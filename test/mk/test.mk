@@ -110,6 +110,9 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
     # Add libtest.a to build.
     LIBRARIES += -ltest
     LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+ifeq "$(is_mingw)" "1"
+    LIBRARIES += -lws2_32
+endif
 else
 ifeq (,$(filter $(TEST_NAME),test_arbitrator))
     INCLUDES += $(ERPC_ROOT)/test/common/config

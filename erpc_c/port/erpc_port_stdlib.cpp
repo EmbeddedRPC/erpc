@@ -15,6 +15,7 @@
 
 using namespace std;
 
+#if !defined(__MINGW32__)
 void *operator new(size_t count) THROW_BADALLOC
 {
     void *p = erpc_malloc(count);
@@ -62,6 +63,7 @@ void operator delete[](void *ptr, std::size_t count) THROW NOEXCEPT
     (void)count;
     erpc_free(ptr);
 }
+#endif
 
 void *erpc_malloc(size_t size)
 {

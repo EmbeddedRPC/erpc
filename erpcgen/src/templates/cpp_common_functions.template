@@ -27,7 +27,11 @@
 {% if empty(crc16) == false %}
 // for mdk/keil do not forgett add "--muldefweak" for linker
 extern const uint32_t erpc_generated_crc;
+#if defined(__MINGW32__)
+__declspec( selectany )
+#else
 #pragma weak erpc_generated_crc
+#endif
 extern const uint32_t erpc_generated_crc = {$crc16};
 {% endif  -- empty(crc16) == false %}
 {% enddef --checkCrc %}
@@ -60,7 +64,11 @@ using namespace {$namespace};
 
 // Constant variable definitions
 {%  for c in consts %}
+#if defined(__MINGW32__)
+__declspec( selectany )
+#else
 #pragma weak {$c.name}
+#endif
 extern const {$c.typeAndName} = {$c.value};
 {%  endfor -- consts %}
 {% endif %}
