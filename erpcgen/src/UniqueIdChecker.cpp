@@ -28,21 +28,21 @@ using namespace std;
 
 void UniqueIdChecker::makeIdsUnique(InterfaceDefinition &def)
 {
-    initUsedInterfaceIds(def.getGlobals().getSymbolsOfType(Symbol::kInterfaceSymbol));
+    initUsedInterfaceIds(def.getGlobals().getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol));
 
-    for (auto it : def.getGlobals().getSymbolsOfType(Symbol::kInterfaceSymbol))
+    for (auto it : def.getGlobals().getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
     {
         assert(nullptr != it);
         Interface *interface = dynamic_cast<Interface *>(it);
         assert(interface);
-        if (Annotation *interfaceId = interface->findAnnotation(ID_ANNOTATION, Annotation::kAll))
+        if (Annotation *interfaceId = interface->findAnnotation(ID_ANNOTATION, Annotation::program_lang_t::kAll))
         {
             setInterfaceId(interface, interfaceId);
         }
         initUsedFunctionIds(interface);
         for (auto function : interface->getFunctions())
         {
-            if (Annotation *functionId = function->findAnnotation(ID_ANNOTATION, Annotation::kAll))
+            if (Annotation *functionId = function->findAnnotation(ID_ANNOTATION, Annotation::program_lang_t::kAll))
             {
                 setFunctionId(function, functionId);
             }

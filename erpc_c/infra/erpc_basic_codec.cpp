@@ -158,7 +158,7 @@ void BasicCodec::startWriteUnion(int32_t discriminator)
 
 void BasicCodec::writeNullFlag(bool isNull)
 {
-    write(static_cast<uint8_t>(isNull ? kIsNull : kNotNull));
+    write(static_cast<uint8_t>(isNull ? null_flag_t::kIsNull : null_flag_t::kNotNull));
 }
 
 void BasicCodec::startReadMessage(message_type_t &type, uint32_t &service, uint32_t &request, uint32_t &sequence)
@@ -361,7 +361,7 @@ void BasicCodec::readNullFlag(bool &isNull)
     read(flag);
     if (isStatusOk())
     {
-        isNull = (flag == (uint8_t)kIsNull);
+        isNull = (flag == static_cast<uint8_t>(null_flag_t::kIsNull));
     }
 }
 

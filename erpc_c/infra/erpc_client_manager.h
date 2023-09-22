@@ -132,8 +132,8 @@ public:
 #endif
 
 protected:
-    uint32_t m_sequence;                    //!< Sequence number.
-    client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
+    uint32_t m_sequence;                   //!< Sequence number.
+    client_error_handler_t m_errorHandler; //!< Pointer to function error handler.
 #if ERPC_NESTED_CALLS
     Server *m_server;                     //!< Server used for nested calls.
     Thread::thread_id_t m_serverThreadId; //!< Thread in which server run function is called.

@@ -56,7 +56,7 @@ int main(int argc, const char *argv[])
 {
     // create logger instance
     StdoutLogger *m_logger = new StdoutLogger();
-    m_logger->setFilterLevel(Logger::kInfo);
+    m_logger->setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(m_logger);
     Log::info("Starting ERPC server...\n");
 

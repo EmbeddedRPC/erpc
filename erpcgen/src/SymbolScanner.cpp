@@ -921,7 +921,7 @@ AstNode *SymbolScanner::handleUnionCase(AstNode *node, bottom_up)
                 const string caseIdName = caseIdTok.getStringValue();
                 Log::debug("union case id name: %s\n", caseIdName.c_str());
                 DataType *caseDataType = nullptr;
-                for (Symbol *enumSymbol : m_globals->getSymbolsOfType(Symbol::kTypenameSymbol))
+                for (Symbol *enumSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
                 {
                     if (enumSymbol->isDatatypeSymbol())
                     {
@@ -1035,7 +1035,7 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
     addAnnotations(node->getChild(2), m_currentInterface);
 
     /* Check if function callbacks were not used in other interfaces*/
-    for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+    for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
     {
         Interface *interface = dynamic_cast<Interface *>(funSymbol);
         assert(interface);
@@ -1323,7 +1323,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
             AstNode *type = typeNode->getChild(1);
             std::string ifaceName = iface->getToken().getStringValue();
             std::string functionTypeName = type->getToken().getStringValue();
-            for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+            for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
             {
                 Interface *interface = dynamic_cast<Interface *>(funSymbol);
                 assert(interface);
@@ -1393,19 +1393,19 @@ AstNode *SymbolScanner::handleParam(AstNode *node, bottom_up)
 void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directionNode)
 {
     /* Extract parameter direction: in/out/inout/out byref. */
-    _param_direction param_direction;
+    param_direction_t param_direction;
     if (nullptr != directionNode)
     {
         switch (directionNode->getToken().getToken())
         {
             case TOK_IN:
-                param_direction = kInDirection;
+                param_direction = param_direction_t::kInDirection;
                 break;
             case TOK_OUT:
-                param_direction = kOutDirection;
+                param_direction = param_direction_t::kOutDirection;
                 break;
             case TOK_INOUT:
-                param_direction = kInoutDirection;
+                param_direction = param_direction_t::kInoutDirection;
                 break;
             default:
                 delete param;
@@ -1416,7 +1416,7 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
     }
     else /* if no direction specified, default case is an 'in' variable */
     {
-        param_direction = kInDirection;
+        param_direction = param_direction_t::kInDirection;
     }
     param->setDirection(param_direction);
 }
@@ -1604,7 +1604,7 @@ void SymbolScanner::addAnnotations(AstNode *childNode, Symbol *symbol)
     {
         for (auto annotation : *childNode)
         {
-            Log::SetOutputLevel logLevel(Logger::kDebug);
+            Log::SetOutputLevel logLevel(Logger::log_level_t::kDebug);
 
             // name can be optional for struct/enum
             string nameOfType;
@@ -1669,18 +1669,18 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         string lang = annotation_value->getToken().getValue()->toString();
         if (lang.compare("c") == 0)
         {
-            return Annotation::kC;
+            return Annotation::program_lang_t::kC;
         }
         else if (lang.compare("py") == 0)
         {
-            return Annotation::kPython;
+            return Annotation::program_lang_t::kPython;
         }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
                                            annotation->getToken().getFirstLine(), lang.c_str()));
     }
 
-    return Annotation::kAll;
+    return Annotation::program_lang_t::kAll;
 }
 
 void SymbolScanner::checkAnnotationBeforeAdding(AstNode *annotation, Symbol *symbol)
@@ -1749,7 +1749,8 @@ void SymbolScanner::scanStructForAnnotations()
             Symbol *disSymbol;
             if (unionType->isNonEncapsulatedUnion())
             {
-                string discrimintorName = structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION, Annotation::kAll);
+                string discrimintorName =
+                    structMember->getAnnStringValue(DISCRIMINATOR_ANNOTATION, Annotation::program_lang_t::kAll);
                 if (discrimintorName.empty())
                 {
                     throw syntax_error(format_string("Missing discriminator for union variable %s on line %d",

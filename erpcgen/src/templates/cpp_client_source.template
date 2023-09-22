@@ -78,7 +78,7 @@ using namespace std;
     else
     {
 {% endif -- generateErrorChecks %}
-{$clientIndent}    codec->startWriteMessage({% if not fn.isReturnValue %}kOnewayMessage{% else %}kInvocationMessage{% endif %}, {$serverIDName}, {$functionIDName}, request.getSequence());
+{$clientIndent}    codec->startWriteMessage({% if not fn.isReturnValue %}message_type_t::kOnewayMessage{% else %}message_type_t::kInvocationMessage{% endif %}, {$serverIDName}, {$functionIDName}, request.getSequence());
 
 {% if fn.isSendValue %}
 {%  for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}

@@ -45,7 +45,7 @@ namespace erpcgen {
 class Generator
 {
 public:
-    enum generator_type_t
+    enum class generator_type_t
     {
         kC,
         kPython

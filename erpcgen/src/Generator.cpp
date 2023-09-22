@@ -116,7 +116,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     data_list groupNames;
     Group *defaultGroup = new Group("");
 
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kInterfaceSymbol))
+    for (auto it : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
     {
         Interface *iface = dynamic_cast<Interface *>(it);
         assert(iface);
@@ -164,7 +164,7 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     // set codec information
     switch (m_def->getCodecType())
     {
-        case InterfaceDefinition::kBasicCodec: {
+        case InterfaceDefinition::codec_t::kBasicCodec: {
             m_templateData["codecClass"] = "BasicCodec";
             m_templateData["codecHeader"] = "erpc_basic_codec.hpp";
             break;
@@ -319,7 +319,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
 
     switch (dataType->getDataType())
     {
-        case DataType::kAliasType: {
+        case DataType::data_type_t::kAliasType: {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             if (aliasType != nullptr)
             {
@@ -327,7 +327,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kArrayType: {
+        case DataType::data_type_t::kArrayType: {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             if (arrayType != nullptr)
             {
@@ -335,7 +335,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kListType: {
+        case DataType::data_type_t::kListType: {
             ListType *listType = dynamic_cast<ListType *>(dataType);
             if (listType != nullptr)
             {
@@ -343,7 +343,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kStructType: {
+        case DataType::data_type_t::kStructType: {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             if (structType != nullptr)
             {
@@ -354,7 +354,7 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::kUnionType: {
+        case DataType::data_type_t::kUnionType: {
             // Keil need extra pragma option when unions are used.
             m_templateData["usedUnionType"] = true;
             UnionType *unionType = dynamic_cast<UnionType *>(dataType);
@@ -394,7 +394,7 @@ void Generator::findGroupDataTypes()
                 {
                     for (DataType *dataType : dataTypes)
                     {
-                        group->addDirToSymbolsMap(dataType, kReturn);
+                        group->addDirToSymbolsMap(dataType, param_direction_t::kReturn);
                     }
                 }
 
@@ -500,7 +500,7 @@ void Generator::generateGroupOutputFiles(Group *group)
         m_templateData["group"] = group->getTemplate();
 
         // Log template data.
-        if (Log::getLogger()->getFilterLevel() >= Logger::kDebug2)
+        if (Log::getLogger()->getFilterLevel() >= Logger::log_level_t::kDebug2)
         {
             dump_data(m_templateData);
         }
@@ -603,13 +603,13 @@ string Generator::getOutputName(Symbol *symbol, bool check)
 
 Annotation::program_lang_t Generator::getAnnotationLang()
 {
-    if (m_generatorType == kC)
+    if (m_generatorType == generator_type_t::kC)
     {
-        return Annotation::kC;
+        return Annotation::program_lang_t::kC;
     }
-    else if (m_generatorType == kPython)
+    else if (m_generatorType == generator_type_t::kPython)
     {
-        return Annotation::kPython;
+        return Annotation::program_lang_t::kPython;
     }
 
     throw internal_error("Unsupported generator type specified for annotation.");
@@ -654,7 +654,7 @@ Generator::datatype_vector_t Generator::getDataTypesFromSymbolScope(SymbolScope 
 {
     datatype_vector_t vector;
 
-    for (Symbol *symbol : scope->getSymbolsOfType(Symbol::kTypenameSymbol))
+    for (Symbol *symbol : scope->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
     {
         DataType *dataType = dynamic_cast<DataType *>(symbol);
         if (dataType->getDataType() == datatype)

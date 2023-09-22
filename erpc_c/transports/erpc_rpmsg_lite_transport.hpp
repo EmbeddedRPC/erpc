@@ -132,7 +132,7 @@ public:
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true: false); }
+    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true : false); }
 
 protected:
     /*!
