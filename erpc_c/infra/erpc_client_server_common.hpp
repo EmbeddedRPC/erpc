@@ -10,8 +10,8 @@
 #ifndef _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 #define _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 
-#include "erpc_config_internal.h"
 #include "erpc_codec.hpp"
+#include "erpc_config_internal.h"
 #if ERPC_MESSAGE_LOGGING
 #include "erpc_message_loggers.hpp"
 #endif

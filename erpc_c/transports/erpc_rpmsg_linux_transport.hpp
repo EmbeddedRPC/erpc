@@ -38,7 +38,7 @@ public:
      *
      * @return RPMsgEndpoint * Rpmsg endpoint.
      */
-    RPMsgEndpoint *getRpmsgEndpoint(void){ return m_endPoint; }
+    RPMsgEndpoint *getRpmsgEndpoint(void) { return m_endPoint; }
 
     /*!
      * @brief This function initializes Linux environment for sending and receiving messages.

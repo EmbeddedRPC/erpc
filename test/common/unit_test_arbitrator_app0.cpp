@@ -12,11 +12,12 @@
 #include "erpc_transport_setup.h"
 
 #include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+
 #include "c_test_firstInterface_client.h"
 #include "c_test_secondInterface_server.h"
 #include "gtest.h"
-#include "semphr.h"
-#include "task.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus
@@ -237,8 +238,8 @@ int main(void)
 {
     int fake_argc = 1;
     const auto fake_arg0 = "dummy";
-    char* fake_argv0 = const_cast<char*>(fake_arg0);
-    char** fake_argv = &fake_argv0;
+    char *fake_argv0 = const_cast<char *>(fake_arg0);
+    char **fake_argv = &fake_argv0;
     ::testing::InitGoogleTest(&fake_argc, fake_argv);
     BOARD_InitHardware();
 

@@ -15,8 +15,8 @@
 #include "erpc_message_buffer.hpp"
 #include "erpc_transport.hpp"
 
-#include <cstring>
 #include <cstdint>
+#include <cstring>
 
 /*!
  * @addtogroup infra_codec

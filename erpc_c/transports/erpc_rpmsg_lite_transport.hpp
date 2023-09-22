@@ -10,8 +10,8 @@
 #ifndef _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 #define _EMBEDDED_RPC__RPMSG_LITE_TRANSPORT_H_
 
-#include "erpc_crc16.hpp"
 #include "erpc_config_internal.h"
+#include "erpc_crc16.hpp"
 #include "erpc_message_buffer.hpp"
 #include "erpc_rpmsg_lite_base_transport.hpp"
 #include "erpc_static_queue.hpp"

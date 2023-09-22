@@ -9,7 +9,7 @@
 #include "erpc_utils.hpp"
 
 bool erpc::findIndexOfFunction(const arrayOfFunctionPtr_t sourceArrayOfFunctionPtr, uint16_t sourceArrayLength,
-                         const functionPtr_t functionPtr, uint16_t &retVal)
+                               const functionPtr_t functionPtr, uint16_t &retVal)
 {
     uint32_t index;
     bool find = false;

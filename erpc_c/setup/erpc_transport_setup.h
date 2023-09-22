@@ -151,7 +151,6 @@ void erpc_transport_lpi2c_slave_deinit(erpc_transport_t transport);
  */
 erpc_transport_t erpc_transport_lpspi_slave_init(void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz);
 
-
 /*!
  * @brief Deinitialize LPSPI slave transport.
  *

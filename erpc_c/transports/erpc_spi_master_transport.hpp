@@ -10,9 +10,10 @@
 #ifndef _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 
+#include "erpc_framed_transport.hpp"
+
 #include <cstdbool>
 #include <cstdlib>
-#include "erpc_framed_transport.hpp"
 
 extern "C" {
 #include "fsl_spi.h"

@@ -49,7 +49,7 @@ public:
     {
         kC,
         kPython
-    };                                                 /*!< Type of generator. */
+    }; /*!< Type of generator. */
 
     typedef std::vector<DataType *> datatype_vector_t; /*!< Vector of data types. */
 

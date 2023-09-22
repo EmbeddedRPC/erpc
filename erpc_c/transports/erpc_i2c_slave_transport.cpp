@@ -6,9 +6,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "erpc_i2c_slave_transport.hpp"
+
 #include <cstdio>
 #include <new>
-#include "erpc_i2c_slave_transport.hpp"
 
 extern "C" {
 #include "board.h"

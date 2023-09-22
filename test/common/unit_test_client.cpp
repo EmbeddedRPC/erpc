@@ -10,13 +10,6 @@
 #include "erpc_mbf_setup.h"
 #include "erpc_transport_setup.h"
 
-#include "board.h"
-#include "c_test_unit_test_common_client.h"
-#include "gtest.h"
-#include "gtestListener.h"
-#include "myAlloc.h"
-#include "unit_test_wrapped.h"
-
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #if defined(RPMSG)
@@ -31,6 +24,14 @@ extern "C" {
 int main(void);
 #endif
 }
+
+#include "board.h"
+
+#include "c_test_unit_test_common_client.h"
+#include "gtest.h"
+#include "gtestListener.hpp"
+#include "myAlloc.hpp"
+#include "unit_test_wrapped.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
@@ -112,8 +113,8 @@ int main(void)
 {
     int fake_argc = 1;
     const auto fake_arg0 = "dummy";
-    char* fake_argv0 = const_cast<char*>(fake_arg0);
-    char** fake_argv = &fake_argv0;
+    char *fake_argv0 = const_cast<char *>(fake_arg0);
+    char **fake_argv = &fake_argv0;
     ::testing::InitGoogleTest(&fake_argc, fake_argv);
 
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();

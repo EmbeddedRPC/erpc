@@ -14,15 +14,17 @@
 #if (defined(RPMSG) || defined(UART) || defined(MU))
 extern "C" {
 #if defined(UART)
-#include "app_core0.h"
 #include "fsl_lpuart_cmsis.h"
+
+#include "app_core0.h"
 #else
 #if defined(RPMSG)
 #include "rpmsg_lite.h"
 #endif
 #define APP_ERPC_READY_EVENT_DATA (1)
-#include "app_core1.h"
 #include "mcmgr.h"
+
+#include "app_core1.h"
 #endif
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
 int main(void);
@@ -31,8 +33,9 @@ int main(void);
 #endif
 
 #include "board.h"
+
+#include "c_test_unit_test_common_server.h"
 #include "myAlloc.hpp"
-#include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,9 +120,9 @@ void add_common_service(erpc_server_t server)
     erpc_add_service_to_server(server, service_common);
 }
 
-void remove_common_services_from_server(erpc_service_t service)
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
 {
-    erpc_remove_service_from_server(service);
+    erpc_remove_service_from_server(server, service);
     destroy_Common_service(service);
 }
 

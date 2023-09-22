@@ -143,7 +143,7 @@ public:
     virtual void stop(void) = 0;
 
 protected:
-    Service *m_firstService;                /*!< Contains pointer to first service. */
+    Service *m_firstService; /*!< Contains pointer to first service. */
 
     /*!
      * @brief Process message.
