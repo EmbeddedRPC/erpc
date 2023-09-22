@@ -60,9 +60,7 @@ extern "C"
 // Aliases data types declarations
 {%  for alias in aliases %}
 {$> alias.mlComment}
-{%   if alias.forwardDecl != "" %}
-typedef {$alias.forwardDecl};{$alias.ilComment}
-{%   elif alias.typenameName == "" %}
+{%   if alias.typenameName == "" %}
 typedef {$alias.unnamedType}
 {
 {%    for mem in alias.unnamed.members %}

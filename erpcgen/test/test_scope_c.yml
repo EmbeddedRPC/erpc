@@ -5,7 +5,7 @@ idl: |
   interface test {
     bar(int32 x) -> void
   }
-c_test_common.h:
+test_common.h:
   - |
     #if !defined(ERPC_TYPE_DEFINITIONS_ERPCSHIM)
     #define ERPC_TYPE_DEFINITIONS_ERPCSHIM
@@ -21,7 +21,7 @@ idl: |
   interface test {
     bar(int32 x) -> void
   }
-c_test_common.h:
+test_common.h:
   - |
     #if !defined(ERPC_TYPE_DEFINITIONS_TEST)
     #define ERPC_TYPE_DEFINITIONS_TEST
@@ -38,7 +38,7 @@ idl: |
   interface test {
     bar(int32 x) -> void
   }
-c_test_common.h:
+test_common.h:
   - |
     #if !defined(ERPC_TYPE_DEFINITIONS_MYSCOPE)
     #define ERPC_TYPE_DEFINITIONS_MYSCOPE
@@ -55,7 +55,7 @@ idl: |
   interface test {
     bar(int32 x) -> void
   }
-c_test_common.h:
+test_common.h:
   - |
     #if !defined(ERPC_TYPE_DEFINITIONS)
     #define ERPC_TYPE_DEFINITIONS

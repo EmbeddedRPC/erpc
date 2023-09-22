@@ -62,11 +62,11 @@ private:
     cpptempl::data_list m_symbolsTemplate; /*!< List of all symbol templates */
 
     std::vector<ListType *>
-        m_listBinaryTypes; /*!<
-                            * Contains binary types transformed to list<uint8>.
-                            * More ListType are present when @length annotation is used for binary type.
-                            * If binary without @length is used then it is placed on first place in this vector.
-                            */
+        m_listBinaryTypes;                       /*!<
+                                                  * Contains binary types transformed to list<uint8>.
+                                                  * More ListType are present when @length annotation is used for binary type.
+                                                  * If binary without @length is used then it is placed on first place in this vector.
+                                                  */
 
     std::vector<StructType *> m_structListTypes; /*!<
                                                   * Contains list types transformed to struct{list<>}.
@@ -757,30 +757,8 @@ private:
      */
     void setNoSharedAnn(Symbol *parentSymbol, Symbol *childSymbol);
 
-    /*!
-     * @brief Set template data related to discriminator
-     *
-     * @param unionType Union for which discriminator are data related
-     * @param structType Structure for which discriminator are data related
-     * @param structMember Structure member for which discriminator are data related
-     * @param isFunctionParam Is discriminator function parameter?
-     * @param templateData Object where data are stored.
-     *
-     * @return bool Return true if temporary variable need be generated.
-     */
     bool setDiscriminatorTemp(UnionType *unionType, StructType *structType, StructMember *structMember,
                               bool isFunctionParam, cpptempl::data_map &templateData);
-
-    /*!
-     * @brief Get the Discriminator type.
-     *
-     * @param unionType Union for which discriminator are data related
-     * @param structType Structure for which discriminator are data related
-     * @param structMember Structure member for which discriminator are data related
-     *
-     * @return DataType* Nullptr or discriminator data type.
-     */
-    DataType *getDiscriminatorType(UnionType *unionType, StructType *structType, StructMember *structMember);
 
     /*!
      * @brief This function returns data type name for scalar data type.

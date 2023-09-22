@@ -170,9 +170,6 @@
     <ClCompile Include="c_common_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpp_common_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cpp_interface_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -73,7 +73,7 @@ idl: |
         sendReceiveStruct(A a) -> A ///< 33 comment;
     } /*!<30 comment */
 
-c_test_common.h:
+test_common.h:
   - "/*"
   - not: "!"
   - "* Comment"

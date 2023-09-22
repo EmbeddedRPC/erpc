@@ -20,7 +20,7 @@ idl: |
   interface B {
     testF(inout A b) ->void
   }
-c_test_common.h:
+test_common.h:
   - typedef struct A A;
   - struct A
   - if: type in ('bool', 'float', 'double')
@@ -41,7 +41,7 @@ idl: |
   interface foo {
     bar(ListType x) -> ListType
   }
-c_test_common.h:
+test_common.h:
   - typedef struct list_int32_1_t list_int32_1_t;
   - typedef list_int32_1_t ListType;
   - struct list_int32_1_t
@@ -72,7 +72,7 @@ idl: |
   interface foo {
     bar(Vector x, binary y) -> void
   }
-c_test_common.h:
+test_common.h:
   - typedef struct binary_t binary_t;
   - typedef struct Vector Vector;
   - struct binary_t
@@ -97,7 +97,7 @@ idl: |
     foo(Vector a) -> void
     bar() -> Vector
   }
-c_test_common.h:
+test_common.h:
   - typedef struct binary_t binary_t;
   - typedef struct Vector Vector;
   - struct binary_t

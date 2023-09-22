@@ -40,7 +40,7 @@ idl: |
   interface foo {
     bar(in Vector vector_x, out Wector vector_y) -> void
   }
-c_test_common.h:
+test_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - struct Vector
@@ -124,7 +124,7 @@ idl: |
   interface fooA {
     barA(out Vector vector_x, in Wector vector_y) -> void
   }
-c_test_common.h:
+test_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - typedef struct NoGroup NoGroup;
@@ -149,7 +149,7 @@ test_client.cpp:
   - not: Vector_struct
   - not: Wector_struct
   - bar(const NoGroup * noGroup_z)
-c_test_A_common.h:
+test_A_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - typedef struct NoGroup NoGroup;
@@ -208,7 +208,7 @@ idl: |
   interface foo_B {
     bar_B(out VectorB b) -> void
   }
-c_test_A_common.h:
+test_A_common.h:
   - typedef struct VectorA VectorA
   - typedef struct VectorB VectorB
   - struct VectorA

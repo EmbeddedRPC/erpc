@@ -71,7 +71,7 @@ idl: |
   struct structwithint {
     {type} i
   }
-c_test_common.h:
+test_common.h:
   - 'struct structwithint {'
   - if: not type in ('bool', 'float', 'double')
     then:

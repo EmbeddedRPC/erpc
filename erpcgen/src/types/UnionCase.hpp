@@ -35,11 +35,10 @@ public:
      * @param[in] caseName Given case name.
      * @param[in] caseValue Given case value.
      */
-    UnionCase(DataType *dataType, const std::string &caseName, int32_t caseValue)
+    UnionCase(const std::string &caseName, int32_t caseValue)
     : Symbol(symbol_type_t::kUnionCaseMemberSymbol, caseName)
     , m_caseName(caseName)
     , m_caseValue(caseValue)
-    , m_caseType(dataType)
     , m_containingUnion(nullptr)
     {
     }
@@ -98,13 +97,6 @@ public:
     std::string getCaseName() { return m_caseName; }
 
     /*!
-     * @brief This function returns union case data type.
-     *
-     * @return Union data type.
-     */
-    DataType *getCaseDataType() { return m_caseType; }
-
-    /*!
      * @brief This function returns vector of member declarations.
      *
      * @return Vector of member declarations.
@@ -150,7 +142,6 @@ public:
 private:
     std::string m_caseName;                            /*!< Union case name. */
     int32_t m_caseValue;                               /*!< Union case value. */
-    DataType *m_caseType;                              /*!< Union case type. */
     std::vector<std::string> m_memberDeclarationNames; /*!< Vector of case members. */
     UnionType *m_containingUnion;                      /*!< Pointer to union type if it contains. */
 };

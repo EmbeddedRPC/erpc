@@ -113,7 +113,7 @@ idl: |
   interface foo {
     bar(Vector v @nullable) -> void
   }
-c_test_common.h:
+test_common.h:
   - '{type[1]} v[3]'
 c_test_client.h:
   - void bar(const Vector * v);
