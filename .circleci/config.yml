@@ -3,43 +3,99 @@ version: 2.1
 orbs:
   win: circleci/windows@5.0 # The Windows orb gives you everything you need to start using the
 
+commands:
+  install_dependencies:
+    parameters:
+      compiler:
+        default: ""
+        type: string
+    steps:
+      - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh <<parameters.compiler>>
+  compile_tests:
+    parameters:
+      compiler:
+        default: ""
+        type: string
+    steps:
+      - run: chmod u+x compile_tests.sh && ./compile_tests.sh <<parameters.compiler>>
+  run_tests:
+    steps:
+      - run: pytest erpcgen/test/
+      - run: python3 test/run_unit_tests.py
+
 jobs:
   build-linux-gcc:
     machine:
       image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
-      - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
-      - run: chmod u+x run_tests.sh && ./run_tests.sh
+      - install_dependencies
+      - compile_tests
       - store_artifacts:
           path: ./Release/Linux/erpcgen/erpcgen
+  test-linux-gcc:
+    machine:
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
+    parallelism: 2
+    steps:
+      - checkout
+      - run_tests
+
   build-linux-clang:
     machine:
       image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
-      - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
-      - run: chmod u+x run_tests.sh && ./run_tests.sh clang
+      - install_dependencies:
+          compiler: "clang"
+      - compile_tests:
+          compiler: "clang"
       # - store_artifacts:
       #     path: ./Release/Linux/erpcgen/erpcgen
+  test-linux-clang:
+    machine:
+      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
+    parallelism: 2
+    steps:
+      - checkout
+      - run_tests
+
   build-mac-gcc:
     macos:
       xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
     resource_class: macos.x86.medium.gen2
     steps:
       - checkout
-      - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh
-      - run: chmod u+x run_tests.sh && ./run_tests.sh
+      - install_dependencies
+      - compile_tests
       - store_artifacts:
           path: ./Release/Darwin/erpcgen/erpcgen
+  test-mac-gcc:
+    macos:
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    parallelism: 2
+    steps:
+      - checkout
+      - run_tests
+
   build-mac-clang:
     macos:
       xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
     resource_class: macos.x86.medium.gen2
     steps:
       - checkout
-      - run: chmod u+x install_dependencies.sh && ./install_dependencies.sh clang
-      - run: chmod u+x run_tests.sh && ./run_tests.sh clang
+      - install_dependencies:
+          compiler: "clang"
+      - compile_tests:
+          compiler: "clang"
+  test-mac-clang:
+    macos:
+      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    parallelism: 2
+    steps:
+      - checkout
+      - run_tests
+
       # - store_artifacts:
       #     path: ./Release/Darwin/erpcgen/erpcgen
   build-windows-mingw:
@@ -70,8 +126,20 @@ workflows:
   build-workflow:
     jobs:
       - build-linux-gcc
+      - test-linux-gcc:
+          requires:
+            - build-linux-gcc
       - build-linux-clang
+      - test-linux-clang:
+          requires:
+            - build-linux-clang
       - build-mac-gcc
+      - test-mac-gcc:
+          requires:
+            - build-mac-gcc
       - build-mac-clang
+      - test-mac-clang:
+          requires:
+            - build-mac-clang
       - build-windows-mingw
       - build-windows-VS
