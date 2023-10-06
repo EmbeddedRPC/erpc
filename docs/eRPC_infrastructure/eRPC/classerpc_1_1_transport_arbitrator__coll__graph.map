@@ -1,0 +1,10 @@
+<map id="erpc::TransportArbitrator" name="erpc::TransportArbitrator">
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="739,5,848,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_mutex.html" title="Mutex. " alt="" coords="748,69,839,96"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="253,204,345,231"/>
+<area shape="rect" id="node9" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="451,124,599,151"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="5,167,147,209"/>
+<area shape="rect" id="node6" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="5,233,147,260"/>
+<area shape="rect" id="node7" href="$structerpc_1_1_transport_arbitrator_1_1_pending_client_info.html" title="Request info for a client trying to receive a response. " alt="" coords="712,159,875,201"/>
+<area shape="rect" id="node8" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="464,175,585,201"/>
+</map>

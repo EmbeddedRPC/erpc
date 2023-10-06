@@ -1,0 +1,4 @@
+<map id="erpc::MessageLoggers" name="erpc::MessageLoggers">
+<area shape="rect" id="node2" href="$classerpc_1_1_message_logger.html" title="Logging messages objects used for logging sent/received messages. " alt="" coords="9,95,156,121"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="28,5,137,32"/>
+</map>

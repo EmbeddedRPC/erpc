@@ -1,0 +1,7 @@
+<map id="Porting" name="Porting">
+<area shape="rect" id="node1" href="$group__port__threads.html" title="Threading model. " alt="" coords="121,5,189,32"/>
+<area shape="rect" id="node2" href="$group__port__sysgpio.html" title="SysGPIO port. " alt="" coords="116,56,193,83"/>
+<area shape="rect" id="node3" href="$group__port__mem.html" title="Memory allocation. " alt="" coords="120,107,189,133"/>
+<area shape="rect" id="node4" href="$group__port__serial.html" title="Serial port. " alt="" coords="127,157,182,184"/>
+<area shape="rect" id="node5" href="$group__port__spidev.html" title="SPIdev port. " alt="" coords="123,208,186,235"/>
+</map>

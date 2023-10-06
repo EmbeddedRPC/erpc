@@ -1,0 +1,4 @@
+<map id="erpc::RPMsgTransport" name="erpc::RPMsgTransport">
+<area shape="rect" id="node2" href="$classerpc_1_1_r_p_msg_base_transport.html" title="Transport that other RPMsg transports inherits. " alt="" coords="5,80,188,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="42,5,151,32"/>
+</map>

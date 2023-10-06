@@ -1,0 +1,15 @@
+<map id="erpc::ArbitratedClientManager" name="erpc::ArbitratedClientManager">
+<area shape="rect" id="node2" href="$classerpc_1_1_client_manager.html" title="Base client implementation. " alt="" coords="1291,109,1429,136"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_client_server_common.html" title="Common class inherited by client and server class. " alt="" coords="1065,79,1241,105"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_codec_factory.html" title="Abstract interface for codec factory. " alt="" coords="737,5,873,32"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="750,145,859,172"/>
+<area shape="rect" id="node7" href="$classerpc_1_1_transport_arbitrator.html" title="Interposer to share transport between client and server. " alt="" coords="1072,220,1235,247"/>
+<area shape="rect" id="node6" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory. " alt="" coords="712,56,897,83"/>
+<area shape="rect" id="node8" href="$classerpc_1_1_mutex.html" title="Mutex. " alt="" coords="759,221,850,248"/>
+<area shape="rect" id="node9" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="253,307,345,333"/>
+<area shape="rect" id="node14" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="451,373,599,400"/>
+<area shape="rect" id="node10" href="$classerpc_1_1_message_buffer_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="5,270,147,311"/>
+<area shape="rect" id="node11" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="5,336,147,363"/>
+<area shape="rect" id="node12" href="$structerpc_1_1_transport_arbitrator_1_1_pending_client_info.html" title="Request info for a client trying to receive a response. " alt="" coords="723,362,886,403"/>
+<area shape="rect" id="node13" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="464,323,585,349"/>
+</map>

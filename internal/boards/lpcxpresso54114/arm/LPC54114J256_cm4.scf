@@ -1,0 +1,98 @@
+#!armclang --target=arm-arm-none-eabi -mcpu=cortex-m4 -E -x c
+/*
+** ###################################################################
+**     Processors:          LPC54114J256BD64_cm4
+**                          LPC54114J256UK49_cm4
+**
+**     Compiler:            Keil ARM C/C++ Compiler
+**     Reference manual:    LPC5411x User manual Rev. 1.0 16 February 2016
+**     Version:             rev. 1.0, 2016-04-29
+**     Build:               b190923
+**
+**     Abstract:
+**         Linker file for the Keil ARM C/C++ Compiler
+**
+**     Copyright 2016 Freescale Semiconductor, Inc.
+**     Copyright 2016-2019 NXP
+**     All rights reserved.
+**
+**     SPDX-License-Identifier: BSD-3-Clause
+**
+**     http:                 www.nxp.com
+**     mail:                 support@nxp.com
+**
+** ###################################################################
+*/
+
+#define m_interrupts_start             0x00000000
+#define m_interrupts_size              0x000002FC
+
+#define  m_crp_start                   0x000002FC
+#define  m_crp_size                    0x00000004
+
+#define m_text_start                   0x00000300
+#define m_text_size                    0x0002FD00
+
+#define m_core1_image_start            0x00030000
+#define m_core1_image_size             0x00010000
+
+#if (defined(__use_shmem__))
+#define m_rpmsg_sh_mem_start           0x20022800
+#define m_rpmsg_sh_mem_size            0x00005800
+#endif
+
+#define m_data_start                   0x20000000
+#define m_data_size                    0x00010000
+
+#define m_sramx_start                  0x04000000
+#define m_sramx_size                   0x00008000
+
+/* Sizes */
+#if (defined(__stack_size__))
+  #define Stack_Size                   __stack_size__
+#else
+  #define Stack_Size                   0x0400
+#endif
+
+#if (defined(__heap_size__))
+  #define Heap_Size                    __heap_size__
+#else
+  #define Heap_Size                    0x0400
+#endif
+
+LR_m_text m_interrupts_start m_interrupts_size+m_crp_size+m_text_size { ; load region size_region
+  VECTOR_ROM m_interrupts_start m_interrupts_size { ; load address = execution address
+    * (.isr_vector,+FIRST)
+  }
+  ER_m_crp m_crp_start FIXED m_crp_size { ; load address = execution address
+    * (.crp)
+  }
+  ER_m_text m_text_start m_text_size  {  ; load address = execution address
+    * (InRoot$$Sections)
+    .ANY (+RO)
+  }
+  ER_m_sramx m_sramx_start m_sramx_size { ; SRAMX memory
+    * (sramx)
+  }
+
+  RW_m_data m_data_start m_data_size-Stack_Size-Heap_Size { ; RW data
+    .ANY (+RW +ZI)
+  }
+  ARM_LIB_HEAP ((ImageLimit(RW_m_data) == m_data_start) ? ImageLimit(RW_m_data) : +0) EMPTY Heap_Size { ; Heap region growing up
+  }
+  ARM_LIB_STACK m_data_start+m_data_size EMPTY -Stack_Size { ; Stack region growing down
+  }
+
+#if (defined(__use_shmem__))
+  RPMSG_SH_MEM m_rpmsg_sh_mem_start UNINIT m_rpmsg_sh_mem_size { ; Shared memory used by RPMSG
+    * (rpmsg_sh_mem_section)
+  }
+#endif
+}
+
+LR_CORE1_IMAGE m_core1_image_start {
+  CORE1_REGION m_core1_image_start m_core1_image_size {
+    * (.core1_code)
+  }
+}
+

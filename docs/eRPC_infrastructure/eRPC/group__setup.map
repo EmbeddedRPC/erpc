@@ -1,0 +1,7 @@
+<map id="Setup API" name="Setup API">
+<area shape="rect" id="node1" href="$group__message__buffer__factory__setup.html" title="Message Buffer Factory setup functions. " alt="" coords="135,5,295,47"/>
+<area shape="rect" id="node2" href="$group__transport__setup.html" title="Transport layer initialization. " alt="" coords="157,71,272,98"/>
+<area shape="rect" id="node3" href="$group__client__setup.html" title="Client side setup functions. " alt="" coords="168,122,261,149"/>
+<area shape="rect" id="node4" href="$group__server__setup.html" title="Server side setup and control functions. " alt="" coords="167,173,263,199"/>
+<area shape="rect" id="node6" href="$group__port__setup__extensions.html" title="Extension setup functions. " alt="" coords="155,223,274,250"/>
+</map>

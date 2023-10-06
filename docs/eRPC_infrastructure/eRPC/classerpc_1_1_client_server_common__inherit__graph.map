@@ -1,0 +1,6 @@
+<map id="erpc::ClientServerCommon" name="erpc::ClientServerCommon">
+<area shape="rect" id="node2" href="$classerpc_1_1_client_manager.html" title="Base client implementation. " alt="" coords="45,80,184,107"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_server.html" title="Based server functionality. " alt="" coords="232,80,323,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_arbitrated_client_manager.html" title="Client that can share a transport with a server. " alt="" coords="5,155,200,181"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_simple_server.html" title="Based server implementation. " alt="" coords="224,155,355,181"/>
+</map>

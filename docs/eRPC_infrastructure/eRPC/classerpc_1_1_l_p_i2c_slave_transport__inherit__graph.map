@@ -1,0 +1,4 @@
+<map id="erpc::LPI2cSlaveTransport" name="erpc::LPI2cSlaveTransport">
+<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers. " alt="" coords="15,80,169,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="37,5,147,32"/>
+</map>
