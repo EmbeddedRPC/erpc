@@ -161,12 +161,12 @@ using namespace std;
     return{% if fn.returnValue.type.isNotVoid %} result{% endif -- isNotVoid %};
 {% enddef --------------------------------------------------------------------------------- clientShimCode(fn, serverIDName, functionIDName) %}
 {% for iface in group.interfaces %}
-{%  for cb in iface.callbacksInt %}
+{%  for cb in iface.callbacksInt if (count(cb.callbacks) > 1) %}
 
 // Common function for serializing and deserializing callback functions of same type.
 static {$cb.callbacksData.prototype};
 {% endfor %}
-{%  for cb in iface.callbacksInt %}
+{%  for cb in iface.callbacksInt if (count(cb.callbacks) > 1) %}
 
 // Common function for serializing and deserializing callback functions of same type.
 static {$cb.callbacksData.prototype}

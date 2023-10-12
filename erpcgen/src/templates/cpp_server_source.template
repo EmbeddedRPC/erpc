@@ -179,13 +179,13 @@ extern bool nestingDetection;
 {% endif %}
 {% enddef --------------------------------------------------------------------------------- serverShimCode(fn, serverIDName, functionIDName) %}
 {% for iface in group.interfaces %}
-{%  for cb in iface.callbacksInt %}
+{%  for cb in iface.callbacksInt  if (count(cb.callbacks) > 1) %}
 // Common function for serializing and deserializing callback functions of same type.
 static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);
 {%  endfor %}
 {% endfor %}
 {% for iface in group.interfaces %}
-{%  for cb in iface.callbacksInt %}
+{%  for cb in iface.callbacksInt if (count(cb.callbacks) > 1) %}
 
 // Common function for serializing and deserializing callback functions of same type.
 static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
