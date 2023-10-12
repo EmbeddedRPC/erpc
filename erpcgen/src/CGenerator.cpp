@@ -1971,10 +1971,10 @@ string CGenerator::getFunctionServerCall(Function *fn, bool isCCall)
                     proto += "&";
                 }
             }
-            std::string paramName = getOutputName(it);
-            if (paramName.empty())
+            std::string paramName = getOutputName(fn->getParameters().getMembers()[n]);
+            if ((paramName.empty()) || (funcType && funcType->getCallbackFuns().size() > 1))
             {
-                paramName = getOutputName(fn->getParameters().getMembers()[n]);
+                paramName = getOutputName(it);
             }
             proto += paramName;
 
