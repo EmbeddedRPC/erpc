@@ -118,11 +118,11 @@ protected:
     const char *m_outputFilePath; /*!< Path to the output file. */
     const char *m_ErpcFile;       /*!< ERPC file. */
     string_vector_t m_positionalArgs;
-    transports_t m_transport; /*!< Transport used for receiving messages. */
-    uint64_t m_quantity;      /*!< Quantity of logs to store. */
-    uint32_t m_baudrate;      /*!< Baudrate rate speed. */
-    const char *m_port;       /*!< Name or number of port. Based on used transport. */
-    const char *m_host;       /*!< Host name */
+    transports_t m_transport;     /*!< Transport used for receiving messages. */
+    uint64_t m_quantity;          /*!< Quantity of logs to store. */
+    uint32_t m_baudrate;          /*!< Baudrate rate speed. */
+    const char *m_port;           /*!< Name or number of port. Based on used transport. */
+    const char *m_host;           /*!< Host name */
 
 public:
     /*!
@@ -225,7 +225,7 @@ public:
                     }
                     else
                     {
-                        Log::error(format_string("error: unknown transport type %s", transport.c_str()).c_str());
+                        Log::error("error: unknown transport type %s", transport.c_str());
                         return 1;
                     }
                     break;

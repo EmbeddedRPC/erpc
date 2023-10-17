@@ -8,13 +8,17 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 ArithmeticService_service *svc;
 
@@ -207,6 +211,42 @@ InnerList *testInnerList(const InnerList *il)
     return newList;
 }
 
+class ArithmeticService_server : public ArithmeticService_interface
+{
+public:
+    gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
+    {
+        gapGenericEvent_t *result = NULL;
+        result = ::testGenericCallback(event);
+
+        return result;
+    }
+
+    foo *sendMyFoo(const foo *f)
+    {
+        foo *result = NULL;
+        result = ::sendMyFoo(f);
+
+        return result;
+    }
+
+    foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
+    {
+        foo *result = NULL;
+        result = ::sendMyUnion(discriminator, unionVariable);
+
+        return result;
+    }
+
+    InnerList *testInnerList(const InnerList *il)
+    {
+        InnerList *result = NULL;
+        result = ::testInnerList(il);
+
+        return result;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +255,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new ArithmeticService_service();
+    svc = new ArithmeticService_service(new ArithmeticService_server());
 
     // add services
     server->addService(svc);
@@ -233,6 +273,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -252,11 +293,6 @@ void remove_services_from_server(erpc_server_t server)
     destroy_ArithmeticService_service(service_test);
 }
 
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

@@ -1,255 +1,88 @@
-{% if mlComment != ""%}
+{% if mlComment != "" %}
 {$mlComment}
 
 {% endif %}
 {$commonHeader()}
+{% set source = "server" >%}
 
-#include "{$serverHeaderName}"
-#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
 #include <new>
-#include "erpc_port.h"
-#endif
+#include "{$serverCHeaderName}"
+#include "{$serverCppHeaderName}"
 #include "erpc_manually_constructed.hpp"
-{% if empty(group.includes) == false %}
-extern "C"
-{
-{%  for inc in group.includes %}
-#include "{$inc}"
-{%  endfor -- group.includes %}
-}
-{% endif -- empty(group.includes) %}
+{% set utils = false >%}
+{% for iface in group.interfaces %}
+{%  if (count(iface.callbacksAll) > 0) && (utils == false) %}
+#include "erpc_utils.hpp"
+{%   set utils = true >%}
+{%  endif %}
+{% endfor %}
 
-{$checkVersion()}
-{$>checkCrc()}
 using namespace erpc;
 using namespace std;
-
-#if ERPC_NESTED_CALLS_DETECTION
-extern bool nestingDetection;
-#endif
-
+{$usingNamespace() >}
 {% for iface in group.interfaces %}
-ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
+{%  if count(iface.callbacksAll) > 0 %}
 
-{% endfor -- iface %}
-{$generateCrcVariable()}
-{$> setSharedMemAddresses()}
-{% if unitTest %}
-{$> callbackTable(functions)}
-{% endif %}
-{$> constantsDefinitions(consts)}
-{$> symbolHeader(group.symbolsMap.symbolsToServer, "deserial", "def")}
-{$> symbolSource(group.symbolsMap.symbolsToServer, "deserial", "def")}
-{$> symbolHeader(group.symbolsMap.symbolsToClient, "serial", "def")}
-{$> symbolSource(group.symbolsMap.symbolsToClient, "serial", "def")}
-{$> symbolFreeSpaceHeader(group.symbolsMap.symbolsServerFree, "def")}
-{$> symbolFreeSpaceSource(group.symbolsMap.symbolsServerFree, "def")}
-{$> symbolHeader(group.symbolsMap.symbolsToServer, "deserial", "noSharedMem")}
-{$> symbolSource(group.symbolsMap.symbolsToServer, "deserial", "noSharedMem")}
-{$> symbolHeader(group.symbolsMap.symbolsToClient, "serial", "noSharedMem")}
-{$> symbolSource(group.symbolsMap.symbolsToClient, "serial", "noSharedMem")}
-{$> symbolFreeSpaceHeader(group.symbolsMap.symbolsServerFree, "noSharedMem")}
-{$> symbolFreeSpaceSource(group.symbolsMap.symbolsServerFree, "noSharedMem")}
-{% def serverShimCode(fn, serverIDName, functionIDName) ------------------------- serverShimCode(fn, serverIDName, functionIDName) %}
-{% set serverIndent = "" >%}
-{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
-    erpc_status_t err = kErpcStatus_Success;
-
-{% endif -- isReturnValue || isSendValue %}
-{% for param in fn.parameters %}
-    {$param.variable}{% if param.isNullParam %} = NULL{% endif %};
-{%  if !empty(param.nullVariable) %}
-    {$param.nullVariable} = NULL;
+{%   for cb in iface.callbacksAll %}
+static const {$cb.name} _{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in cb.callbacks %}{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
+{%   endfor %}
 {%  endif %}
-{%  if !param.shared %}
-{%   if param.isNullable == false && param.direction != OutDirection %}
-{$> addIndent("    ", allocMem(param.mallocServer))}
-{%   endif -- !param.isNullable && param.direction != OutDirection %}
-{%  endif -- shared %}
-{% endfor -- param %}
-{% if fn.needNullVariableOnServer %}
-    bool isNull;
-{% endif -- needNullVariableOnServer %}
-{% if fn.needTempVariableServerI32 %}
-    int32_t _tmp_local_i32;
-{% endif %}
-{% if fn.returnValue.type.isNotVoid %}
-    {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
-{% endif %}
-{% if fn.isReturnValue || fn.isSendValue  %}
-
-{% endif %}
-    // startReadMessage() was already called before this shim was invoked.
-
-{% if fn.isSendValue %}
-{%  for param in fn.parameters if (param.serializedDirection == "" || param.serializedDirection == OutDirection || param.referencedName != "") %}
-{%   if param.isNullable %}
-{$addIndent("    ", f_paramIsNullableDecode(param))}
-
-{%   else -- notNullable %}
-{%    if param.direction != OutDirection %}
-{$addIndent("    ", param.coderCall.decode(param.coderCall))}
-
-{%    endif -- param != OutDirection %}
-{%   endif -- isNullable %}
-{%  endfor -- parametersToServer %}
-{% endif -- isSendValue %}
-{% for param in fn.parametersToClient %}
-{%  if !param.shared %}
-{%   if param.isNullable == false && param.direction == OutDirection && empty(param.mallocServer) == false %}
-{$> addIndent("    ", allocMem(param.mallocServer))}
-
-{%   endif -- !param.isNullable && param.direction == OutDirection %}
-{%  endif -- shared %}
-{% endfor -- param %}
-{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
-{%  set serverIndent = "    " >%}
-    err = codec->getStatus();
-    if (err == kErpcStatus_Success)
-    {
-{% endif -- generateErrorChecks %}
-{$serverIndent}    // Invoke the actual served function.
-#if ERPC_NESTED_CALLS_DETECTION
-{$serverIndent}    nestingDetection = true;
-#endif
-{% if serverIDName == "serviceID" %}
-{%  for callbackFunction in callbackType.functions %}
-{$serverIndent}    {% if loop.first == false %}else {% endif %}if (({$serverIDName} == {$callbackFunction.serviceId}) && ({$functionIDName} == {$callbackFunction.id}))
-{$serverIndent}    {
-{$serverIndent}        {$callbackFunction.serverPrototype}
-{$serverIndent}    }
-{%  endfor -- callbackFunction in callbackType.functions %}
-{% else -- serverIDName == "serviceID" %}
-{$serverIndent}    {$fn.serverPrototype}
-{% endif --serverIDName == "serviceID" %}
-#if ERPC_NESTED_CALLS_DETECTION
-{$serverIndent}    nestingDetection = false;
-#endif
-{% if fn.isReturnValue %}
-
-{$serverIndent}    // preparing MessageBuffer for serializing data
-{$serverIndent}    {% if generateErrorChecks %}err = {% endif %}messageFactory->prepareServerBufferForSend(codec->getBuffer());
-{%  if generateErrorChecks %}
-    }
-
-    if (err == kErpcStatus_Success)
-    {
-{%  endif -- generateErrorChecks %}
-{$serverIndent}    // preparing codec for serializing data
-{$serverIndent}    codec->reset();
-
-{$serverIndent}    // Build response message.
-{$serverIndent}    codec->startWriteMessage(message_type_t::kReplyMessage, {$serverIDName}, {$functionIDName}, sequence);
-{%  for param in fn.parametersToClient if (param.serializedDirection == "" || param.serializedDirection == InDirection || param.referencedName != "") %}
-
-{%   if param.isNullable %}
-{$serverIndent}    if ({% if source == "server" && empty(param.nullVariable) == false %}_{% endif %}{$param.name} != NULL)
-{$serverIndent}    {
-{$addIndent(serverIndent & "        ", param.coderCall.encode(param.coderCall))}
-{$serverIndent}    }
-{%   else -- isNullable %}
-{$addIndent(serverIndent & "    ", param.coderCall.encode(param.coderCall))}
-{%   endif -- isNullable %}
-{%  endfor -- parametersToClient %}
-{%  if fn.returnValue.type.isNotVoid %}
-
-{%   if fn.returnValue.isNullable %}
-{$addIndent(serverIndent & "    ", f_paramIsNullableEncode(fn.returnValue))}
-{%   else -- isNullable %}
-{$addIndent(serverIndent & "    ", fn.returnValue.coderCall.encode(fn.returnValue.coderCall))}
-{%   endif -- isNullable %}
-{%  endif -- notVoid %}
-{%  if generateErrorChecks %}
-
-        err = codec->getStatus();
-{%  endif generateErrorChecks %}
-{% endif -- isReturnValue %}
-{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
-    }
-
-{% endif -- fn.isReturnValue || fn.isSendValue %}
-{% for param in fn.paramsToFree %}
-{$> addIndent("    ", param.coderCall.freeingCall(param.coderCall))}
-{$> addIndent("    ", param.firstFreeingCall1.firstFreeingCall(param.firstFreeingCall1))}
-
-{% endfor -- parameters %}
-{% if fn.returnValue.type.isNotVoid %}
-{%  set needFreeingCall = fn.returnValue.coderCall.freeingCall(fn.returnValue.coderCall) %}
-{%  set needFirstFreeingCall = fn.returnValue.firstFreeingCall1.firstFreeingCall(fn.returnValue.firstFreeingCall1) %}
-{%  if empty(needFreeingCall) == false || empty(needFirstFreeingCall) == false %}
-{$> addIndent("    ", needFreeingCall)}
-{$> addIndent("    ", needFirstFreeingCall)}
-
-{%  endif -- !empty(needFreeingCall) || !empty(needFirstFreeingCall) %}
-{% endif -- notVoid %}
-{% if (fn.isReturnValue || fn.isSendValue) && generateErrorChecks %}
-    return err;
-{% else %}
-    return codec->getStatus();
-{% endif %}
-{% enddef --------------------------------------------------------------------------------- serverShimCode(fn, serverIDName, functionIDName) %}
-{% for callbackType in group.callbacks %}
-
-// Common function for serializing and deserializing callback functions of same type.
-static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);
 {% endfor %}
-{% for callbackType in group.callbacks %}
-
-// Common function for serializing and deserializing callback functions of same type.
-static erpc_status_t {$callbackType.name}_shim(uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
-{
-{$ serverShimCode(callbackType, "serviceID", "functionID") >}
-}
-{% endfor %}
-{% for iface in group.interfaces -- service subclass method impl %}
-
-// Call the correct server shim based on method unique ID.
-erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
-{
-    erpc_status_t erpcStatus;
-{%  if codecClass != "Codec" %}
-    {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
-{%   endif %}
-    switch (methodId)
-    {
-{%  for fn in iface.functions %}
-        case k{$iface.name}_{$fn.name}_id:
-        {
-            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, sequence);
-            break;
-        }
-
-{%  endfor -- fn %}
-        default:
-        {
-            erpcStatus = kErpcStatus_InvalidArgument;
-            break;
-        }
-    }
-
-    return erpcStatus;
-}
-{%  for fn in iface.functions %}
-
-// Server shim for {$fn.name} of {$iface.name} interface.
-erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
-{
-{% if fn.isCallback %}
-    return {$fn.callbackFName}_shim(k{$iface.name}_service_id, k{$iface.name}_{$fn.name}_id, codec, messageFactory, sequence);
-{% else -- fn.isCallback >%}
-{$ serverShimCode(fn, "k"& iface.name & "_service_id", "k" & iface.name & "_" & fn.name & "_id") >}
-{% endif -- fn.isCallback >%}
-}
-{%  endfor -- fn %}
-{% endfor -- iface %}
 {% for iface in group.interfaces %}
+
+class {$iface.serverClassName}: public {$iface.interfaceClassName}
+{
+    public:
+        virtual ~{$iface.serverClassName}() {};
+
+{%  for fn in iface.functions %}
+
+        {$fn.prototypeInterface}
+        {
+{%   if count(fn.callbackParameters) > 0 %}
+            uint16_t _fnIndex;
+{%    for cb in fn.callbackParameters%}
+            ::{$cb.type} _{$cb.name} = NULL;
+{%    endfor %}
+{%   endif %}
+{%   if fn.returnValue.type.isNotVoid %}
+            {$fn.returnValue.resultVariable}{% if fn.returnValue.isNullReturnType %} = NULL{% endif %};
+{%   endif %}
+{%   if count(fn.callbackParameters) > 0 %}
+{%    for cb in fn.callbackParameters if cb.in %}
+
+            if ({% if cb.interface != ""%}{$cb.interface}{% else %}{$iface.interfaceClassName}{% endif %}::get_callbackIdx_{$cb.type}(&{$cb.name}, _fnIndex))
+            {
+                _{$cb.name}=::_{$cb.type}[_fnIndex];
+            }
+{%    endfor %}
+
+{%   endif%}
+            {% if fn.returnValue.type.isNotVoid %}result = {% endif %}::{$fn.name}({% for param in fn.parameters %}{% if !loop.first %}, {% endif %}{$param.pureNameC}{% endfor %});
+{%   for cb in fn.callbackParameters if cb.out %}
+
+            if (findIndexOfFunction((arrayOfFunctionPtr_t)::_{$cb.type}, sizeof(::_{$cb.type})/sizeof(::{$cb.type}), (functionPtr_t)_{$cb.name}, _fnIndex))
+            {
+                {% if cb.interface != ""%}{$cb.interface}{% else %}{$iface.interfaceClassName}{% endif %}::get_callbackAddress_{$cb.type}(_fnIndex, {$cb.name});
+            }
+{%   endfor %}
+{%   if fn.returnValue.type.isNotVoid %}
+
+            return result;
+{%   endif %}
+        }
+{%  endfor -- fn %}
+};
+
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serviceClassName}, s_{$iface.serviceClassName});
+ERPC_MANUALLY_CONSTRUCTED_STATIC({$iface.serverClassName}, s_{$iface.serverClassName});
 
 erpc_service_t create_{$iface.serviceClassName}(void)
 {
     erpc_service_t service;
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    service = new (nothrow) {$iface.serviceClassName}();
+    service = new (nothrow) {$iface.serviceClassName}(new (nothrow){$iface.serverClassName}());
 #else
     if (s_{$iface.serviceClassName}.isUsed())
     {
@@ -257,7 +90,8 @@ erpc_service_t create_{$iface.serviceClassName}(void)
     }
     else
     {
-        s_{$iface.serviceClassName}.construct();
+        s_{$iface.serverClassName}.construct();
+        s_{$iface.serviceClassName}.construct(s_{$iface.serverClassName}.get());
         service = s_{$iface.serviceClassName}.get();
     }
 #endif
@@ -268,12 +102,16 @@ erpc_service_t create_{$iface.serviceClassName}(void)
 void destroy_{$iface.serviceClassName}(erpc_service_t service)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    erpc_assert(service != NULL);
-    delete ({$iface.serviceClassName} *)service;
+    if (service)
+    {
+        delete ({$iface.serverClassName} *)((({$iface.serviceClassName} *)service)->getHandler());
+        delete ({$iface.serviceClassName} *)service;
+    }
 #else
     (void)service;
     erpc_assert(service == s_{$iface.serviceClassName}.get());
     s_{$iface.serviceClassName}.destroy();
+    s_{$iface.serverClassName}.destroy();
 #endif
 }
 

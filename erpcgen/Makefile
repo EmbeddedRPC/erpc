@@ -71,11 +71,18 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen_lexer.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
@@ -86,11 +93,18 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
 
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \

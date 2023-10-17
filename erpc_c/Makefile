@@ -60,6 +60,7 @@ SOURCES += 	$(ERPC_C_ROOT)/infra/erpc_arbitrated_client_manager.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_server.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_simple_server.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.cpp \
+			$(ERPC_C_ROOT)/infra/erpc_utils.cpp \
 			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.cpp \
 			$(ERPC_C_ROOT)/port/erpc_port_stdlib.cpp \
 			$(ERPC_C_ROOT)/port/erpc_threading_pthreads.cpp \
@@ -93,6 +94,7 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/infra/erpc_static_queue.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_utils.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_client_server_common.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_pre_post_action.h \
 			$(ERPC_C_ROOT)/port/erpc_setup_extensions.h \

@@ -122,6 +122,7 @@ void PythonGenerator::generate()
     m_templateData["structs"] = empty;
     m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
+    m_templateData["functions"] = empty;
 
     parseSubtemplates();
 
@@ -145,8 +146,6 @@ void PythonGenerator::generate()
     makeConstTemplateData();
 
     makeEnumsTemplateData();
-
-    makeFunctionsTemplateData();
 
     for (Group *group : m_groups)
     {
@@ -173,7 +172,7 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
     (void)group;
     data_map info;
-    string proto = getFunctionPrototype(fn);
+    string proto = getFunctionPrototype(nullptr, fn);
 
     info["name"] = getOutputName(fn);
     info["prototype"] = proto;
@@ -266,12 +265,22 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
     return info;
 }
 
-string PythonGenerator::getFunctionPrototype(Function *fn)
+string PythonGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const string &interfaceName,
+                                             const string &name, bool insideInterfaceCall)
 {
-    string proto = getOutputName(fn);
+    FunctionType *functionType = dynamic_cast<FunctionType *>(fn);
+    if (functionType)
+    {
+        return ""; /*Todo: implement*/
+    }
+    Function *function = dynamic_cast<Function *>(fn);
+
+    assert(function);
+
+    string proto = getOutputName(function);
     proto += "(self";
 
-    auto params = fn->getParameters().getMembers();
+    auto params = function->getParameters().getMembers();
     if (params.size())
     {
         for (auto it : params)
@@ -572,32 +581,6 @@ void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, data_
     setTemplateComments(member, member_info);
 }
 
-void PythonGenerator::makeFunctionsTemplateData()
-{
-    /* type definitions of functions and table of functions */
-    Log::info("Functions:\n");
-    data_list functions;
-    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::data_type_t::kFunctionType))
-    {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        data_map functionInfo;
-
-        /* Table template data. */
-        data_list callbacks;
-        for (Function *fun : functionType->getCallbackFuns())
-        {
-            data_map callbacksInfo;
-            callbacksInfo["name"] = fun->getName();
-            callbacks.push_back(callbacksInfo);
-        }
-        functionInfo["callbacks"] = callbacks;
-        /* Function type name. */
-        functionInfo["name"] = functionType->getName();
-        functions.push_back(functionInfo);
-    }
-    m_templateData["functions"] = functions;
-}
-
 data_map PythonGenerator::getTypeInfo(DataType *t)
 {
     data_map info;
@@ -643,9 +626,9 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             else
             {
-                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in "
-                                                   "IDL is missing function definition, which can be passed there.")
-                                         .c_str());
+                throw semantic_error(
+                    "Function has function type parameter (callback parameter), but in "
+                    "IDL is missing function definition, which can be passed there.");
             }
             break;
         }
@@ -687,7 +670,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 StructMember *discriminatorMember = dynamic_cast<StructMember *>(discriminatorSym);
                 if (!discriminatorMember)
                 {
-                    throw internal_error(format_string("union discriminator is not a struct member"));
+                    throw internal_error("union discriminator is not a struct member");
                 }
                 info["discriminatorType"] = getTypeInfo(discriminatorMember->getDataType());
             }
@@ -842,7 +825,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type_t com
 {
     (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
-    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
+    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", "/*", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
 
     string result = stripWhitespace(comment);
@@ -870,7 +853,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type_t com
     // Check if we failed to find a matching comment begin.
     if (kCommentBegins[i] == 0)
     {
-        throw internal_error("unable to convert Doxygen comment");
+        throw internal_error("Unable to convert Doxygen comment in:" + result);
     }
 
     // Search for a matching comment end to strip. There may not be a comment end.
@@ -941,7 +924,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type_t com
     return result;
 }
 
-bool PythonGenerator::checkWhitspaceChar(char c)
+bool PythonGenerator::checkWhitespaceChar(char c)
 {
     if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
     {
@@ -961,7 +944,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     {
         char c = result[i];
 
-        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitespaceChar(result[i + 1])) || !checkWhitespaceChar(c))
         {
             break;
         }
@@ -975,7 +958,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
-        if (!checkWhitspaceChar(c))
+        if (!checkWhitespaceChar(c))
         {
             break;
         }

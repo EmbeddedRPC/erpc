@@ -9,13 +9,20 @@
 #ifndef _EMBEDDED_RPC__UNIT_TEST_WRAPPED_H_
 #define _EMBEDDED_RPC__UNIT_TEST_WRAPPED_H_
 
+#include "erpc_client_manager.h"
+#include "erpc_server_setup.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 // Function Prototypes
 ////////////////////////////////////////////////////////////////////////////////
 
+typedef void *erpc_service_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
+void initInterfaces(erpc_client_t client);
+void initInterfaces_common(erpc_client_t client);
+
 void add_services_to_server(erpc_server_t server);
 void remove_services_from_server(erpc_server_t server);
 void remove_common_services_from_server(erpc_server_t server, erpc_service_t service);

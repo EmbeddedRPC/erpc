@@ -5,7 +5,7 @@
     char * {$info.stringLocalName}_local;
     codec->readString({$info.stringLocalName}_len, &{$info.stringLocalName}_local);
 {%  if info.stringAllocSize != info.stringLocalName & "_len" %}
-    if ({$info.stringLocalName}_len <= {$info.stringAllocSize})
+    if (({$info.stringAllocSize} >= 0) && ({$info.stringLocalName}_len <= static_cast<uint32_t>({$info.stringAllocSize})))
     {
 {%   set indent = "    " >%}
 {% else %}
@@ -209,9 +209,13 @@ switch ({% if info.dataLiteral != "" %}{$info.dataLiteral}{% endif %}{$info.disc
 
 {% def decodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-codec->readCallback((funPtr)({$info.callbacks}), (funPtr *)(&{$info.name}));
+{% if param.direction != InDirection %}*{% endif %}{$info.name} = &{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::{$info.callbacks};
 {% else -- info.callbacksCount == 1 %}
-codec->readCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount}, (funPtr *)(&{$info.name}));
+codec->read(_tmp_local_u16);
+if (!{% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackAddress_{$info.cbTypeName}(_tmp_local_u16, {% if param.direction == InDirection %}&{% endif %}{$info.cbParamOutName}))
+{
+    codec->updateStatus(kErpcStatus_UnknownCallback);
+}
 {% endif -- info.callbacksCount == 1 %}
 {% enddef -------------------------- FunctionType %}
 
@@ -257,7 +261,8 @@ codec->readData({$info.name}, {$info.sizeTemp} * sizeof({$info.builtinTypeName})
     uint32_t {$info.stringLocalName}_len = strlen((const char*){$info.name});
 
 {% if info.stringAllocSize != info.stringLocalName & "_len"  %}
-    erpc_assert({$info.stringLocalName}_len <= {$info.stringAllocSize});
+    erpc_assert({$info.stringAllocSize} >= 0);
+    erpc_assert({$info.stringLocalName}_len <= static_cast<uint32_t>({$info.stringAllocSize}));
 
 {% endif %}
     codec->writeString({$info.stringLocalName}_len, (const char*){$info.name});
@@ -340,9 +345,12 @@ switch ({$info.dataLiteral}{$info.discriminatorName})
 
 {% def encodeFunctionType(info) %}
 {% if info.callbacksCount == 1 %}
-codec->writeCallback((funPtr)({$info.callbacks}), (funPtr)({$info.name}));
+/* No need to serialize code for {$info.name} when only one cb exists. */
+// (void){% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
+// codec->write(_tmp_local_u16);
 {% else -- info.callbacksCount == 1 %}
-codec->writeCallback((arrayOfFunPtr)({$info.callbacks}), {$info.callbacksCount}, (funPtr)({$info.name}));
+(void){% if param.ifaceScope != ""%}{$param.ifaceScope}{% else %}{$iface.name}{% endif %}_interface::get_callbackIdx_{$info.cbTypeName}(&{$info.name}, _tmp_local_u16);
+codec->write(_tmp_local_u16);
 {% endif -- info.callbacksCount == 1 %}
 {% enddef -------------------------- FunctionType %}
 

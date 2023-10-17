@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "erpc_dspi_slave_transport.hpp"
+
 #include <cstdio>
 #include <new>
-#include "erpc_dspi_slave_transport.hpp"
 
 extern "C" {
 #include "board.h"

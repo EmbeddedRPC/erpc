@@ -45,8 +45,7 @@ void SymbolScanner::handleRoot(AstNode *node, bottom_up)
             forwardTypes += format_string("type name %s: line %d", it->first.c_str(), it->second->getFirstLine());
         }
         throw syntax_error(format_string("Missing type definitions for one or more forward type declarations: %s",
-                                         forwardTypes.c_str())
-                               .c_str());
+                                         forwardTypes.c_str()));
     }
 }
 
@@ -147,37 +146,43 @@ DataType *SymbolScanner::getDataTypeForConst(AstNode *typeNode)
 
 AstNode *SymbolScanner::handleType(AstNode *node, top_down)
 {
-    // Extract new type name.
-    AstNode *ident = (*node)[0];
-    const Token &tok = ident->getToken();
-    const string &name = tok.getStringValue();
-    Log::debug("type: %s\n", name.c_str());
-
-    // Find existing type.
-    AstNode *typeNode = (*node)[1];
-    DataType *dataType = nullptr;
-    if (!containsStructEnumDeclaration(typeNode))
+    if (m_currentInterface == nullptr)
     {
-        dataType = lookupDataType(typeNode);
+        // Extract new type name.
+        AstNode *ident = (*node)[0];
+        const Token &tok = ident->getToken();
+        const string &name = tok.getStringValue();
+        Log::debug("type: %s\n", name.c_str());
+
+        // Find existing type.
+        AstNode *typeNode = (*node)[1];
+        DataType *dataType = nullptr;
+        if (!containsStructEnumDeclaration(typeNode))
+        {
+            dataType = lookupDataType(typeNode);
+        }
+
+        AliasType *type = new AliasType(tok, dataType);
+
+        // Get comment if exist.
+        addDoxygenComments(type, node->getChild(3), node->getChild(4));
+
+        m_currentAlias = type;
     }
-
-    AliasType *type = new AliasType(tok, dataType);
-
-    // Get comment if exist.
-    addDoxygenComments(type, node->getChild(3), node->getChild(4));
-
-    m_currentAlias = type;
 
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleType(AstNode *node, bottom_up)
 {
-    if (m_currentAlias)
+    if (m_currentInterface == nullptr)
     {
-        addAnnotations(node->getChild(2), m_currentAlias);
-        addGlobalSymbol(m_currentAlias);
-        m_currentAlias = nullptr;
+        if (m_currentAlias)
+        {
+            addAnnotations(node->getChild(2), m_currentAlias);
+            addGlobalSymbol(m_currentAlias);
+            m_currentAlias = nullptr;
+        }
     }
     return nullptr;
 }
@@ -637,9 +642,8 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
     AstNode *structNameNode = (*node)[0];
     if (!structNameNode && m_currentAlias == nullptr)
     {
-        throw semantic_error(
-            format_string("line %d: illegal anonymous struct definition at file level", node->getToken().getFirstLine())
-                .c_str());
+        throw semantic_error(format_string("line %d: illegal anonymous struct definition at file level",
+                                           node->getToken().getFirstLine()));
     }
 
     // Create the struct symbol.
@@ -661,10 +665,10 @@ AstNode *SymbolScanner::handleStruct(AstNode *node, top_down)
             }
             else
             {
-                throw syntax_error(format_string("line %d: Structure definition type name didn't match data type of "
-                                                 "forward declaration from line %d.",
-                                                 tok.getFirstLine(), forwardDecl->second->getFirstLine())
-                                       .c_str());
+                throw syntax_error(
+                    format_string("line %d: Structure definition type name didn't match data type of "
+                                  "forward declaration from line %d.",
+                                  tok.getFirstLine(), forwardDecl->second->getFirstLine()));
             }
         }
         else
@@ -817,10 +821,10 @@ AstNode *SymbolScanner::handleUnion(AstNode *node, top_down)
             }
             else
             {
-                throw syntax_error(format_string("line %d: Union definition type name didn't match data type of "
-                                                 "forward declaration from line %d.",
-                                                 tok->getFirstLine(), forwardDecl->second->getFirstLine())
-                                       .c_str());
+                throw syntax_error(
+                    format_string("line %d: Union definition type name didn't match data type of "
+                                  "forward declaration from line %d.",
+                                  tok->getFirstLine(), forwardDecl->second->getFirstLine()));
             }
         }
         else
@@ -1013,6 +1017,55 @@ AstNode *SymbolScanner::handleInterface(AstNode *node, bottom_up)
 {
     addAnnotations(node->getChild(2), m_currentInterface);
 
+    /* Check if function callbacks were not used in other interfaces*/
+    for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
+    {
+        Interface *interface = dynamic_cast<Interface *>(funSymbol);
+        assert(interface);
+
+        if (interface == m_currentInterface)
+        {
+            continue;
+        }
+
+        for (Function *func : interface->getFunctions())
+        {
+            for (StructMember *param : func->getParameters().getMembers())
+            {
+                DataType *dataType = param->getDataType()->getTrueDataType();
+                if (dataType->isFunction())
+                {
+                    FunctionType *funcType = dynamic_cast<FunctionType *>(dataType);
+                    assert(funcType);
+
+                    if ((m_currentInterface->getName() == funcType->getInterface()->getName()) &&
+                        (m_currentInterface != funcType->getInterface()))
+                    {
+                        bool found = false;
+                        for (FunctionType *funcTypeCurrent : m_currentInterface->getFunctionTypes())
+                        {
+                            if (funcTypeCurrent->getName() == funcType->getName())
+                            {
+                                found = true;
+                                delete funcType->getInterface();
+                                delete funcType;
+                                param->setDataType(funcTypeCurrent);
+                                break;
+                            }
+                        }
+                        if (found == false)
+                        {
+                            throw syntax_error(
+                                format_string("line %d, Callback name %s doesn't exists in interface %s.\n",
+                                              funcType->getLocation().m_firstLine, funcType->getName().c_str(),
+                                              funcType->getInterface()->getName().c_str()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Interfaces cannot be nested, so we can just clear this. If they were nestable, we would
     // have to keep a stack of open interfaces.
     m_currentInterface = nullptr;
@@ -1027,10 +1080,16 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
     const Token &tok = ident->getToken();
     const string &name = tok.getStringValue();
     Log::debug("function: %s\n", name.c_str());
+    bool isFunctionType = node->getChild(4) != nullptr;
 
     // Create function symbol.
     FunctionBase *func;
-    if (m_currentInterface) /* function definition */
+    if (isFunctionType)
+    {
+        func = new FunctionType(tok, m_currentInterface);
+        m_currentInterface->addFunctionType(dynamic_cast<FunctionType *>(func));
+    }
+    else
     {
         if (m_currentInterface->getFunctions().size() == 0)
         {
@@ -1041,11 +1100,6 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
             func = new Function(tok, m_currentInterface);
         }
         m_currentInterface->addFunction(dynamic_cast<Function *>(func));
-    }
-    else /* function type */
-    {
-        func = new FunctionType(tok);
-        addGlobalSymbol(dynamic_cast<FunctionType *>(func));
     }
 
     m_currentStruct = &(func->getParameters());
@@ -1123,21 +1177,30 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
     }
 
     /* Get comment if exist. */
-    addDoxygenComments(dynamic_cast<Symbol *>(func), node->getChild(5), node->getChild(6));
+    addDoxygenComments(dynamic_cast<Symbol *>(func), node->getChild(6), node->getChild(7));
 
     return nullptr;
 }
 
 AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
 {
+    bool isFunctionType = node->getChild(4) != nullptr;
 
-    if (m_currentInterface) /* function definition */
+    if (isFunctionType) /* function type */
+    {
+        FunctionType *func = m_currentInterface->getFunctionTypes().back();
+        func->getParameters().getScope().setParent(&m_currentInterface->getScope());
+
+        /* Function annotations. */
+        addAnnotations(node->getChild(5), func);
+    }
+    else /* function definition */
     {
         Function *func = m_currentInterface->getFunctions().back();
         func->getParameters().getScope().setParent(&m_currentInterface->getScope());
 
         /* Function annotations. */
-        addAnnotations(node->getChild(4), func);
+        addAnnotations(node->getChild(5), func);
 
         /* Add missing callbacks parameters. */
         FunctionType *callbackFunctionType = func->getFunctionType();
@@ -1162,25 +1225,6 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, bottom_up)
             }
         }
     }
-    else /* function type */
-    {
-        FunctionType *func = nullptr;
-        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
-        {
-            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
-            assert(datatype);
-
-            if (datatype->isFunction())
-            {
-                func = dynamic_cast<FunctionType *>(datatype);
-            }
-        }
-        assert(func);
-        func->getParameters().getScope().setParent(m_globals);
-
-        /* Function annotations. */
-        addAnnotations(node->getChild(4), func);
-    }
 
     // Handle annotations for function params
     scanStructForAnnotations();
@@ -1198,34 +1242,27 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
     StructMember *callbackParam = nullptr;
     Function *fun = nullptr;
     FunctionType *funType = nullptr;
-    if (m_currentInterface)
+    bool isFunctionType = m_currentInterface->getFunctions().empty();
+    if (!isFunctionType)
     {
         fun = m_currentInterface->getFunctions().back();
-        for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kTypenameSymbol))
+        for (FunctionType *funType : m_currentInterface->getFunctionTypes())
         {
-            DataType *datatype = dynamic_cast<DataType *>(funSymbol);
-            assert(datatype);
-
-            if (datatype->isFunction())
+            FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
+            if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
             {
-                funType = dynamic_cast<FunctionType *>(datatype);
-                assert(funType);
-                FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
-                if (find(callbacks.begin(), callbacks.end(), fun) != callbacks.end())
+                if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
                 {
-                    if (fun->getParameters().getMembers().size() > funType->getParameters().getMembers().size())
-                    {
-                        throw syntax_error(format_string("line %d: Function definition contains more parameters than "
-                                                         "function type definition from %d.\n",
-                                                         fun->getFirstLine(), funType->getFirstLine())
-                                               .c_str());
-                    }
-                    else
-                    {
-                        callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
-                    }
-                    break;
+                    throw syntax_error(
+                        format_string("line %d: Function definition contains more parameters than "
+                                      "function type definition from %d.\n",
+                                      fun->getFirstLine(), funType->getFirstLine()));
                 }
+                else
+                {
+                    callbackParam = funType->getParameters().getMembers()[fun->getParameters().getMembers().size()];
+                }
+                break;
             }
         }
     }
@@ -1260,7 +1297,48 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
         /* Extract param data type. */
         AstNode *typeNode = (*node)[1];
         assert(typeNode);
-        DataType *dataType = lookupDataType(typeNode);
+        DataType *dataType = nullptr;
+        const Token &typeToken = typeNode->getToken();
+        if (typeToken.getToken() == TOK_IFACE_SCOPE)
+        {
+            /* Find if interface and function definition exist already or create temporary. */
+            AstNode *iface = typeNode->getChild(0);
+            AstNode *type = typeNode->getChild(1);
+            std::string ifaceName = iface->getToken().getStringValue();
+            std::string functionTypeName = type->getToken().getStringValue();
+            for (Symbol *funSymbol : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kInterfaceSymbol))
+            {
+                Interface *interface = dynamic_cast<Interface *>(funSymbol);
+                assert(interface);
+
+                if (interface->getName() == ifaceName)
+                {
+                    for (FunctionType *funcType : interface->getFunctionTypes())
+                    {
+                        if (funcType->getName() == functionTypeName)
+                        {
+                            dataType = funcType;
+                            break;
+                        }
+                    }
+                    if (dataType == nullptr)
+                    {
+                        throw syntax_error(format_string("line %d: Callback name %s doesn't exists.\n",
+                                                         type->getToken().getFirstLine(), functionTypeName.c_str()));
+                    }
+                    break;
+                }
+            }
+            if (dataType == nullptr)
+            {
+                /* create temporary */
+                dataType = new FunctionType(type->getToken(), new Interface(iface->getToken()));
+            }
+        }
+        else
+        {
+            dataType = lookupDataType(typeNode);
+        }
 
         /* Extract param name. */
         if (ident)
@@ -1268,7 +1346,7 @@ AstNode *SymbolScanner::handleParam(AstNode *node, top_down)
             Token &tok = ident->getToken();
             param = new StructMember(tok, dataType);
         }
-        else if (m_currentInterface && !funType) // Functions need param names. Types of functions don't.
+        else if (!isFunctionType) // Functions need param names. Types of functions don't.
         {
             throw syntax_error(
                 format_string("line %d: Missing function param name.\n", node->getToken().getFirstLine()));
@@ -1368,15 +1446,25 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
     const Token &typeToken = typeNode->getToken();
     switch (typeToken.getToken())
     {
-        case TOK_ARRAY:
+        case TOK_ARRAY: {
             return createArrayType(typeNode);
+        }
 
-        case TOK_IDENT:
-            return lookupDataTypeByName(typeToken, m_globals);
-
-        case TOK_LIST:
+        case TOK_IDENT: {
+            DataType *dataType = nullptr;
+            if (m_currentInterface != nullptr)
+            {
+                dataType = lookupDataTypeByName(typeToken, &m_currentInterface->getScope());
+            }
+            if (dataType == nullptr)
+            {
+                dataType = lookupDataTypeByName(typeToken, m_globals);
+            }
+            return dataType;
+        }
+        case TOK_LIST: {
             return createListType(typeNode);
-
+        }
         case TOK_UNION: {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
@@ -1414,7 +1502,7 @@ DataType *SymbolScanner::createArrayType(const AstNode *typeNode)
     return array;
 }
 
-Value *SymbolScanner::getValueFromSymbol(Token &tok)
+Value *SymbolScanner::getValueFromSymbol(const Token &tok)
 {
     if (tok.getValue() != nullptr)
     {
@@ -1572,8 +1660,7 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",
-                                           annotation->getToken().getFirstLine(), lang.c_str())
-                                 .c_str());
+                                           annotation->getToken().getFirstLine(), lang.c_str()));
     }
 
     return Annotation::program_lang_t::kAll;
@@ -1751,8 +1838,7 @@ void SymbolScanner::addForwardDeclaration(DataType *dataType)
     {
         throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                            dataType->getFirstLine(), dataType->getName().c_str(),
-                                           symbol->getFirstLine())
-                                 .c_str());
+                                           symbol->getFirstLine()));
     }
 
     auto findDataTypeIT = m_forwardDeclarations.find(dataType->getName());
@@ -1762,8 +1848,7 @@ void SymbolScanner::addForwardDeclaration(DataType *dataType)
         {
             throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                                dataType->getFirstLine(), dataType->getName().c_str(),
-                                               findDataTypeIT->second->getFirstLine())
-                                     .c_str());
+                                               findDataTypeIT->second->getFirstLine()));
         }
         else
         {
@@ -1782,8 +1867,7 @@ void SymbolScanner::removeForwardDeclaration(DataType *dataType)
         {
             throw semantic_error(format_string("line %d: Declaring type '%s' already declared here '%d'",
                                                dataType->getFirstLine(), dataType->getName().c_str(),
-                                               findDataTypeIT->second->getFirstLine())
-                                     .c_str());
+                                               findDataTypeIT->second->getFirstLine()));
         }
         m_forwardDeclarations.erase(findDataTypeIT);
     }
@@ -1796,8 +1880,7 @@ void SymbolScanner::addGlobalSymbol(Symbol *symbol)
     {
         throw semantic_error(format_string("line %d: Declaring symbol '%s' already declared here '%d'",
                                            symbol->getFirstLine(), symbol->getName().c_str(),
-                                           findDataTypeIT->second->getFirstLine())
-                                 .c_str());
+                                           findDataTypeIT->second->getFirstLine()));
     }
     m_globals->addSymbol(symbol);
 }

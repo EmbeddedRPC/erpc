@@ -36,6 +36,28 @@ extern const uint32_t erpc_generated_crc = {$crc16};
 {% endif  -- empty(crc16) == false %}
 {% enddef --checkCrc %}
 
+{# ---------------- namespace ---------------- #}
+{% def fillNamespaceBegin() %}
+{% if empty(namespace) == false %}
+
+namespace {$namespace}
+{
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
+{% def fillNamespaceEnd() %}
+{% if empty(namespace) == false %}
+} // {$namespace}
+
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
+{% def usingNamespace() %}
+{% if empty(namespace) == false %}
+using namespace {$namespace};
+{% endif  -- empty(crc16) == false %}
+{% enddef --checkCrc %}
+
 {# ---------------- constantsDefinitions ---------------- #}
 {% def constantsDefinitions(consts) %}
 {% if not empty(consts) %}
@@ -349,17 +371,6 @@ static void free_{$union.name}_union(int32_t discriminator, {$union.name} * data
 }
 {% enddef -- unionFreeSpaceSource %}
 
-{# ---------------- callbacksTable ---------------- #}
-{% def callbackTable(functionsTypes) %}
-{% if functionsTypes %}
-{%  for f in functionsTypes %}
-{%   if count(f.callbacks) > 1 %}
-static const {$f.name} _{$f.name}[] = { {%    for c in f.callbacks %}{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
-{%   endif -- f.callbacks.size() %}
-{%  endfor -- functionsTypes %}
-{%  endif -- functionsTypes %}
-{% enddef ------------------------------- callbackTable %}
-
 {# ---------------- allocMem ---------------- #}
 {% def allocMem(info) %}
 {% if empty(info) == false %}
@@ -524,3 +535,11 @@ else
     {% if source == "server" && !empty(param.nullVariable) %}_{% endif %}{$param.nullableName} = NULL;
 }
 {% enddef ------------------------------- f_paramIsNullableDecode %}
+
+{% def getFunctionDeclarationMacroName() %}
+ERPC_FUNCTIONS_DEFINITIONS{% if group.name %}_{% endif %}{$upper(group.name)}{%>%}
+{% enddef ------------------------------- getFunctionDeclarationMacroName %}
+
+{% def getClassFunctionIdName(fn) %}
+m_{$fn.name}Id{%>%}
+{% enddef ------------------------------- getClassFunctionIdName %}

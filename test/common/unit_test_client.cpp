@@ -26,10 +26,12 @@ int main(void);
 }
 
 #include "board.h"
+
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "gtestListener.hpp"
 #include "myAlloc.hpp"
-#include "test_unit_test_common.h"
+#include "unit_test_wrapped.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
@@ -83,7 +85,7 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 #if defined(RPMSG)
 #define APP_ERPC_READY_EVENT_DATA (1)
@@ -111,8 +113,8 @@ int main(void)
 {
     int fake_argc = 1;
     const auto fake_arg0 = "dummy";
-    char* fake_argv0 = const_cast<char*>(fake_arg0);
-    char** fake_argv = &fake_argv0;
+    char *fake_argv0 = const_cast<char *>(fake_arg0);
+    char **fake_argv = &fake_argv0;
     ::testing::InitGoogleTest(&fake_argc, fake_argv);
 
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
@@ -191,6 +193,8 @@ int main(void)
 #endif
 
     client = erpc_client_init(transport, message_buffer_factory);
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -203,4 +207,9 @@ int main(void)
     erpc_client_deinit(client);
 
     return i;
+}
+
+void initInterfaces_common(erpc_client_t client)
+{
+    initCommon_client(client);
 }

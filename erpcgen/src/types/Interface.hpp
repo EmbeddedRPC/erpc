@@ -29,7 +29,8 @@ namespace erpcgen {
 class Interface : public Symbol
 {
 public:
-    typedef std::vector<Function *> function_vector_t; /*!< Vector of Interface functions. */
+    typedef std::vector<Function *> function_vector_t;           /*!< Vector of Interface functions. */
+    typedef std::vector<FunctionType *> function_types_vector_t; /*!< Vector of Interface function types. */
 
     /*!
      * @brief Constructor.
@@ -56,6 +57,16 @@ public:
     void addFunction(Function *func);
 
     /*!
+     * @brief This function will add function type to the interface.
+     *
+     * The function will add function type given by pointer func to the interface members vector m_functionTypes.
+     * Also this member will be added as symbol to interface symbol scope m_scope.
+     *
+     * @param[in] func Function pointer, which is added to interface members vector.
+     */
+    void addFunctionType(FunctionType *func);
+
+    /*!
      * @brief This function return symbol scope.
      *
      * @return Symbol scope.
@@ -67,7 +78,14 @@ public:
      *
      * @return Interface functions vector.
      */
-    function_vector_t &getFunctions() { return m_functions; }
+    const function_vector_t &getFunctions() const { return m_functions; }
+
+    /*!
+     * @brief This function return interface function types vector.
+     *
+     * @return Interface function types vector.
+     */
+    const function_types_vector_t &getFunctionTypes() const { return m_functionTypes; }
 
     /*!
      * @brief This function get unique id of interface.
@@ -101,11 +119,12 @@ public:
     virtual std::string getDescription() const override;
 
 protected:
-    SymbolScope m_scope;           /*!< Scope which interface belongs to. */
-    function_vector_t m_functions; /*!< Vector of interface functions. */
-    uint32_t m_uniqueId;           /*!< Interface unique id. */
+    SymbolScope m_scope;                     /*!< Scope which interface belongs to. */
+    function_vector_t m_functions;           /*!< Vector of interface functions. */
+    function_types_vector_t m_functionTypes; /*!< Vector of interface function types. */
+    uint32_t m_uniqueId;                     /*!< Interface unique id. */
 
-    static uint32_t s_idCounter; /*!< Interface id counter. Each interface will increase this. */
+    static uint32_t s_idCounter;             /*!< Interface id counter. Each interface will increase this. */
 };
 
 } // namespace erpcgen
