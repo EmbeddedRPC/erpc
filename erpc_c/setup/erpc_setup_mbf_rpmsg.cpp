@@ -77,12 +77,12 @@ public:
         }
     }
 
-    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message)
+    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer &message, uint8_t reserveHeaderSize = 0)
     {
         erpc_status_t status;
 
-        dispose(message);
-        *message = create();
+        dispose(&message);
+        message = create(reserveHeaderSize);
         if (message->get() != NULL)
         {
             status = kErpcStatus_Success;

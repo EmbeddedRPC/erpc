@@ -48,7 +48,7 @@ class Transport(object):
 
 
 class FramedTransport(Transport):
-    HEADER_LEN = 4
+    HEADER_LEN = 6
 
     def __init__(self):
         super(FramedTransport, self).__init__()
@@ -70,9 +70,11 @@ class FramedTransport(Transport):
         try:
             self._sendLock.acquire()
 
-            crc = self._Crc16.computeCRC16(message)
+            crcBody = self._Crc16.computeCRC16(message)
+            messageLength = len(message)
+            crcHeader = self._Crc16.computeCRC16(messageLength) + self._Crc16.computeCRC16(crcBody)
 
-            header = bytearray(struct.pack('<HH', len(message), crc))
+            header = bytearray(struct.pack('<HHH', crcHeader, messageLength, crcBody))
             assert len(header) == self.HEADER_LEN
             self._base_send(header + message)
         finally:
@@ -84,14 +86,18 @@ class FramedTransport(Transport):
 
             # Read fixed size header containing the message length.
             headerData = self._base_receive(self.HEADER_LEN)
-            messageLength, crc = struct.unpack('<HH', headerData)
+            crcHeader, messageLength, crcBody = struct.unpack('<HHH', headerData)
+
+            computedCrc = self._Crc16.computeCRC16(messageLength) + self._Crc16.computeCRC16(crcBody)
+            if computedCrc != crcHeader:
+                raise RequestError("invalid header CRC")
 
             # Now we know the length, read the rest of the message.
             data = self._base_receive(messageLength)
             computedCrc = self._Crc16.computeCRC16(data)
-
-            if computedCrc != crc:
+            if computedCrc != crcBody:
                 raise RequestError("invalid message CRC")
+
             return data
         finally:
             self._receiveLock.release()

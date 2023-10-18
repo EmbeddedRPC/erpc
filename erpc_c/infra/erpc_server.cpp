@@ -91,7 +91,7 @@ erpc_status_t Server::processMessage(Codec *codec, message_type_t msgType, uint3
 
     if (err == kErpcStatus_Success)
     {
-        err = service->handleInvocation(methodId, sequence, codec, m_messageFactory);
+        err = service->handleInvocation(methodId, sequence, codec, m_messageFactory, m_transport);
     }
 
     return err;

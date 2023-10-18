@@ -11,7 +11,6 @@
 #include "erpc_rpmsg_tty_rtos_transport.hpp"
 
 #include "erpc_config_internal.h"
-#include "erpc_framed_transport.hpp"
 
 extern "C" {
 #include "rpmsg_ns.h"
@@ -35,7 +34,6 @@ RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
 , m_dst_addr(0)
 , m_rpmsg_queue(NULL)
 , m_rpmsg_ept(NULL)
-, m_crcImpl(NULL)
 {
 }
 
@@ -70,17 +68,6 @@ RPMsgTTYRTOSTransport::~RPMsgTTYRTOSTransport(void)
             s_initialized = 0U;
         }
     }
-}
-
-void RPMsgTTYRTOSTransport::setCrc16(Crc16 *crcImpl)
-{
-    erpc_assert(crcImpl != NULL);
-    m_crcImpl = crcImpl;
-}
-
-Crc16 *RPMsgTTYRTOSTransport::getCrc16(void)
-{
-    return m_crcImpl;
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
@@ -252,101 +239,63 @@ erpc_status_t RPMsgTTYRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, 
     return status;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::receive(MessageBuffer *message)
+erpc_status_t RPMsgTTYRTOSTransport::underlyingSend(MessageBuffer *message, uint32_t size, uint32_t offset)
 {
-    erpc_status_t status = kErpcStatus_Success;
-    FramedTransport::Header h;
-    char *buf = NULL;
-    char *buf2 = NULL;
-    uint32_t length = 0;
-    int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
-    uint16_t computedCrc;
+    erpc_status_t status;
+    int32_t ret_val;
 
-    erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
-
+    ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, &message->get()[offset], size);
     if (ret_val == RL_SUCCESS)
     {
-        erpc_assert(buf != NULL);
-        if (length < sizeof(h))
-        {
-            status = kErpcStatus_ReceiveFailed;
-        }
-        if (status == kErpcStatus_Success)
-        {
-            static_cast<void>(memcpy(reinterpret_cast<uint8_t *>(&h), buf, sizeof(h)));
-            /* If header and body is sent in two packets, we need call receive again to get body part. */
-            if (length == sizeof(h))
-            {
-                ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf2, &length, RL_BLOCK);
-                if (ret_val == RL_SUCCESS)
-                {
-                    erpc_assert(buf2 != NULL);
-                    erpc_assert((length + sizeof(h)) <= ERPC_DEFAULT_BUFFER_SIZE);
-                    static_cast<void>(memcpy(&buf[sizeof(h)], buf2, length));
-                }
-                static_cast<void>(rpmsg_lite_release_rx_buffer(s_rpmsg, buf2));
-            }
-            else
-            {
-                length -= sizeof(h); /* offset for MessageBuffer */
-            }
-            buf = &buf[sizeof(h)]; /* offset for MessageBuffer */
-        }
-    }
-    if (status == kErpcStatus_Success)
-    {
-        if (ret_val == RL_SUCCESS)
-        {
-            message->set(reinterpret_cast<uint8_t *>(buf), length);
 
-            /* Verify CRC. */
-            computedCrc = m_crcImpl->computeCRC16(reinterpret_cast<uint8_t *>(buf), h.m_messageSize);
-            if (computedCrc != h.m_crc)
-            {
-                status = kErpcStatus_CrcCheckFailed;
-            }
-            else
-            {
-                message->setUsed(h.m_messageSize);
-            }
-        }
-        else
-        {
-            status = kErpcStatus_ReceiveFailed;
-        }
+        message->set(NULL, 0);
+        status = kErpcStatus_Success;
+    }
+    else
+    {
+        status = kErpcStatus_SendFailed;
     }
 
     return status;
 }
 
-erpc_status_t RPMsgTTYRTOSTransport::send(MessageBuffer *message)
+erpc_status_t RPMsgTTYRTOSTransport::underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset)
 {
-    erpc_status_t status = kErpcStatus_Success;
-    FramedTransport::Header h;
-    uint8_t *buf = message->get();
-    uint32_t length = message->getLength();
-    uint32_t used = message->getUsed();
-    int32_t ret_val;
-
-    erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
-    message->set(NULL, 0);
-
-    h.m_crc = m_crcImpl->computeCRC16(buf, used);
-    h.m_messageSize = used;
-
-    static_cast<void>(memcpy(&buf[-sizeof(h)], (uint8_t *)&h, sizeof(h)));
-
-    ret_val = rpmsg_lite_send_nocopy(s_rpmsg, m_rpmsg_ept, m_dst_addr, &buf[-sizeof(h)], used + sizeof(h));
+    char *buf = NULL;
+    uint32_t length = 0;
+    int32_t ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
+    erpc_status_t status;
     if (ret_val == RL_SUCCESS)
     {
+        if (offset == 0)
+        {
+            message->set(reinterpret_cast<uint8_t *>(buf), length);
+            message->setUsed(length);
+        }
+        else
+        {
+            erpc_assert(buf != NULL);
+            erpc_assert((length + offset) <= ERPC_DEFAULT_BUFFER_SIZE);
+            static_cast<void>(memcpy(&message->get()[offset], buf, length));
+            message->setUsed(length + offset);
+            static_cast<void>(rpmsg_lite_release_rx_buffer(s_rpmsg, buf));
+        }
         status = kErpcStatus_Success;
     }
     else
     {
-        message->set(buf, length);
-        message->setUsed(used);
-        status = kErpcStatus_SendFailed;
+        status = kErpcStatus_ReceiveFailed;
     }
 
     return status;
+}
+
+erpc_status_t RPMsgTTYRTOSTransport::underlyingReceive(uint8_t *data, uint32_t size)
+{
+    // unused as underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset)
+}
+
+erpc_status_t RPMsgTTYRTOSTransport::underlyingSend(const uint8_t *data, uint32_t size)
+{
+    // unused as underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset)
 }

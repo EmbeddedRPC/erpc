@@ -118,7 +118,7 @@ extern bool nestingDetection;
 {% if fn.isReturnValue %}
 
 {$serverIndent}    // preparing MessageBuffer for serializing data
-{$serverIndent}    {% if generateErrorChecks %}err = {% endif %}messageFactory->prepareServerBufferForSend(codec->getBuffer());
+{$serverIndent}    {% if generateErrorChecks %}err = {% endif %}messageFactory->prepareServerBufferForSend(codec->getBufferRef(), transport->reserveHeaderSize());
 {%  if generateErrorChecks %}
     }
 
@@ -126,7 +126,7 @@ extern bool nestingDetection;
     {
 {%  endif -- generateErrorChecks %}
 {$serverIndent}    // preparing codec for serializing data
-{$serverIndent}    codec->reset();
+{$serverIndent}    codec->reset(transport->reserveHeaderSize());
 
 {$serverIndent}    // Build response message.
 {$serverIndent}    codec->startWriteMessage(message_type_t::kReplyMessage, {$serverIDName}, {$functionIDName}, sequence);
@@ -181,14 +181,14 @@ extern bool nestingDetection;
 {% for iface in group.interfaces %}
 {%  for cb in iface.callbacksInt  if (count(cb.callbacks) > 1) %}
 // Common function for serializing and deserializing callback functions of same type.
-static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence);
+static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, Transport * transport, uint32_t sequence);
 {%  endfor %}
 {% endfor %}
 {% for iface in group.interfaces %}
 {%  for cb in iface.callbacksInt if (count(cb.callbacks) > 1) %}
 
 // Common function for serializing and deserializing callback functions of same type.
-static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
+static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfaceClassName} *m_handler, uint32_t serviceID, uint32_t functionID, {$codecClass} * codec, MessageBufferFactory *messageFactory, Transport * transport, uint32_t sequence)
 {
 {$ serverShimCode(iface, "m_handler", cb.callbacksData, "serviceID", "functionID") >}
 }
@@ -213,7 +213,7 @@ static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfa
 }
 
 // Call the correct server shim based on method unique ID.
-erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory)
+erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory, Transport * transport)
 {
     erpc_status_t erpcStatus;
 {%  if codecClass != "Codec" %}
@@ -224,7 +224,7 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
 {%  for fn in iface.functions %}
         case {$iface.interfaceClassName}::{$getClassFunctionIdName(fn)}:
         {
-            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, sequence);
+            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, transport, sequence);
             break;
         }
 
@@ -241,10 +241,10 @@ erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uin
 {%  for fn in iface.functions %}
 
 // Server shim for {$fn.name} of {$iface.name} interface.
-erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, uint32_t sequence)
+erpc_status_t {$iface.serviceClassName}::{$fn.name}_shim({$codecClass} * codec, MessageBufferFactory *messageFactory, Transport * transport, uint32_t sequence)
 {
 {% if fn.isCallback %}
-    return {$iface.interfaceClassName}_{$fn.callbackFNameNoGroup}_shim(m_handler, {$iface.interfaceClassName}::m_serviceId, {$iface.interfaceClassName}::{$getClassFunctionIdName(fn)}, codec, messageFactory, sequence);
+    return {$iface.interfaceClassName}_{$fn.callbackFNameNoGroup}_shim(m_handler, {$iface.interfaceClassName}::m_serviceId, {$iface.interfaceClassName}::{$getClassFunctionIdName(fn)}, codec, messageFactory, transport, sequence);
 {% else -- fn.isCallback >%}
 {$ serverShimCode(iface, "m_handler", fn, iface.interfaceClassName & "::m_serviceId", iface.interfaceClassName & "::" & getClassFunctionIdName(fn)) >}
 {% endif -- fn.isCallback >%}

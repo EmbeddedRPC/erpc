@@ -96,7 +96,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             break;
         }
 
-        m_codec->setBuffer(*message);
+        m_codec->setBuffer(*message, m_sharedTransport->reserveHeaderSize());
 
         // Parse the message header.
         m_codec->startReadMessage(msgType, service, requestNumber, sequence);
@@ -125,7 +125,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             if (client->m_isValid && (sequence == client->m_request->getSequence()))
             {
                 // Swap the received message buffer with the client's message buffer.
-                client->m_request->getCodec()->getBuffer()->swap(message);
+                client->m_request->getCodec()->getBufferRef().swap(message);
 
                 // Wake up the client receive thread.
                 client->m_sem.put();

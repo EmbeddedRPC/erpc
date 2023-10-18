@@ -9,7 +9,6 @@
  */
 
 #include "erpc_config_internal.h"
-#include "erpc_framed_transport.hpp"
 #include "erpc_manually_constructed.hpp"
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.hpp"
@@ -54,11 +53,11 @@ public:
     {
         void *buf = NULL;
         uint32_t size = 0;
-        buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, TIMEOUT_MS);
 
+        buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, TIMEOUT_MS);
         erpc_assert(NULL != buf);
-        return MessageBuffer(&(reinterpret_cast<uint8_t *>(buf))[sizeof(FramedTransport::Header)],
-                             size - sizeof(FramedTransport::Header));
+
+        return MessageBuffer(buf, size);
     }
 
     /*!
@@ -69,25 +68,20 @@ public:
     virtual void dispose(MessageBuffer *buf)
     {
         erpc_assert(buf != NULL);
-        void *tmp = reinterpret_cast<void *>(buf->get());
-        if (tmp != NULL)
+        if (tmp != buf->get())
         {
             int32_t ret;
-            ret = rpmsg_lite_release_rx_buffer(
-                m_rpmsg, reinterpret_cast<void *>(reinterpret_cast<uint8_t *>(tmp) - sizeof(FramedTransport::Header)));
-            if (ret != RL_SUCCESS)
-            {
-                // error
-            }
+            ret = rpmsg_lite_release_rx_buffer(m_rpmsg, buf->get());
+            erpc_assert(ret == RL_SUCCESS);
         }
     }
 
-    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message)
+    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer &message, uint8_t reserveHeaderSize = 0)
     {
         erpc_status_t status;
 
-        dispose(message);
-        *message = create();
+        dispose(&message);
+        message = create(reserveHeaderSize);
         if (message->get() != NULL)
         {
             status = kErpcStatus_Success;

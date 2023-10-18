@@ -22,7 +22,7 @@ void SimpleServer::disposeBufferAndCodec(Codec *codec)
     {
         if (codec->getBuffer() != NULL)
         {
-            m_messageFactory->dispose(codec->getBuffer());
+            m_messageFactory->dispose(&codec->getBufferRef());
         }
         m_codecFactory->dispose(codec);
     }
@@ -103,7 +103,7 @@ erpc_status_t SimpleServer::runInternalBegin(Codec **codec, MessageBuffer &buff,
 
     if (err == kErpcStatus_Success)
     {
-        (*codec)->setBuffer(buff);
+        (*codec)->setBuffer(buff, m_transport->reserveHeaderSize());
 
         err = readHeadOfMessage(*codec, msgType, serviceId, methodId, sequence);
         if (err != kErpcStatus_Success)
@@ -130,7 +130,7 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
             if (err == kErpcStatus_Success)
             {
 #endif
-                err = m_transport->send(codec->getBuffer());
+                err = m_transport->send(&codec->getBufferRef());
 #if ERPC_MESSAGE_LOGGING
             }
 #endif
@@ -188,7 +188,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
             if (sequence == request.getSequence())
             {
                 // Swap the received message buffer with the client's message buffer.
-                request.getCodec()->getBuffer()->swap(&buff);
+                request.getCodec()->getBufferRef().swap(&buff);
                 codec->setBuffer(buff);
             }
 

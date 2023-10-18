@@ -64,6 +64,8 @@ public:
     {
     }
 
+    MessageBuffer(const MessageBuffer &buffer);
+
     /*!
      * @brief This function set new buffer and his length.
      *
@@ -183,162 +185,173 @@ public:
      */
     const uint8_t &operator[](int index) const { return m_buf[index]; }
 
-    /*!
-     * @brief Cursor within a MessageBuffer.
-     */
-    class Cursor
-    {
-    public:
-        /*!
-         * @brief Constructor.
-         *
-         * This function initializes object attributes.
-         */
-        Cursor(void)
-        : m_buffer(NULL)
-        , m_pos(NULL)
-        {
-        }
-
-        /*!
-         * @brief Constructor.
-         *
-         * This function initializes object attributes.
-         *
-         * @param[in] buffer MessageBuffer for sending/receiving.
-         */
-        explicit Cursor(MessageBuffer *buffer)
-        : m_buffer(buffer)
-        , m_pos(buffer->get())
-        {
-        }
-
-        /*!
-         * @brief Set message buffer.
-         *
-         * @param[in] buffer Message buffer to set.
-         */
-        void set(MessageBuffer *buffer);
-
-        /*!
-         * @brief Return position in buffer.
-         *
-         * Return position, where it last write/read.
-         *
-         * @return Return position in buffer.
-         */
-        uint8_t *get(void) { return m_pos; }
-
-        /*!
-         * @brief Return position in buffer.
-         *
-         * Return position, where it last write/read.
-         *
-         * @return Return position in buffer.
-         */
-        const uint8_t *get(void) const { return m_pos; }
-
-        /*!
-         * @brief Return remaining free space in current buffer.
-         *
-         * @return Remaining free space in current buffer.
-         */
-        uint16_t getRemaining(void) const { return m_buffer->getLength() - (uint16_t)(m_pos - m_buffer->get()); }
-
-        /*!
-         * @brief Return remaining space from used of current buffer.
-         *
-         * @return Remaining space from used of current buffer.
-         */
-        uint16_t getRemainingUsed(void) const { return m_buffer->getUsed() - (uint16_t)(m_pos - m_buffer->get()); }
-
-        /*!
-         * @brief Read data from current buffer.
-         *
-         * @param[out] data Pointer to value, where copy read data.
-         * @param[in] length How much bytes need be read.
-         *
-         * @retval kErpcStatus_Success
-         * @retval kErpcStatus_BufferOverrun
-         */
-        erpc_status_t read(void *data, uint32_t length);
-
-        /*!
-         * @brief Read data from current buffer.
-         *
-         * @param[out] data Pointer to value to be sent.
-         * @param[in] length How much bytes need be wrote.
-         *
-         * @retval kErpcStatus_Success
-         * @retval kErpcStatus_BufferOverrun
-         */
-        erpc_status_t write(const void *data, uint32_t length);
-
-        /*!
-         * @brief Casting operator return local buffer.
-         */
-        operator uint8_t *(void) { return m_pos; }
-
-        /*!
-         * @brief Casting operator return local buffer.
-         */
-        operator const uint8_t *(void) const { return m_pos; }
-
-        /*!
-         * @brief Array operator return value of buffer at given index.
-         *
-         * @param[in] index Index in buffer.
-         */
-        uint8_t &operator[](int index);
-
-        /*!
-         * @brief Array operator return value of buffer at given index.
-         *
-         * @param[in] index Index in buffer.
-         */
-        const uint8_t &operator[](int index) const;
-
-        /*!
-         * @brief Sum operator return local buffer.
-         *
-         * @param[in] n Summing with n.
-         *
-         * @return Current cursor instance.
-         */
-        Cursor &operator+=(uint16_t n);
-
-        /*!
-         * @brief Subtract operator return local buffer.
-         *
-         * @param[in] n Subtracting with n.
-         *
-         * @return Current cursor instance.
-         */
-        Cursor &operator-=(uint16_t n);
-
-        /*!
-         * @brief Sum +1 operator.
-         *
-         * @return Current cursor instance.
-         */
-        Cursor &operator++(void);
-
-        /*!
-         * @brief Subtract -1 operator.
-         *
-         * @return Current cursor instance.
-         */
-        Cursor &operator--(void);
-
-    private:
-        MessageBuffer *m_buffer; /*!< Buffer for reading or writing data. */
-        uint8_t *m_pos;          /*!< Position in buffer, where it last write/read */
-    };
-
 private:
     uint8_t *volatile m_buf;  /*!< Buffer used to read write data. */
     uint16_t volatile m_len;  /*!< Length of buffer. */
     uint16_t volatile m_used; /*!< Used buffer bytes. */
+};
+
+/*!
+ * @brief Cursor within a MessageBuffer.
+ */
+class Cursor
+{
+public:
+    /*!
+     * @brief Constructor.
+     *
+     * This function initializes object attributes.
+     */
+    Cursor(void)
+    : m_buffer()
+    , m_pos(NULL)
+    {
+    }
+
+    /*!
+     * @brief Constructor.
+     *
+     * This function initializes object attributes.
+     *
+     * @param[in] buffer MessageBuffer for sending/receiving.
+     */
+    explicit Cursor(MessageBuffer &buffer)
+    : m_buffer(buffer)
+    , m_pos(buffer.get())
+    {
+    }
+
+    /*!
+     * @brief Set message buffer.
+     *
+     * @param[in] buffer Message buffer to set.
+     * @param[in] reserved Moved cursor position outside of reserved memory.
+     */
+    void setBuffer(MessageBuffer &buffer, uint8_t reserved = 0);
+
+    /*!
+     * @brief Get message buffer.
+     */
+    MessageBuffer getBuffer(void);
+
+    /*!
+     * @brief Get message buffer.
+     */
+    MessageBuffer &getBufferRef(void);
+
+    /*!
+     * @brief Return position in buffer.
+     *
+     * Return position, where it last write/read.
+     *
+     * @return Return position in buffer.
+     */
+    uint8_t *get(void) { return m_pos; }
+
+    /*!
+     * @brief Return position in buffer.
+     *
+     * Return position, where it last write/read.
+     *
+     * @return Return position in buffer.
+     */
+    const uint8_t *get(void) const { return m_pos; }
+
+    /*!
+     * @brief Return remaining free space in current buffer.
+     *
+     * @return Remaining free space in current buffer.
+     */
+    uint16_t getRemaining(void) const { return m_buffer.getLength() - (uint16_t)(m_pos - m_buffer.get()); }
+
+    /*!
+     * @brief Return remaining space from used of current buffer.
+     *
+     * @return Remaining space from used of current buffer.
+     */
+    uint16_t getRemainingUsed(void) const { return m_buffer.getUsed() - (uint16_t)(m_pos - m_buffer.get()); }
+
+    /*!
+     * @brief Read data from current buffer.
+     *
+     * @param[out] data Pointer to value, where copy read data.
+     * @param[in] length How much bytes need be read.
+     *
+     * @retval kErpcStatus_Success
+     * @retval kErpcStatus_BufferOverrun
+     */
+    erpc_status_t read(void *data, uint32_t length);
+
+    /*!
+     * @brief Read data from current buffer.
+     *
+     * @param[out] data Pointer to value to be sent.
+     * @param[in] length How much bytes need be wrote.
+     *
+     * @retval kErpcStatus_Success
+     * @retval kErpcStatus_BufferOverrun
+     */
+    erpc_status_t write(const void *data, uint32_t length);
+
+    /*!
+     * @brief Casting operator return local buffer.
+     */
+    operator uint8_t *(void) { return m_pos; }
+
+    /*!
+     * @brief Casting operator return local buffer.
+     */
+    operator const uint8_t *(void) const { return m_pos; }
+
+    /*!
+     * @brief Array operator return value of buffer at given index.
+     *
+     * @param[in] index Index in buffer.
+     */
+    uint8_t &operator[](int index);
+
+    /*!
+     * @brief Array operator return value of buffer at given index.
+     *
+     * @param[in] index Index in buffer.
+     */
+    const uint8_t &operator[](int index) const;
+
+    /*!
+     * @brief Sum operator return local buffer.
+     *
+     * @param[in] n Summing with n.
+     *
+     * @return Current cursor instance.
+     */
+    Cursor &operator+=(uint16_t n);
+
+    /*!
+     * @brief Subtract operator return local buffer.
+     *
+     * @param[in] n Subtracting with n.
+     *
+     * @return Current cursor instance.
+     */
+    Cursor &operator-=(uint16_t n);
+
+    /*!
+     * @brief Sum +1 operator.
+     *
+     * @return Current cursor instance.
+     */
+    Cursor &operator++(void);
+
+    /*!
+     * @brief Subtract -1 operator.
+     *
+     * @return Current cursor instance.
+     */
+    Cursor &operator--(void);
+
+private:
+    MessageBuffer m_buffer; /*!< Buffer for reading or writing data. */
+    uint8_t *m_pos;         /*!< Position in buffer, where it last write/read */
 };
 
 /*!
@@ -369,6 +382,17 @@ public:
     virtual MessageBuffer create(void) = 0;
 
     /*!
+     * @brief This function creates new message buffer with reserved bytes at the beginning
+     *
+     * Reserved bytes can be used by transport to write transport related header file data.
+     *
+     * @param[in] reserveHeaderSize Reserved amount of bytes at the beginning of message buffer.
+     *
+     * @return New created MessageBuffer.
+     */
+    MessageBuffer create(uint8_t reserveHeaderSize);
+
+    /*!
      * @brief This function informs server if it has to create buffer for received message.
      *
      * @return Has to return TRUE when server need create buffer for receiving message.
@@ -382,8 +406,9 @@ public:
      * In case of using new buffer function has to free given buffer.
      *
      * @param[in] message MessageBuffer which can be reused.
+     * @param[in] reserveHeaderSize Reserved amount of bytes at the beginning of message buffer.
      */
-    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message);
+    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer &message, uint8_t reserveHeaderSize = 0);
 
     /*!
      * @brief This function disposes message buffer.

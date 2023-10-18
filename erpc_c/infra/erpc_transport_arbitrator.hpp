@@ -53,6 +53,13 @@ public:
      */
     virtual ~TransportArbitrator(void);
 
+    /**
+     * @brief Size of data placed in MessageBuffer before serializing eRPC data.
+     *
+     * @return uint8_t Amount of bytes, reserved before serialized data.
+     */
+    virtual uint8_t reserveHeaderSize(void) override { return m_sharedTransport->reserveHeaderSize(); }
+
     /*!
      * @brief This function set shared client/server transport.
      *
