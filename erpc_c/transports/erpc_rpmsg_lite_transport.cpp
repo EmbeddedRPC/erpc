@@ -20,8 +20,8 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgBaseTransport::s_initialized = 0U;
-struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg = NULL;
+uint8_t RPMsgBase::s_initialized = 0U;
+struct rpmsg_lite_instance *RPMsgBase::s_rpmsg = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -40,7 +40,8 @@ int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint3
 }
 
 RPMsgTransport::RPMsgTransport(void)
-: RPMsgBaseTransport()
+: RPMsgBase()
+, Transport()
 , m_dst_addr(0)
 , m_rpmsg_ept(NULL)
 , m_crcImpl(NULL)

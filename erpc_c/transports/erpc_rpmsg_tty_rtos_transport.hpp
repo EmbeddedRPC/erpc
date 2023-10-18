@@ -13,7 +13,7 @@
 #include "erpc_crc16.hpp"
 #include "erpc_framed_transport.hpp"
 #include "erpc_message_buffer.hpp"
-#include "erpc_rpmsg_lite_base_transport.hpp"
+#include "erpc_rpmsg_lite_base.hpp"
 
 extern "C" {
 #include "rpmsg_lite.h"
@@ -41,7 +41,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_tty_rtos_transport
  */
-class RPMsgTTYRTOSTransport : public RPMsgBaseTransport, public FramedTransport
+class RPMsgTTYRTOSTransport : public FramedTransport, public RPMsgBase
 {
 public:
     /*!
@@ -100,8 +100,30 @@ protected:
     rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */
     struct rpmsg_lite_endpoint *m_rpmsg_ept; /*!< Pointer to RPMsg Lite Endpoint structure. */
 
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when sending data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
     virtual erpc_status_t underlyingSend(MessageBuffer *message, uint32_t size, uint32_t offset) override;
 
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when receiving data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
     virtual erpc_status_t underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset) override;
 
     /*!

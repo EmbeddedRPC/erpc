@@ -9,6 +9,7 @@
  */
 
 #include "erpc_rpmsg_lite_rtos_transport.hpp"
+
 #include "erpc_config_internal.h"
 
 extern "C" {
@@ -20,15 +21,16 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgBaseTransport::s_initialized = 0U;
-struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
+uint8_t RPMsgBase::s_initialized = 0U;
+struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
 RPMsgRTOSTransport::RPMsgRTOSTransport(void)
-: RPMsgBaseTransport()
+: RPMsgBase()
+, Transport()
 , m_rdev(NULL)
 , m_app_rp_chnl(NULL)
 , m_dst_addr(0)

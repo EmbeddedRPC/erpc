@@ -12,7 +12,8 @@
 
 #include "erpc_crc16.hpp"
 #include "erpc_message_buffer.hpp"
-#include "erpc_rpmsg_lite_base_transport.hpp"
+#include "erpc_rpmsg_lite_base.hpp"
+#include "erpc_transport.hpp"
 
 extern "C" {
 #include "rpmsg_lite.h"
@@ -39,7 +40,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_lite_rtos_transport
  */
-class RPMsgRTOSTransport : public RPMsgBaseTransport
+class RPMsgRTOSTransport : public RPMsgBase, public Transport
 {
 public:
     /*!
@@ -96,7 +97,7 @@ public:
      * @retval kErpcStatus_ReceiveFailed Failed to receive message buffer.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -106,7 +107,7 @@ public:
      * @retval kErpcStatus_SendFailed Failed to send message buffer.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
      * @brief This functions sets the CRC-16 implementation.

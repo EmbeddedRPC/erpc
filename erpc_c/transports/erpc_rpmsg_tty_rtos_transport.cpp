@@ -22,15 +22,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgBaseTransport::s_initialized = 0U;
-struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
+uint8_t RPMsgBase::s_initialized = 0U;
+struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
 RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
-: RPMsgBaseTransport()
+: FramedTransport()
+, RPMsgBase()
 , m_dst_addr(0)
 , m_rpmsg_queue(NULL)
 , m_rpmsg_ept(NULL)
@@ -293,9 +294,11 @@ erpc_status_t RPMsgTTYRTOSTransport::underlyingReceive(MessageBuffer *message, u
 erpc_status_t RPMsgTTYRTOSTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
     // unused as underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset)
+    return kErpcStatus_ReceiveFailed;
 }
 
 erpc_status_t RPMsgTTYRTOSTransport::underlyingSend(const uint8_t *data, uint32_t size)
 {
     // unused as underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset)
+    return kErpcStatus_SendFailed;
 }
