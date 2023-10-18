@@ -19,15 +19,10 @@ folders = [
     "erpcsniffer/src",
     "test"]
 
-# Files which will be not formatted
-exceptions = [
-    "test/common/gtest/gtest.h",
-    "test/common/gtest/gtest.cpp",
-    "erpc_c/port/erpc_serial.cpp",
-    "erpcgen/src/cpptemplate/cpptempl.hpp",
-    "erpcgen/src/cpptemplate/cpptempl.cpp",
-    "erpcgen/src/cpptemplate/cpptempl_test.cpp"]
+with open(".clang-format-ignore") as f:
+    exceptionsTmp = f.read().split("\n")
 
+exceptions = [exception for exception in exceptionsTmp if exception != "" and exception[0] != "#"]
 # For windows use "\\" instead of "/" path separators.
 if os.environ.get('OS', '') == 'Windows_NT':
     folders = [os.path.normpath(folder) for folder in folders]
