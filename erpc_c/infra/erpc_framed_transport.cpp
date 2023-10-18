@@ -60,7 +60,8 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 
     erpc_assert((m_crcImpl != NULL) && ("Uninitialized Crc16 object." != NULL));
 
-    if (message->getLength() < reserveHeaderSize())
+    // e.g. rpmsg tty may have nullptr and buffer is assigned in receive function.
+    if ((message->get() != nullptr) && (message->getLength() < reserveHeaderSize()))
     {
         retVal = kErpcStatus_MemoryError;
     }
@@ -72,15 +73,20 @@ erpc_status_t FramedTransport::receive(MessageBuffer *message)
 
         // Receive header first.
         retVal = underlyingReceive(message, reserveHeaderSize(), 0);
-        static_cast<void>(memcpy(&h.m_crcHeader, message->get(), sizeof(h.m_crcHeader)));
-        offset = sizeof(h.m_crcHeader);
-        static_cast<void>(memcpy(&h.m_messageSize, &message->get()[offset], sizeof(h.m_messageSize)));
-        offset += sizeof(h.m_messageSize);
-        static_cast<void>(memcpy(&h.m_crcBody, &message->get()[offset], sizeof(h.m_crcBody)));
-        offset += sizeof(h.m_crcBody);
+        if ((retVal == kErpcStatus_Success) && (message->getLength() < reserveHeaderSize()))
+        {
+            retVal = kErpcStatus_MemoryError;
+        }
 
         if (retVal == kErpcStatus_Success)
         {
+            static_cast<void>(memcpy(&h.m_crcHeader, message->get(), sizeof(h.m_crcHeader)));
+            offset = sizeof(h.m_crcHeader);
+            static_cast<void>(memcpy(&h.m_messageSize, &message->get()[offset], sizeof(h.m_messageSize)));
+            offset += sizeof(h.m_messageSize);
+            static_cast<void>(memcpy(&h.m_crcBody, &message->get()[offset], sizeof(h.m_crcBody)));
+            offset += sizeof(h.m_crcBody);
+
             ERPC_READ_AGNOSTIC_16(h.m_crcHeader);
             ERPC_READ_AGNOSTIC_16(h.m_messageSize);
             ERPC_READ_AGNOSTIC_16(h.m_crcBody);
