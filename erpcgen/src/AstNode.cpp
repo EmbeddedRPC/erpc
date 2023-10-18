@@ -22,9 +22,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-AstNode::AstNode(const AstNode &other)
-: m_token(other.m_token)
-, m_parent(other.m_parent)
+AstNode::AstNode(const AstNode &other) : m_token(other.m_token), m_parent(other.m_parent)
 {
     // Clone children.
     for (auto it : other.m_children)

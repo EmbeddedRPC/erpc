@@ -38,7 +38,8 @@ public:
      */
     StaticMessageBufferFactory(void)
 #if !ERPC_THREADS_IS(NONE)
-    : m_semaphore(1)
+    :
+    m_semaphore(1)
 #endif
     {
         (void)memset(m_freeBufferBitmap, 0xff, sizeof(m_freeBufferBitmap));

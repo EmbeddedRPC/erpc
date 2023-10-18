@@ -44,8 +44,7 @@ static uint8_t listCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-CGenerator::CGenerator(InterfaceDefinition *def)
-: Generator(def, kC)
+CGenerator::CGenerator(InterfaceDefinition *def) : Generator(def, kC)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())

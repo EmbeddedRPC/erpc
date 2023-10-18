@@ -38,10 +38,7 @@ public:
      *
      * @param[in] name Group name.
      */
-    explicit Group(const std::string &name)
-    : m_name(name)
-    {
-    }
+    explicit Group(const std::string &name) : m_name(name) {}
 
     /*!
      * @brief This function returns the group name.

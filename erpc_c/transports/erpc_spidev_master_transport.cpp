@@ -84,10 +84,8 @@ static inline void SpidevMasterTransport_WaitForSlaveReadyMarker(int spi_fd)
 }
 #endif
 
-SpidevMasterTransport::SpidevMasterTransport(const char *spidev, uint32_t speed_Hz)
-: m_spidevHandle(0)
-, m_spidev(spidev)
-, m_speed_Hz(speed_Hz)
+SpidevMasterTransport::SpidevMasterTransport(const char *spidev, uint32_t speed_Hz) :
+m_spidevHandle(0), m_spidev(spidev), m_speed_Hz(speed_Hz)
 {
 }
 

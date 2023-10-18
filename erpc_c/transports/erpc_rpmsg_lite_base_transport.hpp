@@ -50,8 +50,7 @@ namespace erpc {
 class RPMsgBaseTransport : public Transport
 {
 public:
-    RPMsgBaseTransport(void)
-    : Transport(){};
+    RPMsgBaseTransport(void) : Transport(){};
 
     virtual ~RPMsgBaseTransport(void) {}
 

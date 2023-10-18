@@ -43,23 +43,13 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-TCPTransport::TCPTransport(bool isServer)
-: m_isServer(isServer)
-, m_host(NULL)
-, m_port(0)
-, m_socket(-1)
-, m_serverThread(serverThreadStub)
-, m_runServer(true)
+TCPTransport::TCPTransport(bool isServer) :
+m_isServer(isServer), m_host(NULL), m_port(0), m_socket(-1), m_serverThread(serverThreadStub), m_runServer(true)
 {
 }
 
-TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer)
-: m_isServer(isServer)
-, m_host(host)
-, m_port(port)
-, m_socket(-1)
-, m_serverThread(serverThreadStub)
-, m_runServer(true)
+TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer) :
+m_isServer(isServer), m_host(host), m_port(port), m_socket(-1), m_serverThread(serverThreadStub), m_runServer(true)
 {
 }
 

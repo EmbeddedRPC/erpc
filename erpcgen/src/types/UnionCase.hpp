@@ -35,11 +35,8 @@ public:
      * @param[in] caseName Given case name.
      * @param[in] caseValue Given case value.
      */
-    UnionCase(const std::string &caseName, int32_t caseValue)
-    : Symbol(kUnionCaseMemberSymbol, caseName)
-    , m_caseName(caseName)
-    , m_caseValue(caseValue)
-    , m_containingUnion(nullptr)
+    UnionCase(const std::string &caseName, int32_t caseValue) :
+    Symbol(kUnionCaseMemberSymbol, caseName), m_caseName(caseName), m_caseValue(caseValue), m_containingUnion(nullptr)
     {
     }
 
@@ -51,11 +48,8 @@ public:
      *
      * @param[in] caseValue Given case value.
      */
-    explicit UnionCase(int32_t caseValue)
-    : Symbol(kUnionCaseMemberSymbol)
-    , m_caseName("")
-    , m_caseValue(caseValue)
-    , m_containingUnion(nullptr)
+    explicit UnionCase(int32_t caseValue) :
+    Symbol(kUnionCaseMemberSymbol), m_caseName(""), m_caseValue(caseValue), m_containingUnion(nullptr)
     {
     }
 
@@ -67,11 +61,8 @@ public:
      *
      * @param[in] caseName Given case name.
      */
-    explicit UnionCase(const std::string &caseName)
-    : Symbol(kUnionCaseMemberSymbol)
-    , m_caseName(caseName)
-    , m_caseValue(-1)
-    , m_containingUnion(nullptr)
+    explicit UnionCase(const std::string &caseName) :
+    Symbol(kUnionCaseMemberSymbol), m_caseName(caseName), m_caseValue(-1), m_containingUnion(nullptr)
     {
     }
 

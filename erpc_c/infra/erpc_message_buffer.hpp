@@ -42,12 +42,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    MessageBuffer(void)
-    : m_buf(NULL)
-    , m_len(0)
-    , m_used(0)
-    {
-    }
+    MessageBuffer(void) : m_buf(NULL), m_len(0), m_used(0) {}
 
     /*!
      * @brief Constructor.
@@ -57,12 +52,7 @@ public:
      * @param[in] buffer Pointer to buffer.
      * @param[in] length Length of buffer.
      */
-    MessageBuffer(uint8_t *buffer, uint16_t length)
-    : m_buf(buffer)
-    , m_len(length)
-    , m_used(0)
-    {
-    }
+    MessageBuffer(uint8_t *buffer, uint16_t length) : m_buf(buffer), m_len(length), m_used(0) {}
 
     /*!
      * @brief This function set new buffer and his length.
@@ -194,11 +184,7 @@ public:
          *
          * This function initializes object attributes.
          */
-        Cursor(void)
-        : m_buffer(NULL)
-        , m_pos(NULL)
-        {
-        }
+        Cursor(void) : m_buffer(NULL), m_pos(NULL) {}
 
         /*!
          * @brief Constructor.
@@ -207,11 +193,7 @@ public:
          *
          * @param[in] buffer MessageBuffer for sending/receiving.
          */
-        explicit Cursor(MessageBuffer *buffer)
-        : m_buffer(buffer)
-        , m_pos(buffer->get())
-        {
-        }
+        explicit Cursor(MessageBuffer *buffer) : m_buffer(buffer), m_pos(buffer->get()) {}
 
         /*!
          * @brief Set message buffer.

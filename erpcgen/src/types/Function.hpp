@@ -33,12 +33,7 @@ public:
     /*!
      * @brief Constructor.
      */
-    FunctionBase()
-    : m_parameters("(fn)")
-    , m_returnType(nullptr)
-    , m_isOneway(false)
-    {
-    }
+    FunctionBase() : m_parameters("(fn)"), m_returnType(nullptr), m_isOneway(false) {}
 
     virtual ~FunctionBase(){};
 
@@ -114,9 +109,7 @@ class FunctionType;
  *
  * The function's parameters are represented by a StructType object.
  */
-class Function
-: public FunctionBase
-, public Symbol
+class Function : public FunctionBase, public Symbol
 {
 public:
     /*!
@@ -127,12 +120,9 @@ public:
      * @param[in] tok Given token.
      * @param[in] m_interface Parent interface.
      */
-    Function(const Token &tok, Interface *interface)
-    : FunctionBase()
-    , Symbol(kFunctionSymbol, tok)
-    , m_uniqueId(++s_idCounter)
-    , m_interface(interface)
-    , m_functionType(nullptr)
+    Function(const Token &tok, Interface *interface) :
+    FunctionBase(), Symbol(kFunctionSymbol, tok), m_uniqueId(++s_idCounter), m_interface(interface),
+    m_functionType(nullptr)
     {
     }
 
@@ -145,12 +135,8 @@ public:
      * @param[in] m_interface Parent interface.
      * @param[in] uniqueId Given unique function id.
      */
-    Function(const Token &tok, Interface *interface, uint32_t uniqueId)
-    : FunctionBase()
-    , Symbol(kFunctionSymbol, tok)
-    , m_uniqueId(uniqueId)
-    , m_interface(interface)
-    , m_functionType(nullptr)
+    Function(const Token &tok, Interface *interface, uint32_t uniqueId) :
+    FunctionBase(), Symbol(kFunctionSymbol, tok), m_uniqueId(uniqueId), m_interface(interface), m_functionType(nullptr)
     {
         s_idCounter = uniqueId;
     }

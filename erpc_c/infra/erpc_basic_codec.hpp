@@ -43,10 +43,7 @@ class BasicCodec : public Codec
 public:
     static const uint32_t kBasicCodecVersion; /*!< Codec version. */
 
-    BasicCodec(void)
-    : Codec()
-    {
-    }
+    BasicCodec(void) : Codec() {}
 
     //! @name Encoding
     //@{

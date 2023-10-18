@@ -50,13 +50,8 @@ public:
      *
      * @param[in] symType Enum symbol type.
      */
-    explicit Symbol(symbol_type_t symType)
-    : m_symbolType(symType)
-    , m_name()
-    , m_location()
-    , m_annotations()
-    , m_mlComment("")
-    , m_ilComment("")
+    explicit Symbol(symbol_type_t symType) :
+    m_symbolType(symType), m_name(), m_location(), m_annotations(), m_mlComment(""), m_ilComment("")
     {
     }
 
@@ -68,13 +63,8 @@ public:
      * @param[in] symType Enum symbol type.
      * @param[in] name Name for symbol.
      */
-    Symbol(symbol_type_t symType, const std::string &name)
-    : m_symbolType(symType)
-    , m_name(name)
-    , m_location()
-    , m_annotations()
-    , m_mlComment("")
-    , m_ilComment("")
+    Symbol(symbol_type_t symType, const std::string &name) :
+    m_symbolType(symType), m_name(name), m_location(), m_annotations(), m_mlComment(""), m_ilComment("")
     {
     }
 
@@ -86,13 +76,9 @@ public:
      * @param[in] symType Enum symbol type.
      * @param[in] tok Token for symbol, which contains name and location.
      */
-    Symbol(symbol_type_t symType, const Token &tok)
-    : m_symbolType(symType)
-    , m_name(tok.getStringValue())
-    , m_location(tok.getLocation())
-    , m_annotations()
-    , m_mlComment("")
-    , m_ilComment("")
+    Symbol(symbol_type_t symType, const Token &tok) :
+    m_symbolType(symType), m_name(tok.getStringValue()), m_location(tok.getLocation()), m_annotations(),
+    m_mlComment(""), m_ilComment("")
     {
     }
 

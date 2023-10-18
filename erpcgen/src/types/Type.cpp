@@ -119,10 +119,8 @@ string Symbol::getAnnStringValue(const string &annName, Annotation::program_lang
     return (annVallue) ? annVallue->toString() : "";
 }
 
-SymbolScope::typed_iterator::typed_iterator(const vit &bv, const vit &ev, Symbol::symbol_type_t predicateType)
-: m_vec(bv)
-, m_endvec(ev)
-, m_predicateType(predicateType)
+SymbolScope::typed_iterator::typed_iterator(const vit &bv, const vit &ev, Symbol::symbol_type_t predicateType) :
+m_vec(bv), m_endvec(ev), m_predicateType(predicateType)
 {
     // Advance to the first matching symbol.
     while (m_vec != m_endvec && (*m_vec)->getSymbolType() != m_predicateType)

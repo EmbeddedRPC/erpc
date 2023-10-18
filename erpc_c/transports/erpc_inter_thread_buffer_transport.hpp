@@ -44,13 +44,8 @@ namespace erpc {
 class InterThreadBufferTransport : public Transport
 {
 public:
-    InterThreadBufferTransport(void)
-    : Transport()
-    , m_state(NULL)
-    , m_peer(NULL)
-    , m_inSem()
-    , m_outSem(1)
-    , m_inBuffer(NULL)
+    InterThreadBufferTransport(void) :
+    Transport(), m_state(NULL), m_peer(NULL), m_inSem(), m_outSem(1), m_inBuffer(NULL)
     {
     }
     virtual ~InterThreadBufferTransport(void);

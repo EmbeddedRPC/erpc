@@ -30,12 +30,8 @@ struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
-: RPMsgBaseTransport()
-, m_dst_addr(0)
-, m_rpmsg_queue(NULL)
-, m_rpmsg_ept(NULL)
-, m_crcImpl(NULL)
+RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void) :
+RPMsgBaseTransport(), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL), m_crcImpl(NULL)
 {
 }
 

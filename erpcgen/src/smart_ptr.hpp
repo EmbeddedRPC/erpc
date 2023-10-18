@@ -48,23 +48,13 @@ public:
     typedef const T &const_ref_type;
 
     //! Default constructor. Initializes with no pointer set.
-    smart_ptr()
-    : _p(nullptr)
-    {
-    }
+    smart_ptr() : _p(nullptr) {}
 
     //! This constructor takes a pointer to the object to be deleted.
-    smart_ptr(ptr_type p)
-    : _p(p)
-    {
-    }
+    smart_ptr(ptr_type p) : _p(p) {}
 
     //! @brief Move copy constructor.
-    smart_ptr(smart_ptr<T> &&other)
-    : _p(other._p)
-    {
-        other._p = nullptr;
-    }
+    smart_ptr(smart_ptr<T> &&other) : _p(other._p) { other._p = nullptr; }
 
     //! @brief Move assignment operator.
     smart_ptr<T> &operator=(smart_ptr<T> &&other)

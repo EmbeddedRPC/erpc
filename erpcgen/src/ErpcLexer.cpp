@@ -33,11 +33,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ErpcLexer::ErpcLexer(const char *inputFile)
-: m_value(nullptr)
-, m_indents(0)
-, m_currentFileInfo(NULL)
-, m_idlCrc16(0)
+ErpcLexer::ErpcLexer(const char *inputFile) : m_value(nullptr), m_indents(0), m_currentFileInfo(NULL), m_idlCrc16(0)
 {
     m_currentFileInfo = openFile(inputFile);
     yyrestart(m_currentFileInfo->m_savedFile.get()); // instead of yyFlexLexer(idlFile);

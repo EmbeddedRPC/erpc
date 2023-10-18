@@ -37,20 +37,14 @@ public:
      *
      * @param[in] tok Given token.
      */
-    explicit EnumType(const Token &tok)
-    : DataType(tok, kEnumType)
-    {
-    }
+    explicit EnumType(const Token &tok) : DataType(tok, kEnumType) {}
 
     /*!
      * @brief Constructor.
      *
      * This function set DataType with default name.
      */
-    EnumType()
-    : DataType("", kEnumType)
-    {
-    }
+    EnumType() : DataType("", kEnumType) {}
 
     /*!
      * @brief This function will add enum member to the enum.

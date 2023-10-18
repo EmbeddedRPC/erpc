@@ -46,13 +46,9 @@ public:
      * @param[in] name Given name.
      * @param[in] dataType Given data type.
      */
-    StructMember(const std::string &name, DataType *dataType)
-    : Symbol(kStructMemberSymbol, name)
-    , m_dataType(dataType)
-    , m_paramDirection()
-    , m_containList()
-    , m_containString()
-    , m_byref(false)
+    StructMember(const std::string &name, DataType *dataType) :
+    Symbol(kStructMemberSymbol, name), m_dataType(dataType), m_paramDirection(), m_containList(), m_containString(),
+    m_byref(false)
     {
     }
 
@@ -64,13 +60,9 @@ public:
      * @param[in] tok Given token.
      * @param[in] dataType Given data type.
      */
-    StructMember(const Token &tok, DataType *dataType)
-    : Symbol(kStructMemberSymbol, tok)
-    , m_dataType(dataType)
-    , m_paramDirection()
-    , m_containList()
-    , m_containString()
-    , m_byref(false)
+    StructMember(const Token &tok, DataType *dataType) :
+    Symbol(kStructMemberSymbol, tok), m_dataType(dataType), m_paramDirection(), m_containList(), m_containString(),
+    m_byref(false)
     {
     }
 

@@ -59,13 +59,11 @@ public:
      *
      * This function initializes object attributes.
      */
-    ClientManager(void)
-    : ClientServerCommon()
-    , m_sequence(0)
-    , m_errorHandler(NULL)
+    ClientManager(void) :
+    ClientServerCommon(), m_sequence(0), m_errorHandler(NULL)
 #if ERPC_NESTED_CALLS
-    , m_server(NULL)
-    , m_serverThreadId(NULL)
+    ,
+    m_server(NULL), m_serverThreadId(NULL)
 #endif
     {
     }
@@ -193,10 +191,8 @@ public:
      * @param[in] codec Set in inout codec.
      * @param[in] isOneway Set information if codec is only oneway or bidirectional.
      */
-    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway)
-    : m_sequence(sequence)
-    , m_codec(codec)
-    , m_oneway(argIsOneway)
+    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway) :
+    m_sequence(sequence), m_codec(codec), m_oneway(argIsOneway)
     {
     }
 

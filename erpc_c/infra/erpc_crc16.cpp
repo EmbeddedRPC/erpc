@@ -15,15 +15,9 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Crc16::Crc16(uint32_t crcStart)
-: m_crcStart(crcStart)
-{
-}
+Crc16::Crc16(uint32_t crcStart) : m_crcStart(crcStart) {}
 
-Crc16::Crc16(void)
-: m_crcStart(0xEF4A)
-{
-}
+Crc16::Crc16(void) : m_crcStart(0xEF4A) {}
 
 Crc16::~Crc16(void) {}
 

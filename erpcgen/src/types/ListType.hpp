@@ -33,10 +33,8 @@ public:
      *
      * @param[in] elementType Given data type.
      */
-    explicit ListType(DataType *elementType)
-    : DataType("(list)", kListType)
-    , m_elementType(elementType)
-    , m_lengthVariableName("")
+    explicit ListType(DataType *elementType) :
+    DataType("(list)", kListType), m_elementType(elementType), m_lengthVariableName("")
     {
     }
 

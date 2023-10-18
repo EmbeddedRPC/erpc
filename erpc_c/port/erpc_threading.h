@@ -349,11 +349,7 @@ public:
          *
          * @param[in] mutex to lock.
          */
-        Guard(Mutex &mutex)
-        : m_mutex(mutex)
-        {
-            (void)m_mutex.lock();
-        }
+        Guard(Mutex &mutex) : m_mutex(mutex) { (void)m_mutex.lock(); }
         /*!
          * @brief Destructor.
          */

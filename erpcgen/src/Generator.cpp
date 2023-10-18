@@ -29,11 +29,8 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
-: m_idlCrc16(def->getIdlCrc16())
-, m_def(def)
-, m_globals(&(def->getGlobals()))
-, m_generatorType(generatorType)
+Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType) :
+m_idlCrc16(def->getIdlCrc16()), m_def(def), m_globals(&(def->getGlobals())), m_generatorType(generatorType)
 {
     string scopeName = "erpcShim";
     string scopeNameC;

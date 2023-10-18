@@ -35,10 +35,7 @@ public:
      *
      * @param[in] tok Given token.
      */
-    explicit Program(const Token &tok)
-    : Symbol(kProgramSymbol, tok)
-    {
-    }
+    explicit Program(const Token &tok) : Symbol(kProgramSymbol, tok) {}
 };
 
 } // namespace erpcgen

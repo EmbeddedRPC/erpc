@@ -37,10 +37,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    SimpleServer(void)
-    : m_isServerOn(true)
-    {
-    }
+    SimpleServer(void) : m_isServerOn(true) {}
 
     /*!
      * @brief Run server in infinite loop.

@@ -121,15 +121,9 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcgenTool(int argc, char *argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_logger(0)
-    , m_verboseType(kWarning)
-    , m_outputFilePath(NULL)
-    , m_ErpcFile(NULL)
-    , m_outputLanguage(kCLanguage)
-    , m_codec(InterfaceDefinition::kNotSpecified)
+    erpcgenTool(int argc, char *argv[]) :
+    m_argc(argc), m_argv(argv), m_logger(0), m_verboseType(kWarning), m_outputFilePath(NULL), m_ErpcFile(NULL),
+    m_outputLanguage(kCLanguage), m_codec(InterfaceDefinition::kNotSpecified)
     {
         // create logger instance
         m_logger = new StdoutLogger();

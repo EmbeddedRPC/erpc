@@ -102,19 +102,9 @@ private:
     const char *const *av; // arg vector
 
 public:
-    explicit OptArgvIter(const char *const argv[])
-    : ndx(0)
-    , ac(-1)
-    , av(argv)
-    {
-    }
+    explicit OptArgvIter(const char *const argv[]) : ndx(0), ac(-1), av(argv) {}
 
-    OptArgvIter(int argc, const char *const argv[])
-    : ndx(0)
-    , ac(argc)
-    , av(argv)
-    {
-    }
+    OptArgvIter(int argc, const char *const argv[]) : ndx(0), ac(argc), av(argv) {}
 
     virtual ~OptArgvIter(void);
 

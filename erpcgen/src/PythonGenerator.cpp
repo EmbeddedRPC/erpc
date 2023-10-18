@@ -37,10 +37,8 @@ extern const char *const kPyGlobalInit;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-PythonGenerator::PythonGenerator(InterfaceDefinition *def)
-: Generator(def, kPython)
-, m_suffixStrip("")
-, m_suffixStripSize(0)
+PythonGenerator::PythonGenerator(InterfaceDefinition *def) :
+Generator(def, kPython), m_suffixStrip(""), m_suffixStripSize(0)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())

@@ -28,13 +28,8 @@ using namespace erpc;
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(TransportArbitrator::PendingClientInfo, s_pendingClientInfoArray,
                                        ERPC_CLIENTS_THREADS_AMOUNT);
 
-TransportArbitrator::TransportArbitrator(void)
-: Transport()
-, m_sharedTransport(NULL)
-, m_codec(NULL)
-, m_clientList(NULL)
-, m_clientFreeList(NULL)
-, m_clientListMutex()
+TransportArbitrator::TransportArbitrator(void) :
+Transport(), m_sharedTransport(NULL), m_codec(NULL), m_clientList(NULL), m_clientFreeList(NULL), m_clientListMutex()
 {
 }
 
@@ -253,11 +248,8 @@ void TransportArbitrator::freeClientList(PendingClientInfo *list)
     }
 }
 
-TransportArbitrator::PendingClientInfo::PendingClientInfo(void)
-: m_request(NULL)
-, m_sem(0)
-, m_isValid(false)
-, m_next(NULL)
+TransportArbitrator::PendingClientInfo::PendingClientInfo(void) :
+m_request(NULL), m_sem(0), m_isValid(false), m_next(NULL)
 {
 }
 

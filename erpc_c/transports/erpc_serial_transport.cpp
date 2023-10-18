@@ -32,10 +32,8 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-SerialTransport::SerialTransport(const char *portName, speed_t baudRate)
-: m_serialHandle(0)
-, m_portName(portName)
-, m_baudRate(baudRate)
+SerialTransport::SerialTransport(const char *portName, speed_t baudRate) :
+m_serialHandle(0), m_portName(portName), m_baudRate(baudRate)
 {
 }
 

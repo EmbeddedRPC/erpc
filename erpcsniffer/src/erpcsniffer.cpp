@@ -133,18 +133,9 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcsnifferTool(int argc, char *argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_logger(0)
-    , m_verboseType(kWarning)
-    , m_outputFilePath(NULL)
-    , m_ErpcFile(NULL)
-    , m_transport(kNoneTransport)
-    , m_quantity(10)
-    , m_baudrate(115200)
-    , m_port(NULL)
-    , m_host(NULL)
+    erpcsnifferTool(int argc, char *argv[]) :
+    m_argc(argc), m_argv(argv), m_logger(0), m_verboseType(kWarning), m_outputFilePath(NULL), m_ErpcFile(NULL),
+    m_transport(kNoneTransport), m_quantity(10), m_baudrate(115200), m_port(NULL), m_host(NULL)
     {
         // create logger instance
         m_logger = new StdoutLogger();
