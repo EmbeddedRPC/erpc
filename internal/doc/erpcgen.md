@@ -41,7 +41,10 @@ Sets output directory path prefix
 Add search path for imports
 
 ###### ``-g <language>`` or ``—generate <language>``
-Select the output language (default is C). Language can be `c` (for C) or `py` (for python).
+Select the output language (default is C). Language can be `c` (for C) or `py` (for python) or `java` (for java).
+
+###### ``-p <packageName>`` or ``—package <packageName>`` 
+Only for **Java**. Select package name used in generated shim code. Example: _com.example.app_ 
 
 The easiest way to use the eRPC generator is:
 ```

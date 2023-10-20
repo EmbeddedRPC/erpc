@@ -13,13 +13,13 @@
 #include "erpc_transport_arbitrator.hpp"
 
 #include "Logging.hpp"
+#include "c_test_firstInterface_client.h"
 #include "gtest.h"
-#include "test_firstInterface.h"
-#include "test_secondInterface.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
+
 #include <chrono>
 #include <thread>
-
 #include <unistd.h>
 
 using namespace erpc;
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     // create logger instance
     StdoutLogger m_logger;
 
-    m_logger.setFilterLevel(Logger::kInfo);
+    m_logger.setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(&m_logger);
 
     Log::info("Intit ERPC first (client) app...\n");
@@ -154,6 +154,8 @@ int main(int argc, char **argv)
 
     add_services(&g_server);
     g_client->setServer(&g_server);
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces(client);
 
     int i = -1;
     err = (erpc_status_t)-1;
@@ -190,6 +192,7 @@ int main(int argc, char **argv)
     return i;
 }
 
+extern "C" {
 void quitSecondInterfaceServer()
 {
     // removing SecondInterface service from the server
@@ -197,4 +200,5 @@ void quitSecondInterfaceServer()
     // Stop server part
     g_server.stop();
     increaseWaitQuit();
+}
 }

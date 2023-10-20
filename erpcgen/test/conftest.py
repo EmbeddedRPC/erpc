@@ -284,8 +284,8 @@ class CCompiler(object):
         # Enable all warnings except for unused functions.
         defaultArgs = ["-c", "-Wall", "-Werror", "-Wno-unused-function"]
         defaultArgs += self._args
-        argsCC = [self._pathCC, "-std=gnu11"] + defaultArgs
-        argsCXX = [self._pathCXX, "-std=gnu++11"] + defaultArgs
+        argsCC = [self._pathCC, "-std=gnu17"] + defaultArgs
+        argsCXX = [self._pathCXX, "-std=gnu++17"] + defaultArgs
 
         incl = []
         for i in self._includes:
@@ -294,15 +294,24 @@ class CCompiler(object):
         argsCXX += incl
         argsCC += incl
 
+        hasCSource = False
+        hasCppSource = False
         for s in self._sources:
             if str(s).split(".")[-1] == "cpp":
                 argsCXX.append(str(s))
+                hasCppSource = True
             else:
                 argsCC.append(str(s))
+                hasCSource = True
 
-        output = [_run(self._cwd, captureOutput, pytestConfig, argsCC, "C")]
-        output.append(_run(self._cwd, captureOutput,
-                      pytestConfig, argsCXX, "CXX"))
+        output = []
+
+        if hasCSource:
+            output.append(_run(self._cwd, captureOutput,
+                          pytestConfig, argsCC, "C"))
+        if hasCppSource:
+            output.append(_run(self._cwd, captureOutput,
+                               pytestConfig, argsCXX, "CXX"))
 
         return output
 
@@ -481,28 +490,57 @@ class ErpcgenCompileTest(object):
         pass
 
 
-class ErpcgenCCompileTest(ErpcgenCompileTest):
-    # @brief Tests that generated C code will compile successfully.
-    #
-    # An objects directory is created under the test case directory. It is used to hold the
-    # .o files written by the compiler. A .c file with the main() function is also written to
-    # the objects directory.
+class ErpcgenCCppCompileTest(ErpcgenCompileTest):
+    # @brief Compile with C and CPP main.
 
+    def __init__(self, spec: ErpcgenTestSpec, name: str, caseDir: str, outDir: str):
+        super(ErpcgenCCppCompileTest, self).__init__(
+            spec, name, caseDir, outDir)
+        self._caseDir = caseDir
+        self._out_dir = outDir
+
+    def run(self):
+        ErpcgenCCompileTest(self._caseDir, self._out_dir).run()
+        ErpcgenCppCompileTest(self._caseDir, self._out_dir).run()
+
+
+class ErpcgenCCppCompileTestCommon(object):
     MAIN_CODE = textwrap.dedent("""
         int main(void) {
             return 0;
         }
         """)
 
-    def __init__(self, spec: ErpcgenTestSpec, name: str, caseDir: str, outDir: str):
-        super(ErpcgenCCompileTest, self).__init__(spec, name, caseDir, outDir)
-        self._objs_dir = caseDir.mkdir(OBJECTS_DIR_NAME)
-        self._compiler = CCompiler(self._objs_dir)
+    def __init__(self, outDir: str):
+        self._out_dir = outDir
+        self._objs_dir = None
+        self._compiler = None
+
+    def getMainSourceCode(self):
+        raise ErpcgenTestException(
+            "Missing implementation for getting main source code")
+
+    def getMainFilename(self):
+        raise ErpcgenTestException(
+            "Missing implementation for getting main filename")
+
+    def getObjectsDir(self):
+        raise ErpcgenTestException(
+            "Missing implementation for getting objects dir")
+
+    def getCompiler(self):
+        raise ErpcgenTestException(
+            "Missing implementation for getting compiler")
+
 
     def run(self):
         # TODO run compiler tests on Windows
         if sys.platform == 'win32':
             return
+
+        self._compiler = self.getCompiler()
+
+        self._objs_dir = self.getObjectsDir()
 
         # Add include directories.
         self._compiler.add_include(erpc_dir.join("erpc_c", "port"))
@@ -515,19 +553,68 @@ class ErpcgenCCompileTest(ErpcgenCompileTest):
             if '.cpp' in file:
                 self._compiler.add_source(self._out_dir.join(file))
 
-        # Add all header includes into main code
-        headers = ['#include "'+f +
-                   '"' for f in os.listdir(str(self._out_dir)) if '.h' in f]
-        self.MAIN_CODE = '\n'.join(headers) + self.MAIN_CODE
-
-        # Add both .c and .cpp copies of the main file.
-        for main_filename in ("main_c.c", "main_cxx.cpp"):
-            main = self._objs_dir.join(main_filename)
-            main.write(self.MAIN_CODE)
-            self._compiler.add_source(main)
+        mainCode = self.getMainSourceCode()
+        mainFilename = self.getMainFilename()
+        main = self._objs_dir.join(mainFilename)
+        main.write(mainCode)
+        self._compiler.add_source(main)
 
         # Run the compiler.
         self._compiler.run()
+
+
+class ErpcgenCCompileTest(ErpcgenCCppCompileTestCommon):
+    # @brief Tests that generated C code will compile successfully.
+    #
+    # An objects directory is created under the test case directory. It is used to hold the
+    # .o files written by the compiler. A .c file with the main() function is also written to
+    # the objects directory.
+
+    def __init__(self, caseDir: str, outDir: str):
+        super(ErpcgenCCompileTest, self).__init__(outDir)
+        self._objs_dir = caseDir.mkdir(OBJECTS_DIR_NAME + "_c")
+        self._compiler = CCompiler(self._objs_dir)
+
+    def getMainSourceCode(self):
+        headers = ['#include "'+f +
+                   '"' for f in os.listdir(str(self._out_dir)) if f[-2:] == '.h']
+        return '\n'.join(headers) + self.MAIN_CODE
+
+    def getMainFilename(self):
+        return "main.c"
+
+    def getObjectsDir(self):
+        return self._objs_dir
+
+    def getCompiler(self):
+        return self._compiler
+
+
+class ErpcgenCppCompileTest(ErpcgenCCppCompileTestCommon):
+    # @brief Tests that generated Cpp code will compile successfully.
+    #
+    # An objects directory is created under the test case directory. It is used to hold the
+    # .o files written by the compiler. A .cpp file with the main() function is also written to
+    # the objects directory.
+
+    def __init__(self, caseDir: str, outDir: str):
+        super(ErpcgenCppCompileTest, self).__init__(outDir)
+        self._objs_dir = caseDir.mkdir(OBJECTS_DIR_NAME + "_cpp")
+        self._compiler = CCompiler(self._objs_dir)
+
+    def getMainSourceCode(self):
+        headers = ['#include "'+f +
+                   '"' for f in os.listdir(str(self._out_dir)) if f[-4:] == '.hpp']
+        return '\n'.join(headers) + self.MAIN_CODE
+
+    def getMainFilename(self):
+        return "main.cpp"
+
+    def getObjectsDir(self):
+        return self._objs_dir
+
+    def getCompiler(self):
+        return self._compiler
 
 
 class ErpcgenPythonCompileTest(ErpcgenCompileTest):
@@ -572,7 +659,7 @@ class ErpcgenTestCase(object):
 
     # Map of language names to compilation test classes.
     COMPILE_TEST_CLASSES = {
-        'c':   ErpcgenCCompileTest,
+        'c':   ErpcgenCCppCompileTest,
         'py':  ErpcgenPythonCompileTest,
     }
 

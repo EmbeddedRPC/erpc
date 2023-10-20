@@ -156,6 +156,9 @@
     <ClInclude Include="..\src\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\JavaGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -164,13 +167,34 @@
     <ClCompile Include="..\src\cpptemplate\cpptempl.cpp">
       <Filter>Source Files\cpptemplate</Filter>
     </ClCompile>
-    <ClCompile Include="c_client_source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_coders.cpp">
+    <ClCompile Include="cpp_coders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_common_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_interface_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_interface_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_client_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_client_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_server_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_server_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_server_header.cpp">
@@ -254,7 +278,7 @@
     <ClCompile Include="..\src\UniqueIdChecker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="c_common_functions.cpp">
+    <ClCompile Include="cpp_common_functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="py_interface.cpp">
@@ -270,6 +294,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\JavaGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_coders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_enum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_struct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="java_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

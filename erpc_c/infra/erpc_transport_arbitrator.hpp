@@ -65,7 +65,7 @@ public:
      *
      * @return Transport * Returns shared client/server transport.
      */
-    Transport *getSharedTransport(void) { return m_sharedTransport; }
+    Transport * getSharedTransport(void) { return m_sharedTransport; }
 
     /*!
      * @brief This function set codec.
@@ -79,7 +79,7 @@ public:
      *
      * @return Codec * Pointer to codec used within transport.
      */
-    Codec *getCodec(void) { return m_codec; }
+    Codec * getCodec(void) { return m_codec; }
 
     /*!
      * @brief Prototype for receiving message.
@@ -140,7 +140,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 *getCrc16(void) override;
+    virtual Crc16 * getCrc16(void) override;
 
     /*!
      * @brief Check if the underlying shared transport has a message

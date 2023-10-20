@@ -14,9 +14,11 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
+
+#include "c_test_firstInterface_server.h"
+#include "c_test_secondInterface_client.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -155,6 +157,7 @@ void runInit(void *arg)
 
     // eRPC client side initialization
     client = erpc_arbitrated_client_init(transportClient, message_buffer_factory, &transportServer);
+    initInterfaces(client);
 
     // eRPC server side initialization
     server = erpc_server_init(transportServer, message_buffer_factory);
@@ -206,6 +209,7 @@ int main(void)
     }
 }
 
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;
@@ -234,6 +238,7 @@ void quitFirstInterfaceServer()
 void whenReady()
 {
     waitClient++;
+}
 }
 
 int testClient()

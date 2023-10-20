@@ -34,7 +34,7 @@ public:
      * @param[in] elementType Given data type.
      */
     explicit ListType(DataType *elementType)
-    : DataType("(list)", kListType)
+    : DataType("(list)", data_type_t::kListType)
     , m_elementType(elementType)
     , m_lengthVariableName("")
     {

@@ -10,8 +10,8 @@
 #ifndef _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 #define _EMBEDDED_RPC__CLIENTSERVERCOMMON_H_
 
-#include "erpc_config_internal.h"
 #include "erpc_codec.hpp"
+#include "erpc_config_internal.h"
 #if ERPC_MESSAGE_LOGGING
 #include "erpc_message_loggers.hpp"
 #endif
@@ -66,7 +66,7 @@ public:
 #endif
 #if ERPC_MESSAGE_LOGGING
 #ifdef ERPC_OTHER_INHERITANCE
-        ,
+    ,
 #else
 #define ERPC_OTHER_INHERITANCE 1
     :
@@ -75,7 +75,7 @@ public:
 #endif
 #if ERPC_PRE_POST_ACTION
 #ifdef ERPC_OTHER_INHERITANCE
-            ,
+    ,
 #else
 #define ERPC_OTHER_INHERITANCE 1
     :
@@ -83,12 +83,15 @@ public:
         PrePostAction()
 #endif
 #ifdef ERPC_OTHER_INHERITANCE
-            ,
+    ,
 #else
 #define ERPC_OTHER_INHERITANCE 1
     :
 #endif
-        m_messageFactory(NULL), m_codecFactory(NULL), m_transport(NULL){};
+    m_messageFactory(NULL)
+    , m_codecFactory(NULL)
+    , m_transport(NULL)
+            {};
 
     /*!
      * @brief ClientServerCommon destructor

@@ -38,7 +38,7 @@ public:
      *
      * @param[in] def Interface definition variable.
      */
-    void makeIdsUnique(erpcgen::InterfaceDefinition &def);
+    void makeIdsUnique(InterfaceDefinition &def);
 
 private:
     /*!
@@ -46,14 +46,14 @@ private:
      *
      * @param[in] ifaces Vector of interfaces.
      */
-    void initUsedInterfaceIds(erpcgen::SymbolScope::symbol_vector_t ifaces);
+    void initUsedInterfaceIds(SymbolScope::symbol_vector_t ifaces);
 
     /*!
      * @brief This function will go through interface functions and set initial value of id number.
      *
      * @param[in] iface Interface.
      */
-    void initUsedFunctionIds(erpcgen::Interface *iface);
+    void initUsedFunctionIds(Interface *iface);
 
     /*!
      * @brief This helper function sets a function symbol's unique id from the specified annotation.

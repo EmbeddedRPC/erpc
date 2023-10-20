@@ -12,6 +12,7 @@
 @c:output_dir("erpc_outputs/") // testing directory with slash on end
 @c:include("addOne.hpp")
 @c:include("external.h")
+@java:include("com.nxp.erpc.tests.common.myEnum")
 program test;
 import "../common/unit_test_common.erpc"
 

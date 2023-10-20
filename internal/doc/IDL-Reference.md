@@ -220,14 +220,15 @@ type _aliasName_ = int32[20] | typedef int32_t _aliasName_[20];
 ### Built-in types
 The built-in atomic types convert to standard integer types. The string type converts directly to a char*.
 
-| IDL definition | C definition | IDL definition | C definition
----|---|---|---
-bool | bool | uint8 | uint8_t
-int8 | int8_t | uint16 | uint16_t
-int16 | int16_t | uint32 | uint32_t
-int32 | int32_t | uint64 | uint64_t
-int64 | int64_t | float | float
-string |  char* | double | double
+| IDL definition | C definition | Java definition | IDL definition | C definition | Java definition   |
+-----------------|--------------|-----------------|----------------|--------------|-------------------|
+ bool            | bool         | Boolean         |  uint8         | uint8_t      | short*            |
+ int8            | int8_t       | byte            |  uint16        | uint16_t     | int*              |
+ int16           | int16_t      | short           |  uint32        | uint32_t     | long*             |
+ int32           | int32_t      | int             |  uint64        | uint64_t     | **_Unsupported_** |
+ int64           | int64_t      | long            |  float         | float        | float             |
+ string          | char*        | String          |  double        | double       | double            |
+*Java uses larger data types to store unsigned numbers, verifying their range during encoding and decoding.  
 
 #### Strings and UTF-8
 The string length is determined by the terminating null byte, which means that no null characters may be included in the middle of the string. The major impact of this is that UTF-8 is not fully supported. If the arbitrary UTF-8 text is intended to be transferred, then the binary type must be used.
@@ -280,6 +281,18 @@ typedef enum enumColor {
 } enumColor;
 
 ```
+
+#### Java definition
+```Java
+public enum enumColor{
+    red(1), 
+    green(10), 
+    blue(20);
+
+    public int getValue() { ... }
+    public static enumColor get(int value) { ... }
+}
+```
 ##### Supported annotations
 ```
 @name(string)
@@ -310,6 +323,30 @@ Two helper functions are generated for encoding and decoding structures. The pro
   * ``int32_t write_<struct_typename>_struct(erpc::Codec * out, <struct_typename> * data);``
 
 For all functions that either _return a structure_ or _pass a structure as a parameter_, those functions expect a pointer to the structure type.
+
+#### Java definition
+```Java
+public class A{
+    private int a;
+    private Reference<Float> b;
+
+    public A (int a, Reference<Float> b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    public A() {
+    }
+    
+    public int get_a() { ... }
+
+    public void set_a(int a) { ... }
+
+    public Reference<Float> get_b() { ... }
+
+    public void set_b(Reference<Float> b) { ... }
+}
+```
 
 #### Supported annotations
 ```
@@ -471,6 +508,9 @@ Type definitions for the list structures are generated in a separate _forward de
 
 For simplicity, the names of the synthesized list structures are currently set to "list_x_y_t", where x is base type and  y is a unique integer. It is recommended to create a type alias to define a user-friendly name for the list structure. The issue is that the list structure names _that include an element type description_ could potentially become excessively long.
 
+Java use interface `List<T>` as default list type. Server side use `ArrayList<>()` as default implementation of the 
+`List<T>`. It is possible to use any implementation of `List<T>`.
+
 #### Supported annotations
 ```
 @length
@@ -482,10 +522,10 @@ For simplicity, the names of the synthesized list structures are currently set t
 ### Arrays
 The IDL type representation for this type is ``typeName[N] variableName``, where ``N`` is an integer constant expression.
 
-| IDL definition | C definition |
----|---
-int32[10] variable | int32_t variable[10];
-int32[10][6] variable | int32_t variable[10][6];
+| IDL definition       | C definition             | Java definition                    |
+-----------------------|--------------------------|------------------------------------|
+ int32[10] variable    | int32_t variable[10];    | int[] variable = new int[10];      |
+ int32[10][6] variable | int32_t variable[10][6]; | int[][] variable = new int[10][6]; |
 
 #### IDL definition
 ```C
@@ -537,6 +577,8 @@ The IDL supports declarations of constants. These constants are replicated in th
 
 String constant prototype: ``const string kVersion = stringValue``
 
+Java stores all constants in class ``common.Constants``.
+
 ## Generating functions based on parameter direction and return value
 Supported keywords for parameter directions are: ``in``, ``out``, and ``inout``. These keywords are used to specify the parameter direction type. The direction keywords are placed before the parameter type. If the direction for a parameter is not specified, then it is the ``in`` direction.
 
@@ -563,6 +605,8 @@ Data type | in | out | inout | Returns |
 
 If a type definition is used, then all pointers are generated as shown in the two previous tables. Instead of these types, the type definition name is used.
 The variable needs to have a set annotation to work for some cases. For example, ``out string`` need set `, and `@max_length`` annotation inform the server the how much memory space needs to be allocated for the string. This size should be allocated by the client on the client side, and is filled by shim code.
+
+Java use ``Reference<T>`` for `out` and `inout` parameters. `Reference<T>` has two methods `public T get() {}` and `public void set(T newVal) {}`.
 
 ### Allocating and freeing space policy
 * **On the client side:** All memory space has to be allocated and provided by the user code. The shim code only reads from or writes into this memory space.

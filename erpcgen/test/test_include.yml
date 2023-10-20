@@ -21,24 +21,5 @@ idl: |
   interface foo {
     bar(in string x) -> void
   }
-test.h:
+test_common.h:
   - '#include "stdio.h"'
----
-name: C include two interfaces
-desc:
-idl: |
-  program test;
-
-  @include("stdio.h")
-  @include("stdio.h")
-  interface fooA {
-    barA(in string xA) -> void
-  }
-
-  @include("stdio.h")
-  interface fooB {
-    barB(in string xB) -> void
-  }
-test_server.cpp:
-  - '#include "stdio.h"'
-  - not: '#include "stdio.h"'

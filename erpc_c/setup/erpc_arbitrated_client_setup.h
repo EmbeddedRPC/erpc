@@ -66,7 +66,8 @@ extern "C" {
  *
  * @return erpc_client_t Pointer to client structure.
  */
-erpc_client_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory, erpc_transport_t *arbitrator);
+erpc_client_t erpc_arbitrated_client_init(erpc_transport_t transport, erpc_mbf_t message_buffer_factory,
+                                          erpc_transport_t *arbitrator);
 
 /*!
  * @brief This function sets error handler function.

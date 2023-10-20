@@ -175,7 +175,7 @@ void ClientManager::verifyReply(RequestContext &request)
     if (request.getCodec()->isStatusOk() == true)
     {
         // Verify that this is a reply to the request we just sent.
-        if ((msgType != kReplyMessage) || (sequence != request.getSequence()))
+        if ((msgType != message_type_t::kReplyMessage) || (sequence != request.getSequence()))
         {
             request.getCodec()->updateStatus(kErpcStatus_ExpectedReply);
         }

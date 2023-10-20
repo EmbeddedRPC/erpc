@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  *
@@ -28,11 +28,12 @@ namespace erpcgen {
 class Annotation
 {
 public:
-    enum program_lang_t
+    enum class program_lang_t
     {
         kAll,
         kC,
-        kPython
+        kPython,
+        kJava
     };
 
     /*!
@@ -63,7 +64,7 @@ public:
     : m_name(token.getStringValue())
     , m_value(nullptr)
     , m_location(token.getLocation())
-    , m_lang(kAll)
+    , m_lang(program_lang_t::kAll)
     {
     }
 

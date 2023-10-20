@@ -4,12 +4,17 @@ erpcgen_parser.tab.cpp
 erpcgen_parser.tab.hpp
 
 # templates
-c_client_source.cpp
-c_coders.cpp
+cpp_client_source.cpp
+cpp_client_header.cpp
+cpp_server_header.cpp
+cpp_server_source.cpp
+cpp_coders.cpp
 c_common_header.cpp
+c_client_source.cpp
+c_client_header.cpp
 c_server_header.cpp
 c_server_source.cpp
-c_common_functions.cpp
+cpp_common_functions.cpp
 c_defines.cpp
 c_crc.cpp
 py_client.cpp
@@ -19,6 +24,7 @@ py_init.cpp
 py_server.cpp
 py_interface.cpp
 py_global_init.cpp
+java_*.cpp
 
 # win flex-bison files
 data

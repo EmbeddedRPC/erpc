@@ -27,7 +27,7 @@ namespace erpc {
 /*!
  * @brief Values of the uint8 flag prefixing nullable values.
  */
-enum _null_flag
+enum class null_flag_t
 {
     kNotNull = 0,
     kIsNull
@@ -189,23 +189,6 @@ public:
      * @param[in] isNull Null flag to send.
      */
     virtual void writeNullFlag(bool isNull) override;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[in] callback Callback which ID should be serialized.
-     */
-    virtual void writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback) override;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which ID should be serialized.
-     */
-    virtual void writeCallback(funPtr callback1, funPtr callback2) override;
     //@}
 
     //! @name Decoding
@@ -350,23 +333,6 @@ public:
      * @param[in] isNull Null flag to read.
      */
     virtual void readNullFlag(bool &isNull) override;
-
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[out] callback Callback which is deserialized. Null in case of error.
-     */
-    virtual void readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback) override;
-
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which is deserialized.
-     */
-    virtual void readCallback(funPtr callbacks1, funPtr *callback2) override;
     //@}
 };
 

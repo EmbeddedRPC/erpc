@@ -24,7 +24,7 @@ namespace erpcgen {
 /*!
  *  @brief Supported directions types.
  */
-enum _param_direction
+enum class param_direction_t
 {
     kInDirection,
     kOutDirection,
@@ -47,7 +47,7 @@ public:
      * @param[in] dataType Given data type.
      */
     StructMember(const std::string &name, DataType *dataType)
-    : Symbol(kStructMemberSymbol, name)
+    : Symbol(symbol_type_t::kStructMemberSymbol, name)
     , m_dataType(dataType)
     , m_paramDirection()
     , m_containList()
@@ -65,7 +65,7 @@ public:
      * @param[in] dataType Given data type.
      */
     StructMember(const Token &tok, DataType *dataType)
-    : Symbol(kStructMemberSymbol, tok)
+    : Symbol(symbol_type_t::kStructMemberSymbol, tok)
     , m_dataType(dataType)
     , m_paramDirection()
     , m_containList()
@@ -111,7 +111,7 @@ public:
      *
      * @param[in] paramDirection Define direction type for parameter in functions.
      */
-    void setDirection(_param_direction paramDirection) { m_paramDirection = paramDirection; }
+    void setDirection(param_direction_t paramDirection) { m_paramDirection = paramDirection; }
 
     /*!
      * @brief This function returns routing for parameter.
@@ -120,7 +120,7 @@ public:
      *
      * @return Returns routing type for parameter in functions.
      */
-    _param_direction getDirection() const { return m_paramDirection; }
+    param_direction_t getDirection() const { return m_paramDirection; }
 
     /*!
      * @brief This function set information about if member contains list data type.
@@ -165,11 +165,11 @@ public:
     void setByref(bool byref) { m_byref = byref; }
 
 protected:
-    DataType *m_dataType;              /*!< Struct member data type. */
-    _param_direction m_paramDirection; /*!< Direction in which is member used. */
-    bool m_containList;                /*!< True when member contains list type */
-    bool m_containString;              /*!< True when member contains string type */
-    bool m_byref;                      /*!< True when member is byref type */
+    DataType *m_dataType;               /*!< Struct member data type. */
+    param_direction_t m_paramDirection; /*!< Direction in which is member used. */
+    bool m_containList;                 /*!< True when member contains list type */
+    bool m_containString;               /*!< True when member contains string type */
+    bool m_byref;                       /*!< True when member is byref type */
 };
 
 } // namespace erpcgen

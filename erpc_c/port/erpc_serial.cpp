@@ -135,7 +135,7 @@ int serial_setup(int fd, speed_t speed)
 
 #ifdef __APPLE__
     return ioctl(fd, IOSSIOSPEED, &speed);
-#endif //#ifdef __APPLE__
+#endif // #ifdef __APPLE__
 
 #endif // _WIN32
     return 0;

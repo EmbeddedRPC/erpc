@@ -97,12 +97,19 @@
       </Inputs>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
-python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
+      <Command>python.exe ..\bin\txt_to_c.py --output .\cpp_coders.cpp ..\src\templates\cpp_coders.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_header.cpp ..\src\templates\cpp_interface_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_source.cpp ..\src\templates\cpp_interface_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_client_header.cpp ..\src\templates\cpp_client_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_client_source.cpp ..\src\templates\cpp_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_server_source.cpp ..\src\templates\cpp_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_server_header.cpp ..\src\templates\cpp_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_header.cpp ..\src\templates\c_client_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
-python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_common_functions.cpp ..\src\templates\cpp_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
@@ -110,7 +117,14 @@ python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_commo
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
 python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
-python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template
+python.exe ..\bin\txt_to_c.py --output .\java_coders.cpp ..\src\templates\java_coders.template
+python.exe ..\bin\txt_to_c.py --output .\java_enum.cpp ..\src\templates\java_enum.template
+python.exe ..\bin\txt_to_c.py --output .\java_interface.cpp ..\src\templates\java_interface.template
+python.exe ..\bin\txt_to_c.py --output .\java_struct.cpp ..\src\templates\java_struct.template
+python.exe ..\bin\txt_to_c.py --output .\java_server.cpp ..\src\templates\java_server.template
+python.exe ..\bin\txt_to_c.py --output .\java_client.cpp ..\src\templates\java_client.template
+python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,12 +151,19 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>python.exe ..\bin\txt_to_c.py --output .\c_coders.cpp ..\src\templates\c_coders.template
-python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
+      <Command>python.exe ..\bin\txt_to_c.py --output .\cpp_coders.cpp ..\src\templates\cpp_coders.template
 python.exe ..\bin\txt_to_c.py --output .\c_common_header.cpp ..\src\templates\c_common_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_header.cpp ..\src\templates\cpp_interface_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_interface_source.cpp ..\src\templates\cpp_interface_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_client_header.cpp ..\src\templates\cpp_client_header.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_client_source.cpp ..\src\templates\cpp_client_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_server_source.cpp ..\src\templates\cpp_server_source.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_server_header.cpp ..\src\templates\cpp_server_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_header.cpp ..\src\templates\c_client_header.template
+python.exe ..\bin\txt_to_c.py --output .\c_client_source.cpp ..\src\templates\c_client_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_source.cpp ..\src\templates\c_server_source.template
 python.exe ..\bin\txt_to_c.py --output .\c_server_header.cpp ..\src\templates\c_server_header.template
-python.exe ..\bin\txt_to_c.py --output .\c_common_functions.cpp ..\src\templates\c_common_functions.template
+python.exe ..\bin\txt_to_c.py --output .\cpp_common_functions.cpp ..\src\templates\cpp_common_functions.template
 python.exe ..\bin\txt_to_c.py --output .\c_crc.cpp ..\src\templates\c_crc.template
 python.exe ..\bin\txt_to_c.py --output .\py_client.cpp ..\src\templates\py_client.template
 python.exe ..\bin\txt_to_c.py --output .\py_coders.cpp ..\src\templates\py_coders.template
@@ -150,7 +171,14 @@ python.exe ..\bin\txt_to_c.py --output .\py_common.cpp ..\src\templates\py_commo
 python.exe ..\bin\txt_to_c.py --output .\py_init.cpp ..\src\templates\py_init.template
 python.exe ..\bin\txt_to_c.py --output .\py_interface.cpp ..\src\templates\py_interface.template
 python.exe ..\bin\txt_to_c.py --output .\py_server.cpp ..\src\templates\py_server.template
-python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_global_init.template
+python.exe ..\bin\txt_to_c.py --output .\java_coders.cpp ..\src\templates\java_coders.template
+python.exe ..\bin\txt_to_c.py --output .\java_enum.cpp ..\src\templates\java_enum.template
+python.exe ..\bin\txt_to_c.py --output .\java_interface.cpp ..\src\templates\java_interface.template
+python.exe ..\bin\txt_to_c.py --output .\java_struct.cpp ..\src\templates\java_struct.template
+python.exe ..\bin\txt_to_c.py --output .\java_server.cpp ..\src\templates\java_server.template
+python.exe ..\bin\txt_to_c.py --output .\java_client.cpp ..\src\templates\java_client.template
+python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template</Command>
     </PreBuildEvent>
     <Flex>
       <OutputFile>$(ProjectDir)\%(Filename).flex.cpp</OutputFile>
@@ -166,6 +194,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClInclude Include="..\src\annotations.h" />
     <ClInclude Include="..\src\format_string.hpp" />
     <ClInclude Include="..\src\HexValues.hpp" />
+    <ClInclude Include="..\src\JavaGenerator.hpp" />
     <ClInclude Include="..\src\Logging.hpp" />
     <ClInclude Include="..\src\options.hpp" />
     <ClInclude Include="..\src\SearchPath.hpp" />
@@ -211,6 +240,7 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="..\..\erpc_c\infra\erpc_crc16.cpp" />
     <ClCompile Include="..\src\format_string.cpp" />
     <ClCompile Include="..\src\HexValues.cpp" />
+    <ClCompile Include="..\src\JavaGenerator.cpp" />
     <ClCompile Include="..\src\Logging.cpp" />
     <ClCompile Include="..\src\options.cpp" />
     <ClCompile Include="..\src\SearchPath.cpp" />
@@ -229,17 +259,31 @@ python.exe ..\bin\txt_to_c.py --output .\py_global_init.cpp ..\src\templates\py_
     <ClCompile Include="..\src\types\Type.cpp" />
     <ClCompile Include="..\src\UniqueIdChecker.cpp" />
     <ClCompile Include="..\src\Utils.cpp" />
-    <ClCompile Include="c_client_source.cpp" />
-    <ClCompile Include="c_coders.cpp" />
+    <ClCompile Include="cpp_coders.cpp" />
     <ClCompile Include="c_common_header.cpp" />
     <ClCompile Include="c_crc.cpp" />
+    <ClCompile Include="cpp_interface_header.cpp" />
+    <ClCompile Include="cpp_interface_source.cpp" />
+    <ClCompile Include="cpp_client_header.cpp" />
+    <ClCompile Include="cpp_client_source.cpp" />
+    <ClCompile Include="cpp_server_header.cpp" />
+    <ClCompile Include="cpp_server_source.cpp" />
+    <ClCompile Include="c_client_header.cpp" />
+    <ClCompile Include="c_client_source.cpp" />
     <ClCompile Include="c_server_header.cpp" />
     <ClCompile Include="c_server_source.cpp" />
-    <ClCompile Include="c_common_functions.cpp" />
+    <ClCompile Include="cpp_common_functions.cpp" />
     <ClCompile Include="erpcgen_lexer.flex.cpp">
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4005;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="erpcgen_parser.tab.cpp" />
+    <ClCompile Include="java_client.cpp" />
+    <ClCompile Include="java_coders.cpp" />
+    <ClCompile Include="java_const.cpp" />
+    <ClCompile Include="java_enum.cpp" />
+    <ClCompile Include="java_interface.cpp" />
+    <ClCompile Include="java_server.cpp" />
+    <ClCompile Include="java_struct.cpp" />
     <ClCompile Include="py_client.cpp" />
     <ClCompile Include="py_coders.cpp" />
     <ClCompile Include="py_common.cpp" />

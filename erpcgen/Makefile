@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Copyright (C) 2014-2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
+# Copyright 2016-2023 NXP
 # All rights reserved.
 #
 # THIS SOFTWARE IS PROVIDED BY FREESCALE "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -56,6 +56,7 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 			$(ERPC_ROOT)/erpcgen/src/UniqueIdChecker.cpp \
 			$(ERPC_ROOT)/erpcgen/src/CGenerator.cpp \
 			$(ERPC_ROOT)/erpcgen/src/PythonGenerator.cpp \
+			$(ERPC_ROOT)/erpcgen/src/JavaGenerator.cpp \
 			$(ERPC_ROOT)/erpcgen/src/erpcgen.cpp \
 			$(ERPC_ROOT)/erpcgen/src/ErpcLexer.cpp \
 			$(ERPC_ROOT)/erpcgen/src/Generator.cpp \
@@ -71,11 +72,18 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
 .SECONDARY: $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen_lexer.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
@@ -83,14 +91,28 @@ SOURCES += $(OBJS_ROOT)/erpcgen_parser.tab.cpp \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_struct.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_server.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_interface.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_enum.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_const.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_client.c \
 
 SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_interface_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_client_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_header.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_server_source.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/cpp_common_functions.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/c_client_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_client_source.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_server_source.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/c_common_functions.c \
             $(OBJS_ROOT)/erpcgen/src/templates/c_crc.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_init.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_common.c \
@@ -98,7 +120,14 @@ SOURCES +=  $(OBJS_ROOT)/erpcgen/src/templates/c_common_header.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_server.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_interface.c \
             $(OBJS_ROOT)/erpcgen/src/templates/py_coders.c \
-            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c
+            $(OBJS_ROOT)/erpcgen/src/templates/py_global_init.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_struct.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_server.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_interface.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_enum.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_const.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_coders.c \
+            $(OBJS_ROOT)/erpcgen/src/templates/java_client.c \
 
 OBJECT_DEP := $(OBJS_ROOT)/erpcgen_lexer.cpp
 

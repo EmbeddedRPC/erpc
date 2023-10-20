@@ -12,12 +12,14 @@
 #include "erpc_transport_setup.h"
 
 #include "FreeRTOS.h"
-#include "gtest.h"
 #include "semphr.h"
 #include "task.h"
-#include "test_firstInterface.h"
-#include "test_secondInterface_server.h"
+
+#include "c_test_firstInterface_client.h"
+#include "c_test_secondInterface_server.h"
+#include "gtest.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -165,6 +167,7 @@ void runInit(void *arg)
 
     // eRPC client side initialization
     client = erpc_arbitrated_client_init(transportClient, message_buffer_factory, &transportServer);
+    initInterfaces(client);
 
     // eRPC server side initialization
     server = erpc_server_init(transportServer, message_buffer_factory);
@@ -237,8 +240,8 @@ int main(void)
 {
     int fake_argc = 1;
     const auto fake_arg0 = "dummy";
-    char* fake_argv0 = const_cast<char*>(fake_arg0);
-    char** fake_argv = &fake_argv0;
+    char *fake_argv0 = const_cast<char *>(fake_arg0);
+    char **fake_argv = &fake_argv0;
     ::testing::InitGoogleTest(&fake_argc, fake_argv);
     BOARD_InitHardware();
 
@@ -271,6 +274,7 @@ int main(void)
     }
 }
 
+extern "C" {
 void quitSecondInterfaceServer()
 {
     /* removing the service from the server */
@@ -280,4 +284,5 @@ void quitSecondInterfaceServer()
     // Stop server part
     erpc_server_stop(server);
     increaseWaitQuit();
+}
 }

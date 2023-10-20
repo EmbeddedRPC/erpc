@@ -158,38 +158,7 @@ void BasicCodec::startWriteUnion(int32_t discriminator)
 
 void BasicCodec::writeNullFlag(bool isNull)
 {
-    write(static_cast<uint8_t>(isNull ? kIsNull : kNotNull));
-}
-
-void BasicCodec::writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback)
-{
-    uint8_t i;
-
-    erpc_assert(callbacksCount > 1U);
-
-    // callbacks = callbacks table
-    for (i = 0; i < callbacksCount; i++)
-    {
-        if (callbacks[i] == callback)
-        {
-            write(i);
-            break;
-        }
-        if ((i + 1U) == callbacksCount)
-        {
-            updateStatus(kErpcStatus_UnknownCallback);
-        }
-    }
-}
-
-void BasicCodec::writeCallback(funPtr callback1, funPtr callback2)
-{
-    // callbacks = callback directly
-    // When declared only one callback function no serialization is needed.
-    if (callback1 != callback2)
-    {
-        updateStatus(kErpcStatus_UnknownCallback);
-    }
+    write(static_cast<uint8_t>(isNull ? null_flag_t::kIsNull : null_flag_t::kNotNull));
 }
 
 void BasicCodec::startReadMessage(message_type_t &type, uint32_t &service, uint32_t &request, uint32_t &sequence)
@@ -392,36 +361,8 @@ void BasicCodec::readNullFlag(bool &isNull)
     read(flag);
     if (isStatusOk())
     {
-        isNull = (flag == (uint8_t)kIsNull);
+        isNull = (flag == static_cast<uint8_t>(null_flag_t::kIsNull));
     }
-}
-
-void BasicCodec::readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback)
-{
-    uint8_t _tmp_local;
-
-    erpc_assert(callbacksCount > 1U);
-
-    // callbacks = callbacks table
-    read(_tmp_local);
-    if (isStatusOk())
-    {
-        if (_tmp_local < callbacksCount)
-        {
-            *callback = callbacks[_tmp_local];
-        }
-        else
-        {
-            *callback = NULL;
-            m_status = kErpcStatus_UnknownCallback;
-        }
-    }
-}
-
-void BasicCodec::readCallback(funPtr callbacks1, funPtr *callback2)
-{
-    // callbacks = callback directly
-    *callback2 = callbacks1;
 }
 
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT);

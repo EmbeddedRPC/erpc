@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cstdio>
 #include "erpc_spi_master_transport.hpp"
+
+#include <cstdio>
 
 extern "C" {
 #include "board.h"

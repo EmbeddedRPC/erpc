@@ -123,7 +123,7 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
 
     if (err == kErpcStatus_Success)
     {
-        if (msgType != kOnewayMessage)
+        if (msgType != message_type_t::kOnewayMessage)
         {
 #if ERPC_MESSAGE_LOGGING
             err = logMessage(codec->getBuffer());
@@ -183,7 +183,7 @@ erpc_status_t SimpleServer::run(RequestContext &request)
             break;
         }
 
-        if (msgType == kReplyMessage)
+        if (msgType == message_type_t::kReplyMessage)
         {
             if (sequence == request.getSequence())
             {

@@ -29,7 +29,7 @@ public:
     /*!
      *  @brief Supported data types.
      */
-    enum data_type_t
+    enum class data_type_t
     {
         kAliasType,
         kArrayType,
@@ -50,7 +50,7 @@ public:
      * @param[in] dataType Given data type.
      */
     explicit DataType(data_type_t dataType)
-    : Symbol(kTypenameSymbol)
+    : Symbol(symbol_type_t::kTypenameSymbol)
     , m_dataType(dataType)
     {
     }
@@ -64,7 +64,7 @@ public:
      * @param[in] name Given name for symbol.
      */
     DataType(const std::string &name, data_type_t dataType)
-    : Symbol(kTypenameSymbol, name)
+    : Symbol(symbol_type_t::kTypenameSymbol, name)
     , m_dataType(dataType)
     {
     }
@@ -78,7 +78,7 @@ public:
      * @param[in] symbolType Given symbol type for symbol.
      */
     DataType(const Token &tok, data_type_t dataType)
-    : Symbol(kTypenameSymbol, tok)
+    : Symbol(symbol_type_t::kTypenameSymbol, tok)
     , m_dataType(dataType)
     {
     }
@@ -115,7 +115,7 @@ public:
      * @retval true When data type is AliasType.
      * @retval false When data type isn't AliasType.
      */
-    bool isAlias() const { return (m_dataType == kAliasType); }
+    bool isAlias() const { return (m_dataType == data_type_t::kAliasType); }
 
     /*!
      * @brief This function is testing data type.
@@ -123,7 +123,7 @@ public:
      * @retval true When data type is ArrayType.
      * @retval false When data type isn't ArrayType.
      */
-    bool isArray() const { return (m_dataType == kArrayType); }
+    bool isArray() const { return (m_dataType == data_type_t::kArrayType); }
 
     /*!
      * @brief This function return "false" value as default for identify binary type.
@@ -145,7 +145,7 @@ public:
      * @retval true When data type is BuiltinType.
      * @retval false When data type isn't BuiltinType.
      */
-    bool isBuiltin() const { return (m_dataType == kBuiltinType); }
+    bool isBuiltin() const { return (m_dataType == data_type_t::kBuiltinType); }
 
     /*!
      * @brief This function is testing data type.
@@ -153,7 +153,7 @@ public:
      * @retval true When data type is EnumTyp.
      * @retval false When data type isn't EnumTyp.
      */
-    bool isEnum() const { return (m_dataType == kEnumType); }
+    bool isEnum() const { return (m_dataType == data_type_t::kEnumType); }
 
     /*!
      * @brief This function is testing data type.
@@ -161,7 +161,7 @@ public:
      * @retval true When data type is FunctionType.
      * @retval false When data type isn't FunctionType.
      */
-    bool isFunction() const { return (m_dataType == kFunctionType); }
+    bool isFunction() const { return (m_dataType == data_type_t::kFunctionType); }
 
     /*!
      * @brief This function is testing data type.
@@ -169,7 +169,7 @@ public:
      * @retval true When data type is ListType.
      * @retval false When data type isn't ListType.
      */
-    bool isList() const { return (m_dataType == kListType); }
+    bool isList() const { return (m_dataType == data_type_t::kListType); }
 
     /*!
      * @brief This function return "false" value as default for identify scalar builtin type.
@@ -212,7 +212,7 @@ public:
      * @retval true When data type is StructType.
      * @retval false When data type isn't StructType.
      */
-    bool isStruct() const { return (m_dataType == kStructType); }
+    bool isStruct() const { return (m_dataType == data_type_t::kStructType); }
 
     /*!
      * @brief This function is testing data type.
@@ -220,7 +220,7 @@ public:
      * @retval true When data type is UnionType.
      * @retval false When data type isn't UnionType.
      */
-    bool isUnion() const { return (m_dataType == kUnionType); }
+    bool isUnion() const { return (m_dataType == data_type_t::kUnionType); }
 
     /*!
      * @brief This function is testing data type.
@@ -228,7 +228,7 @@ public:
      * @retval true When data type is VoidType.
      * @retval false When data type isn't VoidType.
      */
-    bool isVoid() const { return (m_dataType == kVoidType); }
+    bool isVoid() const { return (m_dataType == data_type_t::kVoidType); }
 
 protected:
     data_type_t m_dataType; /*!< Data type of current object */

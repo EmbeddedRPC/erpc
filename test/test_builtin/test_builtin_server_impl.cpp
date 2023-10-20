@@ -8,13 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 BuiltinServices_service *svc;
 
@@ -150,6 +153,94 @@ char *returnHello()
     return hello;
 }
 
+class BuiltinServices_server : public BuiltinServices_interface
+{
+public:
+    void test_int32_in(int32_t a) { ::test_int32_in(a); }
+
+    void test_int32_in2(int32_t b) { ::test_int32_in2(b); }
+
+    void test_int32_out(int32_t *c) { ::test_int32_out(c); }
+
+    void test_int32_inout(int32_t *e) { ::test_int32_inout(e); }
+
+    int32_t test_int32_return(void)
+    {
+        int32_t result;
+        result = ::test_int32_return();
+
+        return result;
+    }
+
+    int32_t test_int32_allDirection(int32_t a, int32_t b, int32_t *c, int32_t *e)
+    {
+        int32_t result;
+        result = ::test_int32_allDirection(a, b, c, e);
+
+        return result;
+    }
+
+    void test_float_inout(float a, float *b) { ::test_float_inout(a, b); }
+
+    void test_double_inout(double a, double *b) { ::test_double_inout(a, b); }
+
+    void test_string_in(const char *a) { ::test_string_in(a); }
+
+    void test_string_in2(const char *b) { ::test_string_in2(b); }
+
+    void test_string_out(char *c) { ::test_string_out(c); }
+
+    void test_string_inout(char *e) { ::test_string_inout(e); }
+
+    char *test_string_return(void)
+    {
+        char *result = NULL;
+        result = ::test_string_return();
+
+        return result;
+    }
+
+    char *test_string_allDirection(const char *a, const char *b, char *c, char *e)
+    {
+        char *result = NULL;
+        result = ::test_string_allDirection(a, b, c, e);
+
+        return result;
+    }
+
+    char *test_string_empty(const char *a, const char *b, char *c, char *e)
+    {
+        char *result = NULL;
+        result = ::test_string_empty(a, b, c, e);
+
+        return result;
+    }
+
+    int32_t sendHello(const char *str)
+    {
+        int32_t result;
+        result = ::sendHello(str);
+
+        return result;
+    }
+
+    int32_t sendTwoStrings(const char *myStr1, const char *myStr2)
+    {
+        int32_t result;
+        result = ::sendTwoStrings(myStr1, myStr2);
+
+        return result;
+    }
+
+    char *returnHello(void)
+    {
+        char *result = NULL;
+        result = ::returnHello();
+
+        return result;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +249,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new BuiltinServices_service();
+    svc = new BuiltinServices_service(new BuiltinServices_server());
 
     // add services
     server->addService(svc);
@@ -176,6 +267,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -193,12 +285,6 @@ void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
     destroy_BuiltinServices_service(service_test);
-}
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

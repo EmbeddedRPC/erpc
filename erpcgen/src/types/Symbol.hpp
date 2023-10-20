@@ -31,7 +31,7 @@ public:
     /*!
      *  @brief Supported symbol types.
      */
-    enum symbol_type_t
+    enum class symbol_type_t
     {
         kConstSymbol,
         kEnumMemberSymbol,
@@ -128,7 +128,7 @@ public:
      * @retval true When symbol is ConstSymbol.
      * @retval false When symbol isn't ConstSymbol.
      */
-    bool isConstSymbol() const { return (m_symbolType == kConstSymbol); }
+    bool isConstSymbol() const { return (m_symbolType == symbol_type_t::kConstSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -136,7 +136,7 @@ public:
      * @retval true When symbol is EnumMemberSymbol.
      * @retval false When symbol isn't EnumMemberSymbol.
      */
-    bool isEnumMemberSymbol() const { return (m_symbolType == kEnumMemberSymbol); }
+    bool isEnumMemberSymbol() const { return (m_symbolType == symbol_type_t::kEnumMemberSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -144,7 +144,7 @@ public:
      * @retval true When symbol is FunctionSymbol.
      * @retval false When symbol isn't FunctionSymbol.
      */
-    bool isFunctionSymbol() const { return (m_symbolType == kFunctionSymbol); }
+    bool isFunctionSymbol() const { return (m_symbolType == symbol_type_t::kFunctionSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -152,7 +152,7 @@ public:
      * @retval true When symbol is InterfaceSymbol.
      * @retval false When symbol isn't InterfaceSymbol.
      */
-    bool isInterfaceSymbol() const { return (m_symbolType == kInterfaceSymbol); }
+    bool isInterfaceSymbol() const { return (m_symbolType == symbol_type_t::kInterfaceSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -160,7 +160,7 @@ public:
      * @retval true When symbol is ProgramSymbol.
      * @retval false When symbol isn't ProgramSymbol.
      */
-    bool isProgramSymbol() const { return (m_symbolType == kProgramSymbol); }
+    bool isProgramSymbol() const { return (m_symbolType == symbol_type_t::kProgramSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -168,7 +168,7 @@ public:
      * @retval true When symbol is StructMemberSymbol.
      * @retval false When symbol isn't StructMemberSymbol.
      */
-    bool isStructMemberSymbol() const { return (m_symbolType == kStructMemberSymbol); }
+    bool isStructMemberSymbol() const { return (m_symbolType == symbol_type_t::kStructMemberSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -176,7 +176,7 @@ public:
      * @retval true When symbol is TypenameSymbol.
      * @retval false When symbol isn't TypenameSymbol.
      */
-    bool isDatatypeSymbol() const { return (m_symbolType == kTypenameSymbol); }
+    bool isDatatypeSymbol() const { return (m_symbolType == symbol_type_t::kTypenameSymbol); }
 
     /*!
      * @brief This function is testing symbol type.
@@ -184,7 +184,7 @@ public:
      * @retval true When symbol is UnionCaseMemberSymbol.
      * @retval false When symbol isn't UnionCaseMemberSymbol.
      */
-    bool isUnionCaseSymbol() const { return (m_symbolType == kUnionCaseMemberSymbol); }
+    bool isUnionCaseSymbol() const { return (m_symbolType == symbol_type_t::kUnionCaseMemberSymbol); }
 
     /*!
      * @brief This function returns location for symbol.

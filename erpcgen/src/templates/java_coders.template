@@ -1,0 +1,236 @@
+{##################################################################################}
+{################################### DECODING #####################################}
+{##################################################################################}
+
+{############################### decodeBuiltinType ###############################}
+{% def decodeBuiltinType(info) --------------- BuiltinType %}
+{% if info.isReference%} 
+{$info.name}.set(codec.read{$info.type.codecTypeName}());
+{% else %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = codec.read{$info.type.codecTypeName}();
+{% endif -- isReference%}
+{% enddef %}
+
+{############################### decodeStructType ###############################}
+{% def decodeStructType(info) --------------- StructType %}
+{% if info.isReference%}
+{$info.name}.set({$info.type.name}.read(codec));
+{% else %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = {$info.type.name}.read(codec);
+{% endif -- isReference%}
+{% enddef -------------------------- StructType %}
+
+{############################### decodeArrayType ###############################}
+{% def decodeArrayType(info) -------------- ArrayType %}
+{% if info.isReference%} 
+{$info.name}.set({$info.initialization});
+{% else %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = {$info.initialization};
+{% endif -- isReference%}
+for (int {$info.counter} = 0; {$info.counter} < {$info.size}; ++{$info.counter})
+{
+{$ addIndent("    ", info.protoNext.decode(info.protoNext))}
+    {$info.name}{% if info.isReference%}.get(){% endif %}[{$info.counter}] = {$info.protoNext.name};
+}
+{% enddef ----------------------------------- ArrayType %}
+
+{############################### decodeUnionType ###############################}
+{% def decodeUnionType(info) ---------------- %}
+{#var _{$name} = {$commonPrefix}{$info.name}().read({$codec}){%>%};
+var {$name} = _{$name}.getFirst();
+var {$type.discriminatorName} = {$info.name}.get(_{$name}.getSecond());#}
+{% enddef -------------------------- UnionType %}
+
+{############################### decodeEnumType ###############################}
+{% def decodeEnumType(info) ---------------- EnumType %}
+{% if info.isReference%}
+{$info.name}.set({$info.type.name}.read(codec));
+{% else %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = {$info.type.name}.read(codec);
+{% endif -- isReference%}
+{% enddef ---------------------------------- EnumType %}
+
+{############################### decodeBinaryType ###############################}
+{% def decodeBinaryType(info) ------------------- BinaryType %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = codec.readBinary();{%>%}
+{% enddef ------------------------------------- BinaryType %}
+
+{############################### decodeListType ###############################}
+{% def decodeListType(info) ------------------- ListType %}
+long {$info.sizeVariable} = {% if info.hasLengthVariable %}{$info.size}{% else %}codec.startReadList(){% endif %};
+{% if info.isReference%}
+{$info.name}.set(new ArrayList<>());
+{% else %}
+{% if info.needTypeDeclaration %}{$info.type.typeName} {% endif %}{$info.name} = new ArrayList<>();
+{% endif -- isReference%}
+for (long {$info.counter} = 0L; {$info.counter} < {$info.sizeVariable}; ++{$info.counter}) {
+{$addIndent("    ", info.protoNext.decode(info.protoNext))}
+    {$info.name}{% if info.isReference%}.get(){% endif %}.add({$info.protoNext.name});
+}
+{% enddef ------------------------------------- ListType %}
+
+
+{##################################################################################}
+{################################### ENCODING #####################################}
+{##################################################################################}
+
+{############################### encodeBuiltinType ###############################}
+{% def encodeBuiltinType(info) --------------- BuiltinType %}
+codec.write{$info.type.codecTypeName}({$info.name}{% if info.isReference%}.get(){% endif %});
+{% enddef %}
+
+{############################### encodeArrayType ###############################}
+{% def encodeArrayType(info) -------------- ArrayType %}
+for (int {$info.counter} = 0; {$info.counter} < {$info.size}; ++{$info.counter})
+{
+    {$info.protoNext.type.typeName} {$info.protoNext.name} = {%if info.isStructMember %}this.{% endif %}{$info.name}{% if info.isReference%}.get(){% endif %}[{$info.counter}];
+{$addIndent("    ", info.protoNext.encode(info.protoNext))}
+}
+{% enddef ----------------------------------- ArrayType %}
+
+{############################### encodeStructType ###############################}
+{% def encodeStructType(info) --------------- StructType %}
+{%if info.isStructMember %}this.{% endif %}{$info.name}{% if info.isReference%}.get(){% endif %}.write(codec);
+{% enddef -------------------------- StructType %}
+
+{############################### encodeUnionType ###############################}
+{% def encodeUnionType(info) ---------------- %}
+
+{% enddef -------------------------- UnionType %}
+
+{############################### encodeEnumType ###############################}
+{% def encodeEnumType(info) ---------------- EnumType %}
+{%if info.isStructMember %}this.{% endif %}{$info.name}{% if info.isReference%}.get(){% endif %}.write(codec);
+{% enddef ---------------------------------- EnumType %}
+
+{############################### encodeBinaryType ###############################}
+{% def encodeBinaryType(info) ------------------- BinaryType %}
+codec.writeBinary({%if info.isStructMember %}this.{% endif %}{$info.name}{% if info.isReference%}.get(){% endif %});{%>%}
+{% enddef ------------------------------------- BinaryType %}
+
+{############################### encodeListType ###############################}
+{% def encodeListType(info) ------------------- ListType %}
+codec.startWriteList({$info.name}{% if info.isReference%}.get(){% endif %}.size());
+for ({$info.protoNext.type.typeName} {$info.protoNext.name} : {%if info.isStructMember %}this.{% endif %}{$info.name}{% if info.isReference%}.get(){% endif %}) {
+{$   addIndent("    ", info.protoNext.encode(info.protoNext))}
+}
+{% enddef ------------------------------------- ListType %}
+
+{############################### union encode/decode ###############################}
+{% def encodeValueUnion(info, name, codec, indent, depth) %}
+{%  if info.isNonEncapsulatedUnion %}
+{%   set self = "" %}
+{%  else %}
+{%   set self = "self." %}
+{%  endif %}
+codec.start_write_union({$self}{$info.discriminatorName})
+{# unions are always within structs, so we have self available #}
+{%  set isFirst = true %}
+{%  set hasNonVoidCase = false %}
+{%  set defaultCase = false %}
+{%  for c in info.cases %}
+{%   if c.name == "default" %}
+{%    set defaultCase = c %}
+{%   elif not c.isVoid %}
+{%    set hasNonVoidCase = true %}
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
+{%    for cm in c.members %}
+{%     if cm.isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        {$codec}.write_null_flag(True)
+{$indent}    else:
+{$indent}        {$codec}.write_null_flag(False)
+{$indent}    {$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     else -- isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        raise ValueError("{$name}.{$cm.name} is None")
+{$indent}    {$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%    set isFirst = false %}
+{%   endif -- default case/not void %}
+{%  endfor -- union cases %}
+{%  if defaultCase %}
+{%   if not isFirst %}
+{$indent}else: # default case
+{%   endif %}
+{%   if defaultCase.isVoid && not isFirst %}
+{$indent}    pass
+{%   else %}
+{%    for cm in defaultCase.members %}
+{%     if cm.isNullable %}
+{$indent}    if {$name}.{$cm.name} is None:
+{$indent}        {$codec}.write_null_flag(True)
+{$indent}    else:
+{$indent}        {$codec}.write_null_flag(False)
+{$indent}    {% if not isFirst %}    {% endif %}{$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     else -- isNullable %}
+{$indent}{% if not isFirst %}    {% endif %}{$encodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%   endif -- defaultCase.isVoid %}
+{%  elif hasNonVoidCase %}
+{$indent}else:
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
+{%  endif -- defaultCase/hasNonVoidCase %}
+{% enddef %}
+
+{% def decodeValueUnion(info, name, codec, indent, depth) %}
+{%  if info.isNonEncapsulatedUnion %}
+{%   set self = "" %}
+{%  else %}
+{%   set self = "self." %}
+{%  endif %}
+{$self}{$info.discriminatorName} = codec.start_read_union()
+{%  if self == "self." %}
+{$indent}{$name} = {$name}_union()
+{%  endif %}
+{%  set isFirst = true %}
+{%  set hasNonVoidCase = false %}
+{%  set defaultCase = false %}
+{%  for c in info.cases %}
+{%   if c.name == "default" %}
+{%    set defaultCase = c %}
+{%   elif not c.isVoid %}
+{%    set hasNonVoidCase = true %}
+{$indent}{$"if" if isFirst else "elif"} {$self}{$info.discriminatorName} == {% if c.name != "" && (c.type.type == "enum" || c.type.type == "const") %}{% if c.type.name != "" %}{$c.type.name}.{%  endif %}{$c.name}{% else %}{$c.value}{%  endif %}:
+{%    for cm in c.members %}
+{%     if cm.isNullable %}
+{$indent}    if not {$codec}.read_null_flag()
+{$indent}        {$decodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{$indent}    else:
+{$indent}        {$name}.{$cm.name} = None
+{%     else -- isNullable %}
+{$indent}    {$decodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%    set isFirst = false %}
+{%   endif -- default/not void %}
+{%  endfor -- union cases %}
+{%  if defaultCase %}
+{%   if not isFirst %}
+{$indent}else: # default case
+{%   endif %}
+{%   if defaultCase.isVoid && not isFirst %}
+{$indent}    pass
+{%   else %}
+{%    for cm in defaultCase.members %}
+{%     if cm.isNullable %}
+{$indent}    if not {$codec}.read_null_flag()
+{$indent}    {% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{$indent}    else:
+{$indent}        {$name}.{$cm.name} = None
+{%     else -- isNullable %}
+{$indent}{% if not isFirst %}    {% endif %}{$decodeValue(cm.type, name & "." & cm.name, codec, indent & "    ", depth + 1)}
+{%     endif -- isNullable %}
+{%    endfor -- union case members %}
+{%   endif -- defaultCase.isVoid %}
+{%  elif hasNonVoidCase %}
+{$indent}else:
+{$indent}    raise ValueError("invalid union discriminator value %s" % repr({$self}{$info.discriminatorName}))
+{%  endif -- default/hasNonVoidCase %}
+{% enddef %}
+
+{% def getTypeValuePosfix(type) %}
+{% if type.type == "float" %}F{% elif type.type == "long" %}L{% elif type.type == "double" %}D{% endif %}{%>%}
+{% enddef%}
