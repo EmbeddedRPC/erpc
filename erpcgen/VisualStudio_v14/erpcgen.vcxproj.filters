@@ -164,13 +164,34 @@
     <ClCompile Include="..\src\cpptemplate\cpptempl.cpp">
       <Filter>Source Files\cpptemplate</Filter>
     </ClCompile>
-    <ClCompile Include="c_client_source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_coders.cpp">
+    <ClCompile Include="cpp_coders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_common_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_interface_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_interface_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_client_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_client_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_server_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_server_source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_client_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="c_server_header.cpp">
@@ -254,7 +275,7 @@
     <ClCompile Include="..\src\UniqueIdChecker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="c_common_functions.cpp">
+    <ClCompile Include="cpp_common_functions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="py_interface.cpp">

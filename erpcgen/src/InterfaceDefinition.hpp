@@ -31,7 +31,7 @@ namespace erpcgen {
 class InterfaceDefinition
 {
 public:
-    enum codec_t
+    enum class codec_t
     {
         kNotSpecified,
         kBasicCodec,

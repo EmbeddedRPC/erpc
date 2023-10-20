@@ -29,7 +29,7 @@ public:
     /*!
      *  @brief Atomic builtin types.
      */
-    enum _builtin_type
+    enum class builtin_type_t
     {
         kBoolType,
         kInt8Type,
@@ -55,8 +55,8 @@ public:
      * @param[in] name Given name.
      * @param[in] builtinType Given builtin type.
      */
-    BuiltinType(const std::string &name, _builtin_type builtinType) :
-    DataType(name, kBuiltinType), m_builtinType(builtinType)
+    BuiltinType(const std::string &name, builtin_type_t builtinType) :
+    DataType(name, data_type_t::kBuiltinType), m_builtinType(builtinType)
     {
     }
 
@@ -65,7 +65,7 @@ public:
      *
      * @return Builtin type of current object.
      */
-    _builtin_type getBuiltinType() const { return m_builtinType; }
+    builtin_type_t getBuiltinType() const { return m_builtinType; }
 
     /*!
      * @brief This function return "true" value for identify scalar type.
@@ -81,7 +81,10 @@ public:
      * @retval true When builtin type is int.
      * @retval false When builtin type isn't int.
      */
-    virtual bool isInt() const override { return ((kInt8Type <= m_builtinType) && (m_builtinType <= kUInt64Type)); }
+    virtual bool isInt() const override
+    {
+        return ((builtin_type_t::kInt8Type <= m_builtinType) && (m_builtinType <= builtin_type_t::kUInt64Type));
+    }
 
     /*!
      * @brief This function return "true" value for identify float type.
@@ -89,7 +92,10 @@ public:
      * @retval true When builtin type is float.
      * @retval false When builtin type isn't float.
      */
-    virtual bool isFloat() const override { return ((m_builtinType == kFloatType) || (m_builtinType == kDoubleType)); }
+    virtual bool isFloat() const override
+    {
+        return ((m_builtinType == builtin_type_t::kFloatType) || (m_builtinType == builtin_type_t::kDoubleType));
+    }
 
     /*!
      * @brief This function return "true" value for identify bool type.
@@ -97,7 +103,7 @@ public:
      * @retval true When builtin type is bool.
      * @retval false When builtin type isn't bool.
      */
-    virtual bool isBool() const override { return m_builtinType == kBoolType; }
+    virtual bool isBool() const override { return m_builtinType == builtin_type_t::kBoolType; }
 
     /*!
      * @brief This function return true/false value for identify string type.
@@ -107,7 +113,7 @@ public:
      */
     virtual bool isString() const override
     {
-        return ((m_builtinType == kStringType) || (m_builtinType == kUStringType));
+        return ((m_builtinType == builtin_type_t::kStringType) || (m_builtinType == builtin_type_t::kUStringType));
     }
 
     /*!
@@ -116,7 +122,7 @@ public:
      * @retval true When builtin type is ustring.
      * @retval false When builtin type isn't ustring.
      */
-    virtual bool isUString() const override { return m_builtinType == kUStringType; }
+    virtual bool isUString() const override { return m_builtinType == builtin_type_t::kUStringType; }
 
     /*!
      * @brief This function return true/false value for identify binary type.
@@ -124,10 +130,10 @@ public:
      * @retval true When builtin type is binary.
      * @retval false When builtin type isn't binary.
      */
-    virtual bool isBinary() const override { return m_builtinType == kBinaryType; }
+    virtual bool isBinary() const override { return m_builtinType == builtin_type_t::kBinaryType; }
 
 protected:
-    _builtin_type m_builtinType; /*!< Builtin type of current object. */
+    builtin_type_t m_builtinType; /*!< Builtin type of current object. */
 };
 
 } // namespace erpcgen

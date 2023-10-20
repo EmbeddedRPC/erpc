@@ -8,13 +8,17 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 PointersService_service *svc;
 
@@ -374,16 +378,185 @@ void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5
 
 void testFunction(){};
 
+class PointersService_server : public PointersService_interface
+{
+public:
+    int32_t (*sendReceivedInt32(const int32_t arrayNumbers[12]))[12]
+    {
+        int32_t(*result)[12] = NULL;
+        result = ::sendReceivedInt32(arrayNumbers);
+
+        return result;
+    }
+
+    int32_t (*sendReceived2Int32(int32_t arrayNumbers[12][10]))[12][10]
+    {
+        int32_t(*result)[12][10] = NULL;
+        result = ::sendReceived2Int32(arrayNumbers);
+
+        return result;
+    }
+
+    char *(*sendReceivedString(char *arrayStrings[12]))[12]
+    {
+        char *(*result)[12] = NULL;
+        result = ::sendReceivedString(arrayStrings);
+
+        return result;
+    }
+
+    char *(*sendReceived2String(char *arrayStrings[3][5]))[3][5]
+    {
+        char *(*result)[3][5] = NULL;
+        result = ::sendReceived2String(arrayStrings);
+
+        return result;
+    }
+
+    enumColor (*sendReceivedEnum(const enumColor arrayEnums[3]))[3]
+    {
+        enumColor(*result)[3] = NULL;
+        result = ::sendReceivedEnum(arrayEnums);
+
+        return result;
+    }
+
+    enumColor (*sendReceived2Enum(enumColor arrayEnums[3][3]))[3][3]
+    {
+        enumColor(*result)[3][3] = NULL;
+        result = ::sendReceived2Enum(arrayEnums);
+
+        return result;
+    }
+
+    list_int32_1_t (*sendReceivedList(const list_int32_1_t arrayLists[2]))[2]
+    {
+        list_int32_1_t(*result)[2] = NULL;
+        result = ::sendReceivedList(arrayLists);
+
+        return result;
+    }
+
+    list_int32_1_t (*sendReceived2List(list_int32_1_t arrayLists[2][2]))[2][2]
+    {
+        list_int32_1_t(*result)[2][2] = NULL;
+        result = ::sendReceived2List(arrayLists);
+
+        return result;
+    }
+
+    ArrayIntType *sendReceivedInt32Type(const ArrayIntType arrayNumbers)
+    {
+        ArrayIntType *result = NULL;
+        result = ::sendReceivedInt32Type(arrayNumbers);
+
+        return result;
+    }
+
+    Array2IntType *sendReceived2Int32Type(Array2IntType arrayNumbers)
+    {
+        Array2IntType *result = NULL;
+        result = ::sendReceived2Int32Type(arrayNumbers);
+
+        return result;
+    }
+
+    ArrayStringType *sendReceivedStringType(ArrayStringType arrayStrings)
+    {
+        ArrayStringType *result = NULL;
+        result = ::sendReceivedStringType(arrayStrings);
+
+        return result;
+    }
+
+    Array2StringType *sendReceived2StringType(Array2StringType arrayStrings)
+    {
+        Array2StringType *result = NULL;
+        result = ::sendReceived2StringType(arrayStrings);
+
+        return result;
+    }
+
+    ArrayEnumType *sendReceivedEnumType(const ArrayEnumType arrayEnums)
+    {
+        ArrayEnumType *result = NULL;
+        result = ::sendReceivedEnumType(arrayEnums);
+
+        return result;
+    }
+
+    Array2EnumType *sendReceived2EnumType(Array2EnumType arrayEnums)
+    {
+        Array2EnumType *result = NULL;
+        result = ::sendReceived2EnumType(arrayEnums);
+
+        return result;
+    }
+
+    ArrayStructType *sendReceivedStructType(const ArrayStructType arrayStructs)
+    {
+        ArrayStructType *result = NULL;
+        result = ::sendReceivedStructType(arrayStructs);
+
+        return result;
+    }
+
+    Array2StructType *sendReceived2StructType(Array2StructType arrayStructs)
+    {
+        Array2StructType *result = NULL;
+        result = ::sendReceived2StructType(arrayStructs);
+
+        return result;
+    }
+
+    ArrayListType *sendReceivedListType(const ArrayListType arrayLists)
+    {
+        ArrayListType *result = NULL;
+        result = ::sendReceivedListType(arrayLists);
+
+        return result;
+    }
+
+    Array2ListType *sendReceived2ListType(Array2ListType arrayLists)
+    {
+        Array2ListType *result = NULL;
+        result = ::sendReceived2ListType(arrayLists);
+
+        return result;
+    }
+
+    AllTypes (*sendReceiveStruct(const AllTypes arrayStructs[2]))[2]
+    {
+        AllTypes(*result)[2] = NULL;
+        result = ::sendReceiveStruct(arrayStructs);
+
+        return result;
+    }
+
+    AllTypes (*sendReceive2Struct(AllTypes arrayStructs[1][1]))[1][1]
+    {
+        AllTypes(*result)[1][1] = NULL;
+        result = ::sendReceive2Struct(arrayStructs);
+
+        return result;
+    }
+
+    void test_array_allDirection(const int32_t a[5], const int32_t b[5], int32_t c[5], int32_t d[5])
+    {
+        ::test_array_allDirection(a, b, c, d);
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
 
 void add_services(erpc::SimpleServer *server)
 {
-    // define services to add on heap
-    // allocate on heap so service doesn't go out of scope at end of method
-    svc = new PointersService_service();
-
+    /* Define services to add using dynamic memory allocation
+     * Exapmle:ArithmeticService_service * svc = new ArithmeticService_service();
+     */
+    svc = new PointersService_service(new PointersService_server());
     // add services
     server->addService(svc);
 }
@@ -400,6 +573,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -417,12 +591,6 @@ void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
     destroy_PointersService_service(service_test);
-}
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

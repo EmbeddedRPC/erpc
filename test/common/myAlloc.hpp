@@ -10,6 +10,8 @@
 #ifndef _EMBEDDED_RPC__MYALLOC_H_
 #define _EMBEDDED_RPC__MYALLOC_H_
 
+#if defined(__cplusplus)
+
 #include "erpc_port.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,15 +40,13 @@ private:
     static int allocated_;
 };
 
-namespace std {
-using ::MyAlloc;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-#define erpc_malloc(X) MyAlloc::my_malloc(X)
-#define erpc_free(X) MyAlloc::my_free((X))
+#define erpc_malloc(X) ::MyAlloc::my_malloc(X)
+#define erpc_free(X) ::MyAlloc::my_free((X))
+
+#endif // __cplusplus
 
 #endif // _EMBEDDED_RPC__MYALLOC_H_

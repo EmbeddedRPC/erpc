@@ -34,7 +34,10 @@ public:
      * @param[in] tok Token, which contains name and location.
      * @param[in] value Given value.
      */
-    EnumMember(const Token &tok, uint32_t value) : Symbol(kEnumMemberSymbol, tok), m_value(value), m_valueSet(true) {}
+    EnumMember(const Token &tok, uint32_t value) :
+    Symbol(symbol_type_t::kEnumMemberSymbol, tok), m_value(value), m_valueSet(true)
+    {
+    }
 
     /*!
      * @brief Constructor.
@@ -43,7 +46,10 @@ public:
      *
      * @param[in] tok Token, which contains name and location.
      */
-    explicit EnumMember(const Token &tok) : Symbol(kEnumMemberSymbol, tok), m_value(-1), m_valueSet(false) {}
+    explicit EnumMember(const Token &tok) :
+    Symbol(symbol_type_t::kEnumMemberSymbol, tok), m_value(-1), m_valueSet(false)
+    {
+    }
 
     /*!
      * @brief This function set enum member value.

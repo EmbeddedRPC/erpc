@@ -37,7 +37,7 @@ public:
      * @param[in] value Given value.
      */
     ConstType(const Token &tok, DataType *dataType, Value *value) :
-    Symbol(kConstSymbol, tok), m_dataType(dataType), m_value(value)
+    Symbol(symbol_type_t::kConstSymbol, tok), m_dataType(dataType), m_value(value)
     {
     }
 

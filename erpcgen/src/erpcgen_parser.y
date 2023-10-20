@@ -155,6 +155,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %token <m_token> TOK_ML_COMMENT   "doxygen ml. comment"
 %token <m_token> TOK_IL_COMMENT   "doxygen il. comment"
 %token <m_token> TOK_PROGRAM      "program"
+%token <m_token> TOK_IFACE_SCOPE  "::"
 %token END       0                "end of file"
 
 // virtual tokens used for AST
@@ -210,6 +211,8 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> function_return_type
 %type <m_ast> function_type_base_def
 %type <m_ast> function_type_def
+%type <m_ast> function_cb_type_def
+%type <m_ast> function_cb_type_list
 %type <m_ast> ident
 %type <m_ast> ident_opt
 %type <m_ast> int_const_expr
@@ -225,6 +228,7 @@ token_loc_t mergeLocation(const token_loc_t & l1, const token_loc_t & l2);
 %type <m_ast> program
 %type <m_ast> root_def
 %type <m_ast> simple_data_type
+%type <m_ast> simple_data_type_scope
 %type <m_ast> string_literal
 %type <m_ast> struct_def
 %type <m_ast> struct_data_type
@@ -339,11 +343,6 @@ definition_base :   const_def
                         {
                             $$ = $interface_def;
                         }
-                |
-                    function_type_def
-                        {
-                            $$ = $function_type_def;
-                        }
                 ;
 
 import_stmt     :   TOK_IMPORT TOK_STRING_LITERAL
@@ -451,7 +450,7 @@ interface_def   :   TOK_INTERFACE[iface] ident[name] '{' function_def_list_opt[f
                 ;
 
 function_def_list_opt
-                :   function_def_list
+                :     function_def_list
                         {
                             $$ = $function_def_list;
                         }
@@ -465,7 +464,12 @@ function_def_list_opt
  * TOK_CHILDREN -> ( function_def* )
  */
 function_def_list
-                :   function_def
+                :   function_cb_type_list function_def
+                        {
+                            $function_cb_type_list->appendChild($function_def);
+                            $$ = $function_cb_type_list;
+                        }
+                | function_def
                         {
                             $$ = new AstNode(Token(TOK_CHILDREN));
                             $$->appendChild($function_def);
@@ -477,13 +481,39 @@ function_def_list
                         }
                 ;
 
-function_def    :   doxy_ml_comment_opt annotation_list_opt function_type_base_def comma_semi_opt doxy_il_comment_opt
+function_cb_type_def
+                :   doxy_ml_comment_opt annotation_list_opt TOK_TYPE function_type_def comma_semi_opt doxy_il_comment_opt
                         {
-                            $$ = $function_type_base_def;
+                            $$ = $function_type_def;
+                            $$->appendChild(new AstNode(*$TOK_TYPE));
                             $$->appendChild($annotation_list_opt);
                             $$->appendChild($doxy_ml_comment_opt);
                             $$->appendChild($doxy_il_comment_opt);
                         }
+                ;
+
+function_cb_type_list
+                :   function_cb_type_def
+                        {
+                            $$ = new AstNode(Token(TOK_CHILDREN));
+                            $$->appendChild($function_cb_type_def);
+                        }
+                |   function_cb_type_list[fun_type_list] function_cb_type_def
+                        {
+                            $fun_type_list->appendChild($function_cb_type_def);
+                            $$ = $fun_type_list;
+                        }
+                ;
+
+function_def    :   doxy_ml_comment_opt annotation_list_opt function_type_base_def comma_semi_opt doxy_il_comment_opt
+                        {
+                            $$ = $function_type_base_def;
+                            $$->appendChild(NULL);  /* Compatibility with function type definition */
+                            $$->appendChild($annotation_list_opt);
+                            $$->appendChild($doxy_ml_comment_opt);
+                            $$->appendChild($doxy_il_comment_opt);
+                        }
+                ;
 
 function_type_base_def
                 :   function_type_def
@@ -592,7 +622,7 @@ param_list_in   :   param_def_in
 /*
  * TOK_PARAM -> ( ident simple_data_type ( TOK_CHILDREN -> TOK_ANNOTATION* ) )
  */
-param_def       :   param_dir[dir] simple_data_type[datatype] ident_opt[name] annotation_list_opt[annotations]
+param_def       :   param_dir[dir] simple_data_type_scope[datatype] ident_opt[name] annotation_list_opt[annotations]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
                             $$->appendChild($name);
@@ -603,7 +633,7 @@ param_def       :   param_dir[dir] simple_data_type[datatype] ident_opt[name] an
                         }
                 ;
 
-param_def_in    :   param_dir_in[dir] simple_data_type[datatype] ident_opt[name] annotation_list_opt[annotations]
+param_def_in    :   param_dir_in[dir] simple_data_type_scope[datatype] ident_opt[name] annotation_list_opt[annotations]
                         {
                             $$ = new AstNode(Token(TOK_PARAM, NULL, @name));
                             $$->appendChild($name);
@@ -892,6 +922,19 @@ union_member
                         }
                 ;
 
+simple_data_type_scope
+                :   ident TOK_IFACE_SCOPE typename
+                        {
+                            $$ = new AstNode(Token(TOK_IFACE_SCOPE));
+                            $$->appendChild($ident);
+                            $$->appendChild($typename);
+                        }
+                |   simple_data_type
+                        {
+                            $$ = $simple_data_type;
+                        }
+                ;
+
 simple_data_type
                 :   list_type
                         {
@@ -905,7 +948,6 @@ simple_data_type
                         {
                             $$ = $typename;
                         }
-
                 ;
 
 data_type       :   simple_data_type

@@ -28,7 +28,7 @@ idl: |
       f() -> {type[0]}
   }
 test_client.cpp:
-  - g_client->releaseRequest(request);
+  - m_clientManager->releaseRequest(request);
   - if: type[1] != 'NULL'
     then:
       - if (err != kErpcStatus_Success)
@@ -71,7 +71,7 @@ idl: |
       f() -> {type[0]}
   }
 test_client.cpp:
-  - g_client->releaseRequest(request);
+  - m_clientManager->releaseRequest(request);
   - if: type[0] != 'A' and type[0] != 'string'
     then:
       - if (err != kErpcStatus_Success)

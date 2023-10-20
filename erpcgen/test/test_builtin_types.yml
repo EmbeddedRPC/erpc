@@ -21,7 +21,7 @@ idl: |
   interface myintf {
     {fns[fore]} somefunc({type} i) {fns[after]}
   }
-test.h:
+c_test_client.h:
   - if: not type in ('bool', 'float', 'double')
     then:
       - void somefunc({type}_t i);
@@ -46,7 +46,7 @@ idl: |
   interface myintf {
     somefunc() -> {type}
   }
-test.h:
+c_test_client.h:
   - if: not type in ('bool', 'float', 'double')
     then:
       - '{type}_t somefunc(void);'
@@ -71,7 +71,7 @@ idl: |
   struct structwithint {
     {type} i
   }
-test.h:
+test_common.h:
   - 'struct structwithint {'
   - if: not type in ('bool', 'float', 'double')
     then:

@@ -103,13 +103,13 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
         }
 
         // If this message is an invocation, return it to the calling server.
-        if ((msgType == kInvocationMessage) || (msgType == kOnewayMessage))
+        if ((msgType == message_type_t::kInvocationMessage) || (msgType == message_type_t::kOnewayMessage))
         {
             break;
         }
 
         // Just ignore messages we don't know what to do with.
-        if (msgType != kReplyMessage)
+        if (msgType != message_type_t::kReplyMessage)
         {
             continue;
         }

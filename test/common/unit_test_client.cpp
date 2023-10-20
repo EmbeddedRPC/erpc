@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -21,15 +21,17 @@ extern "C" {
 #include "fsl_debug_console.h"
 #include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
-int main(int argc, char **argv);
+int main(void);
 #endif
 }
 
 #include "board.h"
+
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "gtestListener.hpp"
 #include "myAlloc.hpp"
-#include "test_unit_test_common.h"
+#include "unit_test_wrapped.h"
 
 #ifdef UNITY_DUMP_RESULTS
 #include "corn_g_test.h"
@@ -83,7 +85,7 @@ class MinimalistPrinter : public ::testing::EmptyTestEventListener
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 
 #if defined(RPMSG)
 #define APP_ERPC_READY_EVENT_DATA (1)
@@ -105,23 +107,15 @@ static void eRPCReadyEventHandler(uint16_t eventData, void *context)
 {
     eRPCReadyEventData = eventData;
 }
-
-/*!
- * @brief Application-specific implementation of the SystemInitHook() weak function.
- */
-void SystemInitHook(void)
-{
-    /* Initialize MCMGR - low level multicore management library. Call this
-       function as close to the reset entry as possible to allow CoreUp event
-       triggering. The SystemInitHook() weak function overloading is used in this
-       application. */
-    MCMGR_EarlyInit();
-}
 #endif
 
-int main(int argc, char **argv)
+int main(void)
 {
-    ::testing::InitGoogleTest(&argc, argv);
+    int fake_argc = 1;
+    const auto fake_arg0 = "dummy";
+    char *fake_argv0 = const_cast<char *>(fake_arg0);
+    char **fake_argv = &fake_argv0;
+    ::testing::InitGoogleTest(&fake_argc, fake_argv);
 
     ::testing::TestEventListeners &listeners = ::testing::UnitTest::GetInstance()->listeners();
     listeners.Append(new LeakChecker);
@@ -199,6 +193,8 @@ int main(int argc, char **argv)
 #endif
 
     client = erpc_client_init(transport, message_buffer_factory);
+    initInterfaces_common(client);
+    initInterfaces(client);
 
     int i = RUN_ALL_TESTS();
     quit();
@@ -211,4 +207,9 @@ int main(int argc, char **argv)
     erpc_client_deinit(client);
 
     return i;
+}
+
+void initInterfaces_common(erpc_client_t client)
+{
+    initCommon_client(client);
 }

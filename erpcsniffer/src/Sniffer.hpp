@@ -39,7 +39,7 @@ public:
     Sniffer(erpc::Transport *transport, erpcgen::InterfaceDefinition *def, const char *outputFilePath,
             uint64_t quantity) :
     m_transport(transport),
-    m_interfaces(def->getGlobals().getSymbolsOfType(erpcgen::Symbol::kInterfaceSymbol)),
+    m_interfaces(def->getGlobals().getSymbolsOfType(erpcgen::Symbol::symbol_type_t::kInterfaceSymbol)),
     m_outputFilePath(outputFilePath), m_quantity(quantity), m_codec(new erpc::BasicCodec()){};
 
     /*!

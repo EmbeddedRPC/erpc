@@ -25,9 +25,9 @@ test_client.cpp:
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
   - codec->startWriteMessage
-  - g_client->performRequest
+  - m_clientManager->performRequest
   - err = codec->getStatus();
-  - g_client->callErrorHandler(err,
+  - m_clientManager->callErrorHandler(err,
   - if: type[1] != 'NULL'
     then:
       - if (err != kErpcStatus_Success)
@@ -115,9 +115,9 @@ test_client.cpp:
   - not: if (result == NULL)
   - not: codec->updateStatus;
   - codec->startWriteMessage
-  - g_client->performRequest
+  - m_clientManager->performRequest
   - err = codec->getStatus();
-  - g_client->callErrorHandler(err, kErrorTest_f_id)
+  - m_clientManager->callErrorHandler(err, m_fId)
   - if: type[1] != 'NULL'
     then:
       - if (err != kErpcStatus_Success)
@@ -164,9 +164,9 @@ test_client.cpp:
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
   - codec->startWriteMessage
-  - g_client->performRequest
+  - m_clientManager->performRequest
   - err = codec->getStatus();
-  - g_client->callErrorHandler(err,
+  - m_clientManager->callErrorHandler(err,
   - if: type[1] != 'NULL'
     then:
       - if (err != kErpcStatus_Success)
@@ -214,7 +214,7 @@ test_client.cpp:
   - if (codec == NULL)
   - err = kErpcStatus_MemoryError;
   - codec->startWriteMessage
-  - g_client->performRequest
+  - m_clientManager->performRequest
   - err = codec->getStatus();
 
 test_server.cpp:
@@ -261,9 +261,9 @@ test_client.cpp:
   - not: if (codec == NULL)
   - not: err = kErpcStatus_MemoryError;
   - codec->startWriteMessage
-  - g_client->performRequest
+  - m_clientManager->performRequest
   - err = codec->getStatus();
-  - g_client->callErrorHandler(err,
+  - m_clientManager->callErrorHandler(err,
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;
@@ -312,10 +312,10 @@ test_client.cpp:
   - err = kErpcStatus_MemoryError;
   - else
   - codec->startWriteMessage
-  - g_client->performRequest(request);
+  - m_clientManager->performRequest(request);
   - err = codec->getStatus();
-  - g_client->releaseRequest(request);
-  - g_client->callErrorHandler(err, kErrorTest_f_id);
+  - m_clientManager->releaseRequest(request);
+  - m_clientManager->callErrorHandler(err, m_fId);
 
 test_server.cpp:
   - erpc_status_t err = kErpcStatus_Success;

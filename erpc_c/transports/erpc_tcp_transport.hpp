@@ -9,6 +9,10 @@
 #ifndef _EMBEDDED_RPC__TCP_TRANSPORT_H_
 #define _EMBEDDED_RPC__TCP_TRANSPORT_H_
 
+#if defined(__MINGW32__)
+#include <winsock2.h>
+#endif
+
 #include "erpc_framed_transport.hpp"
 #include "erpc_threading.h"
 
@@ -82,10 +86,14 @@ public:
     virtual erpc_status_t close(bool stopServer = true);
 
 protected:
-    bool m_isServer;       /*!< If true then server is using transport, else client. */
-    const char *m_host;    /*!< Specify the host name or IP address of the computer. */
-    uint16_t m_port;       /*!< Specify the listening port number. */
-    int m_socket;          /*!< Socket number. */
+    bool m_isServer;    /*!< If true then server is using transport, else client. */
+    const char *m_host; /*!< Specify the host name or IP address of the computer. */
+    uint16_t m_port;    /*!< Specify the listening port number. */
+#if defined(__MINGW32__)
+    SOCKET m_socket; /*!< Socket number. */
+#else
+    int m_socket; /*!< Socket number. */
+#endif
     Thread m_serverThread; /*!< Pointer to server thread. */
     bool m_runServer;      /*!< Thread is executed while this is true. */
 

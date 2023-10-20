@@ -246,7 +246,7 @@ To install the Python infrastructure for eRPC see instructions in the [erpc_pyth
 
 ## Code providing
 
-Repository on Github contains two main branches. __Master__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __master__ branch.
+Repository on Github contains two main branches: __main__ and __develop__. Code is developed on __develop__ branch. Release version is created via merging __develop__ branch into __main__ branch.
 
 ---
 Copyright 2014-2016 Freescale Semiconductor, Inc.

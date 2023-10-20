@@ -7,11 +7,14 @@
  */
 
 #include "gtest.h"
-#include "test.h"
+#include "test_common.h"
+#include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(erpc_client_t client) {}
 
 TEST(test_const, CheckConsts)
 {

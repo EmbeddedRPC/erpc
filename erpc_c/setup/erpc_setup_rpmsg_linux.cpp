@@ -13,8 +13,8 @@
 
 using namespace erpc;
 
-ERPC_MANUALLY_CONSTRUCTED(RPMsgLinuxTransport, s_transport);
-ERPC_MANUALLY_CONSTRUCTED(RPMsgEndpoint, s_endpoint);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(RPMsgLinuxTransport, s_rpmsgTransport);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(RPMsgEndpoint, s_endpoint);
 
 erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type, int16_t remote_addr)
 {
@@ -22,6 +22,7 @@ erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type
     int16_t _local_addr;
     int8_t _type;
     int16_t _remote_addr;
+    RPMsgLinuxTransport *rpmsgTransport;
 
     if (local_addr == -1)
     {
@@ -50,23 +51,57 @@ erpc_transport_t erpc_transport_rpmsg_linux_init(int16_t local_addr, int8_t type
         _remote_addr = remote_addr;
     }
 
-    s_endpoint.construct(_local_addr, _type, _remote_addr);
-    s_transport.construct(s_endpoint.get(), _remote_addr);
-
-    if (s_transport->init() == kErpcStatus_Success)
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_endpoint.isUsed() || s_rpmsgTransport.isUsed())
     {
-        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
+        rpmsgTransport = NULL;
     }
     else
     {
-        transport = NULL;
+        s_endpoint.construct(_local_addr, _type, _remote_addr);
+        s_rpmsgTransport.construct(s_endpoint.get(), _remote_addr);
+        rpmsgTransport = s_rpmsgTransport.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    RPMsgEndpoint *endpoint = new RPMsgEndpoint(_local_addr, _type, _remote_addr);
+    if (endpoint == NULL)
+    {
+        rpmsgTransport = NULL;
+    }
+    else
+    {
+        rpmsgTransport = new RPMsgLinuxTransport(endpoint, _remote_addr);
+    }
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    transport = reinterpret_cast<erpc_transport_t>(rpmsgTransport);
+
+    if (rpmsgTransport != NULL)
+    {
+        if (rpmsgTransport->init() != kErpcStatus_Success)
+        {
+            erpc_transport_rpmsg_linux_deinit(transport);
+            transport = NULL;
+        }
     }
 
     return transport;
 }
 
-void erpc_transport_rpmsg_linux_deinit(void)
+void erpc_transport_rpmsg_linux_deinit(erpc_transport_t transport)
 {
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)transport;
     s_endpoint.destroy();
     s_transport.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(transport != NULL);
+
+    RPMsgLinuxTransport *rpmsgTransport = reinterpret_cast<RPMsgLinuxTransport *>(transport);
+
+    delete rpmsgTransport->getRpmsgEndpoint();
+    delete rpmsgTransport;
+#endif
 }

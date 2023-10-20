@@ -21,6 +21,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace erpcgen {
+class Interface;
 
 /*!
  * @brief Function base declaration.
@@ -33,9 +34,19 @@ public:
     /*!
      * @brief Constructor.
      */
-    FunctionBase() : m_parameters("(fn)"), m_returnType(nullptr), m_isOneway(false) {}
+    FunctionBase(Interface *interface) :
+    m_parameters("(fn)"), m_returnType(nullptr), m_isOneway(false), m_interface(interface)
+    {
+    }
 
     virtual ~FunctionBase(){};
+
+    /*!
+     * @brief This function returns parent Interface.
+     *
+     * @return parent Interface.
+     */
+    Interface *getInterface() const { return m_interface; }
 
     /*!
      * @brief This function returns function parameters.
@@ -100,9 +111,9 @@ protected:
     StructType m_parameters;    /*!< Function parameters are saved as structure members. */
     StructMember *m_returnType; /*!< Function return data type. */
     bool m_isOneway;            /*!< If false then communication is bidirectional. */
+    Interface *m_interface;     /*!< Parent interface. */
 };
 
-class Interface;
 class FunctionType;
 /*!
  * @brief Function declaration.
@@ -118,10 +129,10 @@ public:
      * This function set symbol token to given token.
      *
      * @param[in] tok Given token.
-     * @param[in] m_interface Parent interface.
+     * @param[in] interface Parent interface.
      */
     Function(const Token &tok, Interface *interface) :
-    FunctionBase(), Symbol(kFunctionSymbol, tok), m_uniqueId(++s_idCounter), m_interface(interface),
+    FunctionBase(interface), Symbol(symbol_type_t::kFunctionSymbol, tok), m_uniqueId(++s_idCounter),
     m_functionType(nullptr)
     {
     }
@@ -132,11 +143,11 @@ public:
      * This function set symbol token to given token, uniqueId and idCounter to given uniqueId.
      *
      * @param[in] tok Given token.
-     * @param[in] m_interface Parent interface.
+     * @param[in] interface Parent interface.
      * @param[in] uniqueId Given unique function id.
      */
     Function(const Token &tok, Interface *interface, uint32_t uniqueId) :
-    FunctionBase(), Symbol(kFunctionSymbol, tok), m_uniqueId(uniqueId), m_interface(interface), m_functionType(nullptr)
+    FunctionBase(interface), Symbol(symbol_type_t::kFunctionSymbol, tok), m_uniqueId(uniqueId), m_functionType(nullptr)
     {
         s_idCounter = uniqueId;
     }
@@ -154,13 +165,6 @@ public:
      * @param[in] newId New function unique id.
      */
     void setUniqueId(uint32_t newId) { m_uniqueId = newId; }
-
-    /*!
-     * @brief This function returns parent Interface.
-     *
-     * @return parent Interface.
-     */
-    Interface *getInterface() const { return m_interface; }
 
     /*!
      * @brief This function returns description about the interface function.
@@ -194,8 +198,7 @@ public:
 
 protected:
     uint32_t m_uniqueId;          /*!< Function unique id. */
-    Interface *m_interface;       /*!< Parent interface. */
-    FunctionType *m_functionType; /*!< Parent interface. */
+    FunctionType *m_functionType; /*!< Function type. */
 
     static uint32_t s_idCounter; /*!< Function id counter. Each function will increase this. */
 };

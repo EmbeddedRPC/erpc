@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016 - 2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -16,6 +16,7 @@ extern "C" {
 #if defined(UART)
 /* clang-format off */
 #include "fsl_lpuart_cmsis.h"
+
 #include "app_core0.h"
 /* clang-format on */
 #else
@@ -25,25 +26,27 @@ extern "C" {
 #define APP_ERPC_READY_EVENT_DATA (1)
 /* clang-format off */
 #include "mcmgr.h"
+
 #include "app_core1.h"
 /* clang-format on */
 #endif
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
-int main(int argc, const char *argv[]);
+int main(void);
 #endif
 }
 #endif
 
 #include "board.h"
+
+#include "c_test_unit_test_common_server.h"
 #include "myAlloc.hpp"
-#include "test_unit_test_common_server.h"
 #include "unit_test_wrapped.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-int MyAlloc::allocated_ = 0;
+int ::MyAlloc::allocated_ = 0;
 erpc_service_t service_common = NULL;
 erpc_server_t server;
 
@@ -56,20 +59,9 @@ static void SignalReady(void)
     /* Signal the other core we are ready by trigerring the event and passing the APP_ERPC_READY_EVENT_DATA */
     MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
-/*!
- * @brief Application-specific implementation of the SystemInitHook() weak function.
- */
-void SystemInitHook(void)
-{
-    /* Initialize MCMGR - low level multicore management library. Call this
-       function as close to the reset entry as possible to allow CoreUp event
-       triggering. The SystemInitHook() weak function overloading is used in this
-       application. */
-    MCMGR_EarlyInit();
-}
 #endif
 
-int main(int argc, const char *argv[])
+int main(void)
 {
     BOARD_InitHardware();
 
@@ -132,6 +124,12 @@ void add_common_service(erpc_server_t server)
     erpc_add_service_to_server(server, service_common);
 }
 
+void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
+{
+    erpc_remove_service_from_server(server, service);
+    destroy_Common_service(service);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Common service implementations here
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +147,7 @@ void quit()
 
 int32_t getServerAllocated()
 {
-    int result = MyAlloc::allocated();
-    MyAlloc::allocated(0);
+    int result = ::MyAlloc::allocated();
+    ::MyAlloc::allocated(0);
     return result;
 }

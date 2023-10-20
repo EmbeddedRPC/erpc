@@ -11,7 +11,6 @@
 #define _EMBEDDED_RPC__SPI_SLAVE_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-
 #include <cstdlib>
 #if ERPC_THREADS
 #include "erpc_threading.h"

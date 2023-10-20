@@ -6,8 +6,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "c_test_client.h"
 #include "gtest.h"
-#include "test.h"
+#include "unit_test_wrapped.h"
 
 #include <string.h>
 
@@ -16,6 +17,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(erpc_client_t client)
+{
+    initBuiltinServices_client(client);
+}
 
 int32_t int32A = 2;
 int32_t int32B = -20;

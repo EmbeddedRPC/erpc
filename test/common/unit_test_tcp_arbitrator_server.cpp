@@ -13,10 +13,10 @@
 #include "erpc_transport_arbitrator.hpp"
 
 #include "Logging.hpp"
+#include "c_test_secondInterface_server.h"
 #include "myAlloc.hpp"
-#include "test_firstInterface.h"
-#include "test_secondInterface.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #include <unistd.h>
 
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     // create logger instance
     StdoutLogger m_logger;
 
-    m_logger.setFilterLevel(Logger::kInfo);
+    m_logger.setFilterLevel(Logger::log_level_t::kInfo);
 
     Log::setLogger(&m_logger);
 
@@ -146,6 +146,8 @@ int main(int argc, char **argv)
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
     g_client->setServer(&g_server);
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces(client);
 
     err = (erpc_status_t)-1;
 
@@ -181,6 +183,7 @@ int main(int argc, char **argv)
     return isTestPassing;
 }
 
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;
@@ -207,6 +210,7 @@ void quitFirstInterfaceServer()
 void whenReady()
 {
     waitClient++;
+}
 }
 
 int testClient()

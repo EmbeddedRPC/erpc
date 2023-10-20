@@ -5,15 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "c_test_core0_client.h"
 #include "gtest.h"
-#include "test_core0.h"
-#include "test_core1_server.h"
+#include "unit_test_wrapped.h"
 
 void callback2(int32_t param1, int32_t param2) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unit test Implementation code
 ////////////////////////////////////////////////////////////////////////////////
+
+void initInterfaces(erpc_client_t client)
+{
+    initClientCore0Services_client(client);
+}
 
 TEST(test_callbacks, In_Out_table_1)
 {

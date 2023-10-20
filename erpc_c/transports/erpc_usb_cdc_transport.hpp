@@ -10,7 +10,6 @@
 #define _EMBEDDED_RPC__USB_CDC_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
-
 #include <cstdio>
 #if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"

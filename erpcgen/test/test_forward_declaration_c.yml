@@ -1,43 +1,4 @@
 ---
-name: struct before function
-desc: forward declaration of structure before function which is using type.
-params:
-  dir:
-    - "in"
-    - "out"
-idl:
-  struct forwardStruct;
-
-  oneway forwardCallback_t(forwardStruct s);
-
-  struct forwardStruct
-  {
-    forwardCallback_t pCallback;           /*!< Pointer to callback function */
-  }
-
-  interface foo
-  {
-    myFun({dir} forwardCallback_t pCallback1_t) -> void
-
-    forwardCallback_t forwardCallback;
-  }
-
-test.h:
-  - typedef struct forwardStruct forwardStruct;
-  - typedef void (*forwardCallback_t)(const forwardStruct * s);
-
-  - struct forwardStruct
-  - "{"
-  - forwardCallback_t pCallback;
-  - "};"
-test_server.cpp:
-  - if: dir == 'in'
-    then:
-      - not: erpc_free(pCallback1_t);
-    else:
-      - erpc_free(pCallback1_t);
-
----
 name: struct before struct
 desc: forward declaration of structure before structure which is using type.
 idl:
@@ -58,7 +19,7 @@ idl:
     myFun(in forwardStruct s) -> void
   }
 
-test.h:
+test_common.h:
   - typedef struct struct2 struct2;
   - typedef struct forwardStruct forwardStruct;
 
@@ -102,7 +63,7 @@ idl: |
   {
     myFun(in forwardUnion u @discriminator(discriminator), unionCases discriminator) -> void
   }
-test.h:
+test_common.h:
   - typedef struct structure structure;
   - typedef union forwardUnion forwardUnion;
 

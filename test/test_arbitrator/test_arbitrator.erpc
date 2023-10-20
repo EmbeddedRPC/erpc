@@ -8,6 +8,7 @@
 
 @crc
 @output_dir("erpc_outputs/")
+@namespace("")
 program test;
 
 import "../common/unit_test_common.erpc"

@@ -32,7 +32,7 @@ char rpmsg_lite_base[SH_MEM_TOTAL_SIZE] __attribute__((section(".noinit.$rpmsg_s
 #error "RPMsg: Please provide your definition of rpmsg_lite_base[]!"
 #endif
 
-ERPC_MANUALLY_CONSTRUCTED(RPMsgRTOSTransport, s_transport);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(RPMsgRTOSTransport, s_rpmsgTransport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -42,16 +42,49 @@ erpc_transport_t erpc_transport_rpmsg_lite_rtos_master_init(uint32_t src_addr, u
                                                             uint32_t rpmsg_link_id)
 {
     erpc_transport_t transport;
+    RPMsgRTOSTransport *rpmsgTransport;
 
-    s_transport.construct();
-    if (s_transport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) == kErpcStatus_Success)
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_rpmsgTransport.isUsed())
     {
-        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
+        rpmsgTransport = NULL;
     }
     else
     {
-        transport = NULL;
+        s_rpmsgTransport.construct();
+        rpmsgTransport = s_rpmsgTransport.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    rpmsgTransport = new RPMsgRTOSTransport();
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    transport = reinterpret_cast<erpc_transport_t>(rpmsgTransport);
+
+    if (rpmsgTransport != NULL)
+    {
+        if (rpmsgTransport->init(src_addr, dst_addr, rpmsg_lite_base, SH_MEM_TOTAL_SIZE, rpmsg_link_id) !=
+            kErpcStatus_Success)
+        {
+            erpc_transport_rpmsg_lite_rtos_master_deinit(transport);
+            transport = NULL;
+        }
     }
 
     return transport;
+}
+
+void erpc_transport_rpmsg_lite_rtos_master_deinit(erpc_transport_t transport)
+{
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)transport;
+    s_rpmsgTransport.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(transport != NULL);
+
+    RPMsgRTOSTransport *rpmsgTransport = reinterpret_cast<RPMsgRTOSTransport *>(transport);
+
+    delete rpmsgTransport;
+#endif
 }

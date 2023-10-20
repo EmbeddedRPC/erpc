@@ -15,8 +15,8 @@
 #include "erpc_message_buffer.hpp"
 #include "erpc_transport.hpp"
 
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 
 /*!
  * @addtogroup infra_codec
@@ -32,13 +32,13 @@ namespace erpc {
 /*!
  * @brief Types of messages that can be encoded.
  */
-typedef enum _message_type
+enum class message_type_t
 {
     kInvocationMessage = 0,
     kOnewayMessage,
     kReplyMessage,
     kNotificationMessage
-} message_type_t;
+};
 
 typedef void *funPtr;          // Pointer to functions
 typedef funPtr *arrayOfFunPtr; // Pointer to array of functions
@@ -252,23 +252,6 @@ public:
      * @param[in] isNull Null flag to send.
      */
     virtual void writeNullFlag(bool isNull) = 0;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[in] callback Callback which ID should be serialized.
-     */
-    virtual void writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback) = 0;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which ID should be serialized.
-     */
-    virtual void writeCallback(funPtr callback1, funPtr callback2) = 0;
     //@}
 
     //! @name Decoding
@@ -404,23 +387,6 @@ public:
      * @param[in] isNull Null flag to read.
      */
     virtual void readNullFlag(bool &isNull) = 0;
-
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[out] callback Callback which is deserialized. Null in case of error.
-     */
-    virtual void readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback) = 0;
-
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which is deserialized.
-     */
-    virtual void readCallback(funPtr callbacks1, funPtr *callback2) = 0;
 
 protected:
     MessageBuffer m_buffer;         /*!< Message buffer object */

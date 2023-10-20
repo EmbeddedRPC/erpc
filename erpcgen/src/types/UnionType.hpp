@@ -40,7 +40,8 @@ public:
      * @param[in] discriminatorName Discriminator name.
      */
     UnionType(const std::string &name, const std::string &discriminatorName) :
-    DataType(name, kUnionType), m_discriminator(discriminatorName), m_members("(union)"), m_parentStruct(nullptr)
+    DataType(name, data_type_t::kUnionType), m_discriminator(discriminatorName), m_members("(union)"),
+    m_parentStruct(nullptr)
     {
     }
 
@@ -54,7 +55,8 @@ public:
      * @param[in] discriminatorName Discriminator name.
      */
     UnionType(const Token &tok, const std::string &discriminatorName) :
-    DataType(tok, kUnionType), m_discriminator(discriminatorName), m_members("(union)"), m_parentStruct(nullptr)
+    DataType(tok, data_type_t::kUnionType), m_discriminator(discriminatorName), m_members("(union)"),
+    m_parentStruct(nullptr)
     {
     }
 

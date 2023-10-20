@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016-2021 NXP
+# Copyright 2016-2022 NXP
 # Copyright 2022 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
@@ -240,13 +240,13 @@ class LIBUSBSIOSPITransport(FramedTransport):
         self.sio = LIBUSBSIO()
 
         # Get number of LIBUSBSIO devices
-        res = self.sio.GetNumPorts(pidvids=[LIBUSBSIO.PIDVID_LPCLINK2])
+        res = self.sio.GetNumPorts(vidpids=[LIBUSBSIO.VIDPID_LPCLINK2])
         if res != 0:
             self._gpioport = 1
             self._gpiopin = 2
             self._gpiomode = 1
         else:
-            res = self.sio.GetNumPorts(pidvids=[LIBUSBSIO.PIDVID_MCULINK])
+            res = self.sio.GetNumPorts(vidpids=[LIBUSBSIO.VIDPID_MCULINK])
             if res != 0:
                 self._gpioport = 0
                 self._gpiopin = 4
@@ -347,13 +347,13 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         self.sio = LIBUSBSIO()
 
         # Get number of LIBUSBSIO devices
-        res = self.sio.GetNumPorts(pidvids=[LIBUSBSIO.PIDVID_LPCLINK2])
+        res = self.sio.GetNumPorts(vidpids=[LIBUSBSIO.VIDPID_LPCLINK2])
         if res != 0:
             self._gpioport = 1
             self._gpiopin = 2
             self._gpiomode = 1
         else:
-            res = self.sio.GetNumPorts(pidvids=[LIBUSBSIO.PIDVID_MCULINK])
+            res = self.sio.GetNumPorts(vidpids=[LIBUSBSIO.VIDPID_MCULINK])
             if res != 0:
                 self._gpioport = 1
                 self._gpiopin = 3
@@ -405,12 +405,12 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             res = self.sio.GPIO_GetPin(self._gpioport, self._gpiopin)
         # Send the header first
         data, rxbytesnumber = self._hI2CPort.FastXfer(
-            0x7E, message[:self.HEADER_LEN], self.HEADER_LEN, 0, 0)
+            0x7E, message[:self.HEADER_LEN], self.HEADER_LEN, 0, False, True)
         if rxbytesnumber > 0:
             #print('I2C received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hI2CPort.FastXfer(
-                0x7E, bytes(message[4:]), len(message) - self.HEADER_LEN, 0, 0)
+                0x7E, bytes(message[4:]), len(message) - self.HEADER_LEN, 0, False, True)
         else:
             print('I2C transfer error: %d' % rxbytesnumber)
 
@@ -420,7 +420,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         while (1 == res):
             res = self.sio.GPIO_GetPin(self._gpioport, self._gpiopin)
         # Issue the I2C_Transfer API
-        data, rxbytesnumber = self._hI2CPort.FastXfer(0x7E, 0, 0, count, 0)
+        data, rxbytesnumber = self._hI2CPort.FastXfer(0x7E, 0, 0, count, False, True)
         if rxbytesnumber > 0:
             #print('I2C received %d number of bytes' % rxbytesnumber)
             return bytes(data[:count])

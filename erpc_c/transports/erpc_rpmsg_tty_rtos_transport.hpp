@@ -129,7 +129,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 *getCrc16(void);
+    virtual Crc16 *getCrc16(void) override;
 
 protected:
     uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */

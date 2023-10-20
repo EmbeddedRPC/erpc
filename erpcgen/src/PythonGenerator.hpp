@@ -117,11 +117,24 @@ protected:
      *
      * @param[in] group Pointer to a group.
      * @param[in] fn From this are set interface function template data.
-     * @param[in] fnIndex Function index.
      *
      * @return Contains interface function data.
      */
     cpptempl::data_map getFunctionTemplateData(Group *group, Function *fn) override;
+
+    /*!
+     * @brief This function returns function type (callbacks type) template data.
+     *
+     * This function returns function type (callbacks type) template data with all data, which
+     * are necessary for generating output code for output files. Shim code is generating
+     * common function for serialization/deserialization of data.
+     *
+     * @param[in] group Group to which function belongs.
+     * @param[in] fn From this are set function type template data.
+     *
+     * @return Contains interface function data.
+     */
+    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn) override { return {}; };
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -134,11 +147,16 @@ protected:
     /*!
      * @brief This function return interface function prototype.
      *
+     * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
+     * @param[in] interfaceName Interface name used for function declaration.
+     * @param[in] name Name used for shared code in case of function type.
+     * @param[in] insideInterfaceCall interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Function *fn);
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
+                                     const std::string &name = "", bool insideInterfaceCall = false) override;
 
     /*!
      * @brief This function sets const template data.
@@ -186,13 +204,6 @@ protected:
     void makeAliasesTemplateData();
 
     /*!
-     * @brief This function sets function type template data.
-     *
-     * This is used for registering callback functions in generated output.
-     */
-    void makeFunctionsTemplateData();
-
-    /*!
      * @brief This function sets struct member information to struct data map variable.
      *
      * This function sets struct member information to struct data map variable, which
@@ -235,7 +246,7 @@ protected:
     std::string filterName(const std::string &name);
 
     //! @brief Possible Doxygen comment styles.
-    enum comment_type
+    enum class comment_type_t
     {
         kMultilineComment, //!< Leading multi-line comment
         kInlineComment,    //!< Trailing inline comment.
@@ -249,7 +260,7 @@ protected:
      *
      * @return Python form of the provided comment.
      */
-    std::string convertComment(const std::string &comment, comment_type commentType);
+    std::string convertComment(const std::string &comment, comment_type_t commentType);
 
     /*!
      * @brief Strip leading and trailing whitespace.
@@ -263,7 +274,7 @@ protected:
      *
      * @param[in] c Checked character.
      */
-    bool checkWhitspaceChar(char c);
+    bool checkWhitespaceChar(char c);
 
     /*!
      * Stores reserved words for Python program language.

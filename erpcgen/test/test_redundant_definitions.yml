@@ -40,7 +40,7 @@ idl: |
   interface foo {
     bar(in Vector vector_x, out Wector vector_y) -> void
   }
-test.h:
+test_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - struct Vector
@@ -50,7 +50,7 @@ test_server.cpp:
   - read_Vector_struct
   - not: read_Wector_struct
   - write_Wector_struct
-test_client.cpp:  
+test_client.cpp:
   - write_Vector_struct
   - not: read_Vector_struct
   - read_Wector_struct
@@ -124,44 +124,52 @@ idl: |
   interface fooA {
     barA(out Vector vector_x, in Wector vector_y) -> void
   }
-test.h:
+test_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - typedef struct NoGroup NoGroup;
   - struct Vector
   - struct Wector
   - struct NoGroup
+c_test_server.h:
   - enum _foo_ids
   - void bar(const NoGroup * noGroup_z)
 test_server.cpp:
   - read_NoGroup_struct
   - not: write_NoGroup_struct
-  - not: Vector_struct  
+  - not: Vector_struct
   - not: Wector_struct
   - foo_service::bar_shim
-test_client.cpp:  
+c_test_client.h:
+  - enum _foo_ids
+  - void bar(const NoGroup * noGroup_z)
+test_client.cpp:
   - not: read_NoGroup_struct
   - write_NoGroup_struct
-  - not: Vector_struct  
+  - not: Vector_struct
   - not: Wector_struct
   - bar(const NoGroup * noGroup_z)
-test_A.h:
+test_A_common.h:
   - typedef struct Vector Vector
   - typedef struct Wector Wector
   - typedef struct NoGroup NoGroup;
   - struct Vector
   - struct Wector
   - struct NoGroup
+c_test_A_server.h:
   - enum _fooA_ids
   - void barA(Vector * vector_x, const Wector * vector_y)
-test_A_server.cpp: 
+test_A_server.cpp:
   - read_Wector_struct
   - not: write_Wector_struct
   - write_Vector_struct
   - not: read_Vector_struct
   - not: NoGroup_struct
   - fooA_service::barA_shim
-test_A_client.cpp:  
+c_test_A_client.h:
+  - enum _fooA_ids
+  - void barA(Vector * vector_x, const Wector * vector_y)
+test_A_client.cpp:
   - write_Wector_struct
   - not: read_Wector_struct
   - read_Vector_struct
@@ -200,14 +208,14 @@ idl: |
   interface foo_B {
     bar_B(out VectorB b) -> void
   }
-test.h:
+test_A_common.h:
   - typedef struct VectorA VectorA
   - typedef struct VectorB VectorB
   - struct VectorA
   - struct VectorB
   - not: bar_A(const VectorA * a)
   - not: bar_AA(const VectorA * aa, VectorB * bb)
-test_A.h:
+c_test_A_client.h:
   - not: typedef
   - bar_A(const VectorA * a)
   - bar_AA(const VectorA * aa, VectorB * bb)
@@ -216,10 +224,10 @@ test_A_server.cpp:
   - write_VectorB_struct
   - not: write_VectorA_struct
   - not: read_VectorB_struct
-test_B.h:
+c_test_B_client.h:
   - not: typedef
   - bar_B(VectorB * b)
-test_B_server.cpp:  
+test_B_server.cpp:
   - write_VectorB_struct
   - not: read_VectorB_struct
   - not: VectorA_struct

@@ -51,7 +51,7 @@ public:
     virtual void generate() override;
 
 private:
-    enum _direction
+    enum class direction_t
     {
         kIn,
         kOut,
@@ -92,39 +92,88 @@ private:
     void generateOutputFiles(const std::string &fileNameExtension) override;
 
     /*!
-     * @brief This function generate output common types header file.
+     * @brief This function generate header file output with common eRPC code.
+     *
+     * @param[in] fileName Name for common eRPC header file output.
+     */
+    void generateCommonCHeaderFiles(std::string fileName);
+
+    /*!
+     * @brief This function generate header file output with common eRPC code.
+     *
+     * @param[in] fileName Name for common eRPC header file output.
+     */
+    void generateCommonCppHeaderFiles(std::string fileName);
+
+    /*!
+     * @brief This function generate output interface header file.
+     *
+     * @param[in] fileName Name for output interface header file.
+     */
+    void generateInterfaceCppHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output interface source file.
+     *
+     * @param[in] fileName Name for output interface source file.
+     */
+    void generateInterfaceCppSourceFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client header file for cpp.
+     *
+     * @param[in] fileName Name for output client header file.
+     */
+    void generateClientCppHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client source file for cpp.
      *
      * @param[in] fileName Name for output client source file.
      */
-    void generateTypesHeaderFile();
+    void generateClientCppSourceFile(std::string fileName);
 
     /*!
-     * @brief This function generate output common header file.
-     *
-     * @param[in] fileName Name for output client source file.
-     */
-    void generateCommonHeaderFiles(const std::string &fileName);
-
-    /*!
-     * @brief This function generate output client source file.
-     *
-     * @param[in] fileName Name for output client source file.
-     */
-    void generateClientSourceFile(std::string fileName);
-
-    /*!
-     * @brief This function generate output server header file.
+     * @brief This function generate output server header file for cpp.
      *
      * @param[in] fileName Name for output server header file.
      */
-    void generateServerHeaderFile(std::string fileName);
+    void generateServerCppHeaderFile(std::string fileName);
 
     /*!
-     * @brief This function generate output server source file.
+     * @brief This function generate output server source file for cpp.
      *
      * @param[in] fileName Name for output server source file.
      */
-    void generateServerSourceFile(std::string fileName);
+    void generateServerCppSourceFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client header file for C.
+     *
+     * @param[in] fileName Name for output client header file.
+     */
+    void generateClientCHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output client source file for C.
+     *
+     * @param[in] fileName Name for output client source file.
+     */
+    void generateClientCSourceFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output server header file for C.
+     *
+     * @param[in] fileName Name for output server header file.
+     */
+    void generateServerCHeaderFile(std::string fileName);
+
+    /*!
+     * @brief This function generate output server source file for C.
+     *
+     * @param[in] fileName Name for output server source file.
+     */
+    void generateServerCSourceFile(std::string fileName);
 
     /*!
      * @brief This function generate output crc16 source file.
@@ -204,7 +253,7 @@ private:
      *
      * @return Contains interface function data.
      */
-    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn);
+    cpptempl::data_map getFunctionTypeTemplateData(Group *group, FunctionType *fn) override;
 
     /*!
      * @brief This function will get symbol comments and convert to language specific ones
@@ -420,21 +469,24 @@ private:
      *
      * @param[in] group Group to which function belongs.
      * @param[in] fn Function for prototyping.
-     * @param[in] name Name used for FunctionType.
+     * @param[in] interfaceName Interface name used for function declaration.
+     * @param[in] name Name used for shared code in case of function type.
+     * @param[in] insideInterfaceCall interfaceClass specific.
      *
      * @return String prototype representation for given function.
      */
-    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string name = "");
+    std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
+                                     const std::string &name = "", bool insideInterfaceCall = false) override;
 
     /*!
      * @brief This function return interface function representation called by server side.
      *
      * @param[in] fn Function for interface function representation.
-     * @param[in] functionType Inside FunctionType common shim code server call need use FunctionType parameters names.
+     * @param[in] isCCall C and C++ code is similar, but not same.
      *
      * @return String representation for given function.
      */
-    std::string getFunctionServerCall(Function *fn, FunctionType *functionType = nullptr);
+    std::string getFunctionServerCall(Function *fn, bool isCCall = false);
 
     /*!
      * @brief This function return name with guard.
@@ -480,13 +532,13 @@ private:
      * @param[in] structType Structure holdings structure members.
      * @param[in] inDataContainer Is inside data container (struct, list, array).
      * @param[in] structMember Null for return.
-     * @param[out] needTempVariable Return true, when data type contains enum, function, union type.
+     * @param[out] needTempVariableI32 Return true, when data type contains enum, function, union type.
      * @param[in] isFunctionParam True for function param else false (structure member).
      *
      * @return Template data for decode or encode data type.
      */
     cpptempl::data_map getEncodeDecodeCall(const std::string &name, Group *group, DataType *t, StructType *structType,
-                                           bool inDataContainer, StructMember *structMember, bool &needTempVariable,
+                                           bool inDataContainer, StructMember *structMember, bool &needTempVariableI32,
                                            bool isFunctionParam);
 
     /*!
@@ -577,7 +629,7 @@ private:
      * @param[in,out] toServer List of data types designed for server direction.
      * @param[in] dataMap Map with information about structure or function parameter.
      */
-    void setSymbolDataToSide(const Symbol *symbolType, const std::set<_param_direction> &directions,
+    void setSymbolDataToSide(const Symbol *symbolType, const std::set<param_direction_t> &directions,
                              cpptempl::data_list &toClient, cpptempl::data_list &toServer, cpptempl::data_map &dataMap);
 
     /*!
@@ -726,7 +778,7 @@ private:
      *
      * @return String representation for given direction.
      */
-    std::string getDirection(_param_direction direction);
+    std::string getDirection(param_direction_t direction);
 
     /*!
      * @brief This function returns information if function parameter on server side need be initialized to NULL.

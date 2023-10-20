@@ -38,7 +38,7 @@ public:
      *
      * @param[in] name Given name.
      */
-    explicit StructType(const std::string &name) : DataType(name, kStructType) {}
+    explicit StructType(const std::string &name) : DataType(name, data_type_t::kStructType) {}
 
     /*!
      * @brief Constructor.
@@ -47,7 +47,7 @@ public:
      *
      * @param[in] tok Given token.
      */
-    explicit StructType(const Token &tok) : DataType(tok, kStructType) {}
+    explicit StructType(const Token &tok) : DataType(tok, data_type_t::kStructType) {}
 
     /*!
      * @brief This function will add struct member to the struct.

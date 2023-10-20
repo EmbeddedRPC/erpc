@@ -34,7 +34,8 @@ public:
      * @param[in] name Name.
      * @param[in] elementType Given data type.
      */
-    AliasType(const std::string &name, DataType *elementType) : DataType(name, kAliasType), m_elementType(elementType)
+    AliasType(const std::string &name, DataType *elementType) :
+    DataType(name, data_type_t::kAliasType), m_elementType(elementType)
     {
     }
 
@@ -46,7 +47,10 @@ public:
      * @param[in] tok Token, which contains name and location.
      * @param[in] elementType Given data type.
      */
-    AliasType(const Token &tok, DataType *elementType) : DataType(tok, kAliasType), m_elementType(elementType) {}
+    AliasType(const Token &tok, DataType *elementType) :
+    DataType(tok, data_type_t::kAliasType), m_elementType(elementType)
+    {
+    }
 
     /*!
      * @brief This function return element data type.

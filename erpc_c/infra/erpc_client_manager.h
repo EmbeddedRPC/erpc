@@ -25,6 +25,8 @@
  */
 
 extern "C" {
+#else
+#include "erpc_common.h"
 #endif
 
 typedef void (*client_error_handler_t)(erpc_status_t err,

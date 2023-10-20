@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2020 NXP
+ * Copyright 2016 - 2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -14,8 +14,9 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
-#include "test_firstInterface_server.h"
-#include "test_secondInterface.h"
+
+#include "c_test_firstInterface_server.h"
+#include "c_test_secondInterface_client.h"
 #include "unit_test.h"
 
 #ifdef __cplusplus
@@ -28,7 +29,7 @@ extern "C" {
 #include "board.h"
 #include "mcmgr.h"
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
-int main(int argc, char **argv);
+int main(void);
 #endif
 #ifdef __cplusplus
 }
@@ -125,18 +126,6 @@ static void SignalReady(void)
     MCMGR_TriggerEvent(kMCMGR_RemoteApplicationEvent, APP_ERPC_READY_EVENT_DATA);
 }
 
-/*!
- * @brief Application-specific implementation of the SystemInitHook() weak function.
- */
-void SystemInitHook(void)
-{
-    /* Initialize MCMGR - low level multicore management library. Call this
-       function as close to the reset entry as possible to allow CoreUp event
-       triggering. The SystemInitHook() weak function overloading is used in this
-       application. */
-    MCMGR_EarlyInit();
-}
-
 void runInit(void *arg)
 {
     // Initialize MCMGR before calling its API
@@ -202,7 +191,7 @@ void runInit(void *arg)
     vTaskSuspend(NULL);
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
     BOARD_InitHardware();
 
@@ -218,6 +207,7 @@ int main(int argc, char **argv)
     }
 }
 
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;
@@ -263,4 +253,5 @@ int testClient()
         }
     }
     return 0;
+}
 }

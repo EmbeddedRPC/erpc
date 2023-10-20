@@ -1,0 +1,70 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$clientCGuardMacro})
+#define {$clientCGuardMacro}
+
+#include "{$commonCHeaderName}"
+#include "erpc_client_manager.h"
+{% for iface in group.interfaces %}
+{%  for fn in iface.functions %}
+{%   for externalInterface in fn.externalInterfaces %}
+{%    for interfaceFile in interfacesFiles %}
+{%     if externalInterface == interfaceFile.interfaceName %}
+#include "c_{$interfaceFile.interfaceCommonFileName}_client.h"
+{%     endif %}
+{%    endfor -- interfacesFiles %}
+{%   endfor -- externalInterface %}
+{%  endfor -- fn %}
+{% endfor -- iface %}
+
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
+#if !defined({$getFunctionDeclarationMacroName()})
+#define {$getFunctionDeclarationMacroName()}
+
+{% for iface in group.interfaces %}
+{%  for cb in iface.callbacksInt%}
+typedef {$cb.typenameName};
+{%  endfor %}
+
+/*! @brief {$iface.name} identifiers */
+enum _{$iface.name}_ids
+{
+    k{$iface.name}_service_id = {$iface.id},
+{%  for fn in iface.functions %}
+    k{$iface.name}_{$fn.name}_id = {$fn.id},
+{%  endfor %}
+};
+
+{% endfor %}
+{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
+{$> iface.mlComment}
+//! @name {$iface.name}
+//@{
+{%  for fn in iface.functions if fn.isNonExternalFunction == true %}
+{$> fn.mlComment}
+{$fn.prototype};{$fn.ilComment}{$loop.addNewLineIfNotLast}
+{%  endfor -- functions %}
+//@}{$iface.ilComment}
+
+{% endfor -- iface %}
+#endif // {$getFunctionDeclarationMacroName()}
+
+{% for iface in group.interfaces %}
+void init{$iface.clientClassName}(erpc_client_t client);
+
+void deinit{$iface.clientClassName}(void);
+
+{% endfor -- iface %}
+#if defined(__cplusplus)
+}
+#endif
+
+#endif // {$clientCGuardMacro}

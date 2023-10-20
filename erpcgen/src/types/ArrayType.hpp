@@ -35,7 +35,7 @@ public:
      * @param[in] elementCount Given count.
      */
     ArrayType(DataType *elementType, uint32_t elementCount) :
-    DataType("(array)", kArrayType), m_elementType(elementType), m_elementCount(elementCount)
+    DataType("(array)", data_type_t::kArrayType), m_elementType(elementType), m_elementCount(elementCount)
     {
     }
 

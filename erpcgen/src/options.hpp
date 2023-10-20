@@ -373,7 +373,7 @@ private:
     int parse_longopt(OptIter &iter, const char *&optarg);
 
 public:
-    enum OptCtrl
+    enum class OptCtrl
     {
         DEFAULT = 0x00,    //!< Default setting
         ANYCASE = 0x01,    //!< Ignore case when matching short-options
@@ -400,7 +400,7 @@ public:
 
     //! Error return values for operator()
     //!
-    enum OptRC
+    enum class OptRC
     {
         ENDOPTS = 0,
         BADCHAR = -1,
@@ -454,7 +454,7 @@ public:
     //! the positonal argument (and "iter" is advanced to the next argument
     //! in the iterator).
     //!
-    //! Unless Options::QUIET is used, missing option-arguments and
+    //! Unless Options::OptCtrl::QUIET is used, missing option-arguments and
     //! invalid options (and the like) will automatically cause error
     //! messages to be issued to cerr.
     int operator()(OptIter &iter, const char *&optarg);

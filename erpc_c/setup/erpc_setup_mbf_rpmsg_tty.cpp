@@ -110,10 +110,42 @@ protected:
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-ERPC_MANUALLY_CONSTRUCTED(RPMsgTTYMessageBufferFactory, s_msgFactory);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(RPMsgTTYMessageBufferFactory, s_msgFactory);
 
 erpc_mbf_t erpc_mbf_rpmsg_tty_init(erpc_transport_t transport)
 {
-    s_msgFactory.construct(reinterpret_cast<RPMsgBaseTransport *>(transport)->get_rpmsg_lite_instance());
-    return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());
+    RPMsgTTYMessageBufferFactory *msgFactory;
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_msgFactory.isUsed())
+    {
+        msgFactory = NULL;
+    }
+    else
+    {
+        s_msgFactory.construct(reinterpret_cast<RPMsgBaseTransport *>(transport)->get_rpmsg_lite_instance());
+        msgFactory = s_msgFactory.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    msgFactory =
+        new RPMsgTTYMessageBufferFactory(reinterpret_cast<RPMsgBaseTransport *>(transport)->get_rpmsg_lite_instance());
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    return reinterpret_cast<erpc_mbf_t>(msgFactory);
+}
+
+void erpc_mbf_rpmsg_tty_deinit(erpc_mbf_t mbf)
+{
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)mbf;
+    s_msgFactory.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(mbf != NULL);
+
+    RPMsgTTYMessageBufferFactory *msgFactory = reinterpret_cast<RPMsgTTYMessageBufferFactory *>(mbf);
+
+    delete msgFactory;
+#endif
 }

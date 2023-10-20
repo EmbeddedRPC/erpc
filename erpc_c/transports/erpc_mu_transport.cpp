@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 NXP
+ * Copyright 2017-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -169,7 +169,7 @@ void MUTransport::tx_cb(void)
         {
             tx = m_txBuffer[m_txCntBytes >> 2];
         }
-        MU_SendMsgNonBlocking(m_muBase, i, tx);
+        MU_SendMsg(m_muBase, i, tx);
         m_txCntBytes += 4U;
     }
 
@@ -245,7 +245,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
         m_txCntBytes = 0;
         m_txBuffer = reinterpret_cast<uint32_t *>(message->get());
 
-        MU_SendMsgNonBlocking(m_muBase, 0, m_txMsgSize);
+        MU_SendMsg(m_muBase, 0, m_txMsgSize);
 
         // write to next MU tx registers
         for (i = 1; i < MU_REG_COUNT; i++)
@@ -256,7 +256,7 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
             {
                 tx = m_txBuffer[m_txCntBytes >> 2];
             }
-            MU_SendMsgNonBlocking(m_muBase, i, tx);
+            MU_SendMsg(m_muBase, i, tx);
             m_txCntBytes += 4U;
         }
 
