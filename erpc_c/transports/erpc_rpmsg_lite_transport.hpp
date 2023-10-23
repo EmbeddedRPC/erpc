@@ -41,7 +41,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_lite_transport
  */
-class RPMsgTransport : public RPMsgBase, public Transport
+class RPMsgTransport : public Transport, public RPMsgBase
 {
 public:
     /*!
