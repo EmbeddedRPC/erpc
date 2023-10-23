@@ -40,7 +40,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_lite_rtos_transport
  */
-class RPMsgRTOSTransport : public RPMsgBase, public Transport
+class RPMsgRTOSTransport : public Transport, public RPMsgBase
 {
 public:
     /*!
@@ -110,26 +110,27 @@ public:
     virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
-     * @brief This functions sets the CRC-16 implementation.
-     *
-     * @param[in] crcImpl Object containing crc-16 compute function.
-     */
-    virtual void setCrc16(Crc16 *crcImpl);
-
-    /*!
-     * @brief This functions gets the CRC-16 object.
-     *
-     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
-     */
-    virtual Crc16 *getCrc16(void);
-    /*!
      * @brief Function to check if is message in receive queue and wait for processing.
      *
      * This function should be called before function receive() to avoid waiting for new message.
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return ((rpmsg_queue_get_current_size(m_rpmsg_queue) > 0) ? true : false); }
+    virtual bool hasMessage(void) override;
+
+    /*!
+     * @brief This functions sets the CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl) override;
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void) override;
 
 protected:
     /* Remote device */

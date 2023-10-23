@@ -239,6 +239,10 @@ erpc_status_t Cursor::write(const void *data, uint32_t length)
     return err;
 }
 
+MessageBufferFactory::MessageBufferFactory(void) {}
+
+MessageBufferFactory::~MessageBufferFactory(void) {}
+
 MessageBuffer MessageBufferFactory::create(uint8_t reserveHeaderSize)
 {
     MessageBuffer messageBuffer = create();
@@ -246,6 +250,11 @@ MessageBuffer MessageBufferFactory::create(uint8_t reserveHeaderSize)
     messageBuffer.setUsed(reserveHeaderSize);
 
     return messageBuffer;
+}
+
+bool MessageBufferFactory::createServerBuffer(void)
+{
+    return true;
 }
 
 erpc_status_t MessageBufferFactory::prepareServerBufferForSend(MessageBuffer &message, uint8_t reserveHeaderSize)

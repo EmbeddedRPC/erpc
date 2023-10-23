@@ -44,24 +44,9 @@ TransportArbitrator::~TransportArbitrator(void)
     freeClientList(m_clientFreeList);
 }
 
-void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+uint8_t TransportArbitrator::reserveHeaderSize(void)
 {
-    erpc_assert(crcImpl != NULL);
-    erpc_assert(m_sharedTransport != NULL);
-    m_sharedTransport->setCrc16(crcImpl);
-}
-
-Crc16 *TransportArbitrator::getCrc16(void)
-{
-    erpc_assert(m_sharedTransport != NULL);
-    return m_sharedTransport->getCrc16();
-}
-
-bool TransportArbitrator::hasMessage(void)
-{
-    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
-
-    return m_sharedTransport->hasMessage();
+    return m_sharedTransport->reserveHeaderSize();
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
@@ -149,6 +134,46 @@ erpc_status_t TransportArbitrator::send(MessageBuffer *message)
 {
     erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
     return m_sharedTransport->send(message);
+}
+
+bool TransportArbitrator::hasMessage(void)
+{
+    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
+
+    return m_sharedTransport->hasMessage();
+}
+
+void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+{
+    erpc_assert(crcImpl != NULL);
+    erpc_assert(m_sharedTransport != NULL);
+    m_sharedTransport->setCrc16(crcImpl);
+}
+
+Crc16 *TransportArbitrator::getCrc16(void)
+{
+    erpc_assert(m_sharedTransport != NULL);
+    return m_sharedTransport->getCrc16();
+}
+
+void TransportArbitrator::setSharedTransport(Transport *shared)
+{
+    m_sharedTransport = shared;
+}
+
+Transport *TransportArbitrator::getSharedTransport(void)
+{
+    return m_sharedTransport;
+}
+
+void TransportArbitrator::setCodec(Codec *codec)
+{
+    m_codec = codec;
+}
+
+Codec *TransportArbitrator::getCodec(void)
+{
+    return m_codec;
 }
 
 TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(RequestContext &request)

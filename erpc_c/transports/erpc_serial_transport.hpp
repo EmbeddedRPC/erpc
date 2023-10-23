@@ -74,7 +74,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed Serial failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Receive data from Serial peripheral.
@@ -85,7 +85,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed Serial failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
 private:
     int m_serialHandle;     /*!< Serial handle id. */

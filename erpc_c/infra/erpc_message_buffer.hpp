@@ -367,12 +367,12 @@ public:
      *
      * This function initializes object attributes.
      */
-    MessageBufferFactory(void) {}
+    MessageBufferFactory(void);
 
     /*!
      * @brief MessageBufferFactory destructor
      */
-    virtual ~MessageBufferFactory(void) {}
+    virtual ~MessageBufferFactory(void);
 
     /*!
      * @brief This function creates new message buffer.
@@ -397,7 +397,7 @@ public:
      *
      * @return Has to return TRUE when server need create buffer for receiving message.
      */
-    virtual bool createServerBuffer(void) { return true; }
+    virtual bool createServerBuffer(void);
 
     /*!
      * @brief This function is preparing output buffer on server side.

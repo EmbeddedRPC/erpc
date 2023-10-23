@@ -15,17 +15,49 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-
-void SimpleServer::disposeBufferAndCodec(Codec *codec)
+SimpleServer::SimpleServer(void)
+: m_isServerOn(true)
 {
-    if (codec != NULL)
+}
+
+SimpleServer::~SimpleServer(void) {}
+
+erpc_status_t SimpleServer::run(void)
+{
+    erpc_status_t err = kErpcStatus_Success;
+    while ((err == kErpcStatus_Success) && m_isServerOn)
     {
-        if (codec->getBuffer() != NULL)
-        {
-            m_messageFactory->dispose(&codec->getBufferRef());
-        }
-        m_codecFactory->dispose(codec);
+        err = runInternal();
     }
+    return err;
+}
+
+erpc_status_t SimpleServer::poll(void)
+{
+    erpc_status_t err;
+
+    if (m_isServerOn)
+    {
+        if (m_transport->hasMessage() == true)
+        {
+            err = runInternal();
+        }
+        else
+        {
+            err = kErpcStatus_Success;
+        }
+    }
+    else
+    {
+        err = kErpcStatus_ServerIsDown;
+    }
+
+    return err;
+}
+
+void SimpleServer::stop(void)
+{
+    m_isServerOn = false;
 }
 
 erpc_status_t SimpleServer::runInternal(void)
@@ -151,16 +183,6 @@ erpc_status_t SimpleServer::runInternalEnd(Codec *codec, message_type_t msgType,
     return err;
 }
 
-erpc_status_t SimpleServer::run(void)
-{
-    erpc_status_t err = kErpcStatus_Success;
-    while ((err == kErpcStatus_Success) && m_isServerOn)
-    {
-        err = runInternal();
-    }
-    return err;
-}
-
 #if ERPC_NESTED_CALLS
 erpc_status_t SimpleServer::run(RequestContext &request)
 {
@@ -212,30 +234,14 @@ erpc_status_t SimpleServer::run(RequestContext &request)
 }
 #endif
 
-erpc_status_t SimpleServer::poll(void)
+void SimpleServer::disposeBufferAndCodec(Codec *codec)
 {
-    erpc_status_t err;
-
-    if (m_isServerOn)
+    if (codec != NULL)
     {
-        if (m_transport->hasMessage() == true)
+        if (codec->getBuffer() != NULL)
         {
-            err = runInternal();
+            m_messageFactory->dispose(&codec->getBufferRef());
         }
-        else
-        {
-            err = kErpcStatus_Success;
-        }
+        m_codecFactory->dispose(codec);
     }
-    else
-    {
-        err = kErpcStatus_ServerIsDown;
-    }
-
-    return err;
-}
-
-void SimpleServer::stop(void)
-{
-    m_isServerOn = false;
 }

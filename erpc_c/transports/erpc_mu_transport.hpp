@@ -127,7 +127,7 @@ public:
      *
      * @return kErpcStatus_Success
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -137,7 +137,7 @@ public:
      * @retval kErpcStatus_SendFailed Failed to send message buffer.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
      * @brief Function to check if is new message to receive.
@@ -146,7 +146,7 @@ public:
      *
      * @return True if exist new message, else false.
      */
-    virtual bool hasMessage(void) { return m_newMessage; }
+    virtual bool hasMessage(void) override;
 
 #if ERPC_TRANSPORT_MU_USE_MCMGR
     /*!

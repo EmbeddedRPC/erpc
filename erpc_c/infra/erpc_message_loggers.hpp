@@ -86,7 +86,7 @@ public:
     /*!
      * @brief Transport destructor
      */
-    virtual ~MessageLoggers(void);
+    ~MessageLoggers(void);
 
     /*!
      * @brief This function add given transport to newly created MessageLogger object.

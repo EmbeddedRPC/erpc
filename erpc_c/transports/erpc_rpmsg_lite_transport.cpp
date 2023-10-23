@@ -73,17 +73,6 @@ RPMsgTransport::~RPMsgTransport(void)
     }
 }
 
-void RPMsgTransport::setCrc16(Crc16 *crcImpl)
-{
-    erpc_assert(crcImpl != NULL);
-    m_crcImpl = crcImpl;
-}
-
-Crc16 *RPMsgTransport::getCrc16(void)
-{
-    return m_crcImpl;
-}
-
 erpc_status_t RPMsgTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
                                    uint32_t rpmsg_link_id)
 {
@@ -227,4 +216,20 @@ erpc_status_t RPMsgTransport::send(MessageBuffer *message)
     message->set(NULL, 0);
 
     return (ret_val != RL_SUCCESS) ? kErpcStatus_SendFailed : kErpcStatus_Success;
+}
+
+bool RPMsgTransport::hasMessage(void)
+{
+    return ((0UL < m_messageQueue.size()) ? true : false);
+}
+
+void RPMsgTransport::setCrc16(Crc16 *crcImpl)
+{
+    erpc_assert(crcImpl != NULL);
+    m_crcImpl = crcImpl;
+}
+
+Crc16 *RPMsgTransport::getCrc16(void)
+{
+    return m_crcImpl;
 }

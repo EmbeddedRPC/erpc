@@ -114,26 +114,27 @@ public:
     virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
-     * @brief This functions sets the CRC-16 implementation.
-     *
-     * @param[in] crcImpl Object containing crc-16 compute function.
-     */
-    virtual void setCrc16(Crc16 *crcImpl);
-
-    /*!
-     * @brief This functions gets the CRC-16 object.
-     *
-     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
-     */
-    virtual Crc16 *getCrc16(void);
-    /*!
      * @brief Function to check if is message in receive queue and wait for processing.
      *
      * This function should be called before function receive() to avoid waiting for new message.
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true : false); }
+    virtual bool hasMessage(void) override;
+
+    /*!
+     * @brief This functions sets the CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl) override;
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void) override;
 
 protected:
     /*!

@@ -113,10 +113,12 @@ public:
      * @brief Constructor.
      */
     TransportFactory(void) {}
+
     /*!
      * @brief TransportFactory destructor
      */
     virtual ~TransportFactory(void) {}
+
     /*!
      * @brief Return created transport object.
      *

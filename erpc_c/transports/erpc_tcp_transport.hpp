@@ -115,7 +115,7 @@ protected:
      * @retval #kErpcStatus_ReceiveFailed When reading data ends with error.
      * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief This function writes data.
@@ -127,7 +127,7 @@ protected:
      * @retval #kErpcStatus_SendFailed When writing data ends with error.
      * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Server thread function.
