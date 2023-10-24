@@ -72,7 +72,8 @@ class FramedTransport(Transport):
 
             crcBody = self._Crc16.computeCRC16(message)
             messageLength = len(message)
-            crcHeader = self._Crc16.computeCRC16(messageLength) + self._Crc16.computeCRC16(crcBody)
+            crcHeader = self._Crc16.computeCRC16(bytearray(struct.pack('<H', messageLength))) + self._Crc16.computeCRC16(bytearray(struct.pack('<H', crcBody)))
+            crcHeader &= 0xFFFF # 2bytes
 
             header = bytearray(struct.pack('<HHH', crcHeader, messageLength, crcBody))
             assert len(header) == self.HEADER_LEN
@@ -88,7 +89,8 @@ class FramedTransport(Transport):
             headerData = self._base_receive(self.HEADER_LEN)
             crcHeader, messageLength, crcBody = struct.unpack('<HHH', headerData)
 
-            computedCrc = self._Crc16.computeCRC16(messageLength) + self._Crc16.computeCRC16(crcBody)
+            computedCrc = self._Crc16.computeCRC16(bytearray(struct.pack('<H', messageLength))) + self._Crc16.computeCRC16(bytearray(struct.pack('<H', crcBody)))
+            computedCrc &= 0xFFFF # 2bytes
             if computedCrc != crcHeader:
                 raise RequestError("invalid header CRC")
 
