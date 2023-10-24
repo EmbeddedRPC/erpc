@@ -12,13 +12,15 @@
 #include "erpc_manually_constructed.hpp"
 #include "erpc_mbf_setup.h"
 #include "erpc_message_buffer.hpp"
-#include "erpc_rpmsg_lite_base_transport.hpp"
+#include "erpc_rpmsg_lite_base.hpp"
 
 extern "C" {
 #include "rpmsg_lite.h"
 }
 
 using namespace erpc;
+
+#define TIMEOUT_MS 10
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -51,7 +53,7 @@ public:
     {
         void *buf = NULL;
         uint32_t size = 0;
-        buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, RL_BLOCK);
+        buf = rpmsg_lite_alloc_tx_buffer(m_rpmsg, &size, TIMEOUT_MS);
 
         erpc_assert(NULL != buf);
         return MessageBuffer(reinterpret_cast<uint8_t *>(buf), size);
@@ -77,14 +79,15 @@ public:
         }
     }
 
-    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer *message)
+    virtual erpc_status_t prepareServerBufferForSend(MessageBuffer &message, uint8_t reserveHeaderSize = 0)
     {
         erpc_status_t status;
 
-        dispose(message);
-        *message = create();
-        if (message->get() != NULL)
+        dispose(&message);
+        message = create();
+        if (message.get() != NULL)
         {
+            message.setUsed(reserveHeaderSize);
             status = kErpcStatus_Success;
         }
         else
@@ -118,12 +121,11 @@ erpc_mbf_t erpc_mbf_rpmsg_init(erpc_transport_t transport)
     }
     else
     {
-        s_msgFactory.construct(reinterpret_cast<RPMsgBaseTransport *>(transport)->get_rpmsg_lite_instance());
+        s_msgFactory.construct(reinterpret_cast<RPMsgBase *>(transport)->get_rpmsg_lite_instance());
         msgFactory = s_msgFactory.get();
     }
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    msgFactory =
-        new RPMsgMessageBufferFactory(reinterpret_cast<RPMsgBaseTransport *>(transport)->get_rpmsg_lite_instance());
+    msgFactory = new RPMsgMessageBufferFactory(reinterpret_cast<RPMsgBase *>(transport)->get_rpmsg_lite_instance());
 #else
 #error "Unknown eRPC allocation policy!"
 #endif

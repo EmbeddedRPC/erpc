@@ -43,7 +43,15 @@ class BasicCodec : public Codec
 public:
     static const uint32_t kBasicCodecVersion; /*!< Codec version. */
 
-    BasicCodec(void) : Codec() {}
+    /*!
+     * @brief Constructor.
+     */
+    BasicCodec(void);
+
+    /*!
+     * @brief CodecFactory destructor
+     */
+    virtual ~BasicCodec(void);
 
     //! @name Encoding
     //@{
@@ -341,6 +349,16 @@ public:
 class BasicCodecFactory : public CodecFactory
 {
 public:
+    /*!
+     * @brief Constructor.
+     */
+    BasicCodecFactory(void);
+
+    /*!
+     * @brief CodecFactory destructor
+     */
+    virtual ~BasicCodecFactory(void);
+
     /*!
      * @brief Return created codec.
      *

@@ -58,7 +58,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Codec(void) : m_buffer(), m_cursor(), m_status(kErpcStatus_Success) {}
+    Codec(void) : m_cursor(), m_status(kErpcStatus_Success) {}
 
     /*!
      * @brief Codec destructor
@@ -70,24 +70,31 @@ public:
      *
      * @return Pointer to used message buffer.
      */
-    MessageBuffer *getBuffer(void) { return &m_buffer; }
+    MessageBuffer getBuffer(void) { return m_cursor.getBuffer(); }
+
+    MessageBuffer &getBufferRef(void) { return m_cursor.getBufferRef(); }
 
     /*!
      * @brief Prototype for set message buffer used for read and write data.
      *
      * @param[in] buf Message buffer to set.
+     * @param[in] skip How many bytes to skip from reading.
      */
-    virtual void setBuffer(MessageBuffer &buf)
+    virtual void setBuffer(MessageBuffer &buf, uint8_t skip = 0)
     {
-        m_buffer = buf;
-        m_cursor.set(&m_buffer);
+        m_cursor.setBuffer(buf, skip);
         m_status = kErpcStatus_Success;
     }
 
-    /*! @brief Reset the codec to initial state. */
-    virtual void reset(void)
+    /*!
+     * @brief Reset the codec to initial state.
+     *
+     * @param[in] skip How many bytes to skip from reading.
+     */
+    virtual void reset(uint8_t skip = 0)
     {
-        m_cursor.set(&m_buffer);
+        MessageBuffer buffer = m_cursor.getBuffer();
+        m_cursor.setBuffer(buffer, skip);
         m_status = kErpcStatus_Success;
     }
 
@@ -389,9 +396,8 @@ public:
     virtual void readNullFlag(bool &isNull) = 0;
 
 protected:
-    MessageBuffer m_buffer;         /*!< Message buffer object */
-    MessageBuffer::Cursor m_cursor; /*!< Copy data to message buffers. */
-    erpc_status_t m_status;         /*!< Status of serialized data. */
+    Cursor m_cursor;        /*!< Copy data to message buffers. */
+    erpc_status_t m_status; /*!< Status of serialized data. */
 };
 
 /*!

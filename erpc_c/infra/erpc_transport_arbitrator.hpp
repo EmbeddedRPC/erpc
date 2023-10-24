@@ -53,33 +53,12 @@ public:
      */
     virtual ~TransportArbitrator(void);
 
-    /*!
-     * @brief This function set shared client/server transport.
+    /**
+     * @brief Size of data placed in MessageBuffer before serializing eRPC data.
      *
-     * @param[in] shared Shared client/server transport.
+     * @return uint8_t Amount of bytes, reserved before serialized data.
      */
-    void setSharedTransport(Transport *shared) { m_sharedTransport = shared; }
-
-    /*!
-     * @brief This function returns shared client/server transport.
-     *
-     * @return Transport * Returns shared client/server transport.
-     */
-    Transport *getSharedTransport(void) { return m_sharedTransport; }
-
-    /*!
-     * @brief This function set codec.
-     *
-     * @param[in] codec Codec.
-     */
-    void setCodec(Codec *codec) { m_codec = codec; }
-
-    /*!
-     * @brief This function get codec.
-     *
-     * @return Codec * Pointer to codec used within transport.
-     */
-    Codec *getCodec(void) { return m_codec; }
+    virtual uint8_t reserveHeaderSize(void) override;
 
     /*!
      * @brief Prototype for receiving message.
@@ -91,6 +70,67 @@ public:
      * @return based on receive implementation.
      */
     virtual erpc_status_t receive(MessageBuffer *message) override;
+
+    /*!
+     * @brief Prototype for send message.
+     *
+     * Each transport layer need define this function.
+     *
+     * @param[in] message Pass message buffer to send.
+     *
+     * @return based on send implementation.
+     */
+    virtual erpc_status_t send(MessageBuffer *message) override;
+
+    /*!
+     * @brief Check if the underlying shared transport has a message
+     *
+     * @retval The underlying transport is expected to return true when a message is available to
+     *         process and false otherwise.
+     */
+    virtual bool hasMessage(void) override;
+
+    /*!
+     * @brief This functions sets the CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl) override;
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void) override;
+
+    /*!
+     * @brief This function set shared client/server transport.
+     *
+     * @param[in] shared Shared client/server transport.
+     */
+    void setSharedTransport(Transport *shared);
+
+    /*!
+     * @brief This function returns shared client/server transport.
+     *
+     * @return Transport * Returns shared client/server transport.
+     */
+    Transport *getSharedTransport(void);
+
+    /*!
+     * @brief This function set codec.
+     *
+     * @param[in] codec Codec.
+     */
+    void setCodec(Codec *codec);
+
+    /*!
+     * @brief This function get codec.
+     *
+     * @return Codec * Pointer to codec used within transport.
+     */
+    Codec *getCodec(void);
 
     /*!
      * @brief Add a client request to the client list.
@@ -116,39 +156,6 @@ public:
      * @return erpc_status_t Return erpc status of client receive function.
      */
     erpc_status_t clientReceive(client_token_t token);
-
-    /*!
-     * @brief Prototype for send message.
-     *
-     * Each transport layer need define this function.
-     *
-     * @param[in] message Pass message buffer to send.
-     *
-     * @return based on send implementation.
-     */
-    virtual erpc_status_t send(MessageBuffer *message) override;
-
-    /*!
-     * @brief This functions sets the CRC-16 implementation.
-     *
-     * @param[in] crcImpl Object containing crc-16 compute function.
-     */
-    virtual void setCrc16(Crc16 *crcImpl) override;
-
-    /*!
-     * @brief This functions gets the CRC-16 object.
-     *
-     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
-     */
-    virtual Crc16 *getCrc16(void) override;
-
-    /*!
-     * @brief Check if the underlying shared transport has a message
-     *
-     * @retval The underlying transport is expected to return true when a message is available to
-     *         process and false otherwise.
-     */
-    virtual bool hasMessage(void) override;
 
     /*!
      * @brief Request info for a client trying to receive a response.

@@ -64,6 +64,9 @@ protected:
     uint32_t m_srcClock_Hz;  /*!< Source clock of DSPI peripheral used in this transport layer */
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from DSPI peripheral.
      *
@@ -73,7 +76,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed DSPI failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to DSPI peripheral.
@@ -84,7 +87,7 @@ private:
      * @retval kErpcStatus_SendFailed DSPI failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

@@ -46,6 +46,13 @@ public:
      */
     virtual ~Transport(void) {}
 
+    /**
+     * @brief Size of data placed in MessageBuffer before serializing eRPC data.
+     *
+     * @return uint8_t Amount of bytes, reserved before serialized data.
+     */
+    virtual uint8_t reserveHeaderSize(void) { return 0; }
+
     /*!
      * @brief Prototype for receiving message.
      *
@@ -106,10 +113,12 @@ public:
      * @brief Constructor.
      */
     TransportFactory(void) {}
+
     /*!
      * @brief TransportFactory destructor
      */
     virtual ~TransportFactory(void) {}
+
     /*!
      * @brief Return created transport object.
      *

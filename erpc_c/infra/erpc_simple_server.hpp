@@ -37,7 +37,9 @@ public:
      *
      * This function initializes object attributes.
      */
-    SimpleServer(void) : m_isServerOn(true) {}
+    SimpleServer(void);
+
+    virtual ~SimpleServer(void);
 
     /*!
      * @brief Run server in infinite loop.
@@ -63,6 +65,16 @@ public:
     virtual void stop(void) override;
 
 protected:
+    bool m_isServerOn; /*!< Information if server is ON or OFF. */
+
+    /*!
+     * @brief Run server implementation.
+     *
+     * This function call functions for receiving data, process this data and
+     * if reply exist, send it back.
+     */
+    erpc_status_t runInternal(void);
+
     /*!
      * @brief This function handle receiving request message and reading base info about message.
      *
@@ -102,21 +114,11 @@ protected:
 #endif
 
     /*!
-     * @brief Run server implementation.
-     *
-     * This function call functions for receiving data, process this data and
-     * if reply exist, send it back.
-     */
-    erpc_status_t runInternal(void);
-
-    /*!
      * @brief Disposing message buffers and codecs.
      *
      * @param[in] codec Pointer to codec to dispose. It contains also message buffer to dispose.
      */
     void disposeBufferAndCodec(Codec *codec);
-
-    bool m_isServerOn; /*!< Information if server is ON or OFF. */
 };
 
 } // namespace erpc

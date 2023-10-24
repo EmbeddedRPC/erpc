@@ -59,7 +59,7 @@ for folder in folders:
     for path, subdirs, files in os.walk(folder):
         for name in files:
             if any(ext in name for ext in extensions):
-                file = os.path.join(path, name)
+                file = "./" + os.path.join(path, name)
                 if file in exceptions:
                     print("Ignored: ", file)
                 else:

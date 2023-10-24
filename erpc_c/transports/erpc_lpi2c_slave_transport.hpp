@@ -77,6 +77,9 @@ protected:
 #endif
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from LPI2C peripheral.
      *
@@ -86,7 +89,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed LPI2C failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to LPI2C peripheral.
@@ -97,7 +100,7 @@ private:
      * @retval kErpcStatus_SendFailed LPI2C failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

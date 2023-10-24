@@ -64,7 +64,7 @@ erpc_status_t Sniffer::run()
         }
 
         Log::info("message received\n");
-        m_codec->setBuffer(message);
+        m_codec->setBuffer(message, m_transport->reserveHeaderSize());
 
         // Save time when message was received.
         time_t now = chrono::system_clock::to_time_t(currentTime);

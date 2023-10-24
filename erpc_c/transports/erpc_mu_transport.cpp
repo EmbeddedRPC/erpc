@@ -280,6 +280,11 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
     return status;
 }
 
+bool MUTransport::hasMessage(void)
+{
+    return m_newMessage;
+}
+
 extern "C" {
 
 #if ERPC_TRANSPORT_MU_USE_MCMGR
