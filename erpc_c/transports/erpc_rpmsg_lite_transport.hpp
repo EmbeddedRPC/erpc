@@ -13,8 +13,9 @@
 #include "erpc_config_internal.h"
 #include "erpc_crc16.hpp"
 #include "erpc_message_buffer.hpp"
-#include "erpc_rpmsg_lite_base_transport.hpp"
+#include "erpc_rpmsg_lite_base.hpp"
 #include "erpc_static_queue.hpp"
+#include "erpc_transport.hpp"
 
 extern "C" {
 #include "rpmsg_lite.h"
@@ -40,7 +41,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_lite_transport
  */
-class RPMsgTransport : public RPMsgBaseTransport
+class RPMsgTransport : public Transport, public RPMsgBase
 {
 public:
     /*!
@@ -100,7 +101,7 @@ public:
      *
      * @return kErpcStatus_Success
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -110,21 +111,8 @@ public:
      * @retval kErpcStatus_SendFailed Failed to send message buffer.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
-    /*!
-     * @brief This functions sets the CRC-16 implementation.
-     *
-     * @param[in] crcImpl Object containing crc-16 compute function.
-     */
-    virtual void setCrc16(Crc16 *crcImpl);
-
-    /*!
-     * @brief This functions gets the CRC-16 object.
-     *
-     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
-     */
-    virtual Crc16 *getCrc16(void);
     /*!
      * @brief Function to check if is message in receive queue and wait for processing.
      *
@@ -132,7 +120,21 @@ public:
      *
      * @return True if exist received message, else false.
      */
-    virtual bool hasMessage(void) { return ((0UL < m_messageQueue.size()) ? true : false); }
+    virtual bool hasMessage(void) override;
+
+    /*!
+     * @brief This functions sets the CRC-16 implementation.
+     *
+     * @param[in] crcImpl Object containing crc-16 compute function.
+     */
+    virtual void setCrc16(Crc16 *crcImpl) override;
+
+    /*!
+     * @brief This functions gets the CRC-16 object.
+     *
+     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
+     */
+    virtual Crc16 *getCrc16(void) override;
 
 protected:
     /*!

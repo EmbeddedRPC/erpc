@@ -56,7 +56,7 @@ public:
      * @retval kErpcStatus_Success When message was received successfully.
      * @retval kErpcStatus_Fail When message wasn't received successfully.
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief This function sends the eRPC messages.
@@ -66,7 +66,7 @@ public:
      * @retval kErpcStatus_Success When message was sent successfully.
      * @retval kErpcStatus_Fail When message wasn't sent successfully.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
 private:
     RPMsgEndpoint *m_endPoint; /*!< Object operating with endpoints. */

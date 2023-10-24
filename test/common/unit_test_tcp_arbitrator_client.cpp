@@ -63,7 +63,6 @@ void increaseWaitQuit()
 {
     Mutex::Guard lock(waitQuitMutex);
     waitQuit++;
-    Mutex::Guard unlock(waitQuitMutex);
 }
 
 void runServer(void *arg)
@@ -89,7 +88,6 @@ void runClient(void *arg)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // send to ERPC second (server) app ready to quit state
@@ -175,7 +173,6 @@ int main(int argc, char **argv)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // Close transport

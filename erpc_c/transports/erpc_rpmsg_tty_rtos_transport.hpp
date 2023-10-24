@@ -11,8 +11,9 @@
 #define _EMBEDDED_RPC__RPMSG_LITE_TTY_RTOS_TRANSPORT_H_
 
 #include "erpc_crc16.hpp"
+#include "erpc_framed_transport.hpp"
 #include "erpc_message_buffer.hpp"
-#include "erpc_rpmsg_lite_base_transport.hpp"
+#include "erpc_rpmsg_lite_base.hpp"
 
 extern "C" {
 #include "rpmsg_lite.h"
@@ -40,7 +41,7 @@ namespace erpc {
  *
  * @ingroup rpmsg_tty_rtos_transport
  */
-class RPMsgTTYRTOSTransport : public RPMsgBaseTransport
+class RPMsgTTYRTOSTransport : public FramedTransport, public RPMsgBase
 {
 public:
     /*!
@@ -94,48 +95,63 @@ public:
     virtual erpc_status_t init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t rpmsg_link_id,
                                void (*ready_cb)(void), char *nameservice_name);
 
-    /*!
-     * @brief Store incoming message to message buffer.
-     *
-     * In loop while no message come.
-     *
-     * @param[in] message Message buffer, to which will be stored incoming
-     * message.
-     *
-     * @retval kErpcStatus_ReceiveFailed Failed to receive message buffer.
-     * @retval kErpcStatus_Success Successfully received all data.
-     */
-    virtual erpc_status_t receive(MessageBuffer *message);
-
-    /*!
-     * @brief Function to send prepared message.
-     *
-     * @param[in] message Pass message buffer to send.
-     *
-     * @retval kErpcStatus_SendFailed Failed to send message buffer.
-     * @retval kErpcStatus_Success Successfully sent all data.
-     */
-    virtual erpc_status_t send(MessageBuffer *message);
-
-    /*!
-     * @brief This functions sets the CRC-16 implementation.
-     *
-     * @param[in] crcImpl Object containing crc-16 compute function.
-     */
-    virtual void setCrc16(Crc16 *crcImpl);
-
-    /*!
-     * @brief This functions gets the CRC-16 object.
-     *
-     * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
-     */
-    virtual Crc16 * getCrc16(void) override;
-
 protected:
     uint32_t m_dst_addr;                     /*!< Destination address used by rpmsg. */
     rpmsg_queue_handle m_rpmsg_queue;        /*!< Handle of RPMsg queue. */
     struct rpmsg_lite_endpoint *m_rpmsg_ept; /*!< Pointer to RPMsg Lite Endpoint structure. */
-    Crc16 *m_crcImpl;                        //!< CRC object.
+
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when receiving data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
+    virtual erpc_status_t underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset) override;
+
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when sending data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
+    virtual erpc_status_t underlyingSend(MessageBuffer *message, uint32_t size, uint32_t offset) override;
+
+    /*!
+     * @brief This function read data.
+     *
+     * @param[inout] data Preallocated buffer for receiving data.
+     * @param[in] size Size of data to read.
+     *
+     * @retval #kErpcStatus_Success When data was read successfully.
+     * @retval #kErpcStatus_ReceiveFailed When reading data ends with error.
+     * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
+     */
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
+
+    /*!
+     * @brief This function writes data.
+     *
+     * @param[in] data Buffer to send.
+     * @param[in] size Size of data to send.
+     *
+     * @retval #kErpcStatus_Success When data was written successfully.
+     * @retval #kErpcStatus_SendFailed When writing data ends with error.
+     * @retval #kErpcStatus_ConnectionClosed Peer closed the connection.
+     */
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

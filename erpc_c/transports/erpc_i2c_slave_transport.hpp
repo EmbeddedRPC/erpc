@@ -78,6 +78,9 @@ protected:
 #endif
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from I2C peripheral.
      *
@@ -87,7 +90,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed I2C failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to I2C peripheral.
@@ -98,7 +101,7 @@ private:
      * @retval kErpcStatus_SendFailed I2C failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

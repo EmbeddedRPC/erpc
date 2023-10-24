@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
-#define _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
+#ifndef _EMBEDDED_RPC__RPMSG_LITE_BASE_H_
+#define _EMBEDDED_RPC__RPMSG_LITE_BASE_H_
 
 #include "erpc_config_internal.h"
-#include "erpc_transport.hpp"
 
 extern "C" {
-#include "rpmsg_lite.h"
 #include "rpmsg_env_specific.h"
+#include "rpmsg_lite.h"
 }
 
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
@@ -47,13 +46,12 @@ namespace erpc {
  * @ingroup rpmsg_lite_transport
  * @ingroup rpmsg_lite_rtos_transport
  */
-class RPMsgBaseTransport : public Transport
+class RPMsgBase
 {
 public:
-    RPMsgBaseTransport(void)
-    : Transport(){};
+    RPMsgBase(void){};
 
-    virtual ~RPMsgBaseTransport(void) {}
+    virtual ~RPMsgBase(void) {}
 
     /*!
      * @brief This function returns pointer to instance of RPMSG lite
@@ -82,4 +80,4 @@ protected:
 
 /*! @} */
 
-#endif // _EMBEDDED_RPC__RPMSG_LITE_BASE_TRANSPORT_H_
+#endif // _EMBEDDED_RPC__RPMSG_LITE_BASE_H_

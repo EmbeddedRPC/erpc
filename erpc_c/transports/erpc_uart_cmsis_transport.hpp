@@ -83,6 +83,9 @@ protected:
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 #endif
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from UART peripheral.
      *
@@ -92,7 +95,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed UART failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to UART peripheral.
@@ -102,7 +105,7 @@ private:
      *
      * @retval kErpcStatus_Success Always returns success status.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc
