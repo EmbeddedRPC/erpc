@@ -87,7 +87,7 @@ public:
      * @return Based on handleInvocation implementation.
      */
     virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec,
-                                           MessageBufferFactory *messageFactory) = 0;
+                                           MessageBufferFactory *messageFactory, Transport *transport) = 0;
 
 protected:
     uint32_t m_serviceId; /*!< Service unique id. */

@@ -63,7 +63,6 @@ void increaseWaitQuit()
 {
     Mutex::Guard lock(waitQuitMutex);
     waitQuit++;
-    Mutex::Guard unlock(waitQuitMutex);
 }
 
 void runServer(void *arg)
@@ -84,14 +83,14 @@ void runClient(void *arg)
     while (true)
     {
         isTestPassing = testClient();
-        Mutex::Guard lock(waitQuitMutex);
-        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
-            enableFirstSide();
-            Mutex::Guard unlock(waitQuitMutex);
-            break;
+            Mutex::Guard lock(waitQuitMutex);
+            if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
+            {
+                enableFirstSide();
+                break;
+            }
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     while (true)
@@ -101,7 +100,6 @@ void runClient(void *arg)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // send to ERPC first (client) app ready to quit state
@@ -166,7 +164,6 @@ int main(int argc, char **argv)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // Close transport
