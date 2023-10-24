@@ -97,6 +97,10 @@ protected:
     Thread m_serverThread; /*!< Pointer to server thread. */
     bool m_runServer;      /*!< Thread is executed while this is true. */
 
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
+
     /*!
      * @brief This function connect client to the server.
      *

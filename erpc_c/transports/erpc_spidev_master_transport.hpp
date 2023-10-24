@@ -56,6 +56,9 @@ protected:
     uint32_t m_speed_Hz;  /*!< SPI clock speed in Hz. */
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from SPI peripheral.
      *

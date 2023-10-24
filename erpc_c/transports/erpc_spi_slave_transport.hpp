@@ -79,6 +79,9 @@ protected:
 #endif
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from SPI peripheral.
      *

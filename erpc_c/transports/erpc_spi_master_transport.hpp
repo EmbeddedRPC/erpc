@@ -65,6 +65,9 @@ protected:
     uint32_t m_srcClock_Hz;  /*!< Source clock of SPI peripheral used in this transport layer */
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from SPI peripheral.
      *

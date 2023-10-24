@@ -96,6 +96,9 @@ private:
     uint8_t *m_usbRingBuffer;
     uint32_t m_usbRingBufferLength;
 
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from USB CDC peripheral.
      *

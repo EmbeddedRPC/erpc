@@ -83,6 +83,9 @@ protected:
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
 #endif
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from UART peripheral.
      *
