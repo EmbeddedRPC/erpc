@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2021, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -40,8 +40,8 @@ int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint3
 }
 
 RPMsgTransport::RPMsgTransport(void)
-: RPMsgBase()
-, Transport()
+: Transport()
+, RPMsgBase()
 , m_dst_addr(0)
 , m_rpmsg_ept(NULL)
 , m_crcImpl(NULL)
