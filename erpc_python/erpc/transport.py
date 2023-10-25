@@ -166,7 +166,8 @@ class TCPTransport(FramedTransport):
             self._serverSockEventStart.set()
 
     def close(self):
-        self._serverSockEventStart.clear()
+        if self._isServer:
+            self._serverSockEventStart.clear()
         self._sock.close()
         self._sock = None
 
