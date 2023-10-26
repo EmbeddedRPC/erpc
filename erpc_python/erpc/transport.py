@@ -10,6 +10,8 @@
 import struct
 import socket
 import threading
+from _socket import SHUT_RDWR
+
 from .crc16 import Crc16
 from .client import RequestError
 import time
@@ -168,6 +170,7 @@ class TCPTransport(FramedTransport):
     def close(self):
         if self._isServer:
             self._serverSockEventStart.clear()
+        self._sock.shutdown(SHUT_RDWR)
         self._sock.close()
         self._sock = None
 
