@@ -10,7 +10,7 @@ eRPC documentation can be also found in: https://github.com/EmbeddedRPC/erpc/wik
 
 # Prerequisites
 
-- Java 17 SDK
+- Java 21 SDK
 - Maven 3.9.4
 
 # Example files
