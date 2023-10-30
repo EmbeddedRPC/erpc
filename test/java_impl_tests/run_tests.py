@@ -21,7 +21,6 @@ tests_list = [
     # "test_unions"
 ]
 
-MVN_EXECUTABLE = r"c:\Users\nxf97102\Documents\apache-maven-3.9.4\bin\mvn.cmd"
 PYTHON_TESTS_PATH = r"..\python_impl_tests\scripts"
 
 
