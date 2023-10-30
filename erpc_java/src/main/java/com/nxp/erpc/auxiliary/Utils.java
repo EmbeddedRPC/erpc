@@ -122,6 +122,17 @@ public final class Utils {
     }
 
     /**
+     * Conver int representing uint16 to bytearray (little endian).
+     *
+     * @param value Value to by converted
+     * @return uint16 as bytes
+     */
+    public static byte[] uInt16ToBytes(int value) {
+        checkUInt16(value);
+        return new byte[]{(byte) (value & 0xFF), (byte) ((value >> 8) & 0xFF)};
+    }
+
+    /**
      * Function creates string representing byte array as hex.
      *
      * @param a Byte array

@@ -7,6 +7,7 @@
 package com.nxp.erpc.transport;
 
 import com.nxp.erpc.auxiliary.Crc16;
+import com.nxp.erpc.auxiliary.Utils;
 import com.nxp.erpc.codec.BasicCodec;
 import com.nxp.erpc.codec.Codec;
 
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Abstract class for framed transports implementations.
  */
 public abstract class FramedTransport implements Transport {
-    private static final int HEADER_LEN = 4;
+    private static final int HEADER_LEN = 6;
 
     private final Crc16 crc16 = new Crc16();
     private final Lock receiveLock = new ReentrantLock();
@@ -30,15 +31,24 @@ public abstract class FramedTransport implements Transport {
             byte[] headerData = baseReceive(HEADER_LEN);
             Codec codec = new BasicCodec(headerData);
 
+            int crcHeader = codec.readUInt16();
             int messageLength = codec.readUInt16();
-            int receivedCrc16 = codec.readUInt16();
+            int crcBody = codec.readUInt16();
+
+            int computedCrc = crc16.computeCRC16(Utils.uInt16ToBytes(messageLength))
+                    + crc16.computeCRC16(Utils.uInt16ToBytes(crcBody));
+            computedCrc &= 0xFFFF; // 2 bytes
+
+            if (computedCrc != crcHeader) {
+                throw new RequestError("Invalid message (header) CRC");
+            }
 
             byte[] data = baseReceive(messageLength);
 
-            int computedCrc16 = crc16.computeCRC16(data);
+            int computedBodyCrc16 = crc16.computeCRC16(data);
 
-            if (computedCrc16 != receivedCrc16) {
-                throw new RequestError("Invalid message CRC");
+            if (computedBodyCrc16 != crcBody) {
+                throw new RequestError("Invalid message (body) CRC");
             }
 
             return data;
@@ -53,11 +63,17 @@ public abstract class FramedTransport implements Transport {
         try {
             sendLock.lock();
 
-            int computedCrc16 = crc16.computeCRC16(message);
-
             Codec codec = new BasicCodec();
-            codec.writeUInt16(message.length);
-            codec.writeUInt16(computedCrc16);
+
+            int messageLength = message.length;
+            int crcBody = crc16.computeCRC16(message);
+            int crcHeader = crc16.computeCRC16(Utils.uInt16ToBytes(messageLength))
+                    + crc16.computeCRC16(Utils.uInt16ToBytes(crcBody));
+            crcHeader &= 0xFFFF; // 2 bytes
+
+            codec.writeUInt16(crcHeader);
+            codec.writeUInt16(messageLength);
+            codec.writeUInt16(crcBody);
 
             byte[] header = codec.array();
 
