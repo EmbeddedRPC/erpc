@@ -14,6 +14,25 @@ Current implementation supports these tests:
 
 and communicate via TPC or serial port.
 
+## Prerequisites
+
+- [Java 21 SDK](https://jdk.java.net/21/)
+- [Maven 3.9.5](https://maven.apache.org/download.cgi)
+
+To check that all the prerequisites are correctly installed, run `mvn -v`. You should get something like this:
+
+```
+Apache Maven 3.9.5 (***)
+Maven home: c:\Program Files\Maven\apache-maven-3.9.5
+Java version: 21, vendor: Oracle Corporation, runtime: c:\Program Files\Java\jdk-21
+Default locale: en_US, platform encoding: UTF-8
+OS name: "***", version: "***", arch: "***", family: "***"
+```
+
+- If `mvn -v` fails, check that you have added maven to the `PATH` variable.
+- If you do not see the correct Java version, check that you have set the `JAVA_HOME` and `PATH` variables correctly.
+
+
 ## Test folder structure
 
 * **client/** - client side tests
@@ -66,7 +85,7 @@ To run server test, execute `mvn test -Dtest=TestNameServer -Dserver`
 - `-Dbaudrate=BAUDRATE` (default: 115200) - Set serial link baudrate
 
 ```shell
-mvn test -Dtest=TestArrays # Client test case
+mvn test -Dtest=TestArrays # Client test casemvn 
 mvn test -Dtest=TestArrays -Dserial=COM6 -Dbaudrate=115200 # Specified serial transport
 mvn test -Dtest=TestArraysServer -Dserver # Server test case
 mvn test -Dtest=TestArraysServer -Dserver -Dport=12345 # Server test case with custom port

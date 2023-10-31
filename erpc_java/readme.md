@@ -4,16 +4,28 @@ This folder contains the Java implementation of the eRPC infrastructure.
 
 ## Contents
 
-`/src/main/java/com/nxp/erpc` - Java package for eRPC infrastructure.
-
-`pom.xml` - Maven config file.
-
-`checkstyle.xml` - Check style config file.
+- `/src/main/java/com/nxp/erpc` - Java package containing eRPC infrastructure.
+- `pom.xml` - Maven config file.
+- `checkstyle.xml` - Check style config file.
 
 ## Prerequisites
 
-- Java 21 SDK
-- Maven 3.9.4
+- [Java 21 SDK](https://jdk.java.net/21/)
+- [Maven 3.9.5](https://maven.apache.org/download.cgi)
+
+To check that all the prerequisites are correctly installed, run `mvn -v`. You should get something like this:
+
+```
+Apache Maven 3.9.5 (***)
+Maven home: c:\Program Files\maven\apache-maven-3.9.5
+Java version: 21, vendor: Oracle Corporation, runtime: c:\Program Files\Java\jdk-21
+Default locale: en_US, platform encoding: UTF-8
+OS name: "***", version: "***", arch: "***", family: "***"
+```
+
+- If `mvn -v` fails, check that you have added maven to the `PATH` variable.
+- If you do not see the correct Java version, check that you have set the `JAVA_HOME` and `PATH` variables correctly.
+
 
 ## Installation
 
