@@ -100,7 +100,7 @@ public class Main {
             } else {
                 // server
                 System.out.println("Transport: tcp server - port = " + port);
-                transport = new TCPTransport(40);
+                transport = new TCPTransport(port);
             }
         }
 
