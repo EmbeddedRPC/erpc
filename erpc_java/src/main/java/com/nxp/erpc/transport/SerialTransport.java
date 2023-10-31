@@ -60,7 +60,7 @@ public final class SerialTransport extends FramedTransport {
         int bytesRead = serial.readBytes(received, count);
 
         if (bytesRead != count) {
-            throw new Error("Should read: " + count + ", but read: " + bytesRead);
+            throw new TransportError("Should read: " + count + ", but read: " + bytesRead);
         }
 
         return received;
