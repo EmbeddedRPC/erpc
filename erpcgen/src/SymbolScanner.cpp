@@ -1446,11 +1446,13 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
     const Token &typeToken = typeNode->getToken();
     switch (typeToken.getToken())
     {
-        case TOK_ARRAY: {
+        case TOK_ARRAY:
+        {
             return createArrayType(typeNode);
         }
 
-        case TOK_IDENT: {
+        case TOK_IDENT:
+        {
             DataType *dataType = nullptr;
             if (m_currentInterface != nullptr)
             {
@@ -1462,10 +1464,12 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
             }
             return dataType;
         }
-        case TOK_LIST: {
+        case TOK_LIST:
+        {
             return createListType(typeNode);
         }
-        case TOK_UNION: {
+        case TOK_UNION:
+        {
             assert(nullptr != m_currentStruct);
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
         }

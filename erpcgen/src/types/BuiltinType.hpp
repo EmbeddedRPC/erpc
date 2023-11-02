@@ -55,9 +55,8 @@ public:
      * @param[in] name Given name.
      * @param[in] builtinType Given builtin type.
      */
-    BuiltinType(const std::string &name, builtin_type_t builtinType)
-    : DataType(name, data_type_t::kBuiltinType)
-    , m_builtinType(builtinType)
+    BuiltinType(const std::string &name, builtin_type_t builtinType) :
+    DataType(name, data_type_t::kBuiltinType), m_builtinType(builtinType)
     {
     }
 

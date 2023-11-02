@@ -51,7 +51,7 @@ using namespace erpc;
 
 #if defined(__MINGW32__)
 #ifndef AI_NUMERICSERV
-#define AI_NUMERICSERV              0x00000008  // Servicename must be a numeric port number
+#define AI_NUMERICSERV 0x00000008 // Servicename must be a numeric port number
 #endif
 #endif
 
@@ -59,17 +59,17 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-TCPTransport::TCPTransport(bool isServer)
-: m_isServer(isServer)
-, m_host(NULL)
-, m_port(0)
+TCPTransport::TCPTransport(bool isServer) :
+m_isServer(isServer), m_host(NULL), m_port(0)
 #if defined(__MINGW32__)
-, m_socket(INVALID_SOCKET)
+,
+m_socket(INVALID_SOCKET)
 #else
-, m_socket(-1)
+,
+m_socket(-1)
 #endif
-, m_serverThread(serverThreadStub)
-, m_runServer(true)
+,
+m_serverThread(serverThreadStub), m_runServer(true)
 {
 #if defined(__MINGW32__)
     WSADATA ws;
@@ -77,17 +77,17 @@ TCPTransport::TCPTransport(bool isServer)
 #endif
 }
 
-TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer)
-: m_isServer(isServer)
-, m_host(host)
-, m_port(port)
+TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer) :
+m_isServer(isServer), m_host(host), m_port(port)
 #if defined(__MINGW32__)
-, m_socket(INVALID_SOCKET)
+,
+m_socket(INVALID_SOCKET)
 #else
-, m_socket(-1)
+,
+m_socket(-1)
 #endif
-, m_serverThread(serverThreadStub)
-, m_runServer(true)
+,
+m_serverThread(serverThreadStub), m_runServer(true)
 {
 #if defined(__MINGW32__)
     WSADATA ws;

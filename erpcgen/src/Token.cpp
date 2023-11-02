@@ -19,10 +19,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Token::Token(const Token &other)
-: m_token(other.m_token)
-, m_value()
-, m_location(other.m_location)
+Token::Token(const Token &other) : m_token(other.m_token), m_value(), m_location(other.m_location)
 {
     if (other.m_value)
     {

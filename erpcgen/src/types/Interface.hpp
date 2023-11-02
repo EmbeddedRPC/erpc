@@ -39,10 +39,8 @@ public:
      *
      * @param[in] tok Given token.
      */
-    explicit Interface(const Token &tok)
-    : Symbol(symbol_type_t::kInterfaceSymbol, tok)
-    , m_scope()
-    , m_uniqueId(s_idCounter++)
+    explicit Interface(const Token &tok) :
+    Symbol(symbol_type_t::kInterfaceSymbol, tok), m_scope(), m_uniqueId(s_idCounter++)
     {
     }
 
@@ -124,7 +122,7 @@ protected:
     function_types_vector_t m_functionTypes; /*!< Vector of interface function types. */
     uint32_t m_uniqueId;                     /*!< Interface unique id. */
 
-    static uint32_t s_idCounter;             /*!< Interface id counter. Each interface will increase this. */
+    static uint32_t s_idCounter; /*!< Interface id counter. Each interface will increase this. */
 };
 
 } // namespace erpcgen

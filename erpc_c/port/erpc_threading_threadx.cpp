@@ -31,26 +31,15 @@ static TX_BYTE_POOL tx_app_byte_pool;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_thread()
-, m_next()
+Thread::Thread(const char *name) :
+m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_thread(), m_next()
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_thread()
-, m_next()
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_thread(), m_next()
 {
 }
 
@@ -209,8 +198,7 @@ void Thread::threadEntryPointStub(ULONG arg)
     tx_interrupt_control(my_old_posture);
 }
 
-Mutex::Mutex(void)
-: m_mutex()
+Mutex::Mutex(void) : m_mutex()
 {
     CHAR name[] = "erpc_mutex";
     tx_mutex_create(&m_mutex, name, TX_INHERIT);
@@ -239,8 +227,7 @@ bool Mutex::unlock(void)
     return (status == TX_SUCCESS);
 }
 
-Semaphore::Semaphore(int count)
-: m_sem()
+Semaphore::Semaphore(int count) : m_sem()
 {
     CHAR name[] = "erpc_sem";
     tx_semaphore_create(&m_sem, name, count);

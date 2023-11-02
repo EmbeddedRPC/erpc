@@ -62,11 +62,11 @@ private:
     cpptempl::data_list m_symbolsTemplate; /*!< List of all symbol templates */
 
     std::vector<ListType *>
-        m_listBinaryTypes;                       /*!<
-                                                  * Contains binary types transformed to list<uint8>.
-                                                  * More ListType are present when @length annotation is used for binary type.
-                                                  * If binary without @length is used then it is placed on first place in this vector.
-                                                  */
+        m_listBinaryTypes; /*!<
+                            * Contains binary types transformed to list<uint8>.
+                            * More ListType are present when @length annotation is used for binary type.
+                            * If binary without @length is used then it is placed on first place in this vector.
+                            */
 
     std::vector<StructType *> m_structListTypes; /*!<
                                                   * Contains list types transformed to struct{list<>}.

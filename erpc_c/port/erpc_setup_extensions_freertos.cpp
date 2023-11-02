@@ -23,11 +23,15 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC(Semaphore, s_semaphore);
 
 void erpc::erpc_pre_cb_default(void)
 {
-    erpc_assert((s_erpc_call_in_progress != NULL) &&
-           ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." != NULL));
+    erpc_assert(
+        (s_erpc_call_in_progress != NULL) &&
+        ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
+         NULL));
     (void)s_erpc_call_in_progress->get(s_erpc_call_in_progress->kWaitForever);
-    erpc_assert((s_erpc_call_timer_cb != NULL) &&
-           ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." != NULL));
+    erpc_assert(
+        (s_erpc_call_timer_cb != NULL) &&
+        ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
+         NULL));
     (void)xTimerStart(s_erpc_call_timer_cb, 0);
 }
 
@@ -85,8 +89,10 @@ void erpc_deinit_call_progress_detection_default(void)
 
 bool erpc_is_call_in_progress_default(void)
 {
-    erpc_assert((s_erpc_call_in_progress != NULL) &&
-           ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." != NULL));
+    erpc_assert(
+        (s_erpc_call_in_progress != NULL) &&
+        ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
+         NULL));
     if (s_erpc_call_in_progress->get(0))
     {
         s_erpc_call_in_progress->put();
@@ -98,12 +104,16 @@ bool erpc_is_call_in_progress_default(void)
 void erpc_reset_in_progress_state_default(void)
 {
 
-    erpc_assert((s_erpc_call_in_progress != NULL) &&
-           ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." != NULL));
+    erpc_assert(
+        (s_erpc_call_in_progress != NULL) &&
+        ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
+         NULL));
     s_erpc_call_in_progress->get(0);
     s_erpc_call_in_progress->put();
 
-    erpc_assert((s_erpc_call_timer_cb != NULL) &&
-           ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." != NULL));
+    erpc_assert(
+        (s_erpc_call_timer_cb != NULL) &&
+        ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
+         NULL));
     (void)xTimerStop(s_erpc_call_timer_cb, 0);
 }

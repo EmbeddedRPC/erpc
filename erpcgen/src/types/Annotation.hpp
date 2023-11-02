@@ -45,11 +45,8 @@ public:
      * @param[in] val Pointer to value.
      * @param[in] lang Programming language for which is annotation intended.
      */
-    Annotation(const Token &token, Value *val, program_lang_t lang)
-    : m_name(token.getStringValue())
-    , m_value(val)
-    , m_location(token.getLocation())
-    , m_lang(lang)
+    Annotation(const Token &token, Value *val, program_lang_t lang) :
+    m_name(token.getStringValue()), m_value(val), m_location(token.getLocation()), m_lang(lang)
     {
     }
 
@@ -60,11 +57,8 @@ public:
      *
      * @param[in] token  Token contains annotation name and location in parsed file.
      */
-    explicit Annotation(const Token &token)
-    : m_name(token.getStringValue())
-    , m_value(nullptr)
-    , m_location(token.getLocation())
-    , m_lang(program_lang_t::kAll)
+    explicit Annotation(const Token &token) :
+    m_name(token.getStringValue()), m_value(nullptr), m_location(token.getLocation()), m_lang(program_lang_t::kAll)
     {
     }
 
@@ -75,11 +69,8 @@ public:
      *
      * @param[in] a Source annotation.
      */
-    explicit Annotation(const Annotation &a)
-    : m_name(a.m_name)
-    , m_value(a.m_value)
-    , m_location(a.m_location)
-    , m_lang(a.m_lang)
+    explicit Annotation(const Annotation &a) :
+    m_name(a.m_name), m_value(a.m_value), m_location(a.m_location), m_lang(a.m_lang)
     {
     }
 

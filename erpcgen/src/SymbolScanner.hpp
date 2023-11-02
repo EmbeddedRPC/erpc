@@ -39,14 +39,9 @@ public:
      *
      * @param[in] globals Global symbol scope variable.
      */
-    explicit SymbolScanner(SymbolScope *globals)
-    : m_globals(globals)
-    , m_currentInterface(nullptr)
-    , m_currentStruct(nullptr)
-    , m_currentProgram(nullptr)
-    , m_currentEnum(nullptr)
-    , m_currentAlias(nullptr)
-    , m_currentUnion(nullptr)
+    explicit SymbolScanner(SymbolScope *globals) :
+    m_globals(globals), m_currentInterface(nullptr), m_currentStruct(nullptr), m_currentProgram(nullptr),
+    m_currentEnum(nullptr), m_currentAlias(nullptr), m_currentUnion(nullptr)
     {
     }
 
@@ -58,15 +53,9 @@ public:
      * @param[in] globals Global symbol scope variable.
      * @param[in] fileName name of IDL from which AST was built.
      */
-    SymbolScanner(SymbolScope *globals, const std::string &fileName)
-    : AstWalker(fileName)
-    , m_globals(globals)
-    , m_currentInterface(nullptr)
-    , m_currentStruct(nullptr)
-    , m_currentProgram(nullptr)
-    , m_currentEnum(nullptr)
-    , m_currentAlias(nullptr)
-    , m_currentUnion(nullptr)
+    SymbolScanner(SymbolScope *globals, const std::string &fileName) :
+    AstWalker(fileName), m_globals(globals), m_currentInterface(nullptr), m_currentStruct(nullptr),
+    m_currentProgram(nullptr), m_currentEnum(nullptr), m_currentAlias(nullptr), m_currentUnion(nullptr)
     {
     }
 

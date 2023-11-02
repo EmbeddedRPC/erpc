@@ -27,14 +27,9 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-InterfaceDefinition::InterfaceDefinition()
-: m_ast(nullptr)
-, m_globals()
-, m_program(nullptr)
-, m_programName("")
-, m_outputFilename("")
-, m_codec(codec_t::kNotSpecified)
-, m_idlCrc16(0)
+InterfaceDefinition::InterfaceDefinition() :
+m_ast(nullptr), m_globals(), m_program(nullptr), m_programName(""), m_outputFilename(""),
+m_codec(codec_t::kNotSpecified), m_idlCrc16(0)
 {
     init();
 }

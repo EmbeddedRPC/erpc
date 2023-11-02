@@ -144,13 +144,11 @@ static void I2C_SlaveUserCallback(I2C_Type *base, volatile i2c_slave_transfer_t 
     }
 }
 
-I2cSlaveTransport::I2cSlaveTransport(I2C_Type *i2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_i2cBaseAddr(i2cBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
+I2cSlaveTransport::I2cSlaveTransport(I2C_Type *i2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_i2cBaseAddr(i2cBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz), m_isInited(false)
 #if ERPC_THREADS
-, m_txrxSemaphore()
+,
+m_txrxSemaphore()
 #endif
 {
     s_i2c_slave_instance = this;

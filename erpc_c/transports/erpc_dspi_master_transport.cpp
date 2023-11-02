@@ -100,10 +100,8 @@ static inline void DSpidevMasterTransport_WaitForSlaveReadyMarker(SPI_Type *spiB
 }
 #endif
 
-DspiMasterTransport::DspiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_spiBaseAddr(spiBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
+DspiMasterTransport::DspiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_spiBaseAddr(spiBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz)
 {
 }
 

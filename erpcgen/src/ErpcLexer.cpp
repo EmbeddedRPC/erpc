@@ -33,11 +33,7 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ErpcLexer::ErpcLexer(const char *inputFile)
-: m_value(nullptr)
-, m_indents(0)
-, m_currentFileInfo(NULL)
-, m_idlCrc16(0)
+ErpcLexer::ErpcLexer(const char *inputFile) : m_value(nullptr), m_indents(0), m_currentFileInfo(NULL), m_idlCrc16(0)
 {
     m_currentFileInfo = openFile(inputFile);
     yyrestart(m_currentFileInfo->m_savedFile.get()); // instead of yyFlexLexer(idlFile);
@@ -79,14 +75,16 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
     {
         switch (*in)
         {
-            case '\\': {
+            case '\\':
+            {
                 // start of an escape sequence
                 char c = *++in;
                 switch (c)
                 {
                     case 0: // end of the string, bail
                         break;
-                    case 'x': {
+                    case 'x':
+                    {
                         // start of a hex char escape sequence
 
                         // read high and low nibbles, checking for end of string
