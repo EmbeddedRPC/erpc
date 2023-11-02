@@ -26,11 +26,11 @@ static UartTransport *s_uart_instance = NULL;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv)
-: m_uartDrv(uartDrv)
+UartTransport::UartTransport(ARM_DRIVER_USART *uartDrv) :
+m_uartDrv(uartDrv)
 #if !ERPC_THREADS_IS(NONE)
-, m_rxSemaphore()
-, m_txSemaphore()
+,
+m_rxSemaphore(), m_txSemaphore()
 #endif
 {
     s_uart_instance = this;

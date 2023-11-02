@@ -42,9 +42,7 @@ public:
     /*!
      * @brief PrePostAction constructor.
      */
-    PrePostAction(void)
-    : m_preCB(NULL)
-    , m_postCB(NULL){};
+    PrePostAction(void) : m_preCB(NULL), m_postCB(NULL){};
 
     /*!
      * @brief This function sets "before eRPC call start" callback function.

@@ -30,11 +30,8 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
-: m_idlCrc16(def->getIdlCrc16())
-, m_def(def)
-, m_globals(&(def->getGlobals()))
-, m_generatorType(generatorType)
+Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType) :
+m_idlCrc16(def->getIdlCrc16()), m_def(def), m_globals(&(def->getGlobals())), m_generatorType(generatorType)
 {
     string scopeName = "erpcShim";
     string scopeNameC;
@@ -164,12 +161,14 @@ Generator::Generator(InterfaceDefinition *def, generator_type_t generatorType)
     // set codec information
     switch (m_def->getCodecType())
     {
-        case InterfaceDefinition::codec_t::kBasicCodec: {
+        case InterfaceDefinition::codec_t::kBasicCodec:
+        {
             m_templateData["codecClass"] = "BasicCodec";
             m_templateData["codecHeader"] = "erpc_basic_codec.hpp";
             break;
         }
-        default: {
+        default:
+        {
             m_templateData["codecClass"] = "Codec";
             m_templateData["codecHeader"] = "erpc_codec.hpp";
             break;
@@ -319,7 +318,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
 
     switch (dataType->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             if (aliasType != nullptr)
             {
@@ -327,7 +327,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             if (arrayType != nullptr)
             {
@@ -335,7 +336,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             ListType *listType = dynamic_cast<ListType *>(dataType);
             if (listType != nullptr)
             {
@@ -343,7 +345,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             if (structType != nullptr)
             {
@@ -354,7 +357,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             // Keil need extra pragma option when unions are used.
             m_templateData["usedUnionType"] = true;
             UnionType *unionType = dynamic_cast<UnionType *>(dataType);
@@ -367,7 +371,8 @@ DataType *Generator::findChildDataType(set<DataType *> &dataTypes, DataType *dat
             }
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }

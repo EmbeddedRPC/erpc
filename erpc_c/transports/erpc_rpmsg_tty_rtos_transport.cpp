@@ -29,12 +29,8 @@ struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void)
-: FramedTransport()
-, RPMsgBase()
-, m_dst_addr(0)
-, m_rpmsg_queue(NULL)
-, m_rpmsg_ept(NULL)
+RPMsgTTYRTOSTransport::RPMsgTTYRTOSTransport(void) :
+FramedTransport(), RPMsgBase(), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL)
 {
 }
 

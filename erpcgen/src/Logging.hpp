@@ -62,11 +62,7 @@ public:
 
 public:
     //! \brief Default constructor.
-    Logger()
-    : m_filter(log_level_t::kInfo)
-    , m_level(log_level_t::kInfo)
-    {
-    }
+    Logger() : m_filter(log_level_t::kInfo), m_level(log_level_t::kInfo) {}
 
     //! \brief Destructor.
     virtual ~Logger() {}
@@ -197,9 +193,8 @@ public:
         //!
         //! Saves the current logging output level of the global logger,
         //! as managed by the Log class, and sets the new level to \a level.
-        explicit SetOutputLevel(Logger::log_level_t level)
-        : m_logger(Log::getLogger())
-        , m_saved(Logger::log_level_t::kInfo)
+        explicit SetOutputLevel(Logger::log_level_t level) :
+        m_logger(Log::getLogger()), m_saved(Logger::log_level_t::kInfo)
         {
             assert(m_logger);
             m_saved = m_logger->getOutputLevel();
@@ -210,9 +205,7 @@ public:
         //!
         //! Saves the current logging output level of \a logger and sets
         //! the new level to \a level.
-        SetOutputLevel(Logger *logger, Logger::log_level_t level)
-        : m_logger(logger)
-        , m_saved(logger->getOutputLevel())
+        SetOutputLevel(Logger *logger, Logger::log_level_t level) : m_logger(logger), m_saved(logger->getOutputLevel())
         {
             assert(m_logger);
             m_logger->setOutputLevel(level);
@@ -236,8 +229,7 @@ class StdoutLogger : public Logger
 {
 public:
     //! \brief Default constructor.
-    explicit StdoutLogger(Logger::log_level_t stderrLevel = Logger::log_level_t::kWarning)
-    : m_stderrLevel(stderrLevel)
+    explicit StdoutLogger(Logger::log_level_t stderrLevel = Logger::log_level_t::kWarning) : m_stderrLevel(stderrLevel)
     {
     }
 

@@ -98,19 +98,19 @@ protected:
     {
         kCLanguage,
         kPythonLanguage,
-    };                                      /*!< Generated outputs format. */
+    }; /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
 
-    int m_argc;                             /*!< Number of command line arguments. */
-    char **m_argv;                          /*!< String value for each command line argument. */
-    StdoutLogger *m_logger;                 /*!< Singleton logger instance. */
-    verbose_type_t m_verboseType;           /*!< Which type of log is need to set (warning, info, debug). */
-    const char *m_outputFilePath;           /*!< Path to the output file. */
-    const char *m_ErpcFile;                 /*!< ERPC file. */
-    string_vector_t m_positionalArgs;       /*!< Positional arguments. */
-    languages_t m_outputLanguage;           /*!< Output language we're generating. */
-    InterfaceDefinition::codec_t m_codec;   /*!< Used codec type. */
+    int m_argc;                           /*!< Number of command line arguments. */
+    char **m_argv;                        /*!< String value for each command line argument. */
+    StdoutLogger *m_logger;               /*!< Singleton logger instance. */
+    verbose_type_t m_verboseType;         /*!< Which type of log is need to set (warning, info, debug). */
+    const char *m_outputFilePath;         /*!< Path to the output file. */
+    const char *m_ErpcFile;               /*!< ERPC file. */
+    string_vector_t m_positionalArgs;     /*!< Positional arguments. */
+    languages_t m_outputLanguage;         /*!< Output language we're generating. */
+    InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
 
 public:
     /*!
@@ -121,15 +121,9 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcgenTool(int argc, char *argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_logger(0)
-    , m_verboseType(verbose_type_t::kWarning)
-    , m_outputFilePath(NULL)
-    , m_ErpcFile(NULL)
-    , m_outputLanguage(languages_t::kCLanguage)
-    , m_codec(InterfaceDefinition::codec_t::kNotSpecified)
+    erpcgenTool(int argc, char *argv[]) :
+    m_argc(argc), m_argv(argv), m_logger(0), m_verboseType(verbose_type_t::kWarning), m_outputFilePath(NULL),
+    m_ErpcFile(NULL), m_outputLanguage(languages_t::kCLanguage), m_codec(InterfaceDefinition::codec_t::kNotSpecified)
     {
         // create logger instance
         m_logger = new StdoutLogger();
@@ -193,7 +187,8 @@ public:
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
 
-                case 'g': {
+                case 'g':
+                {
                     string lang = optarg;
                     if (lang == "c")
                     {
@@ -211,7 +206,8 @@ public:
                     break;
                 }
 
-                case 'c': {
+                case 'c':
+                {
                     string codec = optarg;
                     if (codec.compare("basic") == 0)
                     {

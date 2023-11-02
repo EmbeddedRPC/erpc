@@ -83,15 +83,13 @@ void UsbCdcTransport::rx_cb(void)
 
 UsbCdcTransport::UsbCdcTransport(serial_handle_t serialHandle, serial_manager_config_t *serialConfig,
                                  serial_port_usb_cdc_config_t *usbCdcConfig, uint8_t *usbRingBuffer,
-                                 uint32_t usbRingBufferLength)
-: m_serialHandle(serialHandle)
-, m_serialConfig(serialConfig)
-, m_usbCdcConfig(usbCdcConfig)
-, m_usbRingBuffer(usbRingBuffer)
-, m_usbRingBufferLength(usbRingBufferLength)
+                                 uint32_t usbRingBufferLength) :
+m_serialHandle(serialHandle),
+m_serialConfig(serialConfig), m_usbCdcConfig(usbCdcConfig), m_usbRingBuffer(usbRingBuffer),
+m_usbRingBufferLength(usbRingBufferLength)
 #if !ERPC_THREADS_IS(NONE)
-, m_rxSemaphore()
-, m_txSemaphore()
+,
+m_rxSemaphore(), m_txSemaphore()
 #endif
 {
     s_usbcdc_instance = this;

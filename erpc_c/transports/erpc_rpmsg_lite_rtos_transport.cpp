@@ -28,15 +28,9 @@ struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgRTOSTransport::RPMsgRTOSTransport(void)
-: RPMsgBase()
-, Transport()
-, m_rdev(NULL)
-, m_app_rp_chnl(NULL)
-, m_dst_addr(0)
-, m_rpmsg_queue(NULL)
-, m_rpmsg_ept(NULL)
-, m_crcImpl(NULL)
+RPMsgRTOSTransport::RPMsgRTOSTransport(void) :
+RPMsgBase(), Transport(), m_rdev(NULL), m_app_rp_chnl(NULL), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL),
+m_crcImpl(NULL)
 {
 }
 

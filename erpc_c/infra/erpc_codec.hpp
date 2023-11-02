@@ -58,11 +58,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Codec(void)
-    : m_cursor()
-    , m_status(kErpcStatus_Success)
-    {
-    }
+    Codec(void) : m_cursor(), m_status(kErpcStatus_Success) {}
 
     /*!
      * @brief Codec destructor

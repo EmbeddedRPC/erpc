@@ -44,11 +44,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Service(uint32_t serviceId)
-    : m_serviceId(serviceId)
-    , m_next(NULL)
-    {
-    }
+    Service(uint32_t serviceId) : m_serviceId(serviceId), m_next(NULL) {}
 
     /*!
      * @brief Service destructor
@@ -107,11 +103,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Server(void)
-    : ClientServerCommon()
-    , m_firstService(NULL)
-    {
-    }
+    Server(void) : ClientServerCommon(), m_firstService(NULL) {}
 
     /*!
      * @brief Server destructor

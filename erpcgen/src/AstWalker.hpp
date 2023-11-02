@@ -53,10 +53,7 @@ public:
      *
      * @param[in] inputFile Parsed file name.
      */
-    explicit AstWalker(const std::string &inputFile)
-    : m_fileName(inputFile)
-    {
-    }
+    explicit AstWalker(const std::string &inputFile) : m_fileName(inputFile) {}
 
     /*!
      * @brief destructor

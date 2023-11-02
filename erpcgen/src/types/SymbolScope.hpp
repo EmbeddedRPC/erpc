@@ -69,12 +69,7 @@ public:
     /*!
      * @brief Constructor.
      */
-    SymbolScope()
-    : m_symbolMap()
-    , m_symbolVector()
-    , m_parent(nullptr)
-    {
-    }
+    SymbolScope() : m_symbolMap(), m_symbolVector(), m_parent(nullptr) {}
 
     /*!
      * @brief Destructor.

@@ -34,11 +34,8 @@ public:
     /*!
      * @brief Constructor.
      */
-    FunctionBase(Interface *interface)
-    : m_parameters("(fn)")
-    , m_returnType(nullptr)
-    , m_isOneway(false)
-    , m_interface(interface)
+    FunctionBase(Interface *interface) :
+    m_parameters("(fn)"), m_returnType(nullptr), m_isOneway(false), m_interface(interface)
     {
     }
 
@@ -134,11 +131,9 @@ public:
      * @param[in] tok Given token.
      * @param[in] interface Parent interface.
      */
-    Function(const Token &tok, Interface *interface)
-    : FunctionBase(interface)
-    , Symbol(symbol_type_t::kFunctionSymbol, tok)
-    , m_uniqueId(++s_idCounter)
-    , m_functionType(nullptr)
+    Function(const Token &tok, Interface *interface) :
+    FunctionBase(interface), Symbol(symbol_type_t::kFunctionSymbol, tok), m_uniqueId(++s_idCounter),
+    m_functionType(nullptr)
     {
     }
 
@@ -151,11 +146,8 @@ public:
      * @param[in] interface Parent interface.
      * @param[in] uniqueId Given unique function id.
      */
-    Function(const Token &tok, Interface *interface, uint32_t uniqueId)
-    : FunctionBase(interface)
-    , Symbol(symbol_type_t::kFunctionSymbol, tok)
-    , m_uniqueId(uniqueId)
-    , m_functionType(nullptr)
+    Function(const Token &tok, Interface *interface, uint32_t uniqueId) :
+    FunctionBase(interface), Symbol(symbol_type_t::kFunctionSymbol, tok), m_uniqueId(uniqueId), m_functionType(nullptr)
     {
         s_idCounter = uniqueId;
     }
@@ -208,7 +200,7 @@ protected:
     uint32_t m_uniqueId;          /*!< Function unique id. */
     FunctionType *m_functionType; /*!< Function type. */
 
-    static uint32_t s_idCounter;  /*!< Function id counter. Each function will increase this. */
+    static uint32_t s_idCounter; /*!< Function id counter. Each function will increase this. */
 };
 
 } // namespace erpcgen

@@ -49,11 +49,7 @@ public:
      *
      * @param[in] dataType Given data type.
      */
-    explicit DataType(data_type_t dataType)
-    : Symbol(symbol_type_t::kTypenameSymbol)
-    , m_dataType(dataType)
-    {
-    }
+    explicit DataType(data_type_t dataType) : Symbol(symbol_type_t::kTypenameSymbol), m_dataType(dataType) {}
 
     /*!
      * @brief Constructor.
@@ -63,9 +59,8 @@ public:
      * @param[in] dataType Given data type.
      * @param[in] name Given name for symbol.
      */
-    DataType(const std::string &name, data_type_t dataType)
-    : Symbol(symbol_type_t::kTypenameSymbol, name)
-    , m_dataType(dataType)
+    DataType(const std::string &name, data_type_t dataType) :
+    Symbol(symbol_type_t::kTypenameSymbol, name), m_dataType(dataType)
     {
     }
     /*!
@@ -77,9 +72,7 @@ public:
      * @param[in] dataType Given data type.
      * @param[in] symbolType Given symbol type for symbol.
      */
-    DataType(const Token &tok, data_type_t dataType)
-    : Symbol(symbol_type_t::kTypenameSymbol, tok)
-    , m_dataType(dataType)
+    DataType(const Token &tok, data_type_t dataType) : Symbol(symbol_type_t::kTypenameSymbol, tok), m_dataType(dataType)
     {
     }
 
