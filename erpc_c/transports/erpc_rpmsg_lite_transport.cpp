@@ -39,7 +39,7 @@ int32_t RPMsgTransport::rpmsg_read_cb(void *payload, uint32_t payload_len, uint3
     return RL_HOLD;
 }
 
-RPMsgTransport::RPMsgTransport(void) : RPMsgBase(), Transport(), m_dst_addr(0), m_rpmsg_ept(NULL), m_crcImpl(NULL) {}
+RPMsgTransport::RPMsgTransport(void) : Transport(), RPMsgBase(), m_dst_addr(0), m_rpmsg_ept(NULL), m_crcImpl(NULL) {}
 
 RPMsgTransport::~RPMsgTransport(void)
 {
