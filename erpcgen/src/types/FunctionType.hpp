@@ -41,10 +41,8 @@ public:
      * @param[in] tok Given token.
      * @param[in] m_interface Parent interface.
      */
-    FunctionType(const Token &tok, Interface *interface)
-    : FunctionBase(interface)
-    , DataType(tok, data_type_t::kFunctionType)
-    , m_callbackFuns()
+    FunctionType(const Token &tok, Interface *interface) :
+    FunctionBase(interface), DataType(tok, data_type_t::kFunctionType), m_callbackFuns()
     {
     }
 

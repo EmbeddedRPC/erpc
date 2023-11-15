@@ -125,8 +125,7 @@ erpc_mbf_t erpc_mbf_rpmsg_init(erpc_transport_t transport)
         msgFactory = s_msgFactory.get();
     }
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-    msgFactory =
-        new RPMsgMessageBufferFactory(reinterpret_cast<RPMsgBase *>(transport)->get_rpmsg_lite_instance());
+    msgFactory = new RPMsgMessageBufferFactory(reinterpret_cast<RPMsgBase *>(transport)->get_rpmsg_lite_instance());
 #else
 #error "Unknown eRPC allocation policy!"
 #endif

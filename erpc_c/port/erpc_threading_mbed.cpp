@@ -28,26 +28,15 @@ Thread *Thread::s_first = NULL;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_thread(NULL)
-, m_next(NULL)
+Thread::Thread(const char *name) :
+m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_thread(NULL), m_next(NULL)
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_thread(NULL)
-, m_next(NULL)
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_thread(NULL), m_next(NULL)
 {
 }
 
@@ -198,8 +187,7 @@ bool Mutex::unlock(void)
     return m_mutex->unlock();
 }
 
-Semaphore::Semaphore(int count)
-: m_count(count)
+Semaphore::Semaphore(int count) : m_count(count)
 {
     m_sem = new rtos::Semaphore(m_count);
 }

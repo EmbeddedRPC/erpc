@@ -32,10 +32,7 @@ public:
      *
      * @param[in] theType Value type.
      */
-    Value(value_type_t theType)
-    : m_type(theType)
-    {
-    }
+    Value(value_type_t theType) : m_type(theType) {}
 
     /*!
      * @brief Destructor.
@@ -99,22 +96,15 @@ public:
     /*!
      * @brief Constructor.
      */
-    explicit IntegerValue(int_type_t type = kSigned)
-    : Value(kIntegerValue)
-    , m_value(0)
-    , m_intType(type)
-    {
-    }
+    explicit IntegerValue(int_type_t type = kSigned) : Value(kIntegerValue), m_value(0), m_intType(type) {}
 
     /*!
      * @brief Constructor.
      *
      * @param[in] value IntegerValue value.
      */
-    explicit IntegerValue(uint64_t value, int_type_t type = kSigned)
-    : Value(kIntegerValue)
-    , m_value(value)
-    , m_intType(type)
+    explicit IntegerValue(uint64_t value, int_type_t type = kSigned) :
+    Value(kIntegerValue), m_value(value), m_intType(type)
     {
     }
 
@@ -123,10 +113,7 @@ public:
      *
      * @param[in] other IntegerValue to copy.
      */
-    IntegerValue(const IntegerValue &other)
-    : Value(other.getType())
-    , m_value(other.m_value)
-    , m_intType(other.m_intType)
+    IntegerValue(const IntegerValue &other) : Value(other.getType()), m_value(other.m_value), m_intType(other.m_intType)
     {
     }
 
@@ -219,44 +206,28 @@ public:
     /*!
      * @brief Constructor.
      */
-    FloatValue()
-    : Value(kFloatValue)
-    , m_value(0.0)
-    {
-    }
+    FloatValue() : Value(kFloatValue), m_value(0.0) {}
 
     /*!
      * @brief Constructor.
      *
      * @param[in] value FloatValue value.
      */
-    explicit FloatValue(double value)
-    : Value(kFloatValue)
-    , m_value(value)
-    {
-    }
+    explicit FloatValue(double value) : Value(kFloatValue), m_value(value) {}
 
     /*!
      * @brief Constructor.
      *
      * @param[in] value FloatValue value.
      */
-    explicit FloatValue(float value)
-    : Value(kFloatValue)
-    , m_value(value)
-    {
-    }
+    explicit FloatValue(float value) : Value(kFloatValue), m_value(value) {}
 
     /*!
      * @brief Copy constructor.
      *
      * @param[in] other FloatValue to copy.
      */
-    explicit FloatValue(const FloatValue &other)
-    : Value(kFloatValue)
-    , m_value(other.m_value)
-    {
-    }
+    explicit FloatValue(const FloatValue &other) : Value(kFloatValue), m_value(other.m_value) {}
 
     /*!
      * @brief Assign operator.
@@ -361,44 +332,28 @@ public:
     /*!
      * @brief Constructor.
      */
-    StringValue()
-    : Value(kStringValue)
-    , m_value()
-    {
-    }
+    StringValue() : Value(kStringValue), m_value() {}
 
     /*!
      * @brief Constructor.
      *
      * @param[in] value StringValue value.
      */
-    explicit StringValue(const std::string &value)
-    : Value(kStringValue)
-    , m_value(value)
-    {
-    }
+    explicit StringValue(const std::string &value) : Value(kStringValue), m_value(value) {}
 
     /*!
      * @brief Constructor.
      *
      * @param[in] value StringValue value.
      */
-    explicit StringValue(const std::string *value)
-    : Value(kStringValue)
-    , m_value(*value)
-    {
-    }
+    explicit StringValue(const std::string *value) : Value(kStringValue), m_value(*value) {}
 
     /*!
      * @brief Copy constructor.
      *
      * @param[in] other StringValue to copy.
      */
-    StringValue(const StringValue &other)
-    : Value(kStringValue)
-    , m_value(other.m_value)
-    {
-    }
+    StringValue(const StringValue &other) : Value(kStringValue), m_value(other.m_value) {}
 
     /*!
      * @brief Get StringValue type name.

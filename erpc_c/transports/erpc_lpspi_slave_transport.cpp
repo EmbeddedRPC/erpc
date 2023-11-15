@@ -108,13 +108,11 @@ static void LPSPI_SlaveUserCallback(LPSPI_Type *base, lpspi_slave_handle_t *hand
     transport->transfer_cb();
 }
 
-LPSpiSlaveTransport::LPSpiSlaveTransport(LPSPI_Type *lpspiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_lpspiBaseAddr(lpspiBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
+LPSpiSlaveTransport::LPSpiSlaveTransport(LPSPI_Type *lpspiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_lpspiBaseAddr(lpspiBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz), m_isInited(false)
 #if ERPC_THREADS
-, m_txrxSemaphore()
+,
+m_txrxSemaphore()
 #endif
 {
     s_lpspi_slave_instance = this;

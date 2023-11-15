@@ -17,26 +17,15 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_thread(0)
-, m_stack(0)
+Thread::Thread(const char *name) :
+m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_thread(0), m_stack(0)
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_thread(0)
-, m_stack(0)
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_thread(0), m_stack(0)
 {
 }
 
@@ -92,8 +81,7 @@ void *Thread::threadEntryPointStub(void *arg1, void *arg2, void *arg3)
     k_thread_abort(k_current_get());
 }
 
-Mutex::Mutex(void)
-: m_mutex(0)
+Mutex::Mutex(void) : m_mutex(0)
 {
     k_mutex_init(&m_mutex);
 }
@@ -116,8 +104,7 @@ bool Mutex::unlock(void)
     return true;
 }
 
-Semaphore::Semaphore(int count)
-: m_sem(0)
+Semaphore::Semaphore(int count) : m_sem(0)
 {
     // Set max count to highest signed int.
     k_sem_init(&m_sem, count, 0x7fffffff);

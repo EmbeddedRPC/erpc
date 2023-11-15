@@ -34,24 +34,12 @@ const uint32_t sToUs = 1000000;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_thread(0)
-{
-}
+Thread::Thread(const char *name) : m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_thread(0) {}
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_thread(0)
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_thread(0)
 {
 }
 
@@ -163,9 +151,7 @@ bool Mutex::unlock(void)
     return pthread_mutex_unlock(&m_mutex) == 0;
 }
 
-Semaphore::Semaphore(int count)
-: m_count(count)
-, m_mutex()
+Semaphore::Semaphore(int count) : m_count(count), m_mutex()
 {
     pthread_cond_init(&m_cond, NULL);
 }

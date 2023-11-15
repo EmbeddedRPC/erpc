@@ -118,11 +118,11 @@ protected:
     const char *m_outputFilePath; /*!< Path to the output file. */
     const char *m_ErpcFile;       /*!< ERPC file. */
     string_vector_t m_positionalArgs;
-    transports_t m_transport;     /*!< Transport used for receiving messages. */
-    uint64_t m_quantity;          /*!< Quantity of logs to store. */
-    uint32_t m_baudrate;          /*!< Baudrate rate speed. */
-    const char *m_port;           /*!< Name or number of port. Based on used transport. */
-    const char *m_host;           /*!< Host name */
+    transports_t m_transport; /*!< Transport used for receiving messages. */
+    uint64_t m_quantity;      /*!< Quantity of logs to store. */
+    uint32_t m_baudrate;      /*!< Baudrate rate speed. */
+    const char *m_port;       /*!< Name or number of port. Based on used transport. */
+    const char *m_host;       /*!< Host name */
 
 public:
     /*!
@@ -133,18 +133,10 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcsnifferTool(int argc, char *argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_logger(0)
-    , m_verboseType(verbose_type_t::kWarning)
-    , m_outputFilePath(NULL)
-    , m_ErpcFile(NULL)
-    , m_transport(transports_t::kNoneTransport)
-    , m_quantity(10)
-    , m_baudrate(115200)
-    , m_port(NULL)
-    , m_host(NULL)
+    erpcsnifferTool(int argc, char *argv[]) :
+    m_argc(argc), m_argv(argv), m_logger(0), m_verboseType(verbose_type_t::kWarning), m_outputFilePath(NULL),
+    m_ErpcFile(NULL), m_transport(transports_t::kNoneTransport), m_quantity(10), m_baudrate(115200), m_port(NULL),
+    m_host(NULL)
     {
         // create logger instance
         m_logger = new StdoutLogger();
@@ -185,22 +177,26 @@ public:
         {
             switch (optchar)
             {
-                case '?': {
+                case '?':
+                {
                     printUsage(options);
                     return 0;
                 }
 
-                case 'V': {
+                case 'V':
+                {
                     printf("%s %s\n%s\n", k_toolName, k_version, k_copyright);
                     return 0;
                 }
 
-                case 'o': {
+                case 'o':
+                {
                     m_outputFilePath = optarg;
                     break;
                 }
 
-                case 'v': {
+                case 'v':
+                {
                     if (m_verboseType != verbose_type_t::kExtraDebug)
                     {
                         m_verboseType = (verbose_type_t)(((int)m_verboseType) + 1);
@@ -208,12 +204,14 @@ public:
                     break;
                 }
 
-                case 'I': {
+                case 'I':
+                {
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
                 }
 
-                case 't': {
+                case 't':
+                {
                     string transport = optarg;
                     if (transport == "tcp")
                     {
@@ -231,27 +229,32 @@ public:
                     break;
                 }
 
-                case 'q': {
+                case 'q':
+                {
                     m_quantity = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'b': {
+                case 'b':
+                {
                     m_baudrate = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'p': {
+                case 'p':
+                {
                     m_port = optarg;
                     break;
                 }
 
-                case 'h': {
+                case 'h':
+                {
                     m_host = optarg;
                     break;
                 }
 
-                default: {
+                default:
+                {
                     Log::error("error: unrecognized option\n\n");
                     printUsage(options);
                     return 0;
@@ -336,7 +339,8 @@ public:
             Transport *_transport;
             switch (m_transport)
             {
-                case transports_t::kTcpTransport: {
+                case transports_t::kTcpTransport:
+                {
                     uint16_t portNumber = strtoul(m_port, NULL, 10);
                     TCPTransport *tcpTransport = new TCPTransport(m_host, portNumber, true);
                     if (erpc_status_t err = tcpTransport->open())
@@ -347,14 +351,16 @@ public:
                     break;
                 }
 
-                case transports_t::kSerialTransport: {
+                case transports_t::kSerialTransport:
+                {
                     erpc_transport_t transport = erpc_transport_serial_init(m_port, m_baudrate);
                     _transport = reinterpret_cast<Transport *>(transport);
                     assert(_transport);
                     break;
                 }
 
-                default: {
+                default:
+                {
                     break;
                 }
             }

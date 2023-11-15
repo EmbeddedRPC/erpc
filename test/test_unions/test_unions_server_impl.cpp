@@ -31,7 +31,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
     gapGenericEvent_t *newEvent = (gapGenericEvent_t *)erpc_malloc(sizeof(gapGenericEvent_t));
     switch (event->eventType)
     {
-        case gInternalError_c: {
+        case gInternalError_c:
+        {
             if (event->eventData.internalError.errorCode == gBleSuccess_c &&
                 event->eventData.internalError.errorSource == gHciCommandStatus_c &&
                 event->eventData.internalError.hciCommandOpcode == 5)
@@ -44,7 +45,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
             }
             break;
         }
-        case gRandomAddressReady_c: {
+        case gRandomAddressReady_c:
+        {
             int x = 0xAA;
             int success = 1;
             int i = 0;
@@ -67,7 +69,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
             }
             break;
         }
-        case gWhiteListSizeReady_c: {
+        case gWhiteListSizeReady_c:
+        {
             newEvent->eventType = gTestCaseReturn_c;
             if (100 == event->eventData.whiteListSize)
             {
@@ -82,7 +85,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
         case gPublicAddressRead_c:
         case gAdvertisingSetupFailed_c:
         case gAdvTxPowerLevelRead_c:
-        default: {
+        default:
+        {
         }
     }
     return newEvent;
@@ -93,7 +97,8 @@ foo *sendMyFoo(const foo *f)
     foo *newFoo = (foo *)erpc_malloc(sizeof(foo));
     switch (f->discriminator)
     {
-        case apple: {
+        case apple:
+        {
             for (uint32_t i = 0; i < f->bing.myFoobar.rawString.dataLength; ++i)
             {
                 if ((i + 1) != f->bing.myFoobar.rawString.data[i])
@@ -108,7 +113,8 @@ foo *sendMyFoo(const foo *f)
             erpc_free(f->bing.myFoobar.rawString.data);
             break;
         }
-        case banana: {
+        case banana:
+        {
             if ((f->bing.x == 3) && (f->bing.y == 4.0))
             {
                 newFoo->discriminator = papaya;
@@ -123,7 +129,8 @@ foo *sendMyFoo(const foo *f)
             }
             break;
         }
-        case orange: {
+        case orange:
+        {
             for (uint32_t i = 1; i <= f->bing.a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
@@ -140,7 +147,8 @@ foo *sendMyFoo(const foo *f)
             erpc_free(f->bing.a.elements);
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }
@@ -153,7 +161,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
     foo *newFoo = (foo *)erpc_malloc(sizeof(foo));
     switch (discriminator)
     {
-        case apple: {
+        case apple:
+        {
             for (uint32_t i = 0; i < unionVariable->myFoobar.rawString.dataLength; ++i)
             {
                 if ((i + 1) != unionVariable->myFoobar.rawString.data[i])
@@ -167,7 +176,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             newFoo->bing.ret = 0xAA;
             break;
         }
-        case banana: {
+        case banana:
+        {
             if ((unionVariable->x == 3) && (unionVariable->y == 4.0))
             {
                 newFoo->discriminator = papaya;
@@ -182,7 +192,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             }
             break;
         }
-        case orange: {
+        case orange:
+        {
             for (uint32_t i = 1; i <= unionVariable->a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
@@ -198,7 +209,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             newFoo->bing.ret = 0xAA;
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }

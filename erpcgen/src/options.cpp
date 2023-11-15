@@ -74,10 +74,7 @@ static const char endl = '\n';
 class ostream
 {
 public:
-    ostream(FILE *fileptr)
-    : fp(fileptr)
-    {
-    }
+    ostream(FILE *fileptr) : fp(fileptr) {}
 
     ostream &operator<<(char ch);
 
@@ -159,12 +156,8 @@ void OptArgvIter::rewind(void)
 static const char WHITESPACE[] = " \t\n\r\v\f";
 const char *OptStrTokIter::default_delims = WHITESPACE;
 
-OptStrTokIter::OptStrTokIter(const char *tokens, const char *arg_delimiters)
-: len(unsigned(strlen(tokens)))
-, str(tokens)
-, seps(arg_delimiters)
-, cur(NULLSTR)
-, tokstr(NULLSTR)
+OptStrTokIter::OptStrTokIter(const char *tokens, const char *arg_delimiters) :
+len(unsigned(strlen(tokens))), str(tokens), seps(arg_delimiters), cur(NULLSTR), tokstr(NULLSTR)
 {
     if (seps == NULL)
         seps = default_delims;
@@ -220,9 +213,7 @@ enum
 const unsigned OptIstreamIter::MAX_LINE_LEN = 1024;
 
 // Constructor
-OptIstreamIter::OptIstreamIter(istream &input)
-: is(input)
-, tok_iter(NULL)
+OptIstreamIter::OptIstreamIter(istream &input) : is(input), tok_iter(NULL)
 {
 #ifdef USE_STDIO
     fprintf(stderr, "%s: Can't use OptIstreamIter class:\n", "OptIstreamIter::OptIstreamIter");
@@ -408,20 +399,14 @@ static kwdmatch_t kwdmatch(const char *src, const char *attempt, int len = 0)
 class OptionSpec
 {
 public:
-    OptionSpec(const char *decl = NULLSTR)
-    : hidden(0)
-    , spec(decl)
+    OptionSpec(const char *decl = NULLSTR) : hidden(0), spec(decl)
     {
         if (spec == NULL)
             spec = NULL_spec;
         CheckHidden();
     }
 
-    OptionSpec(const OptionSpec &cp)
-    : hidden(cp.hidden)
-    , spec(cp.spec)
-    {
-    }
+    OptionSpec(const OptionSpec &cp) : hidden(cp.hidden), spec(cp.spec) {}
 
     // NOTE: use default destructor!
 
@@ -645,13 +630,9 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #define DIR_SEP_CHAR '/'
 #endif
 
-Options::Options(const char *arg_name, const char *const optv[])
-: explicit_end(0)
-, optctrls(static_cast<signed>(OptCtrl::DEFAULT))
-, optvec(optv)
-, nextchar(NULLSTR)
-, listopt(NULLSTR)
-, cmdname(arg_name)
+Options::Options(const char *arg_name, const char *const optv[]) :
+explicit_end(0), optctrls(static_cast<signed>(OptCtrl::DEFAULT)), optvec(optv), nextchar(NULLSTR), listopt(NULLSTR),
+cmdname(arg_name)
 {
     const char *basename = ::strrchr(cmdname, DIR_SEP_CHAR);
     if (basename)

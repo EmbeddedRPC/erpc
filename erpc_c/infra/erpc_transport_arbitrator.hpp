@@ -102,7 +102,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 * getCrc16(void) override;
+    virtual Crc16 *getCrc16(void) override;
 
     /*!
      * @brief This function set shared client/server transport.
@@ -116,7 +116,7 @@ public:
      *
      * @return Transport * Returns shared client/server transport.
      */
-    Transport * getSharedTransport(void);
+    Transport *getSharedTransport(void);
 
     /*!
      * @brief This function set codec.
@@ -130,7 +130,7 @@ public:
      *
      * @return Codec * Pointer to codec used within transport.
      */
-    Codec * getCodec(void);
+    Codec *getCodec(void);
 
     /*!
      * @brief Add a client request to the client list.

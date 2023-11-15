@@ -26,26 +26,15 @@ Thread *Thread::s_first = NULL;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_task(0)
-, m_next(0)
+Thread::Thread(const char *name) :
+m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_task(0), m_next(0)
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_task(0)
-, m_next(0)
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_task(0), m_next(0)
 {
 }
 
@@ -73,10 +62,10 @@ void Thread::start(void *arg)
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     if (m_stackPtr != NULL)
     {
-        m_task =
-            xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
-                              (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
-                              this, m_priority, m_stackPtr, &m_staticTask);
+        m_task = xTaskCreateStatic(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                                   (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) /
+                                                            sizeof(uint32_t)), // Round up number of words.
+                                   this, m_priority, m_stackPtr, &m_staticTask);
         taskCreated = true;
     }
 #endif
@@ -84,10 +73,10 @@ void Thread::start(void *arg)
 #if configSUPPORT_DYNAMIC_ALLOCATION
     if (m_stackPtr == NULL)
     {
-        if (pdPASS ==
-            xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
-                        (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) / sizeof(uint32_t)), // Round up number of words.
-                        this, m_priority, &m_task))
+        if (pdPASS == xTaskCreate(threadEntryPointStub, (m_name != NULL ? m_name : "task"),
+                                  (configSTACK_DEPTH_TYPE)((m_stackSize + sizeof(uint32_t) - 1U) /
+                                                           sizeof(uint32_t)), // Round up number of words.
+                                  this, m_priority, &m_task))
         {
             taskCreated = true;
         }
@@ -201,8 +190,7 @@ void Thread::threadEntryPointStub(void *arg)
 #endif // INCLUDE_vTaskDelete
 }
 
-Mutex::Mutex(void)
-: m_mutex(0)
+Mutex::Mutex(void) : m_mutex(0)
 {
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     m_mutex = xSemaphoreCreateRecursiveMutexStatic(&m_staticQueue);
@@ -234,8 +222,7 @@ bool Mutex::unlock(void)
     return (pdTRUE == xSemaphoreGiveRecursive(m_mutex) ? true : false);
 }
 
-Semaphore::Semaphore(int count)
-: m_sem(0)
+Semaphore::Semaphore(int count) : m_sem(0)
 {
     // Set max count to highest signed int.
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
