@@ -1,14 +1,12 @@
 /*
- * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
- * All rights reserved.
+ * Copyright 2023 NXP
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _EMBEDDED_RPC__UART_TRANSPORT_H_
-#define _EMBEDDED_RPC__UART_TRANSPORT_H_
+#ifndef _EMBEDDED_RPC_ZEPHYR_UART_TRANSPORT_H_
+#define _EMBEDDED_RPC_ZEPHYR_UART_TRANSPORT_H_
 
 #include "erpc_config_internal.h"
 #if !ERPC_THREADS_IS(NONE)
@@ -35,7 +33,7 @@ extern "C"
 namespace erpc
 {
     /*!
-     * @brief Very basic transport to send/receive messages via UART.
+     * @brief Transport to send/receive messages via UART.
      *
      * @ingroup uart_transport
      */
@@ -110,4 +108,4 @@ namespace erpc
 
 /*! @} */
 
-#endif // _EMBEDDED_RPC__UART_TRANSPORT_H_
+#endif // _EMBEDDED_RPC_ZEPHYR_UART_TRANSPORT_H_

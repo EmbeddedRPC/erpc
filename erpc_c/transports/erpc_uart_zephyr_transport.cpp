@@ -42,7 +42,6 @@ UartTransport::UartTransport(struct device *dev)
 
 UartTransport::~UartTransport(void)
 {
-    // TODO
 }
 
 void UartTransport::tx_cb(void)
