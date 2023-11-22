@@ -162,12 +162,10 @@ erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t s
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpidevMasterTransport_WaitForSlaveReadyGpio();
+    s_isSlaveReady = false;
 #endif
 
     status = SPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-    s_isSlaveReady = false;
-#endif
 
     /* send the payload now */
     masterXfer.txData = (uint8_t *)data + header_size;
@@ -175,12 +173,10 @@ erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t s
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpidevMasterTransport_WaitForSlaveReadyGpio();
+    s_isSlaveReady = false;
 #endif
 
     status = SPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
-#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
-    s_isSlaveReady = false;
-#endif
 
     return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;
 }
