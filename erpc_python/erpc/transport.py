@@ -301,6 +301,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
         self._hSIOPort = None
 
     def _base_send(self, message):
+        #TODO: can we send data at once ?
         # Wait for SPI master-slave signalling GPIO pin to be in low state
         res = self.sio.GPIO_GetPin(self._gpioport, self._gpiopin)
         while (1 == res):
@@ -312,7 +313,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
             #print('SPI received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hSPIPort.Transfer(
-                0, 15, bytes(message[4:]), len(message) - self.HEADER_LEN, 0)
+                0, 15, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0)
         else:
             print('SPI transfer error: %d' % rxbytesnumber)
 
@@ -407,6 +408,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
         self._hSIOPort = None
 
     def _base_send(self, message):
+        #TODO: can we send data at once ?
         # Wait for I2C master-slave signalling GPIO pin to be in low state
         res = self.sio.GPIO_GetPin(self._gpioport, self._gpiopin)
         while (1 == res):
@@ -418,7 +420,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             #print('I2C received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hI2CPort.FastXfer(
-                0x7E, bytes(message[4:]), len(message) - self.HEADER_LEN, 0, False, True)
+                0x7E, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0, False, True)
         else:
             print('I2C transfer error: %d' % rxbytesnumber)
 
