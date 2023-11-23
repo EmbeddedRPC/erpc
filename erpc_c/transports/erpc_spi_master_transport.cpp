@@ -160,6 +160,7 @@ erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t s
     masterXfer.rxData = NULL;
     masterXfer.dataSize = header_size;
 
+    /* send the header first */
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpidevMasterTransport_WaitForSlaveReadyGpio();
 #endif
