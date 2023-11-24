@@ -30,19 +30,17 @@ RING_BUF_DECLARE(uart_send_buf, UART_BUFFER_SIZE);
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-UartTransport::UartTransport(struct device *dev)
-    : m_dev(dev)
+UartTransport::UartTransport(struct device *dev) :
+m_dev(dev)
 #if !ERPC_THREADS_IS(NONE)
-      ,
-      m_rxSemaphore(), m_txSemaphore()
+,
+m_rxSemaphore(), m_txSemaphore()
 #endif
 {
     s_uart_instance = this;
 }
 
-UartTransport::~UartTransport(void)
-{
-}
+UartTransport::~UartTransport(void) {}
 
 void UartTransport::tx_cb(void)
 {
@@ -174,7 +172,8 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
     }
 
     /* read data from buffer */
-    if (ring_buf_get(&uart_receive_buf, data, size) != size) {
+    if (ring_buf_get(&uart_receive_buf, data, size) != size)
+    {
         /* reading error, should not happen */
         erpcStatus = kErpcStatus_ReceiveFailed;
     }
