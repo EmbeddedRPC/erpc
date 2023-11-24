@@ -25,7 +25,7 @@
 #include "semphr.h"
 #include "task.h"
 #elif ERPC_THREADS_IS(ZEPHYR)
-#include "kernel.h"
+#include <zephyr/kernel.h>
 #elif ERPC_THREADS_IS(MBED)
 #if MBED_CONF_RTOS_PRESENT
 #include "rtos.h"
@@ -156,7 +156,7 @@ public:
 #elif ERPC_THREADS_IS(FREERTOS)
         return reinterpret_cast<thread_id_t>(m_task);
 #elif ERPC_THREADS_IS(ZEPHYR)
-        return reinterpret_cast<thread_id_t>(m_thread);
+        return reinterpret_cast<thread_id_t>(m_thread_id);
 #elif ERPC_THREADS_IS(MBED)
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
@@ -239,6 +239,7 @@ private:
 #endif
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_thread m_thread;  /*!< Current thread. */
+    k_tid_t m_thread_id;
     k_thread_stack_t *m_stack; /*!< Pointer to stack. */
 #elif ERPC_THREADS_IS(MBED)
     rtos::Thread *m_thread; /*!< Underlying Thread instance */
@@ -282,7 +283,7 @@ private:
      * @param[in] arg2
      * @param[in] arg3
      */
-    static void *threadEntryPointStub(void *arg1, void *arg2, void *arg3);
+    static void threadEntryPointStub(void *arg1, void *arg2, void *arg3);
 
 #elif ERPC_THREADS_IS(MBED)
 
