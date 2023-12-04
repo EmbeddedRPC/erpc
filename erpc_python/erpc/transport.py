@@ -10,7 +10,7 @@
 import struct
 import socket
 import threading
-from _socket import SHUT_RDWR
+from socket import SHUT_RDWR
 
 from .crc16 import Crc16
 from .client import RequestError
