@@ -29,28 +29,15 @@ CRITICAL_SECTION Thread::m_critical_section;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread(const char *name)
-: m_name(name)
-, m_entry(0)
-, m_arg(0)
-, m_stackSize(0)
-, m_priority(0)
-, m_thread(0)
-, m_thrdaddr(0)
-, m_next(0)
+Thread::Thread(const char *name) :
+m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_thread(0), m_thrdaddr(0), m_next(0)
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
-               thread_stack_pointer stackPtr)
-: m_name(name)
-, m_entry(entry)
-, m_arg(0)
-, m_stackSize(stackSize)
-, m_priority(priority)
-, m_thread(0)
-, m_thrdaddr(0)
-, m_next(0)
+               thread_stack_pointer stackPtr) :
+m_name(name),
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_thread(0), m_thrdaddr(0), m_next(0)
 {
 }
 
@@ -172,10 +159,7 @@ bool Mutex::unlock(void)
     return ReleaseMutex(m_mutex);
 }
 
-Semaphore::Semaphore(int count)
-: m_count(count)
-, m_sem()
-, m_mutex()
+Semaphore::Semaphore(int count) : m_count(count), m_sem(), m_mutex()
 {
     m_sem = CreateSemaphore(NULL, m_count, 1, "");
 }

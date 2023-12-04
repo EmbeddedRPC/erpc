@@ -22,12 +22,11 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-FramedTransport::FramedTransport(void)
-: Transport()
-, m_crcImpl(NULL)
+FramedTransport::FramedTransport(void) :
+Transport(), m_crcImpl(NULL)
 #if !ERPC_THREADS_IS(NONE)
-, m_sendLock()
-, m_receiveLock()
+,
+m_sendLock(), m_receiveLock()
 #endif
 {
 }

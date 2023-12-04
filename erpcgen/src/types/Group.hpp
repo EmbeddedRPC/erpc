@@ -30,7 +30,7 @@ class Group
 public:
     typedef std::vector<Interface *> interface_list_t; /*!< Vector of interfaces belongs to group. */
     typedef std::vector<Symbol *> symbols_list_t;      /*!< Vector of symbols belongs to group. */
-    typedef std::map<Symbol *, std::set<param_direction_t> >
+    typedef std::map<Symbol *, std::set<param_direction_t>>
         symbol_directions_map_t; /*!< Map symbol with direction in which is used in current group. */
 
     /*!
@@ -38,11 +38,7 @@ public:
      *
      * @param[in] name Group name.
      */
-    explicit Group(const std::string &name)
-    : m_name(name)
-    {
-        m_template["name"] = name;
-    }
+    explicit Group(const std::string &name) : m_name(name) { m_template["name"] = name; }
 
     /*!
      * @brief This function returns the group name.

@@ -119,10 +119,8 @@ string Symbol::getAnnStringValue(const string &annName, Annotation::program_lang
     return (annVallue) ? annVallue->toString() : "";
 }
 
-SymbolScope::typed_iterator::typed_iterator(const vit &bv, const vit &ev, Symbol::symbol_type_t predicateType)
-: m_vec(bv)
-, m_endvec(ev)
-, m_predicateType(predicateType)
+SymbolScope::typed_iterator::typed_iterator(const vit &bv, const vit &ev, Symbol::symbol_type_t predicateType) :
+m_vec(bv), m_endvec(ev), m_predicateType(predicateType)
 {
     // Advance to the first matching symbol.
     while (m_vec != m_endvec && (*m_vec)->getSymbolType() != m_predicateType)
@@ -477,12 +475,14 @@ DataType *DataType::getTrueContainerDataType()
     DataType *trueDataType = this->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             ListType *l = dynamic_cast<ListType *>(trueDataType);
             assert(l);
             return l->getElementType()->getTrueContainerDataType();
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *a = dynamic_cast<ArrayType *>(trueDataType);
             assert(a);
             return a->getElementType()->getTrueContainerDataType();

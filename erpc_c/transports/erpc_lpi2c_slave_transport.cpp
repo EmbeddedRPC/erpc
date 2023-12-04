@@ -138,13 +138,11 @@ static void LPI2C_SlaveUserCallback(LPI2C_Type *base, lpi2c_slave_transfer_t *tr
     }
 }
 
-LPI2cSlaveTransport::LPI2cSlaveTransport(LPI2C_Type *lpi2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_lpi2cBaseAddr(lpi2cBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
+LPI2cSlaveTransport::LPI2cSlaveTransport(LPI2C_Type *lpi2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_lpi2cBaseAddr(lpi2cBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz), m_isInited(false)
 #if ERPC_THREADS
-, m_txrxSemaphore()
+,
+m_txrxSemaphore()
 #endif
 {
     s_lpi2c_slave_instance = this;

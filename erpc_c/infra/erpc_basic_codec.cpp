@@ -27,10 +27,7 @@ using namespace erpc;
 
 const uint32_t BasicCodec::kBasicCodecVersion = 1UL;
 
-BasicCodec::BasicCodec(void)
-: Codec()
-{
-}
+BasicCodec::BasicCodec(void) : Codec() {}
 
 BasicCodec::~BasicCodec(void) {}
 
@@ -374,10 +371,7 @@ void BasicCodec::readNullFlag(bool &isNull)
 
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(BasicCodec, s_basicCodecManual, ERPC_CODEC_COUNT);
 
-BasicCodecFactory::BasicCodecFactory(void)
-: CodecFactory()
-{
-}
+BasicCodecFactory::BasicCodecFactory(void) : CodecFactory() {}
 
 BasicCodecFactory::~BasicCodecFactory(void) {}
 

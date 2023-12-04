@@ -53,11 +53,7 @@ public:
      * @see AstNode::AstNode(Token * token, AstNode * parent)
      * @see AstNode::AstNode(const AstNode & other)
      */
-    explicit AstNode(const Token &token)
-    : m_token(token)
-    , m_parent(nullptr)
-    {
-    }
+    explicit AstNode(const Token &token) : m_token(token), m_parent(nullptr) {}
 
     /*!
      * @brief This function is constructor of AstNode class.
@@ -71,11 +67,7 @@ public:
      * @see AstNode::AstNode(Token * token)
      * @see AstNode::AstNode(const AstNode & other)
      */
-    AstNode(Token &token, AstNode *parent)
-    : m_token(token)
-    , m_parent(parent)
-    {
-    }
+    AstNode(Token &token, AstNode *parent) : m_token(token), m_parent(parent) {}
 
     /*!
      * @brief This function is copy constructor of AstNode class.
@@ -401,11 +393,7 @@ public:
      *
      * @param[in] root Pointer to root node.
      */
-    explicit AstPrinter(AstNode *root)
-    : m_root(root)
-    , m_depth(0)
-    {
-    }
+    explicit AstPrinter(AstNode *root) : m_root(root), m_depth(0) {}
 
     /*!
      * @brief This function call for dispatch function.

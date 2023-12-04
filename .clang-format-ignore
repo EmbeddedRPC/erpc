@@ -1,0 +1,9 @@
+#list of ignored files to format
+./erpc_c/port/erpc_serial.cpp
+./erpcgen/src/cpptemplate/cpptempl.hpp
+./erpcgen/src/cpptemplate/cpptempl.cpp
+./erpcgen/src/cpptemplate/cpptempl_test.cpp
+./erpcgen/test/test_includes/test_includes_union.h
+./test/common/gtest/gtest.h
+./test/common/gtest/gtest.cpp
+./test/common/retarget_cpp_streamed_io.c

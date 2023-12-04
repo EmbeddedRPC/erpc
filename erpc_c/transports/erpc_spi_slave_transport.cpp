@@ -112,13 +112,11 @@ static void SPI_SlaveUserCallback(SPI_Type *base, spi_slave_handle_t *handle, st
     transport->transfer_cb();
 }
 
-SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_spiBaseAddr(spiBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
+SpiSlaveTransport::SpiSlaveTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_spiBaseAddr(spiBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz), m_isInited(false)
 #if ERPC_THREADS
-, m_txrxSemaphore()
+,
+m_txrxSemaphore()
 #endif
 {
     s_spi_slave_instance = this;

@@ -37,10 +37,8 @@ extern const char *const kPyGlobalInit;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-PythonGenerator::PythonGenerator(InterfaceDefinition *def)
-: Generator(def, generator_type_t::kPython)
-, m_suffixStrip("")
-, m_suffixStripSize(0)
+PythonGenerator::PythonGenerator(InterfaceDefinition *def) :
+Generator(def, generator_type_t::kPython), m_suffixStrip(""), m_suffixStripSize(0)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -437,7 +435,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
             switch (dataType->getDataType())
             {
-                case DataType::data_type_t::kStructType: {
+                case DataType::data_type_t::kStructType:
+                {
                     StructType *structType = dynamic_cast<StructType *>(symbol);
                     if (structType == nullptr)
                     {
@@ -461,7 +460,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::data_type_t::kUnionType: {
+                case DataType::data_type_t::kUnionType:
+                {
                     UnionType *unionType = dynamic_cast<UnionType *>(symbol);
                     if (unionType == nullptr)
                     {
@@ -491,7 +491,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::data_type_t::kAliasType: {
+                case DataType::data_type_t::kAliasType:
+                {
                     AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
                     if (aliasType == nullptr)
                         break;
@@ -588,11 +589,13 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
     info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             info = getTypeInfo(t->getTrueDataType());
             break;
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             // Array type requires the array element count to come after the variable/member name.
             ArrayType *a = dynamic_cast<ArrayType *>(t);
             assert(a);
@@ -601,16 +604,19 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             assert(dynamic_cast<const BuiltinType *>(t));
             info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
             break;
         }
-        case DataType::data_type_t::kEnumType: {
+        case DataType::data_type_t::kEnumType:
+        {
             info["type"] = "enum";
             break;
         }
-        case DataType::data_type_t::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             info["type"] = "function";
             FunctionType *funType = dynamic_cast<FunctionType *>(t);
             assert(funType);
@@ -632,18 +638,21 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             const ListType *a = dynamic_cast<const ListType *>(t);
             assert(a);
             info["type"] = "list";
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             info["type"] = "struct";
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             info["type"] = "union";
@@ -762,7 +771,8 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["cases"] = unionCases;
             break;
         }
-        case DataType::data_type_t::kVoidType: {
+        case DataType::data_type_t::kVoidType:
+        {
             info["type"] = "void";
             break;
         }

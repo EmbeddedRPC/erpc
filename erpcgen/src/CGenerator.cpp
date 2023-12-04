@@ -53,8 +53,7 @@ static uint8_t listCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
-CGenerator::CGenerator(InterfaceDefinition *def)
-: Generator(def, generator_type_t::kC)
+CGenerator::CGenerator(InterfaceDefinition *def) : Generator(def, generator_type_t::kC)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -232,19 +231,22 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
 
     switch (dataType->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             AliasType *aliasType = dynamic_cast<AliasType *>(dataType);
             assert(aliasType);
             aliasType->setElementType(findChildDataType(dataTypes, aliasType->getElementType()));
             break;
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(dataType);
             assert(arrayType);
             arrayType->setElementType(findChildDataType(dataTypes, arrayType->getElementType()));
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             if (dataType->isBinary())
             {
                 // check if binary data type was replaced with structure wrapper
@@ -275,7 +277,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
             dataTypes.insert(dataType);
             break;
         }
-        case DataType::data_type_t::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             FunctionType *funcType = dynamic_cast<FunctionType *>(dataType);
             assert(funcType);
 
@@ -298,7 +301,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
             }
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             // The only child node of a list node is the element type.
             ListType *listType = dynamic_cast<ListType *>(dataType);
             DataType *trueContainerDataType = listType->getTrueContainerDataType();
@@ -390,7 +394,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
                 break;
             }
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             StructType *structType = dynamic_cast<StructType *>(dataType);
             assert(structType);
 
@@ -415,7 +420,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
             }
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             // Keil need extra pragma option when unions are used.
             m_templateData["usedUnionType"] = true;
             UnionType *currentUnion = dynamic_cast<UnionType *>(dataType);
@@ -429,7 +435,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
             }
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }
@@ -796,7 +803,8 @@ void CGenerator::makeAliasesTemplateData()
                 aliasInfo["unnamedName"] = getOutputName(aliasType);
                 switch (elementDataType->getDataType())
                 {
-                    case DataType::data_type_t::kStructType: {
+                    case DataType::data_type_t::kStructType:
+                    {
                         StructType *structType = dynamic_cast<StructType *>(elementDataType);
                         assert(structType);
                         aliasInfo["unnamed"] = getStructDefinitionTemplateData(
@@ -804,7 +812,8 @@ void CGenerator::makeAliasesTemplateData()
                         aliasInfo["unnamedType"] = "struct";
                         break;
                     }
-                    case DataType::data_type_t::kEnumType: {
+                    case DataType::data_type_t::kEnumType:
+                    {
                         EnumType *enumType = dynamic_cast<EnumType *>(elementDataType);
                         assert(enumType);
                         aliasInfo["unnamed"] = getEnumTemplateData(enumType);
@@ -1807,15 +1816,18 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<param_d
         switch (structMember->getDirection())
         {
             case param_direction_t::kOutDirection:
-            case param_direction_t::kInoutDirection: {
+            case param_direction_t::kInoutDirection:
+            {
                 direction = direction_t::kInOut;
                 break;
             }
-            case param_direction_t::kInDirection: {
+            case param_direction_t::kInDirection:
+            {
                 direction = direction_t::kIn;
                 break;
             }
-            default: {
+            default:
+            {
                 throw internal_error("Unsupported direction type of structure member.");
             }
         }
@@ -1828,15 +1840,18 @@ void CGenerator::setSymbolDataToSide(const Symbol *symbolType, const set<param_d
 
     switch (direction)
     {
-        case direction_t::kIn: {
+        case direction_t::kIn:
+        {
             toServer.push_back(dataMap);
             break;
         }
-        case direction_t::kOut: {
+        case direction_t::kOut:
+        {
             toClient.push_back(dataMap);
             break;
         }
-        case direction_t::kInOut: {
+        case direction_t::kInOut:
+        {
             toServer.push_back(dataMap);
             toClient.push_back(dataMap);
             break;
@@ -1897,22 +1912,28 @@ string CGenerator::getErrorReturnValue(FunctionBase *fn)
             assert(builtinType);
             switch (builtinType->getBuiltinType())
             {
-                case BuiltinType::builtin_type_t::kBoolType: {
+                case BuiltinType::builtin_type_t::kBoolType:
+                {
                     return "false";
                 }
-                case BuiltinType::builtin_type_t::kUInt8Type: {
+                case BuiltinType::builtin_type_t::kUInt8Type:
+                {
                     return "0xFFU";
                 }
-                case BuiltinType::builtin_type_t::kUInt16Type: {
+                case BuiltinType::builtin_type_t::kUInt16Type:
+                {
                     return "0xFFFFU";
                 }
-                case BuiltinType::builtin_type_t::kUInt32Type: {
+                case BuiltinType::builtin_type_t::kUInt32Type:
+                {
                     return "0xFFFFFFFFU";
                 }
-                case BuiltinType::builtin_type_t::kUInt64Type: {
+                case BuiltinType::builtin_type_t::kUInt64Type:
+                {
                     return "0xFFFFFFFFFFFFFFFFU";
                 }
-                default: {
+                default:
+                {
                     return "-1";
                 }
             }
@@ -2184,7 +2205,8 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
     string returnName;
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             // Array type requires the array element count to come after the variable/member name.
             returnName = name;
             ArrayType *a = dynamic_cast<ArrayType *>(t);
@@ -2194,7 +2216,8 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
             returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             assert(nullptr != dynamic_cast<const BuiltinType *>(t));
             returnName = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
             if (!(t->isString() && name != "" && name[0] == '*'))
@@ -2204,14 +2227,16 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
             returnName += name;
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             const ListType *a = dynamic_cast<const ListType *>(t);
             assert(a);
             returnName = "* " + name;
             returnName = getTypenameName(a->getElementType(), returnName);
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             if (unionType->isNonEncapsulatedUnion())
@@ -2227,7 +2252,8 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
             }
             break;
         }
-        case DataType::data_type_t::kVoidType: {
+        case DataType::data_type_t::kVoidType:
+        {
             returnName = "void";
             returnName += returnSpaceWhenNotEmpty(name) + name;
             break;
@@ -2235,7 +2261,8 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
         case DataType::data_type_t::kAliasType:
         case DataType::data_type_t::kEnumType:
         case DataType::data_type_t::kFunctionType:
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             returnName = getOutputName(t);
             returnName += returnSpaceWhenNotEmpty(name) + name;
             break;
@@ -2453,13 +2480,15 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
 
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             AliasType *aliasType = dynamic_cast<AliasType *>(t);
             assert(aliasType);
             return getEncodeDecodeCall(name, group, aliasType->getElementType(), structType, inDataContainer,
                                        structMember, needTempVariableI32, isFunctionParam);
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             static uint8_t arrayCounter;
             ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
             assert(arrayType);
@@ -2492,12 +2521,14 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             --arrayCounter;
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             getEncodeDecodeBuiltin(group, dynamic_cast<BuiltinType *>(t), templateData, structType, structMember,
                                    isFunctionParam);
             break;
         }
-        case DataType::data_type_t::kEnumType: {
+        case DataType::data_type_t::kEnumType:
+        {
             needTempVariableI32 = true;
             templateData["decode"] = m_templateData["decodeEnumType"];
             templateData["encode"] = m_templateData["encodeEnumType"];
@@ -2512,7 +2543,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             }
             break;
         }
-        case DataType::data_type_t::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             FunctionType *funType = dynamic_cast<FunctionType *>(t);
             assert(funType);
             const FunctionType::c_function_list_t &callbacks = funType->getCallbackFuns();
@@ -2539,7 +2571,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             templateData["decode"] = m_templateData["decodeFunctionType"];
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             ListType *listType = dynamic_cast<ListType *>(t);
             assert(listType);
             DataType *elementType = listType->getElementType();
@@ -2684,7 +2717,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
                                                             structMember, needTempVariableI32, isFunctionParam);
             break;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             // needDealloc(templateData, t, structType, structMember);
             string typeName = getOutputName(t);
             if (typeName != "")
@@ -2704,7 +2738,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             }
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
 
@@ -2821,7 +2856,8 @@ data_map CGenerator::getEncodeDecodeCall(const string &name, Group *group, DataT
             }
             break;
         }
-        default: {
+        default:
+        {
             throw internal_error("unknown member type");
         }
     }
@@ -2958,27 +2994,32 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
     DataType *trueDataType = dataType->getTrueDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(trueDataType);
             assert(arrayType);
             return isNeedCallFree(arrayType->getElementType());
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             BuiltinType *builtinType = dynamic_cast<BuiltinType *>(trueDataType);
             assert(builtinType);
             return builtinType->isString() || builtinType->isBinary();
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             return true;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             StructType *structType = dynamic_cast<StructType *>(trueDataType);
             assert(structType);
             set<DataType *> loopDetection;
             return structType->containListMember() || structType->containStringMember() ||
                    containsByrefParamToFree(structType, loopDetection);
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(trueDataType);
             assert(unionType);
             for (auto unionCase : unionType->getCases())
@@ -3112,12 +3153,14 @@ bool CGenerator::containsString(DataType *dataType)
     DataType *trueDataType = dataType->getTrueContainerDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             StructType *s = dynamic_cast<StructType *>(trueDataType);
             assert(s);
             return s->containStringMember();
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *u = dynamic_cast<UnionType *>(trueDataType);
             assert(u);
             for (UnionCase *unionCase : u->getUniqueCases())
@@ -3136,7 +3179,8 @@ bool CGenerator::containsString(DataType *dataType)
             }
             return false;
         }
-        default: {
+        default:
+        {
             if (trueDataType->isString())
             {
                 return true;
@@ -3155,12 +3199,14 @@ bool CGenerator::containsList(DataType *dataType)
     DataType *trueDataType = dataType->getTrueContainerDataType();
     switch (trueDataType->getDataType())
     {
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             StructType *s = dynamic_cast<StructType *>(trueDataType);
             assert(s);
             return s->containListMember();
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *u = dynamic_cast<UnionType *>(trueDataType);
             assert(u);
             for (UnionCase *unionCase : u->getUniqueCases())
@@ -3179,7 +3225,8 @@ bool CGenerator::containsList(DataType *dataType)
             }
             return false;
         }
-        default: {
+        default:
+        {
             return false;
         }
     }

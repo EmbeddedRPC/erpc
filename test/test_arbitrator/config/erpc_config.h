@@ -1,7 +1,9 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2020 NXP
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
+ *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,17 +66,17 @@
 //! Set ERPC_ALLOCATION_POLICY_DYNAMIC if dynamic allocations should be used.
 //! Set ERPC_ALLOCATION_POLICY_STATIC if static allocations should be used.
 //!
-//! Default value is ERPC_ALLOCATION_POLICY_DYNAMIC or in case of FreeRTOS it can be auto-detected if __has_include() is supported
-//! by compiler. Uncomment comment bellow to use static allocation policy.
-//! In case of static implementation user need consider another values to set (ERPC_CODEC_COUNT,
-//! ERPC_MESSAGE_LOGGERS_COUNT, ERPC_CLIENTS_THREADS_AMOUNT).
+//! Default value is ERPC_ALLOCATION_POLICY_DYNAMIC or in case of FreeRTOS it can be auto-detected if __has_include() is
+//! supported by compiler. Uncomment comment bellow to use static allocation policy. In case of static implementation
+//! user need consider another values to set (ERPC_CODEC_COUNT, ERPC_MESSAGE_LOGGERS_COUNT,
+//! ERPC_CLIENTS_THREADS_AMOUNT).
 #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
 
 //! @def ERPC_CODEC_COUNT
 //!
 //! @brief Set amount of codecs objects used simultaneously in case of ERPC_ALLOCATION_POLICY is set to
-//! ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one thread per
-//! each then 2, ... Default value 2.
+//! ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one
+//! thread per each then 2, ... Default value 2.
 #define ERPC_CODEC_COUNT (2U)
 
 //! @def ERPC_MESSAGE_LOGGERS_COUNT
@@ -88,8 +90,8 @@
 
 //! @def ERPC_CLIENTS_THREADS_AMOUNT
 //!
-//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC.
-//! Default value 1 (Most of current cases).
+//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to
+//! ERPC_ALLOCATION_POLICY_STATIC. Default value 1 (Most of current cases).
 #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
 
 //! @def ERPC_THREADS
@@ -145,7 +147,7 @@
 //! ERPC_MESSAGE_LOGGING_DISABLED.
 //!
 //! Uncomment for using logging feature.
-// #define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
+//#define ERPC_MESSAGE_LOGGING (ERPC_MESSAGE_LOGGING_ENABLED)
 
 //! @def ERPC_TRANSPORT_MU_USE_MCMGR
 //!
@@ -181,9 +183,26 @@
 
 //! @name Assert function definition
 //@{
-//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will be used.
+//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will
+//! be used.
 // #define erpc_assert(condition)
 //@}
+
+//! @def ENDIANES_HEADER
+//!
+//! Include header file that controls the communication endianness
+//!
+//! Uncomment for example behaviour for endianness agnostic with:
+//!  1. communication in little endian.
+//!  2. current processor is big endian.
+//!  3. pointer size is 32 bit.
+//!  4. float+double scheme not defined, so throws assert if passes.
+//! #define ERPC_PROCESSOR_ENDIANNESS_LITTLE 0
+//! #define ERPC_COMMUNICATION_LITTLE        1
+//! #define ERPC_POINTER_SIZE_16             0
+//! #define ERPC_POINTER_SIZE_32             1
+//! #define ERPC_POINTER_SIZE_64             0
+//! #define ENDIANNESS_HEADER "erpc_endianness_agnostic_example.h"
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_
