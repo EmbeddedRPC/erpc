@@ -81,7 +81,7 @@ void Thread::threadEntryPointStub(void *arg1, void *arg2, void *arg3)
     k_thread_abort(k_current_get());
 }
 
-Mutex::Mutex(void) : m_mutex(0)
+Mutex::Mutex(void) : m_mutex()
 {
     k_mutex_init(&m_mutex);
 }
@@ -104,7 +104,7 @@ bool Mutex::unlock(void)
     return true;
 }
 
-Semaphore::Semaphore(int count) : m_sem(0)
+Semaphore::Semaphore(int count) : m_sem()
 {
     // Set max count to highest signed int.
     k_sem_init(&m_sem, count, 0x7fffffff);
