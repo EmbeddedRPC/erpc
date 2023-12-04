@@ -56,7 +56,7 @@ if (CONFIG_ERPC)
   endif()
 
   # Optional RPMSG-LITE transport
-  if(ERPC_TRANSPORT_RPMSG_LITE)
+  if(CONFIG_ERPC_TRANSPORT_RPMSG_LITE)
     zephyr_library_sources(
       ${ERPC_DIR}/setup/erpc_setup_mbf_rpmsg.cpp
       ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_master.cpp
@@ -66,7 +66,7 @@ if (CONFIG_ERPC)
   endif()
 
   # Optional arbitrated client
-  if(ERPC_ARBITRATED_CLIENT)
+  if(CONFIG_ERPC_ARBITRATED_CLIENT)
     zephyr_library_sources(
       ${ERPC_DIR}/infra/erpc_arbitrated_client_manager.cpp
       ${ERPC_DIR}/infra/erpc_transport_arbitrator.cpp

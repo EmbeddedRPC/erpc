@@ -35,7 +35,7 @@ config ERPC_TRANSPORT_RPMSG_LITE
 	bool "Enable eRPC rpsmg-lite transport"
 	help
 	  When enabled, eRPC will include rpsmg-lite transport layer.
-	depends	on RPMSG_LITE
+	depends	on RPMSGLITE
 
 config ERPC_ARBITRATED_CLIENT
 	bool "Enable eRPC arbitrated client"
