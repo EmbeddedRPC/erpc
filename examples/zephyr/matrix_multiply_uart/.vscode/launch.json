@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "type": "cppdbg",
+      "name": "Debug project configuration",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "text": "set remotetimeout 600"
+        },
+        {
+          "text": "set debug-file-directory"
+        }
+      ],
+      "program": "",
+      "miDebuggerServerAddress": "",
+      "variables": {
+        "mcuxStopAtSymbol": "main",
+        "mcuxSerialNumber": "724215586",
+        "mcuxAttach": "false",
+        "mcuxRemoteProbeType": ""
+      },
+      "logging": {
+        "engineLogging": false
+      }
+    }
+  ]
+}

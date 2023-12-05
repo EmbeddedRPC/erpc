@@ -2,10 +2,10 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../erpc_rpmsg_remote/zephyr)
+set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../remote_server/zephyr)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(erpc_rpmsg)
+project(matrix_multiply_rpmsglite)
 
 if(CONFIG_INCLUDE_REMOTE_DIR)
   target_include_directories(zephyr_interface
@@ -31,6 +31,6 @@ target_sources(app PRIVATE
 )
 
 # Also include this directory into rpmsg_lite library because of project specific include rpsmg_config.h
-target_include_directories(rpmsg_lite PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(rpmsg_lite  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Same for erpc library and erpc_config.h
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
