@@ -48,30 +48,27 @@ if (CONFIG_ERPC)
   zephyr_library_include_directories(${ERPC_INCLUDE_DIRS})
 
   # Optional UART transport
-  if(CONFIG_ERPC_TRANSPORT_UART)
-    zephyr_library_sources(
-      ${ERPC_DIR}/transports/erpc_uart_zephyr_transport.cpp
-      ${ERPC_DIR}/setup/erpc_setup_uart_zephyr.cpp
-    )
-  endif()
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_UART
+    ${ERPC_DIR}/transports/erpc_uart_zephyr_transport.cpp
+    ${ERPC_DIR}/setup/erpc_setup_uart_zephyr.cpp
+  )
 
   # Optional RPMSG-LITE transport
-  if(CONFIG_ERPC_TRANSPORT_RPMSG_LITE)
-    zephyr_library_sources(
-      ${ERPC_DIR}/setup/erpc_setup_mbf_rpmsg.cpp
-      ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_master.cpp
-      ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_remote.cpp
-      ${ERPC_DIR}/transports/erpc_rpmsg_lite_rtos_transport.cpp
-    )
-  endif()
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_RPMSG_LITE
+    ${ERPC_DIR}/setup/erpc_setup_mbf_rpmsg.cpp
+    ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_master.cpp
+    ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_remote.cpp
+    ${ERPC_DIR}/transports/erpc_rpmsg_lite_rtos_transport.cpp
+  )
 
   # Optional arbitrated client
-  if(CONFIG_ERPC_ARBITRATED_CLIENT)
-    zephyr_library_sources(
-      ${ERPC_DIR}/infra/erpc_arbitrated_client_manager.cpp
-      ${ERPC_DIR}/infra/erpc_transport_arbitrator.cpp
-      ${ERPC_DIR}/setup/erpc_arbitrated_client_setup.cpp
-    )
-  endif()
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_ARBITRATED_CLIENT
+    ${ERPC_DIR}/infra/erpc_arbitrated_client_manager.cpp
+    ${ERPC_DIR}/infra/erpc_transport_arbitrator.cpp
+    ${ERPC_DIR}/setup/erpc_arbitrated_client_setup.cpp
+  )
 
 endif()
