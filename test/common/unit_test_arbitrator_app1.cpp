@@ -41,9 +41,9 @@ int testClient();
 
 #define APP_ERPC_READY_EVENT_DATA (1)
 
-SemaphoreHandle_t g_waitQuitMutex;
-TaskHandle_t g_serverTask;
-TaskHandle_t g_clientTask;
+Mutex waitQuitMutex;
+Thread g_serverThread("runServer");
+Thread g_clientThread("runClient");
 
 volatile int waitQuit = 0;
 volatile int waitClient = 0;
@@ -60,9 +60,8 @@ erpc_server_t server;
 ////////////////////////////////////////////////////////////////////////////////
 void increaseWaitQuit()
 {
-    xSemaphoreTake(g_waitQuitMutex, portMAX_DELAY);
+    Mutex::Guard lock(waitQuitMutex);
     waitQuit++;
-    xSemaphoreGive(g_waitQuitMutex);
 }
 
 void runServer(void *arg)
@@ -90,29 +89,32 @@ void runClient(void *arg)
     // wait until ERPC first (client) app will announce that it is ready.
     while (waitClient == 0)
     {
-        vTaskDelay(10);
+        Thread::sleep(10);
     }
 
     // wait until ERPC first (client) app will announce ready to quit state
     while (true)
     {
         isTestPassing = testClient();
-
-        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
-            enableFirstSide();
-            break;
+            Thread::sleep(10);
+            Mutex::Guard lock(waitQuitMutex);
+            if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
+            {
+                enableFirstSide();
+                break;
+            }
         }
-        vTaskDelay(10);
     }
 
     while (true)
     {
+        Thread::sleep(10);
+        Mutex::Guard lock(waitQuitMutex);
         if (waitQuit != 0)
         {
             break;
         }
-        vTaskDelay(100);
     }
 
     // send to ERPC first (client) app ready to quit state
@@ -166,7 +168,7 @@ void runInit(void *arg)
 
     // adding server to client for nested calls.
     erpc_arbitrated_client_set_server(client, server);
-    erpc_arbitrated_client_set_server_thread_id(client, (void *)g_serverTask);
+    erpc_arbitrated_client_set_server_thread_id(client, (void *)g_serverThread.getThreadId());
 
     // adding the service to the server
     service = create_FirstInterface_service();
@@ -177,18 +179,8 @@ void runInit(void *arg)
 #endif
 
     // unblock server and client task
-    xTaskNotifyGive(g_serverTask);
-    xTaskNotifyGive(g_clientTask);
-
-    // Wait until client side will stop.
-    while (true)
-    {
-        if (waitQuit >= 3)
-        {
-            break;
-        }
-        vTaskDelay(100);
-    }
+    xTaskNotifyGive((TaskHandle_t)g_serverThread.getThreadId());
+    xTaskNotifyGive((TaskHandle_t)g_clientThread.getThreadId());
 
     vTaskSuspend(NULL);
 }
@@ -197,10 +189,13 @@ int main(void)
 {
     BOARD_InitHardware();
 
-    g_waitQuitMutex = xSemaphoreCreateMutex();
-    xTaskCreate(runInit, "runInit", 256, NULL, 1, NULL);
-    xTaskCreate(runServer, "runServer", 1536, NULL, 3, &g_serverTask);
-    xTaskCreate(runClient, "runClient", 1536, NULL, 2, &g_clientTask);
+    Thread initThread(&runInit, 1, 256 * 4, "runInit");
+    g_serverThread.init(&runServer, 3, 1536 * 4);
+    g_clientThread.init(&runClient, 2, 1536 * 4);
+
+    initThread.start();
+    g_serverThread.start();
+    g_clientThread.start();
 
     vTaskStartScheduler();
 
