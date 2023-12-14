@@ -406,15 +406,22 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
         switch (tok.getToken())
         {
             case '+':
+            {
                 result = l + r;
                 break;
+            }
             case '-':
+            {
                 result = l - r;
                 break;
+            }
             case '*':
+            {
                 result = l * r;
                 break;
+            }
             case '/':
+            {
                 // Just make the result a zero if div-by-zero.
                 if (r == 0)
                 {
@@ -425,7 +432,9 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
                     result = l / r;
                 }
                 break;
+            }
             case '%':
+            {
                 // Just make the result a zero if div-by-zero.
                 if (r == 0)
                 {
@@ -436,23 +445,36 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
                     result = l % r;
                 }
                 break;
+            }
             case '&':
+            {
                 result = l & r;
                 break;
+            }
             case '|':
+            {
                 result = l | r;
                 break;
+            }
             case '^':
+            {
                 result = l ^ r;
                 break;
+            }
             case TOK_LSHIFT:
+            {
                 result = l << r;
                 break;
+            }
             case TOK_RSHIFT:
+            {
                 result = l >> r;
                 break;
+            }
             default:
+            {
                 throw internal_error("unknown binary operator");
+            }
         }
 
         IntegerValue::int_type_t intType;
@@ -504,15 +526,22 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
         switch (tok.getToken())
         {
             case '+':
+            {
                 result = l + r;
                 break;
+            }
             case '-':
+            {
                 result = l - r;
                 break;
+            }
             case '*':
+            {
                 result = l * r;
                 break;
+            }
             case '/':
+            {
                 /* Just make the result a zero if div-by-zero. */
                 if (r == 0)
                 {
@@ -523,6 +552,7 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
                     result = l / r;
                 }
                 break;
+            }
 
             /* Throw semantic error on invalid operators for floats. */
             case '%':
@@ -531,9 +561,13 @@ AstNode *SymbolScanner::handleBinaryOp(AstNode *node, bottom_up)
             case '^':
             case TOK_LSHIFT:
             case TOK_RSHIFT:
+            {
                 throw semantic_error(format_string("line %d: invalid operator on float value", tok.getFirstLine()));
+            }
             default:
+            {
                 throw internal_error("unknown binary operator");
+            }
         }
 
         resultNode = new AstNode(Token(TOK_FLOAT_LITERAL, new FloatValue(result)));
@@ -579,13 +613,19 @@ AstNode *SymbolScanner::handleUnaryOp(AstNode *node, bottom_up)
         switch (tok.getToken())
         {
             case TOK_UNARY_NEGATE:
+            {
                 value = (-(int64_t)(value));
                 break;
+            }
             case '~':
+            {
                 value = ~value;
                 break;
+            }
             default:
+            {
                 throw internal_error("unknown unary operator");
+            }
         }
 
         return new AstNode(Token(TOK_INT_LITERAL, new IntegerValue(value, valueInt->getIntType())));
@@ -596,15 +636,21 @@ AstNode *SymbolScanner::handleUnaryOp(AstNode *node, bottom_up)
         switch (tok.getToken())
         {
             case TOK_UNARY_NEGATE:
+            {
                 value = -value;
                 return new AstNode(Token(TOK_FLOAT_LITERAL, new FloatValue(value)));
+            }
 
             // It is a semantic error to use the binary invert operator on a float.
             case '~':
+            {
                 throw semantic_error(format_string("line %d: invalid operator on float value", tok.getFirstLine()));
+            }
 
             default:
+            {
                 throw internal_error("unknown unary operator");
+            }
         }
     }
 
@@ -1116,18 +1162,24 @@ AstNode *SymbolScanner::handleFunction(AstNode *node, top_down)
             switch (returnTypeToken.getToken())
             {
                 case TOK_ONEWAY:
+                {
                     func->setIsOneway(true);
                     func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
                     break;
+                }
 
                 case TOK_VOID:
+                {
                     func->setReturnStructMemberType(new StructMember("(return)", new VoidType));
                     break;
+                }
 
                 default:
+                {
                     DataType *dataType = lookupDataType(returnTypeNode);
                     func->setReturnStructMemberType(new StructMember("(return)", dataType));
                     break;
+                }
             }
             if (returnTypeToken.getToken() != TOK_ONEWAY)
             {
@@ -1382,19 +1434,26 @@ void SymbolScanner::setParameterDirection(StructMember *param, AstNode *directio
         switch (directionNode->getToken().getToken())
         {
             case TOK_IN:
+            {
                 param_direction = param_direction_t::kInDirection;
                 break;
+            }
             case TOK_OUT:
+            {
                 param_direction = param_direction_t::kOutDirection;
                 break;
+            }
             case TOK_INOUT:
+            {
                 param_direction = param_direction_t::kInoutDirection;
                 break;
+            }
             default:
+            {
                 delete param;
                 throw semantic_error(format_string("line %d: expected parameter direction type",
                                                    directionNode->getToken().getFirstLine()));
-                break;
+            }
         }
     }
     else /* if no direction specified, default case is an 'in' variable */
@@ -1474,8 +1533,10 @@ DataType *SymbolScanner::lookupDataType(const AstNode *typeNode)
             return lookupDataTypeByName(typeNode->getChild(3)->getToken(), &(m_currentStruct->getScope()), false);
         }
         default:
+        {
             throw internal_error(format_string("unexpected token type %s on line %d", typeToken.getTokenName(),
                                                typeToken.getLocation().m_firstLine));
+        }
     }
 }
 

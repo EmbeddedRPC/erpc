@@ -109,20 +109,25 @@ static void LPI2C_SlaveUserCallback(LPI2C_Type *base, lpi2c_slave_transfer_t *tr
         break;
         /*  Transmit request */
         case kLPI2C_SlaveTransmitEvent:
+        {
             /*  Update information for transmit process */
             transfer->data = ((LPI2C_CLB_USER_DATA *)userData)->tx_buffer;
             transfer->dataSize = ((LPI2C_CLB_USER_DATA *)userData)->tx_size;
             break;
+        }
 
         /* Setup the slave receive buffer */
         case kLPI2C_SlaveReceiveEvent:
+        {
             /*  Update information for received process */
             transfer->data = ((LPI2C_CLB_USER_DATA *)userData)->rx_buffer;
             transfer->dataSize = ((LPI2C_CLB_USER_DATA *)userData)->rx_size;
             break;
+        }
 
         /* The master has sent a stop transition on the bus */
         case kLPI2C_SlaveCompletionEvent:
+        {
             /* Filter out dummy transaction completions (additional dummy recv./transmit) */
             if (!(transfer->transferredCount == 0 && transfer->dataSize == 0) && transfer->data != NULL)
             {
@@ -131,10 +136,13 @@ static void LPI2C_SlaveUserCallback(LPI2C_Type *base, lpi2c_slave_transfer_t *tr
                 transfer->dataSize = 0;
             }
             break;
+        }
 
         default:
+        {
             s_isTransferCompleted = false;
             break;
+        }
     }
 }
 

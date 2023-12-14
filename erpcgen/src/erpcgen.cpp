@@ -165,27 +165,37 @@ public:
             switch (optchar)
             {
                 case '?':
+                {
                     printUsage(options);
                     return 0;
+                }
 
                 case 'V':
+                {
                     printf("%s %s\n%s\n", k_toolName, k_version, k_copyright);
                     return 0;
+                }
 
                 case 'o':
+                {
                     m_outputFilePath = optarg;
                     break;
+                }
 
                 case 'v':
+                {
                     if (m_verboseType != verbose_type_t::kExtraDebug)
                     {
                         m_verboseType = (verbose_type_t)(((int)m_verboseType) + 1);
                     }
                     break;
+                }
 
                 case 'I':
+                {
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
+                }
 
                 case 'g':
                 {
@@ -222,9 +232,11 @@ public:
                 }
 
                 default:
+                {
                     Log::error("error: unrecognized option\n\n");
                     printUsage(options);
                     return 0;
+                }
             }
         }
 
@@ -309,11 +321,15 @@ public:
             switch (m_outputLanguage)
             {
                 case languages_t::kCLanguage:
+                {
                     CGenerator(&def).generate();
                     break;
+                }
                 case languages_t::kPythonLanguage:
+                {
                     PythonGenerator(&def).generate();
                     break;
+                }
             }
         }
         catch (exception &e)
@@ -353,17 +369,25 @@ public:
         switch (m_verboseType)
         {
             case verbose_type_t::kWarning:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kWarning);
                 break;
+            }
             case verbose_type_t::kInfo:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kInfo);
                 break;
+            }
             case verbose_type_t::kDebug:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug);
                 break;
+            }
             case verbose_type_t::kExtraDebug:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug2);
                 break;
+            }
         }
     }
 };

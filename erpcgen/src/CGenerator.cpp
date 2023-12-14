@@ -821,7 +821,9 @@ void CGenerator::makeAliasesTemplateData()
                         break;
                     }
                     default:
+                    {
                         throw internal_error("Only structs or enums are allowed as unnamed types.");
+                    }
                 }
             }
             aliases.push_back(aliasInfo);
@@ -2268,8 +2270,11 @@ string CGenerator::getTypenameName(DataType *t, const string &name)
             break;
         }
         default:
+        {
             throw internal_error(format_string("In getTypenameName: unknown data type: %s value:%d",
                                                t->getName().c_str(), t->getDataType()));
+            break;
+        }
     }
     return returnName;
 }
@@ -2279,35 +2284,65 @@ string CGenerator::getBuiltinTypename(const BuiltinType *t)
     switch (t->getBuiltinType())
     {
         case BuiltinType::builtin_type_t::kBoolType:
+        {
             return "bool";
+        }
         case BuiltinType::builtin_type_t::kInt8Type:
+        {
             return "int8_t";
+        }
         case BuiltinType::builtin_type_t::kInt16Type:
+        {
             return "int16_t";
+        }
         case BuiltinType::builtin_type_t::kInt32Type:
+        {
             return "int32_t";
+        }
         case BuiltinType::builtin_type_t::kInt64Type:
+        {
             return "int64_t";
+        }
         case BuiltinType::builtin_type_t::kUInt8Type:
+        {
             return "uint8_t";
+        }
         case BuiltinType::builtin_type_t::kUInt16Type:
+        {
             return "uint16_t";
+        }
         case BuiltinType::builtin_type_t::kUInt32Type:
+        {
             return "uint32_t";
+        }
         case BuiltinType::builtin_type_t::kUInt64Type:
+        {
             return "uint64_t";
+        }
         case BuiltinType::builtin_type_t::kFloatType:
+        {
             return "float";
+        }
         case BuiltinType::builtin_type_t::kDoubleType:
+        {
             return "double";
+        }
         case BuiltinType::builtin_type_t::kStringType:
+        {
             return "char *";
+        }
         case BuiltinType::builtin_type_t::kUStringType:
+        {
             return "unsigned char*";
+        }
         case BuiltinType::builtin_type_t::kBinaryType:
+        {
             return "uint8_t *";
+        }
         default:
+        {
             throw internal_error("unknown builtin type");
+        }
     }
 }
 
@@ -3039,7 +3074,9 @@ bool CGenerator::isNeedCallFree(DataType *dataType)
             return false;
         }
         default:
+        {
             return false;
+        }
     }
 }
 
@@ -3422,15 +3459,25 @@ string CGenerator::getDirection(param_direction_t direction)
     switch (direction)
     {
         case param_direction_t::kInDirection:
+        {
             return "kInDirection";
+        }
         case param_direction_t::kOutDirection:
+        {
             return "kOutDirection";
+        }
         case param_direction_t::kInoutDirection:
+        {
             return "kInoutDirection";
+        }
         case param_direction_t::kReturn:
+        {
             return "kReturn";
+        }
         default:
+        {
             throw semantic_error("Unsupported direction type");
+        }
     }
 }
 
