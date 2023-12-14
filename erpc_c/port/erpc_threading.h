@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -99,7 +99,7 @@ public:
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0,
-           thread_stack_pointer stackPtr = 0);
+           thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief Destructor.
@@ -128,7 +128,7 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = 0);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief This function starts thread execution.

@@ -48,6 +48,7 @@ using namespace std;
 #define APP_ERPC_READY_EVENT_DATA (1)
 
 Mutex waitQuitMutex;
+Thread g_initThread("runInit");
 Thread g_serverThread("runServer");
 Thread g_clientThread("runClient");
 
@@ -252,11 +253,11 @@ int main(void)
     memcpy((void *)(char *)CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
 #endif
 
-    Thread initThread(&runInit, 1, 256 * 4, "runInit");
+    g_initThread.init(&runInit, 1, 256 * 4);
     g_serverThread.init(&runServer, 2, 1536 * 4);
     g_clientThread.init(&runClient, 1, 1536 * 4);
 
-    initThread.start();
+    g_initThread.start();
     g_serverThread.start();
     g_clientThread.start();
 

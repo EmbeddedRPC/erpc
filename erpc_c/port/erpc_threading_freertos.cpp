@@ -27,14 +27,14 @@ Thread *Thread::s_first = NULL;
 ////////////////////////////////////////////////////////////////////////////////
 
 Thread::Thread(const char *name) :
-m_name(name), m_entry(0), m_arg(0), m_stackSize(0), m_priority(0), m_task(0), m_next(0), m_stackPtr(0)
+m_name(name), m_entry(NULL), m_arg(0), m_stackSize(0), m_priority(0), m_stackPtr(NULL), m_task(0), m_next(0)
 {
 }
 
 Thread::Thread(thread_entry_t entry, uint32_t priority, uint32_t stackSize, const char *name,
                thread_stack_pointer stackPtr) :
 m_name(name),
-m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_task(0), m_next(0), m_stackPtr(stackPtr)
+m_entry(entry), m_arg(0), m_stackSize(stackSize), m_priority(priority), m_stackPtr(stackPtr), m_task(0), m_next(0)
 {
 }
 
