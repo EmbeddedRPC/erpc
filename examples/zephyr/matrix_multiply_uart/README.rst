@@ -51,3 +51,56 @@ Building the application for mimxrt1060_evk
    :zephyr-app: samples/matrix_multiply_uart
    :board: mimxrt1060_evk
    :goals: debug
+
+Building the application for mimxrt1170_evkb_cm7
+***********************************************
+
+.. zephyr-app-commands::
+   :zephyr-app: samples/matrix_multiply_uart
+   :board: mimxrt1170_evkb_cm7
+   :goals: debug
+
+Sample Output
+=============
+
+Open a serial terminal (minicom, putty, etc.) and connect the board with the
+following settings:
+
+- Speed: 115200
+- Data: 8 bits
+- Parity: None
+- Stop bits: 1
+
+Reset the board and the following message will appear on the corresponding
+serial port:
+
+.. code-block:: console
+ eRPC Matrix Multiply TCP example
+ Transport: serial=COM14 baudrate=115200
+ Matrix #1
+ =========
+ 8 2 1 3 1 
+ 9 4 7 6 0 
+ 3 8 5 9 8 
+ 2 8 7 3 7 
+ 7 8 3 6 3 
+ 
+ Matrix #1
+ =========
+ 1 9 5 7 8 
+ 2 4 8 3 9 
+ 9 1 8 3 0 
+ 7 6 3 4 2 
+ 4 4 8 7 8 
+ 
+ eRPC request is sent to the server
+ 
+ Matrix result
+ =========
+ 46 103 81 84 96 
+ 122 140 151 120 120 
+ 159 150 210 152 178 
+ 130 103 195 120 150 
+ 104 146 165 127 164 
+ 
+ Press Enter to initiate the next matrix multiplication or 'q' to quit
