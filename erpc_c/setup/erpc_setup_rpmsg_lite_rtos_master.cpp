@@ -26,8 +26,8 @@ using namespace erpc;
 #endif
 
 #if defined(__ZEPHYR__)
-#define SHM_MEM_ADDR		DT_REG_ADDR(DT_CHOSEN(zephyr_ipc_shm))
-#define SH_MEM_TOTAL_SIZE	DT_REG_SIZE(DT_CHOSEN(zephyr_ipc_shm))
+#define SHM_MEM_ADDR DT_REG_ADDR(DT_CHOSEN(zephyr_ipc_shm))
+#define SH_MEM_TOTAL_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_ipc_shm))
 void *rpmsg_lite_base = (void *)SHM_MEM_ADDR;
 #elif defined(__ICCARM__) /* IAR Workbench */
 #pragma location = "rpmsg_sh_mem_section"

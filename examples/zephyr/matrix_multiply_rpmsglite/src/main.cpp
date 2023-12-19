@@ -19,9 +19,8 @@
 
 extern char rpmsg_lite_base[];
 
-#define MATRIX_ITEM_MAX_VALUE     (50)
+#define MATRIX_ITEM_MAX_VALUE (50)
 #define APP_ERPC_READY_EVENT_DATA (1U)
-
 
 /*******************************************************************************
  * Variables
@@ -73,7 +72,7 @@ static void print_matrix(Matrix matrix_ptr)
 
 int main(void)
 {
-    Matrix matrix1 = {0}, matrix2 = {0}, result_matrix = {0};
+    Matrix matrix1 = { 0 }, matrix2 = { 0 }, result_matrix = { 0 };
 
     /* RPMsg-Lite transport layer initialization */
     erpc_transport_t transport;
@@ -87,7 +86,7 @@ int main(void)
 
     /* eRPC client side initialization */
     client = erpc_client_init(transport, message_buffer_factory);
-		initMatrixMultiplyService_client(client);
+    initMatrixMultiplyService_client(client);
 
     /* Set default error handler */
     erpc_client_set_error_handler(client, erpc_error_handler);

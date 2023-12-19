@@ -19,7 +19,6 @@
  ******************************************************************************/
 #define UART_DEVICE_NODE DT_CHOSEN(zephyr_console)
 
-
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -71,13 +70,13 @@ void erpcMatrixMultiply(Matrix matrix1, Matrix matrix2, Matrix result_matrix)
 
 int main(void)
 {
-	if (!device_is_ready(uart_dev))
-	{
-		printk("UART device not found!");
-		return -1;
-	}
+    if (!device_is_ready(uart_dev))
+    {
+        printk("UART device not found!");
+        return -1;
+    }
 
-	 /* UART transport layer initialization */
+    /* UART transport layer initialization */
     erpc_transport_t transport;
 
     transport = erpc_transport_zephyr_uart_init((void *)uart_dev);

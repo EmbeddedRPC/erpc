@@ -17,8 +17,8 @@
  ******************************************************************************/
 #define ERPC_TRANSPORT_RPMSG_LITE_LINK_ID (RL_PLATFORM_IMXRT1160_M7_M4_LINK_ID)
 
-#define SHM_MEM_ADDR		DT_REG_ADDR(DT_CHOSEN(zephyr_ipc_shm))
-#define SHM_MEM_SIZE	    DT_REG_SIZE(DT_CHOSEN(zephyr_ipc_shm))
+#define SHM_MEM_ADDR DT_REG_ADDR(DT_CHOSEN(zephyr_ipc_shm))
+#define SHM_MEM_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_ipc_shm))
 
 /*******************************************************************************
  * Prototypes
@@ -63,9 +63,7 @@ void erpcMatrixMultiply(Matrix matrix1, Matrix matrix2, Matrix result_matrix)
     }
 }
 
-static void SignalReady(void)
-{
-}
+static void SignalReady(void) {}
 
 /*!
  * @brief Main function
@@ -79,7 +77,7 @@ int main(void)
     erpc_server_t server;
 
     transport = erpc_transport_rpmsg_lite_rtos_remote_init(101U, 100U, (void *)(char *)shared_memory,
-                                                      ERPC_TRANSPORT_RPMSG_LITE_LINK_ID, SignalReady, NULL);
+                                                           ERPC_TRANSPORT_RPMSG_LITE_LINK_ID, SignalReady, NULL);
 
     /* MessageBufferFactory initialization */
     erpc_mbf_t message_buffer_factory;
