@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2015, 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
- * All rights reserved.
+ * Copyright 2023 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -79,9 +77,6 @@ int main(void)
     /* RPMsg-Lite transport layer initialization */
     erpc_transport_t transport;
     erpc_server_t server;
-
-    //int keep_running = 1;
-    //while (keep_running) {}
 
     transport = erpc_transport_rpmsg_lite_rtos_remote_init(101U, 100U, (void *)(char *)shared_memory,
                                                       ERPC_TRANSPORT_RPMSG_LITE_LINK_ID, SignalReady, NULL);

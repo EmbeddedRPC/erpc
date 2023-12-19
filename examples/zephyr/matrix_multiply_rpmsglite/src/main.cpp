@@ -1,7 +1,5 @@
 /*
- * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
- * All rights reserved.
+ * Copyright 2023 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -81,9 +79,6 @@ int main(void)
     erpc_transport_t transport;
     erpc_client_t client;
 
-    //int keep_running = 1;
-    //while (keep_running) {}
-
     transport = erpc_transport_rpmsg_lite_rtos_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
 
     /* MessageBufferFactory initialization */
@@ -126,11 +121,6 @@ int main(void)
         printk("\r\n=============\r\n");
         print_matrix(result_matrix);
 
-        //(void)printk("\r\nPress the %s button to initiate the next matrix multiplication\r\n", BUTTON_NAME);
-        /* Check for SWx button push. Pin is grounded when button is pushed. */
-        //while (!IS_BUTTON_PRESSED())
-        //{
-        //}
         env_sleep_msec(1000);
 
         /* Wait for 200ms to eliminate the button glitch */
