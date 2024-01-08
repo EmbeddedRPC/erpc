@@ -4,9 +4,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.nxp.erpc</groupId>
+    <groupId>io.github.embeddedrpc.erpc</groupId>
     <artifactId>erpc</artifactId>
     <version>0.1.0</version>
+
+    <name>eRPC</name>
+    <description>eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems
+        and heterogeneous multicore SoCs.
+    </description>
+    <url>https://github.com/EmbeddedRPC/erpc</url>
+
+    <licenses>
+        <license>
+            <name>The 3-Clause BSD License</name>
+            <url>https://opensource.org/license/bsd-3-clause/</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Jan Komarek</name>
+            <email>jan.komarek@nxp.com</email>
+            <organization>nxp.com</organization>
+            <organizationUrl>http://www.nxp.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/EmbeddedRPC/erpc.git</connection>
+        <developerConnection>scm:git:ssh://github.com/EmbeddedRPC/erpc.git</developerConnection>
+        <url>https://github.com/EmbeddedRPC/erpc/tree/develop</url>
+    </scm>
 
     <properties>
         <!-- Java version configuration -->
@@ -52,6 +80,13 @@
             <version>2.5.14</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -100,6 +135,58 @@
                     <encoding>utf-8</encoding>
                     <argLine>-Dfile.encoding=utf-8</argLine>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

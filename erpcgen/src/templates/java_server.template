@@ -10,11 +10,11 @@ import {$groupPackage}.interfaces.I{$iface.name};
 {% if not empty(group.symbolsMap.structs) %}import {$groupPackage}.common.structs.*;{% elif not empty(structs)%}import {$groupPackage}.common.structs.*;{% endif %}
 {% if not empty(enums)%}import {$groupPackage}.common.enums.*;{% endif %}
 
-import com.nxp.erpc.auxiliary.MessageInfo;
-import com.nxp.erpc.auxiliary.MessageType;
-import com.nxp.erpc.codec.Codec;
-import com.nxp.erpc.server.Service;
-import com.nxp.erpc.auxiliary.Reference;
+import io.github.embeddedrpc.erpc.auxiliary.MessageInfo;
+import io.github.embeddedrpc.erpc.auxiliary.MessageType;
+import io.github.embeddedrpc.erpc.codec.Codec;
+import io.github.embeddedrpc.erpc.server.Service;
+import io.github.embeddedrpc.erpc.auxiliary.Reference;
 
 {%  for inc in includes %}
 import {$inc};

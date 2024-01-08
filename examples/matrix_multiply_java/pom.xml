@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.nxp.erpc.example</groupId>
+    <groupId>io.github.embeddedrpc.erpc.example</groupId>
     <artifactId>matrix_multiply_java</artifactId>
     <version>1.0</version>
 
@@ -43,7 +43,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                com.nxp.erpc.example.Main
+                                io.github.embeddedrpc.erpc.example.Main
                             </mainClass>
                         </manifest>
                     </archive>
@@ -54,7 +54,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.nxp.erpc</groupId>
+            <groupId>io.github.embeddedrpc.erpc</groupId>
             <artifactId>erpc</artifactId>
             <version>0.1.0</version>
         </dependency>

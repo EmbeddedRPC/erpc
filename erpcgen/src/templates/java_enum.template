@@ -10,7 +10,7 @@
 
 package {$groupPackage}.common.enums;
 
-import com.nxp.erpc.codec.Codec;
+import io.github.embeddedrpc.erpc.codec.Codec;
 
 {$>(enum.mlComment or enum.ilComment)}
 public enum {$enum.name}{
