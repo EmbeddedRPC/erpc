@@ -37,6 +37,13 @@ config ERPC_TRANSPORT_RPMSG_LITE
 	  When enabled, eRPC will include rpsmg-lite transport layer.
 	depends	on RPMSGLITE
 
+config ERPC_TRANSPORT_MBOX
+	bool "Enable eRPC Zephyr MBOX transport"
+	help
+	  When enabled, eRPC will include Zephyr MBOX transport layer.
+	select RING_BUFFER
+
+
 config ERPC_ARBITRATED_CLIENT
 	bool "Enable eRPC arbitrated client"
 	help

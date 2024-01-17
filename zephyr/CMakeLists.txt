@@ -54,6 +54,13 @@ if (CONFIG_ERPC)
     ${ERPC_DIR}/setup/erpc_setup_uart_zephyr.cpp
   )
 
+  # Optional MBOX transport
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_MBOX
+    ${ERPC_DIR}/transports/erpc_mbox_zephyr_transport.cpp
+    ${ERPC_DIR}/setup/erpc_setup_mbox_zephyr.cpp
+  )
+
   # Optional RPMSG-LITE transport
   zephyr_library_sources_ifdef(
     CONFIG_ERPC_TRANSPORT_RPMSG_LITE
