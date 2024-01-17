@@ -6,9 +6,8 @@
  */
 
 #include "erpc_mbox_zephyr_transport.hpp"
+#include "erpc_port.h"
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/mbox.h>
-#include <zephyr/sys/ring_buffer.h>
 #include <cstdio>
 
 using namespace erpc;
@@ -16,21 +15,15 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-
-static volatile bool s_isTransferReceiveCompleted = false;
-static volatile bool s_isTransferSendCompleted = false;
-static volatile uint32_t s_transferReceiveRequireBytes = 0;
 static MBOXTransport *s_mbox_instance = NULL;
 
-#define MBOX_BUFFER_SIZE ERPC_DEFAULT_BUFFER_SIZE
-
-RING_BUF_DECLARE(mbox_receive_buf, MBOX_BUFFER_SIZE);
+RING_BUF_DECLARE(s_rxRingBuffer, MBOX_BUFFER_SIZE);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-MBOXTransport::MBOXTransport(struct device *dev, struct mbox_channel tx_channel, struct mbox_channel rx_channel) :
+MBOXTransport::MBOXTransport(struct device *dev, struct mbox_channel *tx_channel, struct mbox_channel *rx_channel) :
 m_dev(dev), m_tx_channel(tx_channel), m_rx_channel(rx_channel)
 #if !ERPC_THREADS_IS(NONE)
 ,
@@ -42,56 +35,38 @@ m_rxSemaphore(), m_txSemaphore()
 
 MBOXTransport::~MBOXTransport(void) {}
 
-void MBOXTransport::rx_cb(void)
+void MBOXTransport::rx_cb(struct mbox_msg *data)
 {
+    // Read data to ring buffer
+    ring_buf_put(&s_rxRingBuffer, static_cast<const uint8_t *>(data->data), data->size);
+
+    // message is complete, unblock caller of the receive function
+    if (ring_buf_size_get(&s_rxRingBuffer) >= m_transferReceiveRequireBytes)
+    {
+        m_isTransferReceiveCompleted = true;
 #if !ERPC_THREADS_IS(NONE)
-    m_rxSemaphore.put();
-#else
-    s_isTransferReceiveCompleted = true;
+        // disable MU rx full interrupt in rtos-based blocking implementation
+        m_rxSemaphore.put();
 #endif
-    s_transferReceiveRequireBytes = MBOX_BUFFER_SIZE;
+        m_transferReceiveRequireBytes = MBOX_BUFFER_SIZE;
+    }
 }
 
 /* Transfer callback */
-static void rx_callback(const struct device *dev, uint32_t channel, void *user_data, struct mbox_msg *data)
+static void mbox_callback(const struct device *dev, uint32_t channel, void *user_data, struct mbox_msg *data)
 {
-    uint8_t c;
-    uint32_t size;
-    uint8_t *data;
-    int err;
-
-    size = ring_buf_put_claim(&mbox_receive_buf, &data, MBOX_BUFFER_SIZE);
-
-    if (size < data.size)
-    {
-        /* Not enough size for message */
-        return;
-    }
-
-    memcpy(data, data.data, data.size)
-
-        err = ring_buf_put_finish(&mbox_receive_buf, data.size);
-    if (err != 0)
-    {
-        /* This shouldn't happen */
-    }
-
-    /* Enough bytes was received, call receive callback */
-    if (ring_buf_size_get(&mbox_receive_buf) >= s_transferReceiveRequireBytes)
-    {
-        s_mbox_instance->rx_cb();
-    }
+    s_mbox_instance->rx_cb(data);
 }
 
 erpc_status_t MBOXTransport::init(void)
 {
-    if (mbox_register_callback(&m_rx_channel, rx_callback, NULL))
+    if (mbox_register_callback(m_rx_channel, mbox_callback, NULL))
     {
         printk("mbox_register_callback() error\n");
         return kErpcStatus_InitFailed;
     }
 
-    if (mbox_set_enabled(&m_rx_channel, 1))
+    if (mbox_set_enabled(m_rx_channel, 1))
     {
         printk("mbox_set_enable() error\n");
         return kErpcStatus_InitFailed;
@@ -100,77 +75,118 @@ erpc_status_t MBOXTransport::init(void)
     return kErpcStatus_Success;
 }
 
-erpc_status_t MBOXTransport::underlyingReceive(uint8_t *data, uint32_t size)
+erpc_status_t MBOXTransport::receive(MessageBuffer *message)
 {
-    erpc_status_t erpcStatus = kErpcStatus_ReceiveFailed;
+    erpc_status_t status = kErpcStatus_Success;
+    uint8_t tmp[4];
+    uint32_t rxMsgSize = 0;
 
-    if (ring_buf_size_get(&mbox_receive_buf) < size)
+    if (message == NULL)
     {
-        s_transferReceiveRequireBytes = size;
+        status = kErpcStatus_ReceiveFailed;
+    }
+    else
+    {
+#if !ERPC_THREADS_IS(NONE)
+        Mutex::Guard lock(m_receiveLock);
+#endif
+
+        // Wait for size of the message
+        waitForBytes(sizeof(uint32_t));
+        ring_buf_get(&s_rxRingBuffer, (uint8_t *)&rxMsgSize, sizeof(uint32_t));
+
+        // Wait for message to be transmitted 
+        waitForBytes(rxMsgSize);
+        message->setUsed((uint16_t)rxMsgSize);
+
+        if (ring_buf_get(&s_rxRingBuffer, reinterpret_cast<uint8_t *>(message->get()), rxMsgSize) != rxMsgSize)
+        {
+            status = kErpcStatus_ReceiveFailed;
+        };
+
+        // Read remaining bytes from ring buffer
+        ring_buf_get(&s_rxRingBuffer, tmp, 4 - (rxMsgSize % 4));
+
+        rxMsgSize = 0;
+    }
+
+    return status;
+}
+
+void MBOXTransport::waitForBytes(uint32_t numOfBytes)
+{
+    if (ring_buf_size_get(&s_rxRingBuffer) < numOfBytes)
+    {
+        m_transferReceiveRequireBytes = numOfBytes;
 
 /* wait until the receiving is finished */
 #if !ERPC_THREADS_IS(NONE)
         (void)m_rxSemaphore.get();
 #else
-        s_isTransferReceiveCompleted = false;
-        while (!s_isTransferReceiveCompleted)
+        m_isTransferReceiveCompleted = false;
+        while (!m_isTransferReceiveCompleted)
         {
         }
 #endif
-        erpcStatus = kErpcStatus_Success;
     }
-
-    /* read data from buffer */
-    if (ring_buf_get(&mbox_receive_buf, data, size) != size)
-    {
-        /* reading error, should not happen */
-        erpcStatus = kErpcStatus_ReceiveFailed;
-    }
-
-    return erpcStatus;
 }
 
-erpc_status_t MBOXTransport::underlyingSend(const uint8_t *data, uint32_t size)
+erpc_status_t MBOXTransport::send(MessageBuffer *message)
 {
-    erpc_status_t erpcStatus = kErpcStatus_SendFailed;
+    erpc_status_t status = kErpcStatus_Success;
+    struct mbox_msg txMsg;
+    uint32_t txMsgSize = 0;
+    uint32_t txCntBytes = 0;
+    uint8_t *txBuffer;
 
-    s_isTransferSendCompleted = false;
-
-    int mtu = mbox_mtu_get(m_dev);
-    int send = 0;
-
-    while (send != size)
+    if (message == NULL)
     {
-        struct mbox_msg msg;
-        int size_to_send = mtu < size - send ? mtu : size - send;
+        status = kErpcStatus_SendFailed;
+    }
+    else
+    {
+#if !ERPC_THREADS_IS(NONE)
+        Mutex::Guard lock(m_sendLock);
+#endif
 
-        msg.data = data + send;
-        msg.size = size_to_send;
-        int status = mbox_send(m_tx_channel, msg);
+        txMsgSize = message->getUsed();
+        txCntBytes = 0;
+        txBuffer = message->get();
 
-        if (status == -EBUSY) {
-            continue;
+        txMsg.data = &txMsgSize;
+        txMsg.size = sizeof(uint32_t);
+
+        mbox_send(m_tx_channel, &txMsg);
+
+        while (txCntBytes < txMsgSize)
+        {
+            txMsg.data = &txBuffer[txCntBytes];
+            txMsg.size = sizeof(uint32_t);
+
+            int mboxStatus = mbox_send(m_tx_channel, &txMsg);
+
+            if (mboxStatus == -EBUSY)
+            {
+                continue;
+            }
+
+            if (mboxStatus < 0)
+            {
+                return kErpcStatus_SendFailed;
+            }
+
+            txCntBytes += sizeof(uint32_t);
         }
 
-        if (status != 0) {
-            /* TODO: ERROR*/
-            return;
-        }
-
-        send = size_to_send;
+        txMsgSize = 0;
+        txCntBytes = 0;
+        txBuffer = NULL;
     }
 
+    return status;
+}
 
-/* wait until the sending is finished */
-// #if !ERPC_THREADS_IS(NONE)
-//     (void)m_txSemaphore.get();
-// #else
-//     while (!s_isTransferSendCompleted)
-//     {
-//     }
-// #endif
-
-    erpcStatus = kErpcStatus_Success;
-
-    return erpcStatus;
+bool MBOXTransport::hasMessage(void)
+{
+    return !ring_buf_is_empty(&s_rxRingBuffer);
 }

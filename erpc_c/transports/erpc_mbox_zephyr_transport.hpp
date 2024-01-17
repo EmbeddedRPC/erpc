@@ -12,11 +12,15 @@
 #if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
-#include "erpc_framed_transport.hpp"
+#include "erpc_transport.hpp"
 
 extern "C" {
 #include <stdlib.h>
+#include <zephyr/drivers/mbox.h>
+#include <zephyr/sys/ring_buffer.h>
 }
+
+#define MBOX_BUFFER_SIZE ERPC_DEFAULT_BUFFER_SIZE
 
 /*!
  * @addtogroup mbox_transport
@@ -34,15 +38,17 @@ namespace erpc {
  *
  * @ingroup mbox_transport
  */
-class MBOXTransport : public FramedTransport
+class MBOXTransport : public Transport
 {
 public:
     /*!
      * @brief Constructor.
      *
      * @param[in] dev Zephyr MBOX device.
+     * @param[in] tx_channel Zephyr MBOX tx channel.
+     * @param[in] rx_channel Zephyr MBOX rx channel.
      */
-    MBOXTransport(struct device *dev);
+    MBOXTransport(struct device *dev, struct mbox_channel *tx_channel, struct mbox_channel *rx_channel);
 
     /*!
      * @brief Destructor.
@@ -59,41 +65,65 @@ public:
     virtual erpc_status_t init(void);
 
     /*!
-     * @brief Function called from ARM_USART_SignalEvent when ARM_USART_EVENT_RECEIVE_COMPLETE event is asserted
+     * @brief Start receiving data and stores it to passed message buffer
+     *
+     * Initialize receiving of message, it is blocking until doesn't receive complete message.
+     *
+     * @param[in] message Message buffer, which will be filled by incoming message.
+     *
+     * @return kErpcStatus_Success
+     */
+    virtual erpc_status_t receive(MessageBuffer *message) override;
+
+    /*!
+     * @brief Function to send prepared message.
+     *
+     * @param[in] message Pass message buffer to send.
+     *
+     * @retval kErpcStatus_SendFailed Failed to send message buffer.
+     * @retval kErpcStatus_Success Successfully sent all data.
+     */
+    virtual erpc_status_t send(MessageBuffer *message) override;
+
+    /*!
+     * @brief Function to check if is new message to receive.
+     *
+     * This function should be called before blocking function receive() to avoid waiting for new message.
+     *
+     * @return True if exist new message, else false.
+     */
+    virtual bool hasMessage(void) override;
+
+    /*!
+     * @brief Function called from ISR
      *
      * Unblocks the receive function.
      */
-    void rx_cb(void);
+    void rx_cb(struct mbox_msg *data);
 
 protected:
     struct device *m_dev; /*!< Access structure of the MBOX device */
-    struct mbox_channel m_tx_channel;
-	struct mbox_channel m_rx_channel;
+    struct mbox_channel *m_tx_channel;
+    struct mbox_channel *m_rx_channel;
+
+    
+    volatile bool m_isTransferReceiveCompleted = false;
+    volatile uint32_t m_transferReceiveRequireBytes = 0;
+
+    /*!
+     * @brief Function waits for given amount of bytes to be in ring buffer.
+     * 
+     * @param[in] numOfBytes Required number of bytes in ring buffer
+     */
+    void waitForBytes(uint32_t numOfBytes);
+
 #if !ERPC_THREADS_IS(NONE)
     Semaphore m_rxSemaphore; /*!< Semaphore used by RTOS to block task until the receiving is not complete */
     Semaphore m_txSemaphore; /*!< Semaphore used by RTOS to block task until the sending is not complete */
-#endif
-private:
-    /*!
-     * @brief Receive data from MBOX channel.
-     *
-     * @param[inout] data Preallocated buffer for receiving data.
-     * @param[in] size Size of data to read.
-     *
-     * @retval kErpcStatus_ReceiveFailed MBOX failed to receive data.
-     * @retval kErpcStatus_Success Successfully received all data.
-     */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
 
-    /*!
-     * @brief Write data to MBOX channel.
-     *
-     * @param[in] data Buffer to send.
-     * @param[in] size Size of data to send.
-     *
-     * @retval kErpcStatus_Success Always returns success status.
-     */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    Mutex m_sendLock;    /*!< Mutex protecting send. */
+    Mutex m_receiveLock; /*!< Mutex protecting receive. */
+#endif
 };
 
 } // namespace erpc
