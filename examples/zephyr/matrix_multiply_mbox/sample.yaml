@@ -1,0 +1,3 @@
+sample:
+  description: eRPC Matrix multiplication using MBOX transport layer
+  name: eRPC MBOX Matrix multiplication
