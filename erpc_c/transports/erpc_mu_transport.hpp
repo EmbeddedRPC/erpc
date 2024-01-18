@@ -48,7 +48,8 @@ extern "C" {
 #define MU_REG_COUNT (MU_RR_COUNT) /*!< Count of MU tx/rx registers to be used by this transport layer */
 #endif                             /* ERPC_TRANSPORT_MU_USE_MCMGR */
 
-#if (defined(MIMXRT1187_cm7_SERIES) ||  defined(MIMXRT1187_cm33_SERIES) || defined(MIMXRT1189_cm7_SERIES) ||  defined(MIMXRT1189_cm33_SERIES))
+#if (defined(MIMXRT1187_cm7_SERIES) || defined(MIMXRT1187_cm33_SERIES) || defined(MIMXRT1189_cm7_SERIES) || \
+     defined(MIMXRT1189_cm33_SERIES))
 #define MU_TX_SHIFT (1UL << (MU_REG_COUNT - 1U))
 #define MU_RX_SHIFT (1UL << (MU_REG_COUNT - 1U))
 #define MU_RX_INTR_MASK (MU_RX_INTR(MU_RX_SHIFT))
@@ -126,7 +127,7 @@ public:
      *
      * @return kErpcStatus_Success
      */
-    virtual erpc_status_t receive(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
 
     /*!
      * @brief Function to send prepared message.
@@ -136,7 +137,7 @@ public:
      * @retval kErpcStatus_SendFailed Failed to send message buffer.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     /*!
      * @brief Function to check if is new message to receive.
@@ -145,7 +146,7 @@ public:
      *
      * @return True if exist new message, else false.
      */
-    virtual bool hasMessage(void) { return m_newMessage; }
+    virtual bool hasMessage(void) override;
 
 #if ERPC_TRANSPORT_MU_USE_MCMGR
     /*!

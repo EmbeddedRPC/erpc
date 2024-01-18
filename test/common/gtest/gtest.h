@@ -9910,6 +9910,8 @@ linked_ptr<T> make_linked_ptr(T* ptr) {
 
 #if GTEST_OS_BARE_METAL
 #include <stdint.h>
+#else
+#include <cstdint>
 #endif
 
 #if GTEST_HAS_STD_TUPLE_

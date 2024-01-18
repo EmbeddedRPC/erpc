@@ -45,7 +45,7 @@ UNIT_OUT_DIR = $(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/
 ERPC_NAME ?= test
 ERPC_NAME_APP ?= $(ERPC_NAME)
 
-TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/gcc/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
+TEST_DIR = $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(os_name)/$(TRANSPORT)/$(CC)/$(TEST_NAME)_$(APP_TYPE)/$(DEBUG_OR_RELEASE)
 RPC_OBJS_ROOT = $(TEST_DIR)
 TARGET_OUTPUT_ROOT = $(RPC_OBJS_ROOT)
 
@@ -75,12 +75,16 @@ INCLUDES += $(TARGET_OUTPUT_ROOT) \
 #-------------------------------
 IDL_FILE = $(CUR_DIR).erpc
 
-ifneq "$(TEST_NAME)" "test_arbitrator"
+ifeq (,$(filter $(TEST_NAME),test_arbitrator test_callbacks))
 
     INCLUDES += $(ERPC_ROOT)/test/common/config
 
     SOURCES +=  $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
                 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_interface.cpp \
+                $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_interface.cpp \
+                $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp \
+                $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp \
                 $(CUR_DIR)_$(APP_TYPE)_impl.cpp \
                 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 
@@ -91,7 +95,7 @@ all: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/$(ERPC_NAM
 # Define dependency.
 $(OUTPUT_ROOT)/test/$(TEST_NAME)/$(CUR_DIR)_$(APP_TYPE)_impl.cpp: $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp
 $(UT_COMMON_SRC)/unit_test_$(TRANSPORT)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp
-$(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
+$(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_interface.cpp $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_interface.cpp $(ERPC_OUT_DIR)/$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME_APP)_$(APP_TYPE).cpp $(ERPC_OUT_DIR)/c_$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp
 
 # Run erpcgen for C.
 $(ERPC_OUT_DIR)/$(ERPC_NAME)_unit_test_common_$(APP_TYPE).cpp: $(IDL_FILE)
@@ -106,12 +110,19 @@ $(ERPC_OUT_DIR)/$(ERPC_NAME)/$(APP_TYPE).py: $(IDL_FILE)
     # Add libtest.a to build.
     LIBRARIES += -ltest
     LDFLAGS += -L$(OUTPUT_ROOT)/$(DEBUG_OR_RELEASE)/$(os_name)/test/lib
+ifeq "$(is_mingw)" "1"
+    LIBRARIES += -lws2_32
+endif
 else
+ifeq (,$(filter $(TEST_NAME),test_arbitrator))
+    INCLUDES += $(ERPC_ROOT)/test/common/config
+else
+    INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
+endif
+
     ERPC_C_ROOT = $(ERPC_ROOT)/erpc_c
 
     include $(ERPC_ROOT)/test/mk/erpc_src.mk
-
-    INCLUDES += $(OUTPUT_ROOT)/test/$(TEST_NAME)/config
 
     ifeq "$(TYPE)" "CLIENT"
         include $(TEST_ROOT)/$(TEST_NAME)/client.mk

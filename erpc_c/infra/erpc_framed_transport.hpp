@@ -56,6 +56,14 @@ namespace erpc {
 class FramedTransport : public Transport
 {
 public:
+    /*! @brief Contents of the header that prefixes each message. */
+    struct Header
+    {
+        uint16_t m_crcHeader;   //!< CRC-16 over this header structure data
+        uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
+        uint16_t m_crcBody;     //!< CRC-16 over the message data.
+    };
+
     /*!
      * @brief Constructor.
      */
@@ -65,6 +73,13 @@ public:
      * @brief FramedTransport destructor
      */
     virtual ~FramedTransport(void);
+
+    /**
+     * @brief Size of data placed in MessageBuffer before serializing eRPC data.
+     *
+     * @return uint8_t Amount of bytes, reserved before serialized data.
+     */
+    virtual uint8_t reserveHeaderSize(void) override;
 
     /*!
      * @brief Receives an entire message.
@@ -95,13 +110,6 @@ public:
      */
     virtual erpc_status_t send(MessageBuffer *message) override;
 
-    /*! @brief Contents of the header that prefixes each message. */
-    struct Header
-    {
-        uint16_t m_messageSize; //!< Size in bytes of the message, excluding the header.
-        uint16_t m_crc;         //!< CRC-16 over the message data.
-    };
-
     /*!
      * @brief This functions sets the CRC-16 implementation.
      *
@@ -114,7 +122,7 @@ public:
      *
      * @return Crc16* Pointer to CRC-16 object containing crc-16 compute function.
      */
-    virtual Crc16 *getCrc16() override;
+    virtual Crc16 *getCrc16(void) override;
 
 protected:
     Crc16 *m_crcImpl; /*!< CRC object. */
@@ -123,6 +131,32 @@ protected:
     Mutex m_sendLock;    //!< Mutex protecting send.
     Mutex m_receiveLock; //!< Mutex protecting receive.
 #endif
+
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when sending data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
+    virtual erpc_status_t underlyingSend(MessageBuffer *message, uint32_t size, uint32_t offset);
+
+    /*!
+     * @brief Adds ability to framed transport to overwrite MessageBuffer when receiving data.
+     *
+     * Usually we don't want to do that.
+     *
+     * @param message MessageBuffer to send.
+     * @param size size of message to send.
+     * @param offset data start address offset
+     *
+     * @return erpc_status_t kErpcStatus_Success when it finished successful otherwise error.
+     */
+    virtual erpc_status_t underlyingReceive(MessageBuffer *message, uint32_t size, uint32_t offset);
 
     /*!
      * @brief Subclasses must implement this function to send data.

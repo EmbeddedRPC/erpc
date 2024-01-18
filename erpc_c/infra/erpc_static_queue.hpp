@@ -11,6 +11,7 @@
 #define __embedded_rpc__static_queue__
 
 #include <cstring>
+#include <cstdint>
 
 /*!
  * @addtogroup infra_utility

@@ -25,6 +25,8 @@
  */
 
 extern "C" {
+#else
+#include "erpc_common.h"
 #endif
 
 typedef void (*client_error_handler_t)(erpc_status_t err,
@@ -59,13 +61,11 @@ public:
      *
      * This function initializes object attributes.
      */
-    ClientManager(void)
-    : ClientServerCommon()
-    , m_sequence(0)
-    , m_errorHandler(NULL)
+    ClientManager(void) :
+    ClientServerCommon(), m_sequence(0), m_errorHandler(NULL)
 #if ERPC_NESTED_CALLS
-    , m_server(NULL)
-    , m_serverThreadId(NULL)
+    ,
+    m_server(NULL), m_serverThreadId(NULL)
 #endif
     {
     }
@@ -130,8 +130,8 @@ public:
 #endif
 
 protected:
-    uint32_t m_sequence;                    //!< Sequence number.
-    client_error_handler_t m_errorHandler;  //!< Pointer to function error handler.
+    uint32_t m_sequence;                   //!< Sequence number.
+    client_error_handler_t m_errorHandler; //!< Pointer to function error handler.
 #if ERPC_NESTED_CALLS
     Server *m_server;                     //!< Server used for nested calls.
     Thread::thread_id_t m_serverThreadId; //!< Thread in which server run function is called.
@@ -193,10 +193,8 @@ public:
      * @param[in] codec Set in inout codec.
      * @param[in] isOneway Set information if codec is only oneway or bidirectional.
      */
-    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway)
-    : m_sequence(sequence)
-    , m_codec(codec)
-    , m_oneway(argIsOneway)
+    RequestContext(uint32_t sequence, Codec *codec, bool argIsOneway) :
+    m_sequence(sequence), m_codec(codec), m_oneway(argIsOneway)
     {
     }
 

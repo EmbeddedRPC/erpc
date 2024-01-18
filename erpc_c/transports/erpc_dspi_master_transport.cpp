@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -100,10 +100,8 @@ static inline void DSpidevMasterTransport_WaitForSlaveReadyMarker(SPI_Type *spiB
 }
 #endif
 
-DspiMasterTransport::DspiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_spiBaseAddr(spiBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
+DspiMasterTransport::DspiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_spiBaseAddr(spiBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz)
 {
 }
 
@@ -155,11 +153,26 @@ erpc_status_t DspiMasterTransport::underlyingSend(const uint8_t *data, uint32_t 
 {
     status_t status;
     dspi_transfer_t masterXfer;
+    uint32_t header_size = reserveHeaderSize();
 
+    /* send the header first */
     masterXfer.txData = (uint8_t *)data;
     masterXfer.rxData = NULL;
-    masterXfer.dataSize = size;
+    masterXfer.dataSize = header_size;
     masterXfer.configFlags = (uint32_t)kDSPI_MasterCtar0 | (uint32_t)kDSPI_MasterPcs0;
+    /* send the header first */
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    DSpidevMasterTransport_WaitForSlaveReadyGpio();
+#endif
+
+    status = DSPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    s_isSlaveReady = false;
+#endif
+
+    /* send the payload now */
+    masterXfer.txData = (uint8_t *)data + header_size;
+    masterXfer.dataSize = size - header_size;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     DSpidevMasterTransport_WaitForSlaveReadyGpio();

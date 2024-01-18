@@ -45,11 +45,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    ArbitratedClientManager(void)
-    : ClientManager()
-    , m_arbitrator(NULL)
-    {
-    }
+    ArbitratedClientManager(void) : ClientManager(), m_arbitrator(NULL) {}
 
     /*!
      * @brief Sets the transport arbitrator instance.

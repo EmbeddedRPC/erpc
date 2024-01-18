@@ -1,7 +1,7 @@
 // Copyright (c) 2010-2014 Ryan Ginstrom
 // Copyright (c) 2014 Martinho Fernandes
 // Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
-// Copyright 2016 NXP
+// Copyright 2016-2023 NXP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ void replaceAll(std::string &str, const std::string &from, const std::string &to
 
 namespace impl {
 // Types of tokens in control statements.
-enum TokenType
+enum class token_type_t
 {
     INVALID_TOKEN,
     KEY_PATH_TOKEN,
@@ -94,16 +94,16 @@ enum TokenType
 // Represents a token in a control statement.
 class Token
 {
-    TokenType m_type;
+    token_type_t m_type;
     std::string m_value;
 
 public:
-    Token(TokenType tokenType)
+    Token(token_type_t tokenType)
     : m_type(tokenType)
     , m_value()
     {
     }
-    Token(TokenType tokenType, const std::string &value)
+    Token(token_type_t tokenType, const std::string &value)
     : m_type(tokenType)
     , m_value(value)
     {
@@ -127,7 +127,7 @@ public:
     }
     ~Token() = default;
 
-    TokenType get_type() const { return m_type; }
+    token_type_t get_type() const { return m_type; }
     const std::string &get_value() const { return m_value; }
 };
 
@@ -157,7 +157,7 @@ public:
     bool is_valid() const { return m_index < size(); }
     const Token *get() const;
     const Token *next();
-    const Token *match(TokenType tokenType, const char *failure_msg = nullptr);
+    const Token *match(token_type_t tokenType, const char *failure_msg = nullptr);
     void reset() { m_index = 0; }
     TokenIterator &operator++();
 
@@ -328,7 +328,7 @@ public:
 };
 
 // Lexer states for statement tokenizer.
-enum lexer_state_t
+enum class lexer_state_t
 {
     INIT_STATE,           //!< Initial state, skip whitespace, process single char tokens.
     KEY_PATH_STATE,       //!< Scan a key path.
@@ -339,7 +339,7 @@ enum lexer_state_t
 
 struct KeywordDef
 {
-    TokenType tok;
+    token_type_t tok;
     const char *keyword;
 };
 
@@ -348,12 +348,12 @@ class TemplateParser
     std::string m_text;
     node_vector &m_top_nodes;
     uint32_t m_current_line;
-    std::stack<std::pair<node_ptr, TokenType> > m_node_stack;
+    std::stack<std::pair<node_ptr, token_type_t> > m_node_stack;
     node_ptr m_current_node;
     node_vector *m_current_nodes;
     bool m_eol_precedes;
     bool m_last_was_eol;
-    TokenType m_until;
+    token_type_t m_until;
 
 public:
     TemplateParser(const std::string &text, node_vector &nodes);
@@ -365,13 +365,13 @@ private:
     void parse_stmt();
     void parse_comment();
 
-    void push_node(Node *new_node, TokenType until);
+    void push_node(Node *new_node, token_type_t until);
     void check_omit_eol(size_t pos, bool force_omit);
 };
 
 std::string indent(int level);
 inline bool is_key_path_char(char c);
-TokenType get_keyword_token(const std::string &s);
+token_type_t get_keyword_token(const std::string &s);
 void create_id_token(token_vector &tokens, const std::string &s);
 int append_string_escape(std::string &str, std::function<char(unsigned)> peek);
 token_vector tokenize_statement(const std::string &text);
@@ -759,7 +759,7 @@ std::string indent(int level)
     return result;
 }
 
-Token TokenIterator::s_endToken(END_TOKEN);
+Token TokenIterator::s_endToken(token_type_t::END_TOKEN);
 
 const Token *TokenIterator::get() const
 {
@@ -782,7 +782,7 @@ const Token *TokenIterator::next()
     return get();
 }
 
-const Token *TokenIterator::match(TokenType tokenType, const char *failure_msg)
+const Token *TokenIterator::match(token_type_t tokenType, const char *failure_msg)
 {
     const Token *result = get();
     if (result->get_type() != tokenType)
@@ -804,33 +804,33 @@ inline bool is_key_path_char(char c)
     return (isalnum(c) || c == '.' || c == '_');
 }
 
-const KeywordDef k_keywords[] = { { TRUE_TOKEN, "true" },     { FALSE_TOKEN, "false" }, { FOR_TOKEN, "for" },
-                                  { IN_TOKEN, "in" },         { IF_TOKEN, "if" },       { ELIF_TOKEN, "elif" },
-                                  { ELSE_TOKEN, "else" },     { DEF_TOKEN, "def" },     { SET_TOKEN, "set" },
-                                  { ENDFOR_TOKEN, "endfor" }, { ENDIF_TOKEN, "endif" }, { ENDDEF_TOKEN, "enddef" },
-                                  { AND_TOKEN, "and" },       { OR_TOKEN, "or" },       { NOT_TOKEN, "not" },
-                                  { INVALID_TOKEN, NULL } };
+const KeywordDef k_keywords[] = { { token_type_t::TRUE_TOKEN, "true" },     { token_type_t::FALSE_TOKEN, "false" }, { token_type_t::FOR_TOKEN, "for" },
+                                  { token_type_t::IN_TOKEN, "in" },         { token_type_t::IF_TOKEN, "if" },       { token_type_t::ELIF_TOKEN, "elif" },
+                                  { token_type_t::ELSE_TOKEN, "else" },     { token_type_t::DEF_TOKEN, "def" },     { token_type_t::SET_TOKEN, "set" },
+                                  { token_type_t::ENDFOR_TOKEN, "endfor" }, { token_type_t::ENDIF_TOKEN, "endif" }, { token_type_t::ENDDEF_TOKEN, "enddef" },
+                                  { token_type_t::AND_TOKEN, "and" },       { token_type_t::OR_TOKEN, "or" },       { token_type_t::NOT_TOKEN, "not" },
+                                  { token_type_t::INVALID_TOKEN, NULL } };
 
-TokenType get_keyword_token(const std::string &s)
+token_type_t get_keyword_token(const std::string &s)
 {
     const KeywordDef *k = k_keywords;
-    for (; k->tok != INVALID_TOKEN; ++k)
+    for (; k->tok != token_type_t::INVALID_TOKEN; ++k)
     {
         if (s == k->keyword)
         {
             return k->tok;
         }
     }
-    return INVALID_TOKEN;
+    return token_type_t::INVALID_TOKEN;
 }
 
 void create_id_token(token_vector &tokens, const std::string &s)
 {
-    TokenType t = get_keyword_token(s);
-    if (t == INVALID_TOKEN)
+    token_type_t t = get_keyword_token(s);
+    if (t == token_type_t::INVALID_TOKEN)
     {
         // Create key path token.
-        tokens.emplace_back(KEY_PATH_TOKEN, s);
+        tokens.emplace_back(token_type_t::KEY_PATH_TOKEN, s);
     }
     else
     {
@@ -886,7 +886,7 @@ int append_string_escape(std::string &str, std::function<char(unsigned)> peek)
 token_vector tokenize_statement(const std::string &text)
 {
     token_vector tokens;
-    lexer_state_t state = INIT_STATE;
+    lexer_state_t state = lexer_state_t::INIT_STATE;
     unsigned i = 0;
     uint32_t pos = 0;
     char str_open_quote = 0;
@@ -902,7 +902,7 @@ token_vector tokenize_statement(const std::string &text)
 
         switch (state)
         {
-            case INIT_STATE:
+            case lexer_state_t::INIT_STATE:
                 // Skip any whitespace
                 if (isspace(c))
                 {
@@ -921,97 +921,97 @@ token_vector tokenize_statement(const std::string &text)
                     {
                         is_hex_literal = false;
                     }
-                    state = INT_LITERAL_STATE;
+                    state = lexer_state_t::INT_LITERAL_STATE;
                 }
                 else if (is_key_path_char(c))
                 {
                     pos = i;
-                    state = KEY_PATH_STATE;
+                    state = lexer_state_t::KEY_PATH_STATE;
                 }
                 else if (c == '(' || c == ')' || c == ',' || c == '+' || c == '*' || c == '/' || c == '%')
                 {
-                    tokens.emplace_back(static_cast<TokenType>(c));
+                    tokens.emplace_back(static_cast<token_type_t>(c));
                 }
                 else if (c == '\"' || c == '\'')
                 {
                     str_open_quote = c;
                     literal.clear();
-                    state = STRING_LITERAL_STATE;
+                    state = lexer_state_t::STRING_LITERAL_STATE;
                 }
                 else if (c == '=')
                 {
                     if (peek(1) == '=')
                     {
-                        tokens.emplace_back(EQ_TOKEN);
+                        tokens.emplace_back(token_type_t::EQ_TOKEN);
                         ++i;
                     }
                     else
                     {
-                        tokens.emplace_back(ASSIGN_TOKEN);
+                        tokens.emplace_back(token_type_t::ASSIGN_TOKEN);
                     }
                 }
                 else if (c == '>')
                 {
                     if (peek(1) == '=')
                     {
-                        tokens.emplace_back(GE_TOKEN);
+                        tokens.emplace_back(token_type_t::GE_TOKEN);
                         ++i;
                     }
                     else
                     {
-                        tokens.emplace_back(GT_TOKEN);
+                        tokens.emplace_back(token_type_t::GT_TOKEN);
                     }
                 }
                 else if (c == '<')
                 {
                     if (peek(1) == '=')
                     {
-                        tokens.emplace_back(LE_TOKEN);
+                        tokens.emplace_back(token_type_t::LE_TOKEN);
                         ++i;
                     }
                     else
                     {
-                        tokens.emplace_back(LT_TOKEN);
+                        tokens.emplace_back(token_type_t::LT_TOKEN);
                     }
                 }
                 else if (c == '!')
                 {
                     if (peek(1) == '=')
                     {
-                        tokens.emplace_back(NEQ_TOKEN);
+                        tokens.emplace_back(token_type_t::NEQ_TOKEN);
                         ++i;
                     }
                     else
                     {
-                        tokens.emplace_back(NOT_TOKEN);
+                        tokens.emplace_back(token_type_t::NOT_TOKEN);
                     }
                 }
                 else if (c == '&')
                 {
                     if (peek(1) == '&')
                     {
-                        tokens.emplace_back(AND_TOKEN);
+                        tokens.emplace_back(token_type_t::AND_TOKEN);
                         ++i;
                     }
                     else
                     {
-                        tokens.emplace_back(CONCAT_TOKEN);
+                        tokens.emplace_back(token_type_t::CONCAT_TOKEN);
                     }
                 }
                 else if (c == '|' && peek(1) == '|')
                 {
-                    tokens.emplace_back(OR_TOKEN);
+                    tokens.emplace_back(token_type_t::OR_TOKEN);
                     ++i;
                 }
                 else if (c == '-')
                 {
                     if (peek(1) == '-')
                     {
-                        state = COMMENT_STATE;
+                        state = lexer_state_t::COMMENT_STATE;
                     }
                     else
                     {
-                        tokens.emplace_back(MINUS_TOKEN);
+                        tokens.emplace_back(token_type_t::MINUS_TOKEN);
                     }
                 }
                 else
@@ -1023,23 +1023,23 @@ token_vector tokenize_statement(const std::string &text)
                 }
                 break;
 
-            case KEY_PATH_STATE:
+            case lexer_state_t::KEY_PATH_STATE:
                 if (!is_key_path_char(c))
                 {
                     create_id_token(tokens, text.substr(pos, i - pos));
 
                     // Reprocess this char in the initial state.
-                    state = INIT_STATE;
+                    state = lexer_state_t::INIT_STATE;
                     --i;
                 }
                 break;
 
-            case STRING_LITERAL_STATE:
+            case lexer_state_t::STRING_LITERAL_STATE:
                 if (c == str_open_quote)
                 {
                     // Create the string literal token and return to init state.
-                    tokens.emplace_back(STRING_LITERAL_TOKEN, literal);
-                    state = INIT_STATE;
+                    tokens.emplace_back(token_type_t::STRING_LITERAL_TOKEN, literal);
+                    state = lexer_state_t::INIT_STATE;
                 }
                 else if (c == '\\')
                 {
@@ -1051,40 +1051,40 @@ token_vector tokenize_statement(const std::string &text)
                 }
                 break;
 
-            case INT_LITERAL_STATE:
+            case lexer_state_t::INT_LITERAL_STATE:
                 if (is_hex_literal ? isxdigit(c) : isdigit(c))
                 {
                     literal += c;
                 }
                 else
                 {
-                    tokens.emplace_back(INT_LITERAL_TOKEN, literal);
-                    state = INIT_STATE;
+                    tokens.emplace_back(token_type_t::INT_LITERAL_TOKEN, literal);
+                    state = lexer_state_t::INIT_STATE;
                     --i;
                 }
                 break;
 
-            case COMMENT_STATE:
+            case lexer_state_t::COMMENT_STATE:
                 if (c == '\n')
                 {
-                    state = INIT_STATE;
+                    state = lexer_state_t::INIT_STATE;
                 }
                 break;
         }
     }
 
     // Handle a key path terminated by end of string.
-    if (state == KEY_PATH_STATE)
+    if (state == lexer_state_t::KEY_PATH_STATE)
     {
         create_id_token(tokens, text.substr(pos, i - pos));
     }
-    else if (state == STRING_LITERAL_STATE)
+    else if (state == lexer_state_t::STRING_LITERAL_STATE)
     {
         throw TemplateException("unterminated string literal");
     }
-    else if (state == INT_LITERAL_STATE)
+    else if (state == lexer_state_t::INT_LITERAL_STATE)
     {
-        tokens.emplace_back(INT_LITERAL_TOKEN, literal);
+        tokens.emplace_back(token_type_t::INT_LITERAL_TOKEN, literal);
     }
 
     return tokens;
@@ -1116,7 +1116,7 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
     // Check if this is a pseudo function.
     bool is_fn = false;
     if (path == "count" || path == "empty" || path == "defined" || path == "addIndent" || path == "int" ||
-        path == "str" || path == "upper" || path == "lower")
+        path == "str" || path == "upper" || path == "lower" || path == "capitalize" || path == "dump")
     {
         is_fn = true;
     }
@@ -1191,6 +1191,25 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
                 std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
                 result = s;
             }
+            else if (path == "capitalize")
+            {
+                std::string s = params[0]->getvalue();
+                if (!s.empty())
+                {
+                    s[0] = std::toupper(s[0]);
+                }
+                result = s;
+            }
+            else if (path == "dump")
+            {
+                std::stringstream buffer;
+                std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+                dump_data(params[0]);
+
+                result = buffer.str(); // text will now contain "Bla\n"
+                std::cout.rdbuf(old);
+            }
         }
         else
         {
@@ -1217,57 +1236,57 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
 
 data_ptr ExprParser::parse_factor()
 {
-    TokenType tokType = m_tok->get_type();
+    token_type_t tokType = m_tok->get_type();
     data_ptr result;
     switch (tokType)
     {
-        case NOT_TOKEN:
+        case token_type_t::NOT_TOKEN:
             m_tok.next();
             result = parse_expr()->empty();
             break;
-        case MINUS_TOKEN:
+        case token_type_t::MINUS_TOKEN:
             m_tok.next();
             result = -(parse_expr()->getint());
             break;
-        case OPEN_PAREN_TOKEN:
+        case token_type_t::OPEN_PAREN_TOKEN:
             m_tok.next();
             result = parse_expr();
-            m_tok.match(CLOSE_PAREN_TOKEN, "expected close paren");
+            m_tok.match(token_type_t::CLOSE_PAREN_TOKEN, "expected close paren");
             break;
-        case STRING_LITERAL_TOKEN:
-            result = m_tok.match(STRING_LITERAL_TOKEN)->get_value();
+        case token_type_t::STRING_LITERAL_TOKEN:
+            result = m_tok.match(token_type_t::STRING_LITERAL_TOKEN)->get_value();
             break;
-        case TRUE_TOKEN:
+        case token_type_t::TRUE_TOKEN:
             m_tok.next();
             result = true;
             break;
-        case FALSE_TOKEN:
+        case token_type_t::FALSE_TOKEN:
             m_tok.next();
             result = false;
             break;
-        case INT_LITERAL_TOKEN: {
-            const Token *literal = m_tok.match(INT_LITERAL_TOKEN, "expected int literal");
+        case token_type_t::INT_LITERAL_TOKEN: {
+            const Token *literal = m_tok.match(token_type_t::INT_LITERAL_TOKEN, "expected int literal");
             return new DataInt((int)std::strtol(literal->get_value().c_str(), NULL, 0));
             break;
         }
-        case KEY_PATH_TOKEN: {
-            const Token *path = m_tok.match(KEY_PATH_TOKEN, "expected key path");
+        case token_type_t::KEY_PATH_TOKEN: {
+            const Token *path = m_tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path");
 
             data_list params;
-            if (m_tok->get_type() == OPEN_PAREN_TOKEN)
+            if (m_tok->get_type() == token_type_t::OPEN_PAREN_TOKEN)
             {
-                m_tok.match(OPEN_PAREN_TOKEN);
+                m_tok.match(token_type_t::OPEN_PAREN_TOKEN);
 
-                while (m_tok->get_type() != CLOSE_PAREN_TOKEN)
+                while (m_tok->get_type() != token_type_t::CLOSE_PAREN_TOKEN)
                 {
                     params.push_back(parse_expr());
 
-                    if (m_tok->get_type() != CLOSE_PAREN_TOKEN)
+                    if (m_tok->get_type() != token_type_t::CLOSE_PAREN_TOKEN)
                     {
-                        m_tok.match(COMMA_TOKEN, "expected comma");
+                        m_tok.match(token_type_t::COMMA_TOKEN, "expected comma");
                     }
                 }
-                m_tok.match(CLOSE_PAREN_TOKEN, "expected close paren");
+                m_tok.match(token_type_t::CLOSE_PAREN_TOKEN, "expected close paren");
             }
 
             return get_var_value(path->get_value(), params);
@@ -1282,8 +1301,8 @@ data_ptr ExprParser::parse_bfactor()
 {
     data_ptr ldata = parse_gfactor();
 
-    TokenType tokType = m_tok->get_type();
-    if (tokType == EQ_TOKEN || tokType == NEQ_TOKEN)
+    token_type_t tokType = m_tok->get_type();
+    if (tokType == token_type_t::EQ_TOKEN || tokType == token_type_t::NEQ_TOKEN)
     {
         m_tok.next();
 
@@ -1293,10 +1312,10 @@ data_ptr ExprParser::parse_bfactor()
         std::string rhs = rdata->getvalue();
         switch (tokType)
         {
-            case EQ_TOKEN:
+            case token_type_t::EQ_TOKEN:
                 ldata = (lhs == rhs);
                 break;
-            case NEQ_TOKEN:
+            case token_type_t::NEQ_TOKEN:
                 ldata = (lhs != rhs);
                 break;
             default:
@@ -1310,8 +1329,8 @@ data_ptr ExprParser::parse_gfactor()
 {
     data_ptr ldata = parse_afactor();
 
-    TokenType tokType = m_tok->get_type();
-    if (tokType == GT_TOKEN || tokType == GE_TOKEN || tokType == LT_TOKEN || tokType == LE_TOKEN)
+    token_type_t tokType = m_tok->get_type();
+    if (tokType == token_type_t::GT_TOKEN || tokType == token_type_t::GE_TOKEN || tokType == token_type_t::LT_TOKEN || tokType == token_type_t::LE_TOKEN)
     {
         m_tok.next();
 
@@ -1326,16 +1345,16 @@ data_ptr ExprParser::parse_gfactor()
             int r = ri->getint();
             switch (tokType)
             {
-                case GT_TOKEN:
+                case token_type_t::GT_TOKEN:
                     ldata = (l > r);
                     break;
-                case GE_TOKEN:
+                case token_type_t::GE_TOKEN:
                     ldata = (l >= r);
                     break;
-                case LT_TOKEN:
+                case token_type_t::LT_TOKEN:
                     ldata = (l < r);
                     break;
-                case LE_TOKEN:
+                case token_type_t::LE_TOKEN:
                     ldata = (l <= r);
                     break;
                 default:
@@ -1348,16 +1367,16 @@ data_ptr ExprParser::parse_gfactor()
             std::string rhs = rdata->getvalue();
             switch (tokType)
             {
-                case GT_TOKEN:
+                case token_type_t::GT_TOKEN:
                     ldata = (lhs > rhs);
                     break;
-                case GE_TOKEN:
+                case token_type_t::GE_TOKEN:
                     ldata = (lhs >= rhs);
                     break;
-                case LT_TOKEN:
+                case token_type_t::LT_TOKEN:
                     ldata = (lhs < rhs);
                     break;
-                case LE_TOKEN:
+                case token_type_t::LE_TOKEN:
                     ldata = (lhs <= rhs);
                     break;
                 default:
@@ -1372,8 +1391,8 @@ data_ptr ExprParser::parse_afactor()
 {
     data_ptr ldata = parse_mfactor();
 
-    TokenType tokType = m_tok->get_type();
-    if (tokType == PLUS_TOKEN || tokType == MINUS_TOKEN || tokType == CONCAT_TOKEN)
+    token_type_t tokType = m_tok->get_type();
+    if (tokType == token_type_t::PLUS_TOKEN || tokType == token_type_t::MINUS_TOKEN || tokType == token_type_t::CONCAT_TOKEN)
     {
         m_tok.next();
 
@@ -1381,13 +1400,13 @@ data_ptr ExprParser::parse_afactor()
 
         switch (tokType)
         {
-            case CONCAT_TOKEN:
+            case token_type_t::CONCAT_TOKEN:
                 ldata = ldata->getvalue() + rdata->getvalue();
                 break;
-            case PLUS_TOKEN:
+            case token_type_t::PLUS_TOKEN:
                 ldata = ldata->getint() + rdata->getint();
                 break;
-            case MINUS_TOKEN:
+            case token_type_t::MINUS_TOKEN:
                 ldata = ldata->getint() - rdata->getint();
                 break;
             default:
@@ -1401,8 +1420,8 @@ data_ptr ExprParser::parse_mfactor()
 {
     data_ptr ldata = parse_factor();
 
-    TokenType tokType = m_tok->get_type();
-    if (tokType == TIMES_TOKEN || tokType == DIVIDE_TOKEN || tokType == MOD_TOKEN)
+    token_type_t tokType = m_tok->get_type();
+    if (tokType == token_type_t::TIMES_TOKEN || tokType == token_type_t::DIVIDE_TOKEN || tokType == token_type_t::MOD_TOKEN)
     {
         m_tok.next();
 
@@ -1410,10 +1429,10 @@ data_ptr ExprParser::parse_mfactor()
 
         switch (tokType)
         {
-            case TIMES_TOKEN:
+            case token_type_t::TIMES_TOKEN:
                 ldata = ldata->getint() * rdata->getint();
                 break;
-            case DIVIDE_TOKEN:
+            case token_type_t::DIVIDE_TOKEN:
                 if (rdata->getint() == 0)
                 {
                     ldata = 0;
@@ -1423,7 +1442,7 @@ data_ptr ExprParser::parse_mfactor()
                     ldata = ldata->getint() / rdata->getint();
                 }
                 break;
-            case MOD_TOKEN:
+            case token_type_t::MOD_TOKEN:
                 if (rdata->getint() == 0)
                 {
                     ldata = 0;
@@ -1444,9 +1463,9 @@ data_ptr ExprParser::parse_bterm()
 {
     data_ptr ldata = parse_bfactor();
 
-    while (m_tok->get_type() == AND_TOKEN)
+    while (m_tok->get_type() == token_type_t::AND_TOKEN)
     {
-        m_tok.match(AND_TOKEN);
+        m_tok.match(token_type_t::AND_TOKEN);
 
         data_ptr rdata = parse_bfactor();
 
@@ -1459,9 +1478,9 @@ data_ptr ExprParser::parse_oterm()
 {
     data_ptr ldata = parse_bterm();
 
-    while (m_tok->get_type() == OR_TOKEN)
+    while (m_tok->get_type() == token_type_t::OR_TOKEN)
     {
-        m_tok.match(OR_TOKEN);
+        m_tok.match(token_type_t::OR_TOKEN);
 
         data_ptr rdata = parse_bterm();
 
@@ -1478,11 +1497,11 @@ data_ptr ExprParser::parse_expr()
 {
     data_ptr ldata = parse_oterm();
 
-    if (m_tok->get_type() == IF_TOKEN)
+    if (m_tok->get_type() == token_type_t::IF_TOKEN)
     {
-        m_tok.match(IF_TOKEN);
+        m_tok.match(token_type_t::IF_TOKEN);
         data_ptr predicate = parse_oterm();
-        m_tok.match(ELSE_TOKEN);
+        m_tok.match(token_type_t::ELSE_TOKEN);
         data_ptr rdata = parse_oterm();
 
         if (predicate->empty())
@@ -1607,21 +1626,21 @@ NodeFor::NodeFor(const token_vector &tokens, bool is_top, uint32_t line)
 , m_has_predicate(false)
 {
     TokenIterator tok(tokens);
-    tok.match(FOR_TOKEN, "expected 'for'");
-    m_val = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
-    tok.match(IN_TOKEN, "expected 'in'");
-    m_key = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
-    if (tok->get_type() != END_TOKEN)
+    tok.match(token_type_t::FOR_TOKEN, "expected 'for'");
+    m_val = tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path")->get_value();
+    tok.match(token_type_t::IN_TOKEN, "expected 'in'");
+    m_key = tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path")->get_value();
+    if (tok->get_type() != token_type_t::END_TOKEN)
     {
-        tok.match(IF_TOKEN, "expected 'if'");
-        while (tok->get_type() != END_TOKEN)
+        tok.match(token_type_t::IF_TOKEN, "expected 'if'");
+        while (tok->get_type() != token_type_t::END_TOKEN)
         {
             m_predicate_tokens.push_back(*tok.get());
             ++tok;
         }
         m_has_predicate = true;
     }
-    tok.match(END_TOKEN, "expected end of statement");
+    tok.match(token_type_t::END_TOKEN, "expected end of statement");
 }
 
 NodeType NodeFor::gettype()
@@ -1704,11 +1723,11 @@ NodeIf::NodeIf(const token_vector &expr, uint32_t line)
 , m_else_if(nullptr)
 , m_if_type(NODE_TYPE_IF)
 {
-    if (expr[0].get_type() == ELIF_TOKEN)
+    if (expr[0].get_type() == token_type_t::ELIF_TOKEN)
     {
         m_if_type = NODE_TYPE_ELIF;
     }
-    else if (expr[0].get_type() == ELSE_TOKEN)
+    else if (expr[0].get_type() == token_type_t::ELSE_TOKEN)
     {
         m_if_type = NODE_TYPE_ELSE;
     }
@@ -1746,21 +1765,21 @@ bool NodeIf::is_true(data_map &data)
         TokenIterator it(m_expr);
         if (m_if_type == NODE_TYPE_IF)
         {
-            it.match(IF_TOKEN, "expected 'if' keyword");
+            it.match(token_type_t::IF_TOKEN, "expected 'if' keyword");
         }
         else if (m_if_type == NODE_TYPE_ELIF)
         {
-            it.match(ELIF_TOKEN, "expected 'elif' keyword");
+            it.match(token_type_t::ELIF_TOKEN, "expected 'elif' keyword");
         }
         else if (m_if_type == NODE_TYPE_ELSE)
         {
-            it.match(ELSE_TOKEN, "expected 'else' keyword");
-            it.match(END_TOKEN, "expected end of statement");
+            it.match(token_type_t::ELSE_TOKEN, "expected 'else' keyword");
+            it.match(token_type_t::END_TOKEN, "expected end of statement");
             return true;
         }
         ExprParser parser(it, data);
         data_ptr d = parser.parse_expr();
-        it.match(END_TOKEN, "expected end of statement");
+        it.match(token_type_t::END_TOKEN, "expected end of statement");
 
         return !d->empty();
     }
@@ -1781,26 +1800,26 @@ NodeDef::NodeDef(const token_vector &expr, uint32_t line)
 : NodeParent(line)
 {
     TokenIterator tok(expr);
-    tok.match(DEF_TOKEN, "expected 'def'");
+    tok.match(token_type_t::DEF_TOKEN, "expected 'def'");
 
-    m_name = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
+    m_name = tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path")->get_value();
 
-    if (tok->get_type() == OPEN_PAREN_TOKEN)
+    if (tok->get_type() == token_type_t::OPEN_PAREN_TOKEN)
     {
-        tok.match(OPEN_PAREN_TOKEN);
+        tok.match(token_type_t::OPEN_PAREN_TOKEN);
 
-        while (tok->get_type() != CLOSE_PAREN_TOKEN)
+        while (tok->get_type() != token_type_t::CLOSE_PAREN_TOKEN)
         {
-            m_params.push_back(tok.match(KEY_PATH_TOKEN, "expected key path")->get_value());
+            m_params.push_back(tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path")->get_value());
 
-            if (tok->get_type() != CLOSE_PAREN_TOKEN)
+            if (tok->get_type() != token_type_t::CLOSE_PAREN_TOKEN)
             {
-                tok.match(COMMA_TOKEN, "expected comma");
+                tok.match(token_type_t::COMMA_TOKEN, "expected comma");
             }
         }
-        tok.match(CLOSE_PAREN_TOKEN, "expected close paren");
+        tok.match(token_type_t::CLOSE_PAREN_TOKEN, "expected close paren");
     }
-    tok.match(END_TOKEN, "expected end of statement");
+    tok.match(token_type_t::END_TOKEN, "expected end of statement");
 }
 
 NodeType NodeDef::gettype()
@@ -1832,12 +1851,12 @@ void NodeSet::gettext(std::ostream &stream, data_map &data)
 {
     (void)stream;
     TokenIterator tok(m_expr);
-    tok.match(SET_TOKEN, "expected 'set'");
-    std::string path = tok.match(KEY_PATH_TOKEN, "expected key path")->get_value();
-    tok.match(ASSIGN_TOKEN);
+    tok.match(token_type_t::SET_TOKEN, "expected 'set'");
+    std::string path = tok.match(token_type_t::KEY_PATH_TOKEN, "expected key path")->get_value();
+    tok.match(token_type_t::ASSIGN_TOKEN);
     ExprParser parser(tok, data);
     data_ptr value = parser.parse_expr();
-    tok.match(END_TOKEN, "expected end of statement");
+    tok.match(token_type_t::END_TOKEN, "expected end of statement");
 
     // Follow the key path, creating the key if missing.
     data_ptr &target = data.parse_path(path, true);
@@ -1863,7 +1882,7 @@ TemplateParser::TemplateParser(const std::string &text, node_vector &nodes)
 , m_current_nodes(&m_top_nodes)
 , m_eol_precedes(true)
 , m_last_was_eol(true)
-, m_until(INVALID_TOKEN)
+, m_until(token_type_t::INVALID_TOKEN)
 {
 }
 
@@ -1974,7 +1993,7 @@ void TemplateParser::parse_var()
     m_last_was_eol = false;
 }
 
-void TemplateParser::push_node(Node *new_node, TokenType until)
+void TemplateParser::push_node(Node *new_node, token_type_t until)
 {
     m_node_stack.push(std::make_pair(m_current_node, m_until));
     m_current_node = node_ptr(new_node);
@@ -2003,21 +2022,21 @@ void TemplateParser::parse_stmt()
     token_vector stmt_tokens = tokenize_statement(stmt_text);
     if (!stmt_tokens.empty())
     {
-        TokenType first_token_type = stmt_tokens[0].get_type();
+        token_type_t first_token_type = stmt_tokens[0].get_type();
 
         // Create control statement nodes.
         switch (first_token_type)
         {
-            case FOR_TOKEN:
-                push_node(new NodeFor(stmt_tokens, m_node_stack.empty(), m_current_line), ENDFOR_TOKEN);
+            case token_type_t::FOR_TOKEN:
+                push_node(new NodeFor(stmt_tokens, m_node_stack.empty(), m_current_line), token_type_t::ENDFOR_TOKEN);
                 break;
 
-            case IF_TOKEN:
-                push_node(new NodeIf(stmt_tokens, m_current_line), ENDIF_TOKEN);
+            case token_type_t::IF_TOKEN:
+                push_node(new NodeIf(stmt_tokens, m_current_line), token_type_t::ENDIF_TOKEN);
                 break;
 
-            case ELIF_TOKEN:
-            case ELSE_TOKEN: {
+            case token_type_t::ELIF_TOKEN:
+            case token_type_t::ELSE_TOKEN: {
                 auto current_if = dynamic_cast<NodeIf *>(m_current_node.get());
                 if (!current_if)
                 {
@@ -2035,17 +2054,17 @@ void TemplateParser::parse_stmt()
                 break;
             }
 
-            case DEF_TOKEN:
-                push_node(new NodeDef(stmt_tokens, m_current_line), ENDDEF_TOKEN);
+            case token_type_t::DEF_TOKEN:
+                push_node(new NodeDef(stmt_tokens, m_current_line), token_type_t::ENDDEF_TOKEN);
                 break;
 
-            case SET_TOKEN:
+            case token_type_t::SET_TOKEN:
                 m_current_nodes->push_back(node_ptr(new NodeSet(stmt_tokens, m_current_line)));
                 break;
 
-            case ENDFOR_TOKEN:
-            case ENDIF_TOKEN:
-            case ENDDEF_TOKEN:
+            case token_type_t::ENDFOR_TOKEN:
+            case token_type_t::ENDIF_TOKEN:
+            case token_type_t::ENDDEF_TOKEN:
                 if (m_until == first_token_type)
                 {
                     assert(!m_node_stack.empty());
@@ -2061,7 +2080,7 @@ void TemplateParser::parse_stmt()
                     {
                         m_current_node.reset();
                         m_current_nodes = &m_top_nodes;
-                        m_until = INVALID_TOKEN;
+                        m_until = token_type_t::INVALID_TOKEN;
                     }
                 }
                 else

@@ -15,8 +15,8 @@
 #include "erpc_message_buffer.hpp"
 #include "erpc_transport.hpp"
 
+#include <cstdint>
 #include <cstring>
-#include <stdint.h>
 
 /*!
  * @addtogroup infra_codec
@@ -32,13 +32,13 @@ namespace erpc {
 /*!
  * @brief Types of messages that can be encoded.
  */
-typedef enum _message_type
+enum class message_type_t
 {
     kInvocationMessage = 0,
     kOnewayMessage,
     kReplyMessage,
     kNotificationMessage
-} message_type_t;
+};
 
 typedef void *funPtr;          // Pointer to functions
 typedef funPtr *arrayOfFunPtr; // Pointer to array of functions
@@ -58,12 +58,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Codec(void)
-    : m_buffer()
-    , m_cursor()
-    , m_status(kErpcStatus_Success)
-    {
-    }
+    Codec(void) : m_cursor(), m_status(kErpcStatus_Success) {}
 
     /*!
      * @brief Codec destructor
@@ -75,24 +70,31 @@ public:
      *
      * @return Pointer to used message buffer.
      */
-    MessageBuffer *getBuffer(void) { return &m_buffer; }
+    MessageBuffer getBuffer(void) { return m_cursor.getBuffer(); }
+
+    MessageBuffer &getBufferRef(void) { return m_cursor.getBufferRef(); }
 
     /*!
      * @brief Prototype for set message buffer used for read and write data.
      *
      * @param[in] buf Message buffer to set.
+     * @param[in] skip How many bytes to skip from reading.
      */
-    virtual void setBuffer(MessageBuffer &buf)
+    virtual void setBuffer(MessageBuffer &buf, uint8_t skip = 0)
     {
-        m_buffer = buf;
-        m_cursor.set(&m_buffer);
+        m_cursor.setBuffer(buf, skip);
         m_status = kErpcStatus_Success;
     }
 
-    /*! @brief Reset the codec to initial state. */
-    virtual void reset(void)
+    /*!
+     * @brief Reset the codec to initial state.
+     *
+     * @param[in] skip How many bytes to skip from reading.
+     */
+    virtual void reset(uint8_t skip = 0)
     {
-        m_cursor.set(&m_buffer);
+        MessageBuffer buffer = m_cursor.getBuffer();
+        m_cursor.setBuffer(buffer, skip);
         m_status = kErpcStatus_Success;
     }
 
@@ -257,23 +259,6 @@ public:
      * @param[in] isNull Null flag to send.
      */
     virtual void writeNullFlag(bool isNull) = 0;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[in] callback Callback which ID should be serialized.
-     */
-    virtual void writeCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr callback) = 0;
-
-    /*!
-     * @brief Writes an order ID of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which ID should be serialized.
-     */
-    virtual void writeCallback(funPtr callback1, funPtr callback2) = 0;
     //@}
 
     //! @name Decoding
@@ -410,27 +395,9 @@ public:
      */
     virtual void readNullFlag(bool &isNull) = 0;
 
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callbacks Pointer to array of callbacks.
-     * @param[in] callbacksCount Size of array of callbacks.
-     * @param[out] callback Callback which is deserialized. Null in case of error.
-     */
-    virtual void readCallback(arrayOfFunPtr callbacks, uint8_t callbacksCount, funPtr *callback) = 0;
-
-    /*!
-     * @brief Read an callback function id and return address of callback function.
-     *
-     * @param[in] callback1 Pointer to existing callback.
-     * @param[out] callback2 Callback which is deserialized.
-     */
-    virtual void readCallback(funPtr callbacks1, funPtr *callback2) = 0;
-
 protected:
-    MessageBuffer m_buffer;         /*!< Message buffer object */
-    MessageBuffer::Cursor m_cursor; /*!< Copy data to message buffers. */
-    erpc_status_t m_status;         /*!< Status of serialized data. */
+    Cursor m_cursor;        /*!< Copy data to message buffers. */
+    erpc_status_t m_status; /*!< Status of serialized data. */
 };
 
 /*!

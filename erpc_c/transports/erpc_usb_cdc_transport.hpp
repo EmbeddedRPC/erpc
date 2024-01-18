@@ -9,8 +9,8 @@
 #ifndef _EMBEDDED_RPC__USB_CDC_TRANSPORT_H_
 #define _EMBEDDED_RPC__USB_CDC_TRANSPORT_H_
 
-#include <cstdio>
 #include "erpc_config_internal.h"
+#include <cstdio>
 #if !ERPC_THREADS_IS(NONE)
 #include "erpc_threading.h"
 #endif
@@ -96,6 +96,9 @@ private:
     uint8_t *m_usbRingBuffer;
     uint32_t m_usbRingBufferLength;
 
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from USB CDC peripheral.
      *
@@ -105,7 +108,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed USB CDC failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to USB CDC peripheral.
@@ -115,7 +118,7 @@ private:
      *
      * @retval kErpcStatus_Success Always returns success status.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

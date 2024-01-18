@@ -44,21 +44,16 @@ namespace erpc {
 class InterThreadBufferTransport : public Transport
 {
 public:
-    InterThreadBufferTransport(void)
-    : Transport()
-    , m_state(NULL)
-    , m_peer(NULL)
-    , m_inSem()
-    , m_outSem(1)
-    , m_inBuffer(NULL)
+    InterThreadBufferTransport(void) :
+    Transport(), m_state(NULL), m_peer(NULL), m_inSem(), m_outSem(1), m_inBuffer(NULL)
     {
     }
     virtual ~InterThreadBufferTransport(void);
 
     void linkWithPeer(InterThreadBufferTransport *peer);
 
-    virtual erpc_status_t receive(MessageBuffer *message);
-    virtual erpc_status_t send(MessageBuffer *message);
+    virtual erpc_status_t receive(MessageBuffer *message) override;
+    virtual erpc_status_t send(MessageBuffer *message) override;
 
     virtual int32_t getAvailable(void) const { return 0; }
 

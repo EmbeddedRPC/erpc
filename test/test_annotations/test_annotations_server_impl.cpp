@@ -8,12 +8,17 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
+#include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 AnnotateTest_service *svc;
 
@@ -35,6 +40,30 @@ myInt testIfMyIntAndConstExist(myInt a)
     return a;
 }
 
+class AnnotateTest_server : public AnnotateTest_interface
+{
+public:
+    int32_t add(int32_t a, int32_t b)
+    {
+        int32_t result;
+        result = ::add(a, b);
+
+        return result;
+    }
+
+    void testIfFooStructExist(const fooStruct *a) { ::testIfFooStructExist(a); }
+
+    void testIfMyEnumExist(myEnum a) { ::testIfMyEnumExist(a); }
+
+    myInt testIfMyIntAndConstExist(myInt a)
+    {
+        myInt result;
+        result = ::testIfMyIntAndConstExist(a);
+
+        return result;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +73,7 @@ void add_services(erpc::SimpleServer *server)
     /* Define services to add using dynamic memory allocation
      * Exapmle:ArithmeticService_service * svc = new ArithmeticService_service();
      */
-    svc = new AnnotateTest_service();
+    svc = new AnnotateTest_service(new AnnotateTest_server());
     /* Add services
      * Example: server->addService (svc);
      */
@@ -63,6 +92,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -80,12 +110,6 @@ void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
     destroy_AnnotateTest_service(service_test);
-}
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

@@ -8,12 +8,16 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 EnumsService_service *svc;
 
@@ -75,6 +79,50 @@ enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, 
     return a;
 }
 
+class EnumsService_server : public EnumsService_interface
+{
+public:
+    void test_enumColor_in(enumColor a) { ::test_enumColor_in(a); }
+
+    void test_enumColor_in2(enumColor b) { ::test_enumColor_in2(b); }
+
+    void test_enumColor_out(enumColor *c) { ::test_enumColor_out(c); }
+
+    void test_enumColor_inout(enumColor *e) { ::test_enumColor_inout(e); }
+
+    enumColor test_enumColor_return(void)
+    {
+        enumColor result;
+        result = ::test_enumColor_return();
+
+        return result;
+    }
+
+    enumColor test_enumColor_allDirection(enumColor a, enumColor b, enumColor *c, enumColor *e)
+    {
+        enumColor result;
+        result = ::test_enumColor_allDirection(a, b, c, e);
+
+        return result;
+    }
+
+    enumColor2 test_enumColor2_allDirection(enumColor2 a, enumColor2 b, enumColor2 *c, enumColor2 *e)
+    {
+        enumColor2 result;
+        result = ::test_enumColor2_allDirection(a, b, c, e);
+
+        return result;
+    }
+
+    enumErrorCode test_enumErrorCode_allDirection(enumErrorCode a, enumErrorCode b, enumErrorCode *c, enumErrorCode *e)
+    {
+        enumErrorCode result;
+        result = ::test_enumErrorCode_allDirection(a, b, c, e);
+
+        return result;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +131,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new EnumsService_service();
+    svc = new EnumsService_service(new EnumsService_server());
 
     // add services
     server->addService(svc);
@@ -101,6 +149,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -118,12 +167,6 @@ void remove_services_from_server(erpc_server_t server)
 {
     erpc_remove_service_from_server(server, service_test);
     destroy_EnumsService_service(service_test);
-}
-
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
 }
 #ifdef __cplusplus
 }

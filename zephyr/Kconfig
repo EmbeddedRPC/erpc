@@ -1,0 +1,45 @@
+#
+# Copyright 2023 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+config ZEPHYR_ERPC_MODULE
+	bool
+
+config ERPC
+	bool "eRPC Support"
+	depends on ZEPHYR_ERPC_MODULE
+	help
+	  This option enables the eRPC library
+	depends on CPP
+	depends on FULL_LIBCPP_SUPPORTED
+
+config ZEPHYR_BUILD
+	bool
+
+if ERPC
+
+module = ERPC
+module-str = eRPC
+
+config ERPC_TRANSPORT_UART
+	bool "Enable eRPC UART transport"
+	help
+	  When enabled, eRPC will include UART transport layer.
+	select RING_BUFFER
+	select SERIAL
+	select UART_INTERRUPT_DRIVEN
+
+config ERPC_TRANSPORT_RPMSG_LITE
+	bool "Enable eRPC rpsmg-lite transport"
+	help
+	  When enabled, eRPC will include rpsmg-lite transport layer.
+	depends	on RPMSGLITE
+
+config ERPC_ARBITRATED_CLIENT
+	bool "Enable eRPC arbitrated client"
+	help
+	  When enabled, eRPC will include arbitrated client.
+
+endif # ERPC

@@ -73,7 +73,7 @@ idl: |
         sendReceiveStruct(A a) -> A ///< 33 comment;
     } /*!<30 comment */
 
-test.h:
+test_common.h:
   - "/*"
   - not: "!"
   - "* Comment"
@@ -127,6 +127,8 @@ test.h:
   - //! 10 comment
   - //!11 comment
   - //!< 12 comment
+
+c_test_client.h:
   - /*! @brief DoxygenComments identifiers */
   - //! 28 comment
   - //!29 comment
@@ -136,7 +138,7 @@ test.h:
   - ///< 33 comment;
   -
   - //@} /*!<30 comment */
-  - // _test_h_
+  - // _c_test_client_h_
 
 test_client.cpp:
   - "/*"
@@ -158,7 +160,7 @@ test_client.cpp:
   - // DoxygenComments interface sendReceiveList function client shim.
   - // DoxygenComments interface sendReceiveStruct function client shim.
 
-test_server.h:
+test_server.hpp:
   - "/*"
   - not: "!"
   - "* Comment"
@@ -173,7 +175,7 @@ test_server.h:
   - "*/"
   - /*! @brief Call the correct server shim based on method unique ID. */
   - /*! @brief Server shim for sendReceiveList of DoxygenComments interface. */
-  - // _test_server_h_
+  - // _test_server_hpp_
 
 test_server.cpp:
   - "/*"

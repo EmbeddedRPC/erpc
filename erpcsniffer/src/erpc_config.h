@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2020 NXP
+ * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
  *
@@ -9,6 +10,12 @@
 
 #ifndef _ERPC_CONFIG_H_
 #define _ERPC_CONFIG_H_
+
+/*!
+ * @addtogroup config
+ * @{
+ * @file
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declarations
@@ -176,9 +183,26 @@
 
 //! @name Assert function definition
 //@{
-//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will be used.
+//! User custom asser defition. Include header file if needed before bellow line. If assert is not enabled, default will
+//! be used.
 // #define erpc_assert(condition)
 //@}
+
+//! @def ENDIANES_HEADER
+//!
+//! Include header file that controls the communication endianness
+//!
+//! Uncomment for example behaviour for endianness agnostic with:
+//!  1. communication in little endian.
+//!  2. current processor is big endian.
+//!  3. pointer size is 32 bit.
+//!  4. float+double scheme not defined, so throws assert if passes.
+//! #define ERPC_PROCESSOR_ENDIANNESS_LITTLE 0
+//! #define ERPC_COMMUNICATION_LITTLE        1
+//! #define ERPC_POINTER_SIZE_16             0
+//! #define ERPC_POINTER_SIZE_32             1
+//! #define ERPC_POINTER_SIZE_64             0
+//! #define ENDIANNESS_HEADER "erpc_endianness_agnostic_example.h"
 
 /*! @} */
 #endif // _ERPC_CONFIG_H_

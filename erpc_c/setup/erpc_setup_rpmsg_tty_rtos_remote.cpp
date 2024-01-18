@@ -18,7 +18,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-ERPC_MANUALLY_CONSTRUCTED(RPMsgTTYRTOSTransport, s_transport);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(RPMsgTTYRTOSTransport, s_rpmsgTransport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -29,22 +29,49 @@ erpc_transport_t erpc_transport_rpmsg_lite_tty_rtos_remote_init(uint32_t src_add
                                                                 rpmsg_ready_cb ready, char *nameservice_name)
 {
     erpc_transport_t transport;
+    RPMsgTTYRTOSTransport *rpmsgTransport;
 
-    s_transport.construct();
-    if (s_transport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready, nameservice_name) ==
-        kErpcStatus_Success)
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_rpmsgTransport.isUsed())
     {
-        transport = reinterpret_cast<erpc_transport_t>(s_transport.get());
+        rpmsgTransport = NULL;
     }
     else
     {
-        transport = NULL;
+        s_rpmsgTransport.construct();
+        rpmsgTransport = s_rpmsgTransport.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    rpmsgTransport = new RPMsgTTYRTOSTransport();
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    transport = reinterpret_cast<erpc_transport_t>(rpmsgTransport);
+
+    if (rpmsgTransport != NULL)
+    {
+        if (rpmsgTransport->init(src_addr, dst_addr, start_address, rpmsg_link_id, ready, nameservice_name) !=
+            kErpcStatus_Success)
+        {
+            erpc_transport_rpmsg_lite_tty_rtos_remote_deinit(transport);
+            transport = NULL;
+        }
     }
 
     return transport;
 }
 
-void erpc_transport_rpmsg_lite_tty_rtos_deinit(void)
+void erpc_transport_rpmsg_lite_tty_rtos_remote_deinit(erpc_transport_t transport)
 {
-    s_transport.destroy();
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)transport;
+    s_rpmsgTransport.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(transport != NULL);
+
+    RPMsgTTYRTOSTransport *rpmsgTransport = reinterpret_cast<RPMsgTTYRTOSTransport *>(transport);
+
+    delete rpmsgTransport;
+#endif
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 NXP
+ * Copyright 2022-2023 NXP
  * All rights reserved.
  *
  *
@@ -106,7 +106,6 @@ static void LPI2C_SlaveUserCallback(LPI2C_Type *base, lpi2c_slave_transfer_t *tr
     LPI2cSlaveTransport *transport = s_lpi2c_slave_instance;
     switch (transfer->event)
     {
-        break;
         /*  Transmit request */
         case kLPI2C_SlaveTransmitEvent:
             /*  Update information for transmit process */
@@ -138,13 +137,11 @@ static void LPI2C_SlaveUserCallback(LPI2C_Type *base, lpi2c_slave_transfer_t *tr
     }
 }
 
-LPI2cSlaveTransport::LPI2cSlaveTransport(LPI2C_Type *lpi2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_lpi2cBaseAddr(lpi2cBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
-, m_isInited(false)
+LPI2cSlaveTransport::LPI2cSlaveTransport(LPI2C_Type *lpi2cBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_lpi2cBaseAddr(lpi2cBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz), m_isInited(false)
 #if ERPC_THREADS
-, m_txrxSemaphore()
+,
+m_txrxSemaphore()
 #endif
 {
     s_lpi2c_slave_instance = this;
@@ -212,30 +209,49 @@ erpc_status_t LPI2cSlaveTransport::underlyingSend(const uint8_t *data, uint32_t 
 {
     status_t status;
     s_isTransferCompleted = false;
+    uint32_t header_size = reserveHeaderSize();
 
+    /* send the header first */
     s_callback_user_data.rx_buffer = NULL;
     s_callback_user_data.rx_size = 0;
     s_callback_user_data.tx_buffer = (uint8_t *)data;
-    s_callback_user_data.tx_size = size;
+    s_callback_user_data.tx_size = header_size;
 
+    status = LPI2C_SlaveTransferNonBlocking(m_lpi2cBaseAddr, &s_handle, kLPI2C_SlaveCompletionEvent);
+    if (kStatus_Success == status)
     {
-        status = LPI2C_SlaveTransferNonBlocking(m_lpi2cBaseAddr, &s_handle, kLPI2C_SlaveCompletionEvent);
-
-        if (kStatus_Success == status)
-        {
-            LPI2cSlaveTransport_NotifyTransferGpioReady();
+        LPI2cSlaveTransport_NotifyTransferGpioReady();
 
 /* wait until the sending is finished */
 #if ERPC_THREADS
-            m_txrxSemaphore.get();
+        m_txrxSemaphore.get();
 #else
-            while (!s_isTransferCompleted)
-            {
-            }
+        while (!s_isTransferCompleted)
+        {
+        }
+#endif
+        LPI2cSlaveTransport_NotifyTransferGpioCompleted();
+    }
+
+    /* send the payload now */
+    s_callback_user_data.tx_buffer = (uint8_t *)data + header_size;
+    s_callback_user_data.tx_size = size - header_size;
+    s_isTransferCompleted = false;
+
+    status = LPI2C_SlaveTransferNonBlocking(m_lpi2cBaseAddr, &s_handle, kLPI2C_SlaveCompletionEvent);
+    if (kStatus_Success == status)
+    {
+        LPI2cSlaveTransport_NotifyTransferGpioReady();
+/* wait until the sending is finished */
+#if ERPC_THREADS
+        m_txrxSemaphore.get();
+#else
+        while (!s_isTransferCompleted)
+        {
+        }
 #endif
 
-            LPI2cSlaveTransport_NotifyTransferGpioCompleted();
-        }
+        LPI2cSlaveTransport_NotifyTransferGpioCompleted();
     }
 
     return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;

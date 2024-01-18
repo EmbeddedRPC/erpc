@@ -4,10 +4,16 @@ desc: C/Py import test is the same.
 idl: |
     import "imports/test2.erpc"
 
-test.h:
+c_test_client.h:
   - void hello1(int32_t a);
   - void hello2(int32_t a);
   - void hello3(int32_t a);
   - void hello4(int32_t a);
   - void hello5(int32_t a);
 
+c_test_server.h:
+  - void hello1(int32_t a);
+  - void hello2(int32_t a);
+  - void hello3(int32_t a);
+  - void hello4(int32_t a);
+  - void hello5(int32_t a);

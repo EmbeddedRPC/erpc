@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016-2022 NXP
+# Copyright 2016-2023 NXP
 # Copyright 2022 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
@@ -48,7 +48,7 @@ class Transport(object):
 
 
 class FramedTransport(Transport):
-    HEADER_LEN = 4
+    HEADER_LEN = 6
 
     def __init__(self):
         super(FramedTransport, self).__init__()
@@ -70,9 +70,12 @@ class FramedTransport(Transport):
         try:
             self._sendLock.acquire()
 
-            crc = self._Crc16.computeCRC16(message)
+            crcBody = self._Crc16.computeCRC16(message)
+            messageLength = len(message)
+            crcHeader = self._Crc16.computeCRC16(bytearray(struct.pack('<H', messageLength))) + self._Crc16.computeCRC16(bytearray(struct.pack('<H', crcBody)))
+            crcHeader &= 0xFFFF # 2bytes
 
-            header = bytearray(struct.pack('<HH', len(message), crc))
+            header = bytearray(struct.pack('<HHH', crcHeader, messageLength, crcBody))
             assert len(header) == self.HEADER_LEN
             self._base_send(header + message)
         finally:
@@ -84,14 +87,19 @@ class FramedTransport(Transport):
 
             # Read fixed size header containing the message length.
             headerData = self._base_receive(self.HEADER_LEN)
-            messageLength, crc = struct.unpack('<HH', headerData)
+            crcHeader, messageLength, crcBody = struct.unpack('<HHH', headerData)
+
+            computedCrc = self._Crc16.computeCRC16(bytearray(struct.pack('<H', messageLength))) + self._Crc16.computeCRC16(bytearray(struct.pack('<H', crcBody)))
+            computedCrc &= 0xFFFF # 2bytes
+            if computedCrc != crcHeader:
+                raise RequestError("invalid header CRC")
 
             # Now we know the length, read the rest of the message.
             data = self._base_receive(messageLength)
             computedCrc = self._Crc16.computeCRC16(data)
-
-            if computedCrc != crc:
+            if computedCrc != crcBody:
                 raise RequestError("invalid message CRC")
+
             return data
         finally:
             self._receiveLock.release()
@@ -304,7 +312,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
             #print('SPI received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hSPIPort.Transfer(
-                0, 15, bytes(message[4:]), len(message) - self.HEADER_LEN, 0)
+                0, 15, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0)
         else:
             print('SPI transfer error: %d' % rxbytesnumber)
 
@@ -410,7 +418,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             #print('I2C received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hI2CPort.FastXfer(
-                0x7E, bytes(message[4:]), len(message) - self.HEADER_LEN, 0, False, True)
+                0x7E, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0, False, True)
         else:
             print('I2C transfer error: %d' % rxbytesnumber)
 

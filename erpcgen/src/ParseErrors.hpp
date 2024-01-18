@@ -39,11 +39,7 @@ public:
      *
      * @param[in] __arg Exception error message.
      */
-    explicit erpc_error(const std::string &__arg)
-    : std::runtime_error(__arg)
-    , m_message(__arg)
-    {
-    }
+    explicit erpc_error(const std::string &__arg) : std::runtime_error(__arg), m_message(__arg) {}
 
 protected:
     std::string m_message; /*!< Error message. */
@@ -55,10 +51,8 @@ protected:
      * @param[in] __arg Exception error message.
      * @param[in] errorName Exception error name.
      */
-    explicit erpc_error(const std::string &__arg, const std::string &errorName)
-    : std::runtime_error(__arg)
-    , m_message(__arg)
-    , m_errName(errorName)
+    explicit erpc_error(const std::string &__arg, const std::string &errorName) :
+    std::runtime_error(__arg), m_message(__arg), m_errName(errorName)
     {
     }
 };
@@ -74,10 +68,7 @@ public:
      *
      * @param[in] __arg Exception error message.
      */
-    explicit syntax_error(const std::string &__arg)
-    : erpc_error(__arg)
-    {
-    }
+    explicit syntax_error(const std::string &__arg) : erpc_error(__arg) {}
 };
 
 /*!
@@ -93,11 +84,10 @@ public:
      * @param[in] loc Location of token.
      * @param[in] fileName File name where error occurred.
      */
-    explicit syntax_error2(const std::string &__arg, token_loc_t loc, std::string &fileName)
-    : erpc_error(__arg, "syntax error")
-    , m_errLoc(loc)
-    , m_what(format_string("file %s:%d:%d: %s, %s", fileName.c_str(), m_errLoc.m_firstLine, m_errLoc.m_firstChar,
-                           m_errName.c_str(), m_message.c_str()))
+    explicit syntax_error2(const std::string &__arg, token_loc_t loc, std::string &fileName) :
+    erpc_error(__arg, "syntax error"), m_errLoc(loc),
+    m_what(format_string("file %s:%d:%d: %s, %s", fileName.c_str(), m_errLoc.m_firstLine, m_errLoc.m_firstChar,
+                         m_errName.c_str(), m_message.c_str()))
     {
     }
 
@@ -108,11 +98,10 @@ public:
      * @param[in] loc Location of token for which error occurred.
      * @param[in] fileName File name where error occurred.
      */
-    explicit syntax_error2(const char *__arg, token_loc_t loc, std::string &fileName)
-    : erpc_error(std::string(__arg), "syntax error")
-    , m_errLoc(loc)
-    , m_what(format_string("file %s:%d:%d: %s, %s", fileName.c_str(), m_errLoc.m_firstLine, m_errLoc.m_firstChar,
-                           m_errName.c_str(), m_message.c_str()))
+    explicit syntax_error2(const char *__arg, token_loc_t loc, std::string &fileName) :
+    erpc_error(std::string(__arg), "syntax error"), m_errLoc(loc),
+    m_what(format_string("file %s:%d:%d: %s, %s", fileName.c_str(), m_errLoc.m_firstLine, m_errLoc.m_firstChar,
+                         m_errName.c_str(), m_message.c_str()))
     {
     }
 
@@ -139,10 +128,7 @@ public:
      *
      * @param[in] __arg Exception error message.
      */
-    explicit lexical_error(const std::string &__arg)
-    : erpc_error(__arg)
-    {
-    }
+    explicit lexical_error(const std::string &__arg) : erpc_error(__arg) {}
 };
 
 /*!
@@ -156,10 +142,7 @@ public:
      *
      * @param[in] __arg Exception error message.
      */
-    explicit semantic_error(const std::string &__arg)
-    : erpc_error(__arg)
-    {
-    }
+    explicit semantic_error(const std::string &__arg) : erpc_error(__arg) {}
 };
 
 /*!
@@ -173,10 +156,7 @@ public:
      *
      * @param[in] __arg Exception error message.
      */
-    explicit internal_error(const std::string &__arg)
-    : erpc_error(__arg)
-    {
-    }
+    explicit internal_error(const std::string &__arg) : erpc_error(__arg) {}
 };
 
 /*!

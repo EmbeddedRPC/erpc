@@ -37,10 +37,8 @@ extern const char *const kPyGlobalInit;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-PythonGenerator::PythonGenerator(InterfaceDefinition *def)
-: Generator(def, kPython)
-, m_suffixStrip("")
-, m_suffixStripSize(0)
+PythonGenerator::PythonGenerator(InterfaceDefinition *def) :
+Generator(def, generator_type_t::kPython), m_suffixStrip(""), m_suffixStripSize(0)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -122,6 +120,7 @@ void PythonGenerator::generate()
     m_templateData["structs"] = empty;
     m_templateData["unions"] = empty;
     m_templateData["consts"] = empty;
+    m_templateData["functions"] = empty;
 
     parseSubtemplates();
 
@@ -146,8 +145,6 @@ void PythonGenerator::generate()
 
     makeEnumsTemplateData();
 
-    makeFunctionsTemplateData();
-
     for (Group *group : m_groups)
     {
         data_map groupTemplate;
@@ -165,15 +162,15 @@ void PythonGenerator::generate()
 
 void PythonGenerator::setTemplateComments(Symbol *symbol, data_map &symbolInfo)
 {
-    symbolInfo["mlComment"] = convertComment(symbol->getMlComment(), kMultilineComment);
-    symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), kInlineComment);
+    symbolInfo["mlComment"] = convertComment(symbol->getMlComment(), comment_type_t::kMultilineComment);
+    symbolInfo["ilComment"] = convertComment(symbol->getIlComment(), comment_type_t::kInlineComment);
 }
 
 data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
 {
     (void)group;
     data_map info;
-    string proto = getFunctionPrototype(fn);
+    string proto = getFunctionPrototype(nullptr, fn);
 
     info["name"] = getOutputName(fn);
     info["prototype"] = proto;
@@ -236,18 +233,18 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
         /* Necessary for handling non-discriminated unions */
         paramInfo["discriminator"] = getAnnStringValue(param, DISCRIMINATOR_ANNOTATION);
 
-        _param_direction dir = param->getDirection();
+        param_direction_t dir = param->getDirection();
         switch (dir)
         {
-            case kInDirection:
+            case param_direction_t::kInDirection:
                 paramInfo["direction"] = "in";
                 inParams.push_back(paramInfo);
                 break;
-            case kOutDirection:
+            case param_direction_t::kOutDirection:
                 paramInfo["direction"] = "out";
                 outParams.push_back(paramInfo);
                 break;
-            case kInoutDirection:
+            case param_direction_t::kInoutDirection:
                 paramInfo["direction"] = "inout";
                 inParams.push_back(paramInfo);
                 outParams.push_back(paramInfo);
@@ -266,12 +263,22 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
     return info;
 }
 
-string PythonGenerator::getFunctionPrototype(Function *fn)
+string PythonGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const string &interfaceName,
+                                             const string &name, bool insideInterfaceCall)
 {
-    string proto = getOutputName(fn);
+    FunctionType *functionType = dynamic_cast<FunctionType *>(fn);
+    if (functionType)
+    {
+        return ""; /*Todo: implement*/
+    }
+    Function *function = dynamic_cast<Function *>(fn);
+
+    assert(function);
+
+    string proto = getOutputName(function);
     proto += "(self";
 
-    auto params = fn->getParameters().getMembers();
+    auto params = function->getParameters().getMembers();
     if (params.size())
     {
         for (auto it : params)
@@ -294,7 +301,7 @@ void PythonGenerator::makeConstTemplateData()
 {
     Log::info("Constant globals:\n");
     data_list consts;
-    for (auto it : m_globals->getSymbolsOfType(Symbol::kConstSymbol))
+    for (auto it : m_globals->getSymbolsOfType(Symbol::symbol_type_t::kConstSymbol))
     {
         ConstType *constVar = dynamic_cast<ConstType *>(it);
         assert(constVar);
@@ -330,7 +337,7 @@ void PythonGenerator::makeEnumsTemplateData()
     Log::info("Enums:\n");
     data_list enums;
     int n = 0;
-    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kEnumType))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::data_type_t::kEnumType))
     {
         EnumType *enumType = dynamic_cast<EnumType *>(it);
         assert(enumType);
@@ -371,7 +378,7 @@ void PythonGenerator::makeAliasesTemplateData()
     Log::info("Type definition:\n");
     data_list aliases;
     int n = 0;
-    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kAliasType))
+    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::data_type_t::kAliasType))
     {
         AliasType *aliasType = dynamic_cast<AliasType *>(it);
         assert(aliasType);
@@ -428,7 +435,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
 
             switch (dataType->getDataType())
             {
-                case DataType::kStructType: {
+                case DataType::data_type_t::kStructType:
+                {
                     StructType *structType = dynamic_cast<StructType *>(symbol);
                     if (structType == nullptr)
                     {
@@ -452,7 +460,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::kUnionType: {
+                case DataType::data_type_t::kUnionType:
+                {
                     UnionType *unionType = dynamic_cast<UnionType *>(symbol);
                     if (unionType == nullptr)
                     {
@@ -482,7 +491,8 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::kAliasType: {
+                case DataType::data_type_t::kAliasType:
+                {
                     AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
                     if (aliasType == nullptr)
                         break;
@@ -572,32 +582,6 @@ void PythonGenerator::setOneStructMemberTemplateData(StructMember *member, data_
     setTemplateComments(member, member_info);
 }
 
-void PythonGenerator::makeFunctionsTemplateData()
-{
-    /* type definitions of functions and table of functions */
-    Log::info("Functions:\n");
-    data_list functions;
-    for (Symbol *functionTypeSymbol : getDataTypesFromSymbolScope(m_globals, DataType::kFunctionType))
-    {
-        FunctionType *functionType = dynamic_cast<FunctionType *>(functionTypeSymbol);
-        data_map functionInfo;
-
-        /* Table template data. */
-        data_list callbacks;
-        for (Function *fun : functionType->getCallbackFuns())
-        {
-            data_map callbacksInfo;
-            callbacksInfo["name"] = fun->getName();
-            callbacks.push_back(callbacksInfo);
-        }
-        functionInfo["callbacks"] = callbacks;
-        /* Function type name. */
-        functionInfo["name"] = functionType->getName();
-        functions.push_back(functionInfo);
-    }
-    m_templateData["functions"] = functions;
-}
-
 data_map PythonGenerator::getTypeInfo(DataType *t)
 {
     data_map info;
@@ -605,11 +589,13 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
     info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
-        case DataType::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             info = getTypeInfo(t->getTrueDataType());
             break;
         }
-        case DataType::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             // Array type requires the array element count to come after the variable/member name.
             ArrayType *a = dynamic_cast<ArrayType *>(t);
             assert(a);
@@ -618,16 +604,19 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             assert(dynamic_cast<const BuiltinType *>(t));
             info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
             break;
         }
-        case DataType::kEnumType: {
+        case DataType::data_type_t::kEnumType:
+        {
             info["type"] = "enum";
             break;
         }
-        case DataType::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             info["type"] = "function";
             FunctionType *funType = dynamic_cast<FunctionType *>(t);
             assert(funType);
@@ -643,24 +632,27 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             }
             else
             {
-                throw semantic_error(format_string("Function has function type parameter (callback parameter), but in "
-                                                   "IDL is missing function definition, which can be passed there.")
-                                         .c_str());
+                throw semantic_error(
+                    "Function has function type parameter (callback parameter), but in "
+                    "IDL is missing function definition, which can be passed there.");
             }
             break;
         }
-        case DataType::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             const ListType *a = dynamic_cast<const ListType *>(t);
             assert(a);
             info["type"] = "list";
             info["elementType"] = getTypeInfo(a->getElementType());
             break;
         }
-        case DataType::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             info["type"] = "struct";
             break;
         }
-        case DataType::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             info["type"] = "union";
@@ -687,7 +679,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 StructMember *discriminatorMember = dynamic_cast<StructMember *>(discriminatorSym);
                 if (!discriminatorMember)
                 {
-                    throw internal_error(format_string("union discriminator is not a struct member"));
+                    throw internal_error("union discriminator is not a struct member");
                 }
                 info["discriminatorType"] = getTypeInfo(discriminatorMember->getDataType());
             }
@@ -705,7 +697,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                 }
                 else if (unionCase->getCaseName() != "")
                 {
-                    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::kEnumType))
+                    for (auto it : getDataTypesFromSymbolScope(m_globals, DataType::data_type_t::kEnumType))
                     {
                         EnumType *enumType = dynamic_cast<EnumType *>(it);
                         assert(enumType);
@@ -727,7 +719,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                     }
                     if (!caseData.has("type"))
                     {
-                        for (auto it : m_globals->getSymbolsOfType(DataType::kConstSymbol))
+                        for (auto it : m_globals->getSymbolsOfType(DataType::symbol_type_t::kConstSymbol))
                         {
                             ConstType *constType = dynamic_cast<ConstType *>(it);
                             assert(constType);
@@ -779,7 +771,8 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             info["cases"] = unionCases;
             break;
         }
-        case DataType::kVoidType: {
+        case DataType::data_type_t::kVoidType:
+        {
             info["type"] = "void";
             break;
         }
@@ -793,31 +786,31 @@ string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
 {
     switch (t->getBuiltinType())
     {
-        case BuiltinType::kBoolType:
+        case BuiltinType::builtin_type_t::kBoolType:
             return "bool";
-        case BuiltinType::kInt8Type:
+        case BuiltinType::builtin_type_t::kInt8Type:
             return "int8";
-        case BuiltinType::kInt16Type:
+        case BuiltinType::builtin_type_t::kInt16Type:
             return "int16";
-        case BuiltinType::kInt32Type:
+        case BuiltinType::builtin_type_t::kInt32Type:
             return "int32";
-        case BuiltinType::kInt64Type:
+        case BuiltinType::builtin_type_t::kInt64Type:
             return "int64";
-        case BuiltinType::kUInt8Type:
+        case BuiltinType::builtin_type_t::kUInt8Type:
             return "uint8";
-        case BuiltinType::kUInt16Type:
+        case BuiltinType::builtin_type_t::kUInt16Type:
             return "uint16";
-        case BuiltinType::kUInt32Type:
+        case BuiltinType::builtin_type_t::kUInt32Type:
             return "uint32";
-        case BuiltinType::kUInt64Type:
+        case BuiltinType::builtin_type_t::kUInt64Type:
             return "uint64";
-        case BuiltinType::kFloatType:
+        case BuiltinType::builtin_type_t::kFloatType:
             return "float";
-        case BuiltinType::kDoubleType:
+        case BuiltinType::builtin_type_t::kDoubleType:
             return "double";
-        case BuiltinType::kStringType:
+        case BuiltinType::builtin_type_t::kStringType:
             return "string";
-        case BuiltinType::kBinaryType:
+        case BuiltinType::builtin_type_t::kBinaryType:
             return "binary";
         default:
             throw internal_error("unknown builtin type");
@@ -838,11 +831,11 @@ string PythonGenerator::filterName(const string &name)
     return result;
 }
 
-string PythonGenerator::convertComment(const string &comment, comment_type commentType)
+string PythonGenerator::convertComment(const string &comment, comment_type_t commentType)
 {
     (void)commentType;
     // Longer patterns are ordered earlier than similar shorter patterns.
-    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", 0 };
+    static const char *const kCommentBegins[] = { "//!<", "//!", "///<", "///", "/*!<", "/*!", "/**<", "/**", "/*", 0 };
     static const char *const kCommentEnds[] = { "*/", 0 };
 
     string result = stripWhitespace(comment);
@@ -870,7 +863,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type comme
     // Check if we failed to find a matching comment begin.
     if (kCommentBegins[i] == 0)
     {
-        throw internal_error("unable to convert Doxygen comment");
+        throw internal_error("Unable to convert Doxygen comment in:" + result);
     }
 
     // Search for a matching comment end to strip. There may not be a comment end.
@@ -941,7 +934,7 @@ string PythonGenerator::convertComment(const string &comment, comment_type comme
     return result;
 }
 
-bool PythonGenerator::checkWhitspaceChar(char c)
+bool PythonGenerator::checkWhitespaceChar(char c)
 {
     if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
     {
@@ -961,7 +954,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     {
         char c = result[i];
 
-        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitspaceChar(result[i + 1])) || !checkWhitspaceChar(c))
+        if ((i < (int)result.size() - 1 && c == ' ' && !checkWhitespaceChar(result[i + 1])) || !checkWhitespaceChar(c))
         {
             break;
         }
@@ -975,7 +968,7 @@ string PythonGenerator::stripWhitespace(const string &s)
     for (n = 0, i = (int)result.size() - 1; i > 0; --i, ++n)
     {
         char c = result[i];
-        if (!checkWhitspaceChar(c))
+        if (!checkWhitespaceChar(c))
         {
             break;
         }

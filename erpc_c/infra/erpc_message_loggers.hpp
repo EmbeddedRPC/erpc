@@ -34,9 +34,7 @@ public:
     /*!
      * @brief MessageLogger constructor.
      */
-    explicit MessageLogger(Transport *transport)
-    : m_next(NULL)
-    , m_transport(transport){};
+    explicit MessageLogger(Transport *transport) : m_next(NULL), m_transport(transport){};
 
     /*!
      * @brief MessageLogger destructor
@@ -80,13 +78,12 @@ public:
     /*!
      * @brief Constructor.
      */
-    MessageLoggers(void)
-    : m_logger(NULL){};
+    MessageLoggers(void) : m_logger(NULL){};
 
     /*!
      * @brief Transport destructor
      */
-    virtual ~MessageLoggers(void);
+    ~MessageLoggers(void);
 
     /*!
      * @brief This function add given transport to newly created MessageLogger object.

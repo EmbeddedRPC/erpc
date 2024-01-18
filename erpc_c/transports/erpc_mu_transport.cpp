@@ -76,22 +76,15 @@ void MUTransport::mu_irq_callback(void)
 }
 #endif /* ERPC_TRANSPORT_MU_USE_MCMGR */
 
-MUTransport::MUTransport(void)
-: Transport()
-, m_newMessage(false)
-, m_rxMsgSize(0)
-, m_rxCntBytes(0)
-, m_rxBuffer(NULL)
-, m_txMsgSize(0)
-, m_txCntBytes(0)
-, m_txBuffer(NULL)
+MUTransport::MUTransport(void) :
+Transport(), m_newMessage(false), m_rxMsgSize(0), m_rxCntBytes(0), m_rxBuffer(NULL), m_txMsgSize(0), m_txCntBytes(0),
+m_txBuffer(NULL)
 #if !ERPC_THREADS_IS(NONE)
-, m_rxSemaphore()
-, m_txSemaphore()
-, m_sendLock()
-, m_receiveLock()
+,
+m_rxSemaphore(), m_txSemaphore(), m_sendLock(), m_receiveLock()
 #endif
-, m_muBase(NULL)
+,
+m_muBase(NULL)
 {
     s_mu_instance = this;
 }
@@ -285,6 +278,11 @@ erpc_status_t MUTransport::send(MessageBuffer *message)
     }
 
     return status;
+}
+
+bool MUTransport::hasMessage(void)
+{
+    return m_newMessage;
 }
 
 extern "C" {

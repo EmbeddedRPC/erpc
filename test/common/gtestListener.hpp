@@ -10,9 +10,9 @@
 #ifndef _EMBEDDED_RPC__GTESTLISTENER_H_
 #define _EMBEDDED_RPC__GTESTLISTENER_H_
 
+#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "myAlloc.hpp"
-#include "test_unit_test_common.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -26,10 +26,10 @@ private:
     {
         int serverAlloc = getServerAllocated();
 
-        EXPECT_EQ(MyAlloc::allocated(), 0)
-            << "Leaked (on client side) : " << MyAlloc::allocated() << " unit(s) need be freed!";
+        EXPECT_EQ(::MyAlloc::allocated(), 0)
+            << "Leaked (on client side) : " << ::MyAlloc::allocated() << " unit(s) need be freed!";
         EXPECT_EQ(serverAlloc, 0) << "Leaked (on server side) : " << serverAlloc << " unit(s) need be freed!";
-        MyAlloc::allocated(0);
+        ::MyAlloc::allocated(0);
     }
 };
 

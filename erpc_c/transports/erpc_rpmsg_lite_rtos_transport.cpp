@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -9,6 +9,7 @@
  */
 
 #include "erpc_rpmsg_lite_rtos_transport.hpp"
+
 #include "erpc_config_internal.h"
 
 extern "C" {
@@ -20,21 +21,16 @@ using namespace erpc;
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t RPMsgBaseTransport::s_initialized = 0U;
-struct rpmsg_lite_instance *RPMsgBaseTransport::s_rpmsg;
+uint8_t RPMsgBase::s_initialized = 0U;
+struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgRTOSTransport::RPMsgRTOSTransport(void)
-: RPMsgBaseTransport()
-, m_rdev(NULL)
-, m_app_rp_chnl(NULL)
-, m_dst_addr(0)
-, m_rpmsg_queue(NULL)
-, m_rpmsg_ept(NULL)
-, m_crcImpl(NULL)
+RPMsgRTOSTransport::RPMsgRTOSTransport(void) :
+Transport(), RPMsgBase(), m_rdev(NULL), m_app_rp_chnl(NULL), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL),
+m_crcImpl(NULL)
 {
 }
 
@@ -69,17 +65,6 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport(void)
             s_initialized = 0U;
         }
     }
-}
-
-void RPMsgRTOSTransport::setCrc16(Crc16 *crcImpl)
-{
-    erpc_assert(crcImpl != NULL);
-    m_crcImpl = crcImpl;
-}
-
-Crc16 *RPMsgRTOSTransport::getCrc16(void)
-{
-    return m_crcImpl;
 }
 
 erpc_status_t RPMsgRTOSTransport::init(uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t length,
@@ -287,4 +272,20 @@ erpc_status_t RPMsgRTOSTransport::send(MessageBuffer *message)
     }
 
     return status;
+}
+
+bool RPMsgRTOSTransport::hasMessage(void)
+{
+    return ((rpmsg_queue_get_current_size(m_rpmsg_queue) > 0) ? true : false);
+}
+
+void RPMsgRTOSTransport::setCrc16(Crc16 *crcImpl)
+{
+    erpc_assert(crcImpl != NULL);
+    m_crcImpl = crcImpl;
+}
+
+Crc16 *RPMsgRTOSTransport::getCrc16(void)
+{
+    return m_crcImpl;
 }

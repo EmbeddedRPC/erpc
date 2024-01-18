@@ -44,11 +44,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Service(uint32_t serviceId)
-    : m_serviceId(serviceId)
-    , m_next(NULL)
-    {
-    }
+    Service(uint32_t serviceId) : m_serviceId(serviceId), m_next(NULL) {}
 
     /*!
      * @brief Service destructor
@@ -87,7 +83,7 @@ public:
      * @return Based on handleInvocation implementation.
      */
     virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, Codec *codec,
-                                           MessageBufferFactory *messageFactory) = 0;
+                                           MessageBufferFactory *messageFactory, Transport *transport) = 0;
 
 protected:
     uint32_t m_serviceId; /*!< Service unique id. */
@@ -107,11 +103,7 @@ public:
      *
      * This function initializes object attributes.
      */
-    Server(void)
-    : ClientServerCommon()
-    , m_firstService(NULL)
-    {
-    }
+    Server(void) : ClientServerCommon(), m_firstService(NULL) {}
 
     /*!
      * @brief Server destructor

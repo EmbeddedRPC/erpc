@@ -37,12 +37,10 @@ public:
      * @param[in] quantity How much messages record.
      */
     Sniffer(erpc::Transport *transport, erpcgen::InterfaceDefinition *def, const char *outputFilePath,
-            uint64_t quantity)
-    : m_transport(transport)
-    , m_interfaces(def->getGlobals().getSymbolsOfType(erpcgen::Symbol::kInterfaceSymbol))
-    , m_outputFilePath(outputFilePath)
-    , m_quantity(quantity)
-    , m_codec(new erpc::BasicCodec()){};
+            uint64_t quantity) :
+    m_transport(transport),
+    m_interfaces(def->getGlobals().getSymbolsOfType(erpcgen::Symbol::symbol_type_t::kInterfaceSymbol)),
+    m_outputFilePath(outputFilePath), m_quantity(quantity), m_codec(new erpc::BasicCodec()){};
 
     /*!
      * @brief This function is destructor of Sniffer class.

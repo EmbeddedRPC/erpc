@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -25,7 +25,7 @@
 #include "semphr.h"
 #include "task.h"
 #elif ERPC_THREADS_IS(ZEPHYR)
-#include "kernel.h"
+#include <zephyr/kernel.h>
 #elif ERPC_THREADS_IS(MBED)
 #if MBED_CONF_RTOS_PRESENT
 #include "rtos.h"
@@ -99,7 +99,7 @@ public:
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
     Thread(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, const char *name = 0,
-           thread_stack_pointer stackPtr = 0);
+           thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief Destructor.
@@ -128,7 +128,7 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = 0);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief This function starts thread execution.
@@ -156,7 +156,7 @@ public:
 #elif ERPC_THREADS_IS(FREERTOS)
         return reinterpret_cast<thread_id_t>(m_task);
 #elif ERPC_THREADS_IS(ZEPHYR)
-        return reinterpret_cast<thread_id_t>(m_thread);
+        return reinterpret_cast<thread_id_t>(m_thread_id);
 #elif ERPC_THREADS_IS(MBED)
         return reinterpret_cast<thread_id_t>(m_thread->get_id());
 #elif ERPC_THREADS_IS(WIN32)
@@ -238,7 +238,8 @@ private:
     StaticTask_t m_staticTask; /*!< Hold static task data. */
 #endif
 #elif ERPC_THREADS_IS(ZEPHYR)
-    struct k_thread m_thread;  /*!< Current thread. */
+    struct k_thread m_thread; /*!< Current thread. */
+    k_tid_t m_thread_id;
     k_thread_stack_t *m_stack; /*!< Pointer to stack. */
 #elif ERPC_THREADS_IS(MBED)
     rtos::Thread *m_thread; /*!< Underlying Thread instance */
@@ -282,7 +283,7 @@ private:
      * @param[in] arg2
      * @param[in] arg3
      */
-    static void *threadEntryPointStub(void *arg1, void *arg2, void *arg3);
+    static void threadEntryPointStub(void *arg1, void *arg2, void *arg3);
 
 #elif ERPC_THREADS_IS(MBED)
 
@@ -349,11 +350,7 @@ public:
          *
          * @param[in] mutex to lock.
          */
-        Guard(Mutex &mutex)
-        : m_mutex(mutex)
-        {
-            (void)m_mutex.lock();
-        }
+        Guard(Mutex &mutex) : m_mutex(mutex) { (void)m_mutex.lock(); }
         /*!
          * @brief Destructor.
          */

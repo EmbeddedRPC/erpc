@@ -13,33 +13,38 @@
 #endif
 {% endif -- usedUnionType %}
 
-{% if not commonTypesFile == "" %}
-// Common types header file
-#include "{$commonTypesFile}"
-{% else %}
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include "erpc_version.h"
-{% if empty(crc16) == false %}
-#include "{$crcHeaderName}"
-{% endif  -- empty(crc16) == false %}
 {% for inc in includes %}
 #include "{$inc}"
 {% endfor -- includes %}
 
+{% if cCommonHeaderFile %}
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+{% else %}
+#include <cstdbool>
+#include <cstddef>
+#include <cstdint>
+{% endif %}
+
+#include "erpc_version.h"
+{% if empty(crc16) == false %}
+#include "{$crcHeaderName}"
+{% endif  -- empty(crc16) == false %}
+
 {$checkVersion()}
 {$>checkCrc()}
-{% endif -- not commonTypesFile %}
-{% if commonTypesFile == "" %}
+
 #if !defined(ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC})
 #define ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
 {% if not empty(enums) %}
 
 // Enumerators data types declarations
 {%  for enum in enums %}
-{% if enum.name != "" %}
-{% endif %}
 {$> enum.mlComment}
 {%   if enum.name %}typedef {% endif --enum.name  %}enum{$addIndent(" ", enum.name)}
 {
@@ -103,38 +108,12 @@ extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
 {% endif -- consts %}
 
 #endif // ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
-{% endif -- commonTypesFile %}
 
-{% if not genCommonTypesFile %}
-{% for iface in group.interfaces %}
-/*! @brief {$iface.name} identifiers */
-enum _{$iface.name}_ids
-{
-    k{$iface.name}_service_id = {$iface.id},
-{%  for fn in iface.functions %}
-    k{$iface.name}_{$fn.name}_id = {$fn.id},
-{%  endfor %}
-};
-
-{% endfor %}
-#if defined(__cplusplus)
-extern "C" {
-#endif
-{% for iface in group.interfaces if iface.isNonExternalInterface == true %}
-
-{$> iface.mlComment}
-//! @name {$iface.name}
-//@{
-{%  for fn in iface.functions if fn.isNonExternalFunction == true %}
-{$> fn.mlComment}
-{$fn.prototype};{$fn.ilComment}{$loop.addNewLineIfNotLast}
-{%  endfor -- functions %}
-//@}{$iface.ilComment}
-{% endfor -- iface %}
-
+{% if cCommonHeaderFile %}
 #if defined(__cplusplus)
 }
 #endif
-{% endif -- genCommonTypesFile %}
+{% else %}
+{% endif %}
 
 #endif // {$commonGuardMacro}

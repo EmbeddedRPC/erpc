@@ -237,6 +237,8 @@ void            { return TOK_VOID; }
 
 "->"                                { return TOK_ARROW; }
 
+"::"                                { return TOK_IFACE_SCOPE; }
+
 [@{}()\[\]<>=,;:+\-*/%^~&|]         { return yytext[0]; }
 
 \"(ESC|[^\"])*\"                    {

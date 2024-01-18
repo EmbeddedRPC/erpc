@@ -10,9 +10,10 @@
 #ifndef _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 #define _EMBEDDED_RPC__SPI_MASTER_TRANSPORT_H_
 
+#include "erpc_framed_transport.hpp"
+
 #include <cstdbool>
 #include <cstdlib>
-#include "erpc_framed_transport.hpp"
 
 extern "C" {
 #include "fsl_spi.h"
@@ -64,6 +65,9 @@ protected:
     uint32_t m_srcClock_Hz;  /*!< Source clock of SPI peripheral used in this transport layer */
 
 private:
+    using FramedTransport::underlyingReceive;
+    using FramedTransport::underlyingSend;
+
     /*!
      * @brief Receive data from SPI peripheral.
      *
@@ -73,7 +77,7 @@ private:
      * @retval kErpcStatus_ReceiveFailed SPI failed to receive data.
      * @retval kErpcStatus_Success Successfully received all data.
      */
-    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingReceive(uint8_t *data, uint32_t size) override;
 
     /*!
      * @brief Write data to SPI peripheral.
@@ -84,7 +88,7 @@ private:
      * @retval kErpcStatus_SendFailed SPI failed to send data.
      * @retval kErpcStatus_Success Successfully sent all data.
      */
-    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size);
+    virtual erpc_status_t underlyingSend(const uint8_t *data, uint32_t size) override;
 };
 
 } // namespace erpc

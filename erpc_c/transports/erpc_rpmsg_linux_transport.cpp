@@ -17,10 +17,8 @@ using namespace erpc;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-RPMsgLinuxTransport::RPMsgLinuxTransport(RPMsgEndpoint *endPoint, int16_t remote)
-: Transport()
-, m_endPoint(endPoint)
-, m_remote(remote)
+RPMsgLinuxTransport::RPMsgLinuxTransport(RPMsgEndpoint *endPoint, int16_t remote) :
+Transport(), m_endPoint(endPoint), m_remote(remote)
 {
 }
 

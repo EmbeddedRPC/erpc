@@ -74,10 +74,7 @@ static const char endl = '\n';
 class ostream
 {
 public:
-    ostream(FILE *fileptr)
-    : fp(fileptr)
-    {
-    }
+    ostream(FILE *fileptr) : fp(fileptr) {}
 
     ostream &operator<<(char ch);
 
@@ -159,12 +156,8 @@ void OptArgvIter::rewind(void)
 static const char WHITESPACE[] = " \t\n\r\v\f";
 const char *OptStrTokIter::default_delims = WHITESPACE;
 
-OptStrTokIter::OptStrTokIter(const char *tokens, const char *arg_delimiters)
-: len(unsigned(strlen(tokens)))
-, str(tokens)
-, seps(arg_delimiters)
-, cur(NULLSTR)
-, tokstr(NULLSTR)
+OptStrTokIter::OptStrTokIter(const char *tokens, const char *arg_delimiters) :
+len(unsigned(strlen(tokens))), str(tokens), seps(arg_delimiters), cur(NULLSTR), tokstr(NULLSTR)
 {
     if (seps == NULL)
         seps = default_delims;
@@ -220,9 +213,7 @@ enum
 const unsigned OptIstreamIter::MAX_LINE_LEN = 1024;
 
 // Constructor
-OptIstreamIter::OptIstreamIter(istream &input)
-: is(input)
-, tok_iter(NULL)
+OptIstreamIter::OptIstreamIter(istream &input) : is(input), tok_iter(NULL)
 {
 #ifdef USE_STDIO
     fprintf(stderr, "%s: Can't use OptIstreamIter class:\n", "OptIstreamIter::OptIstreamIter");
@@ -330,18 +321,18 @@ inline static int isEndOpts(const char *token)
 inline static int isOption(unsigned flags, const char *arg)
 {
     return ((arg != nullptr) && ((*arg != '\0') || (arg[1] != '\0')) &&
-            ((*arg == '-') || ((flags & Options::PLUS) && (*arg == '+'))));
+            ((*arg == '-') || ((flags & static_cast<signed>(Options::OptCtrl::PLUS)) && (*arg == '+'))));
 }
 
 // See if we should be parsing only options or if we also need to
 // parse positional arguments
 inline static int isOptsOnly(unsigned flags)
 {
-    return (flags & Options::PARSE_POS) ? 0 : 1;
+    return (flags & static_cast<signed>(Options::OptCtrl::PARSE_POS)) ? 0 : 1;
 }
 
 // return values for a keyword matching function
-enum kwdmatch_t
+enum class kwdmatch_t
 {
     NO_MATCH,
     PARTIAL_MATCH,
@@ -381,21 +372,21 @@ static kwdmatch_t kwdmatch(const char *src, const char *attempt, int len = 0)
     int i;
 
     if (src == attempt)
-        return EXACT_MATCH;
+        return kwdmatch_t::EXACT_MATCH;
     if ((src == NULL) || (attempt == NULL))
-        return NO_MATCH;
+        return kwdmatch_t::NO_MATCH;
     if ((!*src) && (!*attempt))
-        return EXACT_MATCH;
+        return kwdmatch_t::EXACT_MATCH;
     if ((!*src) || (!*attempt))
-        return NO_MATCH;
+        return kwdmatch_t::NO_MATCH;
 
     for (i = 0; ((i < len) || (len == 0)) && (attempt[i]) && (attempt[i] != ' '); i++)
     {
         if (TOLOWER(src[i]) != TOLOWER(attempt[i]))
-            return NO_MATCH;
+            return kwdmatch_t::NO_MATCH;
     }
 
-    return (src[i]) ? PARTIAL_MATCH : EXACT_MATCH;
+    return (src[i]) ? kwdmatch_t::PARTIAL_MATCH : kwdmatch_t::EXACT_MATCH;
 }
 
 // **************************************************************** OptionSpec
@@ -408,20 +399,14 @@ static kwdmatch_t kwdmatch(const char *src, const char *attempt, int len = 0)
 class OptionSpec
 {
 public:
-    OptionSpec(const char *decl = NULLSTR)
-    : hidden(0)
-    , spec(decl)
+    OptionSpec(const char *decl = NULLSTR) : hidden(0), spec(decl)
     {
         if (spec == NULL)
             spec = NULL_spec;
         CheckHidden();
     }
 
-    OptionSpec(const OptionSpec &cp)
-    : hidden(cp.hidden)
-    , spec(cp.spec)
-    {
-    }
+    OptionSpec(const OptionSpec &cp) : hidden(cp.hidden), spec(cp.spec) {}
 
     // NOTE: use default destructor!
 
@@ -572,11 +557,13 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
         value_len = sizeof(default_value) - 1;
     }
 
-    if ((optctrls & Options::SHORT_ONLY) && ((!isNullOpt(optchar)) || (optctrls & Options::NOGUESSING)))
+    if ((optctrls & static_cast<signed>(Options::OptCtrl::SHORT_ONLY)) &&
+        ((!isNullOpt(optchar)) || (optctrls & static_cast<signed>(Options::OptCtrl::NOGUESSING))))
     {
         longopt = NULLSTR;
     }
-    if ((optctrls & Options::LONG_ONLY) && (longopt || (optctrls & Options::NOGUESSING)))
+    if ((optctrls & static_cast<signed>(Options::OptCtrl::LONG_ONLY)) &&
+        (longopt || (optctrls & static_cast<signed>(Options::OptCtrl::NOGUESSING))))
     {
         optchar = '\0';
     }
@@ -602,7 +589,8 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
     if (longopt)
     {
         *(p++) = '-';
-        if (!(optctrls & (Options::LONG_ONLY | Options::SHORT_ONLY)))
+        if (!(optctrls &
+              (static_cast<signed>(Options::OptCtrl::LONG_ONLY) | static_cast<signed>(Options::OptCtrl::SHORT_ONLY))))
         {
             *(p++) = '-';
         }
@@ -642,13 +630,9 @@ unsigned OptionSpec::Format(char *buf, unsigned optctrls) const
 #define DIR_SEP_CHAR '/'
 #endif
 
-Options::Options(const char *arg_name, const char *const optv[])
-: explicit_end(0)
-, optctrls(DEFAULT)
-, optvec(optv)
-, nextchar(NULLSTR)
-, listopt(NULLSTR)
-, cmdname(arg_name)
+Options::Options(const char *arg_name, const char *const optv[]) :
+explicit_end(0), optctrls(static_cast<signed>(OptCtrl::DEFAULT)), optvec(optv), nextchar(NULLSTR), listopt(NULLSTR),
+cmdname(arg_name)
 {
     const char *basename = ::strrchr(cmdname, DIR_SEP_CHAR);
     if (basename)
@@ -785,11 +769,11 @@ const char *Options::match_longopt(const char *opt, int len, int &ambiguous) con
         if (longopt == NULL)
             continue;
         result = kwdmatch(longopt, opt, len);
-        if (result == EXACT_MATCH)
+        if (result == kwdmatch_t::EXACT_MATCH)
         {
             return optspec;
         }
-        else if (result == PARTIAL_MATCH)
+        else if (result == kwdmatch_t::PARTIAL_MATCH)
         {
             if (matched)
             {
@@ -827,7 +811,7 @@ const char *Options::match_longopt(const char *opt, int len, int &ambiguous) con
 // ^SIDE-EFFECTS:
 //    - iter is advanced when an argument completely parsed
 //    - optarg is modified to point to any option argument
-//    - if Options::QUIET is not set, error messages are printed on cerr
+//    - if Options::OptCtrl::QUIET is not set, error messages are printed on cerr
 //
 // ^RETURN-VALUE:
 //    'c' if the -c option was matched (optarg points to its argument)
@@ -842,21 +826,22 @@ int Options::parse_opt(OptIter &iter, const char *&optarg)
     listopt = NULLSTR; // reset the list pointer
 
     if ((optvec == NULL) || (!*optvec))
-        return Options::ENDOPTS;
+        return static_cast<signed>(Options::OptRC::ENDOPTS);
 
     // Try to match a known option
-    OptionSpec optspec = match_opt(*(nextchar++), (optctrls & Options::ANYCASE));
+    OptionSpec optspec = match_opt(*(nextchar++), (optctrls & static_cast<signed>(Options::OptCtrl::ANYCASE)));
 
     // Check for an unknown option
     if (optspec.isNULL())
     {
         // See if this was a long-option in disguise
-        if (!(optctrls & Options::NOGUESSING))
+        if (!(optctrls & static_cast<signed>(Options::OptCtrl::NOGUESSING)))
         {
             unsigned save_ctrls = optctrls;
             const char *save_nextchar = nextchar;
             nextchar -= 1;
-            optctrls |= (Options::QUIET | Options::NOGUESSING);
+            optctrls |=
+                (static_cast<signed>(Options::OptCtrl::QUIET) | static_cast<signed>(Options::OptCtrl::NOGUESSING));
             int optchar = parse_longopt(iter, optarg);
             optctrls = save_ctrls;
             if (optchar > 0)
@@ -868,12 +853,12 @@ int Options::parse_opt(OptIter &iter, const char *&optarg)
                 nextchar = save_nextchar;
             }
         }
-        if (!(optctrls & Options::QUIET))
+        if (!(optctrls & static_cast<signed>(Options::OptCtrl::QUIET)))
         {
             cerr << cmdname << ": unknown option -" << *(nextchar - 1) << "." << endl;
         }
         optarg = (nextchar - 1); // record the bad option in optarg
-        return Options::BADCHAR;
+        return static_cast<signed>(Options::OptRC::BADCHAR);
     }
 
     // If no argument is taken, then leave now
@@ -906,7 +891,7 @@ int Options::parse_opt(OptIter &iter, const char *&optarg)
 
     // No argument given - if its required, thats an error
     optarg = NULLSTR;
-    if (optspec.isValRequired() && !(optctrls & Options::QUIET))
+    if (optspec.isValRequired() && !(optctrls & static_cast<signed>(Options::OptCtrl::QUIET)))
     {
         cerr << cmdname << ": argument required for -" << optspec.OptChar() << " option." << endl;
     }
@@ -934,7 +919,7 @@ int Options::parse_opt(OptIter &iter, const char *&optarg)
 // ^SIDE-EFFECTS:
 //    - iter is advanced when an argument completely parsed
 //    - optarg is modified to point to any option argument
-//    - if Options::QUIET is not set, error messages are printed on cerr
+//    - if Options::OptCtrl::QUIET is not set, error messages are printed on cerr
 //
 // ^RETURN-VALUE:
 //    'c' if the the long-option corresponding to the -c option was matched
@@ -952,7 +937,7 @@ int Options::parse_longopt(OptIter &iter, const char *&optarg)
     listopt = NULLSTR; // reset the list-spec
 
     if ((optvec == NULL) || (!*optvec))
-        return Options::ENDOPTS;
+        return static_cast<signed>(Options::OptRC::ENDOPTS);
 
     // if a value is supplied in this argv element, get it now
     const char *val = strpbrk(nextchar, ":=");
@@ -969,11 +954,12 @@ int Options::parse_longopt(OptIter &iter, const char *&optarg)
     if (optspec.isNULL())
     {
         // See if this was a short-option in disguise
-        if ((!ambiguous) && (!(optctrls & Options::NOGUESSING)))
+        if ((!ambiguous) && (!(optctrls & static_cast<signed>(Options::OptCtrl::NOGUESSING))))
         {
             unsigned save_ctrls = optctrls;
             const char *save_nextchar = nextchar;
-            optctrls |= (Options::QUIET | Options::NOGUESSING);
+            optctrls |=
+                (static_cast<signed>(Options::OptCtrl::QUIET) | static_cast<signed>(Options::OptCtrl::NOGUESSING));
             int optchar = parse_opt(iter, optarg);
             optctrls = save_ctrls;
             if (optchar > 0)
@@ -985,22 +971,25 @@ int Options::parse_longopt(OptIter &iter, const char *&optarg)
                 nextchar = save_nextchar;
             }
         }
-        if (!(optctrls & Options::QUIET))
+        if (!(optctrls & static_cast<signed>(Options::OptCtrl::QUIET)))
         {
             cerr << cmdname << ": " << ((ambiguous) ? "ambiguous" : "unknown") << " option "
-                 << ((optctrls & Options::LONG_ONLY) ? "-" : "--") << nextchar << "." << endl;
+                 << ((optctrls & static_cast<signed>(Options::OptCtrl::LONG_ONLY)) ? "-" : "--") << nextchar << "."
+                 << endl;
         }
         optarg = nextchar;  // record the bad option in optarg
         nextchar = NULLSTR; // we've exhausted this argument
-        return (ambiguous) ? Options::AMBIGUOUS : Options::BADKWD;
+        return (ambiguous) ? static_cast<signed>(Options::OptRC::AMBIGUOUS) :
+                             static_cast<signed>(Options::OptRC::BADKWD);
     }
 
     // If no argument is taken, then leave now
     if (optspec.isNoArg())
     {
-        if ((val) && !(optctrls & Options::QUIET))
+        if ((val) && !(optctrls & static_cast<signed>(Options::OptCtrl::QUIET)))
         {
-            cerr << cmdname << ": option " << ((optctrls & Options::LONG_ONLY) ? "-" : "--") << optspec.LongOpt()
+            cerr << cmdname << ": option "
+                 << ((optctrls & static_cast<signed>(Options::OptCtrl::LONG_ONLY)) ? "-" : "--") << optspec.LongOpt()
                  << " does NOT take an argument." << endl;
         }
         optarg = val;       // record the unexpected argument
@@ -1032,7 +1021,7 @@ int Options::parse_longopt(OptIter &iter, const char *&optarg)
 
     // No argument given - if its required, thats an error
     optarg = NULLSTR;
-    if (optspec.isValRequired() && !(optctrls & Options::QUIET))
+    if (optspec.isValRequired() && !(optctrls & static_cast<signed>(Options::OptCtrl::QUIET)))
     {
         const char *longopt = optspec.LongOpt();
         const char *spc = ::strchr(longopt, ' ');
@@ -1045,7 +1034,8 @@ int Options::parse_longopt(OptIter &iter, const char *&optarg)
         {
             longopt_len = (int)::strlen(longopt);
         }
-        cerr << cmdname << ": argument required for " << ((optctrls & Options::LONG_ONLY) ? "-" : "--");
+        cerr << cmdname << ": argument required for "
+             << ((optctrls & static_cast<signed>(Options::OptCtrl::LONG_ONLY)) ? "-" : "--");
         cerr.write(longopt, longopt_len) << " option." << endl;
     }
     nextchar = NULLSTR; // we exhausted the rest of this arg
@@ -1165,7 +1155,7 @@ void Options::usage(ostream &os, const char *positionals) const
 // ^SIDE-EFFECTS:
 //    - iter is advanced when an argument is completely parsed
 //    - optarg is modified to point to any option argument
-//    - if Options::QUIET is not set, error messages are printed on cerr
+//    - if Options::OptCtrl::QUIET is not set, error messages are printed on cerr
 //
 // ^RETURN-VALUE:
 //     0 if all options have been parsed.
@@ -1203,7 +1193,7 @@ int Options::operator()(OptIter &iter, const char *&optarg)
         if (arg == NULL)
         {
             listopt = NULLSTR;
-            return Options::ENDOPTS;
+            return static_cast<signed>(Options::OptRC::ENDOPTS);
         }
         else if ((!explicit_end) && isEndOpts(arg))
         {
@@ -1211,7 +1201,7 @@ int Options::operator()(OptIter &iter, const char *&optarg)
             listopt = NULLSTR;
             explicit_end = 1;
             if (parse_opts_only)
-                return Options::ENDOPTS;
+                return static_cast<signed>(Options::OptRC::ENDOPTS);
             get_next_arg = 1; // make sure we look at the next argument.
         }
     } while (get_next_arg);
@@ -1221,27 +1211,27 @@ int Options::operator()(OptIter &iter, const char *&optarg)
     {
         if (parse_opts_only)
         {
-            return Options::ENDOPTS;
+            return static_cast<signed>(Options::OptRC::ENDOPTS);
         }
         else
         {
             optarg = arg; // set optarg to the positional argument
             iter.next();  // advance iterator to the next argument
-            return Options::POSITIONAL;
+            return static_cast<signed>(Options::OptRC::POSITIONAL);
         }
     }
 
     iter.next(); // pass the argument that arg already points to
 
     // See if we have a long option ...
-    if (!(optctrls & Options::SHORT_ONLY))
+    if (!(optctrls & static_cast<signed>(Options::OptCtrl::SHORT_ONLY)))
     {
         if ((*arg == '-') && (arg[1] == '-'))
         {
             nextchar = arg + 2;
             return parse_longopt(iter, optarg);
         }
-        else if ((optctrls & Options::PLUS) && (*arg == '+'))
+        else if ((optctrls & static_cast<signed>(Options::OptCtrl::PLUS)) && (*arg == '+'))
         {
             nextchar = arg + 1;
             return parse_longopt(iter, optarg);
@@ -1250,7 +1240,7 @@ int Options::operator()(OptIter &iter, const char *&optarg)
     if (*arg == '-')
     {
         nextchar = arg + 1;
-        if (optctrls & Options::LONG_ONLY)
+        if (optctrls & static_cast<signed>(Options::OptCtrl::LONG_ONLY))
         {
             return parse_longopt(iter, optarg);
         }

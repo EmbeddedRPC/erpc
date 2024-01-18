@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "erpc_transport_arbitrator.hpp"
+
 #include "erpc_config_internal.h"
 #include "erpc_manually_constructed.hpp"
 
@@ -27,13 +28,8 @@ using namespace erpc;
 ERPC_MANUALLY_CONSTRUCTED_ARRAY_STATIC(TransportArbitrator::PendingClientInfo, s_pendingClientInfoArray,
                                        ERPC_CLIENTS_THREADS_AMOUNT);
 
-TransportArbitrator::TransportArbitrator(void)
-: Transport()
-, m_sharedTransport(NULL)
-, m_codec(NULL)
-, m_clientList(NULL)
-, m_clientFreeList(NULL)
-, m_clientListMutex()
+TransportArbitrator::TransportArbitrator(void) :
+Transport(), m_sharedTransport(NULL), m_codec(NULL), m_clientList(NULL), m_clientFreeList(NULL), m_clientListMutex()
 {
 }
 
@@ -44,24 +40,9 @@ TransportArbitrator::~TransportArbitrator(void)
     freeClientList(m_clientFreeList);
 }
 
-void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+uint8_t TransportArbitrator::reserveHeaderSize(void)
 {
-    erpc_assert(crcImpl != NULL);
-    erpc_assert(m_sharedTransport != NULL);
-    m_sharedTransport->setCrc16(crcImpl);
-}
-
-Crc16 *TransportArbitrator::getCrc16(void)
-{
-    erpc_assert(m_sharedTransport != NULL);
-    return m_sharedTransport->getCrc16();
-}
-
-bool TransportArbitrator::hasMessage(void)
-{
-    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
-
-    return m_sharedTransport->hasMessage();
+    return m_sharedTransport->reserveHeaderSize();
 }
 
 erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
@@ -96,7 +77,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             break;
         }
 
-        m_codec->setBuffer(*message);
+        m_codec->setBuffer(*message, m_sharedTransport->reserveHeaderSize());
 
         // Parse the message header.
         m_codec->startReadMessage(msgType, service, requestNumber, sequence);
@@ -107,13 +88,13 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
         }
 
         // If this message is an invocation, return it to the calling server.
-        if ((msgType == kInvocationMessage) || (msgType == kOnewayMessage))
+        if ((msgType == message_type_t::kInvocationMessage) || (msgType == message_type_t::kOnewayMessage))
         {
             break;
         }
 
         // Just ignore messages we don't know what to do with.
-        if (msgType != kReplyMessage)
+        if (msgType != message_type_t::kReplyMessage)
         {
             continue;
         }
@@ -125,7 +106,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             if (client->m_isValid && (sequence == client->m_request->getSequence()))
             {
                 // Swap the received message buffer with the client's message buffer.
-                client->m_request->getCodec()->getBuffer()->swap(message);
+                client->m_request->getCodec()->getBufferRef().swap(message);
 
                 // Wake up the client receive thread.
                 client->m_sem.put();
@@ -149,6 +130,46 @@ erpc_status_t TransportArbitrator::send(MessageBuffer *message)
 {
     erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
     return m_sharedTransport->send(message);
+}
+
+bool TransportArbitrator::hasMessage(void)
+{
+    erpc_assert((m_sharedTransport != NULL) && ("shared transport is not set" != NULL));
+
+    return m_sharedTransport->hasMessage();
+}
+
+void TransportArbitrator::setCrc16(Crc16 *crcImpl)
+{
+    erpc_assert(crcImpl != NULL);
+    erpc_assert(m_sharedTransport != NULL);
+    m_sharedTransport->setCrc16(crcImpl);
+}
+
+Crc16 *TransportArbitrator::getCrc16(void)
+{
+    erpc_assert(m_sharedTransport != NULL);
+    return m_sharedTransport->getCrc16();
+}
+
+void TransportArbitrator::setSharedTransport(Transport *shared)
+{
+    m_sharedTransport = shared;
+}
+
+Transport *TransportArbitrator::getSharedTransport(void)
+{
+    return m_sharedTransport;
+}
+
+void TransportArbitrator::setCodec(Codec *codec)
+{
+    m_codec = codec;
+}
+
+Codec *TransportArbitrator::getCodec(void)
+{
+    return m_codec;
 }
 
 TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(RequestContext &request)
@@ -252,11 +273,8 @@ void TransportArbitrator::freeClientList(PendingClientInfo *list)
     }
 }
 
-TransportArbitrator::PendingClientInfo::PendingClientInfo(void)
-: m_request(NULL)
-, m_sem(0)
-, m_isValid(false)
-, m_next(NULL)
+TransportArbitrator::PendingClientInfo::PendingClientInfo(void) :
+m_request(NULL), m_sem(0), m_isValid(false), m_next(NULL)
 {
 }
 

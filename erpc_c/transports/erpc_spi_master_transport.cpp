@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cstdio>
 #include "erpc_spi_master_transport.hpp"
+
+#include <cstdio>
 
 extern "C" {
 #include "board.h"
@@ -100,10 +101,8 @@ static inline void SpidevMasterTransport_WaitForSlaveReadyMarker(SPI_Type *spiBa
 }
 #endif
 
-SpiMasterTransport::SpiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz)
-: m_spiBaseAddr(spiBaseAddr)
-, m_baudRate(baudRate)
-, m_srcClock_Hz(srcClock_Hz)
+SpiMasterTransport::SpiMasterTransport(SPI_Type *spiBaseAddr, uint32_t baudRate, uint32_t srcClock_Hz) :
+m_spiBaseAddr(spiBaseAddr), m_baudRate(baudRate), m_srcClock_Hz(srcClock_Hz)
 {
 }
 
@@ -154,10 +153,26 @@ erpc_status_t SpiMasterTransport::underlyingSend(const uint8_t *data, uint32_t s
 {
     status_t status;
     spi_transfer_t masterXfer;
+    uint32_t header_size = reserveHeaderSize();
 
+    /* send the header first */
     masterXfer.txData = (uint8_t *)data;
     masterXfer.rxData = NULL;
-    masterXfer.dataSize = size;
+    masterXfer.dataSize = header_size;
+
+    /* send the header first */
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    SpidevMasterTransport_WaitForSlaveReadyGpio();
+#endif
+
+    status = SPI_MasterTransferBlocking(m_spiBaseAddr, &masterXfer);
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    s_isSlaveReady = false;
+#endif
+
+    /* send the payload now */
+    masterXfer.txData = (uint8_t *)data + header_size;
+    masterXfer.dataSize = size - header_size;
 
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     SpidevMasterTransport_WaitForSlaveReadyGpio();

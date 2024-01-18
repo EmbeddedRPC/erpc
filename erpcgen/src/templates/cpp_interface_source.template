@@ -1,0 +1,57 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#include "{$interfaceCppHeaderName}"
+
+{$checkVersion()}
+{$>checkCrc()}
+
+using namespace std;
+{$usingNamespace() >}
+
+{% for iface in group.interfaces -- service subclass method impl %}
+{$iface.interfaceClassName}::~{$iface.interfaceClassName}(void)
+{
+}
+{%  for cb in iface.callbacksInt %}
+{$iface.interfaceClassName}::{$cb.name} {$iface.interfaceClassName}::_{$cb.name}[{$count(cb.callbacks)}] = { {%    for c in cb.callbacks %}&{$iface.interfaceClassName}::{$c.name}{%     if !loop.last %}, {%     endif -- loop.last %}{%    endfor -- f.callbacks %} };
+{%  endfor %}
+{%  for cb in iface.callbacksInt %}
+
+bool {$iface.interfaceClassName}::get_callbackAddress_{$cb.name}(uint16_t index, {$cb.name} *callback)
+{
+    bool find;
+
+    if (index<sizeof(_{$cb.name})/sizeof({$cb.name}))
+    {
+        find = true;
+        *callback={$iface.interfaceClassName}::_{$cb.name}[index];
+    }
+    else
+    {
+        find = false;
+    }
+
+    return find;
+}
+
+bool {$iface.interfaceClassName}::get_callbackIdx_{$cb.name}(const {$cb.name} *callback, uint16_t &index)
+{
+    bool find = false;
+
+    for (index = 0; index < sizeof(_{$cb.name})/sizeof({$cb.name}); index++)
+    {
+        if ({$iface.interfaceClassName}::_{$cb.name}[index] == *callback)
+        {
+            find = true;
+            break;
+        }
+    }
+
+    return find;
+}
+{%  endfor %}
+{% endfor %}

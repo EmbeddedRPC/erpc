@@ -1,0 +1,6 @@
+name: erpc
+build:
+  cmake: ./zephyr
+  kconfig: ./zephyr/Kconfig
+samples:
+  - ./examples/zephyr

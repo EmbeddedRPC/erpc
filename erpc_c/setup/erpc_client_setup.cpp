@@ -29,8 +29,13 @@ using namespace erpc;
 
 // global client variables
 ERPC_MANUALLY_CONSTRUCTED_STATIC(ClientManager, s_client);
-ClientManager *g_client;
+#if defined(__MINGW32__)
+__declspec(selectany)
+#endif
+    ClientManager *g_client;
+#if !defined(__MINGW32__)
 #pragma weak g_client
+#endif
 ERPC_MANUALLY_CONSTRUCTED_STATIC(BasicCodecFactory, s_codecFactory);
 ERPC_MANUALLY_CONSTRUCTED_STATIC(Crc16, s_crc16);
 

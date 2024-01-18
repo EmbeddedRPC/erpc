@@ -9,6 +9,7 @@
  */
 
 #include "erpc_arbitrated_client_manager.hpp"
+
 #include "erpc_transport_arbitrator.hpp"
 
 #if ERPC_THREADS_IS(NONE)
@@ -73,7 +74,7 @@ void ArbitratedClientManager::performClientRequest(RequestContext &request)
     // Send the request.
     if (request.getCodec()->isStatusOk() == true)
     {
-        err = m_arbitrator->send(request.getCodec()->getBuffer());
+        err = m_arbitrator->send(&request.getCodec()->getBufferRef());
         request.getCodec()->updateStatus(err);
     }
 

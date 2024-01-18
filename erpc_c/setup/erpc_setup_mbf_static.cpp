@@ -38,7 +38,8 @@ public:
      */
     StaticMessageBufferFactory(void)
 #if !ERPC_THREADS_IS(NONE)
-    : m_semaphore(1)
+    :
+    m_semaphore(1)
 #endif
     {
         (void)memset(m_freeBufferBitmap, 0xff, sizeof(m_freeBufferBitmap));
@@ -124,10 +125,41 @@ protected:
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-ERPC_MANUALLY_CONSTRUCTED(StaticMessageBufferFactory, s_msgFactory);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(StaticMessageBufferFactory, s_msgFactory);
 
 erpc_mbf_t erpc_mbf_static_init(void)
 {
-    s_msgFactory.construct();
-    return reinterpret_cast<erpc_mbf_t>(s_msgFactory.get());
+    StaticMessageBufferFactory *msgFactory;
+
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    if (s_msgFactory.isUsed())
+    {
+        msgFactory = NULL;
+    }
+    else
+    {
+        s_msgFactory.construct();
+        msgFactory = s_msgFactory.get();
+    }
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    msgFactory = new StaticMessageBufferFactory();
+#else
+#error "Unknown eRPC allocation policy!"
+#endif
+
+    return reinterpret_cast<erpc_mbf_t>(msgFactory);
+}
+
+void erpc_mbf_static_deinit(erpc_mbf_t mbf)
+{
+#if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
+    (void)mbf;
+    s_msgFactory.destroy();
+#elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
+    erpc_assert(mbf != NULL);
+
+    StaticMessageBufferFactory *msgFactory = reinterpret_cast<StaticMessageBufferFactory *>(mbf);
+
+    delete msgFactory;
+#endif
 }

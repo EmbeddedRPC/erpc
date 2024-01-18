@@ -8,13 +8,17 @@
 
 #include "erpc_server_setup.h"
 
-#include "test_server.h"
-#include "test_unit_test_common_server.h"
+#include "c_test_server.h"
+#include "c_test_unit_test_common_server.h"
+#include "test_server.hpp"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
 
 #include <stdlib.h>
 #include <string.h>
+
+using namespace erpc;
+using namespace erpcShim;
 
 ArithmeticService_service *svc;
 
@@ -27,7 +31,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
     gapGenericEvent_t *newEvent = (gapGenericEvent_t *)erpc_malloc(sizeof(gapGenericEvent_t));
     switch (event->eventType)
     {
-        case gInternalError_c: {
+        case gInternalError_c:
+        {
             if (event->eventData.internalError.errorCode == gBleSuccess_c &&
                 event->eventData.internalError.errorSource == gHciCommandStatus_c &&
                 event->eventData.internalError.hciCommandOpcode == 5)
@@ -40,7 +45,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
             }
             break;
         }
-        case gRandomAddressReady_c: {
+        case gRandomAddressReady_c:
+        {
             int x = 0xAA;
             int success = 1;
             int i = 0;
@@ -63,7 +69,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
             }
             break;
         }
-        case gWhiteListSizeReady_c: {
+        case gWhiteListSizeReady_c:
+        {
             newEvent->eventType = gTestCaseReturn_c;
             if (100 == event->eventData.whiteListSize)
             {
@@ -78,7 +85,8 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
         case gPublicAddressRead_c:
         case gAdvertisingSetupFailed_c:
         case gAdvTxPowerLevelRead_c:
-        default: {
+        default:
+        {
         }
     }
     return newEvent;
@@ -89,7 +97,8 @@ foo *sendMyFoo(const foo *f)
     foo *newFoo = (foo *)erpc_malloc(sizeof(foo));
     switch (f->discriminator)
     {
-        case apple: {
+        case apple:
+        {
             for (uint32_t i = 0; i < f->bing.myFoobar.rawString.dataLength; ++i)
             {
                 if ((i + 1) != f->bing.myFoobar.rawString.data[i])
@@ -104,7 +113,8 @@ foo *sendMyFoo(const foo *f)
             erpc_free(f->bing.myFoobar.rawString.data);
             break;
         }
-        case banana: {
+        case banana:
+        {
             if ((f->bing.x == 3) && (f->bing.y == 4.0))
             {
                 newFoo->discriminator = papaya;
@@ -119,7 +129,8 @@ foo *sendMyFoo(const foo *f)
             }
             break;
         }
-        case orange: {
+        case orange:
+        {
             for (uint32_t i = 1; i <= f->bing.a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
@@ -136,7 +147,8 @@ foo *sendMyFoo(const foo *f)
             erpc_free(f->bing.a.elements);
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }
@@ -149,7 +161,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
     foo *newFoo = (foo *)erpc_malloc(sizeof(foo));
     switch (discriminator)
     {
-        case apple: {
+        case apple:
+        {
             for (uint32_t i = 0; i < unionVariable->myFoobar.rawString.dataLength; ++i)
             {
                 if ((i + 1) != unionVariable->myFoobar.rawString.data[i])
@@ -163,7 +176,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             newFoo->bing.ret = 0xAA;
             break;
         }
-        case banana: {
+        case banana:
+        {
             if ((unionVariable->x == 3) && (unionVariable->y == 4.0))
             {
                 newFoo->discriminator = papaya;
@@ -178,7 +192,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             }
             break;
         }
-        case orange: {
+        case orange:
+        {
             for (uint32_t i = 1; i <= unionVariable->a.elementsCount; ++i)
             {
                 // If data sent across is incorrect, return 0x55
@@ -194,7 +209,8 @@ foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
             newFoo->bing.ret = 0xAA;
             break;
         }
-        default: {
+        default:
+        {
             break;
         }
     }
@@ -207,6 +223,42 @@ InnerList *testInnerList(const InnerList *il)
     return newList;
 }
 
+class ArithmeticService_server : public ArithmeticService_interface
+{
+public:
+    gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
+    {
+        gapGenericEvent_t *result = NULL;
+        result = ::testGenericCallback(event);
+
+        return result;
+    }
+
+    foo *sendMyFoo(const foo *f)
+    {
+        foo *result = NULL;
+        result = ::sendMyFoo(f);
+
+        return result;
+    }
+
+    foo *sendMyUnion(fruit discriminator, const unionType *unionVariable)
+    {
+        foo *result = NULL;
+        result = ::sendMyUnion(discriminator, unionVariable);
+
+        return result;
+    }
+
+    InnerList *testInnerList(const InnerList *il)
+    {
+        InnerList *result = NULL;
+        result = ::testInnerList(il);
+
+        return result;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add service to server code
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +267,7 @@ void add_services(erpc::SimpleServer *server)
 {
     // define services to add on heap
     // allocate on heap so service doesn't go out of scope at end of method
-    svc = new ArithmeticService_service();
+    svc = new ArithmeticService_service(new ArithmeticService_server());
 
     // add services
     server->addService(svc);
@@ -233,6 +285,7 @@ void remove_services(erpc::SimpleServer *server)
     server->removeService(svc);
     /* Delete unused service
      */
+    delete svc->getHandler();
     delete svc;
 }
 
@@ -252,11 +305,6 @@ void remove_services_from_server(erpc_server_t server)
     destroy_ArithmeticService_service(service_test);
 }
 
-void remove_common_services_from_server(erpc_server_t server, erpc_service_t service)
-{
-    erpc_remove_service_from_server(server, service);
-    destroy_Common_service(service);
-}
 #ifdef __cplusplus
 }
 #endif

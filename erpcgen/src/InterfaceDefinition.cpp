@@ -27,14 +27,9 @@ using namespace std;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-InterfaceDefinition::InterfaceDefinition()
-: m_ast(nullptr)
-, m_globals()
-, m_program(nullptr)
-, m_programName("")
-, m_outputFilename("")
-, m_codec(kNotSpecified)
-, m_idlCrc16(0)
+InterfaceDefinition::InterfaceDefinition() :
+m_ast(nullptr), m_globals(), m_program(nullptr), m_programName(""), m_outputFilename(""),
+m_codec(codec_t::kNotSpecified), m_idlCrc16(0)
 {
     init();
 }
@@ -73,20 +68,20 @@ void InterfaceDefinition::parse(const char *inputFile)
 
 void InterfaceDefinition::createBuiltinTypes()
 {
-    m_globals.addSymbol(new BuiltinType("bool", BuiltinType::_builtin_type::kBoolType));
-    m_globals.addSymbol(new BuiltinType("int8", BuiltinType::_builtin_type::kInt8Type));
-    m_globals.addSymbol(new BuiltinType("int16", BuiltinType::_builtin_type::kInt16Type));
-    m_globals.addSymbol(new BuiltinType("int32", BuiltinType::_builtin_type::kInt32Type));
-    m_globals.addSymbol(new BuiltinType("int64", BuiltinType::_builtin_type::kInt64Type));
-    m_globals.addSymbol(new BuiltinType("uint8", BuiltinType::_builtin_type::kUInt8Type));
-    m_globals.addSymbol(new BuiltinType("uint16", BuiltinType::_builtin_type::kUInt16Type));
-    m_globals.addSymbol(new BuiltinType("uint32", BuiltinType::_builtin_type::kUInt32Type));
-    m_globals.addSymbol(new BuiltinType("uint64", BuiltinType::_builtin_type::kUInt64Type));
-    m_globals.addSymbol(new BuiltinType("float", BuiltinType::_builtin_type::kFloatType));
-    m_globals.addSymbol(new BuiltinType("double", BuiltinType::_builtin_type::kDoubleType));
-    m_globals.addSymbol(new BuiltinType("string", BuiltinType::_builtin_type::kStringType));
-    m_globals.addSymbol(new BuiltinType("ustring", BuiltinType::_builtin_type::kUStringType));
-    m_globals.addSymbol(new BuiltinType("binary", BuiltinType::_builtin_type::kBinaryType));
+    m_globals.addSymbol(new BuiltinType("bool", BuiltinType::builtin_type_t::kBoolType));
+    m_globals.addSymbol(new BuiltinType("int8", BuiltinType::builtin_type_t::kInt8Type));
+    m_globals.addSymbol(new BuiltinType("int16", BuiltinType::builtin_type_t::kInt16Type));
+    m_globals.addSymbol(new BuiltinType("int32", BuiltinType::builtin_type_t::kInt32Type));
+    m_globals.addSymbol(new BuiltinType("int64", BuiltinType::builtin_type_t::kInt64Type));
+    m_globals.addSymbol(new BuiltinType("uint8", BuiltinType::builtin_type_t::kUInt8Type));
+    m_globals.addSymbol(new BuiltinType("uint16", BuiltinType::builtin_type_t::kUInt16Type));
+    m_globals.addSymbol(new BuiltinType("uint32", BuiltinType::builtin_type_t::kUInt32Type));
+    m_globals.addSymbol(new BuiltinType("uint64", BuiltinType::builtin_type_t::kUInt64Type));
+    m_globals.addSymbol(new BuiltinType("float", BuiltinType::builtin_type_t::kFloatType));
+    m_globals.addSymbol(new BuiltinType("double", BuiltinType::builtin_type_t::kDoubleType));
+    m_globals.addSymbol(new BuiltinType("string", BuiltinType::builtin_type_t::kStringType));
+    m_globals.addSymbol(new BuiltinType("ustring", BuiltinType::builtin_type_t::kUStringType));
+    m_globals.addSymbol(new BuiltinType("binary", BuiltinType::builtin_type_t::kBinaryType));
 }
 
 void InterfaceDefinition::setProgramInfo(const string &filename, const string &outputDir, codec_t codec)

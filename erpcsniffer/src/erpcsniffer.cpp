@@ -94,7 +94,7 @@ Available transports (use with -t option):\n\
 class erpcsnifferTool
 {
 protected:
-    enum verbose_type_t
+    enum class verbose_type_t
     {
         kWarning,
         kInfo,
@@ -102,7 +102,7 @@ protected:
         kExtraDebug
     }; /*!< Types of verbose outputs from erpcsniffer application. */
 
-    enum transports_t
+    enum class transports_t
     {
         kNoneTransport,
         kTcpTransport,
@@ -133,22 +133,14 @@ public:
      *
      * Creates the singleton logger instance.
      */
-    erpcsnifferTool(int argc, char *argv[])
-    : m_argc(argc)
-    , m_argv(argv)
-    , m_logger(0)
-    , m_verboseType(kWarning)
-    , m_outputFilePath(NULL)
-    , m_ErpcFile(NULL)
-    , m_transport(kNoneTransport)
-    , m_quantity(10)
-    , m_baudrate(115200)
-    , m_port(NULL)
-    , m_host(NULL)
+    erpcsnifferTool(int argc, char *argv[]) :
+    m_argc(argc), m_argv(argv), m_logger(0), m_verboseType(verbose_type_t::kWarning), m_outputFilePath(NULL),
+    m_ErpcFile(NULL), m_transport(transports_t::kNoneTransport), m_quantity(10), m_baudrate(115200), m_port(NULL),
+    m_host(NULL)
     {
         // create logger instance
         m_logger = new StdoutLogger();
-        m_logger->setFilterLevel(Logger::kWarning);
+        m_logger->setFilterLevel(Logger::log_level_t::kWarning);
         Log::setLogger(m_logger);
     }
 
@@ -185,73 +177,84 @@ public:
         {
             switch (optchar)
             {
-                case '?': {
+                case '?':
+                {
                     printUsage(options);
                     return 0;
                 }
 
-                case 'V': {
+                case 'V':
+                {
                     printf("%s %s\n%s\n", k_toolName, k_version, k_copyright);
                     return 0;
                 }
 
-                case 'o': {
+                case 'o':
+                {
                     m_outputFilePath = optarg;
                     break;
                 }
 
-                case 'v': {
-                    if (m_verboseType != kExtraDebug)
+                case 'v':
+                {
+                    if (m_verboseType != verbose_type_t::kExtraDebug)
                     {
                         m_verboseType = (verbose_type_t)(((int)m_verboseType) + 1);
                     }
                     break;
                 }
 
-                case 'I': {
+                case 'I':
+                {
                     PathSearcher::getGlobalSearcher().addSearchPath(optarg);
                     break;
                 }
 
-                case 't': {
+                case 't':
+                {
                     string transport = optarg;
                     if (transport == "tcp")
                     {
-                        m_transport = kTcpTransport;
+                        m_transport = transports_t::kTcpTransport;
                     }
                     else if (transport == "serial")
                     {
-                        m_transport = kSerialTransport;
+                        m_transport = transports_t::kSerialTransport;
                     }
                     else
                     {
-                        Log::error(format_string("error: unknown transport type %s", transport.c_str()).c_str());
+                        Log::error("error: unknown transport type %s", transport.c_str());
                         return 1;
                     }
                     break;
                 }
 
-                case 'q': {
+                case 'q':
+                {
                     m_quantity = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'b': {
+                case 'b':
+                {
                     m_baudrate = strtoul(optarg, NULL, 10);
                     break;
                 }
 
-                case 'p': {
+                case 'p':
+                {
                     m_port = optarg;
                     break;
                 }
 
-                case 'h': {
+                case 'h':
+                {
                     m_host = optarg;
                     break;
                 }
 
-                default: {
+                default:
+                {
                     Log::error("error: unrecognized option\n\n");
                     printUsage(options);
                     return 0;
@@ -336,7 +339,8 @@ public:
             Transport *_transport;
             switch (m_transport)
             {
-                case kTcpTransport: {
+                case transports_t::kTcpTransport:
+                {
                     uint16_t portNumber = strtoul(m_port, NULL, 10);
                     TCPTransport *tcpTransport = new TCPTransport(m_host, portNumber, true);
                     if (erpc_status_t err = tcpTransport->open())
@@ -347,14 +351,16 @@ public:
                     break;
                 }
 
-                case kSerialTransport: {
+                case transports_t::kSerialTransport:
+                {
                     erpc_transport_t transport = erpc_transport_serial_init(m_port, m_baudrate);
                     _transport = reinterpret_cast<Transport *>(transport);
                     assert(_transport);
                     break;
                 }
 
-                default: {
+                default:
+                {
                     break;
                 }
             }
@@ -363,7 +369,7 @@ public:
             if (def.hasProgramSymbol())
             {
                 Program *program = def.getProgramSymbol();
-                if (program->findAnnotation(CRC_ANNOTATION, Annotation::kC) != nullptr)
+                if (program->findAnnotation(CRC_ANNOTATION, Annotation::program_lang_t::kC) != nullptr)
                 {
                     crc.setCrcStart(def.getIdlCrc16());
                 }
@@ -408,17 +414,17 @@ public:
         // if the user has selected quiet mode, it overrides verbose
         switch (m_verboseType)
         {
-            case kWarning:
-                Log::getLogger()->setFilterLevel(Logger::kWarning);
+            case verbose_type_t::kWarning:
+                Log::getLogger()->setFilterLevel(Logger::log_level_t::kWarning);
                 break;
-            case kInfo:
-                Log::getLogger()->setFilterLevel(Logger::kInfo);
+            case verbose_type_t::kInfo:
+                Log::getLogger()->setFilterLevel(Logger::log_level_t::kInfo);
                 break;
-            case kDebug:
-                Log::getLogger()->setFilterLevel(Logger::kDebug);
+            case verbose_type_t::kDebug:
+                Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug);
                 break;
-            case kExtraDebug:
-                Log::getLogger()->setFilterLevel(Logger::kDebug2);
+            case verbose_type_t::kExtraDebug:
+                Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug2);
                 break;
         }
     }

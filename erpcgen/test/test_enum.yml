@@ -11,7 +11,7 @@ idl: |
     B,
     C
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - if: name
     then:
@@ -38,7 +38,7 @@ idl: |
     B,
     C
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - if: name
     then:
@@ -68,7 +68,7 @@ idl: |
     B = 30,
     C = {c_val}
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - if: name
     then:
@@ -99,7 +99,7 @@ idl: |
   enum {name} {
     A{a_val}{opt_comma}
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - if: name
     then:
@@ -123,7 +123,7 @@ idl: |
     A = 0,
     B = -1
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - if: name
     then:
@@ -148,7 +148,7 @@ idl: |
     D= 1*five,
     E = 2*five,
   }
-test.h:
+test_common.h:
   # named enums get a typedef
   - A = 0
   - B = 5

@@ -31,10 +31,7 @@ public:
      *
      * This function set name to "(void)".
      */
-    VoidType()
-    : DataType("(void)", kVoidType)
-    {
-    }
+    VoidType() : DataType("(void)", data_type_t::kVoidType) {}
 
     /*!
      * @brief This function returns description about the void.

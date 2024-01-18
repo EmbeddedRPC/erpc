@@ -60,13 +60,9 @@ public:
      * @param[in] fileName Name of analyzed file.
      * @param[in] currentFolderPath Path to folder of current file.
      */
-    CurrentFileInfo(std::ifstream *savedFile, const std::string &fileName, const std::string &currentFolderPath)
-    : m_savedFile(savedFile)
-    , m_previous(NULL)
-    , m_line(1)
-    , m_column(0)
-    , m_fileName(fileName)
-    , m_currentFolderPath(currentFolderPath)
+    CurrentFileInfo(std::ifstream *savedFile, const std::string &fileName, const std::string &currentFolderPath) :
+    m_savedFile(savedFile), m_previous(NULL), m_line(1), m_column(0), m_fileName(fileName),
+    m_currentFolderPath(currentFolderPath)
     {
     }
 

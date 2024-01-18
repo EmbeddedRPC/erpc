@@ -13,10 +13,10 @@
 #include "erpc_transport_arbitrator.hpp"
 
 #include "Logging.hpp"
+#include "c_test_secondInterface_server.h"
 #include "myAlloc.hpp"
-#include "test_firstInterface.h"
-#include "test_secondInterface.h"
 #include "unit_test.h"
+#include "unit_test_wrapped.h"
 
 #include <unistd.h>
 
@@ -63,7 +63,6 @@ void increaseWaitQuit()
 {
     Mutex::Guard lock(waitQuitMutex);
     waitQuit++;
-    Mutex::Guard unlock(waitQuitMutex);
 }
 
 void runServer(void *arg)
@@ -84,14 +83,14 @@ void runClient(void *arg)
     while (true)
     {
         isTestPassing = testClient();
-        Mutex::Guard lock(waitQuitMutex);
-        if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
         {
-            enableFirstSide();
-            Mutex::Guard unlock(waitQuitMutex);
-            break;
+            Mutex::Guard lock(waitQuitMutex);
+            if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
+            {
+                enableFirstSide();
+                break;
+            }
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     while (true)
@@ -101,7 +100,6 @@ void runClient(void *arg)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // send to ERPC first (client) app ready to quit state
@@ -118,7 +116,7 @@ int main(int argc, char **argv)
     // create logger instance
     StdoutLogger m_logger;
 
-    m_logger.setFilterLevel(Logger::kInfo);
+    m_logger.setFilterLevel(Logger::log_level_t::kInfo);
 
     Log::setLogger(&m_logger);
 
@@ -146,6 +144,8 @@ int main(int argc, char **argv)
     g_server.setMessageBufferFactory(&g_msgFactory);
     add_services(&g_server);
     g_client->setServer(&g_server);
+    erpc_client_t client = reinterpret_cast<erpc_client_t>(g_client);
+    initInterfaces(client);
 
     err = (erpc_status_t)-1;
 
@@ -164,7 +164,6 @@ int main(int argc, char **argv)
         {
             break;
         }
-        Mutex::Guard unlock(waitQuitMutex);
     }
 
     // Close transport
@@ -181,6 +180,7 @@ int main(int argc, char **argv)
     return isTestPassing;
 }
 
+extern "C" {
 void stopSecondSide()
 {
     ++stopTest;
@@ -207,6 +207,7 @@ void quitFirstInterfaceServer()
 void whenReady()
 {
     waitClient++;
+}
 }
 
 int testClient()

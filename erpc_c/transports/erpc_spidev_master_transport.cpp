@@ -84,10 +84,8 @@ static inline void SpidevMasterTransport_WaitForSlaveReadyMarker(int spi_fd)
 }
 #endif
 
-SpidevMasterTransport::SpidevMasterTransport(const char *spidev, uint32_t speed_Hz)
-: m_spidevHandle(0)
-, m_spidev(spidev)
-, m_speed_Hz(speed_Hz)
+SpidevMasterTransport::SpidevMasterTransport(const char *spidev, uint32_t speed_Hz) :
+m_spidevHandle(0), m_spidev(spidev), m_speed_Hz(speed_Hz)
 {
 }
 
@@ -108,7 +106,7 @@ SpidevMasterTransport::~SpidevMasterTransport(void)
 
 erpc_status_t SpidevMasterTransport::init(void)
 {
-    erpc_status_t status;
+    erpc_status_t status = kErpcStatus_Success;
 
     /* Initialize the SPI device */
     /* Open SPI device file descriptor */
@@ -217,7 +215,7 @@ erpc_status_t SpidevMasterTransport::underlyingReceive(uint8_t *data, uint32_t s
 
     if (ERPC_SPIDEV_STATUS_SUCCESS != spidev_transfer(m_spidevHandle, NULL, data, size))
     {
-        status = kErpcStatus_SendFailed;
+        status = kErpcStatus_ReceiveFailed;
     }
 
     return status;

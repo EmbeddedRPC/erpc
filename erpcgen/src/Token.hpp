@@ -29,13 +29,7 @@ struct token_loc_t
     int m_lastLine;  /*!< Ending line of the token. */
     int m_lastChar;  /*!< Ending character position on ending line. */
 
-    token_loc_t()
-    : m_firstLine(0)
-    , m_firstChar(0)
-    , m_lastLine(0)
-    , m_lastChar(0)
-    {
-    }
+    token_loc_t() : m_firstLine(0), m_firstChar(0), m_lastLine(0), m_lastChar(0) {}
 
     /*!
      * @brief Default copy constructor.
@@ -71,12 +65,7 @@ public:
      * @see Token::Token(int token, Value * value, const token_loc_t & loc)
      * @see Token::Token(const Token & other)
      */
-    explicit Token(int token)
-    : m_token(token)
-    , m_value()
-    , m_location()
-    {
-    }
+    explicit Token(int token) : m_token(token), m_value(), m_location() {}
 
     /*!
      * @brief Constructor.
@@ -91,12 +80,7 @@ public:
      * @see Token::Token(int token, Value * value, const token_loc_t & loc)
      * @see Token::Token(const Token & other)
      */
-    Token(int token, Value *value)
-    : m_token(token)
-    , m_value(value)
-    , m_location()
-    {
-    }
+    Token(int token, Value *value) : m_token(token), m_value(value), m_location() {}
 
     /*!
      * @brief Constructor.
@@ -112,12 +96,7 @@ public:
      * @see Token::Token(int token, Value * value)
      * @see Token::Token(const Token & other)
      */
-    Token(int token, Value *value, const token_loc_t &loc)
-    : m_token(token)
-    , m_value(value)
-    , m_location(loc)
-    {
-    }
+    Token(int token, Value *value, const token_loc_t &loc) : m_token(token), m_value(value), m_location(loc) {}
 
     /*!
      * @brief This function is copy constructor.

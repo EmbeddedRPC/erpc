@@ -21,7 +21,7 @@ idl: |
     myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
   }
 
-test.h:
+test_common.h:
  - not: typedef union unionType unionType;
  - not: union unionType
  - not: int32 x;
@@ -72,7 +72,7 @@ idl: |
     myUnion(fruitType discriminator, unionType unionVariable @discriminator(discriminator)) -> void
   }
 
-test.h:
+test_common.h:
   - typedef union unionType unionType;
   - union unionType
   - "{"
@@ -95,6 +95,8 @@ test.h:
   - int32_t blah;
   - "};"
   - "};"
+
+c_test_client.h:
   - void myUnion(fruitType discriminator, const unionType * unionVariable);
 
 test_client.cpp:
@@ -146,10 +148,12 @@ test_client.cpp:
   - break;
   - "}"
   - "}"
-  - void myUnion(fruitType discriminator, const unionType * unionVariable)
+  - void foo_client::myUnion(fruitType discriminator, const unionType * unionVariable)
   - not: codec->read(static_cast<int32_t>(discriminator));
   - write_unionType_union(codec, static_cast<int32_t>(discriminator), unionVariable)
 
+c_test_server.h:
+  - void myUnion(fruitType discriminator, const unionType * unionVariable);
 
 test_server.cpp:
   - static void read_unionType_union(erpc::Codec * codec, int32_t & discriminator, unionType * data);
@@ -268,14 +272,19 @@ idl: |
     myUnion(structType structVariable) -> void
   }
 
-test.h:
+test_common.h:
   - struct structType
   - fruitType discriminator
   - unionType unionVariable
+
+c_test_client.h:
   - void myUnion(const structType * structVariable);
 
 test_client.cpp:
   - write_unionType_union(codec, static_cast<int32_t>(data->discriminator), &data->unionVariable);
+
+c_test_server.h:
+  - void myUnion(const structType * structVariable);
 
 test_server.cpp:
   - int32_t _tmp_local_i32;

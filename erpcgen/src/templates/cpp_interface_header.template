@@ -1,0 +1,60 @@
+{% if mlComment != "" %}
+{$mlComment}
+
+{% endif %}
+{$commonHeader()}
+
+#if !defined({$interfaceCppGuardMacro})
+#define {$interfaceCppGuardMacro}
+
+#include "{$commonCppHeaderName}"
+{% for iface in group.interfaces %}
+{%  for fn in iface.functions %}
+{%   for externalInterface in fn.externalInterfaces %}
+{%    for interfaceFile in interfacesFiles %}
+{%     if externalInterface == interfaceFile.interfaceName %}
+#include "{$interfaceFile.interfaceCommonFileName}_interface.hpp"
+{%     endif %}
+{%    endfor -- interfacesFiles %}
+{%   endfor -- externalInterface %}
+{%  endfor -- fn %}
+{% endfor -- iface %}
+{$fillNamespaceBegin()}
+{% for iface in group.interfaces %}
+
+// Abstract base class for {$iface.name}
+class {$iface.interfaceClassName}
+{
+    public:
+{%if count(iface.callbacksInt) > 0%}
+{% for cb in iface.callbacksInt%}
+        typedef {$cb.interfaceTypenameName};
+{% endfor %}
+
+{%endif %}
+        static const uint8_t m_serviceId = {$iface.id};
+{% for fn in iface.functions %}
+        static const uint8_t {$getClassFunctionIdName(fn)} = {$fn.id};
+{% endfor -- fn %}
+
+        virtual ~{$iface.interfaceClassName}(void);
+{% for fn in iface.functions if fn.isNonExternalFunction == true %}
+
+{% if fn.mlComment %}
+        {$fn.mlComment}
+{% endif %}
+        virtual {$fn.prototypeInterface} = 0;
+{% endfor -- fn %}
+{% for cb in iface.callbacksInt %}
+
+       static bool get_callbackAddress_{$cb.name}(uint16_t index, {$cb.name} *callback);
+       static bool get_callbackIdx_{$cb.name}(const {$cb.name} *callback, uint16_t &index);
+{% endfor %}
+private:
+{% for cb in iface.callbacksInt %}
+        static {$cb.name} _{$cb.name}[{$count(cb.callbacks)}];
+{% endfor %}
+};
+{% endfor -- iface %}
+{$fillNamespaceEnd()}
+#endif // {$interfaceCppGuardMacro}
