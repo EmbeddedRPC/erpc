@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -191,22 +191,76 @@ erpc_status_t SpiSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
     status_t status;
     spi_transfer_t slaveXfer = { 0 };
     s_isTransferCompleted = false;
+    uint32_t header_size = reserveHeaderSize();
 
+    /* send the header first */
 #ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
     slaveXfer.txData = (uint8_t *)data;
     slaveXfer.rxData = NULL;
-    slaveXfer.dataSize = size;
+    slaveXfer.dataSize = header_size;
     {
 #else
-    uint8_t *spiData = new (nothrow) uint8_t[size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
+    uint8_t *spiData = new (nothrow) uint8_t[header_size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
     if (spiData != NULL)
     {
         spiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
         spiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
-        (void)memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, size);
+        (void)memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data, header_size);
         slaveXfer.txData = spiData;
         slaveXfer.rxData = NULL;
-        slaveXfer.dataSize = size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
+        slaveXfer.dataSize = header_size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
+#endif
+
+        status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);
+
+        if (kStatus_Success == status)
+        {
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            SpiSlaveTransport_NotifyTransferGpioReady();
+#endif
+
+/* wait until the sending is finished */
+#if ERPC_THREADS
+            m_txrxSemaphore.get();
+#else
+            while (!s_isTransferCompleted)
+            {
+            }
+#endif
+
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+            SpiSlaveTransport_NotifyTransferGpioCompleted();
+#endif
+        }
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    }
+#else
+        delete[] spiData;
+    }
+    else
+    {
+        status = kErpcStatus_SendFailed;
+    }
+#endif
+
+    /* send the payload now */
+    s_isTransferCompleted = false;
+
+#ifdef ERPC_BOARD_SPI_SLAVE_READY_USE_GPIO
+    slaveXfer.txData = (uint8_t *)data + header_size;
+    slaveXfer.rxData = NULL;
+    slaveXfer.dataSize = size - header_size;
+    {
+#else
+    uint8_t *spiData = new (nothrow) uint8_t[size - header_size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN];
+    if (spiData != NULL)
+    {
+        spiData[0] = ERPC_BOARD_SPI_SLAVE_READY_MARKER1;
+        spiData[1] = ERPC_BOARD_SPI_SLAVE_READY_MARKER2;
+        (void)memcpy(&spiData[ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN], data + header_size, size - header_size);
+        slaveXfer.txData = spiData;
+        slaveXfer.rxData = NULL;
+        slaveXfer.dataSize = size - header_size + ERPC_BOARD_SPI_SLAVE_READY_MARKER_LEN;
 #endif
 
         status = SPI_SlaveTransferNonBlocking(m_spiBaseAddr, &s_handle, &slaveXfer);

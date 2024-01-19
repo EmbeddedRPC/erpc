@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  *
@@ -615,6 +615,10 @@ Annotation::program_lang_t Generator::getAnnotationLang()
     else if (m_generatorType == generator_type_t::kPython)
     {
         return Annotation::program_lang_t::kPython;
+    }
+    else if (m_generatorType == generator_type_t::kJava)
+    {
+        return Annotation::program_lang_t::kJava;
     }
 
     throw internal_error("Unsupported generator type specified for annotation.");

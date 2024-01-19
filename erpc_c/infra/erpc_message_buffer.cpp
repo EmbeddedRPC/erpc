@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -110,13 +110,17 @@ void MessageBuffer::swap(MessageBuffer *other)
 
 void Cursor::setBuffer(MessageBuffer &buffer, uint8_t reserved)
 {
-    erpc_assert(buffer != NULL);
-
-    m_buffer = buffer;
     // RPMSG when nested calls are enabled can set NULL buffer.
     // erpc_assert(buffer->get() && "Data buffer wasn't set to MessageBuffer.");
     // receive function should return err if it couldn't set data buffer.
-    m_pos = buffer.get() + reserved;
+
+    // erpc_assert(buffer != NULL);
+
+    m_buffer = buffer;
+    if (buffer != NULL)
+    {
+        m_pos = buffer.get() + reserved;
+    }
 }
 
 MessageBuffer Cursor::getBuffer(void)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2015-2016 Freescale Semiconductor, Inc.
-# Copyright 2016-2022 NXP
+# Copyright 2016-2023 NXP
 # Copyright 2022 ACRIOS Systems s.r.o.
 # All rights reserved.
 #
@@ -312,7 +312,7 @@ class LIBUSBSIOSPITransport(FramedTransport):
             #print('SPI received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hSPIPort.Transfer(
-                0, 15, bytes(message[4:]), len(message) - self.HEADER_LEN, 0)
+                0, 15, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0)
         else:
             print('SPI transfer error: %d' % rxbytesnumber)
 
@@ -418,7 +418,7 @@ class LIBUSBSIOI2CTransport(FramedTransport):
             #print('I2C received %d number of bytes' % rxbytesnumber)
             # Send the payload/data
             data, rxbytesnumber = self._hI2CPort.FastXfer(
-                0x7E, bytes(message[4:]), len(message) - self.HEADER_LEN, 0, False, True)
+                0x7E, bytes(message[self.HEADER_LEN:]), len(message) - self.HEADER_LEN, 0, False, True)
         else:
             print('I2C transfer error: %d' % rxbytesnumber)
 

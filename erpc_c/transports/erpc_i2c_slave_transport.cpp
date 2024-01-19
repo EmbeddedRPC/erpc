@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 NXP
+ * Copyright 2021-2023 NXP
  * All rights reserved.
  *
  *
@@ -216,31 +216,51 @@ erpc_status_t I2cSlaveTransport::underlyingSend(const uint8_t *data, uint32_t si
 {
     status_t status;
     s_isTransferCompleted = false;
+    uint32_t header_size = reserveHeaderSize();
 
+    /* send the header first */
     s_callback_user_data.rx_buffer = NULL;
     s_callback_user_data.rx_size = 0;
     s_callback_user_data.tx_buffer = (uint8_t *)data;
-    s_callback_user_data.tx_size = size;
+    s_callback_user_data.tx_size = header_size;
 
+    status =
+        I2C_SlaveTransferNonBlocking(m_i2cBaseAddr, &s_handle, kI2C_SlaveAddressMatchEvent | kI2C_SlaveCompletionEvent);
+    if (kStatus_Success == status)
     {
-        status = I2C_SlaveTransferNonBlocking(m_i2cBaseAddr, &s_handle,
-                                              kI2C_SlaveAddressMatchEvent | kI2C_SlaveCompletionEvent);
-
-        if (kStatus_Success == status)
-        {
-            I2cSlaveTransport_NotifyTransferGpioReady();
+        I2cSlaveTransport_NotifyTransferGpioReady();
 
 /* wait until the sending is finished */
 #if ERPC_THREADS
-            m_txrxSemaphore.get();
+        m_txrxSemaphore.get();
 #else
-            while (!s_isTransferCompleted)
-            {
-            }
+        while (!s_isTransferCompleted)
+        {
+        }
+#endif
+        I2cSlaveTransport_NotifyTransferGpioCompleted();
+    }
+
+    /* send the payload now */
+    s_callback_user_data.tx_buffer = (uint8_t *)data + header_size;
+    s_callback_user_data.tx_size = size - header_size;
+    s_isTransferCompleted = false;
+
+    status =
+        I2C_SlaveTransferNonBlocking(m_i2cBaseAddr, &s_handle, kI2C_SlaveAddressMatchEvent | kI2C_SlaveCompletionEvent);
+    if (kStatus_Success == status)
+    {
+        I2cSlaveTransport_NotifyTransferGpioReady();
+/* wait until the sending is finished */
+#if ERPC_THREADS
+        m_txrxSemaphore.get();
+#else
+        while (!s_isTransferCompleted)
+        {
+        }
 #endif
 
-            I2cSlaveTransport_NotifyTransferGpioCompleted();
-        }
+        I2cSlaveTransport_NotifyTransferGpioCompleted();
     }
 
     return (status != kStatus_Success) ? kErpcStatus_SendFailed : kErpcStatus_Success;

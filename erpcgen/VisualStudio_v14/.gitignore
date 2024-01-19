@@ -24,6 +24,7 @@ py_init.cpp
 py_server.cpp
 py_interface.cpp
 py_global_init.cpp
+java_*.cpp
 
 # win flex-bison files
 data

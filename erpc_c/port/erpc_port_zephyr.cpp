@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 NXP
+ * Copyright 2017-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -12,7 +12,7 @@
 #include <new>
 
 extern "C" {
-#include "kernel.h"
+#include <zephyr/kernel.h>
 };
 
 using namespace std;
