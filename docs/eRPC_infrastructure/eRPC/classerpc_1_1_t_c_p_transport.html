@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -171,6 +171,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a05359d9edebfc10848c15179d977699a">~FramedTransport</a> (void)</td></tr>
 <tr class="memdesc:a05359d9edebfc10848c15179d977699a inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_framed_transport.html" title="Base class for framed transport layers. ">FramedTransport</a> destructor. <br /></td></tr>
 <tr class="separator:a05359d9edebfc10848c15179d977699a inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a33ba31bc23c13ae6e5e1eae783621957">reserveHeaderSize</a> (void) override</td></tr>
+<tr class="memdesc:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of data placed in <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> before serializing eRPC data.  <a href="#a33ba31bc23c13ae6e5e1eae783621957">More...</a><br /></td></tr>
+<tr class="separator:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a43385b8a021f7382c1f8673613b969a4">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message) override</td></tr>
 <tr class="memdesc:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receives an entire message.  <a href="#a43385b8a021f7382c1f8673613b969a4">More...</a><br /></td></tr>
 <tr class="separator:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,9 +183,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a27955c9e5872ebfaf6affaa095426372">setCrc16</a> (<a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *crcImpl) override</td></tr>
 <tr class="memdesc:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions sets the CRC-16 implementation.  <a href="#a27955c9e5872ebfaf6affaa095426372">More...</a><br /></td></tr>
 <tr class="separator:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a422a71461a0448ef39ba2d144e56b077 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a422a71461a0448ef39ba2d144e56b077">getCrc16</a> () override</td></tr>
-<tr class="memdesc:a422a71461a0448ef39ba2d144e56b077 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions gets the CRC-16 object.  <a href="#a422a71461a0448ef39ba2d144e56b077">More...</a><br /></td></tr>
-<tr class="separator:a422a71461a0448ef39ba2d144e56b077 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a2b134c86844d7ae3e6a557ca3ed22881">getCrc16</a> (void) override</td></tr>
+<tr class="memdesc:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions gets the CRC-16 object.  <a href="#a2b134c86844d7ae3e6a557ca3ed22881">More...</a><br /></td></tr>
+<tr class="separator:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classerpc_1_1_transport"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classerpc_1_1_transport')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classerpc_1_1_transport.html">erpc::Transport</a></td></tr>
 <tr class="memitem:af0b6b9c50d238f99de90ccd8b6050c91 inherit pub_methods_classerpc_1_1_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0b6b9c50d238f99de90ccd8b6050c91"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#af0b6b9c50d238f99de90ccd8b6050c91">Transport</a> (void)</td></tr>
@@ -201,16 +204,23 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a5eb8f5ed0b9d7a8691cf09aa962ec82a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#a5eb8f5ed0b9d7a8691cf09aa962ec82a">connectClient</a> (void)</td></tr>
 <tr class="memdesc:a5eb8f5ed0b9d7a8691cf09aa962ec82a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function connect client to the server.  <a href="#a5eb8f5ed0b9d7a8691cf09aa962ec82a">More...</a><br /></td></tr>
 <tr class="separator:a5eb8f5ed0b9d7a8691cf09aa962ec82a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8d68b7622a84df194ed952c4bfbd2a4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#ad8d68b7622a84df194ed952c4bfbd2a4">underlyingReceive</a> (uint8_t *data, uint32_t size)</td></tr>
-<tr class="memdesc:ad8d68b7622a84df194ed952c4bfbd2a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function read data.  <a href="#ad8d68b7622a84df194ed952c4bfbd2a4">More...</a><br /></td></tr>
-<tr class="separator:ad8d68b7622a84df194ed952c4bfbd2a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3775372dfa7de5fe614c02d635cac05a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#a3775372dfa7de5fe614c02d635cac05a">underlyingSend</a> (const uint8_t *data, uint32_t size)</td></tr>
-<tr class="memdesc:a3775372dfa7de5fe614c02d635cac05a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function writes data.  <a href="#a3775372dfa7de5fe614c02d635cac05a">More...</a><br /></td></tr>
-<tr class="separator:a3775372dfa7de5fe614c02d635cac05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e767ff20469dcb8a403fcbaee79d414"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#a4e767ff20469dcb8a403fcbaee79d414">underlyingReceive</a> (uint8_t *data, uint32_t size) override</td></tr>
+<tr class="memdesc:a4e767ff20469dcb8a403fcbaee79d414"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function read data.  <a href="#a4e767ff20469dcb8a403fcbaee79d414">More...</a><br /></td></tr>
+<tr class="separator:a4e767ff20469dcb8a403fcbaee79d414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff725c017fcbb890dbf8ad279639a17e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#aff725c017fcbb890dbf8ad279639a17e">underlyingSend</a> (const uint8_t *data, uint32_t size) override</td></tr>
+<tr class="memdesc:aff725c017fcbb890dbf8ad279639a17e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function writes data.  <a href="#aff725c017fcbb890dbf8ad279639a17e">More...</a><br /></td></tr>
+<tr class="separator:aff725c017fcbb890dbf8ad279639a17e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90b1d79a66b352b70751600e66e0a610"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90b1d79a66b352b70751600e66e0a610"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_t_c_p_transport.html#a90b1d79a66b352b70751600e66e0a610">serverThread</a> (void)</td></tr>
 <tr class="memdesc:a90b1d79a66b352b70751600e66e0a610"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_server.html" title="Based server functionality. ">Server</a> thread function. <br /></td></tr>
 <tr class="separator:a90b1d79a66b352b70751600e66e0a610"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classerpc_1_1_framed_transport"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classerpc_1_1_framed_transport')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classerpc_1_1_framed_transport.html">erpc::FramedTransport</a></td></tr>
+<tr class="memitem:a4f25fe78a85d23b4e371a38a4b638fa5 inherit pro_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a4f25fe78a85d23b4e371a38a4b638fa5">underlyingSend</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message, uint32_t size, uint32_t offset)</td></tr>
+<tr class="memdesc:a4f25fe78a85d23b4e371a38a4b638fa5 inherit pro_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when sending data.  <a href="#a4f25fe78a85d23b4e371a38a4b638fa5">More...</a><br /></td></tr>
+<tr class="separator:a4f25fe78a85d23b4e371a38a4b638fa5 inherit pro_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d007614c08f757c6116f60f8493ba44 inherit pro_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a9d007614c08f757c6116f60f8493ba44">underlyingReceive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message, uint32_t size, uint32_t offset)</td></tr>
+<tr class="memdesc:a9d007614c08f757c6116f60f8493ba44 inherit pro_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when receiving data.  <a href="#a9d007614c08f757c6116f60f8493ba44">More...</a><br /></td></tr>
+<tr class="separator:a9d007614c08f757c6116f60f8493ba44 inherit pro_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -464,7 +474,7 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad8d68b7622a84df194ed952c4bfbd2a4"></a>
+<a class="anchor" id="a4e767ff20469dcb8a403fcbaee79d414"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -491,7 +501,7 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -517,7 +527,7 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a3775372dfa7de5fe614c02d635cac05a"></a>
+<a class="anchor" id="aff725c017fcbb890dbf8ad279639a17e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -544,7 +554,7 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

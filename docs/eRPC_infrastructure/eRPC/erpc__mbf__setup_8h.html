@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -143,20 +143,26 @@ typedef struct ErpcMessageBufferFactory *&#160;</td><td class="memItemRight" val
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">MessageBufferFactory setup</div></td></tr>
-<tr class="memitem:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga62de0ff0c2a0a23dc2f3db8401def661">erpc_mbf_static_init</a> (void)</td></tr>
-<tr class="memdesc:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create MessageBuffer factory which is using static allocated buffers. <br /></td></tr>
-<tr class="separator:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2639cc838ce1a70f6af184a22d5827e3"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga2639cc838ce1a70f6af184a22d5827e3">erpc_mbf_dynamic_init</a> (void)</td></tr>
 <tr class="memdesc:ga2639cc838ce1a70f6af184a22d5827e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create MessageBuffer factory which is using dynamic allocated buffers. <br /></td></tr>
 <tr class="separator:ga2639cc838ce1a70f6af184a22d5827e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa0cb2eed62169677c0b433f65a76eb12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#gaa0cb2eed62169677c0b433f65a76eb12">erpc_mbf_dynamic_deinit</a> (<a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a> mbf)</td></tr>
+<tr class="memdesc:gaa0cb2eed62169677c0b433f65a76eb12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinit MessageBuffer factory.  <a href="group__message__buffer__factory__setup.html#gaa0cb2eed62169677c0b433f65a76eb12">More...</a><br /></td></tr>
+<tr class="separator:gaa0cb2eed62169677c0b433f65a76eb12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga346cc9751b4e2e85da5191e413d799ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga346cc9751b4e2e85da5191e413d799ae">erpc_mbf_rpmsg_init</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
 <tr class="memdesc:ga346cc9751b4e2e85da5191e413d799ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create MessageBuffer factory which is using RPMSG LITE zero copy buffers.  <a href="group__message__buffer__factory__setup.html#ga346cc9751b4e2e85da5191e413d799ae">More...</a><br /></td></tr>
 <tr class="separator:ga346cc9751b4e2e85da5191e413d799ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga84dce9d7f59e6dd4cb9b041edd0abfb7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga84dce9d7f59e6dd4cb9b041edd0abfb7">erpc_mbf_rpmsg_tty_init</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
-<tr class="memdesc:ga84dce9d7f59e6dd4cb9b041edd0abfb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create MessageBuffer factory which is using RPMSG LITE TTY buffers.  <a href="group__message__buffer__factory__setup.html#ga84dce9d7f59e6dd4cb9b041edd0abfb7">More...</a><br /></td></tr>
-<tr class="separator:ga84dce9d7f59e6dd4cb9b041edd0abfb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga47fa72043266948e19dba9ad35dc71be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga47fa72043266948e19dba9ad35dc71be">erpc_mbf_rpmsg_deinit</a> (<a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a> mbf)</td></tr>
+<tr class="memdesc:ga47fa72043266948e19dba9ad35dc71be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinit MessageBuffer factory.  <a href="group__message__buffer__factory__setup.html#ga47fa72043266948e19dba9ad35dc71be">More...</a><br /></td></tr>
+<tr class="separator:ga47fa72043266948e19dba9ad35dc71be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#ga62de0ff0c2a0a23dc2f3db8401def661">erpc_mbf_static_init</a> (void)</td></tr>
+<tr class="memdesc:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create MessageBuffer factory which is using static allocated buffers. <br /></td></tr>
+<tr class="separator:ga62de0ff0c2a0a23dc2f3db8401def661"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf9099aa373a3560e01c9a27139891f14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__message__buffer__factory__setup.html#gaf9099aa373a3560e01c9a27139891f14">erpc_mbf_static_deinit</a> (<a class="el" href="group__message__buffer__factory__setup.html#ga73f8fbab58ca7553109bc98b28e72bf5">erpc_mbf_t</a> mbf)</td></tr>
+<tr class="memdesc:gaf9099aa373a3560e01c9a27139891f14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinit MessageBuffer factory.  <a href="group__message__buffer__factory__setup.html#gaf9099aa373a3560e01c9a27139891f14">More...</a><br /></td></tr>
+<tr class="separator:gaf9099aa373a3560e01c9a27139891f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

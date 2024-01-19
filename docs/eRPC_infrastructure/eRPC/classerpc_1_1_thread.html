@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -138,11 +138,11 @@ typedef void *&#160;</td><td class="memItemRight" valign="bottom"><b>thread_stac
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a5bdd8acf426795e33c858e070ba0e8bb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a5bdd8acf426795e33c858e070ba0e8bb">Thread</a> (const char *name=0)</td></tr>
-<tr class="memdesc:a5bdd8acf426795e33c858e070ba0e8bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor for use with the <a class="el" href="classerpc_1_1_thread.html#a6de54aede9c918938e91dc265f096af1" title="This function initializes thread. ">init()</a> method.  <a href="#a5bdd8acf426795e33c858e070ba0e8bb">More...</a><br /></td></tr>
+<tr class="memdesc:a5bdd8acf426795e33c858e070ba0e8bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor for use with the <a class="el" href="classerpc_1_1_thread.html#a0e28e2310bf5a1d8094cc4d97b9feafe" title="This function initializes thread. ">init()</a> method.  <a href="#a5bdd8acf426795e33c858e070ba0e8bb">More...</a><br /></td></tr>
 <tr class="separator:a5bdd8acf426795e33c858e070ba0e8bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22c6807cf41955a6a9a2ad88c455a245"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a22c6807cf41955a6a9a2ad88c455a245">Thread</a> (<a class="el" href="group__port__threads.html#ga2c28da51e513ff5423a1c6d6aa56fef9">thread_entry_t</a> entry, uint32_t priority=0, uint32_t stackSize=0, const char *name=0, thread_stack_pointer stackPtr=0)</td></tr>
-<tr class="memdesc:a22c6807cf41955a6a9a2ad88c455a245"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a22c6807cf41955a6a9a2ad88c455a245">More...</a><br /></td></tr>
-<tr class="separator:a22c6807cf41955a6a9a2ad88c455a245"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d866b2aa8144387f81304517c437fa0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a5d866b2aa8144387f81304517c437fa0">Thread</a> (<a class="el" href="group__port__threads.html#ga2c28da51e513ff5423a1c6d6aa56fef9">thread_entry_t</a> entry, uint32_t priority=0, uint32_t stackSize=0, const char *name=0, thread_stack_pointer stackPtr=NULL)</td></tr>
+<tr class="memdesc:a5d866b2aa8144387f81304517c437fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a5d866b2aa8144387f81304517c437fa0">More...</a><br /></td></tr>
+<tr class="separator:a5d866b2aa8144387f81304517c437fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1e25588ebe47a2a6d79ef8c686a992b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1e25588ebe47a2a6d79ef8c686a992b"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#af1e25588ebe47a2a6d79ef8c686a992b">~Thread</a> (void)</td></tr>
 <tr class="memdesc:af1e25588ebe47a2a6d79ef8c686a992b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
@@ -153,9 +153,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a0a7bea50b487914f2f2383d731b4306e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a0a7bea50b487914f2f2383d731b4306e">getName</a> (void) const </td></tr>
 <tr class="memdesc:a0a7bea50b487914f2f2383d731b4306e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns name of thread.  <a href="#a0a7bea50b487914f2f2383d731b4306e">More...</a><br /></td></tr>
 <tr class="separator:a0a7bea50b487914f2f2383d731b4306e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6de54aede9c918938e91dc265f096af1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a6de54aede9c918938e91dc265f096af1">init</a> (<a class="el" href="group__port__threads.html#ga2c28da51e513ff5423a1c6d6aa56fef9">thread_entry_t</a> entry, uint32_t priority=0, uint32_t stackSize=0, thread_stack_pointer stackPtr=0)</td></tr>
-<tr class="memdesc:a6de54aede9c918938e91dc265f096af1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function initializes thread.  <a href="#a6de54aede9c918938e91dc265f096af1">More...</a><br /></td></tr>
-<tr class="separator:a6de54aede9c918938e91dc265f096af1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e28e2310bf5a1d8094cc4d97b9feafe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#a0e28e2310bf5a1d8094cc4d97b9feafe">init</a> (<a class="el" href="group__port__threads.html#ga2c28da51e513ff5423a1c6d6aa56fef9">thread_entry_t</a> entry, uint32_t priority=0, uint32_t stackSize=0, thread_stack_pointer stackPtr=NULL)</td></tr>
+<tr class="memdesc:a0e28e2310bf5a1d8094cc4d97b9feafe"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function initializes thread.  <a href="#a0e28e2310bf5a1d8094cc4d97b9feafe">More...</a><br /></td></tr>
+<tr class="separator:a0e28e2310bf5a1d8094cc4d97b9feafe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae9e0fa0c6b9f2a0bd9e2a6fbc43dc56"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_thread.html#aae9e0fa0c6b9f2a0bd9e2a6fbc43dc56">start</a> (void *arg=0)</td></tr>
 <tr class="memdesc:aae9e0fa0c6b9f2a0bd9e2a6fbc43dc56"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function starts thread execution.  <a href="#aae9e0fa0c6b9f2a0bd9e2a6fbc43dc56">More...</a><br /></td></tr>
 <tr class="separator:aae9e0fa0c6b9f2a0bd9e2a6fbc43dc56"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -202,8 +202,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
       </table>
 </div><div class="memdoc">
 
-<p>Default constructor for use with the <a class="el" href="classerpc_1_1_thread.html#a6de54aede9c918938e91dc265f096af1" title="This function initializes thread. ">init()</a> method. </p>
-<p>If this constructor is used, the <a class="el" href="classerpc_1_1_thread.html#a6de54aede9c918938e91dc265f096af1" title="This function initializes thread. ">init()</a> method must be called before the thread can be started.</p>
+<p>Default constructor for use with the <a class="el" href="classerpc_1_1_thread.html#a0e28e2310bf5a1d8094cc4d97b9feafe" title="This function initializes thread. ">init()</a> method. </p>
+<p>If this constructor is used, the <a class="el" href="classerpc_1_1_thread.html#a0e28e2310bf5a1d8094cc4d97b9feafe" title="This function initializes thread. ">init()</a> method must be called before the thread can be started.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>Optional name for the thread. </td></tr>
@@ -213,7 +213,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="a22c6807cf41955a6a9a2ad88c455a245"></a>
+<a class="anchor" id="a5d866b2aa8144387f81304517c437fa0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -245,7 +245,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">thread_stack_pointer&#160;</td>
-          <td class="paramname"><em>stackPtr</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>stackPtr</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -330,7 +330,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="a6de54aede9c918938e91dc265f096af1"></a>
+<a class="anchor" id="a0e28e2310bf5a1d8094cc4d97b9feafe"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -356,7 +356,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">thread_stack_pointer&#160;</td>
-          <td class="paramname"><em>stackPtr</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>stackPtr</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
           <td></td>

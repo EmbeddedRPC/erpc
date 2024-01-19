@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -150,12 +150,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5665c4538484bc71c3571c5ef7a36519"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5665c4538484bc71c3571c5ef7a36519"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>linkWithPeer</b> (<a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html">InterThreadBufferTransport</a> *peer)</td></tr>
 <tr class="separator:a5665c4538484bc71c3571c5ef7a36519"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc8619a2b970c2c5fbdfa7e464b2fbf4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afc8619a2b970c2c5fbdfa7e464b2fbf4">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message)</td></tr>
-<tr class="memdesc:afc8619a2b970c2c5fbdfa7e464b2fbf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype for receiving message.  <a href="#afc8619a2b970c2c5fbdfa7e464b2fbf4">More...</a><br /></td></tr>
-<tr class="separator:afc8619a2b970c2c5fbdfa7e464b2fbf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e3b7c4ff1f0d77c51a0ce39f253758a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a6e3b7c4ff1f0d77c51a0ce39f253758a">send</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message)</td></tr>
-<tr class="memdesc:a6e3b7c4ff1f0d77c51a0ce39f253758a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype for send message.  <a href="#a6e3b7c4ff1f0d77c51a0ce39f253758a">More...</a><br /></td></tr>
-<tr class="separator:a6e3b7c4ff1f0d77c51a0ce39f253758a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57396a8f67fab0798b7b81e52638bc8b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a57396a8f67fab0798b7b81e52638bc8b">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message) override</td></tr>
+<tr class="memdesc:a57396a8f67fab0798b7b81e52638bc8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype for receiving message.  <a href="#a57396a8f67fab0798b7b81e52638bc8b">More...</a><br /></td></tr>
+<tr class="separator:a57396a8f67fab0798b7b81e52638bc8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbe82f3a95dabdb65bbc9b9aec79c2ab"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afbe82f3a95dabdb65bbc9b9aec79c2ab">send</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message) override</td></tr>
+<tr class="memdesc:afbe82f3a95dabdb65bbc9b9aec79c2ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype for send message.  <a href="#afbe82f3a95dabdb65bbc9b9aec79c2ab">More...</a><br /></td></tr>
+<tr class="separator:afbe82f3a95dabdb65bbc9b9aec79c2ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbb893b5e88c6aca094ebae8e0a25504"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acbb893b5e88c6aca094ebae8e0a25504"></a>
 virtual int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>getAvailable</b> (void) const </td></tr>
 <tr class="separator:acbb893b5e88c6aca094ebae8e0a25504"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,6 +168,9 @@ virtual int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>getAvailab
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#a0cb1c4441873bce62f2ef455a6136888">~Transport</a> (void)</td></tr>
 <tr class="memdesc:a0cb1c4441873bce62f2ef455a6136888 inherit pub_methods_classerpc_1_1_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_transport.html" title="Abstract interface for transport layer. ">Transport</a> destructor. <br /></td></tr>
 <tr class="separator:a0cb1c4441873bce62f2ef455a6136888 inherit pub_methods_classerpc_1_1_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3a06be81cec1e1a5e3904d494526449 inherit pub_methods_classerpc_1_1_transport"><td class="memItemLeft" align="right" valign="top">virtual uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#ab3a06be81cec1e1a5e3904d494526449">reserveHeaderSize</a> (void)</td></tr>
+<tr class="memdesc:ab3a06be81cec1e1a5e3904d494526449 inherit pub_methods_classerpc_1_1_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of data placed in <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> before serializing eRPC data.  <a href="#ab3a06be81cec1e1a5e3904d494526449">More...</a><br /></td></tr>
+<tr class="separator:ab3a06be81cec1e1a5e3904d494526449 inherit pub_methods_classerpc_1_1_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#aea4a3b77e476397c2f665e7c9449839a">hasMessage</a> (void)</td></tr>
 <tr class="memdesc:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poll for an incoming message.  <a href="#aea4a3b77e476397c2f665e7c9449839a">More...</a><br /></td></tr>
 <tr class="separator:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,7 +201,7 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Very basic transport to send/receive messages between threads. </p>
-<p>Can send and receive message buffers to/from another instance of the same class associated with another thread. Only one other thread may be communicated with. To set things up first create two instances. Then call the linkWithPeer() method on the first one, passing the second. The two instances of this class do not have to be created on their respective threads, but the <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a6e3b7c4ff1f0d77c51a0ce39f253758a" title="Prototype for send message. ">send()</a> and <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afc8619a2b970c2c5fbdfa7e464b2fbf4" title="Prototype for receiving message. ">receive()</a> calls must be invoked on the appropriate thread.</p>
+<p>Can send and receive message buffers to/from another instance of the same class associated with another thread. Only one other thread may be communicated with. To set things up first create two instances. Then call the linkWithPeer() method on the first one, passing the second. The two instances of this class do not have to be created on their respective threads, but the <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afbe82f3a95dabdb65bbc9b9aec79c2ab" title="Prototype for send message. ">send()</a> and <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a57396a8f67fab0798b7b81e52638bc8b" title="Prototype for receiving message. ">receive()</a> calls must be invoked on the appropriate thread.</p>
 <p>Only a single message may be pending for each of the two threads. If a message is pending for a thread and another is sent, then the sender will block until the currently pending message is received. </p>
 </div><hr/><h2 class="groupheader">Class Documentation</h2>
 <a name="structerpc_1_1_inter_thread_buffer_transport_1_1_shared_state" id="structerpc_1_1_inter_thread_buffer_transport_1_1_shared_state"></a>
@@ -231,7 +234,7 @@ m_mutex</td>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="afc8619a2b970c2c5fbdfa7e464b2fbf4"></a>
+<a class="anchor" id="a57396a8f67fab0798b7b81e52638bc8b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -248,7 +251,7 @@ m_mutex</td>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -267,7 +270,7 @@ m_mutex</td>
 
 </div>
 </div>
-<a class="anchor" id="a6e3b7c4ff1f0d77c51a0ce39f253758a"></a>
+<a class="anchor" id="afbe82f3a95dabdb65bbc9b9aec79c2ab"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -284,7 +287,7 @@ m_mutex</td>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -134,10 +134,13 @@ Inheritance diagram for erpcgen::FunctionBase:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad713a2fa70593eb081524643f82d828d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad713a2fa70593eb081524643f82d828d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#ad713a2fa70593eb081524643f82d828d">FunctionBase</a> ()</td></tr>
-<tr class="memdesc:ad713a2fa70593eb081524643f82d828d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:ad713a2fa70593eb081524643f82d828d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58a9beadd715ca6f85b5a8da9bcb12d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58a9beadd715ca6f85b5a8da9bcb12d3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#a58a9beadd715ca6f85b5a8da9bcb12d3">FunctionBase</a> (<a class="el" href="classerpcgen_1_1_interface.html">Interface</a> *interface)</td></tr>
+<tr class="memdesc:a58a9beadd715ca6f85b5a8da9bcb12d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a58a9beadd715ca6f85b5a8da9bcb12d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae088f79fd8d3b8a90a8f712b6f8d42fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_interface.html">Interface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#ae088f79fd8d3b8a90a8f712b6f8d42fd">getInterface</a> () const </td></tr>
+<tr class="memdesc:ae088f79fd8d3b8a90a8f712b6f8d42fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns parent <a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a>.  <a href="#ae088f79fd8d3b8a90a8f712b6f8d42fd">More...</a><br /></td></tr>
+<tr class="separator:ae088f79fd8d3b8a90a8f712b6f8d42fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8a6e2492aa75830427d2ed324729fd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_struct_type.html">StructType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#ab8a6e2492aa75830427d2ed324729fd8">getParameters</a> ()</td></tr>
 <tr class="memdesc:ab8a6e2492aa75830427d2ed324729fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns function parameters.  <a href="#ab8a6e2492aa75830427d2ed324729fd8">More...</a><br /></td></tr>
 <tr class="separator:ab8a6e2492aa75830427d2ed324729fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,6 +171,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a380aad1a42551c3afe2b7f88105d5254"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20ec91947cd0331e28ff9fa0271c01a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#a20ec91947cd0331e28ff9fa0271c01a2">m_isOneway</a></td></tr>
 <tr class="separator:a20ec91947cd0331e28ff9fa0271c01a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3e7a8b38af590d0fd70d74e70e6595a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_interface.html">Interface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_function_base.html#aa3e7a8b38af590d0fd70d74e70e6595a">m_interface</a></td></tr>
+<tr class="separator:aa3e7a8b38af590d0fd70d74e70e6595a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> base declaration. </p>
@@ -213,6 +218,32 @@ std::string <a class="el" href="classerpcgen_1_1_array_type.html#a84d08ae35140bd
 std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4b7825f73e420d2571" title="This function returns description about the list. ">ListType::getDescription() const</a> </dd></dl>
 
 <p>Implemented in <a class="el" href="classerpcgen_1_1_function.html#af58dcfa0fbd736d1d5ee2c59a38df876">erpcgen::Function</a>, and <a class="el" href="classerpcgen_1_1_function_type.html#a5f017e310777e36404f94bd414b22fc2">erpcgen::FunctionType</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae088f79fd8d3b8a90a8f712b6f8d42fd"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classerpcgen_1_1_interface.html">Interface</a>* erpcgen::FunctionBase::getInterface </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function returns parent <a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>parent <a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a>. </dd></dl>
 
 </div>
 </div>
@@ -391,6 +422,27 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="aa3e7a8b38af590d0fd70d74e70e6595a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classerpcgen_1_1_interface.html">Interface</a>* erpcgen::FunctionBase::m_interface</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Parent interface. </p>
+
+</div>
+</div>
 <a class="anchor" id="a20ec91947cd0331e28ff9fa0271c01a2"></a>
 <div class="memitem">
 <div class="memproto">

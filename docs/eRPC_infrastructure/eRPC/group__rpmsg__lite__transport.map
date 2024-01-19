@@ -1,26 +1,26 @@
 <map id="RPMsg&#45;Lite" name="RPMsg&#45;Lite">
-<area shape="rect" id="node1" href="$group__transports.html" title="Transport layer classes. " alt="" coords="5,604,124,631"/>
-<area shape="rect" id="node2" href="$group__dspi__slave__transport.html" title="MCUXpressoSDK DSPI slave driver transport. " alt="" coords="503,21,590,48"/>
-<area shape="rect" id="node3" href="$group__i2c__slave__transport.html" title="MCUXpressoSDK I2C slave driver transport. " alt="" coords="509,72,585,99"/>
-<area shape="rect" id="node4" href="$group__port__threads.html" title="Threading model. " alt="" coords="513,123,581,149"/>
-<area shape="rect" id="node5" href="$group__mu__transport.html" title="Messaging Unit transport. " alt="" coords="491,173,603,200"/>
-<area shape="rect" id="node6" href="$group__tcp__transport.html" title="Simple TCP/IP transport. " alt="" coords="515,224,578,251"/>
-<area shape="rect" id="node7" href="$group__infra__client.html" title="Client classes. " alt="" coords="519,275,574,301"/>
-<area shape="rect" id="node8" href="$group__infra__transport.html" title="Superclasses for building transports. " alt="" coords="505,325,588,352"/>
-<area shape="rect" id="node9" href="$group__serial__transport.html" title="POSIX and Win32 serial port transport. " alt="" coords="506,376,587,403"/>
-<area shape="rect" id="node10" href="$group__infra__utility.html" title="Utility code used by the infrastructure. " alt="" coords="514,427,579,453"/>
-<area shape="rect" id="node11" href="$group__spi__slave__transport.html" title="MCUXpressoSDK SPI slave driver transport. " alt="" coords="507,477,586,504"/>
-<area shape="rect" id="node12" href="$group__uart__transport.html" title="CMSIS UART driver transport. " alt="" coords="496,528,597,555"/>
-<area shape="rect" id="node13" href="$group__spidev__master__transport.html" title="SPIdev Linux transport. " alt="" coords="476,579,617,605"/>
-<area shape="rect" id="node14" href="$group__spi__master__transport.html" title="MCUXpressoSDK SPI master driver transport. " alt="" coords="503,629,590,656"/>
-<area shape="rect" id="node15" href="$group__rpmsg__tty__rtos__transport.html" title="RPMsg TTY RTOS transport. " alt="" coords="481,680,612,707"/>
-<area shape="rect" id="node16" href="$group__infra__server.html" title="Server classes. " alt="" coords="517,731,576,757"/>
-<area shape="rect" id="node17" href="$group__lpi2c__slave__transport.html" title="Lpi2c_slave_transport" alt="" coords="473,781,620,808"/>
-<area shape="rect" id="node18" href="$group__itbp__transport.html" title="Simple inter&#45;thread communications transport. " alt="" coords="503,832,590,859"/>
-<area shape="rect" id="node19" href="$group__dspi__master__transport.html" title="MCUXpressoSDK DSPI master driver transport. " alt="" coords="499,883,595,909"/>
-<area shape="rect" id="node20" href="$group___u_s_b___c_d_c__transport.html" title="USB CDC transport. " alt="" coords="507,933,587,960"/>
-<area shape="rect" id="node21" href="$group__infra__codec.html" title="Classes used for message serialization. " alt="" coords="500,984,593,1011"/>
-<area shape="rect" id="node22" href="$group__rpmsg__lite__rtos__transport.html" title="RPMsg&#45;Lite zero copy transport using RTOS API. " alt="" coords="482,1043,611,1069"/>
-<area shape="rect" id="node24" href="$group__port__setup__extensions.html" title="Extension setup functions. " alt="" coords="487,1101,606,1128"/>
-<area shape="rect" id="node25" href="$group__lpspi__slave__transport.html" title="Lpspi_slave_transport" alt="" coords="473,1152,620,1179"/>
+<area shape="rect" id="node1" href="$group__transports.html" title="Transport layer classes. " alt="" coords="5,599,124,625"/>
+<area shape="rect" id="node2" href="$group__dspi__slave__transport.html" title="MCUXpressoSDK DSPI slave driver transport. " alt="" coords="449,16,535,43"/>
+<area shape="rect" id="node3" href="$group__i2c__slave__transport.html" title="MCUXpressoSDK I2C slave driver transport. " alt="" coords="454,67,530,93"/>
+<area shape="rect" id="node4" href="$group__port__threads.html" title="Threading model. " alt="" coords="458,117,526,144"/>
+<area shape="rect" id="node5" href="$group__mu__transport.html" title="Messaging Unit transport. " alt="" coords="436,168,548,195"/>
+<area shape="rect" id="node6" href="$group__tcp__transport.html" title="Simple TCP/IP transport. " alt="" coords="461,219,523,245"/>
+<area shape="rect" id="node7" href="$group__infra__client.html" title="Client classes. " alt="" coords="465,269,519,296"/>
+<area shape="rect" id="node8" href="$group__infra__transport.html" title="Superclasses for building transports. " alt="" coords="451,320,533,347"/>
+<area shape="rect" id="node9" href="$group__serial__transport.html" title="POSIX and Win32 serial port transport. " alt="" coords="451,371,533,397"/>
+<area shape="rect" id="node10" href="$group__infra__utility.html" title="Utility code used by the infrastructure. " alt="" coords="459,421,525,448"/>
+<area shape="rect" id="node11" href="$group__spi__slave__transport.html" title="MCUXpressoSDK SPI slave driver transport. " alt="" coords="453,472,531,499"/>
+<area shape="rect" id="node12" href="$group__uart__transport.html" title="CMSIS UART driver transport. " alt="" coords="441,523,543,549"/>
+<area shape="rect" id="node13" href="$group__spidev__master__transport.html" title="SPIdev Linux transport. " alt="" coords="421,573,563,600"/>
+<area shape="rect" id="node14" href="$group__spi__master__transport.html" title="MCUXpressoSDK SPI master driver transport. " alt="" coords="449,624,535,651"/>
+<area shape="rect" id="node15" href="$group__rpmsg__tty__rtos__transport.html" title="RPMsg TTY RTOS transport. " alt="" coords="427,675,557,701"/>
+<area shape="rect" id="node16" href="$group__infra__server.html" title="Server classes. " alt="" coords="463,725,521,752"/>
+<area shape="rect" id="node17" href="$group__lpi2c__slave__transport.html" title="Lpi2c_slave_transport" alt="" coords="419,776,565,803"/>
+<area shape="rect" id="node18" href="$group__itbp__transport.html" title="Simple inter&#45;thread communications transport. " alt="" coords="449,827,535,853"/>
+<area shape="rect" id="node19" href="$group__dspi__master__transport.html" title="MCUXpressoSDK DSPI master driver transport. " alt="" coords="444,877,540,904"/>
+<area shape="rect" id="node20" href="$group___u_s_b___c_d_c__transport.html" title="USB CDC transport. " alt="" coords="452,928,532,955"/>
+<area shape="rect" id="node21" href="$group__infra__codec.html" title="Classes used for message serialization. " alt="" coords="445,979,539,1005"/>
+<area shape="rect" id="node22" href="$group__rpmsg__lite__rtos__transport.html" title="RPMsg&#45;Lite zero copy transport using RTOS API. " alt="" coords="427,1037,557,1064"/>
+<area shape="rect" id="node24" href="$group__port__setup__extensions.html" title="Extension setup functions. " alt="" coords="433,1096,551,1123"/>
+<area shape="rect" id="node25" href="$group__lpspi__slave__transport.html" title="Lpspi_slave_transport" alt="" coords="419,1147,565,1173"/>
 </map>

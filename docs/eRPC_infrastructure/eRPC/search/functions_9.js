@@ -1,10 +1,7 @@
 var searchData=
 [
-  ['messagebuffer',['MessageBuffer',['../classerpc_1_1_message_buffer.html#ada32e828c2edcd3546376d4d3ee90081',1,'erpc::MessageBuffer::MessageBuffer(void)'],['../classerpc_1_1_message_buffer.html#a7785b972a2ed8719a7afcd8f15c1b3ca',1,'erpc::MessageBuffer::MessageBuffer(uint8_t *buffer, uint16_t length)']]],
-  ['messagebufferfactory',['MessageBufferFactory',['../classerpc_1_1_message_buffer_factory.html#a619ed494036f760b0394b43815f2a086',1,'erpc::MessageBufferFactory']]],
-  ['messagelogger',['MessageLogger',['../classerpc_1_1_message_logger.html#ae6317cf8f4c10faa57b5ba834d136fe6',1,'erpc::MessageLogger']]],
-  ['messageloggers',['MessageLoggers',['../classerpc_1_1_message_loggers.html#ac1fcb4e780a1868303e31422ae2d3d0c',1,'erpc::MessageLoggers']]],
-  ['mu_5firq_5fcallback',['mu_irq_callback',['../classerpc_1_1_m_u_transport.html#aa2cc9aad8e99fb873ef142426d10a7be',1,'erpc::MUTransport']]],
-  ['mutex',['Mutex',['../classerpc_1_1_mutex.html#a00b2ff557451955a905ecdca2855389b',1,'erpc::Mutex']]],
-  ['mutransport',['MUTransport',['../classerpc_1_1_m_u_transport.html#a27300b08ba409b3d249055f80544ac13',1,'erpc::MUTransport']]]
+  ['lock',['lock',['../classerpc_1_1_mutex.html#a23dc76a396337f3f29f8ad4239c46658',1,'erpc::Mutex']]],
+  ['logmessage',['logMessage',['../classerpc_1_1_message_loggers.html#adb7e3cf37abdbbaab9ab6ed686415302',1,'erpc::MessageLoggers']]],
+  ['lpi2cslavetransport',['LPI2cSlaveTransport',['../classerpc_1_1_l_p_i2c_slave_transport.html#a6a631827134882ff1ee539fd4ab3f4fd',1,'erpc::LPI2cSlaveTransport']]],
+  ['lpspislavetransport',['LPSpiSlaveTransport',['../classerpc_1_1_l_p_spi_slave_transport.html#a97a11e73518ffe35cdeb3d51c98a5d13',1,'erpc::LPSpiSlaveTransport']]]
 ];

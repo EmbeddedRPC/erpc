@@ -2,8 +2,9 @@ var classerpcgen_1_1_generator =
 [
     [ "datatype_vector_t", "classerpcgen_1_1_generator.html#aac14e41bce876c761f554176a9b00203", null ],
     [ "generator_type_t", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bf", [
-      [ "kC", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bfa1ac243a744f2be90da38a1ac180461ed", null ],
-      [ "kPython", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bface5321e211fef91206e95a1b95a372d1", null ]
+      [ "kC", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bfaf73b7a14626c25aa554e2437ea3fc1df", null ],
+      [ "kPython", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bfa488cf4fe1b755336998076c2a5ca7cfa", null ],
+      [ "kJava", "classerpcgen_1_1_generator.html#a73e608ae6849a141197d12d73b94e1bfac2d418337f7fcde600c82f8b310295c8", null ]
     ] ],
     [ "Generator", "classerpcgen_1_1_generator.html#a20b0c4225f24c61fb9d1ba5bfae3308d", null ],
     [ "~Generator", "classerpcgen_1_1_generator.html#a8967776f04f7894136cff8ea30eed6ab", null ],
@@ -22,8 +23,11 @@ var classerpcgen_1_1_generator =
     [ "getAnnStringValue", "classerpcgen_1_1_generator.html#a0f388effab62bbe453a0a2789ca8be3e", null ],
     [ "getAnnValue", "classerpcgen_1_1_generator.html#a9da9e69c5c5169d715db7534093639a6", null ],
     [ "getDataTypesFromSymbolScope", "classerpcgen_1_1_generator.html#a91fcb350eab3a0fd1ee8d388452f378d", null ],
+    [ "getFunctionPrototype", "classerpcgen_1_1_generator.html#af3d9ce58e13a92f04dbabda56e72c949", null ],
     [ "getFunctionTemplateData", "classerpcgen_1_1_generator.html#aaea7b9a3157ee0246e97ec78cbd88d23", null ],
+    [ "getFunctionTypeTemplateData", "classerpcgen_1_1_generator.html#adf5e0dd5aeaa4d6b65485ddd97afaab5", null ],
     [ "getGroupByName", "classerpcgen_1_1_generator.html#a2c168ddae0ecede4131afd9d7881a1c5", null ],
+    [ "getGroupCommonFileName", "classerpcgen_1_1_generator.html#a907ad00cb1f62fc1d13d2dc3be9d28f9", null ],
     [ "getOutputName", "classerpcgen_1_1_generator.html#ad9248c9805e956ae0176ad4bcc302bcd", null ],
     [ "getTime", "classerpcgen_1_1_generator.html#a4d3777837dd875dd3d462ced226b3e30", null ],
     [ "isMemberDataTypeUsingForwardDeclaration", "classerpcgen_1_1_generator.html#abca9eb93f49923bccb75756345ce8733", null ],

@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('erpc__framed__transport_8hpp.html','')
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="erpc__framed__transport_8hpp__dep__incl.svg" width="2515" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="erpc__framed__transport_8hpp__dep__incl.svg" width="2910" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div>
@@ -160,15 +160,21 @@ Classes</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Class Members</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a16cd1cdb5099f7bfad5e4ebe6020bf59"></a>uint16_t</td>
+<td class="fieldname">
+m_crcHeader</td>
+<td class="fielddoc">
+CRC-16 over this header structure data. </td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a2d1167a8481639bb57198ee8e4470749"></a>uint16_t</td>
 <td class="fieldname">
 m_messageSize</td>
 <td class="fielddoc">
 Size in bytes of the message, excluding the header. </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="aea0866f65f3441d290076833c9cdae19"></a>uint16_t</td>
+<a class="anchor" id="a8fc8fb5d250b5539380317961380e6d9"></a>uint16_t</td>
 <td class="fieldname">
-m_crc</td>
+m_crcBody</td>
 <td class="fielddoc">
 CRC-16 over the message data. </td></tr>
 </table>

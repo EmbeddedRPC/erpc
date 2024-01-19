@@ -1,8 +1,8 @@
 var classerpc_1_1_message_buffer =
 [
-    [ "Cursor", "classerpc_1_1_message_buffer_1_1_cursor.html", "classerpc_1_1_message_buffer_1_1_cursor" ],
     [ "MessageBuffer", "classerpc_1_1_message_buffer.html#ada32e828c2edcd3546376d4d3ee90081", null ],
     [ "MessageBuffer", "classerpc_1_1_message_buffer.html#a7785b972a2ed8719a7afcd8f15c1b3ca", null ],
+    [ "MessageBuffer", "classerpc_1_1_message_buffer.html#a292834bab301b933d79a5a77a37ab5fb", null ],
     [ "set", "classerpc_1_1_message_buffer.html#ae68c8d9c1ded075f6a85ecd92fb958be", null ],
     [ "get", "classerpc_1_1_message_buffer.html#adb0539e7fbd649e0902efb61b7b7cf6b", null ],
     [ "get", "classerpc_1_1_message_buffer.html#aab101146fdec5df33e7bdf7608dddcef", null ],

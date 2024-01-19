@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -90,6 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
       <li><a href="functions.html#index_a"><span>a</span></a></li>
+      <li><a href="functions_b.html#index_b"><span>b</span></a></li>
       <li><a href="functions_c.html#index_c"><span>c</span></a></li>
       <li><a href="functions_d.html#index_d"><span>d</span></a></li>
       <li><a href="functions_f.html#index_f"><span>f</span></a></li>
@@ -146,16 +147,12 @@ $(document).ready(function(){initNavTree('functions_r.html','');});
 <li>read()
 : <a class="el" href="classerpc_1_1_basic_codec.html#a075e3e213224ebe0e3a261a24edbe6ef">erpc::BasicCodec</a>
 , <a class="el" href="classerpc_1_1_codec.html#a4c454256c5fbee7af0d787b196cdf634">erpc::Codec</a>
-, <a class="el" href="classerpc_1_1_message_buffer_1_1_cursor.html#a13613fadb3bb88585f5802ff845259a4">erpc::MessageBuffer::Cursor</a>
+, <a class="el" href="classerpc_1_1_cursor.html#a2f5dd6199b5c6f06622286c4c63b614a">erpc::Cursor</a>
 , <a class="el" href="classerpc_1_1_message_buffer.html#a046c0aa6baf607d5de23f18cfa13f08e">erpc::MessageBuffer</a>
 </li>
 <li>readBinary()
 : <a class="el" href="classerpc_1_1_basic_codec.html#aed673eaca5c768f28c419990c86820c3">erpc::BasicCodec</a>
 , <a class="el" href="classerpc_1_1_codec.html#aa34f455f56b11c83993cc4fe2be52af8">erpc::Codec</a>
-</li>
-<li>readCallback()
-: <a class="el" href="classerpc_1_1_basic_codec.html#af81ce3b25d504b1841d3cfa91277c63b">erpc::BasicCodec</a>
-, <a class="el" href="classerpc_1_1_codec.html#a3f7eedc7d95818b93c8ac1d2948015de">erpc::Codec</a>
 </li>
 <li>readData()
 : <a class="el" href="classerpc_1_1_basic_codec.html#a6f2abb34bfd874ad8ea64537caf8236f">erpc::BasicCodec</a>
@@ -177,12 +174,11 @@ $(document).ready(function(){initNavTree('functions_r.html','');});
 </li>
 <li>receive()
 : <a class="el" href="classerpc_1_1_framed_transport.html#a43385b8a021f7382c1f8673613b969a4">erpc::FramedTransport</a>
-, <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afc8619a2b970c2c5fbdfa7e464b2fbf4">erpc::InterThreadBufferTransport</a>
-, <a class="el" href="classerpc_1_1_m_u_transport.html#a781435aad523645be3034460ac8631dc">erpc::MUTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#ac18d51ff2ba19c8373f5f9dd9f7ca8fe">erpc::RPMsgLinuxTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#adaaccd23d645603b560482de2c016d71">erpc::RPMsgRTOSTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#accaaae7170e9b1ae42a4cdf1b2213583">erpc::RPMsgTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#ab3e7d041fb640421c52236918c1698d5">erpc::RPMsgTTYRTOSTransport</a>
+, <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a57396a8f67fab0798b7b81e52638bc8b">erpc::InterThreadBufferTransport</a>
+, <a class="el" href="classerpc_1_1_m_u_transport.html#ab443ab2af135f9d7f5820c25703ad86c">erpc::MUTransport</a>
+, <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#a8ad10fc24ba78dd0dc244026d6776812">erpc::RPMsgLinuxTransport</a>
+, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#af56bcf609a9fbaf7573c4f8ef1227e40">erpc::RPMsgRTOSTransport</a>
+, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a521dd7cc6e5c11ab4dd11350d9d352ce">erpc::RPMsgTransport</a>
 , <a class="el" href="classerpc_1_1_transport.html#a3f886733620e1a2fe00d12f36711dde5">erpc::Transport</a>
 , <a class="el" href="classerpc_1_1_transport_arbitrator.html#a429fdc3fd0e8647a1875cc672cbaf3d5">erpc::TransportArbitrator</a>
 </li>
@@ -198,8 +194,13 @@ $(document).ready(function(){initNavTree('functions_r.html','');});
 <li>RequestContext()
 : <a class="el" href="classerpc_1_1_request_context.html#aafeb0f6cde1276d5f372c3dcfec7f507">erpc::RequestContext</a>
 </li>
+<li>reserveHeaderSize()
+: <a class="el" href="classerpc_1_1_framed_transport.html#a33ba31bc23c13ae6e5e1eae783621957">erpc::FramedTransport</a>
+, <a class="el" href="classerpc_1_1_transport.html#ab3a06be81cec1e1a5e3904d494526449">erpc::Transport</a>
+, <a class="el" href="classerpc_1_1_transport_arbitrator.html#ac4f4e50a5a831d828fcae53be7f5cbe3">erpc::TransportArbitrator</a>
+</li>
 <li>reset()
-: <a class="el" href="classerpc_1_1_codec.html#a5ee5a1d8930812d4256201bde6390bf3">erpc::Codec</a>
+: <a class="el" href="classerpc_1_1_codec.html#a9a1b03a0b9d56eed6f8caf22432706f7">erpc::Codec</a>
 </li>
 <li>rpmsg_read_cb()
 : <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a218c8710c2a9b3aa9226ba0471322718">erpc::RPMsgTransport</a>
@@ -215,9 +216,6 @@ $(document).ready(function(){initNavTree('functions_r.html','');});
 </li>
 <li>RPMsgTransport()
 : <a class="el" href="classerpc_1_1_r_p_msg_transport.html#ae361cc53021d8286ac7b0ca9ff87b5ea">erpc::RPMsgTransport</a>
-</li>
-<li>RPMsgTTYMessageBufferFactory()
-: <a class="el" href="class_r_p_msg_t_t_y_message_buffer_factory.html#a43f0cec255cd28dffd4d834aa0062437">RPMsgTTYMessageBufferFactory</a>
 </li>
 <li>RPMsgTTYRTOSTransport()
 : <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a1e4b22999bd5dd423973050e4175a420">erpc::RPMsgTTYRTOSTransport</a>

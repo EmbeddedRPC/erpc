@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -85,7 +85,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
       <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
-      <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
     </ul>
   </div>
   <div id="navrow4" class="tabs3">
@@ -101,13 +100,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_h.html#index_h"><span>h</span></a></li>
       <li><a href="functions_i.html#index_i"><span>i</span></a></li>
       <li><a href="functions_j.html#index_j"><span>j</span></a></li>
-      <li><a href="functions_k.html#index_k"><span>k</span></a></li>
       <li><a href="functions_l.html#index_l"><span>l</span></a></li>
       <li><a href="functions_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_n.html#index_n"><span>n</span></a></li>
       <li><a href="functions_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_p.html#index_p"><span>p</span></a></li>
-      <li><a href="functions_q.html#index_q"><span>q</span></a></li>
       <li><a href="functions_r.html#index_r"><span>r</span></a></li>
       <li><a href="functions_s.html#index_s"><span>s</span></a></li>
       <li><a href="functions_t.html#index_t"><span>t</span></a></li>
@@ -154,13 +151,22 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 <li>generate()
 : <a class="el" href="classerpcgen_1_1_c_generator.html#a589d69d0df767b542f8edd1efa642b22">erpcgen::CGenerator</a>
 , <a class="el" href="classerpcgen_1_1_generator.html#ac0f9c23d8eafcdcf87af6ff311766811">erpcgen::Generator</a>
+, <a class="el" href="classerpcgen_1_1_java_generator.html#a9dfd56f6fa3e6779ad6ab8a97b7ef08f">erpcgen::JavaGenerator</a>
 , <a class="el" href="classerpcgen_1_1_python_generator.html#a5965f9a8c7980ec7174cc2a7f4216019">erpcgen::PythonGenerator</a>
 </li>
 <li>generateClientFile()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a2089e01eceb16260cc331687cceddfaa">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#ac1571701ae26da68ae91aa06ea11c9ec">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a2089e01eceb16260cc331687cceddfaa">erpcgen::PythonGenerator</a>
 </li>
 <li>generateCommonFile()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a72086513216a45445c5a5a8c4a76c46f">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a42c44cff7639840dbf055742fd343cd8">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a72086513216a45445c5a5a8c4a76c46f">erpcgen::PythonGenerator</a>
+</li>
+<li>generateConstFile()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a70c56e791dbbe340c5c3c8c50997509a">erpcgen::JavaGenerator</a>
+</li>
+<li>generateEnumFiles()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a6b9281ff352c5dc84e449f6b534fdd1d">erpcgen::JavaGenerator</a>
 </li>
 <li>generateGlobalInitFile()
 : <a class="el" href="classerpcgen_1_1_python_generator.html#a9eacc3582abb3ecba72ad9acbf3320d3">erpcgen::PythonGenerator</a>
@@ -172,23 +178,29 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classerpcgen_1_1_python_generator.html#a6be8642a52699e67a25cc871eaad71d4">erpcgen::PythonGenerator</a>
 </li>
 <li>generateInterfaceFile()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a8a6db075f452a06cc42bf6fe690c22c9">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a99d359582c8d0beb1ab688fc694f256a">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a8a6db075f452a06cc42bf6fe690c22c9">erpcgen::PythonGenerator</a>
 </li>
 <li>generateOutputFile()
 : <a class="el" href="classerpcgen_1_1_generator.html#a2361005441df20adab606197c72d3ccd">erpcgen::Generator</a>
 </li>
 <li>generateOutputFiles()
 : <a class="el" href="classerpcgen_1_1_generator.html#a04a8c839676144808195e21e6153729d">erpcgen::Generator</a>
+, <a class="el" href="classerpcgen_1_1_java_generator.html#a5234f598283b426da6b41904e8672e57">erpcgen::JavaGenerator</a>
 , <a class="el" href="classerpcgen_1_1_python_generator.html#a62823e0d7875b978cf29543dafe60b5a">erpcgen::PythonGenerator</a>
 </li>
 <li>generateServerFile()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a93a809338bbbf64d52d77a356571ac98">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#ae22f77d05a51aa8d0a83d59eea44d396">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a93a809338bbbf64d52d77a356571ac98">erpcgen::PythonGenerator</a>
+</li>
+<li>generateStructFiles()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#af409a6252f5559f1934528523a63de13">erpcgen::JavaGenerator</a>
 </li>
 <li>Generator()
 : <a class="el" href="classerpcgen_1_1_generator.html#a20b0c4225f24c61fb9d1ba5bfae3308d">erpcgen::Generator</a>
 </li>
 <li>get()
-: <a class="el" href="classsmart__ptr.html#ad0c2a080cd6a6e5f4196fa847b93e28e">smart_ptr&lt; T, delete_policy &gt;</a>
+: <a class="el" href="classsmart__ptr.html#ae6d32c0876260a672fc0348baf8ed1b9">smart_ptr&lt; T, delete_policy &gt;</a>
 </li>
 <li>getAnnotationLang()
 : <a class="el" href="classerpcgen_1_1_generator.html#a0d5a57e18b09ac92a911616a569c58d4">erpcgen::Generator</a>
@@ -215,11 +227,18 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 <li>getAttribute()
 : <a class="el" href="classerpcgen_1_1_ast_node.html#abbb9fcfb549677f64e71b3345b17ef53">erpcgen::AstNode</a>
 </li>
+<li>getBuiltinCodecTypeName()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a777b702e9106a716b088aa09910636c1">erpcgen::JavaGenerator</a>
+</li>
+<li>getBuiltinObjectTypename()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#ae833d8fd116b4858f9347ebc1f448a46">erpcgen::JavaGenerator</a>
+</li>
 <li>getBuiltinType()
-: <a class="el" href="classerpcgen_1_1_builtin_type.html#a2f067a043464e7157495a8f29d62899e">erpcgen::BuiltinType</a>
+: <a class="el" href="classerpcgen_1_1_builtin_type.html#a675a4003b70e7f54616e95ca12cbe2dc">erpcgen::BuiltinType</a>
 </li>
 <li>getBuiltinTypename()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a8cc74c4d08efa3629983131b0037f085">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a985cfe5735bec924ae8f16c361b4aba1">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a8cc74c4d08efa3629983131b0037f085">erpcgen::PythonGenerator</a>
 </li>
 <li>getCallbackFuns()
 : <a class="el" href="classerpcgen_1_1_function_type.html#a671559bb774ffbff5125024dfd448189">erpcgen::FunctionType</a>
@@ -276,7 +295,7 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 , <a class="el" href="classerpcgen_1_1_void_type.html#a56a37821b5805994481b41b84e37981a">erpcgen::VoidType</a>
 </li>
 <li>getDirection()
-: <a class="el" href="classerpcgen_1_1_struct_member.html#ac3937669079891a709583eaf5b3523ee">erpcgen::StructMember</a>
+: <a class="el" href="classerpcgen_1_1_struct_member.html#abd5b4104523394e6a73a9c26f5ba5528">erpcgen::StructMember</a>
 </li>
 <li>getDiscriminatorName()
 : <a class="el" href="classerpcgen_1_1_union_type.html#a24ba483c24634b07d88677d775e72fcb">erpcgen::UnionType</a>
@@ -290,7 +309,8 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 , <a class="el" href="classerpcgen_1_1_list_type.html#a4a6243a52627f44bc40761b794c3d17b">erpcgen::ListType</a>
 </li>
 <li>getEnumMembersTemplateData()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a2af3aec5e6e3fee1417287f4c12c5cfc">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a2ab761d9aaed5ffd2c3b1de6c94b3922">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a2af3aec5e6e3fee1417287f4c12c5cfc">erpcgen::PythonGenerator</a>
 </li>
 <li>getFileName()
 : <a class="el" href="classerpcgen_1_1_erpc_lexer.html#a73c80263e93bd44e21b47a5d05a83ec3">erpcgen::ErpcLexer</a>
@@ -303,17 +323,28 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 , <a class="el" href="classerpcgen_1_1_token.html#a6d939b79bd2f8e11ef4699ba388128f7">erpcgen::Token</a>
 </li>
 <li>getFunctionPrototype()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#a82835df27d6dce465b6cbd77d97476ae">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_generator.html#af3d9ce58e13a92f04dbabda56e72c949">erpcgen::Generator</a>
+, <a class="el" href="classerpcgen_1_1_java_generator.html#a5f300a02618fa71160e8eeb6931cc145">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#ab7c6e15779bc69b40254c0519fbe7172">erpcgen::PythonGenerator</a>
 </li>
 <li>getFunctions()
-: <a class="el" href="classerpcgen_1_1_interface.html#a08a3aa3a3ef86cc8be10a85ececa37e0">erpcgen::Interface</a>
+: <a class="el" href="classerpcgen_1_1_interface.html#a3bfbcd2bd1e1d8e35c6bf308dd677b27">erpcgen::Interface</a>
 </li>
 <li>getFunctionTemplateData()
 : <a class="el" href="classerpcgen_1_1_generator.html#aaea7b9a3157ee0246e97ec78cbd88d23">erpcgen::Generator</a>
+, <a class="el" href="classerpcgen_1_1_java_generator.html#a0c8a330d50bcba65cc4c137b9ee07ac0">erpcgen::JavaGenerator</a>
 , <a class="el" href="classerpcgen_1_1_python_generator.html#ab3841ddb0f9ebf4cb63fe8f002d0355c">erpcgen::PythonGenerator</a>
 </li>
 <li>getFunctionType()
 : <a class="el" href="classerpcgen_1_1_function.html#ace460284b7ce58fafdae393e7361bcf2">erpcgen::Function</a>
+</li>
+<li>getFunctionTypes()
+: <a class="el" href="classerpcgen_1_1_interface.html#a25d278009afb608bfbd9f8a85027050c">erpcgen::Interface</a>
+</li>
+<li>getFunctionTypeTemplateData()
+: <a class="el" href="classerpcgen_1_1_generator.html#adf5e0dd5aeaa4d6b65485ddd97afaab5">erpcgen::Generator</a>
+, <a class="el" href="classerpcgen_1_1_java_generator.html#ae2a49be38f1da09ac101cc780ccb1a5c">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#a9f407a1b9fd4d6d5796c6b8c5bacdb5b">erpcgen::PythonGenerator</a>
 </li>
 <li>getGlobals()
 : <a class="el" href="classerpcgen_1_1_interface_definition.html#a75ea44989d648f061e056a0860c6b006">erpcgen::InterfaceDefinition</a>
@@ -323,6 +354,12 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 </li>
 <li>getGroupByName()
 : <a class="el" href="classerpcgen_1_1_generator.html#a2c168ddae0ecede4131afd9d7881a1c5">erpcgen::Generator</a>
+</li>
+<li>getGroupCommonFileName()
+: <a class="el" href="classerpcgen_1_1_generator.html#a907ad00cb1f62fc1d13d2dc3be9d28f9">erpcgen::Generator</a>
+</li>
+<li>getGroupPackageName()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#a535a8dfa52e5b2e42fb1398303394bc8">erpcgen::JavaGenerator</a>
 </li>
 <li>getIdlCrc16()
 : <a class="el" href="classerpcgen_1_1_erpc_lexer.html#a366677220c0e46869acfb8c0cae9d33c">erpcgen::ErpcLexer</a>
@@ -338,7 +375,7 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classerpcgen_1_1_ast_node.html#a6eb4f7483a6c1cefeeb1f8b04113665d">erpcgen::AstNode</a>
 </li>
 <li>getInterface()
-: <a class="el" href="classerpcgen_1_1_function.html#a66a0253a01ca7f5755fec1900d6aae3a">erpcgen::Function</a>
+: <a class="el" href="classerpcgen_1_1_function_base.html#ae088f79fd8d3b8a90a8f712b6f8d42fd">erpcgen::FunctionBase</a>
 </li>
 <li>getInterfaces()
 : <a class="el" href="classerpcgen_1_1_group.html#aa5e3e1667ee8648a1929c3b8679e8aa4">erpcgen::Group</a>
@@ -449,7 +486,7 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classerpcgen_1_1_symbol_scope.html#a307cfc7cdbb201f06062fddf48b4948a">erpcgen::SymbolScope</a>
 </li>
 <li>getSymbolDirections()
-: <a class="el" href="classerpcgen_1_1_group.html#a2a601a71e96f8280afcbb368c038f243">erpcgen::Group</a>
+: <a class="el" href="classerpcgen_1_1_group.html#a18e068232e6cc6bb1f7728df639ddb7d">erpcgen::Group</a>
 </li>
 <li>getSymbolPos()
 : <a class="el" href="classerpcgen_1_1_symbol_scope.html#ae887ebd5083298aecd8f75bdc6889e0e">erpcgen::SymbolScope</a>
@@ -495,13 +532,17 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="class_value.html#afa67d20e19fb0a4d81b4caddb1d4ac11">Value</a>
 </li>
 <li>getTypeInfo()
-: <a class="el" href="classerpcgen_1_1_python_generator.html#ab2c05b210c26321b3c8d3596a6bbb63d">erpcgen::PythonGenerator</a>
+: <a class="el" href="classerpcgen_1_1_java_generator.html#ab7bc1311474576c1e3f1e156221acda9">erpcgen::JavaGenerator</a>
+, <a class="el" href="classerpcgen_1_1_python_generator.html#ab2c05b210c26321b3c8d3596a6bbb63d">erpcgen::PythonGenerator</a>
 </li>
 <li>getTypeName()
 : <a class="el" href="class_float_value.html#a8dc48e8be387205f340a51c619a5819a">FloatValue</a>
 , <a class="el" href="class_integer_value.html#a09356e83bfae4059117ffc72d34c2218">IntegerValue</a>
 , <a class="el" href="class_string_value.html#addd85db535133ca5a5b59497c0b2f79c">StringValue</a>
 , <a class="el" href="class_value.html#a4dd8c49629bdbd9b0313889e5dd7bae6">Value</a>
+</li>
+<li>getTypenameName()
+: <a class="el" href="classerpcgen_1_1_java_generator.html#aca5fbfc002780c33eba08eaa289b64be">erpcgen::JavaGenerator</a>
 </li>
 <li>getUnionMemberDeclaration()
 : <a class="el" href="classerpcgen_1_1_union_case.html#ac49bff6bd8c8d74426e46b19f6e81394">erpcgen::UnionCase</a>
@@ -528,7 +569,7 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classerpcgen_1_1_symbol_scanner.html#a9ac20033318390d892f89e6b979c9cf6">erpcgen::SymbolScanner</a>
 </li>
 <li>getValueFromSymbol()
-: <a class="el" href="classerpcgen_1_1_symbol_scanner.html#aebf449e771d235701c27d9aac189fe8e">erpcgen::SymbolScanner</a>
+: <a class="el" href="classerpcgen_1_1_symbol_scanner.html#accaeb31d5b6e4f54137839b15d1f804e">erpcgen::SymbolScanner</a>
 </li>
 <li>getValueObject()
 : <a class="el" href="classerpcgen_1_1_annotation.html#ac907c227156887ae849bb1ae64989dd5">erpcgen::Annotation</a>

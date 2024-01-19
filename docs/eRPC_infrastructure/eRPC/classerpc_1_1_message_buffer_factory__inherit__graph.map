@@ -1,6 +1,5 @@
 <map id="erpc::MessageBufferFactory" name="erpc::MessageBufferFactory">
-<area shape="rect" id="node2" href="$class_dynamic_message_buffer_factory.html" title="Dynamic message buffer factory. " alt="" coords="247,5,449,32"/>
-<area shape="rect" id="node3" href="$class_r_p_msg_message_buffer_factory.html" title="RPMsg zero copy message buffer factory. " alt="" coords="251,56,445,83"/>
-<area shape="rect" id="node4" href="$class_r_p_msg_t_t_y_message_buffer_factory.html" title="RPMsg TTY message buffer factory. " alt="" coords="239,107,457,133"/>
-<area shape="rect" id="node5" href="$class_static_message_buffer_factory.html" title="Static Message buffer factory. " alt="" coords="255,157,441,184"/>
+<area shape="rect" id="node2" href="$class_dynamic_message_buffer_factory.html" title="Dynamic message buffer factory. " alt="" coords="5,80,208,107"/>
+<area shape="rect" id="node3" href="$class_r_p_msg_message_buffer_factory.html" title="RPMsg zero copy message buffer factory. " alt="" coords="232,80,427,107"/>
+<area shape="rect" id="node4" href="$class_static_message_buffer_factory.html" title="Static Message buffer factory. " alt="" coords="451,80,637,107"/>
 </map>

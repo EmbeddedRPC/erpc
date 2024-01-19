@@ -21,6 +21,7 @@ var files =
     [ "HexValues.hpp", "_hex_values_8hpp_source.html", null ],
     [ "Interface.hpp", "_interface_8hpp_source.html", null ],
     [ "InterfaceDefinition.hpp", "_interface_definition_8hpp_source.html", null ],
+    [ "JavaGenerator.hpp", "_java_generator_8hpp_source.html", null ],
     [ "ListType.hpp", "_list_type_8hpp_source.html", null ],
     [ "Logging.hpp", "_logging_8hpp_source.html", null ],
     [ "options.hpp", "options_8hpp_source.html", null ],

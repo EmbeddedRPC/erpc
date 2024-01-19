@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -111,6 +111,7 @@ $(document).ready(function(){initNavTree('classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_tr
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -127,7 +128,7 @@ $(document).ready(function(){initNavTree('classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_tr
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport__inherit__graph.svg" width="222" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport__inherit__graph.svg" width="318" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -135,7 +136,7 @@ $(document).ready(function(){initNavTree('classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_tr
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport__coll__graph.svg" width="328" height="203"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport__coll__graph.svg" width="419" height="218"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -154,22 +155,30 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:aba58761e6f6e8df72db29b24e12d9a71"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#aba58761e6f6e8df72db29b24e12d9a71">init</a> (uint32_t src_addr, uint32_t dst_addr, void *base_address, uint32_t rpmsg_link_id, void(*ready_cb)(void), char *nameservice_name)</td></tr>
 <tr class="memdesc:aba58761e6f6e8df72db29b24e12d9a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function call RPMsg rtos init function - as RPMsg remote.  <a href="#aba58761e6f6e8df72db29b24e12d9a71">More...</a><br /></td></tr>
 <tr class="separator:aba58761e6f6e8df72db29b24e12d9a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3e7d041fb640421c52236918c1698d5"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#ab3e7d041fb640421c52236918c1698d5">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message)</td></tr>
-<tr class="memdesc:ab3e7d041fb640421c52236918c1698d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store incoming message to message buffer.  <a href="#ab3e7d041fb640421c52236918c1698d5">More...</a><br /></td></tr>
-<tr class="separator:ab3e7d041fb640421c52236918c1698d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7d645c3f81bcc2025b06b2536f32a88"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#af7d645c3f81bcc2025b06b2536f32a88">send</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message)</td></tr>
-<tr class="memdesc:af7d645c3f81bcc2025b06b2536f32a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to send prepared message.  <a href="#af7d645c3f81bcc2025b06b2536f32a88">More...</a><br /></td></tr>
-<tr class="separator:af7d645c3f81bcc2025b06b2536f32a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8aa45d2d5926eb93221ad42b4753e6e6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a8aa45d2d5926eb93221ad42b4753e6e6">setCrc16</a> (<a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *crcImpl)</td></tr>
-<tr class="memdesc:a8aa45d2d5926eb93221ad42b4753e6e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions sets the CRC-16 implementation.  <a href="#a8aa45d2d5926eb93221ad42b4753e6e6">More...</a><br /></td></tr>
-<tr class="separator:a8aa45d2d5926eb93221ad42b4753e6e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a582ee658b536ce80dafcb4679bdf8ea5"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a582ee658b536ce80dafcb4679bdf8ea5">getCrc16</a> (void)</td></tr>
-<tr class="memdesc:a582ee658b536ce80dafcb4679bdf8ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions gets the CRC-16 object.  <a href="#a582ee658b536ce80dafcb4679bdf8ea5">More...</a><br /></td></tr>
-<tr class="separator:a582ee658b536ce80dafcb4679bdf8ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classerpc_1_1_r_p_msg_base_transport"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classerpc_1_1_r_p_msg_base_transport')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classerpc_1_1_r_p_msg_base_transport.html">erpc::RPMsgBaseTransport</a></td></tr>
-<tr class="memitem:ad5a3b7702d944d7c497ad4590364002f inherit pub_methods_classerpc_1_1_r_p_msg_base_transport"><td class="memItemLeft" align="right" valign="top">struct rpmsg_lite_instance *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#ad5a3b7702d944d7c497ad4590364002f">get_rpmsg_lite_instance</a> (void)</td></tr>
-<tr class="memdesc:ad5a3b7702d944d7c497ad4590364002f inherit pub_methods_classerpc_1_1_r_p_msg_base_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns pointer to instance of RPMSG lite.  <a href="#ad5a3b7702d944d7c497ad4590364002f">More...</a><br /></td></tr>
-<tr class="separator:ad5a3b7702d944d7c497ad4590364002f inherit pub_methods_classerpc_1_1_r_p_msg_base_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classerpc_1_1_framed_transport"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classerpc_1_1_framed_transport')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classerpc_1_1_framed_transport.html">erpc::FramedTransport</a></td></tr>
+<tr class="memitem:a5cfed6f7b88aae9d017b4a1053acebc3 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5cfed6f7b88aae9d017b4a1053acebc3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a5cfed6f7b88aae9d017b4a1053acebc3">FramedTransport</a> (void)</td></tr>
+<tr class="memdesc:a5cfed6f7b88aae9d017b4a1053acebc3 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a5cfed6f7b88aae9d017b4a1053acebc3 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05359d9edebfc10848c15179d977699a inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05359d9edebfc10848c15179d977699a"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a05359d9edebfc10848c15179d977699a">~FramedTransport</a> (void)</td></tr>
+<tr class="memdesc:a05359d9edebfc10848c15179d977699a inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_framed_transport.html" title="Base class for framed transport layers. ">FramedTransport</a> destructor. <br /></td></tr>
+<tr class="separator:a05359d9edebfc10848c15179d977699a inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a33ba31bc23c13ae6e5e1eae783621957">reserveHeaderSize</a> (void) override</td></tr>
+<tr class="memdesc:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of data placed in <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> before serializing eRPC data.  <a href="#a33ba31bc23c13ae6e5e1eae783621957">More...</a><br /></td></tr>
+<tr class="separator:a33ba31bc23c13ae6e5e1eae783621957 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a43385b8a021f7382c1f8673613b969a4">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message) override</td></tr>
+<tr class="memdesc:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receives an entire message.  <a href="#a43385b8a021f7382c1f8673613b969a4">More...</a><br /></td></tr>
+<tr class="separator:a43385b8a021f7382c1f8673613b969a4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19fd4d6148ef66dd916d445a019051f4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a19fd4d6148ef66dd916d445a019051f4">send</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message) override</td></tr>
+<tr class="memdesc:a19fd4d6148ef66dd916d445a019051f4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to send prepared message.  <a href="#a19fd4d6148ef66dd916d445a019051f4">More...</a><br /></td></tr>
+<tr class="separator:a19fd4d6148ef66dd916d445a019051f4 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a27955c9e5872ebfaf6affaa095426372">setCrc16</a> (<a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *crcImpl) override</td></tr>
+<tr class="memdesc:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions sets the CRC-16 implementation.  <a href="#a27955c9e5872ebfaf6affaa095426372">More...</a><br /></td></tr>
+<tr class="separator:a27955c9e5872ebfaf6affaa095426372 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a2b134c86844d7ae3e6a557ca3ed22881">getCrc16</a> (void) override</td></tr>
+<tr class="memdesc:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">This functions gets the CRC-16 object.  <a href="#a2b134c86844d7ae3e6a557ca3ed22881">More...</a><br /></td></tr>
+<tr class="separator:a2b134c86844d7ae3e6a557ca3ed22881 inherit pub_methods_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classerpc_1_1_transport"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classerpc_1_1_transport')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classerpc_1_1_transport.html">erpc::Transport</a></td></tr>
 <tr class="memitem:af0b6b9c50d238f99de90ccd8b6050c91 inherit pub_methods_classerpc_1_1_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0b6b9c50d238f99de90ccd8b6050c91"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#af0b6b9c50d238f99de90ccd8b6050c91">Transport</a> (void)</td></tr>
@@ -182,6 +191,25 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#aea4a3b77e476397c2f665e7c9449839a">hasMessage</a> (void)</td></tr>
 <tr class="memdesc:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poll for an incoming message.  <a href="#aea4a3b77e476397c2f665e7c9449839a">More...</a><br /></td></tr>
 <tr class="separator:aea4a3b77e476397c2f665e7c9449839a inherit pub_methods_classerpc_1_1_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classerpc_1_1_r_p_msg_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classerpc_1_1_r_p_msg_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classerpc_1_1_r_p_msg_base.html">erpc::RPMsgBase</a></td></tr>
+<tr class="memitem:a73304e82bd409ff96feb9d1b632e884d inherit pub_methods_classerpc_1_1_r_p_msg_base"><td class="memItemLeft" align="right" valign="top">struct rpmsg_lite_instance *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base.html#a73304e82bd409ff96feb9d1b632e884d">get_rpmsg_lite_instance</a> (void)</td></tr>
+<tr class="memdesc:a73304e82bd409ff96feb9d1b632e884d inherit pub_methods_classerpc_1_1_r_p_msg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns pointer to instance of RPMSG lite.  <a href="#a73304e82bd409ff96feb9d1b632e884d">More...</a><br /></td></tr>
+<tr class="separator:a73304e82bd409ff96feb9d1b632e884d inherit pub_methods_classerpc_1_1_r_p_msg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a010965dd940228df4797815cffd0f7bf"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a010965dd940228df4797815cffd0f7bf">underlyingReceive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message, uint32_t size, uint32_t offset) override</td></tr>
+<tr class="memdesc:a010965dd940228df4797815cffd0f7bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when receiving data.  <a href="#a010965dd940228df4797815cffd0f7bf">More...</a><br /></td></tr>
+<tr class="separator:a010965dd940228df4797815cffd0f7bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a805c3e72a7cb310ec48504cb9f46c51d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a805c3e72a7cb310ec48504cb9f46c51d">underlyingSend</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message, uint32_t size, uint32_t offset) override</td></tr>
+<tr class="memdesc:a805c3e72a7cb310ec48504cb9f46c51d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when sending data.  <a href="#a805c3e72a7cb310ec48504cb9f46c51d">More...</a><br /></td></tr>
+<tr class="separator:a805c3e72a7cb310ec48504cb9f46c51d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affeb702eff0b50e177bb3b8a1501d49e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#affeb702eff0b50e177bb3b8a1501d49e">underlyingReceive</a> (uint8_t *data, uint32_t size) override</td></tr>
+<tr class="memdesc:affeb702eff0b50e177bb3b8a1501d49e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function read data.  <a href="#affeb702eff0b50e177bb3b8a1501d49e">More...</a><br /></td></tr>
+<tr class="separator:affeb702eff0b50e177bb3b8a1501d49e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52f40f74be57a504f0eb17bc77129c3d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a52f40f74be57a504f0eb17bc77129c3d">underlyingSend</a> (const uint8_t *data, uint32_t size) override</td></tr>
+<tr class="memdesc:a52f40f74be57a504f0eb17bc77129c3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function writes data.  <a href="#a52f40f74be57a504f0eb17bc77129c3d">More...</a><br /></td></tr>
+<tr class="separator:a52f40f74be57a504f0eb17bc77129c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -191,18 +219,25 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a0b9fb3987163c5f4d778064a727d5fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb088b1e889c2aaf217001fc448338d6"><td class="memItemLeft" align="right" valign="top">struct rpmsg_lite_endpoint *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#adb088b1e889c2aaf217001fc448338d6">m_rpmsg_ept</a></td></tr>
 <tr class="separator:adb088b1e889c2aaf217001fc448338d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a374babae7a9c659bc1ebd7bba08028a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a374babae7a9c659bc1ebd7bba08028a9"></a>
-<a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a374babae7a9c659bc1ebd7bba08028a9">m_crcImpl</a></td></tr>
-<tr class="memdesc:a374babae7a9c659bc1ebd7bba08028a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">CRC object. <br /></td></tr>
-<tr class="separator:a374babae7a9c659bc1ebd7bba08028a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classerpc_1_1_framed_transport"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classerpc_1_1_framed_transport')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classerpc_1_1_framed_transport.html">erpc::FramedTransport</a></td></tr>
+<tr class="memitem:ae29f9f3e6b7c8f41a0825ca25cb08d50 inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#ae29f9f3e6b7c8f41a0825ca25cb08d50">m_crcImpl</a></td></tr>
+<tr class="separator:ae29f9f3e6b7c8f41a0825ca25cb08d50 inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8dfd9730202307529a072ad1bc86a49a inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8dfd9730202307529a072ad1bc86a49a"></a>
+<a class="el" href="classerpc_1_1_mutex.html">Mutex</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#a8dfd9730202307529a072ad1bc86a49a">m_sendLock</a></td></tr>
+<tr class="memdesc:a8dfd9730202307529a072ad1bc86a49a inherit pro_attribs_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_mutex.html" title="Mutex. ">Mutex</a> protecting send. <br /></td></tr>
+<tr class="separator:a8dfd9730202307529a072ad1bc86a49a inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd338c7149151c832c2932156dc100ca inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acd338c7149151c832c2932156dc100ca"></a>
+<a class="el" href="classerpc_1_1_mutex.html">Mutex</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_framed_transport.html#acd338c7149151c832c2932156dc100ca">m_receiveLock</a></td></tr>
+<tr class="memdesc:acd338c7149151c832c2932156dc100ca inherit pro_attribs_classerpc_1_1_framed_transport"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_mutex.html" title="Mutex. ">Mutex</a> protecting receive. <br /></td></tr>
+<tr class="separator:acd338c7149151c832c2932156dc100ca inherit pro_attribs_classerpc_1_1_framed_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_static_attribs_classerpc_1_1_r_p_msg_base_transport"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classerpc_1_1_r_p_msg_base_transport')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classerpc_1_1_r_p_msg_base_transport.html">erpc::RPMsgBaseTransport</a></td></tr>
-<tr class="memitem:abbb9e11e0a1e71baa21cddbbba92b36b inherit pro_static_attribs_classerpc_1_1_r_p_msg_base_transport"><td class="memItemLeft" align="right" valign="top">static struct rpmsg_lite_instance *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#abbb9e11e0a1e71baa21cddbbba92b36b">s_rpmsg</a></td></tr>
-<tr class="separator:abbb9e11e0a1e71baa21cddbbba92b36b inherit pro_static_attribs_classerpc_1_1_r_p_msg_base_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7994d488250d7f5ae3fa152839b5bb31 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base_transport"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#a7994d488250d7f5ae3fa152839b5bb31">s_initialized</a></td></tr>
-<tr class="separator:a7994d488250d7f5ae3fa152839b5bb31 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base_transport"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_static_attribs_classerpc_1_1_r_p_msg_base"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classerpc_1_1_r_p_msg_base')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classerpc_1_1_r_p_msg_base.html">erpc::RPMsgBase</a></td></tr>
+<tr class="memitem:a0dd0de2a17e50658c71b09688de84a55 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base"><td class="memItemLeft" align="right" valign="top">static struct rpmsg_lite_instance *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base.html#a0dd0de2a17e50658c71b09688de84a55">s_rpmsg</a></td></tr>
+<tr class="separator:a0dd0de2a17e50658c71b09688de84a55 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a285bf2aa56f1ee53121accb297085552 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_r_p_msg_base.html#a285bf2aa56f1ee53121accb297085552">s_initialized</a></td></tr>
+<tr class="separator:a285bf2aa56f1ee53121accb297085552 inherit pro_static_attribs_classerpc_1_1_r_p_msg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classerpc_1_1_transport.html" title="Abstract interface for transport layer. ">Transport</a> that uses RPMsg zero copy RTOS API for interprocessor messaging. </p>
@@ -376,7 +411,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab3e7d041fb640421c52236918c1698d5"></a>
+<a class="anchor" id="a010965dd940228df4797815cffd0f7bf"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -384,41 +419,160 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::receive </td>
+          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::underlyingReceive </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *&#160;</td>
-          <td class="paramname"><em>message</em></td><td>)</td>
+          <td class="paramname"><em>message</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Store incoming message to message buffer. </p>
-<p>In loop while no message come.</p>
+<p>Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when receiving data. </p>
+<p>Usually we don't want to do that.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>Message buffer, to which will be stored incoming message.</td></tr>
+    <tr><td class="paramname">message</td><td><a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> to send. </td></tr>
+    <tr><td class="paramname">size</td><td>size of message to send. </td></tr>
+    <tr><td class="paramname">offset</td><td>data start address offset</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>erpc_status_t kErpcStatus_Success when it finished successful otherwise error. </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classerpc_1_1_framed_transport.html#a9d007614c08f757c6116f60f8493ba44">erpc::FramedTransport</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a805c3e72a7cb310ec48504cb9f46c51d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::underlyingSend </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *&#160;</td>
+          <td class="paramname"><em>message</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds ability to framed transport to overwrite <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> when sending data. </p>
+<p>Usually we don't want to do that.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td><a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> to send. </td></tr>
+    <tr><td class="paramname">size</td><td>size of message to send. </td></tr>
+    <tr><td class="paramname">offset</td><td>data start address offset</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>erpc_status_t kErpcStatus_Success when it finished successful otherwise error. </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classerpc_1_1_framed_transport.html#a4f25fe78a85d23b4e371a38a4b638fa5">erpc::FramedTransport</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="affeb702eff0b50e177bb3b8a1501d49e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::underlyingReceive </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function read data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">data</td><td>Preallocated buffer for receiving data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>Size of data to read.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">kErpcStatus_ReceiveFailed</td><td>Failed to receive message buffer. </td></tr>
-    <tr><td class="paramname">kErpcStatus_Success</td><td>Successfully received all data. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752aad3aa76a604b7bd6c3828c50b33dca33" title="No error occurred. ">kErpcStatus_Success</a></td><td>When data was read successfully. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752a27228549b96649e28f58852f5f7ea203" title="Failed to receive data. ">kErpcStatus_ReceiveFailed</a></td><td>When reading data ends with error. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752adc60b9b2440d0fcc2ca34938e3b25072" title="Connected closed by peer. ">kErpcStatus_ConnectionClosed</a></td><td>Peer closed the connection. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classerpc_1_1_transport.html#a3f886733620e1a2fe00d12f36711dde5">erpc::Transport</a>.</p>
+<p>Implements <a class="el" href="classerpc_1_1_framed_transport.html#aad1844c654b1f0dd09f275fafc1b7a7e">erpc::FramedTransport</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="af7d645c3f81bcc2025b06b2536f32a88"></a>
+<a class="anchor" id="a52f40f74be57a504f0eb17bc77129c3d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -426,99 +580,48 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::send </td>
+          <td class="memname"><a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a> RPMsgTTYRTOSTransport::underlyingSend </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *&#160;</td>
-          <td class="paramname"><em>message</em></td><td>)</td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Function to send prepared message. </p>
+<p>This function writes data. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>Pass message buffer to send.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>Buffer to send. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>Size of data to send.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">kErpcStatus_SendFailed</td><td>Failed to send message buffer. </td></tr>
-    <tr><td class="paramname">kErpcStatus_Success</td><td>Successfully sent all data. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752aad3aa76a604b7bd6c3828c50b33dca33" title="No error occurred. ">kErpcStatus_Success</a></td><td>When data was written successfully. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752a6b5748a4c4dc3087a70c64386dc8d7b0" title="Failed to send data. ">kErpcStatus_SendFailed</a></td><td>When writing data ends with error. </td></tr>
+    <tr><td class="paramname"><a class="el" href="group__infra.html#ggacf5d3df9e7a78f29bc823b71f1529752adc60b9b2440d0fcc2ca34938e3b25072" title="Connected closed by peer. ">kErpcStatus_ConnectionClosed</a></td><td>Peer closed the connection. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classerpc_1_1_transport.html#a4ede71b16625cba746818294148f9aba">erpc::Transport</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a8aa45d2d5926eb93221ad42b4753e6e6"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void RPMsgTTYRTOSTransport::setCrc16 </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classerpc_1_1_crc16.html">Crc16</a> *&#160;</td>
-          <td class="paramname"><em>crcImpl</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>This functions sets the CRC-16 implementation. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">crcImpl</td><td>Object containing crc-16 compute function. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented from <a class="el" href="classerpc_1_1_transport.html#a077e72c8afa8caa483220faf45df62c6">erpc::Transport</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a582ee658b536ce80dafcb4679bdf8ea5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classerpc_1_1_crc16.html">Crc16</a> * RPMsgTTYRTOSTransport::getCrc16 </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>This functions gets the CRC-16 object. </p>
-<dl class="section return"><dt>Returns</dt><dd>Crc16* Pointer to CRC-16 object containing crc-16 compute function. </dd></dl>
-
-<p>Reimplemented from <a class="el" href="classerpc_1_1_transport.html#a8f3107c5d8d7c89fe074d4433761b924">erpc::Transport</a>.</p>
+<p>Implements <a class="el" href="classerpc_1_1_framed_transport.html#af5bc7721ee65e9c8230d43a87c47d925">erpc::FramedTransport</a>.</p>
 
 </div>
 </div>

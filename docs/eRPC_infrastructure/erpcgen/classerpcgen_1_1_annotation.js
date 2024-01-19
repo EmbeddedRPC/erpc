@@ -1,9 +1,10 @@
 var classerpcgen_1_1_annotation =
 [
     [ "program_lang_t", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1b", [
-      [ "kAll", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1ba809f719e1c4cbb530c153f24df159705", null ],
-      [ "kC", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1baac928fa600ea44a67c1f54065f0e8a9a", null ],
-      [ "kPython", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1bae2a6a6e52b89cf0a306571b43e8ebf92", null ]
+      [ "kAll", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1ba34bdbffdb1c0e1b603f58fc0d49548b6", null ],
+      [ "kC", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1baf73b7a14626c25aa554e2437ea3fc1df", null ],
+      [ "kPython", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1ba488cf4fe1b755336998076c2a5ca7cfa", null ],
+      [ "kJava", "classerpcgen_1_1_annotation.html#a5ec95669ec43fe71abdeac66d8e2da1bac2d418337f7fcde600c82f8b310295c8", null ]
     ] ],
     [ "Annotation", "classerpcgen_1_1_annotation.html#a8e01ad3e229cbcd55877420a27a399b0", null ],
     [ "Annotation", "classerpcgen_1_1_annotation.html#aeaa03b81e72b64279bf91374761b7363", null ],

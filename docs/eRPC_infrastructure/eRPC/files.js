@@ -19,8 +19,9 @@ var files =
     [ "erpc_endianness_undefined.h", "erpc__endianness__undefined_8h_source.html", null ],
     [ "erpc_framed_transport.hpp", "erpc__framed__transport_8hpp.html", [
       [ "Header", "classerpc_1_1_framed_transport.html#structerpc_1_1_framed_transport_1_1_header", [
+        [ "m_crcHeader", "classerpc_1_1_framed_transport.html#a16cd1cdb5099f7bfad5e4ebe6020bf59", null ],
         [ "m_messageSize", "classerpc_1_1_framed_transport.html#a2d1167a8481639bb57198ee8e4470749", null ],
-        [ "m_crc", "classerpc_1_1_framed_transport.html#aea0866f65f3441d290076833c9cdae19", null ]
+        [ "m_crcBody", "classerpc_1_1_framed_transport.html#a8fc8fb5d250b5539380317961380e6d9", null ]
       ] ]
     ] ],
     [ "erpc_i2c_slave_transport.hpp", "erpc__i2c__slave__transport_8hpp.html", null ],
@@ -34,14 +35,14 @@ var files =
     [ "erpc_manually_constructed.hpp", "erpc__manually__constructed_8hpp.html", "erpc__manually__constructed_8hpp" ],
     [ "erpc_mbf_setup.h", "erpc__mbf__setup_8h.html", "erpc__mbf__setup_8h" ],
     [ "erpc_message_buffer.hpp", "erpc__message__buffer_8hpp.html", [
-      [ "Cursor", "classerpc_1_1_message_buffer_1_1_cursor.html", "classerpc_1_1_message_buffer_1_1_cursor" ]
+      [ "Cursor", "classerpc_1_1_cursor.html", "classerpc_1_1_cursor" ]
     ] ],
     [ "erpc_message_loggers.hpp", "erpc__message__loggers_8hpp.html", null ],
     [ "erpc_mu_transport.hpp", "erpc__mu__transport_8hpp.html", "erpc__mu__transport_8hpp" ],
     [ "erpc_port.h", "erpc__port_8h.html", "erpc__port_8h" ],
     [ "erpc_pre_post_action.h", "erpc__pre__post__action_8h.html", "erpc__pre__post__action_8h" ],
     [ "erpc_rpmsg_linux_transport.hpp", "erpc__rpmsg__linux__transport_8hpp_source.html", null ],
-    [ "erpc_rpmsg_lite_base_transport.hpp", "erpc__rpmsg__lite__base__transport_8hpp.html", null ],
+    [ "erpc_rpmsg_lite_base.hpp", "erpc__rpmsg__lite__base_8hpp.html", null ],
     [ "erpc_rpmsg_lite_rtos_transport.hpp", "erpc__rpmsg__lite__rtos__transport_8hpp.html", null ],
     [ "erpc_rpmsg_lite_transport.hpp", "erpc__rpmsg__lite__transport_8hpp.html", null ],
     [ "erpc_rpmsg_tty_rtos_transport.hpp", "erpc__rpmsg__tty__rtos__transport_8hpp.html", null ],
@@ -65,6 +66,8 @@ var files =
     ] ],
     [ "erpc_transport_setup.h", "erpc__transport__setup_8h.html", "erpc__transport__setup_8h" ],
     [ "erpc_uart_cmsis_transport.hpp", "erpc__uart__cmsis__transport_8hpp.html", null ],
+    [ "erpc_uart_zephyr_transport.hpp", "erpc__uart__zephyr__transport_8hpp.html", null ],
     [ "erpc_usb_cdc_transport.hpp", "erpc__usb__cdc__transport_8hpp.html", null ],
+    [ "erpc_utils.hpp", "erpc__utils_8hpp_source.html", null ],
     [ "erpc_version.h", "erpc__version_8h_source.html", null ]
 ];

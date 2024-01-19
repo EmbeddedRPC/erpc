@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -149,9 +149,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ac7f0e6b17b44fd8be07bcb92d0454360"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_service.html#ac7f0e6b17b44fd8be07bcb92d0454360">setNext</a> (<a class="el" href="classerpc_1_1_service.html">Service</a> *next)</td></tr>
 <tr class="memdesc:ac7f0e6b17b44fd8be07bcb92d0454360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set next service.  <a href="#ac7f0e6b17b44fd8be07bcb92d0454360">More...</a><br /></td></tr>
 <tr class="separator:ac7f0e6b17b44fd8be07bcb92d0454360"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc0b3e350803e0388da9a01db2b99f5c"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_service.html#abc0b3e350803e0388da9a01db2b99f5c">handleInvocation</a> (uint32_t methodId, uint32_t sequence, <a class="el" href="classerpc_1_1_codec.html">Codec</a> *codec, <a class="el" href="classerpc_1_1_message_buffer_factory.html">MessageBufferFactory</a> *messageFactory)=0</td></tr>
-<tr class="memdesc:abc0b3e350803e0388da9a01db2b99f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function call function implementation of current service.  <a href="#abc0b3e350803e0388da9a01db2b99f5c">More...</a><br /></td></tr>
-<tr class="separator:abc0b3e350803e0388da9a01db2b99f5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaaa8829571163c2d3d0cff3c0b365bd"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_service.html#aeaaa8829571163c2d3d0cff3c0b365bd">handleInvocation</a> (uint32_t methodId, uint32_t sequence, <a class="el" href="classerpc_1_1_codec.html">Codec</a> *codec, <a class="el" href="classerpc_1_1_message_buffer_factory.html">MessageBufferFactory</a> *messageFactory, <a class="el" href="classerpc_1_1_transport.html">Transport</a> *transport)=0</td></tr>
+<tr class="memdesc:aeaaa8829571163c2d3d0cff3c0b365bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function call function implementation of current service.  <a href="#aeaaa8829571163c2d3d0cff3c0b365bd">More...</a><br /></td></tr>
+<tr class="separator:aeaaa8829571163c2d3d0cff3c0b365bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -277,7 +277,7 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="abc0b3e350803e0388da9a01db2b99f5c"></a>
+<a class="anchor" id="aeaaa8829571163c2d3d0cff3c0b365bd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -306,7 +306,13 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classerpc_1_1_message_buffer_factory.html">MessageBufferFactory</a> *&#160;</td>
-          <td class="paramname"><em>messageFactory</em>&#160;</td>
+          <td class="paramname"><em>messageFactory</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classerpc_1_1_transport.html">Transport</a> *&#160;</td>
+          <td class="paramname"><em>transport</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

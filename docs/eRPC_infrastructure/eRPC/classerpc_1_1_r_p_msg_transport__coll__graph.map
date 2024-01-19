@@ -1,6 +1,6 @@
 <map id="erpc::RPMsgTransport" name="erpc::RPMsgTransport">
-<area shape="rect" id="node2" href="$classerpc_1_1_r_p_msg_base_transport.html" title="Transport that other RPMsg transports inherits. " alt="" coords="183,5,365,32"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="5,5,115,32"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l 2U *ERPC_DEFAULT_BUFFERS\l_COUNT \&gt;" alt="" coords="164,57,384,127"/>
-<area shape="rect" id="node5" href="$classerpc_1_1_crc16.html" title="Class for compute crc16. " alt="" coords="229,152,319,179"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="61,5,170,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_r_p_msg_base.html" title="Transport that other RPMsg transports inherits. " alt="" coords="51,56,179,83"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_static_queue.html" title="erpc::StaticQueue\&lt;\l erpc::MessageBuffer,\l 2U *ERPC_DEFAULT_BUFFERS\l_COUNT \&gt;" alt="" coords="5,107,225,178"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_crc16.html" title="Class for compute crc16. " alt="" coords="71,203,160,229"/>
 </map>

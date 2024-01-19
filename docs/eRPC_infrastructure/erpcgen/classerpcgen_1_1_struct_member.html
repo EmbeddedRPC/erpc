@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -148,12 +148,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a355ed861260653ecbc726328d30d2e06"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#a355ed861260653ecbc726328d30d2e06">getDescription</a> () const  override</td></tr>
 <tr class="memdesc:a355ed861260653ecbc726328d30d2e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns description about the struct member.  <a href="#a355ed861260653ecbc726328d30d2e06">More...</a><br /></td></tr>
 <tr class="separator:a355ed861260653ecbc726328d30d2e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa640e047933d02929518b4e622a90e11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#aa640e047933d02929518b4e622a90e11">setDirection</a> (_param_direction paramDirection)</td></tr>
-<tr class="memdesc:aa640e047933d02929518b4e622a90e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function set direction type for parameter.  <a href="#aa640e047933d02929518b4e622a90e11">More...</a><br /></td></tr>
-<tr class="separator:aa640e047933d02929518b4e622a90e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3937669079891a709583eaf5b3523ee"><td class="memItemLeft" align="right" valign="top">_param_direction&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#ac3937669079891a709583eaf5b3523ee">getDirection</a> () const </td></tr>
-<tr class="memdesc:ac3937669079891a709583eaf5b3523ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns routing for parameter.  <a href="#ac3937669079891a709583eaf5b3523ee">More...</a><br /></td></tr>
-<tr class="separator:ac3937669079891a709583eaf5b3523ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87ae9629f7c3c6d038e61a3f2f6d6e23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#a87ae9629f7c3c6d038e61a3f2f6d6e23">setDirection</a> (param_direction_t paramDirection)</td></tr>
+<tr class="memdesc:a87ae9629f7c3c6d038e61a3f2f6d6e23"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function set direction type for parameter.  <a href="#a87ae9629f7c3c6d038e61a3f2f6d6e23">More...</a><br /></td></tr>
+<tr class="separator:a87ae9629f7c3c6d038e61a3f2f6d6e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd5b4104523394e6a73a9c26f5ba5528"><td class="memItemLeft" align="right" valign="top">param_direction_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#abd5b4104523394e6a73a9c26f5ba5528">getDirection</a> () const </td></tr>
+<tr class="memdesc:abd5b4104523394e6a73a9c26f5ba5528"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns routing for parameter.  <a href="#abd5b4104523394e6a73a9c26f5ba5528">More...</a><br /></td></tr>
+<tr class="separator:abd5b4104523394e6a73a9c26f5ba5528"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bc51253c4a72731dcd1b42edbd7d306"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#a0bc51253c4a72731dcd1b42edbd7d306">setContainList</a> (bool containList)</td></tr>
 <tr class="memdesc:a0bc51253c4a72731dcd1b42edbd7d306"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function set information about if member contains list data type.  <a href="#a0bc51253c4a72731dcd1b42edbd7d306">More...</a><br /></td></tr>
 <tr class="separator:a0bc51253c4a72731dcd1b42edbd7d306"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -269,8 +269,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 Protected Attributes</h2></td></tr>
 <tr class="memitem:aa1dd550a2edd72b7e13f7421f778c8dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_data_type.html">DataType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#aa1dd550a2edd72b7e13f7421f778c8dd">m_dataType</a></td></tr>
 <tr class="separator:aa1dd550a2edd72b7e13f7421f778c8dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a596906ace75dd770bfc6048e67f69790"><td class="memItemLeft" align="right" valign="top">_param_direction&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#a596906ace75dd770bfc6048e67f69790">m_paramDirection</a></td></tr>
-<tr class="separator:a596906ace75dd770bfc6048e67f69790"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdd4cd9f825251dc50c8272adb51ef1f"><td class="memItemLeft" align="right" valign="top">param_direction_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#afdd4cd9f825251dc50c8272adb51ef1f">m_paramDirection</a></td></tr>
+<tr class="separator:afdd4cd9f825251dc50c8272adb51ef1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2340c490221778803f3e9436b78ba9bb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#a2340c490221778803f3e9436b78ba9bb">m_containList</a></td></tr>
 <tr class="separator:a2340c490221778803f3e9436b78ba9bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadcb757486b178cbbf8ab88a4b6608f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_struct_member.html#aadcb757486b178cbbf8ab88a4b6608f0">m_containString</a></td></tr>
@@ -528,7 +528,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
 
 </div>
 </div>
-<a class="anchor" id="ac3937669079891a709583eaf5b3523ee"></a>
+<a class="anchor" id="abd5b4104523394e6a73a9c26f5ba5528"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -536,7 +536,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">_param_direction erpcgen::StructMember::getDirection </td>
+          <td class="memname">param_direction_t erpcgen::StructMember::getDirection </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -714,7 +714,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
 
 </div>
 </div>
-<a class="anchor" id="aa640e047933d02929518b4e622a90e11"></a>
+<a class="anchor" id="a87ae9629f7c3c6d038e61a3f2f6d6e23"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -724,7 +724,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
         <tr>
           <td class="memname">void erpcgen::StructMember::setDirection </td>
           <td>(</td>
-          <td class="paramtype">_param_direction&#160;</td>
+          <td class="paramtype">param_direction_t&#160;</td>
           <td class="paramname"><em>paramDirection</em></td><td>)</td>
           <td></td>
         </tr>
@@ -832,7 +832,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
 
 </div>
 </div>
-<a class="anchor" id="a596906ace75dd770bfc6048e67f69790"></a>
+<a class="anchor" id="afdd4cd9f825251dc50c8272adb51ef1f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -840,7 +840,7 @@ std::string <a class="el" href="classerpcgen_1_1_union_type.html#a036ad04e41d4f6
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">_param_direction erpcgen::StructMember::m_paramDirection</td>
+          <td class="memname">param_direction_t erpcgen::StructMember::m_paramDirection</td>
         </tr>
       </table>
   </td>

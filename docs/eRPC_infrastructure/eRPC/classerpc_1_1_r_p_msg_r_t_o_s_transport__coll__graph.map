@@ -1,5 +1,5 @@
 <map id="erpc::RPMsgRTOSTransport" name="erpc::RPMsgRTOSTransport">
-<area shape="rect" id="node2" href="$classerpc_1_1_r_p_msg_base_transport.html" title="Transport that other RPMsg transports inherits. " alt="" coords="5,81,188,108"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="42,5,151,32"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_crc16.html" title="Class for compute crc16. " alt="" coords="212,81,301,108"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer. " alt="" coords="5,5,115,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_r_p_msg_base.html" title="Transport that other RPMsg transports inherits. " alt="" coords="139,5,267,32"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_crc16.html" title="Class for compute crc16. " alt="" coords="291,5,381,32"/>
 </map>

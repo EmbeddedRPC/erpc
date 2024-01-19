@@ -26,6 +26,7 @@ var hierarchy =
     ] ],
     [ "erpcgen::Generator", "classerpcgen_1_1_generator.html", [
       [ "erpcgen::CGenerator", "classerpcgen_1_1_c_generator.html", null ],
+      [ "erpcgen::JavaGenerator", "classerpcgen_1_1_java_generator.html", null ],
       [ "erpcgen::PythonGenerator", "classerpcgen_1_1_python_generator.html", null ]
     ] ],
     [ "erpcgen::Group", "classerpcgen_1_1_group.html", null ],

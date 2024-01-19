@@ -1,7 +1,6 @@
 <map id="erpc::TransportArbitrator::PendingClientInfo" name="erpc::TransportArbitrator::PendingClientInfo">
-<area shape="rect" id="node2" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="5,199,127,225"/>
-<area shape="rect" id="node3" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="151,199,299,225"/>
-<area shape="rect" id="node4" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="179,109,271,136"/>
-<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="71,5,213,47"/>
-<area shape="rect" id="node6" href="$classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. " alt="" coords="237,13,378,39"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class. " alt="" coords="5,184,127,211"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_request_context.html" title="Encapsulates all information about a request. " alt="" coords="151,184,299,211"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface. " alt="" coords="179,95,271,121"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_cursor.html" title="Cursor within a MessageBuffer. " alt="" coords="178,5,271,32"/>
 </map>

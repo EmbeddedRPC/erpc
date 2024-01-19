@@ -1,13 +1,13 @@
 var classerpcgen_1_1_python_generator =
 [
-    [ "comment_type", "classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad", [
-      [ "kMultilineComment", "classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ada9b1c3c4cc99d25a7714dffa03f5bf786", null ],
-      [ "kInlineComment", "classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ada7840ee571c5c5bf32b7ab020cd654d49", null ]
+    [ "comment_type_t", "classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25", [
+      [ "kMultilineComment", "classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25a6c48773eb5ac0315e5c3077bd1777c47", null ],
+      [ "kInlineComment", "classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25ab44aab15988be6ce55c05370848c4db1", null ]
     ] ],
     [ "PythonGenerator", "classerpcgen_1_1_python_generator.html#aad87b3a5437e1840f97dc9c4a98030bf", null ],
     [ "~PythonGenerator", "classerpcgen_1_1_python_generator.html#a16c687c782244dd5a1ffdb20541ee7aa", null ],
-    [ "checkWhitspaceChar", "classerpcgen_1_1_python_generator.html#ab1ed7536bc90b790eef9e499e1f25530", null ],
-    [ "convertComment", "classerpcgen_1_1_python_generator.html#a8b627ff8666052e6799bd8b87d8d8b74", null ],
+    [ "checkWhitespaceChar", "classerpcgen_1_1_python_generator.html#a2e62841c0c87052e66c739c021653687", null ],
+    [ "convertComment", "classerpcgen_1_1_python_generator.html#aef9e26fb6e7e9dfc9fb824210a2c0c02", null ],
     [ "filterName", "classerpcgen_1_1_python_generator.html#a3a18b17878987df2ea6606d8beb45887", null ],
     [ "generate", "classerpcgen_1_1_python_generator.html#a5965f9a8c7980ec7174cc2a7f4216019", null ],
     [ "generateClientFile", "classerpcgen_1_1_python_generator.html#a2089e01eceb16260cc331687cceddfaa", null ],
@@ -19,14 +19,14 @@ var classerpcgen_1_1_python_generator =
     [ "generateServerFile", "classerpcgen_1_1_python_generator.html#a93a809338bbbf64d52d77a356571ac98", null ],
     [ "getBuiltinTypename", "classerpcgen_1_1_python_generator.html#a8cc74c4d08efa3629983131b0037f085", null ],
     [ "getEnumMembersTemplateData", "classerpcgen_1_1_python_generator.html#a2af3aec5e6e3fee1417287f4c12c5cfc", null ],
-    [ "getFunctionPrototype", "classerpcgen_1_1_python_generator.html#a82835df27d6dce465b6cbd77d97476ae", null ],
+    [ "getFunctionPrototype", "classerpcgen_1_1_python_generator.html#ab7c6e15779bc69b40254c0519fbe7172", null ],
     [ "getFunctionTemplateData", "classerpcgen_1_1_python_generator.html#ab3841ddb0f9ebf4cb63fe8f002d0355c", null ],
+    [ "getFunctionTypeTemplateData", "classerpcgen_1_1_python_generator.html#a9f407a1b9fd4d6d5796c6b8c5bacdb5b", null ],
     [ "getTypeInfo", "classerpcgen_1_1_python_generator.html#ab2c05b210c26321b3c8d3596a6bbb63d", null ],
     [ "initPythonReservedWords", "classerpcgen_1_1_python_generator.html#a0c489b72c0a49e306655e5d09dfa9cce", null ],
     [ "makeAliasesTemplateData", "classerpcgen_1_1_python_generator.html#a8432d73aacea31ea804c9f61e951fbf2", null ],
     [ "makeConstTemplateData", "classerpcgen_1_1_python_generator.html#aa037acaace79eb6ca1574dd0f8f224b3", null ],
     [ "makeEnumsTemplateData", "classerpcgen_1_1_python_generator.html#a159433bdd4b08321645dde2ab16486eb", null ],
-    [ "makeFunctionsTemplateData", "classerpcgen_1_1_python_generator.html#aad265247ed52bc38c3d7762ef2a33db4", null ],
     [ "makeGroupSymbolsTemplateData", "classerpcgen_1_1_python_generator.html#ac48c017cf8fc45f568774ef8e530013e", null ],
     [ "parseSubtemplates", "classerpcgen_1_1_python_generator.html#ad42fb80a53dd3a60083e068213c1e1dc", null ],
     [ "setOneStructMemberTemplateData", "classerpcgen_1_1_python_generator.html#afda1685e2f240fb65bbba975fb686e76", null ],

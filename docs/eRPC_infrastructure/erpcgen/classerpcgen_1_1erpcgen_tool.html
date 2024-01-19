@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -163,7 +163,9 @@ Protected Types</h2></td></tr>
 <tr class="memitem:a2272fbc051cb2f34767db19b2b96b836"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2272fbc051cb2f34767db19b2b96b836"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>languages_t</b> { <br />
 &#160;&#160;<b>kCLanguage</b>, 
 <br />
-&#160;&#160;<b>kPythonLanguage</b>
+&#160;&#160;<b>kPythonLanguage</b>, 
+<br />
+&#160;&#160;<b>kJavaLanguage</b>
 <br />
  }</td></tr>
 <tr class="separator:a2272fbc051cb2f34767db19b2b96b836"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -190,6 +192,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a545ca3976d44a60b1ce59f2a63897e86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90adef0cb996f0bb4df3092315c1d5a1"><td class="memItemLeft" align="right" valign="top">InterfaceDefinition::codec_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1erpcgen_tool.html#a90adef0cb996f0bb4df3092315c1d5a1">m_codec</a></td></tr>
 <tr class="separator:a90adef0cb996f0bb4df3092315c1d5a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a467a9a2d9b94aec55a1481de187811b2"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1erpcgen_tool.html#a467a9a2d9b94aec55a1481de187811b2">m_javaPackageName</a></td></tr>
+<tr class="separator:a467a9a2d9b94aec55a1481de187811b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that encapsulates the erpcgen tool. </p>
@@ -391,7 +395,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="class_log.html#a4ff7049d62b9094caf622d9d8b7d6c57" title="Log a message with Logger::kError level. ">Log::error</a></td><td>This function is called, when function wasn't processed successfully. </td></tr>
+    <tr><td class="paramname"><a class="el" href="class_log.html#a4ff7049d62b9094caf622d9d8b7d6c57" title="Log a message with #Logger::kError level. ">Log::error</a></td><td>This function is called, when function wasn't processed successfully. </td></tr>
     <tr><td class="paramname">runtime_error</td><td>Thrown, when positional args is empty. </td></tr>
   </table>
   </dd>
@@ -481,6 +485,27 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>ERPC file. </p>
+
+</div>
+</div>
+<a class="anchor" id="a467a9a2d9b94aec55a1481de187811b2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string erpcgen::erpcgenTool::m_javaPackageName</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Used java package. </p>
 
 </div>
 </div>

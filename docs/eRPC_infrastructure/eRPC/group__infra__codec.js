@@ -4,7 +4,8 @@ var group__infra__codec =
     [ "erpc_codec.hpp", "erpc__codec_8hpp.html", null ],
     [ "erpc_message_buffer.hpp", "erpc__message__buffer_8hpp.html", null ],
     [ "BasicCodec", "classerpc_1_1_basic_codec.html", [
-      [ "BasicCodec", "classerpc_1_1_basic_codec.html#abd7b171481037fc3a9f4238acf6f7f6d", null ],
+      [ "BasicCodec", "classerpc_1_1_basic_codec.html#afa2bf959bf3802d01314c50453252015", null ],
+      [ "~BasicCodec", "classerpc_1_1_basic_codec.html#af11142f93f940a9ce3964fe6d4a5b6b5", null ],
       [ "startWriteMessage", "classerpc_1_1_basic_codec.html#a33d38fa04f8fbbeb6083877e64e38bcc", null ],
       [ "writeData", "classerpc_1_1_basic_codec.html#a7ce6c47bcb25093c3c69277d6c4d98ea", null ],
       [ "write", "classerpc_1_1_basic_codec.html#a60715de9345dca91ea57936c60b66470", null ],
@@ -24,8 +25,6 @@ var group__infra__codec =
       [ "startWriteList", "classerpc_1_1_basic_codec.html#aae93dd526efcd3d8bd2ee5eb131d4d06", null ],
       [ "startWriteUnion", "classerpc_1_1_basic_codec.html#a8922ffc14d40547332944b9be2ccaa1e", null ],
       [ "writeNullFlag", "classerpc_1_1_basic_codec.html#af48f6fa8b24b279b1c1b7959f8b1cee4", null ],
-      [ "writeCallback", "classerpc_1_1_basic_codec.html#a93a62ff08b16d0c615b40cae9d30379a", null ],
-      [ "writeCallback", "classerpc_1_1_basic_codec.html#a186fe55fbe74ea7c2e1e95eaa165ca9b", null ],
       [ "startReadMessage", "classerpc_1_1_basic_codec.html#ab704e735b8b15b22a66574a866fe6f8a", null ],
       [ "readData", "classerpc_1_1_basic_codec.html#a6f2abb34bfd874ad8ea64537caf8236f", null ],
       [ "read", "classerpc_1_1_basic_codec.html#a075e3e213224ebe0e3a261a24edbe6ef", null ],
@@ -44,20 +43,21 @@ var group__infra__codec =
       [ "readBinary", "classerpc_1_1_basic_codec.html#aed673eaca5c768f28c419990c86820c3", null ],
       [ "startReadList", "classerpc_1_1_basic_codec.html#a1af15313f92dc9dae454570b7ae0e90e", null ],
       [ "startReadUnion", "classerpc_1_1_basic_codec.html#a0d8519b842e307574c4d2b36adde1065", null ],
-      [ "readNullFlag", "classerpc_1_1_basic_codec.html#a40021a080250cd09b8cbcaf0eaff88d0", null ],
-      [ "readCallback", "classerpc_1_1_basic_codec.html#af81ce3b25d504b1841d3cfa91277c63b", null ],
-      [ "readCallback", "classerpc_1_1_basic_codec.html#a5a0125e98aa650b4f9bd1aa1db552223", null ]
+      [ "readNullFlag", "classerpc_1_1_basic_codec.html#a40021a080250cd09b8cbcaf0eaff88d0", null ]
     ] ],
     [ "BasicCodecFactory", "classerpc_1_1_basic_codec_factory.html", [
+      [ "BasicCodecFactory", "classerpc_1_1_basic_codec_factory.html#a866df6b84968b5cdde245e2d6db0cf1e", null ],
+      [ "~BasicCodecFactory", "classerpc_1_1_basic_codec_factory.html#a4213aede299c450edce8825fead0553a", null ],
       [ "create", "classerpc_1_1_basic_codec_factory.html#ad498ae49e4180191cc8ec63c51f6aedd", null ],
       [ "dispose", "classerpc_1_1_basic_codec_factory.html#ae2d5f6edf7255cb0bdacba3e0040f51a", null ]
     ] ],
     [ "Codec", "classerpc_1_1_codec.html", [
       [ "Codec", "classerpc_1_1_codec.html#a39f0596a2957fb80bf3b5de6a4420f26", null ],
       [ "~Codec", "classerpc_1_1_codec.html#adab0e09abe91747902ac3d4622682082", null ],
-      [ "getBuffer", "classerpc_1_1_codec.html#a1ffdc810b2381805a0ab4e92201f72d3", null ],
-      [ "setBuffer", "classerpc_1_1_codec.html#ace7d311abca68729346074d603879c9f", null ],
-      [ "reset", "classerpc_1_1_codec.html#a5ee5a1d8930812d4256201bde6390bf3", null ],
+      [ "getBuffer", "classerpc_1_1_codec.html#a3db88abe49ead1273cd940f4efc0c4ad", null ],
+      [ "getBufferRef", "classerpc_1_1_codec.html#a6c75c8bbf2dfbe3fe1505de1aec3fdcd", null ],
+      [ "setBuffer", "classerpc_1_1_codec.html#affa4b95dc470afa54909d3e3857f1e50", null ],
+      [ "reset", "classerpc_1_1_codec.html#a9a1b03a0b9d56eed6f8caf22432706f7", null ],
       [ "getStatus", "classerpc_1_1_codec.html#ac329078b8a41270ef630ec44cb408860", null ],
       [ "isStatusOk", "classerpc_1_1_codec.html#a663439fd4b60421df4915f43c07051b8", null ],
       [ "updateStatus", "classerpc_1_1_codec.html#a86556f8f7f972a796766bcaafae3f349", null ],
@@ -79,8 +79,6 @@ var group__infra__codec =
       [ "startWriteList", "classerpc_1_1_codec.html#aa2b752ae654eecf49a388dca8d341f7d", null ],
       [ "startWriteUnion", "classerpc_1_1_codec.html#a87fdbe883363642751bae1d6d53520c8", null ],
       [ "writeNullFlag", "classerpc_1_1_codec.html#a41efd3899943f2168f7f58be03045679", null ],
-      [ "writeCallback", "classerpc_1_1_codec.html#a16711856846fa8bf4b8b70e69249b98e", null ],
-      [ "writeCallback", "classerpc_1_1_codec.html#ac8a168512fd2fb26797d49c3b41732a5", null ],
       [ "startReadMessage", "classerpc_1_1_codec.html#a958e07b9dc0853ab4de4e834b6d54d50", null ],
       [ "read", "classerpc_1_1_codec.html#affef2ee164f9b68623858bb00f0a473d", null ],
       [ "read", "classerpc_1_1_codec.html#ac95c32b5a5df22711b6f33410bce7984", null ],
@@ -99,10 +97,7 @@ var group__infra__codec =
       [ "startReadList", "classerpc_1_1_codec.html#a961a5e0bf1911da2446fb58a6d481712", null ],
       [ "startReadUnion", "classerpc_1_1_codec.html#ae08d8fce5eb43efd3cb47187de67c162", null ],
       [ "readNullFlag", "classerpc_1_1_codec.html#a0f5dc329e076ee69789d500a6b12ae14", null ],
-      [ "readCallback", "classerpc_1_1_codec.html#a3f7eedc7d95818b93c8ac1d2948015de", null ],
-      [ "readCallback", "classerpc_1_1_codec.html#abd44f7095097d6d702c133a0973457ca", null ],
-      [ "m_buffer", "classerpc_1_1_codec.html#a003c4d8420239b9a347b46554ebeb903", null ],
-      [ "m_cursor", "classerpc_1_1_codec.html#ad9fe5af5136be642e05a9e7335af8ff7", null ],
+      [ "m_cursor", "classerpc_1_1_codec.html#ae5ff4c694cc2107b206380fb923265ee", null ],
       [ "m_status", "classerpc_1_1_codec.html#aa1f493b99584ed6e75a0e4ea06a1d14a", null ]
     ] ],
     [ "CodecFactory", "classerpc_1_1_codec_factory.html", [
@@ -112,27 +107,9 @@ var group__infra__codec =
       [ "dispose", "classerpc_1_1_codec_factory.html#a5dcc103c26e177051cc9e8dd98454591", null ]
     ] ],
     [ "MessageBuffer", "classerpc_1_1_message_buffer.html", [
-      [ "Cursor", "classerpc_1_1_message_buffer_1_1_cursor.html", [
-        [ "Cursor", "classerpc_1_1_message_buffer_1_1_cursor.html#a60509ca3865cd27ce1200acf6ea21393", null ],
-        [ "Cursor", "classerpc_1_1_message_buffer_1_1_cursor.html#a0e15e87d9811aa62005be4a985b94451", null ],
-        [ "set", "classerpc_1_1_message_buffer_1_1_cursor.html#adb7e71e444dcdb0a135d45d351d5dd62", null ],
-        [ "get", "classerpc_1_1_message_buffer_1_1_cursor.html#a63d96e45fb73f509b40c9692734b77c8", null ],
-        [ "get", "classerpc_1_1_message_buffer_1_1_cursor.html#a4d588e8e587f3b21c252ea98e37b9e91", null ],
-        [ "getRemaining", "classerpc_1_1_message_buffer_1_1_cursor.html#a6f3dff599ef13d4ffca7e5d559a50afa", null ],
-        [ "getRemainingUsed", "classerpc_1_1_message_buffer_1_1_cursor.html#af00cc3be42e41c2a1b01ee3707f59b95", null ],
-        [ "read", "classerpc_1_1_message_buffer_1_1_cursor.html#a13613fadb3bb88585f5802ff845259a4", null ],
-        [ "write", "classerpc_1_1_message_buffer_1_1_cursor.html#a7e3588d2e063d827dbe5dbf72d5952e8", null ],
-        [ "operator uint8_t *", "classerpc_1_1_message_buffer_1_1_cursor.html#aa5019dc0b15d584306b7f8048471a7c7", null ],
-        [ "operator const uint8_t *", "classerpc_1_1_message_buffer_1_1_cursor.html#ae4f90eaa930d92cc411272df9f038218", null ],
-        [ "operator[]", "classerpc_1_1_message_buffer_1_1_cursor.html#a2f1e17f17825f09461f56251f490da86", null ],
-        [ "operator[]", "classerpc_1_1_message_buffer_1_1_cursor.html#a8674068997bbabb7290c1ea98222cd77", null ],
-        [ "operator+=", "classerpc_1_1_message_buffer_1_1_cursor.html#a0959f4badd1e460843e27796d6a617d7", null ],
-        [ "operator-=", "classerpc_1_1_message_buffer_1_1_cursor.html#a5afd2d6fde5886c56e829e2764cb31cf", null ],
-        [ "operator++", "classerpc_1_1_message_buffer_1_1_cursor.html#a7cea25fd89b923762142d28a2b29ec5c", null ],
-        [ "operator--", "classerpc_1_1_message_buffer_1_1_cursor.html#a07bcd96a371c9abc96be26866b436e37", null ]
-      ] ],
       [ "MessageBuffer", "classerpc_1_1_message_buffer.html#ada32e828c2edcd3546376d4d3ee90081", null ],
       [ "MessageBuffer", "classerpc_1_1_message_buffer.html#a7785b972a2ed8719a7afcd8f15c1b3ca", null ],
+      [ "MessageBuffer", "classerpc_1_1_message_buffer.html#a292834bab301b933d79a5a77a37ab5fb", null ],
       [ "set", "classerpc_1_1_message_buffer.html#ae68c8d9c1ded075f6a85ecd92fb958be", null ],
       [ "get", "classerpc_1_1_message_buffer.html#adb0539e7fbd649e0902efb61b7b7cf6b", null ],
       [ "get", "classerpc_1_1_message_buffer.html#aab101146fdec5df33e7bdf7608dddcef", null ],
@@ -150,11 +127,12 @@ var group__infra__codec =
       [ "operator[]", "classerpc_1_1_message_buffer.html#a2f3450dcebc3fec37f2d5719847042f8", null ]
     ] ],
     [ "MessageBufferFactory", "classerpc_1_1_message_buffer_factory.html", [
-      [ "MessageBufferFactory", "classerpc_1_1_message_buffer_factory.html#a619ed494036f760b0394b43815f2a086", null ],
-      [ "~MessageBufferFactory", "classerpc_1_1_message_buffer_factory.html#add24390e455e842edc93467feb40e8eb", null ],
+      [ "MessageBufferFactory", "classerpc_1_1_message_buffer_factory.html#a405ac0162a485e75bb4848cb65664cf4", null ],
+      [ "~MessageBufferFactory", "classerpc_1_1_message_buffer_factory.html#aaa0e015e0f05726a8329fd9492d66e8a", null ],
       [ "create", "classerpc_1_1_message_buffer_factory.html#a16330c2cb35a0329efb98430018273da", null ],
-      [ "createServerBuffer", "classerpc_1_1_message_buffer_factory.html#a52d400d44d1836d7764cc64e3d842a06", null ],
-      [ "prepareServerBufferForSend", "classerpc_1_1_message_buffer_factory.html#aab77e9b0501e87a332f4cb3e2835bd54", null ],
+      [ "create", "classerpc_1_1_message_buffer_factory.html#afa0402452a9bf8910731d5f59193449b", null ],
+      [ "createServerBuffer", "classerpc_1_1_message_buffer_factory.html#a09f45de145d4b951228d7a38910cfc42", null ],
+      [ "prepareServerBufferForSend", "classerpc_1_1_message_buffer_factory.html#a580a3a72effff3e73c269923315039b8", null ],
       [ "dispose", "classerpc_1_1_message_buffer_factory.html#a089b5bf3041323a3387c52c86fd61971", null ]
     ] ]
 ];

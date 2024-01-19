@@ -1,9 +1,12 @@
 var searchData=
 [
-  ['uarttransport',['UartTransport',['../classerpc_1_1_uart_transport.html#afef0f236ad72e5a21112f9b8c415b95f',1,'erpc::UartTransport']]],
-  ['underlyingreceive',['underlyingReceive',['../classerpc_1_1_framed_transport.html#aad1844c654b1f0dd09f275fafc1b7a7e',1,'erpc::FramedTransport::underlyingReceive()'],['../classerpc_1_1_t_c_p_transport.html#ad8d68b7622a84df194ed952c4bfbd2a4',1,'erpc::TCPTransport::underlyingReceive()']]],
-  ['underlyingsend',['underlyingSend',['../classerpc_1_1_framed_transport.html#af5bc7721ee65e9c8230d43a87c47d925',1,'erpc::FramedTransport::underlyingSend()'],['../classerpc_1_1_t_c_p_transport.html#a3775372dfa7de5fe614c02d635cac05a',1,'erpc::TCPTransport::underlyingSend()']]],
-  ['unlock',['unlock',['../classerpc_1_1_mutex.html#a8a936aa1a83f74e1ad224982af2d9792',1,'erpc::Mutex']]],
-  ['updatestatus',['updateStatus',['../classerpc_1_1_codec.html#a86556f8f7f972a796766bcaafae3f349',1,'erpc::Codec']]],
-  ['usbcdctransport',['UsbCdcTransport',['../classerpc_1_1_usb_cdc_transport.html#aedb9ac8397a72583c7adc3457a7c1e96',1,'erpc::UsbCdcTransport']]]
+  ['tcptransport',['TCPTransport',['../classerpc_1_1_t_c_p_transport.html#aeb1f592078d519301d3bc0742670ed78',1,'erpc::TCPTransport::TCPTransport(bool isServer)'],['../classerpc_1_1_t_c_p_transport.html#ac2f9d1dc1d6aecf85e6672656c8ad487',1,'erpc::TCPTransport::TCPTransport(const char *host, uint16_t port, bool isServer)']]],
+  ['thread',['Thread',['../classerpc_1_1_thread.html#a5bdd8acf426795e33c858e070ba0e8bb',1,'erpc::Thread::Thread(const char *name=0)'],['../classerpc_1_1_thread.html#a5d866b2aa8144387f81304517c437fa0',1,'erpc::Thread::Thread(thread_entry_t entry, uint32_t priority=0, uint32_t stackSize=0, const char *name=0, thread_stack_pointer stackPtr=NULL)']]],
+  ['threadentrypoint',['threadEntryPoint',['../classerpc_1_1_thread.html#a549c658e575af0342283a688e58b26eb',1,'erpc::Thread']]],
+  ['transfer_5fcb',['transfer_cb',['../classerpc_1_1_dspi_slave_transport.html#a72f4c34ef9ec316f03a7f713a1545b6e',1,'erpc::DspiSlaveTransport::transfer_cb()'],['../classerpc_1_1_i2c_slave_transport.html#aab03a0ae125ea8bb44c3ba4bf88107c2',1,'erpc::I2cSlaveTransport::transfer_cb()'],['../classerpc_1_1_l_p_i2c_slave_transport.html#a00a04b1a134caf593b8b5ab6adf719a4',1,'erpc::LPI2cSlaveTransport::transfer_cb()'],['../classerpc_1_1_l_p_spi_slave_transport.html#af5aefc51d5182eba81f87ff7d61efaf9',1,'erpc::LPSpiSlaveTransport::transfer_cb()'],['../classerpc_1_1_spi_slave_transport.html#a70d6fbf5a4c23325f106bb6a8fba44da',1,'erpc::SpiSlaveTransport::transfer_cb()']]],
+  ['transport',['Transport',['../classerpc_1_1_transport.html#af0b6b9c50d238f99de90ccd8b6050c91',1,'erpc::Transport']]],
+  ['transportarbitrator',['TransportArbitrator',['../classerpc_1_1_transport_arbitrator.html#a036683937acdb539f8fbc44995120648',1,'erpc::TransportArbitrator']]],
+  ['transportfactory',['TransportFactory',['../classerpc_1_1_transport_factory.html#a3df8dc7ce4f6c9972fe4a5183c3a894f',1,'erpc::TransportFactory']]],
+  ['trylock',['tryLock',['../classerpc_1_1_mutex.html#a69702e86e24cbb72cb144a626bae07bb',1,'erpc::Mutex']]],
+  ['tx_5fcb',['tx_cb',['../classerpc_1_1_m_u_transport.html#ad7d078fe2c9e6c31c4eefe6d7720a244',1,'erpc::MUTransport::tx_cb()'],['../classerpc_1_1_uart_transport.html#ae285c1aa6b805c50ff2d743535bdfd27',1,'erpc::UartTransport::tx_cb(void)'],['../classerpc_1_1_uart_transport.html#a14007a8096842eba5436b045ddce8ff3',1,'erpc::UartTransport::tx_cb(void)'],['../classerpc_1_1_usb_cdc_transport.html#ac2ea2e9052222e1ceba6eddf1e6ba0c3',1,'erpc::UsbCdcTransport::tx_cb()']]]
 ];

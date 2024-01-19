@@ -1,7 +1,7 @@
 var erpc__basic__codec_8hpp =
 [
-    [ "_null_flag", "erpc__basic__codec_8hpp.html#a21a4abaef5b1d4080cc65043a9ccd89f", [
-      [ "kNotNull", "erpc__basic__codec_8hpp.html#a21a4abaef5b1d4080cc65043a9ccd89fad50982dd6aa1e55ce635325480b122cc", null ],
-      [ "kIsNull", "erpc__basic__codec_8hpp.html#a21a4abaef5b1d4080cc65043a9ccd89faf61feb49b44fefd0f83fc007f25f2b31", null ]
+    [ "null_flag_t", "erpc__basic__codec_8hpp.html#ae8176d427bf2d204870a6163baa2fe81", [
+      [ "kNotNull", "erpc__basic__codec_8hpp.html#ae8176d427bf2d204870a6163baa2fe81a1a578f0f8d46031f3bacc20f79162499", null ],
+      [ "kIsNull", "erpc__basic__codec_8hpp.html#ae8176d427bf2d204870a6163baa2fe81a97d32b1715072e6ea4faed111189927a", null ]
     ] ]
 ];

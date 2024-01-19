@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -140,262 +140,165 @@ typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="separator:ga91393683cc6882b93796e4c28438c84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-CMSIS UART transport setup</h2></td></tr>
-<tr class="memitem:gadd5c1658590ea80c4c777c872ac4dd94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gadd5c1658590ea80c4c777c872ac4dd94">erpc_transport_cmsis_uart_init</a> (void *uartDrv)</td></tr>
-<tr class="memdesc:gadd5c1658590ea80c4c777c872ac4dd94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a CMSIS UART transport.  <a href="#gadd5c1658590ea80c4c777c872ac4dd94">More...</a><br /></td></tr>
-<tr class="separator:gadd5c1658590ea80c4c777c872ac4dd94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-Host PC serial port transport setup</h2></td></tr>
-<tr class="memitem:ga1b147303de598800663eb584960d3450"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga1b147303de598800663eb584960d3450">erpc_transport_serial_init</a> (const char *portName, long baudRate)</td></tr>
-<tr class="memdesc:ga1b147303de598800663eb584960d3450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a host PC serial port transport.  <a href="#ga1b147303de598800663eb584960d3450">More...</a><br /></td></tr>
-<tr class="separator:ga1b147303de598800663eb584960d3450"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-SPI transport setup</h2></td></tr>
-<tr class="memitem:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gacb323f539b6f76ae42c8a0bd1d531d1e">erpc_transport_spi_master_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
-<tr class="memdesc:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPI master transport.  <a href="#gacb323f539b6f76ae42c8a0bd1d531d1e">More...</a><br /></td></tr>
-<tr class="separator:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaed6619b165642ced65cb37275f0838b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaed6619b165642ced65cb37275f0838b9">erpc_transport_spi_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
-<tr class="memdesc:gaed6619b165642ced65cb37275f0838b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPI slave transport.  <a href="#gaed6619b165642ced65cb37275f0838b9">More...</a><br /></td></tr>
-<tr class="separator:gaed6619b165642ced65cb37275f0838b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 DSPI transport setup</h2></td></tr>
 <tr class="memitem:ga6e4233b8dae8239d9cfc0a8bfc510fae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga6e4233b8dae8239d9cfc0a8bfc510fae">erpc_transport_dspi_master_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
 <tr class="memdesc:ga6e4233b8dae8239d9cfc0a8bfc510fae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a DSPI master transport.  <a href="#ga6e4233b8dae8239d9cfc0a8bfc510fae">More...</a><br /></td></tr>
 <tr class="separator:ga6e4233b8dae8239d9cfc0a8bfc510fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4962d66c7815ec425190f1e6cdad186d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga4962d66c7815ec425190f1e6cdad186d">erpc_transport_dspi_master_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga4962d66c7815ec425190f1e6cdad186d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize DSPI master transport.  <a href="#ga4962d66c7815ec425190f1e6cdad186d">More...</a><br /></td></tr>
+<tr class="separator:ga4962d66c7815ec425190f1e6cdad186d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac616eb1f8e41b1ac4b14ebfb231c565e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gac616eb1f8e41b1ac4b14ebfb231c565e">erpc_transport_dspi_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
 <tr class="memdesc:gac616eb1f8e41b1ac4b14ebfb231c565e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a DSPI slave transport.  <a href="#gac616eb1f8e41b1ac4b14ebfb231c565e">More...</a><br /></td></tr>
 <tr class="separator:gac616eb1f8e41b1ac4b14ebfb231c565e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-LPSPI transport setup</h2></td></tr>
-<tr class="memitem:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gacfe5e07c008ba0641ce48ae077bfb5d3">erpc_transport_lpspi_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
-<tr class="memdesc:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a LPSPI slave transport.  <a href="#gacfe5e07c008ba0641ce48ae077bfb5d3">More...</a><br /></td></tr>
-<tr class="separator:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-SPIdev transport setup</h2></td></tr>
-<tr class="memitem:gadb42991295a59e64ef2ba0d26416dfc7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gadb42991295a59e64ef2ba0d26416dfc7">erpc_transport_spidev_master_init</a> (const char *spidev, uint32_t speed_Hz)</td></tr>
-<tr class="memdesc:gadb42991295a59e64ef2ba0d26416dfc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPIdev transport.  <a href="#gadb42991295a59e64ef2ba0d26416dfc7">More...</a><br /></td></tr>
-<tr class="separator:gadb42991295a59e64ef2ba0d26416dfc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-MU transport setup</h2></td></tr>
-<tr class="memitem:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaa5b2e0c4868c59f9210a8a43cc8feaac">erpc_transport_mu_init</a> (void *baseAddr)</td></tr>
-<tr class="memdesc:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an MU transport.  <a href="#gaa5b2e0c4868c59f9210a8a43cc8feaac">More...</a><br /></td></tr>
-<tr class="separator:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-RPMsg-Lite transport setup</h2></td></tr>
-<tr class="memitem:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga66ce929ff3f1a3c3fc41b7a61046395a">erpc_transport_rpmsg_lite_master_init</a> (uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id)</td></tr>
-<tr class="memdesc:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite transport.  <a href="#ga66ce929ff3f1a3c3fc41b7a61046395a">More...</a><br /></td></tr>
-<tr class="separator:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga2c5e55dc9a0dcc71f49307684f7f9889">erpc_transport_rpmsg_lite_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
-<tr class="memdesc:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite transport.  <a href="#ga2c5e55dc9a0dcc71f49307684f7f9889">More...</a><br /></td></tr>
-<tr class="separator:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga64968859e91d0981eba046a789970a89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga64968859e91d0981eba046a789970a89">erpc_transport_rpmsg_lite_rtos_master_init</a> (uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id)</td></tr>
-<tr class="memdesc:ga64968859e91d0981eba046a789970a89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite RTOS transport.  <a href="#ga64968859e91d0981eba046a789970a89">More...</a><br /></td></tr>
-<tr class="separator:ga64968859e91d0981eba046a789970a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga9f515fd359ccfb08fc37c31eaf11caa8">erpc_transport_rpmsg_lite_rtos_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
-<tr class="memdesc:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite RTOS transport.  <a href="#ga9f515fd359ccfb08fc37c31eaf11caa8">More...</a><br /></td></tr>
-<tr class="separator:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaae1c57466e15bd11815fdf20acd5cb44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaae1c57466e15bd11815fdf20acd5cb44">erpc_transport_rpmsg_lite_tty_rtos_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
-<tr class="memdesc:gaae1c57466e15bd11815fdf20acd5cb44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite TTY transport.  <a href="#gaae1c57466e15bd11815fdf20acd5cb44">More...</a><br /></td></tr>
-<tr class="separator:gaae1c57466e15bd11815fdf20acd5cb44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae31326c850449e6983fdea9e75900ddf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gae31326c850449e6983fdea9e75900ddf">erpc_transport_rpmsg_lite_tty_rtos_deinit</a> (void)</td></tr>
-<tr class="memdesc:gae31326c850449e6983fdea9e75900ddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize an RPMSG lite tty rtos transport.  <a href="#gae31326c850449e6983fdea9e75900ddf">More...</a><br /></td></tr>
-<tr class="separator:gae31326c850449e6983fdea9e75900ddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-Linux RPMSG endpoint setup</h2></td></tr>
-<tr class="memitem:ga3c41e3f28a910416a17ba6e418e5771a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga3c41e3f28a910416a17ba6e418e5771a">erpc_transport_rpmsg_linux_init</a> (int16_t local_addr, int8_t type, int16_t remote_addr)</td></tr>
-<tr class="memdesc:ga3c41e3f28a910416a17ba6e418e5771a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an Linux RPMSG endpoint transport.  <a href="#ga3c41e3f28a910416a17ba6e418e5771a">More...</a><br /></td></tr>
-<tr class="separator:ga3c41e3f28a910416a17ba6e418e5771a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga47ceb0fc19ed2d526711e5edb7857bfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga47ceb0fc19ed2d526711e5edb7857bfc">erpc_transport_rpmsg_linux_deinit</a> (void)</td></tr>
-<tr class="memdesc:ga47ceb0fc19ed2d526711e5edb7857bfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize an Linux RPMSG endpoint transport.  <a href="#ga47ceb0fc19ed2d526711e5edb7857bfc">More...</a><br /></td></tr>
-<tr class="separator:ga47ceb0fc19ed2d526711e5edb7857bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-TCP transport setup</h2></td></tr>
-<tr class="memitem:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga04d179a8f547f7f7924fd9a7ec9205aa">erpc_transport_tcp_init</a> (const char *host, uint16_t port, bool isServer)</td></tr>
-<tr class="memdesc:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create and open TCP transport.  <a href="#ga04d179a8f547f7f7924fd9a7ec9205aa">More...</a><br /></td></tr>
-<tr class="separator:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6a7cbe195e4275705c0e3ab5338c8664"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga6a7cbe195e4275705c0e3ab5338c8664">erpc_transport_tcp_close</a> (void)</td></tr>
-<tr class="memdesc:ga6a7cbe195e4275705c0e3ab5338c8664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close TCP connection.  <a href="#ga6a7cbe195e4275705c0e3ab5338c8664">More...</a><br /></td></tr>
-<tr class="separator:ga6a7cbe195e4275705c0e3ab5338c8664"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-USB CDC transport setup</h2></td></tr>
-<tr class="memitem:ga34c5ca73771a6175e9ba1ffe40630879"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga34c5ca73771a6175e9ba1ffe40630879">erpc_transport_usb_cdc_init</a> (void *serialHandle, void *serialConfig, void *usbCdcConfig, uint8_t *usbRingBuffer, uint32_t usbRingBufferLength)</td></tr>
-<tr class="memdesc:ga34c5ca73771a6175e9ba1ffe40630879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an USB CDC transport.  <a href="#ga34c5ca73771a6175e9ba1ffe40630879">More...</a><br /></td></tr>
-<tr class="separator:ga34c5ca73771a6175e9ba1ffe40630879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6e560c826bfd7c9a253719bc01a5dabe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga6e560c826bfd7c9a253719bc01a5dabe">erpc_transport_dspi_slave_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga6e560c826bfd7c9a253719bc01a5dabe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize DSPI slave transport.  <a href="#ga6e560c826bfd7c9a253719bc01a5dabe">More...</a><br /></td></tr>
+<tr class="separator:ga6e560c826bfd7c9a253719bc01a5dabe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 I2C transport setup</h2></td></tr>
 <tr class="memitem:ga1d9f98c8926f281f68dbeca9e21f5ba9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga1d9f98c8926f281f68dbeca9e21f5ba9">erpc_transport_i2c_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
 <tr class="memdesc:ga1d9f98c8926f281f68dbeca9e21f5ba9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an I2C slave transport.  <a href="#ga1d9f98c8926f281f68dbeca9e21f5ba9">More...</a><br /></td></tr>
 <tr class="separator:ga1d9f98c8926f281f68dbeca9e21f5ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab0967247e6e3008737bad540e412be0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gab0967247e6e3008737bad540e412be0f">erpc_transport_i2c_slave_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gab0967247e6e3008737bad540e412be0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize I2C slave transport.  <a href="#gab0967247e6e3008737bad540e412be0f">More...</a><br /></td></tr>
+<tr class="separator:gab0967247e6e3008737bad540e412be0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 LPI2C transport setup</h2></td></tr>
 <tr class="memitem:gad609adbdfb449e937c7d1aa38651ce91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gad609adbdfb449e937c7d1aa38651ce91">erpc_transport_lpi2c_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
 <tr class="memdesc:gad609adbdfb449e937c7d1aa38651ce91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an LPI2C slave transport.  <a href="#gad609adbdfb449e937c7d1aa38651ce91">More...</a><br /></td></tr>
 <tr class="separator:gad609adbdfb449e937c7d1aa38651ce91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga07df36d63887903bea28c696190f9a47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga07df36d63887903bea28c696190f9a47">erpc_transport_lpi2c_slave_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga07df36d63887903bea28c696190f9a47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize LPI2C slave transport.  <a href="#ga07df36d63887903bea28c696190f9a47">More...</a><br /></td></tr>
+<tr class="separator:ga07df36d63887903bea28c696190f9a47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+LPSPI transport setup</h2></td></tr>
+<tr class="memitem:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gacfe5e07c008ba0641ce48ae077bfb5d3">erpc_transport_lpspi_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
+<tr class="memdesc:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a LPSPI slave transport.  <a href="#gacfe5e07c008ba0641ce48ae077bfb5d3">More...</a><br /></td></tr>
+<tr class="separator:gacfe5e07c008ba0641ce48ae077bfb5d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabf43e99b95cbdb9d2818e88305cfc4c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gabf43e99b95cbdb9d2818e88305cfc4c3">erpc_transport_lpspi_slave_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gabf43e99b95cbdb9d2818e88305cfc4c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize LPSPI slave transport.  <a href="#gabf43e99b95cbdb9d2818e88305cfc4c3">More...</a><br /></td></tr>
+<tr class="separator:gabf43e99b95cbdb9d2818e88305cfc4c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+MU transport setup</h2></td></tr>
+<tr class="memitem:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaa5b2e0c4868c59f9210a8a43cc8feaac">erpc_transport_mu_init</a> (void *baseAddr)</td></tr>
+<tr class="memdesc:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an MU transport.  <a href="#gaa5b2e0c4868c59f9210a8a43cc8feaac">More...</a><br /></td></tr>
+<tr class="separator:gaa5b2e0c4868c59f9210a8a43cc8feaac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac983267718f18143702f870226d71a54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gac983267718f18143702f870226d71a54">erpc_transport_mu_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gac983267718f18143702f870226d71a54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize MU transport.  <a href="#gac983267718f18143702f870226d71a54">More...</a><br /></td></tr>
+<tr class="separator:gac983267718f18143702f870226d71a54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+Linux RPMSG endpoint setup</h2></td></tr>
+<tr class="memitem:ga3c41e3f28a910416a17ba6e418e5771a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga3c41e3f28a910416a17ba6e418e5771a">erpc_transport_rpmsg_linux_init</a> (int16_t local_addr, int8_t type, int16_t remote_addr)</td></tr>
+<tr class="memdesc:ga3c41e3f28a910416a17ba6e418e5771a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an Linux RPMSG endpoint transport.  <a href="#ga3c41e3f28a910416a17ba6e418e5771a">More...</a><br /></td></tr>
+<tr class="separator:ga3c41e3f28a910416a17ba6e418e5771a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9e16bcca4c9db9467b8af38aae0bc875"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga9e16bcca4c9db9467b8af38aae0bc875">erpc_transport_rpmsg_linux_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga9e16bcca4c9db9467b8af38aae0bc875"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize an Linux RPMSG endpoint transport.  <a href="#ga9e16bcca4c9db9467b8af38aae0bc875">More...</a><br /></td></tr>
+<tr class="separator:ga9e16bcca4c9db9467b8af38aae0bc875"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+RPMsg-Lite transport setup</h2></td></tr>
+<tr class="memitem:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga66ce929ff3f1a3c3fc41b7a61046395a">erpc_transport_rpmsg_lite_master_init</a> (uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id)</td></tr>
+<tr class="memdesc:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite transport.  <a href="#ga66ce929ff3f1a3c3fc41b7a61046395a">More...</a><br /></td></tr>
+<tr class="separator:ga66ce929ff3f1a3c3fc41b7a61046395a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga97b4caa29ce918b5f2b31e4abf64f9a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga97b4caa29ce918b5f2b31e4abf64f9a2">erpc_transport_rpmsg_lite_master_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga97b4caa29ce918b5f2b31e4abf64f9a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize RPMsg-Lite transport.  <a href="#ga97b4caa29ce918b5f2b31e4abf64f9a2">More...</a><br /></td></tr>
+<tr class="separator:ga97b4caa29ce918b5f2b31e4abf64f9a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga2c5e55dc9a0dcc71f49307684f7f9889">erpc_transport_rpmsg_lite_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
+<tr class="memdesc:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite transport.  <a href="#ga2c5e55dc9a0dcc71f49307684f7f9889">More...</a><br /></td></tr>
+<tr class="separator:ga2c5e55dc9a0dcc71f49307684f7f9889"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga50905cd2bfabf10d12e30686de67cae3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga50905cd2bfabf10d12e30686de67cae3">erpc_transport_rpmsg_lite_remote_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga50905cd2bfabf10d12e30686de67cae3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize RPMsg-Lite transport.  <a href="#ga50905cd2bfabf10d12e30686de67cae3">More...</a><br /></td></tr>
+<tr class="separator:ga50905cd2bfabf10d12e30686de67cae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga64968859e91d0981eba046a789970a89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga64968859e91d0981eba046a789970a89">erpc_transport_rpmsg_lite_rtos_master_init</a> (uint32_t src_addr, uint32_t dst_addr, uint32_t rpmsg_link_id)</td></tr>
+<tr class="memdesc:ga64968859e91d0981eba046a789970a89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite RTOS transport.  <a href="#ga64968859e91d0981eba046a789970a89">More...</a><br /></td></tr>
+<tr class="separator:ga64968859e91d0981eba046a789970a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8558ba3e6d654773005b243d33016ca1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga8558ba3e6d654773005b243d33016ca1">erpc_transport_rpmsg_lite_rtos_master_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga8558ba3e6d654773005b243d33016ca1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize RPMsg-Lite RTOS transport.  <a href="#ga8558ba3e6d654773005b243d33016ca1">More...</a><br /></td></tr>
+<tr class="separator:ga8558ba3e6d654773005b243d33016ca1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga9f515fd359ccfb08fc37c31eaf11caa8">erpc_transport_rpmsg_lite_rtos_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
+<tr class="memdesc:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite RTOS transport.  <a href="#ga9f515fd359ccfb08fc37c31eaf11caa8">More...</a><br /></td></tr>
+<tr class="separator:ga9f515fd359ccfb08fc37c31eaf11caa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga18086b56aed81e4e318df599f60912ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga18086b56aed81e4e318df599f60912ac">erpc_transport_rpmsg_lite_rtos_remote_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga18086b56aed81e4e318df599f60912ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize RPMsg-Lite RTOS transport.  <a href="#ga18086b56aed81e4e318df599f60912ac">More...</a><br /></td></tr>
+<tr class="separator:ga18086b56aed81e4e318df599f60912ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae1c57466e15bd11815fdf20acd5cb44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaae1c57466e15bd11815fdf20acd5cb44">erpc_transport_rpmsg_lite_tty_rtos_remote_init</a> (uint32_t src_addr, uint32_t dst_addr, void *start_address, uint32_t rpmsg_link_id, <a class="el" href="group__transport__setup.html#ga91393683cc6882b93796e4c28438c84c">rpmsg_ready_cb</a> ready, char *nameservice_name)</td></tr>
+<tr class="memdesc:gaae1c57466e15bd11815fdf20acd5cb44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an RPMsg-Lite TTY transport.  <a href="#gaae1c57466e15bd11815fdf20acd5cb44">More...</a><br /></td></tr>
+<tr class="separator:gaae1c57466e15bd11815fdf20acd5cb44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad0bab0a384afd131724c8581bbdf5af6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gad0bab0a384afd131724c8581bbdf5af6">erpc_transport_rpmsg_lite_tty_rtos_remote_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gad0bab0a384afd131724c8581bbdf5af6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize an RPMSG lite tty rtos transport.  <a href="#gad0bab0a384afd131724c8581bbdf5af6">More...</a><br /></td></tr>
+<tr class="separator:gad0bab0a384afd131724c8581bbdf5af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+Host PC serial port transport setup</h2></td></tr>
+<tr class="memitem:ga1b147303de598800663eb584960d3450"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga1b147303de598800663eb584960d3450">erpc_transport_serial_init</a> (const char *portName, long baudRate)</td></tr>
+<tr class="memdesc:ga1b147303de598800663eb584960d3450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a host PC serial port transport.  <a href="#ga1b147303de598800663eb584960d3450">More...</a><br /></td></tr>
+<tr class="separator:ga1b147303de598800663eb584960d3450"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0f84bb03356466bd4f213d5f89bd537a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga0f84bb03356466bd4f213d5f89bd537a">erpc_transport_serial_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga0f84bb03356466bd4f213d5f89bd537a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize a host PC serial port transport.  <a href="#ga0f84bb03356466bd4f213d5f89bd537a">More...</a><br /></td></tr>
+<tr class="separator:ga0f84bb03356466bd4f213d5f89bd537a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+SPI transport setup</h2></td></tr>
+<tr class="memitem:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gacb323f539b6f76ae42c8a0bd1d531d1e">erpc_transport_spi_master_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
+<tr class="memdesc:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPI master transport.  <a href="#gacb323f539b6f76ae42c8a0bd1d531d1e">More...</a><br /></td></tr>
+<tr class="separator:gacb323f539b6f76ae42c8a0bd1d531d1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacabd61e52832b597a239c95681bb92fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gacabd61e52832b597a239c95681bb92fe">erpc_transport_spi_master_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gacabd61e52832b597a239c95681bb92fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize SPI master transport.  <a href="#gacabd61e52832b597a239c95681bb92fe">More...</a><br /></td></tr>
+<tr class="separator:gacabd61e52832b597a239c95681bb92fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaed6619b165642ced65cb37275f0838b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaed6619b165642ced65cb37275f0838b9">erpc_transport_spi_slave_init</a> (void *baseAddr, uint32_t baudRate, uint32_t srcClock_Hz)</td></tr>
+<tr class="memdesc:gaed6619b165642ced65cb37275f0838b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPI slave transport.  <a href="#gaed6619b165642ced65cb37275f0838b9">More...</a><br /></td></tr>
+<tr class="separator:gaed6619b165642ced65cb37275f0838b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga04af655feece19142b5bed21a835f143"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga04af655feece19142b5bed21a835f143">erpc_transport_spi_slave_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga04af655feece19142b5bed21a835f143"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize SPI slave transport.  <a href="#ga04af655feece19142b5bed21a835f143">More...</a><br /></td></tr>
+<tr class="separator:ga04af655feece19142b5bed21a835f143"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+SPIdev transport setup</h2></td></tr>
+<tr class="memitem:gadb42991295a59e64ef2ba0d26416dfc7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gadb42991295a59e64ef2ba0d26416dfc7">erpc_transport_spidev_master_init</a> (const char *spidev, uint32_t speed_Hz)</td></tr>
+<tr class="memdesc:gadb42991295a59e64ef2ba0d26416dfc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a SPIdev transport.  <a href="#gadb42991295a59e64ef2ba0d26416dfc7">More...</a><br /></td></tr>
+<tr class="separator:gadb42991295a59e64ef2ba0d26416dfc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9bbf08cb9a1eb744527e5d41ed237873"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga9bbf08cb9a1eb744527e5d41ed237873">erpc_transport_spidev_master_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga9bbf08cb9a1eb744527e5d41ed237873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize SPIdev transport.  <a href="#ga9bbf08cb9a1eb744527e5d41ed237873">More...</a><br /></td></tr>
+<tr class="separator:ga9bbf08cb9a1eb744527e5d41ed237873"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+TCP transport setup</h2></td></tr>
+<tr class="memitem:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga04d179a8f547f7f7924fd9a7ec9205aa">erpc_transport_tcp_init</a> (const char *host, uint16_t port, bool isServer)</td></tr>
+<tr class="memdesc:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create and open TCP transport.  <a href="#ga04d179a8f547f7f7924fd9a7ec9205aa">More...</a><br /></td></tr>
+<tr class="separator:ga04d179a8f547f7f7924fd9a7ec9205aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad0e0e6458116377508723a28fc39dfdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gad0e0e6458116377508723a28fc39dfdf">erpc_transport_tcp_close</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gad0e0e6458116377508723a28fc39dfdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close TCP connection.  <a href="#gad0e0e6458116377508723a28fc39dfdf">More...</a><br /></td></tr>
+<tr class="separator:gad0e0e6458116377508723a28fc39dfdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad23b9d88d91864e6402d33e94a36dd8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gad23b9d88d91864e6402d33e94a36dd8d">erpc_transport_tcp_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gad23b9d88d91864e6402d33e94a36dd8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize TCP transport.  <a href="#gad23b9d88d91864e6402d33e94a36dd8d">More...</a><br /></td></tr>
+<tr class="separator:gad23b9d88d91864e6402d33e94a36dd8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+CMSIS UART transport setup</h2></td></tr>
+<tr class="memitem:gadd5c1658590ea80c4c777c872ac4dd94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gadd5c1658590ea80c4c777c872ac4dd94">erpc_transport_cmsis_uart_init</a> (void *uartDrv)</td></tr>
+<tr class="memdesc:gadd5c1658590ea80c4c777c872ac4dd94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a CMSIS UART transport.  <a href="#gadd5c1658590ea80c4c777c872ac4dd94">More...</a><br /></td></tr>
+<tr class="separator:gadd5c1658590ea80c4c777c872ac4dd94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaad7f485bc1c822a1459595fa16dab364"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#gaad7f485bc1c822a1459595fa16dab364">erpc_transport_cmsis_uart_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:gaad7f485bc1c822a1459595fa16dab364"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize CMSIS UART transport.  <a href="#gaad7f485bc1c822a1459595fa16dab364">More...</a><br /></td></tr>
+<tr class="separator:gaad7f485bc1c822a1459595fa16dab364"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga99eab2c1e203e70cc7dab8a6a4675fce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga99eab2c1e203e70cc7dab8a6a4675fce">erpc_transport_zephyr_uart_init</a> (void *dev)</td></tr>
+<tr class="memdesc:ga99eab2c1e203e70cc7dab8a6a4675fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a Zephyr UART transport.  <a href="#ga99eab2c1e203e70cc7dab8a6a4675fce">More...</a><br /></td></tr>
+<tr class="separator:ga99eab2c1e203e70cc7dab8a6a4675fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+USB CDC transport setup</h2></td></tr>
+<tr class="memitem:ga34c5ca73771a6175e9ba1ffe40630879"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga34c5ca73771a6175e9ba1ffe40630879">erpc_transport_usb_cdc_init</a> (void *serialHandle, void *serialConfig, void *usbCdcConfig, uint8_t *usbRingBuffer, uint32_t usbRingBufferLength)</td></tr>
+<tr class="memdesc:ga34c5ca73771a6175e9ba1ffe40630879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an USB CDC transport.  <a href="#ga34c5ca73771a6175e9ba1ffe40630879">More...</a><br /></td></tr>
+<tr class="separator:ga34c5ca73771a6175e9ba1ffe40630879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga06f84d7e1c442699a9b721e2102e927d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__transport__setup.html#ga06f84d7e1c442699a9b721e2102e927d">erpc_transport_usb_cdc_deinit</a> (<a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> transport)</td></tr>
+<tr class="memdesc:ga06f84d7e1c442699a9b721e2102e927d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitialize USB CDC transport.  <a href="#ga06f84d7e1c442699a9b721e2102e927d">More...</a><br /></td></tr>
+<tr class="separator:ga06f84d7e1c442699a9b721e2102e927d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gadd5c1658590ea80c4c777c872ac4dd94"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_cmsis_uart_init </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>uartDrv</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a CMSIS UART transport. </p>
-<p>Create a CMSIS UART transport instance, to be used on both the server and the client side.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">uartDrv</td><td>CMSIS USART driver structure address (Driver Control Block).</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga1b147303de598800663eb584960d3450"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_serial_init </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>portName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>baudRate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a host PC serial port transport. </p>
-<p>Create a host PC serial port transport instance.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">portName</td><td>Port name. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>Baud rate.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gacb323f539b6f76ae42c8a0bd1d531d1e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spi_master_init </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>baseAddr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a SPI master transport. </p>
-<p>Create SPI master transport instance, to be used at master core.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of SPI peripheral used in this transport layer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>SPI source clock in Hz.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gaed6619b165642ced65cb37275f0838b9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spi_slave_init </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>baseAddr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a SPI slave transport. </p>
-<p>Create SPI slave transport instance, to be used at slave core.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of SPI peripheral used in this transport layer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>SPI source clock in Hz.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="ga6e4233b8dae8239d9cfc0a8bfc510fae"></a>
 <div class="memitem">
 <div class="memproto">
@@ -437,6 +340,30 @@ LPI2C transport setup</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga4962d66c7815ec425190f1e6cdad186d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_dspi_master_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize DSPI master transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -484,6 +411,166 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga6e560c826bfd7c9a253719bc01a5dabe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_dspi_slave_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize DSPI slave transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga1d9f98c8926f281f68dbeca9e21f5ba9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_i2c_slave_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>baseAddr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>baudRate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create an I2C slave transport. </p>
+<p>Create I2C slave transport instance, to be used at slave core.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of I2C peripheral used in this transport layer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>I2C source clock in Hz.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gab0967247e6e3008737bad540e412be0f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_i2c_slave_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize I2C slave transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gad609adbdfb449e937c7d1aa38651ce91"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_lpi2c_slave_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>baseAddr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>baudRate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create an LPI2C slave transport. </p>
+<p>Create LPI2C slave transport instance, to be used at slave core.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of LPI2C peripheral used in this transport layer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>LPI2C source clock in Hz.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga07df36d63887903bea28c696190f9a47"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_lpi2c_slave_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize LPI2C slave transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="gacfe5e07c008ba0641ce48ae077bfb5d3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -528,40 +615,27 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gadb42991295a59e64ef2ba0d26416dfc7"></a>
+<a class="anchor" id="gabf43e99b95cbdb9d2818e88305cfc4c3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spidev_master_init </td>
+          <td class="memname">void erpc_transport_lpspi_slave_deinit </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>spidev</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>speed_Hz</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create a SPIdev transport. </p>
-<p>Create SPIdev master transport instance, to be used at master core.</p>
+<p>Deinitialize LPSPI slave transport. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">spidev</td><td>SPI device name. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">speed_Hz</td><td>SPI clock speed in Hz.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
 
 </div>
 </div>
@@ -588,6 +662,100 @@ LPI2C transport setup</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac983267718f18143702f870226d71a54"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_mu_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize MU transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga3c41e3f28a910416a17ba6e418e5771a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_rpmsg_linux_init </td>
+          <td>(</td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>local_addr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int8_t&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>remote_addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create an Linux RPMSG endpoint transport. </p>
+<p>This function is using RPMSG endpoints based on this implementation: github.com/nxp-mcuxpresso/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .</p>
+<p>When local/remote address is set to '-1', then default addresses will be used. When type is set to '0', then Datagram model will be used, else Stream.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_addr</td><td>Local endpoint address. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>Datagram (0) or Stream (1). </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">remote_addr</td><td>Remote endpoint address.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga9e16bcca4c9db9467b8af38aae0bc875"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_rpmsg_linux_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize an Linux RPMSG endpoint transport. </p>
+<p>This function deinitialize the Linux RPMSG endpoint transport.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was returned from init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -632,6 +800,30 @@ LPI2C transport setup</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga97b4caa29ce918b5f2b31e4abf64f9a2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_rpmsg_lite_master_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize RPMsg-Lite transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -700,6 +892,30 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga50905cd2bfabf10d12e30686de67cae3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_rpmsg_lite_remote_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize RPMsg-Lite transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ga64968859e91d0981eba046a789970a89"></a>
 <div class="memitem">
 <div class="memproto">
@@ -741,6 +957,30 @@ LPI2C transport setup</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga8558ba3e6d654773005b243d33016ca1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_rpmsg_lite_rtos_master_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize RPMsg-Lite RTOS transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -809,6 +1049,30 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga18086b56aed81e4e318df599f60912ac"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_rpmsg_lite_rtos_remote_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize RPMsg-Lite RTOS transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="gaae1c57466e15bd11815fdf20acd5cb44"></a>
 <div class="memitem">
 <div class="memproto">
@@ -874,46 +1138,46 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gae31326c850449e6983fdea9e75900ddf"></a>
+<a class="anchor" id="gad0bab0a384afd131724c8581bbdf5af6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void erpc_transport_rpmsg_lite_tty_rtos_deinit </td>
+          <td class="memname">void erpc_transport_rpmsg_lite_tty_rtos_remote_deinit </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Deinitialize an RPMSG lite tty rtos transport. </p>
-<p>This function deinitializes the RPMSG lite tty rtos transport. </p>
+<p>This function deinitialize the RPMSG lite tty rtos transport.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was returned from init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ga3c41e3f28a910416a17ba6e418e5771a"></a>
+<a class="anchor" id="ga1b147303de598800663eb584960d3450"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_rpmsg_linux_init </td>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_serial_init </td>
           <td>(</td>
-          <td class="paramtype">int16_t&#160;</td>
-          <td class="paramname"><em>local_addr</em>, </td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>portName</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int8_t&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int16_t&#160;</td>
-          <td class="paramname"><em>remote_addr</em>&#160;</td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>baudRate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -923,14 +1187,12 @@ LPI2C transport setup</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create an Linux RPMSG endpoint transport. </p>
-<p>This function is using RPMSG endpoints based on this implementation: github.com/nxp-mcuxpresso/rpmsg-sysfs/tree/0aa1817545a765c200b1b2f9b6680a420dcf9171 .</p>
-<p>When local/remote address is set to '-1', then default addresses will be used. When type is set to '0', then Datagram model will be used, else Stream.</p>
+<p>Create a host PC serial port transport. </p>
+<p>Create a host PC serial port transport instance.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">local_addr</td><td>Local endpoint address. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>Datagram (0) or Stream (1). </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">remote_addr</td><td>Remote endpoint address.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">portName</td><td>Port name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>Baud rate.</td></tr>
   </table>
   </dd>
 </dl>
@@ -938,22 +1200,224 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga47ceb0fc19ed2d526711e5edb7857bfc"></a>
+<a class="anchor" id="ga0f84bb03356466bd4f213d5f89bd537a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void erpc_transport_rpmsg_linux_deinit </td>
+          <td class="memname">void erpc_transport_serial_deinit </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Deinitialize an Linux RPMSG endpoint transport. </p>
-<p>This function deinitializes the Linux RPMSG endpoint transport. </p>
+<p>Deinitialize a host PC serial port transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gacb323f539b6f76ae42c8a0bd1d531d1e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spi_master_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>baseAddr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>baudRate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a SPI master transport. </p>
+<p>Create SPI master transport instance, to be used at master core.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of SPI peripheral used in this transport layer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>SPI source clock in Hz.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gacabd61e52832b597a239c95681bb92fe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_spi_master_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize SPI master transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gaed6619b165642ced65cb37275f0838b9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spi_slave_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>baseAddr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>baudRate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a SPI slave transport. </p>
+<p>Create SPI slave transport instance, to be used at slave core.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of SPI peripheral used in this transport layer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>SPI source clock in Hz.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga04af655feece19142b5bed21a835f143"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_spi_slave_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize SPI slave transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gadb42991295a59e64ef2ba0d26416dfc7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_spidev_master_init </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>spidev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>speed_Hz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a SPIdev transport. </p>
+<p>Create SPIdev master transport instance, to be used at master core.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">spidev</td><td>SPI device name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">speed_Hz</td><td>SPI clock speed in Hz.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga9bbf08cb9a1eb744527e5d41ed237873"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_spidev_master_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize SPIdev transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1001,15 +1465,15 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga6a7cbe195e4275705c0e3ab5338c8664"></a>
+<a class="anchor" id="gad0e0e6458116377508723a28fc39dfdf"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void erpc_transport_tcp_close </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1017,7 +1481,112 @@ LPI2C transport setup</h2></td></tr>
 
 <p>Close TCP connection. </p>
 <p>For server, stop listening and close all sockets. Note that the server mode uses and accept() which is a not-recommended blocking method so we can't exit until a connection attempts is made. This is a deadlock but assuming that TCP code is supposed to be for test, I assume it's acceptable. Otherwise a non-blocking socket or select() shoudl be used For client, close server connection</p>
-<dl class="section return"><dt>Returns</dt><dd>Return TRUE if listen/connection successful </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was returned from init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gad23b9d88d91864e6402d33e94a36dd8d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_tcp_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize TCP transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="gadd5c1658590ea80c4c777c872ac4dd94"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_cmsis_uart_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>uartDrv</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a CMSIS UART transport. </p>
+<p>Create a CMSIS UART transport instance, to be used on both the server and the client side.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uartDrv</td><td>CMSIS USART driver structure address (Driver Control Block).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaad7f485bc1c822a1459595fa16dab364"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void erpc_transport_cmsis_uart_deinit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deinitialize CMSIS UART transport. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga99eab2c1e203e70cc7dab8a6a4675fce"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_zephyr_uart_init </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>dev</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a Zephyr UART transport. </p>
+<p>Create a Zephyr UART transport instance, to be used on both the server and the client side.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dev</td><td>Zephyr UART device address.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
 
 </div>
 </div>
@@ -1079,91 +1648,27 @@ LPI2C transport setup</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga1d9f98c8926f281f68dbeca9e21f5ba9"></a>
+<a class="anchor" id="ga06f84d7e1c442699a9b721e2102e927d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_i2c_slave_init </td>
+          <td class="memname">void erpc_transport_usb_cdc_deinit </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>baseAddr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create an I2C slave transport. </p>
-<p>Create I2C slave transport instance, to be used at slave core.</p>
+<p>Deinitialize USB CDC transport. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of I2C peripheral used in this transport layer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>I2C source clock in Hz.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">transport</td><td>Transport which was initialized with init function. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gad609adbdfb449e937c7d1aa38651ce91"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__transport__setup.html#ga925aa73c3fc0da2a6f94ee65c4b108c0">erpc_transport_t</a> erpc_transport_lpi2c_slave_init </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>baseAddr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>srcClock_Hz</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create an LPI2C slave transport. </p>
-<p>Create LPI2C slave transport instance, to be used at slave core.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">baseAddr</td><td>Base address of LPI2C peripheral used in this transport layer. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">baudRate</td><td>SPI baud rate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">srcClock_Hz</td><td>LPI2C source clock in Hz.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Return NULL or erpc_transport_t instance pointer. </dd></dl>
 
 </div>
 </div>

@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['pendingclientinfo',['PendingClientInfo',['../structerpc_1_1_transport_arbitrator_1_1_pending_client_info.html#a69e14bb61dc75bd28f2ed71081b3b3db',1,'erpc::TransportArbitrator::PendingClientInfo']]],
-  ['performclientrequest',['performClientRequest',['../classerpc_1_1_arbitrated_client_manager.html#a2daeb518e1342cebba62c1b508dc49c2',1,'erpc::ArbitratedClientManager::performClientRequest()'],['../classerpc_1_1_client_manager.html#adbcd4666494d84570a161e385b32abb9',1,'erpc::ClientManager::performClientRequest()']]],
-  ['performrequest',['performRequest',['../classerpc_1_1_client_manager.html#aa6ebf07e809527feacf7f89fc21ee6c6',1,'erpc::ClientManager']]],
-  ['poll',['poll',['../classerpc_1_1_simple_server.html#ab193473ca5e3807142bc997d8e90628a',1,'erpc::SimpleServer']]],
-  ['prepareclientreceive',['prepareClientReceive',['../classerpc_1_1_transport_arbitrator.html#a67fb2d8bab8f754bf07d2caefff86b7d',1,'erpc::TransportArbitrator']]],
-  ['prepareserverbufferforsend',['prepareServerBufferForSend',['../classerpc_1_1_message_buffer_factory.html#aab77e9b0501e87a332f4cb3e2835bd54',1,'erpc::MessageBufferFactory::prepareServerBufferForSend()'],['../class_r_p_msg_message_buffer_factory.html#af655e8fd7910648899263d7718cb5575',1,'RPMsgMessageBufferFactory::prepareServerBufferForSend()'],['../class_r_p_msg_t_t_y_message_buffer_factory.html#a8854e60200563b13e4597bab78b90239',1,'RPMsgTTYMessageBufferFactory::prepareServerBufferForSend()']]],
-  ['prepostaction',['PrePostAction',['../classerpc_1_1_pre_post_action.html#ab6ee8fb5d6ced22a1b2098251a200c21',1,'erpc::PrePostAction']]],
-  ['processmessage',['processMessage',['../classerpc_1_1_server.html#a9dc0e23354f3ba5749926bdd190c0b54',1,'erpc::Server']]],
-  ['put',['put',['../classerpc_1_1_semaphore.html#a0e5a7ea7ccad9e7424c1b23eda77baab',1,'erpc::Semaphore']]]
+  ['open',['open',['../classerpc_1_1_t_c_p_transport.html#af43c66b7123b3845d37a7e3478ef98fd',1,'erpc::TCPTransport']]],
+  ['operator_20const_20uint8_5ft_20_2a',['operator const uint8_t *',['../classerpc_1_1_message_buffer.html#a553560547fa1b61a113a81279b80d043',1,'erpc::MessageBuffer::operator const uint8_t *()'],['../classerpc_1_1_cursor.html#a357f476bb24068dc3c7da199f88ca325',1,'erpc::Cursor::operator const uint8_t *()']]],
+  ['operator_20uint8_5ft_20_2a',['operator uint8_t *',['../classerpc_1_1_message_buffer.html#ac846f6d4c3acba8c49995d4d338b11e9',1,'erpc::MessageBuffer::operator uint8_t *()'],['../classerpc_1_1_cursor.html#ab5cc45449acb5a5ebd7c2f17bf728bae',1,'erpc::Cursor::operator uint8_t *()']]],
+  ['operator_2b_2b',['operator++',['../classerpc_1_1_cursor.html#aa38a9e36e6c678e23fc282d1558b224f',1,'erpc::Cursor']]],
+  ['operator_2b_3d',['operator+=',['../classerpc_1_1_cursor.html#a9a45dc3be8833adc7fd11636a79fb1dc',1,'erpc::Cursor']]],
+  ['operator_2d_2d',['operator--',['../classerpc_1_1_cursor.html#a7a4bf43d5bf3525500ddad864721d5e7',1,'erpc::Cursor']]],
+  ['operator_2d_3d',['operator-=',['../classerpc_1_1_cursor.html#ac30485c5f293c17ea5abdf3984d19d29',1,'erpc::Cursor']]],
+  ['operator_3d_3d',['operator==',['../classerpc_1_1_thread.html#a46180774600273a9a0445e28aafd4af7',1,'erpc::Thread']]],
+  ['operator_5b_5d',['operator[]',['../classerpc_1_1_message_buffer.html#aedf09a86aef402ba74387c8590bcf23c',1,'erpc::MessageBuffer::operator[](int index)'],['../classerpc_1_1_message_buffer.html#a2f3450dcebc3fec37f2d5719847042f8',1,'erpc::MessageBuffer::operator[](int index) const '],['../classerpc_1_1_cursor.html#a98ae1d0282e3f77035a5aca2d1690232',1,'erpc::Cursor::operator[](int index)'],['../classerpc_1_1_cursor.html#ab5615888be7c098f8665d6685bafe8d2',1,'erpc::Cursor::operator[](int index) const ']]]
 ];

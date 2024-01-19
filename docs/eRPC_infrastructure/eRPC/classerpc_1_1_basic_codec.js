@@ -1,6 +1,7 @@
 var classerpc_1_1_basic_codec =
 [
-    [ "BasicCodec", "classerpc_1_1_basic_codec.html#abd7b171481037fc3a9f4238acf6f7f6d", null ],
+    [ "BasicCodec", "classerpc_1_1_basic_codec.html#afa2bf959bf3802d01314c50453252015", null ],
+    [ "~BasicCodec", "classerpc_1_1_basic_codec.html#af11142f93f940a9ce3964fe6d4a5b6b5", null ],
     [ "startWriteMessage", "classerpc_1_1_basic_codec.html#a33d38fa04f8fbbeb6083877e64e38bcc", null ],
     [ "writeData", "classerpc_1_1_basic_codec.html#a7ce6c47bcb25093c3c69277d6c4d98ea", null ],
     [ "write", "classerpc_1_1_basic_codec.html#a60715de9345dca91ea57936c60b66470", null ],
@@ -20,8 +21,6 @@ var classerpc_1_1_basic_codec =
     [ "startWriteList", "classerpc_1_1_basic_codec.html#aae93dd526efcd3d8bd2ee5eb131d4d06", null ],
     [ "startWriteUnion", "classerpc_1_1_basic_codec.html#a8922ffc14d40547332944b9be2ccaa1e", null ],
     [ "writeNullFlag", "classerpc_1_1_basic_codec.html#af48f6fa8b24b279b1c1b7959f8b1cee4", null ],
-    [ "writeCallback", "classerpc_1_1_basic_codec.html#a93a62ff08b16d0c615b40cae9d30379a", null ],
-    [ "writeCallback", "classerpc_1_1_basic_codec.html#a186fe55fbe74ea7c2e1e95eaa165ca9b", null ],
     [ "startReadMessage", "classerpc_1_1_basic_codec.html#ab704e735b8b15b22a66574a866fe6f8a", null ],
     [ "readData", "classerpc_1_1_basic_codec.html#a6f2abb34bfd874ad8ea64537caf8236f", null ],
     [ "read", "classerpc_1_1_basic_codec.html#a075e3e213224ebe0e3a261a24edbe6ef", null ],
@@ -40,7 +39,5 @@ var classerpc_1_1_basic_codec =
     [ "readBinary", "classerpc_1_1_basic_codec.html#aed673eaca5c768f28c419990c86820c3", null ],
     [ "startReadList", "classerpc_1_1_basic_codec.html#a1af15313f92dc9dae454570b7ae0e90e", null ],
     [ "startReadUnion", "classerpc_1_1_basic_codec.html#a0d8519b842e307574c4d2b36adde1065", null ],
-    [ "readNullFlag", "classerpc_1_1_basic_codec.html#a40021a080250cd09b8cbcaf0eaff88d0", null ],
-    [ "readCallback", "classerpc_1_1_basic_codec.html#af81ce3b25d504b1841d3cfa91277c63b", null ],
-    [ "readCallback", "classerpc_1_1_basic_codec.html#a5a0125e98aa650b4f9bd1aa1db552223", null ]
+    [ "readNullFlag", "classerpc_1_1_basic_codec.html#a40021a080250cd09b8cbcaf0eaff88d0", null ]
 ];

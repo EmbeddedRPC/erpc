@@ -23,7 +23,7 @@ var searchData=
   ['erpc_5fmu_5ftransport_2ehpp',['erpc_mu_transport.hpp',['../erpc__mu__transport_8hpp.html',1,'']]],
   ['erpc_5fport_2eh',['erpc_port.h',['../erpc__port_8h.html',1,'']]],
   ['erpc_5fpre_5fpost_5faction_2eh',['erpc_pre_post_action.h',['../erpc__pre__post__action_8h.html',1,'']]],
-  ['erpc_5frpmsg_5flite_5fbase_5ftransport_2ehpp',['erpc_rpmsg_lite_base_transport.hpp',['../erpc__rpmsg__lite__base__transport_8hpp.html',1,'']]],
+  ['erpc_5frpmsg_5flite_5fbase_2ehpp',['erpc_rpmsg_lite_base.hpp',['../erpc__rpmsg__lite__base_8hpp.html',1,'']]],
   ['erpc_5frpmsg_5flite_5frtos_5ftransport_2ehpp',['erpc_rpmsg_lite_rtos_transport.hpp',['../erpc__rpmsg__lite__rtos__transport_8hpp.html',1,'']]],
   ['erpc_5frpmsg_5flite_5ftransport_2ehpp',['erpc_rpmsg_lite_transport.hpp',['../erpc__rpmsg__lite__transport_8hpp.html',1,'']]],
   ['erpc_5frpmsg_5ftty_5frtos_5ftransport_2ehpp',['erpc_rpmsg_tty_rtos_transport.hpp',['../erpc__rpmsg__tty__rtos__transport_8hpp.html',1,'']]],
@@ -43,5 +43,6 @@ var searchData=
   ['erpc_5ftransport_5farbitrator_2ehpp',['erpc_transport_arbitrator.hpp',['../erpc__transport__arbitrator_8hpp.html',1,'']]],
   ['erpc_5ftransport_5fsetup_2eh',['erpc_transport_setup.h',['../erpc__transport__setup_8h.html',1,'']]],
   ['erpc_5fuart_5fcmsis_5ftransport_2ehpp',['erpc_uart_cmsis_transport.hpp',['../erpc__uart__cmsis__transport_8hpp.html',1,'']]],
+  ['erpc_5fuart_5fzephyr_5ftransport_2ehpp',['erpc_uart_zephyr_transport.hpp',['../erpc__uart__zephyr__transport_8hpp.html',1,'']]],
   ['erpc_5fusb_5fcdc_5ftransport_2ehpp',['erpc_usb_cdc_transport.hpp',['../erpc__usb__cdc__transport_8hpp.html',1,'']]]
 ];

@@ -1,10 +1,9 @@
 var class_path_searcher =
 [
     [ "string_list_t", "class_path_searcher.html#a63744c70ba23ec6b7ba57e8cc6ea2fea", null ],
-    [ "target_type_t", "class_path_searcher.html#ab2a0b67049e737e4558ad5d62147b0d9", null ],
-    [ "_target_type", "class_path_searcher.html#ac28f2355c7999501e3150fd0e575db14", [
-      [ "kFindFile", "class_path_searcher.html#ac28f2355c7999501e3150fd0e575db14aa34490463f6165d4817968f667315313", null ],
-      [ "kFindDirectory", "class_path_searcher.html#ac28f2355c7999501e3150fd0e575db14a825e474893f340b42cd4031ee4fc706b", null ]
+    [ "target_type_t", "class_path_searcher.html#a2e1e8cf3e1d34a04a6d943209e23352e", [
+      [ "kFindFile", "class_path_searcher.html#a2e1e8cf3e1d34a04a6d943209e23352eacfe51c9b21dfc431ea321b5999878b9d", null ],
+      [ "kFindDirectory", "class_path_searcher.html#a2e1e8cf3e1d34a04a6d943209e23352eabd09a9bd13f4abe236811e2d7b423739", null ]
     ] ],
     [ "PathSearcher", "class_path_searcher.html#a0a2b1157faa1145b87258e65b7c2d8df", null ],
     [ "addSearchPath", "class_path_searcher.html#af9554bf75313b8d268db3b642e0c4008", null ],

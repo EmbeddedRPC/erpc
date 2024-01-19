@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -90,6 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
       <li><a href="functions_func.html#index_a"><span>a</span></a></li>
+      <li><a href="functions_func_b.html#index_b"><span>b</span></a></li>
       <li><a href="functions_func_c.html#index_c"><span>c</span></a></li>
       <li><a href="functions_func_d.html#index_d"><span>d</span></a></li>
       <li><a href="functions_func_f.html#index_f"><span>f</span></a></li>
@@ -143,23 +144,27 @@ $(document).ready(function(){initNavTree('functions_func_g.html','');});
 
 <h3><a class="anchor" id="index_g"></a>- g -</h3><ul>
 <li>get()
-: <a class="el" href="classerpc_1_1_message_buffer_1_1_cursor.html#a63d96e45fb73f509b40c9692734b77c8">erpc::MessageBuffer::Cursor</a>
+: <a class="el" href="classerpc_1_1_cursor.html#a601d1a9c96c6d67fbe79e6b319252906">erpc::Cursor</a>
 , <a class="el" href="classerpc_1_1_message_buffer.html#aab101146fdec5df33e7bdf7608dddcef">erpc::MessageBuffer</a>
 , <a class="el" href="classerpc_1_1_semaphore.html#a22d7b30599b8df73b7786e362e353f0d">erpc::Semaphore</a>
 , <a class="el" href="classerpc_1_1_static_queue.html#a50621cf1d1676983bbf95c7dbf178229">erpc::StaticQueue&lt; T, elementCount &gt;</a>
 </li>
 <li>get_rpmsg_lite_instance()
-: <a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#ad5a3b7702d944d7c497ad4590364002f">erpc::RPMsgBaseTransport</a>
+: <a class="el" href="classerpc_1_1_r_p_msg_base.html#a73304e82bd409ff96feb9d1b632e884d">erpc::RPMsgBase</a>
 </li>
 <li>getArbitrator()
 : <a class="el" href="classerpc_1_1_arbitrated_client_manager.html#aacea5d60c0c62c8ffdfd5eb6e0dba2db">erpc::ArbitratedClientManager</a>
 </li>
 <li>getBuffer()
-: <a class="el" href="classerpc_1_1_codec.html#a1ffdc810b2381805a0ab4e92201f72d3">erpc::Codec</a>
+: <a class="el" href="classerpc_1_1_codec.html#a3db88abe49ead1273cd940f4efc0c4ad">erpc::Codec</a>
+, <a class="el" href="classerpc_1_1_cursor.html#a72dbf3cb3d25028667686cf5bcde27aa">erpc::Cursor</a>
+</li>
+<li>getBufferRef()
+: <a class="el" href="classerpc_1_1_cursor.html#a556d3c4faa20fdbe21d03db0caa51e0e">erpc::Cursor</a>
 </li>
 <li>getCodec()
 : <a class="el" href="classerpc_1_1_request_context.html#a0908f33c7475d2a370dca60bf0341d75">erpc::RequestContext</a>
-, <a class="el" href="classerpc_1_1_transport_arbitrator.html#abaed62c292dfa4204e6b5c2fb4c4a432">erpc::TransportArbitrator</a>
+, <a class="el" href="classerpc_1_1_transport_arbitrator.html#a916d6c752157d530cfdb4b2618cd0a79">erpc::TransportArbitrator</a>
 </li>
 <li>getCodecFactory()
 : <a class="el" href="classerpc_1_1_client_server_common.html#afd00c12c170d282646646c393c160019">erpc::ClientServerCommon</a>
@@ -168,10 +173,9 @@ $(document).ready(function(){initNavTree('functions_func_g.html','');});
 : <a class="el" href="classerpc_1_1_semaphore.html#a19fa4fe7ab2e2adf7387ba8eddac998a">erpc::Semaphore</a>
 </li>
 <li>getCrc16()
-: <a class="el" href="classerpc_1_1_framed_transport.html#a422a71461a0448ef39ba2d144e56b077">erpc::FramedTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#acd40ad76e33f86d99d6be67b18a49d1b">erpc::RPMsgRTOSTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a21c225fad9594f63d3447637ec21a1e6">erpc::RPMsgTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a582ee658b536ce80dafcb4679bdf8ea5">erpc::RPMsgTTYRTOSTransport</a>
+: <a class="el" href="classerpc_1_1_framed_transport.html#a2b134c86844d7ae3e6a557ca3ed22881">erpc::FramedTransport</a>
+, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a5ce75525127ced9d1ae2e80a9d3f39b1">erpc::RPMsgRTOSTransport</a>
+, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#abf467bfb667dc07da473d90bd5156b0f">erpc::RPMsgTransport</a>
 , <a class="el" href="classerpc_1_1_transport.html#a8f3107c5d8d7c89fe074d4433761b924">erpc::Transport</a>
 , <a class="el" href="classerpc_1_1_transport_arbitrator.html#acee58ae1179ad04da75bdf446548caa4">erpc::TransportArbitrator</a>
 </li>
@@ -204,10 +208,13 @@ $(document).ready(function(){initNavTree('functions_func_g.html','');});
 : <a class="el" href="classerpc_1_1_pre_post_action.html#a8d735e12101041ac094b5a504e6b7d8f">erpc::PrePostAction</a>
 </li>
 <li>getRemaining()
-: <a class="el" href="classerpc_1_1_message_buffer_1_1_cursor.html#a6f3dff599ef13d4ffca7e5d559a50afa">erpc::MessageBuffer::Cursor</a>
+: <a class="el" href="classerpc_1_1_cursor.html#af3e3e733619bc9b1697ef02f5818f6db">erpc::Cursor</a>
 </li>
 <li>getRemainingUsed()
-: <a class="el" href="classerpc_1_1_message_buffer_1_1_cursor.html#af00cc3be42e41c2a1b01ee3707f59b95">erpc::MessageBuffer::Cursor</a>
+: <a class="el" href="classerpc_1_1_cursor.html#a5260899f8e6eabcd43d0ebe8c40a8ace">erpc::Cursor</a>
+</li>
+<li>getRpmsgEndpoint()
+: <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#a7ae45cf0bf0cda67f18330fe58421a1b">erpc::RPMsgLinuxTransport</a>
 </li>
 <li>getSequence()
 : <a class="el" href="classerpc_1_1_request_context.html#a893ef5c5b1cef2f9dd5e131370bb85e2">erpc::RequestContext</a>
@@ -216,7 +223,7 @@ $(document).ready(function(){initNavTree('functions_func_g.html','');});
 : <a class="el" href="classerpc_1_1_service.html#a6a53f31f19ce52a29c14f903b873b4f2">erpc::Service</a>
 </li>
 <li>getSharedTransport()
-: <a class="el" href="classerpc_1_1_transport_arbitrator.html#a04c4955bf1b4c4732f61fb9cc25d40c5">erpc::TransportArbitrator</a>
+: <a class="el" href="classerpc_1_1_transport_arbitrator.html#a7160c72a1554bda7224efad8be67f818">erpc::TransportArbitrator</a>
 </li>
 <li>getStatus()
 : <a class="el" href="classerpc_1_1_codec.html#ac329078b8a41270ef630ec44cb408860">erpc::Codec</a>

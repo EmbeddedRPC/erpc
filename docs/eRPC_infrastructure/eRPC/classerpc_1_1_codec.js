@@ -2,9 +2,10 @@ var classerpc_1_1_codec =
 [
     [ "Codec", "classerpc_1_1_codec.html#a39f0596a2957fb80bf3b5de6a4420f26", null ],
     [ "~Codec", "classerpc_1_1_codec.html#adab0e09abe91747902ac3d4622682082", null ],
-    [ "getBuffer", "classerpc_1_1_codec.html#a1ffdc810b2381805a0ab4e92201f72d3", null ],
-    [ "setBuffer", "classerpc_1_1_codec.html#ace7d311abca68729346074d603879c9f", null ],
-    [ "reset", "classerpc_1_1_codec.html#a5ee5a1d8930812d4256201bde6390bf3", null ],
+    [ "getBuffer", "classerpc_1_1_codec.html#a3db88abe49ead1273cd940f4efc0c4ad", null ],
+    [ "getBufferRef", "classerpc_1_1_codec.html#a6c75c8bbf2dfbe3fe1505de1aec3fdcd", null ],
+    [ "setBuffer", "classerpc_1_1_codec.html#affa4b95dc470afa54909d3e3857f1e50", null ],
+    [ "reset", "classerpc_1_1_codec.html#a9a1b03a0b9d56eed6f8caf22432706f7", null ],
     [ "getStatus", "classerpc_1_1_codec.html#ac329078b8a41270ef630ec44cb408860", null ],
     [ "isStatusOk", "classerpc_1_1_codec.html#a663439fd4b60421df4915f43c07051b8", null ],
     [ "updateStatus", "classerpc_1_1_codec.html#a86556f8f7f972a796766bcaafae3f349", null ],
@@ -26,8 +27,6 @@ var classerpc_1_1_codec =
     [ "startWriteList", "classerpc_1_1_codec.html#aa2b752ae654eecf49a388dca8d341f7d", null ],
     [ "startWriteUnion", "classerpc_1_1_codec.html#a87fdbe883363642751bae1d6d53520c8", null ],
     [ "writeNullFlag", "classerpc_1_1_codec.html#a41efd3899943f2168f7f58be03045679", null ],
-    [ "writeCallback", "classerpc_1_1_codec.html#a16711856846fa8bf4b8b70e69249b98e", null ],
-    [ "writeCallback", "classerpc_1_1_codec.html#ac8a168512fd2fb26797d49c3b41732a5", null ],
     [ "startReadMessage", "classerpc_1_1_codec.html#a958e07b9dc0853ab4de4e834b6d54d50", null ],
     [ "read", "classerpc_1_1_codec.html#affef2ee164f9b68623858bb00f0a473d", null ],
     [ "read", "classerpc_1_1_codec.html#ac95c32b5a5df22711b6f33410bce7984", null ],
@@ -46,9 +45,6 @@ var classerpc_1_1_codec =
     [ "startReadList", "classerpc_1_1_codec.html#a961a5e0bf1911da2446fb58a6d481712", null ],
     [ "startReadUnion", "classerpc_1_1_codec.html#ae08d8fce5eb43efd3cb47187de67c162", null ],
     [ "readNullFlag", "classerpc_1_1_codec.html#a0f5dc329e076ee69789d500a6b12ae14", null ],
-    [ "readCallback", "classerpc_1_1_codec.html#a3f7eedc7d95818b93c8ac1d2948015de", null ],
-    [ "readCallback", "classerpc_1_1_codec.html#abd44f7095097d6d702c133a0973457ca", null ],
-    [ "m_buffer", "classerpc_1_1_codec.html#a003c4d8420239b9a347b46554ebeb903", null ],
-    [ "m_cursor", "classerpc_1_1_codec.html#ad9fe5af5136be642e05a9e7335af8ff7", null ],
+    [ "m_cursor", "classerpc_1_1_codec.html#ae5ff4c694cc2107b206380fb923265ee", null ],
     [ "m_status", "classerpc_1_1_codec.html#aa1f493b99584ed6e75a0e4ea06a1d14a", null ]
 ];

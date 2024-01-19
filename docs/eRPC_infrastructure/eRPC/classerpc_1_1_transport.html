@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -126,7 +126,7 @@ $(document).ready(function(){initNavTree('classerpc_1_1_transport.html','');});
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_transport__inherit__graph.svg" width="634" height="772"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classerpc_1_1_transport__inherit__graph.svg" width="634" height="671"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -140,6 +140,9 @@ Public Member Functions</h2></td></tr>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#a0cb1c4441873bce62f2ef455a6136888">~Transport</a> (void)</td></tr>
 <tr class="memdesc:a0cb1c4441873bce62f2ef455a6136888"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpc_1_1_transport.html" title="Abstract interface for transport layer. ">Transport</a> destructor. <br /></td></tr>
 <tr class="separator:a0cb1c4441873bce62f2ef455a6136888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3a06be81cec1e1a5e3904d494526449"><td class="memItemLeft" align="right" valign="top">virtual uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#ab3a06be81cec1e1a5e3904d494526449">reserveHeaderSize</a> (void)</td></tr>
+<tr class="memdesc:ab3a06be81cec1e1a5e3904d494526449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of data placed in <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> before serializing eRPC data.  <a href="#ab3a06be81cec1e1a5e3904d494526449">More...</a><br /></td></tr>
+<tr class="separator:ab3a06be81cec1e1a5e3904d494526449"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f886733620e1a2fe00d12f36711dde5"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__infra.html#gadea8a058796ed8b9a73c5f833445a661">erpc_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpc_1_1_transport.html#a3f886733620e1a2fe00d12f36711dde5">receive</a> (<a class="el" href="classerpc_1_1_message_buffer.html">MessageBuffer</a> *message)=0</td></tr>
 <tr class="memdesc:a3f886733620e1a2fe00d12f36711dde5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prototype for receiving message.  <a href="#a3f886733620e1a2fe00d12f36711dde5">More...</a><br /></td></tr>
 <tr class="separator:a3f886733620e1a2fe00d12f36711dde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,6 +162,35 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract interface for transport layer. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ab3a06be81cec1e1a5e3904d494526449"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual uint8_t erpc::Transport::reserveHeaderSize </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Size of data placed in <a class="el" href="classerpc_1_1_message_buffer.html" title="Represents a memory buffer containing a message. ">MessageBuffer</a> before serializing eRPC data. </p>
+<dl class="section return"><dt>Returns</dt><dd>uint8_t Amount of bytes, reserved before serialized data. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classerpc_1_1_framed_transport.html#a33ba31bc23c13ae6e5e1eae783621957">erpc::FramedTransport</a>, and <a class="el" href="classerpc_1_1_transport_arbitrator.html#ac4f4e50a5a831d828fcae53be7f5cbe3">erpc::TransportArbitrator</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a3f886733620e1a2fe00d12f36711dde5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -191,7 +223,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>based on receive implementation. </dd></dl>
 
-<p>Implemented in <a class="el" href="classerpc_1_1_m_u_transport.html#a781435aad523645be3034460ac8631dc">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#ab3e7d041fb640421c52236918c1698d5">erpc::RPMsgTTYRTOSTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#accaaae7170e9b1ae42a4cdf1b2213583">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#adaaccd23d645603b560482de2c016d71">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_transport_arbitrator.html#a429fdc3fd0e8647a1875cc672cbaf3d5">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a43385b8a021f7382c1f8673613b969a4">erpc::FramedTransport</a>, <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afc8619a2b970c2c5fbdfa7e464b2fbf4">erpc::InterThreadBufferTransport</a>, and <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#ac18d51ff2ba19c8373f5f9dd9f7ca8fe">erpc::RPMsgLinuxTransport</a>.</p>
+<p>Implemented in <a class="el" href="classerpc_1_1_m_u_transport.html#ab443ab2af135f9d7f5820c25703ad86c">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a521dd7cc6e5c11ab4dd11350d9d352ce">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a43385b8a021f7382c1f8673613b969a4">erpc::FramedTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#af56bcf609a9fbaf7573c4f8ef1227e40">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_transport_arbitrator.html#a429fdc3fd0e8647a1875cc672cbaf3d5">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#a8ad10fc24ba78dd0dc244026d6776812">erpc::RPMsgLinuxTransport</a>, and <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a57396a8f67fab0798b7b81e52638bc8b">erpc::InterThreadBufferTransport</a>.</p>
 
 </div>
 </div>
@@ -227,7 +259,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>based on send implementation. </dd></dl>
 
-<p>Implemented in <a class="el" href="classerpc_1_1_m_u_transport.html#a1d91622c7c8b8161aaf8dec891ff298a">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_transport_arbitrator.html#a84e50c39ad807ebc1bdfce2bf4eef1ea">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#af7d645c3f81bcc2025b06b2536f32a88">erpc::RPMsgTTYRTOSTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a6060897b2c31b37876dccc357d274278">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#aed718fd7667298a5132504109f656616">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a19fd4d6148ef66dd916d445a019051f4">erpc::FramedTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#a5dc1aa6f8d38fce9382993393d163e3f">erpc::RPMsgLinuxTransport</a>, and <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#a6e3b7c4ff1f0d77c51a0ce39f253758a">erpc::InterThreadBufferTransport</a>.</p>
+<p>Implemented in <a class="el" href="classerpc_1_1_m_u_transport.html#a37482b6566cdae49d18a128108ef1366">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#ad3f9ce18173f8a3213eed86ea6f58fa0">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a19fd4d6148ef66dd916d445a019051f4">erpc::FramedTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a7d49c08a162e07cd3206427703979337">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_transport_arbitrator.html#a84e50c39ad807ebc1bdfce2bf4eef1ea">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_r_p_msg_linux_transport.html#abb0544f4fe70d9e606f88cc8b06f9a31">erpc::RPMsgLinuxTransport</a>, and <a class="el" href="classerpc_1_1_inter_thread_buffer_transport.html#afbe82f3a95dabdb65bbc9b9aec79c2ab">erpc::InterThreadBufferTransport</a>.</p>
 
 </div>
 </div>
@@ -262,7 +294,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classerpc_1_1_transport_arbitrator.html#ac8e0873216bf60c047e0c7bbb8df4cfd">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_m_u_transport.html#a09917644bb01fe45f8e0f0313eb031e0">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a51eac0d87a7d70408df2290c8175706d">erpc::RPMsgTransport</a>, and <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a4f68756cf6eb065eaa94b3f20b6df112">erpc::RPMsgRTOSTransport</a>.</p>
+<p>Reimplemented in <a class="el" href="classerpc_1_1_m_u_transport.html#ac0cf22bd2923f082defb4338654a1f6a">erpc::MUTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a493edb23bf3d2f7b4ea30de67257ca9a">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a968df7c5d674067d06487164ad9540f4">erpc::RPMsgRTOSTransport</a>, and <a class="el" href="classerpc_1_1_transport_arbitrator.html#ac8e0873216bf60c047e0c7bbb8df4cfd">erpc::TransportArbitrator</a>.</p>
 
 </div>
 </div>
@@ -296,7 +328,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classerpc_1_1_transport_arbitrator.html#a1f8677af45f5637f6714c5f10593ca8d">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a8aa45d2d5926eb93221ad42b4753e6e6">erpc::RPMsgTTYRTOSTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#ab7176cb51e66d34cff9e96c466dc836c">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#abb7fecc89530eb60a139d8e695428ff3">erpc::RPMsgRTOSTransport</a>, and <a class="el" href="classerpc_1_1_framed_transport.html#a27955c9e5872ebfaf6affaa095426372">erpc::FramedTransport</a>.</p>
+<p>Reimplemented in <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a1483d0a4bb9bb4f7de9f567d5879e754">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a459aa5cc8fd42182eb7bda84ed25505e">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a27955c9e5872ebfaf6affaa095426372">erpc::FramedTransport</a>, and <a class="el" href="classerpc_1_1_transport_arbitrator.html#a1f8677af45f5637f6714c5f10593ca8d">erpc::TransportArbitrator</a>.</p>
 
 </div>
 </div>
@@ -325,7 +357,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>This functions gets the CRC-16 object. </p>
 <dl class="section return"><dt>Returns</dt><dd>Crc16* Pointer to CRC-16 object containing crc-16 compute function. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classerpc_1_1_transport_arbitrator.html#acee58ae1179ad04da75bdf446548caa4">erpc::TransportArbitrator</a>, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a582ee658b536ce80dafcb4679bdf8ea5">erpc::RPMsgTTYRTOSTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a21c225fad9594f63d3447637ec21a1e6">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#acd40ad76e33f86d99d6be67b18a49d1b">erpc::RPMsgRTOSTransport</a>, and <a class="el" href="classerpc_1_1_framed_transport.html#a422a71461a0448ef39ba2d144e56b077">erpc::FramedTransport</a>.</p>
+<p>Reimplemented in <a class="el" href="classerpc_1_1_r_p_msg_transport.html#abf467bfb667dc07da473d90bd5156b0f">erpc::RPMsgTransport</a>, <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a5ce75525127ced9d1ae2e80a9d3f39b1">erpc::RPMsgRTOSTransport</a>, <a class="el" href="classerpc_1_1_framed_transport.html#a2b134c86844d7ae3e6a557ca3ed22881">erpc::FramedTransport</a>, and <a class="el" href="classerpc_1_1_transport_arbitrator.html#acee58ae1179ad04da75bdf446548caa4">erpc::TransportArbitrator</a>.</p>
 
 </div>
 </div>

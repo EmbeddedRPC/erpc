@@ -9,6 +9,7 @@ var annotated_dup =
       [ "Codec", "classerpc_1_1_codec.html", "classerpc_1_1_codec" ],
       [ "CodecFactory", "classerpc_1_1_codec_factory.html", "classerpc_1_1_codec_factory" ],
       [ "Crc16", "classerpc_1_1_crc16.html", "classerpc_1_1_crc16" ],
+      [ "Cursor", "classerpc_1_1_cursor.html", "classerpc_1_1_cursor" ],
       [ "DspiMasterTransport", "classerpc_1_1_dspi_master_transport.html", "classerpc_1_1_dspi_master_transport" ],
       [ "DspiSlaveTransport", "classerpc_1_1_dspi_slave_transport.html", "classerpc_1_1_dspi_slave_transport" ],
       [ "FramedTransport", "classerpc_1_1_framed_transport.html", "classerpc_1_1_framed_transport" ],
@@ -25,7 +26,7 @@ var annotated_dup =
       [ "MUTransport", "classerpc_1_1_m_u_transport.html", "classerpc_1_1_m_u_transport" ],
       [ "PrePostAction", "classerpc_1_1_pre_post_action.html", "classerpc_1_1_pre_post_action" ],
       [ "RequestContext", "classerpc_1_1_request_context.html", "classerpc_1_1_request_context" ],
-      [ "RPMsgBaseTransport", "classerpc_1_1_r_p_msg_base_transport.html", "classerpc_1_1_r_p_msg_base_transport" ],
+      [ "RPMsgBase", "classerpc_1_1_r_p_msg_base.html", "classerpc_1_1_r_p_msg_base" ],
       [ "RPMsgLinuxTransport", "classerpc_1_1_r_p_msg_linux_transport.html", "classerpc_1_1_r_p_msg_linux_transport" ],
       [ "RPMsgRTOSTransport", "classerpc_1_1_r_p_msg_r_t_o_s_transport.html", "classerpc_1_1_r_p_msg_r_t_o_s_transport" ],
       [ "RPMsgTransport", "classerpc_1_1_r_p_msg_transport.html", "classerpc_1_1_r_p_msg_transport" ],
@@ -51,6 +52,5 @@ var annotated_dup =
     [ "I2C_CLB_USER_DATA_PTR", "struct_i2_c___c_l_b___u_s_e_r___d_a_t_a.html", "struct_i2_c___c_l_b___u_s_e_r___d_a_t_a" ],
     [ "LPI2C_CLB_USER_DATA_PTR", "struct_l_p_i2_c___c_l_b___u_s_e_r___d_a_t_a.html", "struct_l_p_i2_c___c_l_b___u_s_e_r___d_a_t_a" ],
     [ "RPMsgMessageBufferFactory", "class_r_p_msg_message_buffer_factory.html", "class_r_p_msg_message_buffer_factory" ],
-    [ "RPMsgTTYMessageBufferFactory", "class_r_p_msg_t_t_y_message_buffer_factory.html", "class_r_p_msg_t_t_y_message_buffer_factory" ],
     [ "StaticMessageBufferFactory", "class_static_message_buffer_factory.html", "class_static_message_buffer_factory" ]
 ];

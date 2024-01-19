@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -155,14 +155,14 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
 Protected Types</h2></td></tr>
-<tr class="memitem:afb39bd4d55ecf9aee7d12d0cd35cc7ad"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad">comment_type</a> { <br />
-&#160;&#160;<a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ada9b1c3c4cc99d25a7714dffa03f5bf786">kMultilineComment</a>, 
+<tr class="memitem:aec31f946b8f9f60cfa179c7c09b7dc25"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25">comment_type_t</a> { <br />
+&#160;&#160;<a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25a6c48773eb5ac0315e5c3077bd1777c47">comment_type_t::kMultilineComment</a>, 
 <br />
-&#160;&#160;<a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ada7840ee571c5c5bf32b7ab020cd654d49">kInlineComment</a>
+&#160;&#160;<a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25ab44aab15988be6ce55c05370848c4db1">comment_type_t::kInlineComment</a>
 <br />
- }<tr class="memdesc:afb39bd4d55ecf9aee7d12d0cd35cc7ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible Doxygen comment styles.  <a href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad">More...</a><br /></td></tr>
+ }<tr class="memdesc:aec31f946b8f9f60cfa179c7c09b7dc25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Possible Doxygen comment styles.  <a href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25">More...</a><br /></td></tr>
 </td></tr>
-<tr class="separator:afb39bd4d55ecf9aee7d12d0cd35cc7ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:aec31f946b8f9f60cfa179c7c09b7dc25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -194,12 +194,15 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:ab3841ddb0f9ebf4cb63fe8f002d0355c"><td class="memItemLeft" align="right" valign="top">cpptempl::data_map&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#ab3841ddb0f9ebf4cb63fe8f002d0355c">getFunctionTemplateData</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group, <a class="el" href="classerpcgen_1_1_function.html">Function</a> *fn) override</td></tr>
 <tr class="memdesc:ab3841ddb0f9ebf4cb63fe8f002d0355c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface function template data.  <a href="#ab3841ddb0f9ebf4cb63fe8f002d0355c">More...</a><br /></td></tr>
 <tr class="separator:ab3841ddb0f9ebf4cb63fe8f002d0355c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f407a1b9fd4d6d5796c6b8c5bacdb5b"><td class="memItemLeft" align="right" valign="top">cpptempl::data_map&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a9f407a1b9fd4d6d5796c6b8c5bacdb5b">getFunctionTypeTemplateData</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group, <a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> *fn) override</td></tr>
+<tr class="memdesc:a9f407a1b9fd4d6d5796c6b8c5bacdb5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns function type (callbacks type) template data.  <a href="#a9f407a1b9fd4d6d5796c6b8c5bacdb5b">More...</a><br /></td></tr>
+<tr class="separator:a9f407a1b9fd4d6d5796c6b8c5bacdb5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1314e3edacce05b615d8a5b1394d7933"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a1314e3edacce05b615d8a5b1394d7933">setTemplateComments</a> (<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *symbol, cpptempl::data_map &amp;symbolInfo) override</td></tr>
 <tr class="memdesc:a1314e3edacce05b615d8a5b1394d7933"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will get symbol comments and convert to language specific ones.  <a href="#a1314e3edacce05b615d8a5b1394d7933">More...</a><br /></td></tr>
 <tr class="separator:a1314e3edacce05b615d8a5b1394d7933"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82835df27d6dce465b6cbd77d97476ae"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a82835df27d6dce465b6cbd77d97476ae">getFunctionPrototype</a> (<a class="el" href="classerpcgen_1_1_function.html">Function</a> *fn)</td></tr>
-<tr class="memdesc:a82835df27d6dce465b6cbd77d97476ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface function prototype.  <a href="#a82835df27d6dce465b6cbd77d97476ae">More...</a><br /></td></tr>
-<tr class="separator:a82835df27d6dce465b6cbd77d97476ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c6e15779bc69b40254c0519fbe7172"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#ab7c6e15779bc69b40254c0519fbe7172">getFunctionPrototype</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group, <a class="el" href="classerpcgen_1_1_function_base.html">FunctionBase</a> *fn, const std::string &amp;interfaceName=&quot;&quot;, const std::string &amp;name=&quot;&quot;, bool insideInterfaceCall=false) override</td></tr>
+<tr class="memdesc:ab7c6e15779bc69b40254c0519fbe7172"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface function prototype.  <a href="#ab7c6e15779bc69b40254c0519fbe7172">More...</a><br /></td></tr>
+<tr class="separator:ab7c6e15779bc69b40254c0519fbe7172"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa037acaace79eb6ca1574dd0f8f224b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#aa037acaace79eb6ca1574dd0f8f224b3">makeConstTemplateData</a> ()</td></tr>
 <tr class="memdesc:aa037acaace79eb6ca1574dd0f8f224b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function sets const template data.  <a href="#aa037acaace79eb6ca1574dd0f8f224b3">More...</a><br /></td></tr>
 <tr class="separator:aa037acaace79eb6ca1574dd0f8f224b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,9 +219,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a8432d73aacea31ea804c9f61e951fbf2">makeAliasesTemplateData</a> ()</td></tr>
 <tr class="memdesc:a8432d73aacea31ea804c9f61e951fbf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill in template data for type aliases. <br /></td></tr>
 <tr class="separator:a8432d73aacea31ea804c9f61e951fbf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad265247ed52bc38c3d7762ef2a33db4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#aad265247ed52bc38c3d7762ef2a33db4">makeFunctionsTemplateData</a> ()</td></tr>
-<tr class="memdesc:aad265247ed52bc38c3d7762ef2a33db4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function sets function type template data.  <a href="#aad265247ed52bc38c3d7762ef2a33db4">More...</a><br /></td></tr>
-<tr class="separator:aad265247ed52bc38c3d7762ef2a33db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a395a47fda56e74785ec229bf3f58b655"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a395a47fda56e74785ec229bf3f58b655">setStructMembersTemplateData</a> (<a class="el" href="classerpcgen_1_1_struct_type.html">StructType</a> *structType, cpptempl::data_map &amp;structInfo)</td></tr>
 <tr class="memdesc:a395a47fda56e74785ec229bf3f58b655"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function sets struct member information to struct data map variable.  <a href="#a395a47fda56e74785ec229bf3f58b655">More...</a><br /></td></tr>
 <tr class="separator:a395a47fda56e74785ec229bf3f58b655"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,15 +236,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a3a18b17878987df2ea6606d8beb45887">filterName</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a3a18b17878987df2ea6606d8beb45887"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filter symbol names. <br /></td></tr>
 <tr class="separator:a3a18b17878987df2ea6606d8beb45887"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b627ff8666052e6799bd8b87d8d8b74"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a8b627ff8666052e6799bd8b87d8d8b74">convertComment</a> (const std::string &amp;comment, <a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad">comment_type</a> commentType)</td></tr>
-<tr class="memdesc:a8b627ff8666052e6799bd8b87d8d8b74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a C++-style Doxygen comment into a Python Doxygen comment.  <a href="#a8b627ff8666052e6799bd8b87d8d8b74">More...</a><br /></td></tr>
-<tr class="separator:a8b627ff8666052e6799bd8b87d8d8b74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef9e26fb6e7e9dfc9fb824210a2c0c02"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#aef9e26fb6e7e9dfc9fb824210a2c0c02">convertComment</a> (const std::string &amp;comment, <a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25">comment_type_t</a> commentType)</td></tr>
+<tr class="memdesc:aef9e26fb6e7e9dfc9fb824210a2c0c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a C++-style Doxygen comment into a Python Doxygen comment.  <a href="#aef9e26fb6e7e9dfc9fb824210a2c0c02">More...</a><br /></td></tr>
+<tr class="separator:aef9e26fb6e7e9dfc9fb824210a2c0c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ce867132a8c720f8aae4090ab51f0cd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a9ce867132a8c720f8aae4090ab51f0cd">stripWhitespace</a> (const std::string &amp;s)</td></tr>
 <tr class="memdesc:a9ce867132a8c720f8aae4090ab51f0cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip leading and trailing whitespace.  <a href="#a9ce867132a8c720f8aae4090ab51f0cd">More...</a><br /></td></tr>
 <tr class="separator:a9ce867132a8c720f8aae4090ab51f0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1ed7536bc90b790eef9e499e1f25530"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#ab1ed7536bc90b790eef9e499e1f25530">checkWhitspaceChar</a> (char c)</td></tr>
-<tr class="memdesc:ab1ed7536bc90b790eef9e499e1f25530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if character is whitespace type.  <a href="#ab1ed7536bc90b790eef9e499e1f25530">More...</a><br /></td></tr>
-<tr class="separator:ab1ed7536bc90b790eef9e499e1f25530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e62841c0c87052e66c739c021653687"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a2e62841c0c87052e66c739c021653687">checkWhitespaceChar</a> (char c)</td></tr>
+<tr class="memdesc:a2e62841c0c87052e66c739c021653687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if character is whitespace type.  <a href="#a2e62841c0c87052e66c739c021653687">More...</a><br /></td></tr>
+<tr class="separator:a2e62841c0c87052e66c739c021653687"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c489b72c0a49e306655e5d09dfa9cce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_python_generator.html#a0c489b72c0a49e306655e5d09dfa9cce">initPythonReservedWords</a> ()</td></tr>
 <tr class="separator:a0c489b72c0a49e306655e5d09dfa9cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classerpcgen_1_1_generator"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classerpcgen_1_1_generator')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classerpcgen_1_1_generator.html">erpcgen::Generator</a></td></tr>
@@ -281,6 +281,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a97eb33c66b3209d2cf5c651f86fa8150 inherit pro_methods_classerpcgen_1_1_generator"><td class="memItemLeft" align="right" valign="top">cpptempl::data_list&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_generator.html#a97eb33c66b3209d2cf5c651f86fa8150">makeGroupInterfacesTemplateData</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group)</td></tr>
 <tr class="memdesc:a97eb33c66b3209d2cf5c651f86fa8150 inherit pro_methods_classerpcgen_1_1_generator"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function sets interfaces template data.  <a href="#a97eb33c66b3209d2cf5c651f86fa8150">More...</a><br /></td></tr>
 <tr class="separator:a97eb33c66b3209d2cf5c651f86fa8150 inherit pro_methods_classerpcgen_1_1_generator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a907ad00cb1f62fc1d13d2dc3be9d28f9 inherit pro_methods_classerpcgen_1_1_generator"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_generator.html#a907ad00cb1f62fc1d13d2dc3be9d28f9">getGroupCommonFileName</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group)</td></tr>
+<tr class="memdesc:a907ad00cb1f62fc1d13d2dc3be9d28f9 inherit pro_methods_classerpcgen_1_1_generator"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> return common fileName part for group generated files.  <a href="#a907ad00cb1f62fc1d13d2dc3be9d28f9">More...</a><br /></td></tr>
+<tr class="separator:a907ad00cb1f62fc1d13d2dc3be9d28f9 inherit pro_methods_classerpcgen_1_1_generator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67802d9fd67f2a5b3b12c2c7f9c95769 inherit pro_methods_classerpcgen_1_1_generator"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_generator.html#a67802d9fd67f2a5b3b12c2c7f9c95769">generateGroupOutputFiles</a> (<a class="el" href="classerpcgen_1_1_group.html">Group</a> *group)</td></tr>
 <tr class="memdesc:a67802d9fd67f2a5b3b12c2c7f9c95769 inherit pro_methods_classerpcgen_1_1_generator"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function generates output files for defined interfaces.  <a href="#a67802d9fd67f2a5b3b12c2c7f9c95769">More...</a><br /></td></tr>
 <tr class="separator:a67802d9fd67f2a5b3b12c2c7f9c95769 inherit pro_methods_classerpcgen_1_1_generator"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -353,7 +356,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a73e608ae6849a141197d12d73b94e1bf inherit pub_types_classerpcgen_1_1_generator"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73e608ae6849a141197d12d73b94e1bf"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>generator_type_t</b> { <br />
 &#160;&#160;<b>kC</b>, 
 <br />
-&#160;&#160;<b>kPython</b>
+&#160;&#160;<b>kPython</b>, 
+<br />
+&#160;&#160;<b>kJava</b>
 <br />
  }</td></tr>
 <tr class="separator:a73e608ae6849a141197d12d73b94e1bf inherit pub_types_classerpcgen_1_1_generator"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -363,7 +368,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Code generator for Python. </p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
-<a class="anchor" id="afb39bd4d55ecf9aee7d12d0cd35cc7ad"></a>
+<a class="anchor" id="aec31f946b8f9f60cfa179c7c09b7dc25"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -371,22 +376,22 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad">erpcgen::PythonGenerator::comment_type</a></td>
+          <td class="memname">enum <a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25">erpcgen::PythonGenerator::comment_type_t</a></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">strong</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Possible Doxygen comment styles. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="afb39bd4d55ecf9aee7d12d0cd35cc7ada9b1c3c4cc99d25a7714dffa03f5bf786"></a>kMultilineComment&#160;</td><td class="fielddoc">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="aec31f946b8f9f60cfa179c7c09b7dc25a6c48773eb5ac0315e5c3077bd1777c47"></a>kMultilineComment&#160;</td><td class="fielddoc">
 <p>Leading multi-line comment. </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="afb39bd4d55ecf9aee7d12d0cd35cc7ada7840ee571c5c5bf32b7ab020cd654d49"></a>kInlineComment&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="aec31f946b8f9f60cfa179c7c09b7dc25ab44aab15988be6ce55c05370848c4db1"></a>kInlineComment&#160;</td><td class="fielddoc">
 <p>Trailing inline comment. </p>
 </td></tr>
 </table>
@@ -453,7 +458,7 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ab1ed7536bc90b790eef9e499e1f25530"></a>
+<a class="anchor" id="a2e62841c0c87052e66c739c021653687"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -461,7 +466,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool PythonGenerator::checkWhitspaceChar </td>
+          <td class="memname">bool PythonGenerator::checkWhitespaceChar </td>
           <td>(</td>
           <td class="paramtype">char&#160;</td>
           <td class="paramname"><em>c</em></td><td>)</td>
@@ -485,7 +490,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a8b627ff8666052e6799bd8b87d8d8b74"></a>
+<a class="anchor" id="aef9e26fb6e7e9dfc9fb824210a2c0c02"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -501,7 +506,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classerpcgen_1_1_python_generator.html#afb39bd4d55ecf9aee7d12d0cd35cc7ad">comment_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_python_generator.html#aec31f946b8f9f60cfa179c7c09b7dc25">comment_type_t</a>&#160;</td>
           <td class="paramname"><em>commentType</em>&#160;</td>
         </tr>
         <tr>
@@ -819,7 +824,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a82835df27d6dce465b6cbd77d97476ae"></a>
+<a class="anchor" id="ab7c6e15779bc69b40254c0519fbe7172"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -829,14 +834,42 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">string PythonGenerator::getFunctionPrototype </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classerpcgen_1_1_function.html">Function</a> *&#160;</td>
-          <td class="paramname"><em>fn</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_group.html">Group</a> *&#160;</td>
+          <td class="paramname"><em>group</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_function_base.html">FunctionBase</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>interfaceName</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>insideInterfaceCall</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -844,11 +877,17 @@ Additional Inherited Members</h2></td></tr>
 <p>This function return interface function prototype. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> for prototyping.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">group</td><td><a class="el" href="classerpcgen_1_1_group.html" title="An interface that contains functions. ">Group</a> to which function belongs. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> for prototyping. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interfaceName</td><td><a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a> name used for function declaration. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>Name used for shared code in case of function type. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">insideInterfaceCall</td><td>interfaceClass specific.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String prototype representation for given function. </dd></dl>
+
+<p>Implements <a class="el" href="classerpcgen_1_1_generator.html#af3d9ce58e13a92f04dbabda56e72c949">erpcgen::Generator</a>.</p>
 
 </div>
 </div>
@@ -889,14 +928,60 @@ Additional Inherited Members</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">group</td><td>Pointer to a group. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>From this are set interface function template data. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">fnIndex</td><td><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> index.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>From this are set interface function template data.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Contains interface function data. </dd></dl>
 
 <p>Implements <a class="el" href="classerpcgen_1_1_generator.html#aaea7b9a3157ee0246e97ec78cbd88d23">erpcgen::Generator</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9f407a1b9fd4d6d5796c6b8c5bacdb5b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cpptempl::data_map erpcgen::PythonGenerator::getFunctionTypeTemplateData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_group.html">Group</a> *&#160;</td>
+          <td class="paramname"><em>group</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> *&#160;</td>
+          <td class="paramname"><em>fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function returns function type (callbacks type) template data. </p>
+<p>This function returns function type (callbacks type) template data with all data, which are necessary for generating output code for output files. Shim code is generating common function for serialization/deserialization of data.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">group</td><td><a class="el" href="classerpcgen_1_1_group.html" title="An interface that contains functions. ">Group</a> to which function belongs. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fn</td><td>From this are set function type template data.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Contains interface function data. </dd></dl>
+
+<p>Implements <a class="el" href="classerpcgen_1_1_generator.html#adf5e0dd5aeaa4d6b65485ddd97afaab5">erpcgen::Generator</a>.</p>
 
 </div>
 </div>
@@ -1007,32 +1092,6 @@ Additional Inherited Members</h2></td></tr>
 
 <p>This function sets enum template data. </p>
 <p>This function sets enum template data with all data, which are necessary for generating output code for output files. </p>
-
-</div>
-</div>
-<a class="anchor" id="aad265247ed52bc38c3d7762ef2a33db4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PythonGenerator::makeFunctionsTemplateData </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>This function sets function type template data. </p>
-<p>This is used for registering callback functions in generated output. </p>
 
 </div>
 </div>

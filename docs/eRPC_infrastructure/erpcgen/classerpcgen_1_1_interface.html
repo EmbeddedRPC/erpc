@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -137,6 +137,8 @@ Inheritance diagram for erpcgen::Interface:</div>
 Public Types</h2></td></tr>
 <tr class="memitem:a16f113a54ffefef5bb88a80dee4f824e"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="classerpcgen_1_1_function.html">Function</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a></td></tr>
 <tr class="separator:a16f113a54ffefef5bb88a80dee4f824e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25165fc509f8b4010ff480cf254e23dc"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">function_types_vector_t</a></td></tr>
+<tr class="separator:a25165fc509f8b4010ff480cf254e23dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_types_classerpcgen_1_1_symbol"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classerpcgen_1_1_symbol')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classerpcgen_1_1_symbol.html">erpcgen::Symbol</a></td></tr>
 <tr class="memitem:a41dbbe424222a8e9b4b73c390cf06775 inherit pub_types_classerpcgen_1_1_symbol"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a41dbbe424222a8e9b4b73c390cf06775"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_symbol.html#a41dbbe424222a8e9b4b73c390cf06775">symbol_type_t</a> { <br />
 &#160;&#160;<b>kConstSymbol</b>, 
@@ -167,12 +169,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac40ec70b9076e7a824c10e4ef9219722"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#ac40ec70b9076e7a824c10e4ef9219722">addFunction</a> (<a class="el" href="classerpcgen_1_1_function.html">Function</a> *func)</td></tr>
 <tr class="memdesc:ac40ec70b9076e7a824c10e4ef9219722"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will add function to the interface.  <a href="#ac40ec70b9076e7a824c10e4ef9219722">More...</a><br /></td></tr>
 <tr class="separator:ac40ec70b9076e7a824c10e4ef9219722"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74978efaf11e02d04c5297a920146800"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a74978efaf11e02d04c5297a920146800">addFunctionType</a> (<a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> *func)</td></tr>
+<tr class="memdesc:a74978efaf11e02d04c5297a920146800"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will add function type to the interface.  <a href="#a74978efaf11e02d04c5297a920146800">More...</a><br /></td></tr>
+<tr class="separator:a74978efaf11e02d04c5297a920146800"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a332008916b0644e8e7d90abdfd3dcae6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_symbol_scope.html">SymbolScope</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a332008916b0644e8e7d90abdfd3dcae6">getScope</a> ()</td></tr>
 <tr class="memdesc:a332008916b0644e8e7d90abdfd3dcae6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return symbol scope.  <a href="#a332008916b0644e8e7d90abdfd3dcae6">More...</a><br /></td></tr>
 <tr class="separator:a332008916b0644e8e7d90abdfd3dcae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08a3aa3a3ef86cc8be10a85ececa37e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a08a3aa3a3ef86cc8be10a85ececa37e0">getFunctions</a> ()</td></tr>
-<tr class="memdesc:a08a3aa3a3ef86cc8be10a85ececa37e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface functions vector.  <a href="#a08a3aa3a3ef86cc8be10a85ececa37e0">More...</a><br /></td></tr>
-<tr class="separator:a08a3aa3a3ef86cc8be10a85ececa37e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bfbcd2bd1e1d8e35c6bf308dd677b27"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a3bfbcd2bd1e1d8e35c6bf308dd677b27">getFunctions</a> () const </td></tr>
+<tr class="memdesc:a3bfbcd2bd1e1d8e35c6bf308dd677b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface functions vector.  <a href="#a3bfbcd2bd1e1d8e35c6bf308dd677b27">More...</a><br /></td></tr>
+<tr class="separator:a3bfbcd2bd1e1d8e35c6bf308dd677b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25d278009afb608bfbd9f8a85027050c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">function_types_vector_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a25d278009afb608bfbd9f8a85027050c">getFunctionTypes</a> () const </td></tr>
+<tr class="memdesc:a25d278009afb608bfbd9f8a85027050c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function return interface function types vector.  <a href="#a25d278009afb608bfbd9f8a85027050c">More...</a><br /></td></tr>
+<tr class="separator:a25d278009afb608bfbd9f8a85027050c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0ca719823770af363b680af4ef1db74"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#ac0ca719823770af363b680af4ef1db74">getUniqueId</a> () const </td></tr>
 <tr class="memdesc:ac0ca719823770af363b680af4ef1db74"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function get unique id of interface.  <a href="#ac0ca719823770af363b680af4ef1db74">More...</a><br /></td></tr>
 <tr class="separator:ac0ca719823770af363b680af4ef1db74"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,6 +289,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a0e724fcee9047ffd6e8489ec11b37633"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abda1f3c752ee0e7b479d6a8979252063"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#abda1f3c752ee0e7b479d6a8979252063">m_functions</a></td></tr>
 <tr class="separator:abda1f3c752ee0e7b479d6a8979252063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ad4d43857b514d7f27269bf8c00d82"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">function_types_vector_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a25ad4d43857b514d7f27269bf8c00d82">m_functionTypes</a></td></tr>
+<tr class="separator:a25ad4d43857b514d7f27269bf8c00d82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9824f20d0c8f6f2fdb31e2e763b2db7d"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_interface.html#a9824f20d0c8f6f2fdb31e2e763b2db7d">m_uniqueId</a></td></tr>
 <tr class="separator:a9824f20d0c8f6f2fdb31e2e763b2db7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classerpcgen_1_1_symbol"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classerpcgen_1_1_symbol')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classerpcgen_1_1_symbol.html">erpcgen::Symbol</a></td></tr>
@@ -305,6 +315,19 @@ Static Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An interface that contains functions. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a25165fc509f8b4010ff480cf254e23dc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::vector&lt;<a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> *&gt; <a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">erpcgen::Interface::function_types_vector_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Vector of <a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a> function types. </p>
+
+</div>
+</div>
 <a class="anchor" id="a16f113a54ffefef5bb88a80dee4f824e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -378,6 +401,31 @@ Static Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a74978efaf11e02d04c5297a920146800"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Interface::addFunctionType </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classerpcgen_1_1_function_type.html">FunctionType</a> *&#160;</td>
+          <td class="paramname"><em>func</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This function will add function type to the interface. </p>
+<p>The function will add function type given by pointer func to the interface members vector m_functionTypes. Also this member will be added as symbol to interface symbol scope m_scope.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td><a class="el" href="classerpcgen_1_1_function.html" title="Function declaration. ">Function</a> pointer, which is added to interface members vector. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a61b94d15715bc0fd5330d76286d3cd07"></a>
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +471,7 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 
 </div>
 </div>
-<a class="anchor" id="a08a3aa3a3ef86cc8be10a85ececa37e0"></a>
+<a class="anchor" id="a3bfbcd2bd1e1d8e35c6bf308dd677b27"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -431,10 +479,10 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a>&amp; erpcgen::Interface::getFunctions </td>
+          <td class="memname">const <a class="el" href="classerpcgen_1_1_interface.html#a16f113a54ffefef5bb88a80dee4f824e">function_vector_t</a>&amp; erpcgen::Interface::getFunctions </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -446,6 +494,32 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 
 <p>This function return interface functions vector. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a> functions vector. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a25d278009afb608bfbd9f8a85027050c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">function_types_vector_t</a>&amp; erpcgen::Interface::getFunctionTypes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function return interface function types vector. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classerpcgen_1_1_interface.html" title="An interface that contains functions. ">Interface</a> function types vector. </dd></dl>
 
 </div>
 </div>
@@ -552,6 +626,27 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 </table>
 </div><div class="memdoc">
 <p>Vector of interface functions. </p>
+
+</div>
+</div>
+<a class="anchor" id="a25ad4d43857b514d7f27269bf8c00d82"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classerpcgen_1_1_interface.html#a25165fc509f8b4010ff480cf254e23dc">function_types_vector_t</a> erpcgen::Interface::m_functionTypes</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Vector of interface function types. </p>
 
 </div>
 </div>

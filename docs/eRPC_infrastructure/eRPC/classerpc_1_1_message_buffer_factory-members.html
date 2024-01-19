@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -117,11 +117,12 @@ $(document).ready(function(){initNavTree('classerpc_1_1_message_buffer_factory.h
 <p>This is the complete list of members for <a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a>, including all inherited members.</p>
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a16330c2cb35a0329efb98430018273da">create</a>(void)=0</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a52d400d44d1836d7764cc64e3d842a06">createServerBuffer</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a089b5bf3041323a3387c52c86fd61971">dispose</a>(MessageBuffer *buf)=0</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a619ed494036f760b0394b43815f2a086">MessageBufferFactory</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#aab77e9b0501e87a332f4cb3e2835bd54">prepareServerBufferForSend</a>(MessageBuffer *message)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#add24390e455e842edc93467feb40e8eb">~MessageBufferFactory</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#afa0402452a9bf8910731d5f59193449b">create</a>(uint8_t reserveHeaderSize)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a09f45de145d4b951228d7a38910cfc42">createServerBuffer</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a089b5bf3041323a3387c52c86fd61971">dispose</a>(MessageBuffer *buf)=0</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a405ac0162a485e75bb4848cb65664cf4">MessageBufferFactory</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#a580a3a72effff3e73c269923315039b8">prepareServerBufferForSend</a>(MessageBuffer &amp;message, uint8_t reserveHeaderSize=0)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html#aaa0e015e0f05726a8329fd9492d66e8a">~MessageBufferFactory</a>(void)</td><td class="entry"><a class="el" href="classerpc_1_1_message_buffer_factory.html">erpc::MessageBufferFactory</a></td><td class="entry"><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.5-->

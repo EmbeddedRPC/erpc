@@ -5,6 +5,7 @@ var searchData=
   ['info',['info',['../class_log.html#a52bf8d1b0ecfec71e6b21815ec165447',1,'Log']]],
   ['info2',['info2',['../class_log.html#a350246a1cc5865b6e2b9607594df671c',1,'Log']]],
   ['init',['init',['../classerpcgen_1_1_interface_definition.html#a8606a673f88a995913d7e80ded615898',1,'erpcgen::InterfaceDefinition']]],
+  ['initjavareservedwords',['initJavaReservedWords',['../classerpcgen_1_1_java_generator.html#adb7fc966670074f96f36b6f4e523359a',1,'erpcgen::JavaGenerator']]],
   ['initpythonreservedwords',['initPythonReservedWords',['../classerpcgen_1_1_python_generator.html#a0c489b72c0a49e306655e5d09dfa9cce',1,'erpcgen::PythonGenerator']]],
   ['int_5ftype_5ft',['int_type_t',['../class_integer_value.html#acb6f6bfc4690be410499df6fe6b746d4',1,'IntegerValue']]],
   ['integervalue',['IntegerValue',['../class_integer_value.html',1,'IntegerValue'],['../class_integer_value.html#a022c81735c187721de6f66e373221365',1,'IntegerValue::IntegerValue(int_type_t type=kSigned)'],['../class_integer_value.html#a30adc31106b678ca4c7d11006b9f187a',1,'IntegerValue::IntegerValue(uint64_t value, int_type_t type=kSigned)'],['../class_integer_value.html#a2904e4789a2fc1f0cb506020befa6092',1,'IntegerValue::IntegerValue(const IntegerValue &amp;other)']]],

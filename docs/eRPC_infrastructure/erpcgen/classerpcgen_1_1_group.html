@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -128,8 +128,8 @@ Public Types</h2></td></tr>
 <tr class="separator:a6958e110daf1a2f2b67c8495fd93779c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a445d27f77f14b9577850ed5ac2252ced"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; <a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a445d27f77f14b9577850ed5ac2252ced">symbols_list_t</a></td></tr>
 <tr class="separator:a445d27f77f14b9577850ed5ac2252ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b4750210cd8a7976f1173059a24fa7f"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *, std::set&lt; _param_direction &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a3b4750210cd8a7976f1173059a24fa7f">symbol_directions_map_t</a></td></tr>
-<tr class="separator:a3b4750210cd8a7976f1173059a24fa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1788854b62678ed2571e7d99310f56f9"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; <a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *, std::set&lt; param_direction_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a1788854b62678ed2571e7d99310f56f9">symbol_directions_map_t</a></td></tr>
+<tr class="separator:a1788854b62678ed2571e7d99310f56f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -145,12 +145,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa5e3e1667ee8648a1929c3b8679e8aa4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classerpcgen_1_1_group.html#a6958e110daf1a2f2b67c8495fd93779c">interface_list_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#aa5e3e1667ee8648a1929c3b8679e8aa4">getInterfaces</a> () const </td></tr>
 <tr class="memdesc:aa5e3e1667ee8648a1929c3b8679e8aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns vector with pointers to interfaces belonging to the group.  <a href="#aa5e3e1667ee8648a1929c3b8679e8aa4">More...</a><br /></td></tr>
 <tr class="separator:aa5e3e1667ee8648a1929c3b8679e8aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47b4d062b82dc4f60698ae208fe12b9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a47b4d062b82dc4f60698ae208fe12b9d">addDirToSymbolsMap</a> (<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *symbol, _param_direction dir)</td></tr>
-<tr class="memdesc:a47b4d062b82dc4f60698ae208fe12b9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will add direction for specified symbol held in a symbol map.  <a href="#a47b4d062b82dc4f60698ae208fe12b9d">More...</a><br /></td></tr>
-<tr class="separator:a47b4d062b82dc4f60698ae208fe12b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a601a71e96f8280afcbb368c038f243"><td class="memItemLeft" align="right" valign="top">const std::set&lt; _param_direction &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a2a601a71e96f8280afcbb368c038f243">getSymbolDirections</a> (<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *symbol) const </td></tr>
-<tr class="memdesc:a2a601a71e96f8280afcbb368c038f243"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns set with symbol directions.  <a href="#a2a601a71e96f8280afcbb368c038f243">More...</a><br /></td></tr>
-<tr class="separator:a2a601a71e96f8280afcbb368c038f243"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48a5d55a9b8bcd12d6438d026f0cb13b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a48a5d55a9b8bcd12d6438d026f0cb13b">addDirToSymbolsMap</a> (<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *symbol, param_direction_t dir)</td></tr>
+<tr class="memdesc:a48a5d55a9b8bcd12d6438d026f0cb13b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function will add direction for specified symbol held in a symbol map.  <a href="#a48a5d55a9b8bcd12d6438d026f0cb13b">More...</a><br /></td></tr>
+<tr class="separator:a48a5d55a9b8bcd12d6438d026f0cb13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18e068232e6cc6bb1f7728df639ddb7d"><td class="memItemLeft" align="right" valign="top">const std::set&lt; param_direction_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a18e068232e6cc6bb1f7728df639ddb7d">getSymbolDirections</a> (<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *symbol) const </td></tr>
+<tr class="memdesc:a18e068232e6cc6bb1f7728df639ddb7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns set with symbol directions.  <a href="#a18e068232e6cc6bb1f7728df639ddb7d">More...</a><br /></td></tr>
+<tr class="separator:a18e068232e6cc6bb1f7728df639ddb7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b1d2e14f40455a7fa91b406479b2585"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classerpcgen_1_1_group.html#a445d27f77f14b9577850ed5ac2252ced">symbols_list_t</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classerpcgen_1_1_group.html#a6b1d2e14f40455a7fa91b406479b2585">getSymbols</a> () const </td></tr>
 <tr class="memdesc:a6b1d2e14f40455a7fa91b406479b2585"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function returns vector with symbols.  <a href="#a6b1d2e14f40455a7fa91b406479b2585">More...</a><br /></td></tr>
 <tr class="separator:a6b1d2e14f40455a7fa91b406479b2585"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,12 +180,12 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a3b4750210cd8a7976f1173059a24fa7f"></a>
+<a class="anchor" id="a1788854b62678ed2571e7d99310f56f9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *, std::set&lt;_param_direction&gt; &gt; <a class="el" href="classerpcgen_1_1_group.html#a3b4750210cd8a7976f1173059a24fa7f">erpcgen::Group::symbol_directions_map_t</a></td>
+          <td class="memname">typedef std::map&lt;<a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *, std::set&lt;param_direction_t&gt; &gt; <a class="el" href="classerpcgen_1_1_group.html#a1788854b62678ed2571e7d99310f56f9">erpcgen::Group::symbol_directions_map_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -240,7 +240,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a47b4d062b82dc4f60698ae208fe12b9d"></a>
+<a class="anchor" id="a48a5d55a9b8bcd12d6438d026f0cb13b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -253,7 +253,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">_param_direction&#160;</td>
+          <td class="paramtype">param_direction_t&#160;</td>
           <td class="paramname"><em>dir</em>&#160;</td>
         </tr>
         <tr>
@@ -386,12 +386,12 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 
 </div>
 </div>
-<a class="anchor" id="a2a601a71e96f8280afcbb368c038f243"></a>
+<a class="anchor" id="a18e068232e6cc6bb1f7728df639ddb7d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const set&lt; _param_direction &gt; Group::getSymbolDirections </td>
+          <td class="memname">const set&lt; param_direction_t &gt; Group::getSymbolDirections </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classerpcgen_1_1_symbol.html">Symbol</a> *&#160;</td>
           <td class="paramname"><em>symbol</em></td><td>)</td>
@@ -433,7 +433,7 @@ std::string <a class="el" href="classerpcgen_1_1_list_type.html#a589a9b0e3935cd4
 </div><div class="memdoc">
 
 <p>This function returns vector with symbols. </p>
-<p>Unique symbols are added into vector within <a class="el" href="classerpcgen_1_1_group.html#a47b4d062b82dc4f60698ae208fe12b9d" title="This function will add direction for specified symbol held in a symbol map. ">addDirToSymbolsMap()</a> function.</p>
+<p>Unique symbols are added into vector within <a class="el" href="classerpcgen_1_1_group.html#a48a5d55a9b8bcd12d6438d026f0cb13b" title="This function will add direction for specified symbol held in a symbol map. ">addDirToSymbolsMap()</a> function.</p>
 <dl class="section return"><dt>Returns</dt><dd>Vector with pointers to symbols. </dd></dl>
 
 </div>

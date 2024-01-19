@@ -1,8 +1,8 @@
 var classerpcgen_1_1_interface_definition =
 [
     [ "codec_t", "classerpcgen_1_1_interface_definition.html#a3f41bc1d1fd7a8e563c1a8637ef1e204", [
-      [ "kNotSpecified", "classerpcgen_1_1_interface_definition.html#a3f41bc1d1fd7a8e563c1a8637ef1e204a834232e90d673840b6d3833b44a525c7", null ],
-      [ "kBasicCodec", "classerpcgen_1_1_interface_definition.html#a3f41bc1d1fd7a8e563c1a8637ef1e204a335c5051750beafc3e067b11909062ed", null ]
+      [ "kNotSpecified", "classerpcgen_1_1_interface_definition.html#a3f41bc1d1fd7a8e563c1a8637ef1e204a87635f074ae2d912681888c7113144e4", null ],
+      [ "kBasicCodec", "classerpcgen_1_1_interface_definition.html#a3f41bc1d1fd7a8e563c1a8637ef1e204a020bfd757cb9e00ad6a0c9da5466af8f", null ]
     ] ],
     [ "InterfaceDefinition", "classerpcgen_1_1_interface_definition.html#a3f7c1016bef2b3dd45d08f4316580106", null ],
     [ "~InterfaceDefinition", "classerpcgen_1_1_interface_definition.html#abc1e95f7ba6ec4862e83b518eb5f36ff", null ],

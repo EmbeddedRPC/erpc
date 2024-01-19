@@ -25,6 +25,7 @@ var annotated_dup =
       [ "Interface", "classerpcgen_1_1_interface.html", "classerpcgen_1_1_interface" ],
       [ "InterfaceDefinition", "classerpcgen_1_1_interface_definition.html", "classerpcgen_1_1_interface_definition" ],
       [ "internal_error", "classerpcgen_1_1internal__error.html", "classerpcgen_1_1internal__error" ],
+      [ "JavaGenerator", "classerpcgen_1_1_java_generator.html", "classerpcgen_1_1_java_generator" ],
       [ "lexical_error", "classerpcgen_1_1lexical__error.html", "classerpcgen_1_1lexical__error" ],
       [ "ListType", "classerpcgen_1_1_list_type.html", "classerpcgen_1_1_list_type" ],
       [ "Program", "classerpcgen_1_1_program.html", "classerpcgen_1_1_program" ],

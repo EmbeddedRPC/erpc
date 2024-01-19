@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC API Reference
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -152,9 +152,6 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 , <a class="el" href="classerpc_1_1_spi_master_transport.html#a24b88eb93d5e23027b626a2c8b8e0634">erpc::SpiMasterTransport</a>
 , <a class="el" href="classerpc_1_1_spi_slave_transport.html#afb4c69110ca0995cef8b0775a4cca051">erpc::SpiSlaveTransport</a>
 </li>
-<li>m_buffer
-: <a class="el" href="classerpc_1_1_codec.html#a003c4d8420239b9a347b46554ebeb903">erpc::Codec</a>
-</li>
 <li>m_buffers
 : <a class="el" href="class_static_message_buffer_factory.html#acdadc631c42d4f677122defd283b69c3">StaticMessageBufferFactory</a>
 </li>
@@ -177,20 +174,25 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 <li>m_codecFactory
 : <a class="el" href="classerpc_1_1_client_server_common.html#af61816a592a9bceb17797fee50a574f6">erpc::ClientServerCommon</a>
 </li>
-<li>m_crc
-: <a class="el" href="classerpc_1_1_framed_transport.html#aea0866f65f3441d290076833c9cdae19">erpc::FramedTransport::Header</a>
+<li>m_crcBody
+: <a class="el" href="classerpc_1_1_framed_transport.html#a8fc8fb5d250b5539380317961380e6d9">erpc::FramedTransport::Header</a>
+</li>
+<li>m_crcHeader
+: <a class="el" href="classerpc_1_1_framed_transport.html#a16cd1cdb5099f7bfad5e4ebe6020bf59">erpc::FramedTransport::Header</a>
 </li>
 <li>m_crcImpl
 : <a class="el" href="classerpc_1_1_framed_transport.html#ae29f9f3e6b7c8f41a0825ca25cb08d50">erpc::FramedTransport</a>
 , <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#ae94c3eaa5262f141cb56bfac21cb7bcc">erpc::RPMsgRTOSTransport</a>
 , <a class="el" href="classerpc_1_1_r_p_msg_transport.html#a06eec6cf1852cd6fae7df9bedd760f10">erpc::RPMsgTransport</a>
-, <a class="el" href="classerpc_1_1_r_p_msg_t_t_y_r_t_o_s_transport.html#a374babae7a9c659bc1ebd7bba08028a9">erpc::RPMsgTTYRTOSTransport</a>
 </li>
 <li>m_crcStart
 : <a class="el" href="classerpc_1_1_crc16.html#acb3e6a1b8947a0d530d57d2d26481cf3">erpc::Crc16</a>
 </li>
 <li>m_cursor
-: <a class="el" href="classerpc_1_1_codec.html#ad9fe5af5136be642e05a9e7335af8ff7">erpc::Codec</a>
+: <a class="el" href="classerpc_1_1_codec.html#ae5ff4c694cc2107b206380fb923265ee">erpc::Codec</a>
+</li>
+<li>m_dev
+: <a class="el" href="classerpc_1_1_uart_transport.html#a43aad36870f61d93108cee6ca183efd8">erpc::UartTransport</a>
 </li>
 <li>m_dst_addr
 : <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#aa57f102d300b1b0b0fdd6c67a294ba26">erpc::RPMsgRTOSTransport</a>
@@ -287,7 +289,6 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 </li>
 <li>m_rpmsg
 : <a class="el" href="class_r_p_msg_message_buffer_factory.html#a6c5a8426772d5f53ffb09a4687365382">RPMsgMessageBufferFactory</a>
-, <a class="el" href="class_r_p_msg_t_t_y_message_buffer_factory.html#a9b8224eca792ce43dd46159f28851400">RPMsgTTYMessageBufferFactory</a>
 </li>
 <li>m_rpmsg_ept
 : <a class="el" href="classerpc_1_1_r_p_msg_r_t_o_s_transport.html#a6ac7c896e66631661255f7bd2d61d49e">erpc::RPMsgRTOSTransport</a>
@@ -408,10 +409,10 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>s_initialized
-: <a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#a7994d488250d7f5ae3fa152839b5bb31">erpc::RPMsgBaseTransport</a>
+: <a class="el" href="classerpc_1_1_r_p_msg_base.html#a285bf2aa56f1ee53121accb297085552">erpc::RPMsgBase</a>
 </li>
 <li>s_rpmsg
-: <a class="el" href="classerpc_1_1_r_p_msg_base_transport.html#abbb9e11e0a1e71baa21cddbbba92b36b">erpc::RPMsgBaseTransport</a>
+: <a class="el" href="classerpc_1_1_r_p_msg_base.html#a0dd0de2a17e50658c71b09688de84a55">erpc::RPMsgBase</a>
 </li>
 </ul>
 </div><!-- contents -->

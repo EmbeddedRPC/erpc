@@ -8,6 +8,7 @@ var searchData=
   ['_7eerpclexer',['~ErpcLexer',['../classerpcgen_1_1_erpc_lexer.html#a087eb9c830768214b4c8875b8ffeb8b7',1,'erpcgen::ErpcLexer']]],
   ['_7egenerator',['~Generator',['../classerpcgen_1_1_generator.html#a8967776f04f7894136cff8ea30eed6ab',1,'erpcgen::Generator']]],
   ['_7einterfacedefinition',['~InterfaceDefinition',['../classerpcgen_1_1_interface_definition.html#abc1e95f7ba6ec4862e83b518eb5f36ff',1,'erpcgen::InterfaceDefinition']]],
+  ['_7ejavagenerator',['~JavaGenerator',['../classerpcgen_1_1_java_generator.html#a54e0a2b89610ac94d0ea4d9f1e4e82e8',1,'erpcgen::JavaGenerator']]],
   ['_7elogger',['~Logger',['../class_logger.html#ae93f62ca3e47716b7120acb032a260f3',1,'Logger']]],
   ['_7epythongenerator',['~PythonGenerator',['../classerpcgen_1_1_python_generator.html#a16c687c782244dd5a1ffdb20541ee7aa',1,'erpcgen::PythonGenerator']]],
   ['_7esetoutputlevel',['~SetOutputLevel',['../class_log_1_1_set_output_level.html#add93dff7c0b5c79cf5a167617128402d',1,'Log::SetOutputLevel']]],

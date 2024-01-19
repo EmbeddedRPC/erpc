@@ -34,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="nxp_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">eRPC Generator (erpcgen)
-   &#160;<span id="projectnumber">Rev. 1.11.0</span>
+   &#160;<span id="projectnumber">Rev. 1.12.0</span>
    </div>
    <div id="projectbrief">NXP Semiconductors</div>
   </td>
@@ -129,15 +129,13 @@ $(document).ready(function(){initNavTree('class_path_searcher.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ac28f2355c7999501e3150fd0e575db14"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac28f2355c7999501e3150fd0e575db14"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>_target_type</b> { <br />
+<tr class="memitem:a2e1e8cf3e1d34a04a6d943209e23352e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e1e8cf3e1d34a04a6d943209e23352e"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>target_type_t</b> { <br />
 &#160;&#160;<b>kFindFile</b>, 
 <br />
 &#160;&#160;<b>kFindDirectory</b>
 <br />
  }</td></tr>
-<tr class="separator:ac28f2355c7999501e3150fd0e575db14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2a0b67049e737e4558ad5d62147b0d9"><td class="memItemLeft" align="right" valign="top">typedef enum _target_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_path_searcher.html#ab2a0b67049e737e4558ad5d62147b0d9">target_type_t</a></td></tr>
-<tr class="separator:ab2a0b67049e737e4558ad5d62147b0d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a2e1e8cf3e1d34a04a6d943209e23352e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -153,7 +151,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_path_searcher.html#adae60e58362ae0098ffdc8fbf1b9e007">setTempPath</a> (const std::string &amp;path)</td></tr>
 <tr class="memdesc:adae60e58362ae0098ffdc8fbf1b9e007"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set temporary path. <br /></td></tr>
 <tr class="separator:adae60e58362ae0098ffdc8fbf1b9e007"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32c8f23e9994995e464722ea07bd0529"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_path_searcher.html#a32c8f23e9994995e464722ea07bd0529">search</a> (const std::string &amp;base, <a class="el" href="class_path_searcher.html#ab2a0b67049e737e4558ad5d62147b0d9">target_type_t</a> targetType, bool searchCwd, std::string &amp;result)</td></tr>
+<tr class="memitem:a32c8f23e9994995e464722ea07bd0529"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_path_searcher.html#a32c8f23e9994995e464722ea07bd0529">search</a> (const std::string &amp;base, target_type_t targetType, bool searchCwd, std::string &amp;result)</td></tr>
 <tr class="memdesc:a32c8f23e9994995e464722ea07bd0529"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to locate a file by using the search paths.  <a href="#a32c8f23e9994995e464722ea07bd0529">More...</a><br /></td></tr>
 <tr class="separator:a32c8f23e9994995e464722ea07bd0529"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -201,21 +199,7 @@ static <a class="el" href="class_path_searcher.html">PathSearcher</a> *&#160;</t
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Handles searching a list of paths for a file. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a class="anchor" id="ab2a0b67049e737e4558ad5d62147b0d9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef enum _target_type <a class="el" href="class_path_searcher.html#ab2a0b67049e737e4558ad5d62147b0d9">PathSearcher::target_type_t</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Type of searched item. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a2d808911bacf77ecb43afd7f3de08a8e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -255,7 +239,7 @@ static <a class="el" href="class_path_searcher.html">PathSearcher</a> *&#160;</t
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_path_searcher.html#ab2a0b67049e737e4558ad5d62147b0d9">target_type_t</a>&#160;</td>
+          <td class="paramtype">target_type_t&#160;</td>
           <td class="paramname"><em>targetType</em>, </td>
         </tr>
         <tr>
