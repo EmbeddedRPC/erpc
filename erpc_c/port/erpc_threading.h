@@ -128,7 +128,8 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = NULL);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0,
+              thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief This function starts thread execution.
@@ -231,9 +232,9 @@ private:
     static pthread_key_t s_threadObjectKey; /*!< Thread key. */
     pthread_t m_thread;                     /*!< Current thread. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    TaskHandle_t m_task;       /*!< Current task. */
-    Thread *m_next;            /*!< Pointer to next Thread. */
-    static Thread *s_first;    /*!< Pointer to first Thread. */
+    TaskHandle_t m_task;    /*!< Current task. */
+    Thread *m_next;         /*!< Pointer to next Thread. */
+    static Thread *s_first; /*!< Pointer to first Thread. */
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     StaticTask_t m_staticTask; /*!< Hold static task data. */
 #endif
@@ -412,7 +413,7 @@ private:
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_mutex m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Mutex *m_mutex;   /*!< Mutex. */
+    rtos::Mutex *m_mutex; /*!< Mutex. */
 #elif ERPC_THREADS_IS(WIN32)
     HANDLE m_mutex;
 #elif ERPC_THREADS_IS(THREADX)
@@ -498,7 +499,7 @@ private:
     SemaphoreHandle_t m_sem;         /*!< Semaphore. */
     StaticSemaphore_t m_staticQueue; /*!< Static queue. */
 #elif ERPC_THREADS_IS(ZEPHYR)
-    struct k_sem m_sem;     /*!< Semaphore. */
+    struct k_sem m_sem; /*!< Semaphore. */
 #elif ERPC_THREADS_IS(MBED)
     rtos::Semaphore *m_sem; /*!< Semaphore. */
     int m_count;            /*!< Semaphore count number. */
