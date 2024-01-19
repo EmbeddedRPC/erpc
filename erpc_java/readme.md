@@ -4,7 +4,7 @@ This folder contains the Java implementation of the eRPC infrastructure.
 
 ## Contents
 
-- `/src/main/java/com/nxp/erpc` - Java package containing eRPC infrastructure.
+- `/src/main/java/io/github/embeddedrpc/erpc` - Java package containing eRPC infrastructure.
 - `pom.xml` - Maven config file.
 - `checkstyle.xml` - Check style config file.
 
@@ -36,11 +36,11 @@ OS name: "***", version: "***", arch: "***", family: "***"
 ### Client
 
 ```Java
-import com.nxp.erpc.auxiliary.Reference;
-import com.nxp.erpc.client.ClientManager;
-import com.nxp.erpc.codec.BasicCodecFactory;
-import com.nxp.erpc.transport.TCPTransport;
-import com.nxp.erpc.transport.Transport;
+import  io.github.embeddedrpc.erpc.auxiliary.Reference;
+import  io.github.embeddedrpc.erpc.client.ClientManager;
+import  io.github.embeddedrpc.erpc.codec.BasicCodecFactory;
+import  io.github.embeddedrpc.erpc.transport.TCPTransport;
+import  io.github.embeddedrpc.erpc.transport.Transport;
 
 import com.example.app.client.MyTestClient;
 
@@ -64,11 +64,11 @@ public class Main {
 ### Server
 #### Main.java
 ```Java
-import com.nxp.erpc.server.Server;
-import com.nxp.erpc.server.SimpleServer;
-import com.nxp.erpc.codec.BasicCodecFactory;
-import com.nxp.erpc.transport.TCPTransport;
-import com.nxp.erpc.transport.Transport;
+import  io.github.embeddedrpc.erpc.server.Server;
+import  io.github.embeddedrpc.erpc.server.SimpleServer;
+import  io.github.embeddedrpc.erpc.codec.BasicCodecFactory;
+import  io.github.embeddedrpc.erpc.transport.TCPTransport;
+import  io.github.embeddedrpc.erpc.transport.Transport;
 
 import com.example.app.MyTestService;
 
@@ -88,7 +88,7 @@ public class Main {
 #### MyTestService.java
 
 ```Java
-import com.nxp.erpc.auxiliary.Reference;
+import  io.github.embeddedrpc.erpc.auxiliary.Reference;
 import com.example.app.server.AbstractMyTestService;
 
 public class MyTestService extends AbstractMyTestService {

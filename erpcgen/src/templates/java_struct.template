@@ -11,9 +11,9 @@ package {$groupPackage}.common.structs;
 
 {% if not empty(group.symbolsMap.structs) %}import {$groupPackage}.common.structs.*;{% elif not empty(structs)%}import {$groupPackage}.common.structs.*;{% endif %}
 {% if not empty(enums)%}import {$groupPackage}.common.enums.*;{% endif %}
-import com.nxp.erpc.auxiliary.Reference;
-import com.nxp.erpc.auxiliary.Utils;
-import com.nxp.erpc.codec.Codec;
+import io.github.embeddedrpc.erpc.auxiliary.Reference;
+import io.github.embeddedrpc.erpc.auxiliary.Utils;
+import io.github.embeddedrpc.erpc.codec.Codec;
 
 {%  for inc in includes %}
 import {$inc};

@@ -4,9 +4,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.nxp.erpc</groupId>
+    <groupId>io.github.embeddedrpc.erpc</groupId>
     <artifactId>erpc</artifactId>
     <version>0.1.0</version>
+
+    <name>eRPC</name>
+    <description>eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems
+        and heterogeneous multicore SoCs.
+    </description>
+    <url>https://github.com/EmbeddedRPC/erpc</url>
+
+    <licenses>
+        <license>
+            <name>The 3-Clause BSD License</name>
+            <url>https://opensource.org/license/bsd-3-clause/</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Jan Komarek</name>
+            <email>jan.komarek@nxp.com</email>
+            <organization>nxp.com</organization>
+            <organizationUrl>http://www.nxp.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/EmbeddedRPC/erpc.git</connection>
+        <developerConnection>scm:git:ssh://github.com/EmbeddedRPC/erpc.git</developerConnection>
+        <url>https://github.com/EmbeddedRPC/erpc/tree/develop</url>
+    </scm>
 
     <properties>
         <!-- Java version configuration -->
@@ -19,12 +47,6 @@
         <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
-
-        <!-- Internal repository configuration -->
-        <repository.id>internal.repo</repository.id>
-        <repository.name>Internal maven repository</repository.name>
-        <repository.url>file:c:\maven_repository</repository.url>
     </properties>
 
     <dependencies>

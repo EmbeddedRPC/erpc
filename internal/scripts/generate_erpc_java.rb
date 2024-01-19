@@ -31,16 +31,16 @@ def execute(command)
 end
 
 unit_tests.each do | unit_test |
-    execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p com.nxp.erpc.tests.#{unit_test}.erpc_outputs -o #{erpc_path}/test/java_impl_tests/src/main/java/com/nxp/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")
+    execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p io.github.embeddedrpc.erpc.tests.#{unit_test}.erpc_outputs -o #{erpc_path}/test/java_impl_tests/src/main/java/io/github/embeddedrpc/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")
 end
 
 # Custom test for test_struct without uint64 type.
 unit_test = 'test_struct'
-execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p com.nxp.erpc.tests.#{unit_test}.erpc_outputs -o #{erpc_path}/test/java_impl_tests/src/main/java/com/nxp/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/test_struct_java.erpc")
+execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p io.github.embeddedrpc.erpc.tests.#{unit_test}.erpc_outputs -o #{erpc_path}/test/java_impl_tests/src/main/java/io/github/embeddedrpc/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/test_struct_java.erpc")
 
 # Custom test for test_array with different package name.
 unit_test = 'test_arrays'
-execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p com.nxp.erpc.tests.#{unit_test} -o #{erpc_path}/test/java_impl_tests/src/main/java/com/nxp/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")
+execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p io.github.embeddedrpc.erpc.tests.#{unit_test} -o #{erpc_path}/test/java_impl_tests/src/main/java/io/github/embeddedrpc/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")
 
 unit_test = 'test_annotations'
-execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p com.nxp.erpc.tests.#{unit_test} -o #{erpc_path}/test/java_impl_tests/src/main/java/com/nxp/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")
+execute("#{erpc_path}/#{erpcgen_path}/erpcgen -g java -p io.github.embeddedrpc.erpc.tests.#{unit_test} -o #{erpc_path}/test/java_impl_tests/src/main/java/io/github/embeddedrpc/erpc/tests/#{unit_test}/ #{erpc_path}/test/#{unit_test}/#{unit_test}.erpc")

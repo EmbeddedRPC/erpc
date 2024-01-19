@@ -16,7 +16,7 @@ package {$groupPackage}.interfaces;
 import {$inc};
 {%  endfor -- includes %}
 
-import com.nxp.erpc.auxiliary.Reference;
+import io.github.embeddedrpc.erpc.auxiliary.Reference;
 
 import java.util.List;
 

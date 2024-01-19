@@ -14,13 +14,13 @@ import {$groupPackage}.interfaces.I{$iface.name};
 import {$inc};
 {%  endfor -- includes %}
 
-import com.nxp.erpc.auxiliary.MessageType;
-import com.nxp.erpc.auxiliary.MessageInfo;
-import com.nxp.erpc.auxiliary.RequestContext;
-import com.nxp.erpc.auxiliary.Reference;
-import com.nxp.erpc.auxiliary.Utils;
-import com.nxp.erpc.client.ClientManager;
-import com.nxp.erpc.codec.Codec;
+import io.github.embeddedrpc.erpc.auxiliary.MessageType;
+import io.github.embeddedrpc.erpc.auxiliary.MessageInfo;
+import io.github.embeddedrpc.erpc.auxiliary.RequestContext;
+import io.github.embeddedrpc.erpc.auxiliary.Reference;
+import io.github.embeddedrpc.erpc.auxiliary.Utils;
+import io.github.embeddedrpc.erpc.client.ClientManager;
+import io.github.embeddedrpc.erpc.codec.Codec;
 
 import java.util.ArrayList;
 import java.util.List;

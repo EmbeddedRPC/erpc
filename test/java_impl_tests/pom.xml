@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.nxp.erpc.tests</groupId>
+    <groupId>io.github.embeddedrpc.erpc.tests</groupId>
     <artifactId>java_impl_tests</artifactId>
     <version>0.1.0</version>
 
@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.nxp.erpc</groupId>
+            <groupId>io.github.embeddedrpc.erpc</groupId>
             <artifactId>erpc</artifactId>
             <version>0.1.0</version>
         </dependency>
