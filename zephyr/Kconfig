@@ -31,6 +31,11 @@ config ERPC_TRANSPORT_UART
 	select SERIAL
 	select UART_INTERRUPT_DRIVEN
 
+config ERPC_TRANSPORT_TCP
+	bool "Enable eRPC TCP transport"
+	help
+	  When enabled, eRPC will include TCP transport layer. This layer use Zephyr POSIX.
+
 config ERPC_TRANSPORT_RPMSG_LITE
 	bool "Enable eRPC rpsmg-lite transport"
 	help
