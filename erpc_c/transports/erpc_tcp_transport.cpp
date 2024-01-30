@@ -268,7 +268,7 @@ erpc_status_t TCPTransport::connectClient(void)
         {
 #else
             // globally disable the SIGPIPE signal
-#if !defined(__MINGW32__)
+#if !defined(__MINGW32__) && !defined(__ZEPHYR__)
             signal(SIGPIPE, SIG_IGN);
 #endif
 #endif // defined(SO_NOSIGPIPE)
