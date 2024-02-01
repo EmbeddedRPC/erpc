@@ -26,7 +26,6 @@ extern "C"
 #include <stddef.h>
 #include <stdint.h>
 {% else %}
-#include <cstdbool>
 #include <cstddef>
 #include <cstdint>
 {% endif %}
