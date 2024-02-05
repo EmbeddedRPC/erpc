@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2024 NXP
  * Copyright 2019 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -507,6 +507,11 @@ erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
  * @param[in] transport Transport which was initialized with init function.
  */
 void erpc_transport_cmsis_uart_deinit(erpc_transport_t transport);
+
+//@}
+
+//! @name Zephyr transports setup
+//@{
 
 /*!
  * @brief Create a Zephyr UART transport.
