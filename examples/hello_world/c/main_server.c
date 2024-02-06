@@ -3,7 +3,7 @@
 #include "erpc_c/setup/erpc_mbf_setup.h"
 #include "examples/hello_world/shim/c/c_hello_world_server.h"
 #include "examples/config.h"
-#include <cstdio>
+#include <stdio.h>
 
 /* eRPC call definition */
 void printText(const char *text) { printf("%s", text); }
@@ -24,7 +24,7 @@ int main()
     erpc_add_service_to_server(server, service);
 
     /* poll for requests */
-    erpc_status_t err = server.poll();
+    erpc_status_t err = erpc_server_poll(server);
 
     /* deinit objects */
     destroy_TextService_service(service);
