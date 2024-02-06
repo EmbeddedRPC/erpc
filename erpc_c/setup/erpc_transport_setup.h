@@ -526,6 +526,13 @@ void erpc_transport_cmsis_uart_deinit(erpc_transport_t transport);
 erpc_transport_t erpc_transport_zephyr_uart_init(void *dev);
 
 /*!
+ * @brief Deinitialize Zephyr UART transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_zephyr_uart_deinit(erpc_transport_t transport);
+
+/*!
  * @brief Create a Zephyr MBOX transport.
  *
  * Create a Zephyr MBOX transport instance, to be used on both the server
@@ -538,6 +545,14 @@ erpc_transport_t erpc_transport_zephyr_uart_init(void *dev);
  * @return Return NULL or erpc_transport_t instance pointer.
  */
 erpc_transport_t erpc_transport_zephyr_mbox_init(void *dev, void *tx_channel, void *rx_channel);
+
+/*!
+ * @brief Deinitialize Zephyr MBOX transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_zephyr_mbox_deinit(erpc_transport_t transport);
+
 
 //@}
 
