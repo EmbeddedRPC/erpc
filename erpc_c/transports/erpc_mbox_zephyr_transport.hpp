@@ -106,13 +106,12 @@ protected:
     struct mbox_channel *m_tx_channel;
     struct mbox_channel *m_rx_channel;
 
-    
     volatile bool m_isTransferReceiveCompleted = false;
     volatile uint32_t m_transferReceiveRequireBytes = 0;
 
     /*!
      * @brief Function waits for given amount of bytes to be in ring buffer.
-     * 
+     *
      * @param[in] numOfBytes Required number of bytes in ring buffer
      */
     void waitForBytes(uint32_t numOfBytes);

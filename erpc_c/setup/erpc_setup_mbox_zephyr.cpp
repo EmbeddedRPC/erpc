@@ -15,7 +15,7 @@ using namespace erpc;
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-ERPC_MANUALLY_CONSTRUCTED(MBOXTransport, s_transport);
+ERPC_MANUALLY_CONSTRUCTED_STATIC(MBOXTransport, s_transport);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -33,13 +33,14 @@ erpc_transport_t erpc_transport_zephyr_mbox_init(void *dev, void *tx_channel, vo
     }
     else
     {
-        s_transport.construct((struct device *)dev, (struct mbox_channel *)tx_channel, (struct mbox_channel *)rx_channel);
+        s_transport.construct((struct device *)dev, (struct mbox_channel *)tx_channel,
+                              (struct mbox_channel *)rx_channel);
         mboxTransport = s_transport.get();
     }
 
-    
 #elif ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_DYNAMIC
-        mboxTransport = new MBOXTransport((struct device *)dev, (struct mbox_channel *)tx_channel, (struct mbox_channel *)rx_channel);
+    mboxTransport =
+        new MBOXTransport((struct device *)dev, (struct mbox_channel *)tx_channel, (struct mbox_channel *)rx_channel);
 #else
 #error "Unknown eRPC allocation policy!"
 #endif

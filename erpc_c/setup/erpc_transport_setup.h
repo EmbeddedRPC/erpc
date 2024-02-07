@@ -553,7 +553,6 @@ erpc_transport_t erpc_transport_zephyr_mbox_init(void *dev, void *tx_channel, vo
  */
 void erpc_transport_zephyr_mbox_deinit(erpc_transport_t transport);
 
-
 //@}
 
 //! @name USB CDC transport setup

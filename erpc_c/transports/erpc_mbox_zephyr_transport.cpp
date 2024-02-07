@@ -95,7 +95,7 @@ erpc_status_t MBOXTransport::receive(MessageBuffer *message)
         waitForBytes(sizeof(uint32_t));
         ring_buf_get(&s_rxRingBuffer, (uint8_t *)&rxMsgSize, sizeof(uint32_t));
 
-        // Wait for message to be transmitted 
+        // Wait for message to be transmitted
         waitForBytes(rxMsgSize);
         message->setUsed((uint16_t)rxMsgSize);
 
