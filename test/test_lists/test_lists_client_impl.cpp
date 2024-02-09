@@ -205,14 +205,20 @@ TEST(test_list, SendReceived2Enum)
             switch (j)
             {
                 case 0:
+                {
                     *list_s = red;
                     break;
+                }
                 case 1:
+                {
                     *list_s = green;
                     break;
+                }
                 case 2:
+                {
                     *list_s = blue;
                     break;
+                }
             }
             ++list_s;
         }

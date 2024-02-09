@@ -21,13 +21,21 @@ bool isHexDigit(char c)
 uint8_t hexCharToInt(char c)
 {
     if (c >= '0' && c <= '9')
+    {
         return c - '0';
+    }
     else if (c >= 'a' && c <= 'f')
+    {
         return c - 'a' + 10;
+    }
     else if (c >= 'A' && c <= 'F')
+    {
         return c - 'A' + 10;
+    }
     else
+    {
         return static_cast<uint8_t>(-1);
+    }
 }
 
 //! \param encodedByte Must point to at least two ASCII hex characters.

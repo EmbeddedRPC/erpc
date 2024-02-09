@@ -82,7 +82,9 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
                 switch (c)
                 {
                     case 0: // end of the string, bail
+                    {
                         break;
+                    }
                     case 'x':
                     {
                         // start of a hex char escape sequence
@@ -90,10 +92,14 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
                         // read high and low nibbles, checking for end of string
                         char hi = *++in;
                         if (hi == 0)
+                        {
                             break;
+                        }
                         char lo = *++in;
                         if (lo == 0)
+                        {
                             break;
+                        }
 
                         if (isHexDigit(hi) && isHexDigit(lo))
                         {
@@ -111,41 +117,57 @@ int ErpcLexer::processStringEscapes(const char *in, char *out)
                         break;
                     }
                     case 'n':
+                    {
                         *out++ = '\n';
                         count++;
                         break;
+                    }
                     case 't':
+                    {
                         *out++ = '\t';
                         count++;
                         break;
+                    }
                     case 'r':
+                    {
                         *out++ = '\r';
                         count++;
                         break;
+                    }
                     case 'b':
+                    {
                         *out++ = '\b';
                         count++;
                         break;
+                    }
                     case 'f':
+                    {
                         *out++ = '\f';
                         count++;
                         break;
+                    }
                     case '0':
+                    {
                         *out++ = '\0';
                         count++;
                         break;
+                    }
                     default:
+                    {
                         *out++ = c;
                         count++;
                         break;
+                    }
                 }
                 break;
             }
 
             default:
+            {
                 // copy all other chars directly
                 *out++ = *in++;
                 count++;
+            }
         }
     }
 
