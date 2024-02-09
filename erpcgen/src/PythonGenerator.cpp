@@ -237,20 +237,29 @@ data_map PythonGenerator::getFunctionTemplateData(Group *group, Function *fn)
         switch (dir)
         {
             case param_direction_t::kInDirection:
+            {
                 paramInfo["direction"] = "in";
                 inParams.push_back(paramInfo);
                 break;
+            }
             case param_direction_t::kOutDirection:
+            {
                 paramInfo["direction"] = "out";
                 outParams.push_back(paramInfo);
                 break;
+            }
             case param_direction_t::kInoutDirection:
+            {
                 paramInfo["direction"] = "inout";
                 inParams.push_back(paramInfo);
                 outParams.push_back(paramInfo);
                 break;
+            }
             default:
+            {
                 paramInfo["direction"] = "none";
+                break;
+            }
         }
 
         params.push_back(paramInfo);
@@ -516,7 +525,9 @@ data_map PythonGenerator::makeGroupSymbolsTemplateData(Group *group)
                     break;
                 }
                 default:
+                {
                     break;
+                }
             }
         }
     }
@@ -701,7 +712,7 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
                     {
                         EnumType *enumType = dynamic_cast<EnumType *>(it);
                         assert(enumType);
-                        for (auto itMember : enumType->getMembers())
+                        for (const auto itMember : enumType->getMembers())
                         {
                             if (unionCase->getCaseName() == itMember->getName())
                             {
@@ -777,7 +788,9 @@ data_map PythonGenerator::getTypeInfo(DataType *t)
             break;
         }
         default:
+        {
             throw internal_error("unknown data type");
+        }
     }
     return info;
 }
@@ -787,33 +800,61 @@ string PythonGenerator::getBuiltinTypename(const BuiltinType *t)
     switch (t->getBuiltinType())
     {
         case BuiltinType::builtin_type_t::kBoolType:
+        {
             return "bool";
+        }
         case BuiltinType::builtin_type_t::kInt8Type:
+        {
             return "int8";
+        }
         case BuiltinType::builtin_type_t::kInt16Type:
+        {
             return "int16";
+        }
         case BuiltinType::builtin_type_t::kInt32Type:
+        {
             return "int32";
+        }
         case BuiltinType::builtin_type_t::kInt64Type:
+        {
             return "int64";
+        }
         case BuiltinType::builtin_type_t::kUInt8Type:
+        {
             return "uint8";
+        }
         case BuiltinType::builtin_type_t::kUInt16Type:
+        {
             return "uint16";
+        }
         case BuiltinType::builtin_type_t::kUInt32Type:
+        {
             return "uint32";
+        }
         case BuiltinType::builtin_type_t::kUInt64Type:
+        {
             return "uint64";
+        }
         case BuiltinType::builtin_type_t::kFloatType:
+        {
             return "float";
+        }
         case BuiltinType::builtin_type_t::kDoubleType:
+        {
             return "double";
+        }
         case BuiltinType::builtin_type_t::kStringType:
+        {
             return "string";
+        }
         case BuiltinType::builtin_type_t::kBinaryType:
+        {
             return "binary";
+        }
         default:
+        {
             throw internal_error("unknown builtin type");
+        }
     }
 }
 

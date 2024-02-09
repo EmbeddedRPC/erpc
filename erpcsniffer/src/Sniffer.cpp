@@ -690,7 +690,9 @@ string Sniffer::getDataTypeName(DataType *dataType)
             return "void";
         }
         default:
+        {
             return dataType->getName();
+        }
     }
 }
 

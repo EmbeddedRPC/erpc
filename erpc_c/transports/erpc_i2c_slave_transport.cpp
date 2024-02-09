@@ -108,39 +108,49 @@ static void I2C_SlaveUserCallback(I2C_Type *base, volatile i2c_slave_transfer_t 
     {
         /*  Address match event */
         case kI2C_SlaveAddressMatchEvent:
+        {
             transfer->rxData = NULL;
             transfer->rxSize = 0;
             break;
+        }
         /*  Transmit request */
         case kI2C_SlaveTransmitEvent:
+        {
             /*  Update information for transmit process */
             transfer->txData = ((I2C_CLB_USER_DATA *)userData)->tx_buffer;
             transfer->txSize = ((I2C_CLB_USER_DATA *)userData)->tx_size;
             transfer->rxData = NULL;
             transfer->rxSize = 0;
             break;
+        }
 
         /* Setup the slave receive buffer */
         case kI2C_SlaveReceiveEvent:
+        {
             /*  Update information for received process */
             transfer->rxData = ((I2C_CLB_USER_DATA *)userData)->rx_buffer;
             transfer->rxSize = ((I2C_CLB_USER_DATA *)userData)->rx_size;
             transfer->txData = NULL;
             transfer->txSize = 0;
             break;
+        }
 
         /* The master has sent a stop transition on the bus */
         case kI2C_SlaveCompletionEvent:
+        {
             transport->transfer_cb();
             transfer->rxData = NULL;
             transfer->rxSize = 0;
             transfer->txData = NULL;
             transfer->txSize = 0;
             break;
+        }
 
         default:
+        {
             s_isTransferCompleted = false;
             break;
+        }
     }
 }
 
