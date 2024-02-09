@@ -2,10 +2,7 @@
 
 This file documents the parser and output test system for erpcgen.
 
-This test system is built on py.test using its extensive plugin hooks. To run the tests, just run
-py.test in `erpc/erpcgen/test/` directory. It's safer to run py.test with parameter source
-directory (from erpcgen directory run: "pytest test"). This prevent on windows to execute
-boost test in boost folder.
+This test system is built on py.test using its extensive plugin hooks.
 
 ## Setup
 
@@ -23,7 +20,19 @@ the VisualStudio project.
 ## Running
 
 Run the tests by running the py.test executable.  The tests can be run from either the
-`erpc/erpcgen/` or `erpc/erpcgen/test/` directories.
+[erpc/erpcgen/](/erpcgen) or [erpc/erpcgen/test/](.) directories. The tests can be also run from root folder defining directory with tests as next parameter.
+
+Run all tests:
+
+```bash
+$ pytest erpcgen/test
+```
+
+Run one test
+
+```bash
+$ pytest erpcgen/test/test_union_py.yml
+```
 
 Use the `--help` option of py.test to see all available command line options. Useful options are
 `-s` to turn off output capturing and `-v` to list each test case by name as it runs. The `-k`
@@ -35,13 +44,12 @@ such as `--ev=3`. Default verbosity is 0.
 
 ## Config
 
-The tests use a config file. The standard config is `erpc/erpcgen/test/config.py`. It tries to
-figure out the erpcgen executable location based on the OS. If you need to override this, you can
-create a `config_local.py` that defines the config variables listed below.
+The tests use a config file. The standard config is [erpc/erpcgen/test/config.py](config.py). It tries to figure out the erpcgen executable location based on the OS. If you need to override this, you can create a `config_local.py` that defines the config variables listed below.
 
 Config variables:
 
-- `CC` = C/C++ compiler path, defaults to "gcc"
+- `CC` = C compiler path, defaults to "gcc"
+- `CXX` = C++ compiler path, defaults to "g++"
 - `ERPCGEN` = absolute path to the erpcgen executable
 - `RUN_KEEP_COUNT` = number of historical test runs to retain, not including the most recent run
 
@@ -195,7 +203,7 @@ Here, both not pattern searches range from the last matching character of the po
 also shows a `not_re` pattern that requires a regular expression to not match within the search
 range.
 
-## Parametrizatio
+## Parametrization
 
 If the test spec dictionary has a `params` key, then the spec will be parametrized. The `params`
 key must have a dictionary value with parameter names for keys. Under each of the parameter names
