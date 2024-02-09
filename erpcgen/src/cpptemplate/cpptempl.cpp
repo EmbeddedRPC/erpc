@@ -1,7 +1,7 @@
 // Copyright (c) 2010-2014 Ryan Ginstrom
 // Copyright (c) 2014 Martinho Fernandes
 // Copyright (c) 2014-2016 Freescale Semiconductor, Inc.
-// Copyright 2016 NXP
+// Copyright 2016-2023 NXP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1116,7 +1116,7 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
     // Check if this is a pseudo function.
     bool is_fn = false;
     if (path == "count" || path == "empty" || path == "defined" || path == "addIndent" || path == "int" ||
-        path == "str" || path == "upper" || path == "lower")
+        path == "str" || path == "upper" || path == "lower" || path == "capitalize" || path == "dump")
     {
         is_fn = true;
     }
@@ -1190,6 +1190,25 @@ data_ptr ExprParser::get_var_value(const std::string &path, data_list &params)
                 std::string s = params[0]->getvalue();
                 std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
                 result = s;
+            }
+            else if (path == "capitalize")
+            {
+                std::string s = params[0]->getvalue();
+                if (!s.empty())
+                {
+                    s[0] = std::toupper(s[0]);
+                }
+                result = s;
+            }
+            else if (path == "dump")
+            {
+                std::stringstream buffer;
+                std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+                dump_data(params[0]);
+
+                result = buffer.str(); // text will now contain "Bla\n"
+                std::cout.rdbuf(old);
             }
         }
         else

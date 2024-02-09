@@ -508,6 +508,18 @@ erpc_transport_t erpc_transport_cmsis_uart_init(void *uartDrv);
  */
 void erpc_transport_cmsis_uart_deinit(erpc_transport_t transport);
 
+/*!
+ * @brief Create a Zephyr UART transport.
+ *
+ * Create a Zephyr UART transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] dev Zephyr UART device address.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_zephyr_uart_init(void *dev);
+
 //@}
 
 //! @name USB CDC transport setup

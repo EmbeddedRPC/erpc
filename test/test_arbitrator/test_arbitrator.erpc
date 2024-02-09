@@ -11,8 +11,6 @@
 @namespace("")
 program test;
 
-import "../common/unit_test_common.erpc"
-
 @group("firstInterface")
 interface FirstInterface
 {

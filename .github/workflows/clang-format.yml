@@ -11,4 +11,5 @@ jobs:
     - uses: DoozyX/clang-format-lint-action@v0.16.2
       with:
         source: '.'
+        exclude: './examples/zephyr/matrix_multiply_rpmsglite/remote/src/service ./examples/zephyr/matrix_multiply_rpmsglite/src/service ./examples/zephyr/matrix_multiply_uart/src/service'
         clangFormatVersion: 16

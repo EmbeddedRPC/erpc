@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  *
@@ -32,7 +32,8 @@ public:
     {
         kAll,
         kC,
-        kPython
+        kPython,
+        kJava
     };
 
     /*!

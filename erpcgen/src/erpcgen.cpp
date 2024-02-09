@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2023 NXP
  * All rights reserved.
  *
  *
@@ -14,6 +14,7 @@
 #include "InterfaceDefinition.hpp"
 #include "Logging.hpp"
 #include "PythonGenerator.hpp"
+#include "JavaGenerator.hpp"
 #include "SearchPath.hpp"
 #include "UniqueIdChecker.hpp"
 #include "options.hpp"
@@ -51,6 +52,7 @@ static const char *k_optionsDefinition[] = { "?|help",
                                              "I:path <filePath>",
                                              "g:generate <language>",
                                              "c:codec <codecType>",
+                                             "p:package <packageName>",
                                              NULL };
 
 /*! Help string. */
@@ -63,10 +65,12 @@ const char k_usageText[] =
   -I/--path <filePath>         Add search path for imports\n\
   -g/--generate <language>     Select the output language (default is C)\n\
   -c/--codec <codecType>       Specify used codec type\n\
+  -p/--package <packageName>   Java app package (com.example.app) (only for Java)\n\
 \n\
 Available languages (use with -g option):\n\
   c    C/C++\n\
   py   Python\n\
+  java Java\n\
 \n\
 Available codecs (use with --c option):\n\
   basic   BasicCodec\n\
@@ -98,6 +102,7 @@ protected:
     {
         kCLanguage,
         kPythonLanguage,
+        kJavaLanguage,
     }; /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
@@ -111,6 +116,7 @@ protected:
     string_vector_t m_positionalArgs;     /*!< Positional arguments. */
     languages_t m_outputLanguage;         /*!< Output language we're generating. */
     InterfaceDefinition::codec_t m_codec; /*!< Used codec type. */
+    string m_javaPackageName;             /*!< Used java package. */
 
 public:
     /*!
@@ -198,6 +204,10 @@ public:
                     {
                         m_outputLanguage = languages_t::kPythonLanguage;
                     }
+                    else if (lang == "java")
+                    {
+                        m_outputLanguage = languages_t::kJavaLanguage;
+                    }
                     else
                     {
                         Log::error("error: unknown language %s", lang.c_str());
@@ -218,6 +228,12 @@ public:
                         Log::error("error: unknown codec type %s", codec.c_str());
                         return 1;
                     }
+                    break;
+                }
+
+                case 'p':
+                {
+                    m_javaPackageName = optarg;
                     break;
                 }
 
@@ -313,6 +329,10 @@ public:
                     break;
                 case languages_t::kPythonLanguage:
                     PythonGenerator(&def).generate();
+                    break;
+                case languages_t::kJavaLanguage:
+                    // TODO: Check java package
+                    JavaGenerator(&def, m_javaPackageName).generate();
                     break;
             }
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -29,7 +29,7 @@ struct rpmsg_lite_instance *RPMsgBase::s_rpmsg;
 ////////////////////////////////////////////////////////////////////////////////
 
 RPMsgRTOSTransport::RPMsgRTOSTransport(void) :
-RPMsgBase(), Transport(), m_rdev(NULL), m_app_rp_chnl(NULL), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL),
+Transport(), RPMsgBase(), m_rdev(NULL), m_app_rp_chnl(NULL), m_dst_addr(0), m_rpmsg_queue(NULL), m_rpmsg_ept(NULL),
 m_crcImpl(NULL)
 {
 }
