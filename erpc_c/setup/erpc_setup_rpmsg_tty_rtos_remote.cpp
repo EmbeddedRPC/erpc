@@ -72,6 +72,6 @@ void erpc_transport_rpmsg_lite_tty_rtos_remote_deinit(erpc_transport_t transport
 
     RPMsgTTYRTOSTransport *rpmsgTransport = reinterpret_cast<RPMsgTTYRTOSTransport *>(transport);
 
-    delete rpmsgTransport
+    delete rpmsgTransport;
 #endif
 }

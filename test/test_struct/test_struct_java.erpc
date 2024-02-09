@@ -1,0 +1,152 @@
+/*
+ * Copyright 2023 NXP
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+@c:include("myAlloc.hpp")
+@output_dir("erpc_outputs")
+//@clientOutputFormat(C)
+//@serverOutputFormat(C)
+program test;
+
+import "../common/unit_test_common.erpc"
+
+// Hello world!
+
+struct C
+{
+    int32 m
+    int32 n
+}
+struct B
+{
+    float x
+    float y
+}
+struct A
+{
+    B b
+    C c
+}
+
+struct D
+{
+    C c
+}
+
+struct F {
+    int8 a
+    int16 b
+    int32 c
+    int64 d
+}
+
+// Java does not support uint64
+
+struct G {
+    uint8 a
+    uint16 b
+    uint32 c
+    // uint64 d
+}
+
+
+struct primate {
+    string species
+    bool is_ape
+}
+
+struct stringStruct {
+    string one
+    string two
+    string three
+}
+
+enum school_year_t {
+    FRESHMAN = 9,
+    SOPHOMORE,
+    JUNIOR,
+    SENIOR
+}
+
+struct student {
+    string name
+    float[3] test_grades
+    school_year_t school_year
+    int32 age
+}
+
+enum enumColor{red, green, blue}
+
+struct AllTypes {
+    int32 number
+    string text
+    enumColor color
+    C c
+    list<int32> list_numbers
+    list<string> list_text
+    int32[2] array_numbers
+    string[2] array_text
+    binary binary_numbers
+}
+
+type Int32Type = int32
+type StringType = string
+type EnumColorType = enumColor
+type StructCType = C
+type ListInt32Type = list<int32>
+type ArrayInt32Type = int32[5]
+
+//type AnonymousStruct = struct { int32 a int32 b}
+
+//type AnonymousStruct2 = AnonymousStruct
+
+struct structOfAllTypes
+{
+    Int32Type number
+    StringType text
+    EnumColorType color
+    StructCType c
+    ListInt32Type list_numbers
+    ArrayInt32Type array_numbres
+}
+
+type TypeOfAllTypes = AllTypes
+
+struct StructWithByrefMembers
+{
+    byref A a @shared;
+    byref int32 b;
+}
+
+@group("group")
+interface GroupService {
+    oneway groupFunction()
+}
+
+@group("ArithmeticService")
+interface ArithmeticService1 {
+    getMember(C c) -> int32
+    returnStruct(float a, float b) -> B
+    getMemberTest2(A a) -> B
+    sendNestedStruct(D d) -> int32
+    checkString(primate p @retain) -> int32
+    returnStrings() -> stringStruct
+}
+
+@group("ArithmeticService")
+interface ArithmeticService2 {
+    sendManyInts(F f) -> int32
+    sendManyUInts(G g) -> int32
+    //student functions
+    getStudentName(student stud) -> string
+    getStudentTestAverage(student stud) -> float
+    getStudentYear(student stud) -> int32
+    getStudentAge(student stud) -> int32
+    createStudent(string name, float[3] test_scores, school_year_t year, int32 age) -> student
+
+    test_struct_allDirection(AllTypes a, in AllTypes b, inout AllTypes e) -> void
+
+    testSendingByrefMembers(StructWithByrefMembers s) -> bool
+}

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2023 NXP
  * Copyright (c) 2020 Texas Instruments Incorporated
  * All rights reserved.
  *
@@ -1722,6 +1722,10 @@ Annotation::program_lang_t SymbolScanner::getAnnotationLang(AstNode *annotation)
         else if (lang.compare("py") == 0)
         {
             return Annotation::program_lang_t::kPython;
+        }
+        else if (lang.compare("java") == 0)
+        {
+            return Annotation::program_lang_t::kJava;
         }
 
         throw semantic_error(format_string("line %d: Unsupported programming language '%s' specified.",

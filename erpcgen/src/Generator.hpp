@@ -48,7 +48,8 @@ public:
     enum class generator_type_t
     {
         kC,
-        kPython
+        kPython,
+        kJava
     }; /*!< Type of generator. */
 
     typedef std::vector<DataType *> datatype_vector_t; /*!< Vector of data types. */

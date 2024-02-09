@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2023 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -11,17 +11,25 @@
 #include "erpc_rpmsg_lite_rtos_transport.hpp"
 #include "erpc_transport_setup.h"
 
+#if defined(__ZEPHYR__)
+#include <zephyr/device.h>
+#endif
+
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(SH_MEM_TOTAL_SIZE)
+#if !defined(SH_MEM_TOTAL_SIZE) && !defined(__ZEPHYR__)
 #define SH_MEM_TOTAL_SIZE (6144U)
 #endif
 
-#if defined(__ICCARM__) /* IAR Workbench */
+#if defined(__ZEPHYR__)
+#define SHM_MEM_ADDR DT_REG_ADDR(DT_CHOSEN(zephyr_ipc_shm))
+#define SH_MEM_TOTAL_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_ipc_shm))
+void *rpmsg_lite_base = (void *)SHM_MEM_ADDR;
+#elif defined(__ICCARM__) /* IAR Workbench */
 #pragma location = "rpmsg_sh_mem_section"
 char rpmsg_lite_base[SH_MEM_TOTAL_SIZE];
 #elif defined(__CC_ARM) || defined(__ARMCC_VERSION) /* Keil MDK */

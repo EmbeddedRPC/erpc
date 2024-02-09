@@ -1,0 +1,162 @@
+{	"folders": [
+		{
+			"name": "INTERNAL",
+			"path": "."
+		}
+	],
+	"settings": {
+		"launch": {
+			"configurations": [
+				{
+					"name": "test_annotations_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_annotations/test_annotations.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_arrays_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_arrays/test_arrays.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_binary_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_binary/test_binary.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_builtin_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_builtin/test_builtin.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_const_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_const/test_const.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_enums_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_enums/test_enums.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_lists_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_lists/test_lists.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_struct_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_struct/test_struct.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_typedef_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_typedef/test_typedef.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_unions_tcp_client_server",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_unions/test_unions.py",
+					"args": ["-c", "-s"]
+				},{
+					"name": "test_annotations_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_annotations/test_annotations.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_arrays_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_arrays/test_arrays.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_binary_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_binary/test_binary.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_builtin_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_builtin/test_builtin.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_const_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_const/test_const.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_enums_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_enums/test_enums.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_lists_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_lists/test_lists.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_struct_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_struct/test_struct.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_typedef_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_typedef/test_typedef.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_unions_uart_client",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_unions/test_unions.py",
+					"args": ["-c", "-S", "COM3"]
+				},{
+					"name": "test_annotations_tcp_client_server_ip",
+					"type": "python",
+					"request": "launch",
+					"cwd": "${workspaceFolder:INTERNAL}/scripts",
+					"program":  "${workspaceFolder:INTERNAL}/scripts/test_annotations/test_annotations.py",
+					"args": ["-s", "-c", "-t", "192.168.1.249", "-p", "54321"]
+				},
+			],
+			"compounds": []
+		},
+	}
+}

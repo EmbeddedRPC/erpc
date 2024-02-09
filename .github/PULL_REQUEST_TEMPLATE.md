@@ -1,36 +1,36 @@
 # Pull request
 
-**Choose Correct**
+## Choose Correct
 
 - [ ] bug
 - [ ] feature
 
-**Describe the pull request**
+## Describe the pull request
 <!--
 A clear and concise description of what the pull request is.
 -->
 
-**To Reproduce**
+## To Reproduce
 <!--
 Steps to reproduce the behavior.
 -->
 
-**Expected behavior**
+## Expected behavior
 <!--
 A clear and concise description of what you expected to happen.
 -->
 
-**Screenshots**
+## Screenshots
 <!--
 If applicable, add screenshots to help explain your problem.
 -->
 
-**Desktop (please complete the following information):**
+## Desktop (please complete the following information):
 
 - OS<!--[e.g. iOS]-->:
 - eRPC Version<!--[e.g. v1.9.0]-->:
 
-**Steps you didn't forgot to do**
+## Steps you didn't forgot to do
 
 - [ ] I checked if other PR isn't solving this issue.
 - [ ] I read Contribution details and did appropriate actions.
@@ -38,7 +38,7 @@ If applicable, add screenshots to help explain your problem.
 - [ ] PR code is formatted.
 - [ ] Allow edits from maintainers pull request option is set (recommended).
 
-**Additional context**
+## Additional context
 <!--
 Add any other context about the problem here.
 -->

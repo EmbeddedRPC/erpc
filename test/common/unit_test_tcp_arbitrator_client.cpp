@@ -14,7 +14,6 @@
 
 #include "Logging.hpp"
 #include "c_test_firstInterface_client.h"
-#include "c_test_unit_test_common_client.h"
 #include "gtest.h"
 #include "unit_test.h"
 #include "unit_test_wrapped.h"
