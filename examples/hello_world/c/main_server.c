@@ -3,10 +3,14 @@
 #include "erpc_c/setup/erpc_mbf_setup.h"
 #include "examples/hello_world/shim/c/c_hello_world_server.h"
 #include "examples/config.h"
+#include "erpc_error_handler.h"
 #include <stdio.h>
 
 /* eRPC call definition */
-void printText(const char *text) { printf("%s", text); }
+void printText(const char *text)
+{
+    printf("%s", text);
+}
 
 int main()
 {
@@ -26,9 +30,17 @@ int main()
     /* poll for requests */
     erpc_status_t err = erpc_server_poll(server);
 
+    /* handle error status */
+    if (err != kErpcStatus_Success)
+    {
+        /* print error description */
+        erpc_error_handler(err, 0);
+    }
+
     /* deinit objects */
     destroy_TextService_service(service);
     erpc_server_deinit(server);
     erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_close(transport);
     erpc_transport_tcp_deinit(transport);
 }

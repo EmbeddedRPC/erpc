@@ -8,8 +8,11 @@ cmake_minimum_required(VERSION 3.20.0)
 
 project(erpc_hello_world C CXX)
 
-add_executable(server)
 add_executable(client)
+add_executable(server)
+
+add_executable(client_cpp)
+add_executable(server_cpp)
 
 set(ERPC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../erpc_c)
 
@@ -53,26 +56,49 @@ set(APP_INCLUDE_DIRS
 )
 
 target_sources(client PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/c/main_client.c
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/c_hello_world_client.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_client.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/main_client.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
   ${ERPC_SOURCES}
 )
 
 target_sources(server PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/c/main_server.c
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/c_hello_world_server.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_server.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/main_server.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${ERPC_SOURCES}
+)
+
+target_sources(client_cpp PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/c/main_client.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_client.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${ERPC_SOURCES}
+)
+
+target_sources(server_cpp PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/c/main_server.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_server.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
   ${ERPC_SOURCES}
 )
 
 target_include_directories(client PRIVATE ${APP_INCLUDE_DIRS})
 target_include_directories(server PRIVATE ${APP_INCLUDE_DIRS})
 
+target_include_directories(client_cpp PRIVATE ${APP_INCLUDE_DIRS})
+target_include_directories(server_cpp PRIVATE ${APP_INCLUDE_DIRS})
 
 if(WIN32)
   target_link_libraries(client wsock32 ws2_32)
   target_link_libraries(server wsock32 ws2_32)
+
+  target_link_libraries(client_cpp wsock32 ws2_32)
+  target_link_libraries(server_cpp wsock32 ws2_32)
 endif()

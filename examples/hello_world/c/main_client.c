@@ -3,6 +3,7 @@
 #include "erpc_c/setup/erpc_mbf_setup.h"
 #include "examples/hello_world/shim/c/c_hello_world_client.h"
 #include "examples/config.h"
+#include "erpc_error_handler.h"
 
 int main()
 {
@@ -25,5 +26,6 @@ int main()
     deinitTextService_client();
     erpc_client_deinit(client_manager);
     erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_close(transport);
     erpc_transport_tcp_deinit(transport);
 }
