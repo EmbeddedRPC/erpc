@@ -12,7 +12,6 @@
 
 #include "erpc_framed_transport.hpp"
 
-#include <cstdbool>
 #include <cstdlib>
 
 extern "C" {

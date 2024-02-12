@@ -17,7 +17,6 @@
 #define _erpc_matrix_multiply_common_hpp_
 
 
-#include <cstdbool>
 #include <cstddef>
 #include <cstdint>
 
