@@ -4,14 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "hello_world_server.hpp"
+#include "config.h"
+
 #include "erpc_basic_codec.hpp"
 #include "erpc_crc16.hpp"
 #include "erpc_message_buffer.hpp"
 #include "erpc_simple_server.hpp"
 #include "erpc_tcp_transport.hpp"
 
-#include "hello_world_server.hpp"
-#include "examples/config.h"
 #include "erpc_error_handler.h"
 
 #include <iostream>
@@ -72,7 +73,7 @@ int main()
 
     if (status != kErpcStatus_Success)
     {
-        /* print error description */
+        /* Print error description */
         erpc_error_handler(status, 0);
         return -1;
     }

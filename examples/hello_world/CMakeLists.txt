@@ -17,7 +17,6 @@ add_executable(server_cpp)
 set(ERPC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../erpc_c)
 
 set(ERPC_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/../..
   ${ERPC_DIR}/port
   ${ERPC_DIR}/infra
   ${ERPC_DIR}/service
@@ -52,6 +51,7 @@ set(ERPC_SOURCES
 set(APP_INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/shim/c
   ${CMAKE_CURRENT_SOURCE_DIR}/c
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
   ${ERPC_INCLUDE_DIRS}
 )
 

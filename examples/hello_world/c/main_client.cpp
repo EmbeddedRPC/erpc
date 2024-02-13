@@ -5,11 +5,13 @@
  */
 
 #include "hello_world_client.hpp"
-#include "examples/config.h"
+#include "config.h"
 
 #include "erpc_basic_codec.hpp"
 #include "erpc_client_manager.h"
 #include "erpc_tcp_transport.hpp"
+
+#include "erpc_error_handler.h"
 
 using namespace erpcShim;
 using namespace erpc;
@@ -41,32 +43,42 @@ public:
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-
 int main()
 {
+    erpc_status_t status;
+
+    /* Init eRPC client components */
     TCPTransport transport(ERPC_HOSTNAME, ERPC_PORT, false);
     MyMessageBufferFactory msgFactory;
     BasicCodecFactory basicCodecFactory;
     Crc16 crc16;
     ClientManager clientManager;
 
-
+    /* Init transport */
     transport.setCrc16(&crc16);
-    transport.open();
+    status = transport.open();
 
+    if (status != kErpcStatus_Success)
+    {
+        /* print error description */
+        erpc_error_handler(status, 0);
+        return -1;
+    }
+
+    /* Init client manager */
     clientManager.setMessageBufferFactory(&msgFactory);
     clientManager.setTransport(&transport);
     clientManager.setCodecFactory(&basicCodecFactory);
 
-    /* scope for client service */
+    /* Scope for client service */
     {
-        /* init eRPC client TextService service */
+        /* Init eRPC client TextService service */
         TextService_client client(&clientManager);
 
-        /* do eRPC call */
+        /* Do eRPC call */
         client.printText("Hello world!");
     }
 
-    /* deinit objects */
+    /* Deinit objects */
     transport.close();
 }
