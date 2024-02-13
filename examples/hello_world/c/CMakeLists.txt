@@ -14,7 +14,9 @@ add_executable(server)
 add_executable(client_cpp)
 add_executable(server_cpp)
 
-set(ERPC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../erpc_c)
+set(ERPC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../erpc_c)
+set(SHIM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
+set(CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 set(ERPC_INCLUDE_DIRS
   ${ERPC_DIR}/port
@@ -49,43 +51,43 @@ set(ERPC_SOURCES
 )
 
 set(APP_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c
-  ${CMAKE_CURRENT_SOURCE_DIR}/c
-  ${CMAKE_CURRENT_SOURCE_DIR}/..
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CONFIG_DIR}
+  ${SHIM_DIR}
   ${ERPC_INCLUDE_DIRS}
 )
 
 target_sources(client PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/c/main_client.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/c_hello_world_client.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_client.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/main_client.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+  ${SHIM_DIR}/c_hello_world_client.cpp
+  ${SHIM_DIR}/hello_world_client.cpp
+  ${SHIM_DIR}/hello_world_interface.cpp
   ${ERPC_SOURCES}
 )
 
 target_sources(server PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/c/main_server.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/c_hello_world_server.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_server.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/main_server.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+  ${SHIM_DIR}/c_hello_world_server.cpp
+  ${SHIM_DIR}/hello_world_server.cpp
+  ${SHIM_DIR}/hello_world_interface.cpp
   ${ERPC_SOURCES}
 )
 
 target_sources(client_cpp PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/c/main_client.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_client.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/main_client.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+  ${SHIM_DIR}/hello_world_client.cpp
+  ${SHIM_DIR}/hello_world_interface.cpp
   ${ERPC_SOURCES}
 )
 
 target_sources(server_cpp PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/c/main_server.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_server.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shim/c/hello_world_interface.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/c/erpc_error_handler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/main_server.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+  ${SHIM_DIR}/hello_world_server.cpp
+  ${SHIM_DIR}/hello_world_interface.cpp
   ${ERPC_SOURCES}
 )
 
