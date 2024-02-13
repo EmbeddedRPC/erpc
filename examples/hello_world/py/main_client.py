@@ -3,11 +3,10 @@ import sys
 
 sys.path.insert(1, '../../../erpc_python')  # nopep8
 sys.path.insert(2, '../../')  # nopep8
-sys.path.insert(3, '../')  # nopep8
 
 import erpc
 import config
-from shim.py import hello_world
+from shim import hello_world
 
 
 def main():
@@ -24,4 +23,5 @@ def main():
     # do eRPC call
     client.printText("Hello world!")
 
-main()
+if __name__ == "__main__":
+    main()
