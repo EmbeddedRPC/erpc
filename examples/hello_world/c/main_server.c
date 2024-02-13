@@ -1,9 +1,18 @@
-#include "erpc_c/setup/erpc_server_setup.h"
-#include "erpc_c/setup/erpc_transport_setup.h"
-#include "erpc_c/setup/erpc_mbf_setup.h"
-#include "examples/hello_world/shim/c/c_hello_world_server.h"
-#include "examples/config.h"
+/*
+ * Copyright 2024 NXP
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#include "c_hello_world_server.h"
+#include "config.h"
+
+#include "erpc_server_setup.h"
+#include "erpc_transport_setup.h"
+#include "erpc_mbf_setup.h"
+
 #include "erpc_error_handler.h"
+
 #include <stdio.h>
 
 /* eRPC call definition */
@@ -24,20 +33,20 @@ int main()
     message_buffer_factory = erpc_mbf_dynamic_init();
     server = erpc_server_init(transport, message_buffer_factory);
 
-    /* add custom service implementation to the server */
+    /* Add custom service implementation to the server */
     erpc_add_service_to_server(server, service);
 
-    /* poll for requests */
+    /* Poll for request */
     erpc_status_t err = erpc_server_poll(server);
 
-    /* handle error status */
+    /* Handle error status */
     if (err != kErpcStatus_Success)
     {
-        /* print error description */
+        /* Print error description */
         erpc_error_handler(err, 0);
     }
 
-    /* deinit objects */
+    /* Deinit objects */
     destroy_TextService_service(service);
     erpc_server_deinit(server);
     erpc_mbf_dynamic_deinit(message_buffer_factory);
