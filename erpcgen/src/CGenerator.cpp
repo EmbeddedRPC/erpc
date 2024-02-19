@@ -305,8 +305,8 @@ DataType *CGenerator::findChildDataType(set<DataType *> &dataTypes, DataType *da
         {
             // The only child node of a list node is the element type.
             ListType *listType = dynamic_cast<ListType *>(dataType);
-            DataType *trueContainerDataType = listType->getTrueContainerDataType();
             assert(listType);
+            DataType *trueContainerDataType = listType->getTrueContainerDataType();
             DataType *elementType = findChildDataType(dataTypes, listType->getElementType());
             listType->setElementType(elementType);
 
