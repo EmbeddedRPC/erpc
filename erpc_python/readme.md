@@ -7,29 +7,27 @@ protocol level. Also, the classes mirror those in the C++ infrastructure.
 
 ## Contents
 
-`erpc` - Python package for eRPC infrastructure.
+[erpc](erpc) - Python package for eRPC infrastructure.
 
-`setup.py` - setuptools setup script that installs the erpc package.
+[setup.py](setup.py) - setuptools setup script that installs the erpc package.
 
-`setup.cfg, README_Pypi.md` - necessary files for the pypi support.
+[setup.cfg](setup.cfg), [README_Pypi.md](README_Pypi.md) - necessary files for the pypi support.
 
 ## Installation
 
 Pip package installer needs to be installed in your Python version. Use following way for Python3 pip installation:
 
 ```sh
-sudo apt-get install python3-pip
-/usr/bin$ sudo rm python
-/usr/bin$ sudo ln -s python3 python
+sudo apt-get install python3 python3-pip
 ```
 
-To install the eRPC Python infrastructure, run the setup.py script like this (based on your system admin rights are required):
+To install the eRPC Python infrastructure from pypi:
 
 ```sh
-python setup.py install
+pip install erpc
 ```
 
-Alternatively, you may use pip to install the package, like this:
+To install the eRPC Python infrastructure from local folder ([erpc/erpc_python](/erpc_python)):
 
 ```sh
 pip install .

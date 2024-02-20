@@ -415,17 +415,25 @@ public:
         switch (m_verboseType)
         {
             case verbose_type_t::kWarning:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kWarning);
                 break;
+            }
             case verbose_type_t::kInfo:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kInfo);
                 break;
+            }
             case verbose_type_t::kDebug:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug);
                 break;
+            }
             case verbose_type_t::kExtraDebug:
+            {
                 Log::getLogger()->setFilterLevel(Logger::log_level_t::kDebug2);
                 break;
+            }
         }
     }
 };

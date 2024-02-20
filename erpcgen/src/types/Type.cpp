@@ -488,7 +488,9 @@ DataType *DataType::getTrueContainerDataType()
             return a->getElementType()->getTrueContainerDataType();
         }
         default:
+        {
             return trueDataType;
+        }
     }
 }
 

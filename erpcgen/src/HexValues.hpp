@@ -9,7 +9,6 @@
 #if !defined(_HexValues_h_)
 #define _HexValues_h_
 
-#include <cstdbool>
 #include <cstdint>
 
 //! \brief Determines whether \a c is a hex digit character.
