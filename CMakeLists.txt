@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.5)
 project (erpc)
 
 set(CMAKE_CXX_STANDARD 17)
-
+set(ERPC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(erpc_c)
 
 # Option for building eRPC project
@@ -27,10 +27,10 @@ endif()
 message(STATUS "ERPCGEN path: ${ERPCGEN}")
 
 # Build all tests
-#if (BUILD_TESTS)
-#    message(STATUS "Building tests...")
-#    add_subdirectory(tests)
-#endif()
+if (BUILD_TESTS)
+    message(STATUS "Building tests...")
+    add_subdirectory(test)
+endif()
 
 # Build all examples
 if (BUILD_EXAMPLES)
