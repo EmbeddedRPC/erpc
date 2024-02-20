@@ -40,11 +40,12 @@ set(ERPC_SOURCES
     ${ERPC_DIR}/setup/erpc_setup_tcp.cpp
 )
 
+# Create erpc library
 add_library(erpc STATIC ${ERPC_SOURCES})
 
 target_include_directories(erpc PUBLIC ${ERPC_INCLUDES})
 
+# Required for TCP transport
 if(WIN32)
   target_link_libraries(erpc wsock32 ws2_32)
-
 endif()

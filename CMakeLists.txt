@@ -12,10 +12,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(erpc_c)
 
+# Option for building eRPC project
 option(BUILD_TESTS "Build library tests" ON)
 option(BUILD_EXAMPLES "Build example executables" ON)
 option(ERPCGEN "Path to erpcgen executable" "erpcgen")
 
+# Create absolute path for erpcgen
 cmake_path(IS_RELATIVE ERPCGEN ERPCGEN_REL)
 
 if(ERPCGEN_REL)
@@ -24,11 +26,13 @@ endif()
 
 message(STATUS "ERPCGEN path: ${ERPCGEN}")
 
-# if (BUILD_TESTS)
-#     message(STATUS "Building tests...")
-#     add_subdirectory(tests)
-# endif()
+# Build all tests
+#if (BUILD_TESTS)
+#    message(STATUS "Building tests...")
+#    add_subdirectory(tests)
+#endif()
 
+# Build all examples
 if (BUILD_EXAMPLES)
     message(STATUS "Building examples...")
     add_subdirectory(examples)

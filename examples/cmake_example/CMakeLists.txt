@@ -5,25 +5,13 @@
 #
 project (${CMAKE_PROJECT_NAME})
 
-set(target_name hello_world)
-SET(SHIM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
+set(SHIM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
+set(target_name "hello_world")
 
 add_executable(client main.c)
+# add_executable(server main.c)
 
-set(OUTPUT_FILES
-    ${SHIM_DIR}/${target_name}_interface.cpp
-    ${SHIM_DIR}/${target_name}_client.cpp
-    ${SHIM_DIR}/${target_name}_server.cpp
-    ${SHIM_DIR}/c_${target_name}_client.cpp
-    ${SHIM_DIR}/c_${target_name}_server.cpp
-)
-
-# The custom command
-add_custom_command(
-    OUTPUT ${OUTPUT_FILES}
-    COMMAND ${ERPCGEN} -g c -o ${SHIM_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.erpc
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.erpc
-)
+generate_shim(${target_name} ${SHIM_DIR})
 
 target_sources(client PRIVATE
     ${SHIM_DIR}/${target_name}_interface.cpp
