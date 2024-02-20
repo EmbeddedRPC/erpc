@@ -29,4 +29,4 @@ function(generate_shim erpc_file output_name output_dir)
 endfunction()
 
 # All examples using CMake
-add_subdirectory(cmake_example)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hello_world/c)
