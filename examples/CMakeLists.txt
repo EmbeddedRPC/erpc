@@ -11,6 +11,7 @@ project(${CMAKE_PROJECT_NAME})
 # output_name - name of the output files ({output_name}_interface.cpp, ${output_name}_client.cpp, ...)
 # output_dir - path where shim code will be generated
 function(generate_shim erpc_file output_name output_dir)
+
     set(SHIM_FILES
         ${output_dir}/${output_name}_interface.cpp
         ${output_dir}/${output_name}_client.cpp
@@ -22,8 +23,8 @@ function(generate_shim erpc_file output_name output_dir)
     # The custom command
     add_custom_command(
         OUTPUT ${SHIM_FILES}
-        COMMAND ${ERPCGEN} -g c -o ${output_dir} ${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.erpc
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${target_name}.erpc
+        COMMAND ${ERPCGEN} -g c -o ${output_dir} ${erpc_file}
+        DEPENDS ${erpc_file}
     )
 endfunction()
 

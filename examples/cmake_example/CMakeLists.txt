@@ -3,20 +3,22 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
+
 project (${CMAKE_PROJECT_NAME})
 
 set(SHIM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
-set(target_name "hello_world")
+set(SHIM_NAME "hello_world")
+set(SHIM_IDL ${CMAKE_CURRENT_SOURCE_DIR}/hello_world.erpc)
 
 add_executable(client main.c)
 # add_executable(server main.c)
 
-generate_shim(${target_name} ${SHIM_DIR})
+generate_shim(${SHIM_IDL} ${SHIM_NAME} ${SHIM_DIR})
 
 target_sources(client PRIVATE
-    ${SHIM_DIR}/${target_name}_interface.cpp
-    ${SHIM_DIR}/c_${target_name}_client.cpp
-    ${SHIM_DIR}/${target_name}_client.cpp
+    ${SHIM_DIR}/${SHIM_NAME}_interface.cpp
+    ${SHIM_DIR}/c_${SHIM_NAME}_client.cpp
+    ${SHIM_DIR}/${SHIM_NAME}_client.cpp
 )
 
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
