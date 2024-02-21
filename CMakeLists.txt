@@ -10,6 +10,8 @@ project (erpc)
 
 set(CMAKE_CXX_STANDARD 17)
 set(ERPC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Build erpc_c lib
 add_subdirectory(erpc_c)
 
 # Option for building eRPC project
