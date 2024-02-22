@@ -153,7 +153,7 @@ erpc_status_t UartTransport::init(void)
 
 erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
 {
-    erpc_status_t erpcStatus = kErpcStatus_ReceiveFailed;
+    erpc_status_t erpcStatus = kErpcStatus_Success;
 
     if (ring_buf_size_get(&uart_receive_buf) < size)
     {
@@ -168,7 +168,6 @@ erpc_status_t UartTransport::underlyingReceive(uint8_t *data, uint32_t size)
         {
         }
 #endif
-        erpcStatus = kErpcStatus_Success;
     }
 
     /* read data from buffer */
