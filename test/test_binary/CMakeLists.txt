@@ -6,7 +6,5 @@
 
 project(${CMAKE_PROJECT_NAME})
 
-set(ERPC_OUT_DIR "")
-
 include(${ERPC_TEST_ROOT}/test.cmake)
 
