@@ -8,7 +8,7 @@ project(${CMAKE_PROJECT_NAME})
 
 include(${ERPC_TEST_ROOT}/variables.cmake)
 
-set(TEST_ERPC_OUT_DIR ${ERPC_OUT_ROOT_DIR})
+set(ERPC_NAME_APP test_ArithmeticService)
 
 include(${ERPC_TEST_ROOT}/test.cmake)
 

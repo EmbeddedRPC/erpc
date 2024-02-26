@@ -6,5 +6,6 @@
 
 project(${CMAKE_PROJECT_NAME})
 
+include(${ERPC_TEST_ROOT}/variables.cmake)
 include(${ERPC_TEST_ROOT}/test.cmake)
 
