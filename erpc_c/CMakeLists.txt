@@ -14,6 +14,7 @@ set(ERPC_INCLUDES
     ${ERPC_DIR}/service
     ${ERPC_DIR}/setup
     ${ERPC_DIR}/transports
+    ${ERPC_DIR}/config
 ) 
 
 set(ERPC_SOURCES

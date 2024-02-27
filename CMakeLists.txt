@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.20)
 
 project (erpc)
 
@@ -17,7 +17,8 @@ add_subdirectory(erpc_c)
 # Option for building eRPC project
 option(BUILD_TESTS "Build library tests" ON)
 option(BUILD_EXAMPLES "Build example executables" ON)
-option(ERPCGEN "Path to erpcgen executable" "erpcgen")
+option(BUILD_ERPCGEN "Build erpcgen" ON)
+option(ERPCGEN "Path to erpcgen executable")
 
 # Create absolute path for erpcgen
 cmake_path(IS_RELATIVE ERPCGEN ERPCGEN_REL)
@@ -26,7 +27,14 @@ if(ERPCGEN_REL)
     set(ERPCGEN ${CMAKE_CURRENT_SOURCE_DIR}/${ERPCGEN})
 endif()
 
+
 message(STATUS "ERPCGEN path: ${ERPCGEN}")
+
+# Build erpcgen
+if (BUILD_ERPCGEN)
+    message(STATUS "Building erpcgen...")
+    add_subdirectory(erpcgen)
+endif()
 
 # Build all tests
 if (BUILD_TESTS)
