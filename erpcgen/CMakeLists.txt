@@ -9,12 +9,20 @@ set(ERPCGEN_ROOT ${ERPC_ROOT}/erpcgen)
 
 # Paths to executable
 set(PYTHON_SCRIPT ${ERPCGEN_ROOT}/bin/txt_to_c.py)
-set(FLEX ${ERPCGEN_ROOT}/VisualStudio_v14/win_flex.exe)
-set(BISON ${ERPCGEN_ROOT}/VisualStudio_v14/win_bison.exe)
+find_program(FLEX NAMES flex win_flex.exe HINTS ${ERPCGEN_ROOT}/VisualStudio_v14)
+find_program(BISON NAMES bison win_bison.exe HINTS ${ERPCGEN_ROOT}/VisualStudio_v14)
+
+if(NOT BISON)
+    message(FATAL_ERROR "Executable 'bison' not found.")
+endif()
+
+if(NOT FLEX)
+    message(FATAL_ERROR "Executable 'flex' not found.")
+endif()
 
 # FLEX & BISON flags
 set(YYFLAGS "-Wno-other")
-set(LLFLAGS )
+set(LLFLAGS "")
 
 # erpcgen sources
 set(ERPCGEN_SOURCE
@@ -111,6 +119,7 @@ foreach(template ${ERPCGEN_TEMPLATE_NAMES})
 endforeach(template)
 
 # Run flex
+message(STATUS "BISON: ${BISON} ${YYFLAGS} -o ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_parser.tab.cpp ${ERPCGEN_ROOT}/src/erpcgen_parser.y")
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_lexer.cpp
     COMMAND ${FLEX} ${LLFLAGS} -o ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_lexer.cpp ${ERPCGEN_ROOT}/src/erpcgen_lexer.l
