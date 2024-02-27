@@ -96,14 +96,14 @@ set(ERPCGEN_TEMPLATE_NAMES
 # that generates .c file in ERPCGEN_TEMPLATE_OUT_DIR folder
 foreach(template ${ERPCGEN_TEMPLATE_NAMES})
     string(REGEX REPLACE "[.]template$" ".c" c_file ${template})
-    message(STATUS "Generating ${template} -> ${c_file}")
 
     add_custom_command(
         OUTPUT ${ERPCGEN_TEMPLATE_OUT_DIR}/${c_file}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${ERPCGEN_TEMPLATE_OUT_DIR}
         COMMAND python ${PYTHON_SCRIPT} -o ${ERPCGEN_TEMPLATE_OUT_DIR}/${c_file} 
                                            ${ERPCGEN_TEMPLATE_DIR}/${template}
         DEPENDS ${ERPCGEN_TEMPLATE_DIR}/${template}
-        COMMENT
+        COMMENT "Generating ${template} -> ${c_file}"
     )
 
     # Add full path to .c file to the sources
