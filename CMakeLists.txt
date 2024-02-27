@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required (VERSION 3.5)
 
 project (erpc)
 
@@ -21,12 +21,9 @@ option(BUILD_ERPCGEN "Build erpcgen" ON)
 option(ERPCGEN "Path to erpcgen executable")
 
 # Create absolute path for erpcgen
-cmake_path(IS_RELATIVE ERPCGEN ERPCGEN_REL)
-
-if(ERPCGEN_REL)
+if(NOT IS_ABSOLUTE ${ERPCGEN})
     set(ERPCGEN ${CMAKE_CURRENT_SOURCE_DIR}/${ERPCGEN})
 endif()
-
 
 message(STATUS "ERPCGEN path: ${ERPCGEN}")
 
