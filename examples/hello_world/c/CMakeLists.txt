@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-cmake_minimum_required(VERSION 3.20.0)
-
 project(erpc_hello_world C CXX)
 
 add_executable(client)
@@ -14,47 +12,59 @@ add_executable(server)
 add_executable(client_cpp)
 add_executable(server_cpp)
 
-set(SHIM_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
-set(SHIM_NAME "hello_world")
-set(SHIM_IDL ${CMAKE_CURRENT_SOURCE_DIR}/../hello_world.erpc)
+set(ERPC_OUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shim)
+set(APP_NAME "hello_world")
+set(IDL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../hello_world.erpc)
 set(CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 set(APP_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CONFIG_DIR}
-  ${SHIM_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CONFIG_DIR}
+    ${ERPC_OUT_DIR}
 )
 
-generate_shim(${SHIM_IDL} ${SHIM_NAME} ${SHIM_DIR})
+set(OUTPUT_FILES
+  ${ERPC_OUT_DIR}/${APP_NAME}_interface.cpp
+  ${ERPC_OUT_DIR}/${APP_NAME}_client.cpp
+  ${ERPC_OUT_DIR}/${APP_NAME}_server.cpp
+  ${ERPC_OUT_DIR}/c_${APP_NAME}_client.cpp
+  ${ERPC_OUT_DIR}/c_${APP_NAME}_server.cpp
+)
+
+generate_erpc_files(
+    IDL_FILE ${IDL_FILES} 
+    OUTPUT_DIR ${ERPC_OUT_DIR} 
+    OUTPUT_FILES ${OUTPUT_FILES}
+)
 
 target_sources(client PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/main_client.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
-  ${SHIM_DIR}/c_hello_world_client.cpp
-  ${SHIM_DIR}/hello_world_client.cpp
-  ${SHIM_DIR}/hello_world_interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main_client.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+    ${ERPC_OUT_DIR}/c_hello_world_client.cpp
+    ${ERPC_OUT_DIR}/hello_world_client.cpp
+    ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )
 
 target_sources(server PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/main_server.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
-  ${SHIM_DIR}/c_hello_world_server.cpp
-  ${SHIM_DIR}/hello_world_server.cpp
-  ${SHIM_DIR}/hello_world_interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main_server.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+    ${ERPC_OUT_DIR}/c_hello_world_server.cpp
+    ${ERPC_OUT_DIR}/hello_world_server.cpp
+    ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )
 
 target_sources(client_cpp PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/main_client.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
-  ${SHIM_DIR}/hello_world_client.cpp
-  ${SHIM_DIR}/hello_world_interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+    ${ERPC_OUT_DIR}/hello_world_client.cpp
+    ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )
 
 target_sources(server_cpp PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/main_server.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
-  ${SHIM_DIR}/hello_world_server.cpp
-  ${SHIM_DIR}/hello_world_interface.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+    ${ERPC_OUT_DIR}/hello_world_server.cpp
+    ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )
 
 target_include_directories(client PRIVATE ${APP_INCLUDE_DIRS})

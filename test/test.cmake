@@ -29,13 +29,12 @@ if (GENERATE_ERPC_IDL_FILES)
     )
 
     # Generate IDL files
-    add_custom_command(
-        OUTPUT ${TEST_IDL_FILES}
-        COMMAND ${ERPCGEN} -g c -o ${ERPC_OUT_ROOT_DIR} ${IDL_FILE}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        DEPENDS ${IDL_FILE}
-        COMMENT "Generating IDL files"
+    generate_erpc_files(
+        IDL_FILE ${IDL_FILE} 
+        OUTPUT_DIR ${ERPC_OUT_ROOT_DIR}
+        OUTPUT_FILES ${TEST_IDL_FILES}
     )
+
 endif()
 
 # Add sources and includes to client if not provided
