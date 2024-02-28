@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-
 set(ERPCGEN_ROOT ${ERPC_ROOT}/erpcgen)
 
 # Paths to executable
@@ -119,7 +118,6 @@ foreach(template ${ERPCGEN_TEMPLATE_NAMES})
 endforeach(template)
 
 # Run flex
-message(STATUS "BISON: ${BISON} ${YYFLAGS} -o ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_parser.tab.cpp ${ERPCGEN_ROOT}/src/erpcgen_parser.y")
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_lexer.cpp
     COMMAND ${FLEX} ${LLFLAGS} -o ${CMAKE_CURRENT_BINARY_DIR}/erpcgen_lexer.cpp ${ERPCGEN_ROOT}/src/erpcgen_lexer.l

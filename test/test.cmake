@@ -34,6 +34,7 @@ if (GENERATE_ERPC_IDL_FILES)
     add_custom_command(
         OUTPUT ${TEST_IDL_FILES}
         COMMAND ${ERPCGEN} -g c -o ${ERPC_OUT_ROOT_DIR} ${IDL_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${IDL_FILE}
         COMMENT "Generating IDL files"
     )
