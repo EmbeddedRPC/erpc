@@ -65,8 +65,10 @@ target_include_directories(server_cpp PRIVATE ${APP_INCLUDE_DIRS})
 
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(client PRIVATE erpc)
-target_link_libraries(server PRIVATE erpc)
+find_package(Threads REQUIRED)
 
-target_link_libraries(client_cpp PRIVATE erpc)
-target_link_libraries(server_cpp PRIVATE erpc)
+target_link_libraries(client PRIVATE erpc Threads::Threads)
+target_link_libraries(server PRIVATE erpc Threads::Threads)
+
+target_link_libraries(client_cpp PRIVATE erpc Threads::Threads)
+target_link_libraries(server_cpp PRIVATE erpc Threads::Threads)

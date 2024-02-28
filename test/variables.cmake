@@ -48,5 +48,3 @@ set(UT_COMMON_SRC ${ERPC_TEST_ROOT}/common)
 
 # eRPC IDL file
 set(IDL_FILE ${CURRENT_DIR}/${CURRENT_DIR_NAME}.erpc)
-
-message(STATUS ${TEST_NAME})

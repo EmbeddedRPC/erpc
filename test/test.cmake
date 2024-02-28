@@ -7,8 +7,6 @@
 # This file generate test client and server targets. CMake including this file
 # can override the variables to custom output, test name, ...
 
-message(STATUS "Building test: ${TEST_NAME}")
-
 # Add IDL files if not provided
 if (GENERATE_ERPC_IDL_FILES)
     set(TEST_IDL_FILES
@@ -113,7 +111,7 @@ if (NOT TEST_SERVER_INCLUDES)
     )
 endif()
 
-message(STATUS "SOURCES: ${ERPC_OUT_DIR}")
+find_package(Threads REQUIRED)
 
 add_executable(${TEST_NAME}_client ${TEST_CLIENT_SOURCES})
 add_executable(${TEST_NAME}_server ${TEST_SERVER_SOURCES})
@@ -121,8 +119,8 @@ add_executable(${TEST_NAME}_server ${TEST_SERVER_SOURCES})
 target_include_directories(${TEST_NAME}_client PRIVATE ${TEST_CLIENT_INCLUDES})
 target_include_directories(${TEST_NAME}_server PRIVATE ${TEST_SERVER_INCLUDES})
 
-target_link_libraries(${TEST_NAME}_client PRIVATE gtest erpc)
-target_link_libraries(${TEST_NAME}_server PRIVATE erpc)
+target_link_libraries(${TEST_NAME}_client PRIVATE gtest erpc Threads::Threads)
+target_link_libraries(${TEST_NAME}_server PRIVATE erpc Threads::Threads)
 
 add_custom_target(run_${TEST_NAME}
     # COMMAND $<TARGET_FILE:${TEST_NAME}_server> &
