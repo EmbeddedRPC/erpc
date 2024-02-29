@@ -6,8 +6,8 @@
 
 set(ERPCGEN_ROOT ${ERPC_ROOT}/erpcgen)
 
-# Paths to executable
-set(PYTHON_SCRIPT ${ERPCGEN_ROOT}/bin/txt_to_c.py)
+# Find executables
+find_program(PYTHON NAMES python python3 python36 DOC "Python executable location")
 find_program(FLEX NAMES flex win_flex.exe HINTS ${ERPCGEN_ROOT}/VisualStudio_v14)
 find_program(BISON NAMES bison win_bison.exe HINTS ${ERPCGEN_ROOT}/VisualStudio_v14)
 
@@ -22,6 +22,9 @@ endif()
 # FLEX & BISON flags
 set(YYFLAGS "-Wno-other")
 set(LLFLAGS "")
+
+# Python text-to-c script
+set(PYTHON_SCRIPT ${ERPCGEN_ROOT}/bin/txt_to_c.py)
 
 # erpcgen sources
 set(ERPCGEN_SOURCE
@@ -68,6 +71,7 @@ set(ERPCGEN_INCLUDES
 set(ERPCGEN_TEMPLATE_DIR ${ERPCGEN_ROOT}/src/templates)
 set(ERPCGEN_TEMPLATE_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/src/templates)
 
+# List of all templates 
 set(ERPCGEN_TEMPLATE_NAMES
     c_common_header.template
     cpp_interface_header.template
@@ -107,7 +111,7 @@ foreach(template ${ERPCGEN_TEMPLATE_NAMES})
     add_custom_command(
         OUTPUT ${ERPCGEN_TEMPLATE_OUT_DIR}/${c_file}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${ERPCGEN_TEMPLATE_OUT_DIR}
-        COMMAND python ${PYTHON_SCRIPT} -o ${ERPCGEN_TEMPLATE_OUT_DIR}/${c_file} 
+        COMMAND ${PYTHON} ${PYTHON_SCRIPT} -o ${ERPCGEN_TEMPLATE_OUT_DIR}/${c_file} 
                                            ${ERPCGEN_TEMPLATE_DIR}/${template}
         DEPENDS ${ERPCGEN_TEMPLATE_DIR}/${template}
         COMMENT "Generating ${template} -> ${c_file}"

@@ -40,27 +40,24 @@ set(INCLUDE_DIRS
 
 target_sources(matrix_multiply_client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main_client.c
-
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
 
     ${ERPC_OUT_DIR}/${APP_NAME}_interface.cpp    
-    ${ERPC_OUT_DIR}/${APP_NAME}_client.cpp
     ${ERPC_OUT_DIR}/c_${APP_NAME}_client.cpp
+    ${ERPC_OUT_DIR}/${APP_NAME}_client.cpp
 )
 
 target_sources(matrix_multiply_server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main_server.c
-
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
 
     ${ERPC_OUT_DIR}/${APP_NAME}_interface.cpp    
-    ${ERPC_OUT_DIR}/${APP_NAME}_server.cpp
     ${ERPC_OUT_DIR}/c_${APP_NAME}_server.cpp
+    ${ERPC_OUT_DIR}/${APP_NAME}_server.cpp
 )
 
 target_sources(matrix_multiply_client_cpp PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main_client.cpp
-
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
 
     ${ERPC_OUT_DIR}/${APP_NAME}_interface.cpp    
@@ -69,7 +66,6 @@ target_sources(matrix_multiply_client_cpp PRIVATE
 
 target_sources(matrix_multiply_server_cpp PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main_server.cpp
-
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
 
     ${ERPC_OUT_DIR}/${APP_NAME}_interface.cpp    
@@ -78,6 +74,7 @@ target_sources(matrix_multiply_server_cpp PRIVATE
 
 target_include_directories(matrix_multiply_client PRIVATE ${INCLUDE_DIRS})
 target_include_directories(matrix_multiply_server PRIVATE ${INCLUDE_DIRS})
+
 target_include_directories(matrix_multiply_client_cpp PRIVATE ${INCLUDE_DIRS})
 target_include_directories(matrix_multiply_server_cpp PRIVATE ${INCLUDE_DIRS})
 
@@ -85,5 +82,6 @@ find_package(Threads REQUIRED)
 
 target_link_libraries(matrix_multiply_client PRIVATE erpc Threads::Threads)
 target_link_libraries(matrix_multiply_server PRIVATE erpc Threads::Threads)
+
 target_link_libraries(matrix_multiply_client_cpp PRIVATE erpc Threads::Threads)
 target_link_libraries(matrix_multiply_server_cpp PRIVATE erpc Threads::Threads)

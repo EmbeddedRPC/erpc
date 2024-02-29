@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -46,7 +46,8 @@ set(ERPC_SOURCES
     ${ERPC_DIR}/transports/erpc_tcp_transport.cpp
     ${ERPC_DIR}/transports/erpc_serial_transport.cpp
 
-    # ${ERPC_DIR}/port/erpc_serial.cpp
+    # TODO: Add serial transport support
+    # ${ERPC_DIR}/port/erpc_serial.cpp 
 )
 
 # Create erpc library

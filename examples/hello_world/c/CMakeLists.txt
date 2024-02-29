@@ -40,6 +40,7 @@ generate_erpc_files(
 target_sources(client PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/main_client.c
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+
     ${ERPC_OUT_DIR}/c_hello_world_client.cpp
     ${ERPC_OUT_DIR}/hello_world_client.cpp
     ${ERPC_OUT_DIR}/hello_world_interface.cpp
@@ -48,6 +49,7 @@ target_sources(client PRIVATE
 target_sources(server PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/main_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+
     ${ERPC_OUT_DIR}/c_hello_world_server.cpp
     ${ERPC_OUT_DIR}/hello_world_server.cpp
     ${ERPC_OUT_DIR}/hello_world_interface.cpp
@@ -56,6 +58,7 @@ target_sources(server PRIVATE
 target_sources(client_cpp PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/main_client.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+
     ${ERPC_OUT_DIR}/hello_world_client.cpp
     ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )
@@ -63,6 +66,7 @@ target_sources(client_cpp PRIVATE
 target_sources(server_cpp PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/main_server.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/erpc_error_handler.cpp
+    
     ${ERPC_OUT_DIR}/hello_world_server.cpp
     ${ERPC_OUT_DIR}/hello_world_interface.cpp
 )

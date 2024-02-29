@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -14,7 +14,7 @@ set(ERPC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 # Build erpc_c lib
 add_subdirectory(erpc_c)
 
-# Include generate_erpc_files
+# Include function generate_erpc_files to be in global scope
 include(${ERPC_ROOT}/generate_erpc_files.cmake)
 
 # Option for building eRPC project
@@ -23,7 +23,7 @@ option(BUILD_EXAMPLES "Build example executables" ON)
 option(BUILD_ERPCGEN "Build erpcgen" ON)
 option(ERPCGEN "Path to erpcgen executable")
 
-# BUILD_TESTS and BUILD_EXAMPLES required erpcgen
+# BUILD_TESTS and BUILD_EXAMPLES require erpcgen
 if(BUILD_TESTS OR BUILD_EXAMPLES)
     if (ERPCGEN)
         if (NOT IS_ABSOLUTE ${ERPCGEN})
@@ -31,7 +31,7 @@ if(BUILD_TESTS OR BUILD_EXAMPLES)
         endif()
     else()
         if(NOT BUILD_ERPCGEN)
-            message(FATAL_ERROR "No ERPCGEN specified and BUILD_ERPCGEN is disabled. Not able to generate erpc file!")
+            message(FATAL_ERROR "No ERPCGEN specified and BUILD_ERPCGEN is disabled. Unable to generate erpc file!")
         endif()
 
         set(ERPCGEN $<TARGET_FILE:erpcgen>)
