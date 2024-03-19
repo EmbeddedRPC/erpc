@@ -1,3 +1,6 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
 #ifndef _ERPC_ENDIANNESS_UNDEFINED_H_
 #define _ERPC_ENDIANNESS_UNDEFINED_H_
