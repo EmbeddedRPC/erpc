@@ -1,4 +1,8 @@
 /*
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/*
  * This is example file for endianness agnostic communication based on byteswap.h.
  * Other approach can be done with htons(), htonl(), ntohs(), ntohl() and such.
  */
