@@ -25,10 +25,10 @@ Darwin*)
     brew update
     echo "Installing dependencies."
     brew install python3 bison flex -v -f 2>&1
-    sudo pip3 install tornado
-    sudo pip3 install --user nose
-    sudo pip3 install pytest --upgrade --ignore-installed six
-    sudo pip3 install pyyaml
+    sudo pip3 install --break-system-packages tornado
+    sudo pip3 install --break-system-packages --user nose
+    sudo pip3 install --break-system-packages pytest --upgrade --ignore-installed six
+    sudo pip3 install --break-system-packages pyyaml
     ;;
 *)
     echo "Unknown or currently unsupported os: ${unameOut}"
