@@ -77,7 +77,8 @@ static void TransferCallback(const struct device *dev, void *user_data)
 
     if (uart_irq_rx_ready(dev))
     {
-        do {
+        do 
+        {
             if (ring_buf_space_get(&uart_receive_buf) == 0)
             {
                 /* Error - receive buffer is full */
