@@ -64,7 +64,6 @@ void UartTransport::rx_cb(void)
 /* Transfer callback */
 static void TransferCallback(const struct device *dev, void *user_data)
 {
-    uint8_t c;
     uint32_t size;
     uint32_t rx_size;
     uint32_t tx_size;
@@ -78,29 +77,29 @@ static void TransferCallback(const struct device *dev, void *user_data)
 
     if (uart_irq_rx_ready(dev))
     {
-        size = ring_buf_put_claim(&uart_receive_buf, &data, UART_BUFFER_SIZE);
-
-        /* read until FIFO empty */
-        rx_size = uart_fifo_read(dev, data, size);
-
-        if (rx_size < 0)
+        do
         {
-            /* Error */
-        }
-
-        if (rx_size == size)
-        {
-            if (uart_fifo_read(dev, &c, 1) == 1)
+            if (ring_buf_space_get(&uart_receive_buf) == 0)
             {
-                /* Error - more data in fifo */
+                /* Error - receive buffer is full */
             }
-        }
 
-        err = ring_buf_put_finish(&uart_receive_buf, rx_size);
-        if (err != 0)
-        {
-            /* This shouldn't happen unless rx_size > size */
-        }
+            size = ring_buf_put_claim(&uart_receive_buf, &data, UART_BUFFER_SIZE);
+
+            /* read until FIFO empty */
+            rx_size = uart_fifo_read(dev, data, size);
+            if (rx_size < 0)
+            {
+                /* Error */
+            }
+
+            err = ring_buf_put_finish(&uart_receive_buf, rx_size);
+            if (err != 0)
+            {
+                /* This shouldn't happen unless rx_size > size */
+            }
+
+        } while (rx_size == size);
 
         /* Enough bytes was received, call receive callback */
         if (ring_buf_size_get(&uart_receive_buf) >= s_transferReceiveRequireBytes)
