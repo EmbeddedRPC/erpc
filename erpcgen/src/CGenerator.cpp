@@ -765,6 +765,8 @@ void CGenerator::makeAliasesTemplateData()
             DataType *elementDataType = aliasType->getElementType();
             setTemplateComments(aliasType, aliasInfo);
 
+            aliasInfo["forwardDecl"] = "";
+
             if (elementDataType->getName() != "")
             {
                 string realType;
@@ -785,14 +787,18 @@ void CGenerator::makeAliasesTemplateData()
                 if (elementDataType->getName() == aliasType->getName() ||
                     getOutputName(elementDataType, false) == aliasType->getName())
                 {
+                    string forwardDecl;
                     if (elementDataType->isStruct())
                     {
                         realType = "struct " + realType;
+                        forwardDecl = "struct " + getOutputName(aliasType);
                     }
                     else
                     {
                         realType = "union " + realType;
+                        forwardDecl = "union " + getOutputName(aliasType);
                     }
+                    aliasInfo["forwardDecl"] = forwardDecl;
                 }
 
                 aliasInfo["typenameName"] = realType;
