@@ -34,7 +34,7 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC(ArbitratedClientManager, s_client);
 #if defined(__MINGW32__)
 __declspec(selectany)
 #endif
-    ClientManager *g_client;
+ClientManager *g_client;
 #if !defined(__MINGW32__)
 #pragma weak g_client
 #endif
@@ -162,7 +162,7 @@ void erpc_arbitrated_client_set_error_handler(erpc_client_t client, client_error
 
     ArbitratedClientManager *clientManager = reinterpret_cast<ArbitratedClientManager *>(client);
 
-    clientManager->setErrorHandler(error_handler);
+    clientManager->setErrorHandler(error_handler, NULL);
 }
 
 void erpc_arbitrated_client_set_crc(erpc_client_t client, uint32_t crcStart)
