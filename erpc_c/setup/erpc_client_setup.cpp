@@ -32,7 +32,7 @@ ERPC_MANUALLY_CONSTRUCTED_STATIC(ClientManager, s_client);
 #if defined(__MINGW32__)
 __declspec(selectany)
 #endif
-ClientManager *g_client;
+    ClientManager *g_client;
 #if !defined(__MINGW32__)
 #pragma weak g_client
 #endif
