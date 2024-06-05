@@ -1,0 +1,238 @@
+//
+// Created by intellij-pest on 2023-11-12
+// grammar
+// Author: marek
+//
+
+program = _{ SOI ~ definition* ~ EOI }
+
+definition = _{ import | definition_base }
+
+definition_base = { #pcd = doxygenPrecedingCommentsOpt ~ #def = (programDefinition | constDefinition | enumDefinition | unionDefinition | unionForwardDefinition | structDefinition | structForwardDefinition | typedefDefinition | interfaceDefinition | callbackDefinitionWithParams) ~ ";"? ~ #tcd = doxygenTrailingCommentsOpt  }
+
+annotation = _{ "@" ~ (typesHeader | sharedMemoryEnd | sharedMemoryBegin | shared | retain | outputDir | nullable | noInfraErrors | noConstParam | noAllocErrors | name | maxLength | length | include | id | group | external | errorReturn | discriminator | crc) }
+    typesHeader = { (#ls = languageSpecifier ~ ":")? ~ "types_header" ~ lrb ~ #str = string ~ rrb }
+    sharedMemoryEnd = { (#ls = languageSpecifier ~ ":")? ~ "shared_memory_end" ~ lrb ~ #exp = expression ~ rrb }
+    sharedMemoryBegin = { (#ls = languageSpecifier ~ ":")? ~ "shared_memory_begin" ~ lrb ~ #exp = expression ~ rrb }
+    shared = { (#ls = languageSpecifier ~ ":")? ~ "shared" }
+    retain = { (#ls = languageSpecifier ~ ":")? ~ "retain" }
+    outputDir = { (#ls = languageSpecifier ~ ":")? ~ "output_dir" ~ lrb ~ #str = string ~ rrb }
+    nullable = { (#ls = languageSpecifier ~ ":")? ~ "nullable" }
+    noInfraErrors = { (#ls = languageSpecifier ~ ":")? ~ "no_infra_errors" }
+    noConstParam = { (#ls = languageSpecifier ~ ":")?~ "no_const_params" }
+    noAllocErrors = { (#ls = languageSpecifier ~ ":")? ~ "no_alloc_errors" }
+    name = { (#ls = languageSpecifier ~ ":")? ~ "name" ~ lrb ~ #str = (string | ident) ~ rrb }
+    maxLength = { (#ls = languageSpecifier ~ ":")?~ "max_length" ~ lrb ~ #exp = expression ~ rrb }
+    length = { (#ls = languageSpecifier ~ ":")? ~ "length" ~ lrb ~ #exp = expression ~ rrb }
+    include = { (#ls = languageSpecifier ~ ":")? ~ "include" ~ lrb ~ #str = string ~ rrb  }
+    id = { (#ls = languageSpecifier ~ ":")? ~ "id" ~ lrb ~ decimal ~ rrb }
+    group = { (#ls = languageSpecifier ~ ":")? ~ "group" ~ lrb ~ #str = string ~ rrb }
+    external = { (#ls = languageSpecifier ~ ":")? ~ "external" }
+    errorReturn = { (#ls = languageSpecifier ~ ":")? ~ "error_return" ~ lrb ~ #exp = constExpression ~ rrb }
+    discriminator = { (#ls = languageSpecifier ~ ":")? ~ "discriminator" ~ lrb ~ #name = ident ~ rrb }
+    crc = { (#ls = languageSpecifier ~ ":")? ~ "crc" }
+
+languageSpecifier = { "c" | "py" }
+
+annotationList = { annotation* }
+
+programDefinition = { #al = annotationList ~ "program" ~ #name = ident }
+
+import = { "import" ~ #str = string }
+
+typedefDefinition = { #al = annotationList ~ "type" ~ #name = ident ~ eq ~ #dt = dataType }
+
+enumDefinition = { #al = annotationList ~ "enum" ~ #opt_name = ident? ~ lcb ~ #ml = enumMemberList ~ rcb }
+
+enumMember = { #pc = doxygenPrecedingCommentsOpt ~ #name = ident ~ (eq ~ #exp = expression)? ~ #al = annotationList? ~ ","? ~ #tc = doxygenTrailingCommentsOpt }
+
+enumMemberList = { enumMember+ }
+
+structForwardDefinition = { "struct" ~ #name = ident }
+
+structDefinition = { #al = annotationList ~"struct" ~ #name = ident ~ lcb ~ #ml = structMemberList ~ rcb }
+
+structMemberList = { (structUnionMember | structDataMember)* }
+
+structDataMember = { #pc = doxygenPrecedingCommentsOpt ~ #ol = structMemberOptionList ~ #sdt = simpleDataType ~ #name = ident ~ #al = annotationList ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+structUnionMember = { #pc = doxygenPrecedingCommentsOpt ~ "union" ~ lrb ~ #disc = ident ~ rrb ~ lcb ~ #cl = unionCaseList ~ rcb ~ #member_name = ident ~ #al = annotationList ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+structMemberOptionList = { (byref | optional)* }
+
+byref = { "byref" }
+
+optional = { "optional" }
+
+unionForwardDefinition = { "union" ~ #name = ident  }
+
+unionDefinition = { #al = annotationList ~ "union" ~ #name = ident ~ lcb ~ #cl = unionCaseList ~ rcb }
+
+unionCaseList = { (unionCase | unionDefaultCase)* }
+
+unionCase = { case ~  #cl = unionCaseExprList ~ ":" ~ #ml = unionMemberList }
+
+case = { "case" }
+
+unionDefaultCase = { #dc = default ~ ":" ~ #ml = unionMemberList }
+
+default = { "default" }
+
+unionCaseExprList = { #exp = expression ~ (comma ~ #exp = expression)* }
+
+unionMemberList = { unionMember* }
+
+unionMember = { (!"case") ~ #pc = doxygenPrecedingCommentsOpt ~ #ol = structMemberOptionList ~ #sdt = simpleDataType ~ #name = ident ~ #al = annotationList? ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+interfaceDefinition = { #al = annotationList ~ "interface" ~ #name = ident ~ lcb ~ #cl = callbackTypeDefinitionList ~ #fl = functionDefinitionList ~ rcb}
+
+functionDefinitionList = { (functionDefinition | callbackDefinition )* }
+
+callbackTypeDefinitionList = { callbackTypeDefinition* }
+
+callbackTypeDefinition = { #pc = doxygenPrecedingCommentsOpt ~ #al = annotationList ~ "type" ~ #def = functionTypeDefinition ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+functionDefinition = { #pc = doxygenPrecedingCommentsOpt ~ #al = annotationList ~ #def = functionTypeDefinition  ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+callbackDefinition = { #pc = doxygenPrecedingCommentsOpt ~ #al = annotationList ~ #def = callbackDefinitionBase ~ ";"? ~ #tc = doxygenTrailingCommentsOpt }
+
+functionTypeDefinition = { oneWayFunction | returningFunction }
+
+oneWayFunction = _{ #ow = oneWay ~ #name = ident ~ "(" ~ #pl = paramDefinitionList ~ ")" }
+
+returningFunction = _{ #name = ident ~ "(" ~ #pl = paramDefinitionList ~ ")" ~ #rt = functionReturnType }
+
+oneWay = { "oneway" }
+
+functionReturnType = { "->" ~ (#vo = void | (#al = annotationList ~ #sdt = simpleDataType)) }
+
+void = { "void" }
+
+paramDefinitionList = { void | ( #pdf = paramDefinition ~ (comma
+     ~ #pdf = paramDefinition)*)? }
+
+paramDefinition = { #pd = paramDirection? ~ #sds = simpleDataTypeScope ~ #name = ident? ~ #al = annotationList }
+
+paramDirection = _{ paramDirectionIn | paramDirectionOut | paramDirectionInout }
+
+paramDirectionIn = @{ "in" ~ WHITESPACE }
+
+paramDirectionOut = @{ "out" ~ WHITESPACE  }
+
+paramDirectionInout = @{ "inout" ~ WHITESPACE  }
+
+callbackDefinitionBase = _{ callbackDefinitionWithParams | callback }
+
+callbackDefinitionWithParams = { #type = simpleDataTypeScope ~ #name = ident ~ lrb ~ #pl = callbackParamList ~ rrb }
+
+callback = { #type = simpleDataTypeScope ~ #name = ident }
+
+callbackParamList = { ( #cbp = ident ~ (comma ~ #cbp = ident)*)? }
+
+dataType = _{ structDefinition | enumDefinition | simpleDataType } 
+
+simpleDataTypeScope = { (#scp = ident ~ "::")? ~ #sdt = simpleDataType }
+
+simpleDataType = { arrayType | listType | ident }
+
+arrayType = { #type = ident ~ #dim = arrayDimension+ }
+
+listType = { "list" ~ lab ~ #type = ident ~ rab }
+
+arrayDimension = { lsb ~ #exp = expression ~ rsb }
+
+constDefinition = { #al = annotationList ~ "const" ~ #sdt = simpleDataType ~ #name = ident ~ eq ~ #ce = constExpression }
+
+constExpression = { expression | string }
+
+expression = { primary ~ (binaryOperation ~ expression)* }
+
+atom = _{ unaryOperation? ~ primary }
+
+binaryOperation = _{ add | sub | mul | div | md | and | or | xor | shl | shr }
+    add = { "+" }
+    sub = { "-" }
+    mul = { "*" }
+    div = { "/" }
+    md  = { "%" }
+    and = { "&" }
+    or  = { "|" }
+    xor = { "^" }
+    shl = { "<<" }
+    shr = { ">>" }
+
+unaryOperation = _{ nop | neg | inv }
+          nop   = { "+" }
+          neg   = { "-" }
+          inv   = { "~" }
+
+ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_" )* }
+
+primary = _{ decimal | hexadecimal | binary | floatingPoint | ident | bracedExpression }
+
+bracedExpression = { lrb ~ #exp = expression ~ rrb }
+
+decimal = @{ ASCII_DIGIT+ ~ integerSuffix? }
+
+hexadecimal = @{ "0x" ~ ASCII_HEX_DIGIT+ ~ integerSuffix? }
+
+binary = @{ "0b" ~ ASCII_BIN_DIGIT+ ~ integerSuffix? }
+
+
+floatingPoint = @{
+    decimal_sequence ~ "." ~ decimal_sequence? ~ exponent?
+    | "." ~ decimal_sequence ~ exponent?
+}
+
+exponent = @{
+    ^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+ ~ decimal_sequence
+}
+
+decimal_sequence = @{ ASCII_DIGIT+ }
+
+integerSuffix = @{ ull | ul | u }
+        u   = { ^"u" }
+        ul  = { ^"ul" }
+        ull = { ^"ull" }
+
+string = @{ "\"" ~ ( "\"\"" | (!"\"" ~ ANY) )* ~ "\"" }
+
+doxygenPrecedingCommentsOpt = { (doxygenMultilineCommentPreceding | doxygenSingleLineCommentPreceding)* }
+
+doxygenMultilineCommentPreceding = _{ ("/**" | "/*!" ) ~ #ct = multilineCommentContent ~ "*/" }
+
+doxygenMultilineCommentTrailing = _{ ("/**<" | "/*!<" ) ~ #ct = multilineCommentContent ~ "*/" }
+
+multilineCommentContent = { (!"*/" ~ ANY)* }
+
+doxygenTrailingCommentsOpt = { (doxygenMultilineCommentTrailing | doxygenSingleLineCommentTrailing)*  }
+
+doxygenSingleLineCommentPreceding = _{ ("///" | "//!") ~ #ct = singleLineCommentContent }
+
+doxygenSingleLineCommentTrailing = _{ ("///<" | "//!<") ~ #ct = singleLineCommentContent }
+
+singleLineCommentContent = @{ (!NEWLINE ~ ANY)* ~ NEWLINE }
+
+lcb = { "{" }
+
+rcb = { "}" }
+
+lsb = { "[" }
+
+rsb = { "]" }
+
+lrb = { "(" }
+
+rrb = { ")" }
+
+eq = { "=" }
+
+lab = { "<" }
+
+rab = { ">" }
+
+comma = { "," }
+
+WHITESPACE = _{ " " | "\t" | "\r\n" | "\n" }
+
+COMMENT = _{ (( !"//!" ~ !"///" ~ "//") ~ (!NEWLINE ~ ANY)*) | ( !"/**" ~ !"/*!" ~ "/*" ~ (!"*/" ~ ANY)* ~ "*/") }

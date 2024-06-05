@@ -1,0 +1,15 @@
+{% if !enum_.preceding_comment.is_empty() -%}
+{{ enum_.preceding_comment -}}
+{% endif -%}
+{% if enum_.name.is_some() -%}
+class {{ enum_.name.clone().unwrap() }}:
+{% endif -%}
+{% for member in enum_.members -%}
+{%     if !member.preceding_comment.is_empty() -%}
+   {{ member.preceding_comment -}}
+{%     endif -%}
+{% if enum_.name.is_some() +%}    {%+ endif %}{{ member.name +}} = {{+ member.value }} {% if !member.trailing_comment.is_empty() %} {{ member.trailing_comment -}}{% endif %}
+{% endfor -%}
+{%- if !enum_.trailing_comment.is_empty() -%}
+{{ enum_.trailing_comment -}}
+{% endif -%}
