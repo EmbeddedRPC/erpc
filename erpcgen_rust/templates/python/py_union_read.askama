@@ -1,0 +1,49 @@
+{% let self_e_name = "self.".to_string() -%}
+{% let discr = "discriminator".to_string() %}
+        discriminator = codec.start_read_union()
+{%- if union_.has_only_default_case() -%} {# case union has 1 or 0 cases#}
+{%-     for case in union_.cases -%}
+{%          for member in case.case_members -%}
+{%              let self_m_name = self_e_name.clone() + member.name.as_str() -%}
+{%              let indent = self::optional_indent(member.is_nullable) -%}
+{%              if  member.is_nullable %}
+        if codec.read_null_flag():
+            {{ self_m_name }} = None
+        else:
+{%-             endif -%}
+{%              if member.type_.is_union() %}
+        {{ indent }}{{ self_e_name }}.{{member.name}}, self.{{ member.discriminator_name.clone().unwrap() }} = {{ member.type_.clone().get_name() }}()._read(codec)
+{%-             else %}
+        {{ indent }}{{ self::decode_type(member.type_.clone(), (self_e_name.clone() + member.name.as_str()).as_str(), "", member.discriminator_name.clone(), "codec", indent, 0)|indent(12) }}
+{%-             endif -%}
+{%          endfor -%}
+{%      endfor -%}
+{%- else -%} {# case union has 2 or more cases #}
+{%-     for case in union_.cases -%}
+{%          if loop.first %}
+        if {{ self::format_case_values_py(case.case_values, discr) }}:
+{%-         else if loop.last %}
+        else:
+{%-         else %}
+        elif {{ self::format_case_values_py(case.case_values, discr) -}}:
+{%-         endif -%}
+{%          for member in case.case_members -%}
+{%              let self_m_name = self_e_name.clone() +  member.name.as_str() -%}
+{%              let indent = self::optional_indent(member.is_nullable) -%}
+{%              if  member.is_nullable %}
+            if codec.read_null_flag():
+                {{ self_m_name }} = None
+            else:
+{%-             endif -%}
+{%              if member.type_.is_union() %}
+            {{ indent }}{{ self_e_name }}.{{member.name}}, self.{{ member.discriminator_name.clone().unwrap() }} = {{ member.type_.clone().get_name() }}()._read(codec)
+{%-             else %}
+            {{ self::decode_type(member.type_.clone(), (self_e_name.clone() + member.name.as_str()).as_str(), "", member.discriminator_name.clone(), "codec", indent, 0)|indent(12) }}
+{%-             endif -%}
+{%          endfor -%}
+{%      endfor -%}
+{%  endif %} {# case union has 2 or more cases end #}
+{%- if !union_.has_default_case()  %}
+        else:
+            raise ValueError("invalid union discriminator value %s" % repr(discriminator))
+{%- endif %}

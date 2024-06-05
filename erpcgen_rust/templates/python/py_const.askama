@@ -1,0 +1,4 @@
+{% if !const_.preceding_comment.is_empty() -%}
+{{ const_.preceding_comment -}}
+{% endif -%}
+{{ const_.name }} = {{ const_.value }}{% if !const_.trailing_comment.is_empty() %}{{ const_.trailing_comment }}{% endif -%}

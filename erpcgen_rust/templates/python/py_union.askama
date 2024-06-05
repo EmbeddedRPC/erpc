@@ -1,0 +1,22 @@
+{% if !union_.preceding_comment.is_empty() -%}
+{{ union_.preceding_comment -}}
+{% endif -%}
+    class {{ union_.name }}(object):
+{%- for c in union_.cases -%}
+{%      if !c.case_members.is_empty() %}
+    # {% if c.case_values.is_empty() %}default case{% else %}case {{ self::format_values_py(c.case_values) }}{% endif %}
+{%-     for cm in c.case_members %}
+    {{ cm.name }} = None # {{+ self::format_type_name_py(cm.type_.clone()) -}}
+{%      endfor -%}
+{%      endif -%}
+{%  endfor %}
+
+    def _read(self, codec):
+        {%- include "py_union_read.askama" %}
+        return self, discriminator
+
+    def _write(self, codec, discriminator):
+        {%- include "py_union_write.askama" %}
+
+    def __repr__(self):
+        return self.__str__()

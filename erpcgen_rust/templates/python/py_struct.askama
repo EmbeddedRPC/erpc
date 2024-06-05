@@ -1,0 +1,100 @@
+{% if !struct_.preceding_comment.is_empty() -%}
+{{ struct_.preceding_comment -}}
+{% endif -%}
+class {{ struct_.name }}(object):
+{%- for encapsulated in struct_.unions -%}
+    {% include "py_encapsulated.askama" %}
+{% endfor %}
+    def __init__(self, {{ self::format_class_init_py(struct_.data_members) }}):
+{%- for m in struct_.members -%}
+{%      if m.is_data_member() -%}
+{%          let data_member = m.clone().to_data_member() -%}
+{%          if data_member.is_length_for.is_none() %}
+        self.{{ data_member.name }} = {{ data_member.name +}} # {{ self::format_type_name_py(data_member.type_.clone()) -}}
+{%          endif -%}
+{%      else -%}
+{%          let union_member = m.clone().to_encapsulated_union() %}
+        self.{{ union_member.name }} = self.{{ union_member.name }}_union # {{ self::format_type_name_py(union_member.type_.clone() ) -}}
+{%      endif -%}
+{%  endfor -%}
+
+{# create read-only properties for @length counts #}
+{%  for m in struct_.data_members -%}
+{%  if m.is_length_for.is_some() %}
+    @property
+    def {{ m.name }}(self):
+        return len(self.{{ m.is_length_for.clone().unwrap() }})
+{%- endif -%}
+{% endfor %}
+    def _read(self, codec):
+{%- for m in struct_.members -%}
+{%      if m.is_data_member() -%} {# member variant #}
+{%-         let data_member = m.clone().to_data_member() -%}
+{%          let self_dm_name = "self.".to_string() + data_member.name.as_str() -%}
+{%          let indent = self::optional_indent(data_member.is_nullable) -%}
+{%          if data_member.is_length_for.is_none() && data_member.is_discriminator.is_none() -%} {# member variant #}
+{%-              if data_member.is_nullable %}
+        if codec.read_null_flag():
+            {{ self_dm_name }} = None
+        else:
+{%-             endif -%}
+{%              if data_member.type_.is_union() %}
+        {{ indent }}{{ self_dm_name }}, self.{{ data_member.discriminator_name.clone().unwrap() }} = {{ data_member.type_.clone().get_name() }}()._read(codec)
+{%-             else %}
+        {{ self::decode_type(data_member.type_.clone(), self_dm_name, "", data_member.discriminator_name.clone(), "codec", indent, 0)|indent(8) -}}
+{%              endif -%}
+{%          endif -%}
+{%      else -%} {# union variant #}
+{%-         let encapsulated = m.clone().to_encapsulated_union() -%}
+{%          include "py_en_union_read.askama" -%}
+{%      endif -%} {# member variant #}
+{%- endfor  %}
+        return self
+
+    def _write(self, codec):
+{%- for m in struct_.members -%}
+{%      if m.is_data_member() -%} {# member variant #}
+{%-         let data_member = m.clone().to_data_member() -%}
+{%          let self_dm_name = "self.".to_string() + data_member.name.as_str() -%}
+{%          let indent = self::optional_indent(data_member.is_nullable) -%}
+{%          if data_member.is_length_for.is_none() && data_member.is_discriminator.is_none() -%} {# member variant #}
+{%-              if data_member.is_nullable %}
+        codec.write_null_flag({{ self_dm_name }} is None)
+        if {{ self_dm_name }} is not None:
+{%-             else %}
+        if {{ self_dm_name }} is None:
+            raise ValueError("{{ data_member.name }} is None")
+{%-             endif -%}
+{%              if data_member.type_.is_union() %}
+        {{ indent }}{{ data_member.type_.clone().get_name() }}()._write(codec, self.{{ data_member.discriminator_name.clone().unwrap() }})
+{%-             else %}
+        {{ self::encode_type(data_member.type_.clone(), self_dm_name, "", None, "codec", indent, 0)|indent(8) -}}
+{%              endif -%}
+{%          endif -%}
+{%      else -%} {# union variant #}
+{%-         let encapsulated = m.clone().to_encapsulated_union() -%}
+{%          include "py_en_union_write.askama" -%}
+{%      endif -%} {# member variant #}
+{%- endfor  %}
+
+    def __str__(self):
+        return "<%s@%x
+{%-      for m in struct_.members -%}
+{%-         if m.is_data_member() -%}
+{%-             let data_member = m.clone().to_data_member() %} 
+{%-             if data_member.is_length_for.is_none() %} {{ data_member.name }}=%s {%- endif %}
+{%-         else %}
+{%-             let union_member = m.clone().to_encapsulated_union() %} {{ union_member.name }}=%s 
+{%-         endif %}
+{%-         endfor %}>" % (self.__class__.__name__, id(self)
+{%-      for m in struct_.members -%}
+{%-         if m.is_data_member() -%}
+{%-             let data_member = m.clone().to_data_member() %} 
+{%-             if data_member.is_length_for.is_none() %}, self.{{ data_member.name }} {%- endif %}
+{%-         else %}
+{%-             let union_member = m.clone().to_encapsulated_union() %} self.{{ union_member.name }} 
+{%-         endif %}
+{%-      endfor %})
+
+    def __repr__(self):
+        return self.__str__()

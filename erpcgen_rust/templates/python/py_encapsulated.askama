@@ -1,0 +1,12 @@
+{%  if !encapsulated.preceding_comment.is_empty() -%}
+{{ encapsulated.preceding_comment -}}
+{%  endif %}
+    class {{~ encapsulated.name }}_union(object):
+{%- for c in encapsulated.cases -%}
+{%      if !c.case_members.is_empty() %}
+        # {% if c.case_values.is_empty() %}default case{% else %}case {{ self::format_values_py(c.case_values) }}{% endif %}
+{%-     for cm in c.case_members %}
+        {{ cm.name }} = None # {{+ self::format_type_name_py(cm.type_.clone()) -}}
+{%      endfor -%}
+{%      endif -%}
+{%  endfor -%}
