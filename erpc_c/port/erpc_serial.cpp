@@ -220,7 +220,7 @@ int serial_read(int fd, char *buf, int size)
 
             ClearCommError(hCom, &errors, NULL);
 
-            if (!ReadFile(hCom, temp, RX_BUF_BYTES - bytesToRead, &bytesRead, &s_readOverlap))
+            if (!ReadFile(hCom, temp, size - bytesToRead, &bytesRead, &s_readOverlap))
             {
                 if (GetLastError() == ERROR_IO_PENDING)
                 {

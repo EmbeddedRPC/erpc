@@ -1,4 +1,8 @@
-# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright 2023-2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
 
 cmake_minimum_required(VERSION 3.20.0)
 

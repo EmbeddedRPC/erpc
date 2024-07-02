@@ -64,6 +64,7 @@ TEST(test_arbitrator, NestedCallTest)
     stopSecondSide();
     while (!enabled)
     {
+        Thread::sleep(1000);
     };
     EXPECT_EQ(nestedCallTest(), nestedCallsCount * 2 - 1);
 }

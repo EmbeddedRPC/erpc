@@ -6,7 +6,7 @@
 
     <groupId>io.github.embeddedrpc.erpc</groupId>
     <artifactId>erpc</artifactId>
-    <version>0.1.0</version>
+    <version>1.13.0</version>
 
     <name>eRPC</name>
     <description>eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems

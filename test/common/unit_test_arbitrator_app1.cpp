@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2023 NXP
+ * Copyright 2016 - 2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -90,7 +90,7 @@ void runClient(void *arg)
     // wait until ERPC first (client) app will announce that it is ready.
     while (waitClient == 0)
     {
-        Thread::sleep(10);
+        Thread::sleep(10000);
     }
 
     // wait until ERPC first (client) app will announce ready to quit state
@@ -98,7 +98,7 @@ void runClient(void *arg)
     {
         isTestPassing = testClient();
         {
-            Thread::sleep(10);
+            Thread::sleep(10000);
             Mutex::Guard lock(waitQuitMutex);
             if (waitQuit != 0 || isTestPassing != 0 || stopTest != 0)
             {
@@ -110,7 +110,7 @@ void runClient(void *arg)
 
     while (true)
     {
-        Thread::sleep(10);
+        Thread::sleep(100000);
         Mutex::Guard lock(waitQuitMutex);
         if (waitQuit != 0)
         {
@@ -252,5 +252,4 @@ int testClient()
         }
     }
     return 0;
-}
 }

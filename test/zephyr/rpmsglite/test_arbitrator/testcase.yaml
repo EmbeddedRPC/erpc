@@ -1,0 +1,7 @@
+tests:
+  erpc.rpmsglite.arbitrator:
+    sysbuild: true
+    harness: gtest
+    timeout: 60
+    extra_configs:
+      - CONFIG_THREAD_CUSTOM_DATA=y

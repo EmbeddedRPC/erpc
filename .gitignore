@@ -112,3 +112,6 @@ boost*/
 mingw.7z
 mingw64/
 vs_BuildTools*
+
+# Zephyr's repo link
+__repo__/

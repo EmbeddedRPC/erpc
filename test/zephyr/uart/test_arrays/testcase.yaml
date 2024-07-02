@@ -1,0 +1,8 @@
+tests:
+  erpc.uart.arrays:
+    harness: pytest
+    tags:
+      - pytest
+    harness_config:
+      pytest_root:
+        - "../../../python_impl_tests/scripts/test_arrays/test_arrays.py"
