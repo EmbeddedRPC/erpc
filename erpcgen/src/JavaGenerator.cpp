@@ -34,11 +34,8 @@ extern const char *const kJavaInterface;
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-JavaGenerator::JavaGenerator(InterfaceDefinition *def, const std::string javaPackageName)
-: Generator(def, generator_type_t::kJava)
-, m_javaPackageName(javaPackageName)
-, m_suffixStrip("")
-, m_suffixStripSize(0)
+JavaGenerator::JavaGenerator(InterfaceDefinition *def, const std::string javaPackageName) :
+Generator(def, generator_type_t::kJava), m_javaPackageName(javaPackageName), m_suffixStrip(""), m_suffixStripSize(0)
 {
     /* Set copyright rules. */
     if (m_def->hasProgramSymbol())
@@ -354,7 +351,7 @@ data_map JavaGenerator::getFunctionTemplateData(Group *group, Function *fn)
 }
 
 string JavaGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const string &interfaceName,
-                                             const string &name, bool insideInterfaceCall)
+                                           const string &name, bool insideInterfaceCall)
 {
     FunctionType *functionType = dynamic_cast<FunctionType *>(fn);
     if (functionType)
@@ -385,20 +382,20 @@ string JavaGenerator::getFunctionPrototype(Group *group, FunctionBase *fn, const
             // Skip data serialization for variables placed as @length value for lists.
             if (findParamReferencedFromAnn(params, getOutputName(it), LENGTH_ANNOTATION))
             {
-               continue;
+                continue;
             }
 
             if (!isFirst)
             {
-               proto += ", ";
-               
+                proto += ", ";
             }
             else
             {
-               isFirst = false;
+                isFirst = false;
             }
 
-            if (it->getDirection() == param_direction_t::kOutDirection || it->getDirection() == param_direction_t::kInoutDirection)
+            if (it->getDirection() == param_direction_t::kOutDirection ||
+                it->getDirection() == param_direction_t::kInoutDirection)
             {
                 proto += getTypenameName(it->getDataType(), true, true);
             }
@@ -419,17 +416,17 @@ string JavaGenerator::getTypenameName(DataType *t, bool isReference, bool object
 {
     string returnName;
 
-
-
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *a = dynamic_cast<ArrayType *>(t);
             assert(a);
             returnName = getTypenameName(a->getElementType(), false, false) + "[]";
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             assert(nullptr != dynamic_cast<const BuiltinType *>(t));
             if (objectType)
             {
@@ -442,23 +439,27 @@ string JavaGenerator::getTypenameName(DataType *t, bool isReference, bool object
 
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             const ListType *a = dynamic_cast<const ListType *>(t);
             assert(a);
             returnName = "List<" + getTypenameName(a->getElementType(), false, true) + ">";
             break;
         }
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             AliasType *aliasType = dynamic_cast<AliasType *>(t);
             return getTypenameName(aliasType->getTrueDataType(), isReference, objectType);
         }
-        case DataType::data_type_t::kVoidType: {
+        case DataType::data_type_t::kVoidType:
+        {
             returnName = "void";
             break;
         }
         case DataType::data_type_t::kUnionType:
         case DataType::data_type_t::kEnumType:
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             returnName = getOutputName(t);
             break;
         }
@@ -638,7 +639,8 @@ data_map JavaGenerator::makeGroupSymbolsTemplateData(Group *group)
 
             switch (dataType->getDataType())
             {
-                case DataType::data_type_t::kStructType: {
+                case DataType::data_type_t::kStructType:
+                {
                     StructType *structType = dynamic_cast<StructType *>(symbol);
                     if (structType == nullptr)
                     {
@@ -662,7 +664,8 @@ data_map JavaGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::data_type_t::kUnionType: {
+                case DataType::data_type_t::kUnionType:
+                {
                     UnionType *unionType = dynamic_cast<UnionType *>(symbol);
                     if (unionType == nullptr)
                     {
@@ -692,7 +695,8 @@ data_map JavaGenerator::makeGroupSymbolsTemplateData(Group *group)
                     }
                     break;
                 }
-                case DataType::data_type_t::kAliasType: {
+                case DataType::data_type_t::kAliasType:
+                {
                     AliasType *aliasType = dynamic_cast<AliasType *>(symbol);
                     if (aliasType == nullptr)
                         break;
@@ -791,7 +795,7 @@ data_map JavaGenerator::getEncodeDecodeCall(const string &name, DataType *t, Str
 {
     static uint8_t listArrayCounter; // Used for creating nested loops variable names
     data_map templateData;
-    bool isReference = (isStructMember && structMember->isByref()) || 
+    bool isReference = (isStructMember && structMember->isByref()) ||
                        (isFunctionParam && (structMember->getDirection() == param_direction_t::kOutDirection ||
                                             structMember->getDirection() == param_direction_t::kInoutDirection));
     templateData["type"] = getTypeInfo(t, isReference); // Type info about variable
@@ -804,14 +808,16 @@ data_map JavaGenerator::getEncodeDecodeCall(const string &name, DataType *t, Str
 
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             AliasType *aliasType = dynamic_cast<AliasType *>(t);
             assert(aliasType);
             templateData = getEncodeDecodeCall(name, aliasType->getElementType(), structType, inDataContainer, false,
                                                structMember, true, false);
             break;
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             ArrayType *arrayType = dynamic_cast<ArrayType *>(t);
             assert(arrayType);
             DataType *elementType = arrayType->getElementType()->getTrueDataType();
@@ -833,20 +839,24 @@ data_map JavaGenerator::getEncodeDecodeCall(const string &name, DataType *t, Str
             templateData["isElementArrayType"] = elementType->isArray();
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             templateData["decode"] = m_templateData["decodeBuiltinType"];
             templateData["encode"] = m_templateData["encodeBuiltinType"];
             break;
         }
-        case DataType::data_type_t::kEnumType: {
+        case DataType::data_type_t::kEnumType:
+        {
             templateData["decode"] = m_templateData["decodeEnumType"];
             templateData["encode"] = m_templateData["encodeEnumType"];
             break;
         }
-        case DataType::data_type_t::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             throw internal_error("Java does not support functions yet.");
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             ListType *listType = dynamic_cast<ListType *>(t);
             assert(listType);
             DataType *elementType = listType->getElementType()->getTrueDataType();
@@ -890,15 +900,18 @@ data_map JavaGenerator::getEncodeDecodeCall(const string &name, DataType *t, Str
 
             break;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             templateData["decode"] = m_templateData["decodeStructType"];
             templateData["encode"] = m_templateData["encodeStructType"];
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             break;
         }
-        default: {
+        default:
+        {
             throw internal_error("unknown member type");
         }
     }
@@ -948,40 +961,48 @@ data_map JavaGenerator::getTypeInfo(DataType *t, int isReference, bool inDataCon
     info["isNonEncapsulatedUnion"] = false;
     switch (t->getDataType())
     {
-        case DataType::data_type_t::kAliasType: {
+        case DataType::data_type_t::kAliasType:
+        {
             info = getTypeInfo(t->getTrueDataType(), false);
             break;
         }
-        case DataType::data_type_t::kArrayType: {
+        case DataType::data_type_t::kArrayType:
+        {
             // Array type requires the array element count to come after the variable/member name.
             info["type"] = "array";
             break;
         }
-        case DataType::data_type_t::kBuiltinType: {
+        case DataType::data_type_t::kBuiltinType:
+        {
             assert(dynamic_cast<const BuiltinType *>(t));
             info["type"] = getBuiltinTypename(dynamic_cast<const BuiltinType *>(t));
             info["codecTypeName"] = getBuiltinCodecTypeName(dynamic_cast<const BuiltinType *>(t));
             break;
         }
-        case DataType::data_type_t::kEnumType: {
+        case DataType::data_type_t::kEnumType:
+        {
             info["type"] = "enum";
             break;
         }
-        case DataType::data_type_t::kFunctionType: {
+        case DataType::data_type_t::kFunctionType:
+        {
             info["type"] = "function";
             break;
         }
-        case DataType::data_type_t::kListType: {
+        case DataType::data_type_t::kListType:
+        {
             info["type"] = "list";
             break;
         }
-        case DataType::data_type_t::kStructType: {
+        case DataType::data_type_t::kStructType:
+        {
             info["type"] = "struct";
             info["decode"] = m_templateData["decodeStructType"];
             info["encode"] = m_templateData["encodeStructType"];
             break;
         }
-        case DataType::data_type_t::kUnionType: {
+        case DataType::data_type_t::kUnionType:
+        {
             UnionType *unionType = dynamic_cast<UnionType *>(t);
             assert(unionType);
             info["type"] = "union";
@@ -1102,7 +1123,8 @@ data_map JavaGenerator::getTypeInfo(DataType *t, int isReference, bool inDataCon
             info["cases"] = unionCases;
             break;
         }
-        case DataType::data_type_t::kVoidType: {
+        case DataType::data_type_t::kVoidType:
+        {
             info["type"] = "void";
             break;
         }

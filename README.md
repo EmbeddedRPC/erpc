@@ -1,30 +1,56 @@
 # eRPC
 
+![GitHub all releases](https://img.shields.io/github/downloads/EmbeddedRPC/erpc/total)
+[![GitHub License](https://img.shields.io/github/license/EmbeddedRPC/erpc)](/LICENSE)
 [![Version](https://img.shields.io/github/v/release/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/releases/latest)
+![GitHub language count](https://img.shields.io/github/languages/count/EmbeddedRPC/erpc)
+![GitHub top language](https://img.shields.io/github/languages/top/EmbeddedRPC/erpc)
+![GitHub repo size](https://img.shields.io/github/repo-size/EmbeddedRPC/erpc)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/EmbeddedRPC/erpc)
+[![GitHub forks](https://img.shields.io/github/forks/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/forks)
+![GitHub Repo stars](https://img.shields.io/github/stars/EmbeddedRPC/erpc)
+![GitHub watchers](https://img.shields.io/github/watchers/EmbeddedRPC/erpc)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/t/EmbeddedRPC/erpc)
+![GitHub commits difference between two branches/tags/commits](https://img.shields.io/github/commits-difference/EmbeddedRPC/erpc?base=main&head=develop&label=master%20behind%20develop%20commits)
 [![Contributors](https://img.shields.io/github/contributors/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/graphs/contributors)
 [![Issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/issues)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/EmbeddedRPC/erpc/pulls)
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EmbeddedRPC/erpc)
+[![PRs Welcome](https://img.shields.io/github/issues-pr/EmbeddedRPC/erpc)](https://github.com/EmbeddedRPC/erpc/pulls)
 
-- [eRPC](#erpc)
-  - [About](#about)
-  - [Releases](#releases)
-    - [Edge releases](#edge-releases)
-  - [Documentation](#documentation)
-  - [Examples](#examples)
-  - [References](#references)
-  - [Directories](#directories)
-  - [Building and installing](#building-and-installing)
-    - [Requirements](#requirements)
-      - [Windows](#windows)
-      - [Linux and Cygwin](#linux-and-cygwin)
-      - [Mac OS X](#mac-os-x)
-    - [Building](#building)
-    - [Installing for Python](#installing-for-python)
-  - [Known issues and limitations](#known-issues-and-limitations)
-  - [Code providing](#code-providing)
+* [eRPC](#erpc)
+  * [About](#about)
+  * [Releases](#releases)
+    * [Edge releases](#edge-releases)
+  * [Documentation](#documentation)
+  * [Examples](#examples)
+  * [References](#references)
+  * [Directories](#directories)
+  * [Building and installing](#building-and-installing)
+    * [Requirements](#requirements)
+      * [Windows](#windows)
+      * [Linux](#linux)
+      * [Mac OS X](#mac-os-x)
+    * [Building](#building)
+    * [Installing for Python](#installing-for-python)
+  * [Known issues and limitations](#known-issues-and-limitations)
+  * [Code providing](#code-providing)
 
 ## About
+
+[![Open enhancement issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc/enhancement?labelColor=blue&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+[![Closed enhancement issues](https://img.shields.io/github/issues-closed/EmbeddedRPC/erpc/enhancement?labelColor=blue&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aclosed+label%3Aenhancement)
+[![Open enhancement PRs](https://img.shields.io/github/issues-pr/EmbeddedRPC/erpc/enhancement?labelColor=blue&color=black)](https://github.com/EmbeddedRPC/erpc/pulls?q=is%3Apr+is%3Aopen+label%3Aenhancement)
+[![Closed enhancement PRs](https://img.shields.io/github/issues-pr-closed/EmbeddedRPC/erpc/enhancement?labelColor=blue&color=black)](https://github.com/EmbeddedRPC/erpc/pulls?q=is%3Apr+is%3Aclosed+label%3Aenhancement)
+
+[![Open bug issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc/bug?labelColor=darkred&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+[![Closed bug issues](https://img.shields.io/github/issues-closed/EmbeddedRPC/erpc/bug?labelColor=darkred&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aclosed+label%3Abug)
+[![Open bug PRs](https://img.shields.io/github/issues-pr/EmbeddedRPC/erpc/bug?labelColor=darkred&color=black)](https://github.com/EmbeddedRPC/erpc/pulls?q=is%3Apr+is%3Aopen+label%3Abug)
+[![Closed bug PRs](https://img.shields.io/github/issues-pr-closed/EmbeddedRPC/erpc/bug?labelColor=darkred&color=black)](https://github.com/EmbeddedRPC/erpc/pulls?q=is%3Apr+is%3Aclosed+label%3Abug)
+
+[![Open question issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc/question?labelColor=darkviolet&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aopen+label%3Aquestion)
+[![Closed question issues](https://img.shields.io/github/issues-closed/EmbeddedRPC/erpc/question?labelColor=darkviolet&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aclosed+label%3Aquestion)
+
+[![Open help-wanted issues](https://img.shields.io/github/issues/EmbeddedRPC/erpc/help%20wanted?labelColor=darkgreen&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aopen+label%3A%22help%20wanted%22)
+[![Closed help-wanted issues](https://img.shields.io/github/issues-closed/EmbeddedRPC/erpc/help%20wanted?labelColor=darkgreen&color=black)](https://github.com/EmbeddedRPC/erpc/issues?q=is%3Aissue+is%3Aclosed+label%3A%22help%20wanted%22)
 
 eRPC (Embedded RPC) is an open source Remote Procedure Call (RPC) system for multichip embedded systems and heterogeneous multicore SoCs.
 
@@ -36,7 +62,7 @@ A code generator tool called `erpcgen` is included. It accepts input IDL files, 
 
 Example `.erpc` file:
 
-```java
+```C++
 // Define a data type.
 enum LEDName { kRed, kGreen, kBlue }
 
@@ -51,13 +77,53 @@ Client side usage:
 
 ```C
 void example_client(void) {
-    // Initialize client running over UART.
-    erpc_client_init(
-        erpc_transport_cmsis_uart_init(Driver_USART0),
-        erpc_mbf_dynamic_init());
+    erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
+    erpc_client_t client_manager;
+
+    /* Init eRPC client infrastructure */
+    transport = erpc_transport_cmsis_uart_init(Driver_USART0);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+    client_manager = erpc_client_init(transport, message_buffer_factory);
+
+    /* init eRPC client IO service */
+    initIO_client(client_manager);
 
     // Now we can call the remote function to turn on the green LED.
     set_led(kGreen, true);
+
+    /* deinit objects */
+    deinitIO_client();
+    erpc_client_deinit(client_manager);
+    erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_deinit(transport);
+}
+```
+
+```C++
+void example_client(void) {
+    erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
+    erpc_client_t client_manager;
+
+    /* Init eRPC client infrastructure */
+    transport = erpc_transport_cmsis_uart_init(Driver_USART0);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+    client_manager = erpc_client_init(transport, message_buffer_factory);
+
+    /* scope for client service */
+    {
+        /* init eRPC client IO service */
+        IO_client client(client_manager);
+
+        // Now we can call the remote function to turn on the green LED.
+        client.set_led(kGreen, true);
+    }
+
+    /* deinit objects */
+    erpc_client_deinit(client_manager);
+    erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_deinit(transport);
 }
 ```
 
@@ -70,22 +136,68 @@ void set_led(LEDName whichLed, bool onOrOff) {
 }
 
 void example_server(void) {
-    // Initialize server running over UART.
-    erpc_server_init(
-        erpc_transport_cmsis_uart_init(Driver_USART0),
-        erpc_mbf_dynamic_init());
+    erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
+    erpc_server_t server;
+    erpc_service_t service = create_IO_service();
 
-    // Add the IO service.
-    erpc_add_service_to_server(create_IO_service());
+    /* Init eRPC server infrastructure */
+    transport = erpc_transport_cmsis_uart_init(Driver_USART0);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+    server = erpc_server_init(transport, message_buffer_factory);
+
+    /* add custom service implementation to the server */
+    erpc_add_service_to_server(server, service);
 
     // Run the server.
     erpc_server_run();
+
+    /* deinit objects */
+    destroy_IO_service(service);
+    erpc_server_deinit(server);
+    erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_deinit(transport);
+}
+```
+
+```C++
+// Implement the remote function.
+class IO : public IO_interface
+{
+    /* eRPC call definition */
+    void set_led(LEDName whichLed, bool onOrOff) override {
+        // implementation goes here
+    }
+}
+
+void example_server(void) {
+    erpc_transport_t transport;
+    erpc_mbf_t message_buffer_factory;
+    erpc_server_t server;
+    IO IOImpl;
+    IO_service io(&IOImpl);
+
+    /* Init eRPC server infrastructure */
+    transport = erpc_transport_cmsis_uart_init(Driver_USART0);
+    message_buffer_factory = erpc_mbf_dynamic_init();
+    server = erpc_server_init(transport, message_buffer_factory);
+
+    /* add custom service implementation to the server */
+    erpc_add_service_to_server(server, &io);
+
+    /* poll for requests */
+    erpc_status_t err = server.run();
+
+    /* deinit objects */
+    erpc_server_deinit(server);
+    erpc_mbf_dynamic_deinit(message_buffer_factory);
+    erpc_transport_tcp_deinit(transport);
 }
 ```
 
 A number of transports are supported, and new transport classes are easy to write.
 
-Supported transports:
+Supported transports can be found in [erpc/erpc_c/transport](/erpc_c/transports) folder. E.g:
 
 * CMSIS UART
 * NXP Kinetis SPI and DSPI
@@ -114,7 +226,7 @@ Edge releases can by found on [eRPC CircleCI](https://app.circleci.com/pipelines
 
 ## Examples
 
-[Example IDL](examples/README.md) is available in the `examples/` folder.
+[Example IDL](examples/README.md) is available in the [examples/](/examples/) folder.
 
 Plenty of eRPC multicore and multiprocessor examples can be also found in NXP MCUXpressoSDK packages. Visit [https://mcuxpresso.nxp.com](https://mcuxpresso.nxp.com) to configure, build and download these packages.
 
@@ -145,53 +257,48 @@ This section provides links to interesting erpc-based projects, articles, blogs 
 
 ## Directories
 
-`doc` - Documentation.
+[doc](/doc) - Documentation.
 
-`doxygen` - Configuration and support files for running Doxygen over the eRPC C++ infrastructure and erpcgen code.
+[doxygen](/doxygen) - Configuration and support files for running Doxygen over the eRPC C++ infrastructure and erpcgen code.
 
-`erpc_c` - Holds C/C++ infrastructure for eRPC. This is the code you will include in your application.
+[erpc_c](/erpc_c) - Holds C/C++ infrastructure for eRPC. This is the code you will include in your application.
 
-`erpc_python` - Holds Python version of the eRPC infrastructure.
+[erpc_python](/erpc_python) - Holds Python version of the eRPC infrastructure.
 
-`erpcgen` - Holds source code for erpcgen and makefiles or project files to build erpcgen on Windows, Linux, and OS X.
+[erpcgen](/erpcgen) - Holds source code for erpcgen and makefiles or project files to build erpcgen on Windows, Linux, and OS X.
 
-`erpcsniffer` - Holds source code for erpcsniffer application.
+[erpcsniffer](/erpcsniffer) - Holds source code for erpcsniffer application.
 
-`examples` - Several example IDL files.
+[examples](/examples) - Several example IDL files.
 
-`mk` - Contains common makefiles for building eRPC components.
+[mk](/mk) - Contains common makefiles for building eRPC components.
 
-`test` - Client/server tests. These tests verify the entire communications path from client to server and back.
+[test](/test) - Client/server tests. These tests verify the entire communications path from client to server and back.
 
-`utilities` - Holds utilities which bring additional benefit to eRPC apps developers.
+[utilities](/utilities) - Holds utilities which bring additional benefit to eRPC apps developers.
 
 ## Building and installing
 
-These build instructions apply to host PCs and embedded Linux. For bare metal or RTOS embedded environments, you should copy the `erpc_c` directory into your application sources.
+These build instructions apply to host PCs and embedded Linux. For bare metal or RTOS embedded environments, you should copy the [erpc_c](/erpc_c) directory into your application sources.
 
 The primary build system is makefile based. It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests.
 
 The makefiles are compatible with gcc or clang on Linux, OS X, and Cygwin. A Windows build
-of erpcgen using Visual Studio is also available in the `erpcgen/VisualStudio_v14/` directory.
-There is also an Xcode project file in the `erpcgen/` directory which can be used to build erpcgen
-for OS X.
+of erpcgen using Visual Studio is also available in the [erpcgen/VisualStudio_v14](erpcgen/VisualStudio_v14) directory.
+There is also an Xcode project file in the [erpcgen](/erpcgen) directory, which can be used to build erpcgen for OS X.
 
 ### Requirements
 
 #### Windows
 
-Steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
+* Related to Visual Studio: steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
+* mingw compilation can be used too
 
-#### Linux and Cygwin
+#### Linux
 
-Install these packages:
-
-* bison: GNU yacc-compatible parser generator
-* flex: A fast lexical analyzer generator
-* make: the GNU version of the 'make' utility
-* python: Python language interpreter 3.6+ work
-* gcc-7: GNU C compiler (recommended version)
-* g++-7: GNU C++ compiler (recommended version)
+```bash
+./install_dependencies.sh
+```
 
 Mandatory for case, when build for different architecture is needed
 
@@ -199,10 +306,9 @@ Mandatory for case, when build for different architecture is needed
 
 #### Mac OS X
 
-Install these packages with [homebrew](http://brew.sh/):
-
-* bison: GNU yacc-compatible parser generator (version 3.7.3 is recommended)
-* flex: A fast lexical analyzer generator (version 2.6.4 is recommended)
+```bash
+./install_dependencies.sh
+```
 
 ### Building
 
@@ -230,7 +336,8 @@ List of top level Makefile targets:
 
 * `erpc`: build the liberpc.a static library
 * `erpcgen`: build the erpcgen tool
-* `test`: build the unit tests under the `test/` directory
+* `erpcsniffer`: build the sniffer tool
+* `test`: build the unit tests under the [test](/test) directory
 * `all`: build all of the above
 * `install`: install liberpc.a, erpcgen, and include files
 
@@ -238,7 +345,7 @@ eRPC code is validated with respect to the C++ 11 standard.
 
 ### Installing for Python
 
-To install the Python infrastructure for eRPC see instructions in the [erpc_python folder readme](erpc_python/readme.md).
+To install the Python infrastructure for eRPC see instructions in the [erpc python readme](/erpc_python/readme.md).
 
 ## Known issues and limitations
 

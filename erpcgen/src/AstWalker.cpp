@@ -62,49 +62,79 @@ void AstWalker::dispatch(AstNode *node)
     switch (tok.getToken())
     {
         case TOK_PROGRAM:
+        {
             rewrite = handleProgram(node, dir);
             break;
+        }
         case TOK_CHILDREN:
+        {
             break;
+        }
         case TOK_TYPE:
+        {
             rewrite = handleType(node, dir);
             break;
+        }
         case TOK_ENUM:
+        {
             rewrite = handleEnum(node, dir);
             break;
+        }
         case TOK_ENUM_MEMBER:
+        {
             rewrite = handleEnumMember(node, dir);
             break;
+        }
         case TOK_STRUCT:
+        {
             rewrite = handleStruct(node, dir);
             break;
+        }
         case TOK_STRUCT_MEMBER:
+        {
             rewrite = handleStructMember(node, dir);
             break;
+        }
         case TOK_UNION:
+        {
             rewrite = handleUnion(node, dir);
             break;
+        }
         case TOK_UNION_CASE:
+        {
             rewrite = handleUnionCase(node, dir);
             break;
+        }
         case TOK_INTERFACE:
+        {
             rewrite = handleInterface(node, dir);
             break;
+        }
         case TOK_FUNCTION:
+        {
             rewrite = handleFunction(node, dir);
             break;
+        }
         case TOK_PARAM:
+        {
             rewrite = handleParam(node, dir);
             break;
+        }
         case TOK_CONST:
+        {
             rewrite = handleConst(node, dir);
             break;
+        }
         case TOK_EXPR:
+        {
             rewrite = handleExpr(node, dir);
             break;
+        }
         case TOK_ANNOTATION:
+        {
             rewrite = handleAnnotation(node, dir);
             break;
+        }
         case '+':
         case '-':
         case '*':
@@ -115,12 +145,16 @@ void AstWalker::dispatch(AstNode *node)
         case '^':
         case TOK_LSHIFT:
         case TOK_RSHIFT:
+        {
             rewrite = handleBinaryOp(node, dir);
             break;
+        }
         case TOK_UNARY_NEGATE:
         case '~':
+        {
             rewrite = handleUnaryOp(node, dir);
             break;
+        }
     }
 
     if (rewrite)

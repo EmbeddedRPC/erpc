@@ -47,9 +47,9 @@ public:
     virtual void generate() override;
 
 protected:
-    std::string m_suffixStrip; //!< String to remove from suffixes of names.
-    size_t m_suffixStripSize;  //!< Length of the suffix filter string.
-    std::string m_javaPackageName;  //!< Used java package. 
+    std::string m_suffixStrip;     //!< String to remove from suffixes of names.
+    size_t m_suffixStripSize;      //!< Length of the suffix filter string.
+    std::string m_javaPackageName; //!< Used java package.
 
     /*!
      * @brief This function prepare helpful functions located in template files.
@@ -159,12 +159,12 @@ protected:
     std::string getFunctionPrototype(Group *group, FunctionBase *fn, const std::string &interfaceName = "",
                                      const std::string &name = "", bool insideInterfaceCall = false) override;
 
-     /*!
+    /*!
      * @brief This function return typename name base on DataType. If objectType is true,
      * return builtin object insted of primitive.
      *
      * @param[in] t data type.
-     * @param[in] objectType 
+     * @param[in] objectType
      *
      * @return Return data type name.
      */
@@ -247,7 +247,8 @@ protected:
      * TODO
      */
     cpptempl::data_map getEncodeDecodeCall(const std::string &name, DataType *t, StructType *structType,
-                                           bool inDataContainer, bool isStructMember, StructMember *structMember, bool needTypeDeclaration, bool isFunctionParam);
+                                           bool inDataContainer, bool isStructMember, StructMember *structMember,
+                                           bool needTypeDeclaration, bool isFunctionParam);
 
     /*
      * TODO
@@ -268,7 +269,7 @@ protected:
 
     /*!
      * @brief This function return CamelCase string representation for given BuiltinType.
-     * 
+     *
      * @param[in] t Builtin type.
      *
      * @return String representation for given builtin type.
@@ -285,7 +286,7 @@ protected:
      */
     std::string getBuiltinTypename(const BuiltinType *t);
 
-     /*!
+    /*!
      * @brief This function return string representation for given BuiltinType as Object type.
      *
      * @param[in] t Builtin type.
@@ -307,12 +308,12 @@ protected:
     };
 
     /*!
-    * @brief This function creates Group package name.
-    * 
-    * @param[in] group Group
-    * 
-    * @return Package name for given group.  
-    */
+     * @brief This function creates Group package name.
+     *
+     * @param[in] group Group
+     *
+     * @return Package name for given group.
+     */
     std::string getGroupPackageName(const Group *group);
 
     /*!

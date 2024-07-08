@@ -1,0 +1,8 @@
+tests:
+  erpc.uart.const:
+    harness: pytest
+    tags:
+      - pytest
+    harness_config:
+      pytest_root:
+        - "../../../python_impl_tests/scripts/test_const/test_const.py"

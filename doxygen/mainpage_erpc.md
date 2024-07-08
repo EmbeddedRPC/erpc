@@ -9,7 +9,7 @@ When a remote function is called by the client, the function's parameters and an
 
 Here is a block diagram of an RPC system:
 
-![](./rpc_block_diagram.png)
+![rpc block diagram](./rpc_block_diagram.png)
 
 This diagram only shows one direction of communication. It leaves out the reply from the server to send the invoked function's return value. This reply uses basically the same sequence of events, but flows back from the server to the client.
 

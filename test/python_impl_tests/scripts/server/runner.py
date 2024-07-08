@@ -20,12 +20,19 @@ class Runner:
         self.client = None
         self.proc = None
         self.argParser = self.initParser()
-        try:
-            self.args = self.argParser.parse_args()
-        except:
-            args = [item for item in sys.argv if (item in ['-c', '-s', '--server', '--client']) or ('=' in item)] 
+
+        if '--twister-harness' in sys.argv:
+            # Filter all unnecessary arguments from Twister
+            args = [item for item in sys.argv if ('--device-serial' in item or '--device-serial-baud' in item)]
+            args.append('-c')
             self.args = self.argParser.parse_args(args)
-        self.initTest(name, params)
+        else:
+            try:
+                self.args = self.argParser.parse_args()
+            except:
+                args = [item for item in sys.argv if (item in ['-c', '-s', '--server', '--client']) or ('=' in item)] 
+                self.args = self.argParser.parse_args(args)
+            self.initTest(name, params)
 
     def initParser(self):
         # parse cmd parameters
@@ -36,6 +43,9 @@ class Runner:
         argParser.add_argument('-p', '--port', default='12345', help='Port (default value is 12345)')
         argParser.add_argument('-S', '--serial', default=None, help='Serial device (default value is None)')
         argParser.add_argument('-B', '--baud', default='115200', help='Baud (default value is 115200)')
+        # Zephyr Twister arguments
+        argParser.add_argument('--device-serial', default=None, dest='serial')
+        argParser.add_argument('--device-serial-baud', default='115200', dest='baud', )
         return argParser
         
     def initTest(self, name, params):

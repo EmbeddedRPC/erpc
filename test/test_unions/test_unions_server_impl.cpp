@@ -87,6 +87,7 @@ gapGenericEvent_t *testGenericCallback(const gapGenericEvent_t *event)
         case gAdvTxPowerLevelRead_c:
         default:
         {
+            break;
         }
     }
     return newEvent;

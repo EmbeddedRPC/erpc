@@ -1,0 +1,8 @@
+tests:
+  erpc.uart.struct:
+    harness: pytest
+    tags:
+      - pytest
+    harness_config:
+      pytest_root:
+        - "../../../python_impl_tests/scripts/test_struct/test_atest_structrrays.py"

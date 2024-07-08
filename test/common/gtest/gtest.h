@@ -3393,29 +3393,54 @@ inline bool IsDir(const StatStruct& st) {
 # endif  // GTEST_OS_WINDOWS_MOBILE
 
 #elif GTEST_OS_BARE_METAL
-
 typedef struct { int x; } StatStruct;
 
-#if not defined(__ARMCC_VERSION)
+#if not defined(__ARMCC_VERSION) && not defined(__ZEPHYR__)
 inline int FileNo(FILE* file) { return fileno(file); }
 #else
 inline int FileNo(FILE* file) { return -1; }
 #endif
 inline int IsATTY(int fd) { return 0; }
 inline int Stat(const char* path, StatStruct* buf) { return -1; }
+#if not defined(__ZEPHYR__) 
 inline int StrCaseCmp(const char* s1, const char* s2) {
   return strcasecmp(s1, s2);
 }
-#if not defined(__ARMCC_VERSION)
+#else
+inline int StrCaseCmp(const char* s1, const char* s2) 
+{
+	const char *ch1 = (const char *)s1;
+	const char *ch2 = (const char *)s2;
+
+	while (tolower(*ch1) == tolower(*ch2++)) {
+    if (*ch1++ == '\0') {
+			return (0);
+    }
+  }
+
+	return (tolower(*ch1) - tolower(*--ch2));
+}
+#endif 
+#if not defined(__ARMCC_VERSION) && not defined(__ZEPHYR__)
 inline char* StrDup(const char* src) { return strdup(src); }
 #else
-inline char* StrDup(const char* src) { return (NULL); }
+inline char* StrDup(const char* src) {
+	size_t len;
+	char *copy;
+
+	len = strlen(src) + 1;
+	if ((copy = (char *)malloc(len)) == NULL) {
+		return (NULL);
+  }
+
+	memcpy(copy, src, len);
+	return (copy);
+}
 #endif
 inline int RmDir(const char* dir) { return -1; }
 inline bool IsDir(const StatStruct& st) { return false; }
 
 #else
-
 typedef struct stat StatStruct;
 
 inline int FileNo(FILE* file) { return fileno(file); }

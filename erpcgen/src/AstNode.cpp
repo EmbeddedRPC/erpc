@@ -217,7 +217,9 @@ string AstNode::getDescription() const
         case TOK_UNARY_NEGATE:
         case TOK_ARRAY:
         case TOK_UNION_CASE:
+        {
             break;
+        }
         default:
         {
             output += " " + valToString + " ";

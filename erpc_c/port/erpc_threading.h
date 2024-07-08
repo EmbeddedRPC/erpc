@@ -128,7 +128,8 @@ public:
      * @param[in] stackSize Stack size.
      * @param[in] stackPtr Mandatory task stack pointer for static api usage.
      */
-    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0, thread_stack_pointer stackPtr = NULL);
+    void init(thread_entry_t entry, uint32_t priority = 0, uint32_t stackSize = 0,
+              thread_stack_pointer stackPtr = NULL);
 
     /*!
      * @brief This function starts thread execution.
