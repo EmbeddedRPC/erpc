@@ -14,6 +14,15 @@
 
 #if ERPC_THREADS_IS(FREERTOS)
 
+// The portYIELD_FROM_ISR() macro declares a variable called
+// ulPortYieldRequired. FreeRTOS assumes ulPortYieldRequired is in the
+// global namespace. To prevent linking errors, portYIELD_FROM_ISR()
+// should not be called from within a namespace.
+inline void ErpcPortYieldFromISR(BaseType_t &higher_priority_task_woken)
+{
+    portYIELD_FROM_ISR(higher_priority_task_woken);
+}
+
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +257,7 @@ void Semaphore::putFromISR(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     (void)xSemaphoreGiveFromISR(m_sem, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    ErpcPortYieldFromISR(xHigherPriorityTaskWoken);
 }
 
 bool Semaphore::get(uint32_t timeoutUsecs)
