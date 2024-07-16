@@ -1,0 +1,22 @@
+{% macro decode_type(py_type, name, prefix, codec, indent, depth) %}
+{% if py_type.is_struct() %} {# struct #}
+self.{{name}} = {{ name }}._read({{ codec }})
+{% else if py_type.is_union %} {# union in list for exampe #}
+{{ member.name }}, discriminator = {{ member.name }}._read({{codec}})
+{% else if py_type.is_enum() %} {# enum #}
+{{ name }} = {{ codec }}.read_int32() 
+{% else if py_type.is_string() %} {# string #}
+{{ name }} = {{ codec }}.read_string()
+{% else if py_type.is_binary() %} {# binary #}
+{{ name }} = {{ codec }}.read_binary()
+{% else if py_type.is_array() || py_type.is_list() %}
+{%     if py_type.is_list() %}
+_n{{ depth }} = {{ codec }}.start_read_list(len({{ name }}))
+{%     endif %}
+{%  if py_type.is_list() %}    {%  endif %}{{ name }} = []
+for _i{{ depth }} in range({% if py_type.is_list() %}_n{{ depth }}{% else %}{{ get_current_array_dim(py_type) }}{% endif %}):
+    {% call decode_type(shed_array_dimension(py_type), concat_slices("_v", depth.as_str()), prefix, codec, indent, depth + 1) %}
+    {{ name }}.append(_v{{ depth }})
+{% endif %}        
+{% endmacro decode_type %}
+

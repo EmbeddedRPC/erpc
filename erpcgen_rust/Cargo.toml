@@ -1,0 +1,21 @@
+[package]
+name = "erpcgen"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+pest = "2.7.9"
+pest_derive = {  version = "2.7.9", features = ["grammar-extras"] }
+clap = { version = "4.4.12", features = ["derive"] }
+structopt = "0.3.26"
+fern = "0.6.2"
+log = "0.4.20"
+lazy_static = "1.4.0"
+askama = "0.12.1"
+askama_escape = "0.10.3"
+crc = "3.0.1"
+chrono = "0.4.37"
+
+[build-dependencies]
+askama = "0.12.1"
