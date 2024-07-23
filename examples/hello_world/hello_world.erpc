@@ -1,0 +1,4 @@
+interface TextService
+{
+    oneway printText(string text)
+}
