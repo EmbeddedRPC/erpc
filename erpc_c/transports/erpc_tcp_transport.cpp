@@ -32,6 +32,9 @@ extern "C" {
 #else
 #include <netdb.h>
 #include <netinet/tcp.h>
+#ifdef ANDROID
+#include <netinet/in.h>
+#endif
 #include <sys/socket.h>
 #endif
 #include <signal.h>
