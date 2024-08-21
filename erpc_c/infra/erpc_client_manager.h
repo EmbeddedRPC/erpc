@@ -29,8 +29,9 @@ extern "C" {
 #include "erpc_common.h"
 #endif
 
-typedef void (*client_error_handler_t)(erpc_status_t err,
-                                       uint32_t functionID); /*!< eRPC error handler function type. */
+typedef void (*client_error_handler_t)(erpc_status_t err,   /*!< eRPC error code. */
+                                       uint32_t functionID, /*!< eRPC error handler function type. */
+                                       void *context);      /*!< User supplied context. */
 
 //! @brief Opaque client object type.
 typedef struct ClientType *erpc_client_t;
@@ -62,7 +63,7 @@ public:
      * This function initializes object attributes.
      */
     ClientManager(void) :
-    ClientServerCommon(), m_sequence(0), m_errorHandler(NULL)
+    ClientServerCommon(), m_sequence(0), m_errorHandler(NULL), m_errorHandlerContext(NULL)
 #if ERPC_NESTED_CALLS
     ,
     m_server(NULL), m_serverThreadId(NULL)
@@ -100,8 +101,13 @@ public:
      * @brief This function sets error handler function for infrastructure errors.
      *
      * @param[in] error_handler Pointer to error handler function.
+     * @param[in] error_handler_context Pointer to error handler user context.
      */
-    void setErrorHandler(client_error_handler_t error_handler) { m_errorHandler = error_handler; }
+    void setErrorHandler(client_error_handler_t error_handler, void *error_handler_context)
+    {
+        m_errorHandler = error_handler;
+        m_errorHandlerContext = error_handler_context;
+    }
 
     /*!
      * @brief This function calls error handler callback function with given status.
@@ -132,6 +138,7 @@ public:
 protected:
     uint32_t m_sequence;                   //!< Sequence number.
     client_error_handler_t m_errorHandler; //!< Pointer to function error handler.
+    void *m_errorHandlerContext;           //!< Pointer to a user supplied context.
 #if ERPC_NESTED_CALLS
     Server *m_server;                     //!< Server used for nested calls.
     Thread::thread_id_t m_serverThreadId; //!< Thread in which server run function is called.

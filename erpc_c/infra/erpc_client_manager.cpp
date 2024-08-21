@@ -219,6 +219,6 @@ void ClientManager::callErrorHandler(erpc_status_t err, uint32_t functionID)
 {
     if (m_errorHandler != NULL)
     {
-        m_errorHandler(err, functionID);
+        m_errorHandler(err, functionID, m_errorHandlerContext);
     }
 }
