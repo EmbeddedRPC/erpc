@@ -152,10 +152,8 @@ public:
      * associated with @a token. The client must have called prepareClientReceive() previously.
      *
      * @param[in] token The token previously returned by prepareClientReceive().
-     *
-     * @return erpc_status_t Return erpc status of client receive function.
      */
-    erpc_status_t clientReceive(client_token_t token);
+    void clientReceive(client_token_t token);
 
     /*!
      * @brief This function free client token.
