@@ -40,6 +40,9 @@ extern "C"
 
 #if !defined(ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC})
 #define ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
+{% if not cCommonHeaderFile %}
+{$fillNamespaceBegin()}
+{% endif -- not cCommonHeaderFile %}
 {% if not empty(enums) %}
 
 // Enumerators data types declarations
@@ -67,6 +70,9 @@ typedef {$alias.unnamedType}
 {%    endfor -- alias.unnamed.members %}
 } {$alias.unnamedName};
 {%   else -- alias.typenameName %}
+{%    if alias.forwardDecl != "" %}
+{$alias.forwardDecl};
+{%    endif -- alias.forwardDecl %}
 typedef {$alias.typenameName};{$alias.ilComment}
 {%   endif -- alias.typenameName %}
 {%  endfor -- aliases %}
@@ -95,17 +101,24 @@ union {$us.name}
 {%    endif -- us.type == "union/struct" %}
 {%   endif -- !us.isExternal %}
 {%  endfor -- symbols %}
-
 {% endif -- nonExternalStruct || nonExternalUnion %}
 {% if not empty(consts) %}
 
 // Constant variable declarations
 {%  for c in consts %}
 {$> c.mlComment}
+{%   if cCommonHeaderFile %}
 extern const {$c.typeAndName};{$c.ilComment}{$loop.addNewLineIfNotLast}
+{%   else -- not cCommonHeaderFile %}
+constexpr {$c.typeAndName} = {$c.value};{$c.ilComment}{$loop.addNewLineIfNotLast}
+{%   endif -- cCommonHeaderFile %}
 {%  endfor -- consts %}
 {% endif -- consts %}
+{% if not cCommonHeaderFile %}
 
+{$fillNamespaceEnd()}
+
+{% endif -- not cCommonHeaderFile %}
 #endif // ERPC_TYPE_DEFINITIONS{$scopeNamePrefix}{$scopeNameC}
 
 {% if cCommonHeaderFile %}
