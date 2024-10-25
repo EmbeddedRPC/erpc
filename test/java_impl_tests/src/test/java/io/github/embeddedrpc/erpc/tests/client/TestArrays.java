@@ -25,12 +25,12 @@ public class TestArrays extends TestingClient {
     private final PointersServiceClient client = new PointersServiceClient(clientManager);
 
     @Test
-    public void runTestArraysServiceID() {
+    public void testArraysServiceID() {
         assertEquals(2, IPointersService.SERVICE_ID);
     }
 
     @Test
-    public void runTestsendReceivedInt32() {
+    public void testSendReceivedInt32() {
         int[] sendArray = new int[12];
         int[] receivedArray;
 
@@ -46,7 +46,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2Int32() {
+    public void testSendReceived2Int32() {
         int[][] sendArray = new int[12][10];
         int[][] receivedArray;
 
@@ -66,7 +66,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedString() {
+    public void testSendReceivedString() {
         String[] sendArray = new String[12];
         String[] receiveArray;
 
@@ -82,7 +82,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2String() {
+    public void testSendReceived2String() {
         String[][] sendArray = new String[3][5];
         String[][] receiveArray;
 
@@ -102,7 +102,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedEnum() {
+    public void testSendReceivedEnum() {
         enumColor[] sendArray = new enumColor[3];
         enumColor[] receiveArray;
 
@@ -118,7 +118,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2Enum() {
+    public void testSendReceived2Enum() {
         enumColor[][] sendArray = new enumColor[3][3];
         enumColor[][] receiveArray;
 
@@ -138,7 +138,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedList() {
+    public void testSendReceivedList() {
         List<Integer>[] sendArray = new List[]{List.of(0, 1), List.of(0, 1)};
         List<Integer>[] receiveArray;
 
@@ -149,7 +149,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2List() {
+    public void testSendReceived2List() {
         List<Integer>[][] sendArray = new List[][]{
                 {List.of(0, 1), List.of(0, 1)},
                 {List.of(0, 1), List.of(0, 1)}
@@ -165,7 +165,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedInt32Type() {
+    public void testSendReceivedInt32Type() {
         int[] sendArray = new int[12];
         int[] receivedArray;
 
@@ -181,7 +181,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2Int32Type() {
+    public void testSendReceived2Int32Type() {
         int[][] sendArray = new int[12][10];
         int[][] receivedArray;
 
@@ -201,7 +201,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedStringType() {
+    public void testSendReceivedStringType() {
         String[] sendArray = new String[12];
         String[] receiveArray;
 
@@ -217,7 +217,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2StringType() {
+    public void testSendReceived2StringType() {
         String[][] sendArray = new String[3][5];
         String[][] receiveArray;
 
@@ -237,7 +237,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedEnumType() {
+    public void testSendReceivedEnumType() {
         enumColor[] sendArray = new enumColor[3];
         enumColor[] receiveArray;
 
@@ -253,7 +253,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2EnumType() {
+    public void testSendReceived2EnumType() {
         enumColor[][] sendArray = new enumColor[3][3];
         enumColor[][] receiveArray;
 
@@ -273,7 +273,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedStructType() {
+    public void testSendReceivedStructType() {
         C[] sendArray = new C[3];
         C[] receiveArray;
 
@@ -290,7 +290,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2StructType() {
+    public void testSendReceived2StructType() {
         C[][] sendArray = new C[3][3];
         C[][] receiveArray;
 
@@ -311,7 +311,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceivedListType() {
+    public void testSendReceivedListType() {
         List<Integer>[] sendArray = new List[]{List.of(0, 1), List.of(0, 1)};
         List<Integer>[] receiveArray;
 
@@ -322,7 +322,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceived2ListType() {
+    public void testSendReceived2ListType() {
         List<Integer>[][] sendArray = new List[][]{
                 {List.of(0, 1), List.of(0, 1)},
                 {List.of(0, 1), List.of(0, 1)}
@@ -338,7 +338,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceiveStruct() {
+    public void testSendReceiveStruct() {
         AllTypes[] sendArray = new AllTypes[2];
         AllTypes[] receiveArray;
 
@@ -373,7 +373,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTestsendReceive2Struct() {
+    public void testSendReceive2Struct() {
         AllTypes[][] sendArray = new AllTypes[1][1];
         AllTypes[][] receiveArray;
 
@@ -402,7 +402,7 @@ public class TestArrays extends TestingClient {
     }
 
     @Test
-    public void runTesttest_array_allDirection() {
+    public void test_array_allDirection() {
         int[] aArray = new int[5];
         int[] bArray = new int[5];
         Reference<int[]> cArray = new Reference<>(new int[5]);

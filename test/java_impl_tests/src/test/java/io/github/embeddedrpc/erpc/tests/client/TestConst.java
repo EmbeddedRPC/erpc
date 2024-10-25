@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestConst extends TestingClient {
     @Test
-    public void runTestConstServiceID(){
+    public void testConstServiceID(){
         assertEquals(2, IEmptyInterface.SERVICE_ID);
     }
 
     @Test
-    public void runTestCheckConsts(){
+    public void testCheckConsts(){
         assertEquals(3, Constants.a);
         assertEquals(3.14F, Constants.b);
         assertEquals("feedbabe", Constants.c);

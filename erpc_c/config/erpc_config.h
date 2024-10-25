@@ -56,6 +56,10 @@
 #define ERPC_PRE_POST_ACTION_DEFAULT_ENABLED (1U)  //!< Pre post shim default callback functions enabled.
 //@}
 
+#ifdef MCUXPRESSO_SDK
+#include "erpc_config_gen.h"
+#endif /* MCUXPRESSO_SDK */
+
 //! @name Configuration options
 //@{
 

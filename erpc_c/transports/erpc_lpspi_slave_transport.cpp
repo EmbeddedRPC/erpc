@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 NXP
+ * Copyright 2022-2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -135,6 +135,11 @@ erpc_status_t LPSpiSlaveTransport::init(void)
     lpspi_slave_config_t lpspiConfig;
 
     LPSPI_SlaveGetDefaultConfig(&lpspiConfig);
+#if defined(MIMXRT798S_cm33_core0_SERIES) || defined(MIMXRT798S_cm33_core1_SERIES) || \
+    defined(MIMXRT758S_cm33_core0_SERIES) || defined(MIMXRT758S_cm33_core1_SERIES) || \
+    defined(MIMXRT735S_cm33_core0_SERIES) || defined(MIMXRT735S_cm33_core1_SERIES)
+    lpspiConfig.pinCfg = kLPSPI_SdoInSdiOut;
+#endif
 
     (void)LPSPI_SlaveInit(m_lpspiBaseAddr, &lpspiConfig);
     (void)LPSPI_SlaveTransferCreateHandle(m_lpspiBaseAddr, &s_handle, LPSPI_SlaveUserCallback, NULL);

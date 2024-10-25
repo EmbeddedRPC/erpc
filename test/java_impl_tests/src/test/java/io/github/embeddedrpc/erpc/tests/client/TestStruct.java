@@ -28,12 +28,12 @@ public class TestStruct extends TestingClient {
     private final ArithmeticService2Client client2 = new ArithmeticService2Client(clientManager);
 
     @Test
-    public void runTestArithmeticServiceID() {
+    public void testArithmeticServiceID() {
         assertEquals(3, IArithmeticService1.SERVICE_ID);
     }
 
     @Test
-    public void runGetMember1() {
+    public void getMember1() {
         C c = new C(4, 5);
 
         int r = client1.getMember(c);
@@ -42,7 +42,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runNestedStruct1() {
+    public void nestedStruct1() {
         C c = new C(4, 5);
         D d = new D(c);
 
@@ -52,7 +52,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runReturnStruct1() {
+    public void returnStruct1() {
         B b;
 
         b = client1.returnStruct(3.14F, 2.71828F);
@@ -62,19 +62,19 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runSendIntSizes() {
+    public void sendIntSizes() {
         F f = new F((byte) -1, (short) -1, -1, (long) -1);
 
         assertEquals(0, client2.sendManyInts(f));
     }
 
     @Test
-    public void runSendUnsignedIntSizes() {
+    public void sendUnsignedIntSizes() {
         // UInt64 not supported
     }
 
     @Test
-    public void runGetMember2() {
+    public void getMember2() {
         C c = new C(4, 5);
         B b = new B(3.14F, 2.71828F);
         A a = new A(b, c);
@@ -87,14 +87,14 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runTestString1() {
+    public void testString1() {
         primate prim8 = new primate("Ape", false);
 
         assertEquals(0, client1.checkString(prim8));
     }
 
     @Test
-    public void runTestReturnString1() {
+    public void testReturnString1() {
         stringStruct result;
 
         result = client1.returnStrings();
@@ -105,7 +105,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runTestStudent1() {
+    public void testStudent1() {
         student stud = new student("Donnie Darko", new float[]{85.75F, 93.29F, 92.46F}, school_year_t.SENIOR, 19);
         assertEquals("Donnie Darko", client2.getStudentName(stud));
         assertEquals((stud.get_test_grades()[0] + stud.get_test_grades()[1] + stud.get_test_grades()[2]) / 3, client2.getStudentTestAverage(stud));
@@ -114,7 +114,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runTestStudent2() {
+    public void testStudent2() {
         student stud;
 
         stud = client2.createStudent("George Bush", new float[]{65.32F, 69.68F, 0}, school_year_t.FRESHMAN, 68);
@@ -125,7 +125,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runtest_struct_allDirection() {
+    public void test_struct_allDirection() {
 
         byte[] a_binary = new byte[2];
         byte[] b_binary = new byte[2];
@@ -164,7 +164,7 @@ public class TestStruct extends TestingClient {
     }
 
     @Test
-    public void runTestSendingByrefMembers() {
+    public void testSendingByrefMembers() {
         StructWithByrefMembers s;
         int b = 4;
         // Not sure how the test work

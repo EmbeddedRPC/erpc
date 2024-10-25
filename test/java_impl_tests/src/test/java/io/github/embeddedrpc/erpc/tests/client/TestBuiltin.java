@@ -26,12 +26,12 @@ class TestBuiltin extends TestingClient {
     private final BuiltinServicesClient client = new BuiltinServicesClient(clientManager);
 
     @Test
-    public void runTestEnumsServiceID() {
+    public void testEnumsServiceID() {
         assertEquals(2, IBuiltinServices.SERVICE_ID);
     }
 
     @Test
-    public void runTesttest_int32_in_out() {
+    public void test_int32_in_out() {
         Reference<Integer> int32C = new Reference<>(0);
 
         System.out.println("RPC request is sent to the server");
@@ -44,7 +44,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTesttest_int32_inout() {
+    public void test_int32_inout() {
         Reference<Integer> int32E = new Reference<>(-6);
 
         for (int i = -5; i < 5; i++) {
@@ -55,7 +55,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTestest_int32_return() {
+    public void test_int32_return() {
         int int32R = 0;
 
         System.out.println("RPC request is sent to the server");
@@ -71,7 +71,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTestest_int32_allDirection() {
+    public void test_int32_allDirection() {
         Reference<Integer> int32C = new Reference<>(0);
         Reference<Integer> int32E = new Reference<>(7);
         int int32R = 0;
@@ -85,7 +85,7 @@ class TestBuiltin extends TestingClient {
         assertEquals((gInt32AClient * gInt32BClient), int32R);
     }
     @Test
-    public void runTestest_float_inout() {
+    public void test_float_inout() {
         float a = 3.14F;
         Reference<Float> b = new Reference<>(0.0F);
 
@@ -96,7 +96,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTestest_double_inout() {
+    public void test_double_inout() {
         double a = 3.14F;
         Reference<Double> b = new Reference<>(0.0D);
 
@@ -108,7 +108,7 @@ class TestBuiltin extends TestingClient {
 
     @Test
     @Order(1)
-    public void runTest1test_string_in_out() {
+    public void test1test_string_in_out() {
         System.out.println("1");
         Reference<String> stringC = new Reference<>("");
 
@@ -122,7 +122,7 @@ class TestBuiltin extends TestingClient {
 
     @Test
     @Order(2)
-    public void runTest2test_string_inout() {
+    public void test2test_string_inout() {
         System.out.println("2");
         Reference<String> stringE = new Reference<>(gStringAClient + " ");
 
@@ -136,7 +136,7 @@ class TestBuiltin extends TestingClient {
 
     @Test
     @Order(3)
-    public void runTest3test_string_return() {
+    public void test3test_string_return() {
         System.out.println("3");
         String stringR = "";
 
@@ -147,7 +147,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTestest_string_allDirection() {
+    public void test_string_allDirection() {
         Reference<String> stringC = new Reference<>("");
         Reference<String> stringE = new Reference<>(gStringAClient + " ");
         String stringR = "";
@@ -161,7 +161,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTesStringParamTest1() {
+    public void testStringParamTest1() {
         int int32R = -1;
 
         System.out.println("RPC request is sent to the server");
@@ -171,7 +171,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTesStringParamTest2() {
+    public void testStringParamTest2() {
         int int32R = -1;
 
         System.out.println("RPC request is sent to the server");
@@ -181,7 +181,7 @@ class TestBuiltin extends TestingClient {
     }
 
     @Test
-    public void runTesStringReturnTest1() {
+    public void testStringReturnTest1() {
         System.out.println("RPC request is sent to the server");
         assertEquals("Hello", client.returnHello());
     }

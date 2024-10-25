@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016 - 2023 NXP
+ * Copyright 2016 - 2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -251,7 +251,12 @@ int main(void)
 
     // Copy application from FLASH to RAM
     memcpy((void *)(char *)CORE1_BOOT_ADDRESS, (void *)CORE1_IMAGE_START, core1_image_size);
-#endif
+
+#ifdef APP_INVALIDATE_CACHE_FOR_SECONDARY_CORE_IMAGE_MEMORY
+    invalidate_cache_for_core1_image_memory(CORE1_BOOT_ADDRESS, core1_image_size);
+#endif /* APP_INVALIDATE_CACHE_FOR_SECONDARY_CORE_IMAGE_MEMORY */
+
+#endif /* CORE1_IMAGE_COPY_TO_RAM */
 
     g_initThread.init(&runInit, 1, 256 * 4);
     g_serverThread.init(&runServer, 2, 1536 * 4);

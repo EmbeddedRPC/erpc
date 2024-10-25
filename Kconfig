@@ -1,0 +1,177 @@
+#
+# Copyright 2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+config ERPC_GENERATOR
+    bool "Build eRPC Generator"
+    default y
+
+config REQUIRE_ERPCGEN
+    bool
+    default n
+
+config ERPC_LIB
+    bool "Build eRPC C Library"
+    default y
+
+menuconfig ERPC_TESTS
+    bool "Build eRPC Tests"
+    default n
+    select REQUIRE_ERPCGEN
+
+if ERPC_TESTS
+    menu "Test transport"
+        menuconfig ERPC_TESTS.transport.tcp
+            bool "Test transport TCP"
+            default y
+
+        if ERPC_TESTS.transport.tcp
+            config ERPC_TESTS.transport.tcp.host
+                string "TCP Host"
+                default "localhost"
+
+            config ERPC_TESTS.transport.tcp.port
+                int "TCP Port"
+                default 12345
+        endif
+
+        menuconfig ERPC_TESTS.transport.serial
+            bool "Test transport Serial"
+            default n
+
+        if ERPC_TESTS.transport.serial
+            config ERPC_TESTS.transport.serial.port
+                string "Serial port"
+                default "localhost"
+
+            config ERPC_TESTS.transport.serial.baud
+                int "Baud"
+                default 115200
+        endif
+    endmenu
+
+    config ERPC_TESTS.client
+        bool "Build test's client side"
+        default y
+
+    config ERPC_TESTS.server
+        bool "Build test's server side"
+        default y
+    
+    menu "Test cases"
+        config ERPC_TESTS.testcase.test_annotations
+            bool "Build test_annotations"
+            default y
+        config ERPC_TESTS.testcase.test_arbitrator
+            bool "Build test_arbitrator"
+            default y
+        config ERPC_TESTS.testcase.test_arrays
+            bool "Build test_arrays"
+            default y
+        config ERPC_TESTS.testcase.test_binary
+            bool "Build test_binary"
+            default y
+        config ERPC_TESTS.testcase.test_builtin
+            bool "Build test_builtin"
+            default y
+        config ERPC_TESTS.testcase.test_callbacks
+            bool "Build test_callbacks"
+            default y
+        config ERPC_TESTS.testcase.test_const
+            bool "Build test_const"
+            default y
+        config ERPC_TESTS.testcase.test_enums
+            bool "Build test_enums"
+            default y
+        config ERPC_TESTS.testcase.test_lists
+            bool "Build test_lists"
+            default y
+        config ERPC_TESTS.testcase.test_shared
+            bool "Build test_shared"
+            default y
+        config ERPC_TESTS.testcase.test_struct
+            bool "Build test_struct"
+            default y
+        config ERPC_TESTS.testcase.test_typedef
+            bool "Build test_typedef"
+            default y
+        config ERPC_TESTS.testcase.test_unions
+            bool "Build test_unions"
+            default y
+    endmenu
+
+endif
+
+menuconfig ERPC_EXAMPLES
+    bool "Build eRPC Examples"
+    default n
+    select REQUIRE_ERPCGEN
+
+if ERPC_EXAMPLES
+    menuconfig ERPC_MATRIX_MULTIPLY_TCP
+        bool "Matrix Multiply TCP example"
+        default n
+        select REQUIRE_ERPCGEN
+
+    if ERPC_MATRIX_MULTIPLY_TCP
+        config ERPC_MATRIX_MULTIPLY_TCP.host
+            string "TCP Host"
+            default "localhost"
+
+        config ERPC_MATRIX_MULTIPLY_TCP.port
+            int "TCP Port"
+            default 8811
+
+        config ERPC_MATRIX_MULTIPLY_TCP.c
+            bool "Build C version of the demo"
+            default y
+        config ERPC_MATRIX_MULTIPLY_TCP.cpp
+            bool "Build C++ version of the demo"
+            default y 
+    endif
+
+    menuconfig ERPC_MATRIX_MULTIPLY_UART
+        bool "Matrix Multiply UART example"
+        default n
+        select REQUIRE_ERPCGEN
+
+    if ERPC_MATRIX_MULTIPLY_UART
+        config ERPC_MATRIX_MULTIPLY_UART.serial
+            string "Serial port"
+            default "localhost"
+
+        config ERPC_MATRIX_MULTIPLY_UART.baud
+            int "Baud"
+            default 115200
+
+        config ERPC_MATRIX_MULTIPLY_UART.c
+            bool "Build C version of the demo"
+            default y
+        config ERPC_MATRIX_MULTIPLY_UART.cpp
+            bool "Build C++ version of the demo"
+            default y 
+    endif
+
+    menuconfig ERPC_HELLO_WORLD
+        bool "Hello World example"
+        default n
+        select REQUIRE_ERPCGEN
+
+    if ERPC_HELLO_WORLD
+        config ERPC_HELLO_WORLD.c
+            bool "Build C version of the demo"
+            default y
+        config ERPC_HELLO_WORLD.cpp
+            bool "Build C++ version of the demo"
+            default y 
+        config ERPC_HELLO_WORLD.python
+            bool "Generate shim code for Python"
+            default y
+        config ERPC_HELLO_WORLD.java
+            bool "Generate shim code for Java"
+            default y 
+    endif
+endif
+

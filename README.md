@@ -281,7 +281,15 @@ This section provides links to interesting erpc-based projects, articles, blogs 
 
 These build instructions apply to host PCs and embedded Linux. For bare metal or RTOS embedded environments, you should copy the [erpc_c](/erpc_c) directory into your application sources.
 
-The primary build system is makefile based. It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests.
+**CMake and KConfig build**:
+
+It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests and examples.
+
+CMake is compatible with gcc and clang. On Windows local MingGW downloaded by [script](./install_dependencies.ps1) can be used. 
+
+**Make build**:
+
+It builds a static library of the eRPC C/C++ infrastructure, the `erpcgen` executable, and optionally the unit tests.
 
 The makefiles are compatible with gcc or clang on Linux, OS X, and Cygwin. A Windows build
 of erpcgen using Visual Studio is also available in the [erpcgen/VisualStudio_v14](erpcgen/VisualStudio_v14) directory.
@@ -289,10 +297,29 @@ There is also an Xcode project file in the [erpcgen](/erpcgen) directory, which 
 
 ### Requirements
 
-#### Windows
+eRPC now support building **erpcgen**, **erpc_lib**, **tests** and **C examples** using CMake.
 
-* Related to Visual Studio: steps are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
-* mingw compilation can be used too
+Requirements when using CMake:
+* **CMake** (minimal version 3.20.0)
+* Generator - **Make**, **Ninja**, ...
+* **C/C++ compiler** - **GCC**, **CLANG**, ...
+* **Binson** - https://www.gnu.org/software/bison/
+* **Flex** - https://github.com/westes/flex/
+
+Requirements when using Make:
+* **Make**
+* **C/C++ compiler** - **GCC**, **CLANG**, ...
+* **Binson** - https://www.gnu.org/software/bison/
+* **Flex** - https://github.com/westes/flex/
+
+
+#### Windows
+Related steps to build **erpcgen** using **Visual Studio** are described in [`erpcgen/VisualStudio_v14/readme_erpcgen.txt`](erpcgen/VisualStudio_v14/readme_erpcgen.txt).
+
+To install MinGW, Bison, Flex locally on Windows:
+```bash
+./install_dependencies.ps1
+* ```
 
 #### Linux
 
@@ -312,6 +339,25 @@ Mandatory for case, when build for different architecture is needed
 
 ### Building
 
+#### CMake and KConfig
+eRPC use CMake and KConfig to configurate and build eRPC related targets. KConfig can be edited by [prj.conf](./prj.conf) or _menuconfig_ when building. 
+
+Generate project, config and build. In [erpc/](./) execute:
+```bash
+cmake -B ./build # in erpc/build generate cmake project
+cmake --build ./build --target menuconfig # Build menuconfig and configurate erpcgen, erpc_lib, tests and examples
+cmake --build ./build # Build all selected target from prj.conf/menuconfig 
+```
+**CMake will use the system's default compilers and generator
+
+If you want to use Windows and locally installed MinGW, use [CMake preset](./CMakePresets.json) :
+```bash
+cmake --preset mingw64 # Generate project in ./build using mingw64's make and compilers
+cmake --build ./build --target menuconfig # Build menuconfig and configurate erpcgen, erpc_lib, tests and examples
+cmake --build ./build # Build all selected target from prj.conf/menuconfig 
+```
+
+#### Make
 To build the library and erpcgen, run from the repo root directory:
 
 ```sh

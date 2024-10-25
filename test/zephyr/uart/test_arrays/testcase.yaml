@@ -5,4 +5,4 @@ tests:
       - pytest
     harness_config:
       pytest_root:
-        - "../../../python_impl_tests/scripts/test_arrays/test_arrays.py"
+        - "../../../python_impl_tests/test_arrays/"

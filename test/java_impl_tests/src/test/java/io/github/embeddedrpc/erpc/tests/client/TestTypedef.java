@@ -20,19 +20,19 @@ public class TestTypedef extends TestingClient {
     private final TypedefServiceClient client = new TypedefServiceClient(clientManager);
 
     @Test
-    public void runSendReceiveInt() {
+    public void sendReceiveInt() {
         int a = 10;
         int b = 2 * a + 1;
         assertEquals(b, client.sendReceiveInt(a));
     }
 
     @Test
-    public void runTestTypedefServiceID() {
+    public void testTypedefServiceID() {
         assertEquals(2, ITypedefService.SERVICE_ID);
     }
 
     @Test
-    public void runSendReceiveEnum() {
+    public void sendReceiveEnum() {
         // Java have not typedef
         enumColor a = enumColor.green;
 
@@ -40,7 +40,7 @@ public class TestTypedef extends TestingClient {
     }
 
     @Test
-    public void runSendReceiveStruct() {
+    public void sendReceiveStruct() {
         A a = new A(1, 4);
         A b = new A(2 * a.get_m(), 2 + a.get_n());
         A r;
@@ -52,7 +52,7 @@ public class TestTypedef extends TestingClient {
     }
 
     @Test
-    public void runSendReceiveListType() {
+    public void sendReceiveListType() {
         List<Integer> sendList = new ArrayList<>();
 
         for (int i = 0; i < 12; i++) {
@@ -67,7 +67,7 @@ public class TestTypedef extends TestingClient {
     }
 
     @Test
-    public void runSendReceiveString() {
+    public void sendReceiveString() {
         String send = "Hello";
 
         String received = client.sendReceiveString(send);
@@ -76,7 +76,7 @@ public class TestTypedef extends TestingClient {
     }
 
     @Test
-    public void runSendReceive2ListType() {
+    public void sendReceive2ListType() {
         List<List<Integer>> sendList = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {

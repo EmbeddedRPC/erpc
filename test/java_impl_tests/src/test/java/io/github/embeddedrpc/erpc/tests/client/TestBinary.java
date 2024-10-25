@@ -20,17 +20,17 @@ public class TestBinary extends TestingClient {
     private final BinaryClient client = new BinaryClient(clientManager);
 
     @Test
-    public void runTestsendBinary() {
+    public void testSendBinary() {
         client.sendBinary(new byte[]{0, 1, 2, 3, 4});
     }
 
     @Test
-    public void runTestBinaryServiceID() {
+    public void testBinaryServiceID() {
         assertEquals(2, IBinary.SERVICE_ID);
     }
 
     @Test
-    public void runTesttest_binary_allDirection() {
+    public void test_binary_allDirection() {
         byte[] a_binary = new byte[5];
         byte[] b_binary = new byte[5];
         Reference<byte[]> e_binary = new Reference<>(new byte[5]);

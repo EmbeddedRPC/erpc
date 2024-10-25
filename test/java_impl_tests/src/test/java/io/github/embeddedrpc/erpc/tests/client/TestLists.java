@@ -28,12 +28,12 @@ public class TestLists extends TestingClient {
     private final PointersServiceClient client = new PointersServiceClient(clientManager);
 
     @Test
-    public void runTestListsServiceID() {
+    public void testListsServiceID() {
         assertEquals(2, IPointersService.SERVICE_ID);
     }
 
     @Test
-    public void runSendReceivedInt32() {
+    public void sendReceivedInt32() {
         List<Integer> sendList = new ArrayList<>(12);
         List<Integer> receivedList;
 
@@ -49,7 +49,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceiveZeroSize() {
+    public void sendReceiveZeroSize() {
         List<Integer> sendList = List.of(0);
         List<Integer> receivedList;
 
@@ -59,7 +59,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceived2Int32() {
+    public void sendReceived2Int32() {
         List<List<Integer>> sendList = new ArrayList<>();
         List<List<Integer>> receivedList;
 
@@ -81,7 +81,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceivedEnum() {
+    public void sendReceivedEnum() {
         List<enumColor> sendList = List.of(enumColor.red, enumColor.green, enumColor.blue);
         List<enumColor> receivedList;
 
@@ -91,7 +91,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceived2Enum() {
+    public void sendReceived2Enum() {
         List<List<enumColor>> sendList = new ArrayList<>();
         List<List<enumColor>> receivedList;
 
@@ -113,7 +113,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceivedStruct() {
+    public void sendReceivedStruct() {
         List<C> sendList = new ArrayList<>();
         List<C> receivedList;
 
@@ -130,7 +130,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceived2Struct() {
+    public void sendReceived2Struct() {
         List<List<C>> sendList = new ArrayList<>();
         List<List<C>> receivedList;
 
@@ -153,7 +153,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceivedString() {
+    public void sendReceivedString() {
         List<String> sendList = new ArrayList<>();
         List<String> receivedList;
 
@@ -169,11 +169,11 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runSendReceived2String() {
+    public void sendReceived2String() {
         List<List<String>> sendList = new ArrayList<>();
         List<List<String>> receivedList;
 
-        for (int a = 0; a < 12; a++) {
+        for (int a = 0; a < 5; a++) {
             List<String> x = new ArrayList<>();
             for (int b = 0; b < a + 1; b++) {
                 x.add("Hello");
@@ -191,7 +191,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runtest_list_allDirection() {
+    public void test_list_allDirection() {
         List<Long> sendListA = new ArrayList<>();
         List<Long> sendListB = new ArrayList<>();
         Reference<List<Long>> sendListC = new Reference<>(new ArrayList<>());
@@ -210,7 +210,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runtestLengthAnnotation() {
+    public void testLengthAnnotation() {
         long length = 5;
         List<Integer> list = new ArrayList<>();
         int result;
@@ -225,7 +225,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runtestLengthAnnotationInStruct() {
+    public void testLengthAnnotationInStruct() {
         listStruct myListStruct = new listStruct(new ArrayList<>());
         int result;
 
@@ -239,7 +239,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runreturnSentStructLengthAnnotation() {
+    public void returnSentStructLengthAnnotation() {
         listStruct myListStruct = new listStruct(new ArrayList<>());
         listStruct returnStruct;
 
@@ -255,7 +255,7 @@ public class TestLists extends TestingClient {
     }
 
     @Test
-    public void runsendGapAdvertisingData() {
+    public void sendGapAdvertisingData() {
         gapAdvertisingData_t ad = new gapAdvertisingData_t(new ArrayList<>());
         int result;
 

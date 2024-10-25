@@ -28,12 +28,12 @@ public class TestEnums extends TestingClient {
     private final EnumsServiceClient client = new EnumsServiceClient(clientManager);
 
     @Test
-    public void runTestEnumsServiceID() {
+    public void testEnumsServiceID() {
         assertEquals(2, IEnumsService.SERVICE_ID);
     }
 
     @Test
-    public void runTesttest_enumColor_in_out() {
+    public void test_enumColor_in_out() {
         Reference<enumColor> enumColorC = new Reference<>();
 
         System.out.println("RPC request is sent to the server");
@@ -46,7 +46,7 @@ public class TestEnums extends TestingClient {
     }
 
     @Test
-    public void runTesttest_enumColor_inout() {
+    public void test_enumColor_inout() {
         Reference<enumColor> enumColorE = new Reference<>(gEnumColorAClient);
 
         client.test_enumColor_inout(enumColorE);
@@ -55,14 +55,14 @@ public class TestEnums extends TestingClient {
     }
 
     @Test
-    public void runTesttest_enumColor_return() {
+    public void test_enumColor_return() {
 //        client.test_enumColor_in(gEnumColorBClient);
 //        client.test_enumColor_in(gEnumColorBClient);
 
     }
 
     @Test
-    public void runTesttest_enumColor_allDirection() {
+    public void test_enumColor_allDirection() {
         Reference<enumColor> enumColorC = new Reference<>();
         Reference<enumColor> enumColorE = new Reference<>(gEnumColorAClient);
         enumColor enumColorR;
@@ -75,7 +75,7 @@ public class TestEnums extends TestingClient {
     }
 
     @Test
-    public void runTesttest_enumColor2_allDirection() {
+    public void test_enumColor2_allDirection() {
         enumColor2 enumColor2A = enumColor2.pink;
         enumColor2 enumColor2B = enumColor2.yellow;
         Reference<enumColor2> enumColor2C = new Reference<>();
@@ -90,7 +90,7 @@ public class TestEnums extends TestingClient {
     }
 
     @Test
-    public void runTesttest_enumErrorCode_allDirection() {
+    public void test_enumErrorCode_allDirection() {
         enumErrorCode enumErrorCodeA = ERROR_NONE;
         enumErrorCode enumErrorCodeB = ERROR_UNKNOWN;
         Reference<enumErrorCode> enumErrorCodeC = new Reference<>();

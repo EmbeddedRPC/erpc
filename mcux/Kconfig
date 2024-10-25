@@ -1,0 +1,253 @@
+#
+# Copyright 2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+menuconfig MCUX_COMPONENT_middleware.multicore.erpc
+    bool "embedded Remote Procedure Call (eRPC)"
+    default n
+    help
+        This option will enable embedded Remote Procedure Call Middleware Component
+
+config MCUX_COMPONENT_middleware.multicore.erpc.client
+    bool "eRPC Client"
+    default n
+    depends on MCUX_COMPONENT_middleware.multicore.erpc
+    help
+        This option enables eRPC Client implementation.
+
+config MCUX_COMPONENT_middleware.multicore.erpc.server
+    bool "eRPC Server"
+    default n
+    depends on MCUX_COMPONENT_middleware.multicore.erpc
+    help
+        This option enables eRPC Server implementation.
+
+config MCUX_COMPONENT_middleware.multicore.erpc.arbitrator
+    bool "eRPC Arbitrator"
+    default n
+    depends on MCUX_COMPONENT_middleware.multicore.erpc
+    help
+        This option enables eRPC Arbitrator implementation.
+
+if MCUX_COMPONENT_middleware.multicore.erpc
+choice
+    prompt "Select eRPC memory allocation porting layer"
+    depends on MCUX_COMPONENT_middleware.multicore.erpc
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.port_stdlib
+        tristate "eRPC stdlib memory allocation port layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.port_freertos
+        tristate "eRPC FreeRTOS memory allocation port layer"
+endchoice
+
+choice
+    prompt "Select eRPC transport layer"
+    depends on MCUX_COMPONENT_middleware.multicore.erpc.port_stdlib || MCUX_COMPONENT_middleware.multicore.erpc.port_freertos
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_mu_transport
+        tristate "eRPC MU transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport
+        tristate "eRPC RPMsg-Lite transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport
+        tristate "eRPC RPMsg-Lite RTOS transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_tty_rtos_transport
+        tristate "eRPC RPMsg-Lite TTY RTOS transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_uart_cmsis_transport
+        tristate "eRPC UART CMSIS transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_dspi_master_transport
+        tristate "eRPC DSPI master transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_dspi_slave_transport
+        tristate "eRPC DSPI slave transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_spi_master_transport
+        tristate "eRPC SPI master transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_spi_slave_transport
+        tristate "eRPC SPI slave transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_lpspi_slave_transport
+        tristate "eRPC LPSPI slave transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_i2c_slave_transport
+        tristate "eRPC I2C slave transport layer"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_lpi2c_slave_transport
+        tristate "eRPC LPI2C slave transport layer"
+endchoice
+
+config MCUX_PRJSEG_middleware.multicore.erpc.generated_config
+    bool "Generate eRPC configuration header"
+    depends on MCUX_COMPONENT_middleware.multicore.erpc
+    default y
+    help
+        Generate the erpc_config_gen.h, otherwise users need to provide their
+        own erpc_config.h.
+
+if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
+    menu "eRPC Configuration(erpc_config_gen.h)"
+        choice ERPC_ALLOCATION_POLICY_CONFIG
+            prompt "Choice ERPC_ALLOCATION_POLICY_STATIC"
+            help
+                Choose which allocation policy should be used.
+                Set ERPC_ALLOCATION_POLICY_DYNAMIC if dynamic allocations should be used.
+                Set ERPC_ALLOCATION_POLICY_STATIC if static allocations should be used.
+        config ERPC_ALLOCATION_POLICY_DYNAMIC
+            bool "ERPC_ALLOCATION_POLICY_DYNAMIC"
+        config ERPC_ALLOCATION_POLICY_STATIC
+            bool "ERPC_ALLOCATION_POLICY_STATIC"
+        endchoice
+
+        config ERPC_ALLOCATION_POLICY
+            string
+            default "(ERPC_ALLOCATION_POLICY_DYNAMIC)" if ERPC_ALLOCATION_POLICY_DYNAMIC
+            default "(ERPC_ALLOCATION_POLICY_STATIC)" if ERPC_ALLOCATION_POLICY_STATIC
+            help
+                No prefix in generated macro
+
+        config ERPC_CODEC_COUNT
+            int "ERPC_CODEC_COUNT"
+            default 2
+            help
+                No prefix in generated macro
+                Set amount of codecs objects used simultaneously in case of ERPC_ALLOCATION_POLICY is set to
+                ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one
+                thread per each then 2, ... Default value 2
+
+        config ERPC_MESSAGE_LOGGERS_COUNT
+            int "ERPC_MESSAGE_LOGGERS_COUNT"
+            default 0
+            help
+                No prefix in generated macro
+                Set amount of message loggers objects used simultaneously  in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC. 
+                For example if client or server is used in one thread then 1. If both are used in one thread per each then 2, ... For arbitrated client 1 is enough.
+
+        config ERPC_CLIENTS_THREADS_AMOUNT
+            int "ERPC_CLIENTS_THREADS_AMOUNT"
+            default 1
+            help
+                No prefix in generated macro
+                Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC
+
+        choice ERPC_THREADS_CONFIG
+            prompt "Choice ERPC_THREADS"
+            help
+                Select threading model
+        config ERPC_THREADS_NONE
+            bool "ERPC_THREADS_NONE"
+        config ERPC_THREADS_PTHREADS
+            bool "ERPC_THREADS_PTHREADS"
+        config ERPC_THREADS_FREERTOS
+            bool "ERPC_THREADS_FREERTOS"
+        config ERPC_THREADS_ZEPHYR
+            bool "ERPC_THREADS_ZEPHYR"
+        config ERPC_THREADS_MBED
+            bool "ERPC_THREADS_MBED"
+        config ERPC_THREADS_WIN32
+            bool "ERPC_THREADS_WIN32"
+        config ERPC_THREADS_THREADX
+            bool "ERPC_THREADS_THREADX"
+        endchoice
+
+        config ERPC_THREADS
+            string
+            default "(ERPC_THREADS_NONE)" if ERPC_THREADS_NONE
+            default "(ERPC_THREADS_PTHREADS)" if ERPC_THREADS_PTHREADS
+            default "(ERPC_THREADS_FREERTOS)" if ERPC_THREADS_FREERTOS
+            default "(ERPC_THREADS_ZEPHYR)" if ERPC_THREADS_ZEPHYR
+            default "(ERPC_THREADS_MBED)" if ERPC_THREADS_MBED
+            default "(ERPC_THREADS_WIN32)" if ERPC_THREADS_WIN32
+            default "(ERPC_THREADS_THREADX)" if ERPC_THREADS_THREADX
+            help
+                No prefix in generated macro
+
+        config ERPC_DEFAULT_BUFFER_SIZE
+            int "ERPC_DEFAULT_BUFFER_SIZE"
+            default 256
+            help
+                No prefix in generated macro
+                Set the size of buffers allocated by one of MessageBufferFactory.
+                For RPMsg transport layer, ERPC_DEFAULT_BUFFER_SIZE must be 2^n - 16.
+
+        config ERPC_DEFAULT_BUFFERS_COUNT
+            int "ERPC_DEFAULT_BUFFERS_COUNT"
+            default 2
+            help
+                No prefix in generated macro
+                Set the count of buffers allocated by one of statically allocated messages
+
+        config ERPC_NOEXCEPT
+            bool "ERPC_NOEXCEPT"
+            default n
+            help
+                No prefix in generated macro
+                Disable/enable noexcept support
+
+        config ERPC_NESTED_CALLS
+            bool "ERPC_NESTED_CALLS"
+            default n
+            help
+                No prefix in generated macro
+                Disable/enable nested calls. Enable this option when callbacks or other eRPC functions are called 
+                from server implementation of another eRPC call. Nested functions need to be marked as @nested in IDL.
+
+        config ERPC_NESTED_CALLS_DETECTION
+            bool "ERPC_NESTED_CALLS_DETECTION"
+            default n
+            help
+                No prefix in generated macro
+                This serve for locating nested calls in code. Nested calls are calls where inside eRPC function
+                on server side is called another eRPC function (like callbacks). Code need be a bit changed
+                to support nested calls. See ERPC_NESTED_CALLS macro.
+
+        config ERPC_MESSAGE_LOGGING
+            bool "ERPC_MESSAGE_LOGGING"
+            default n
+            help
+                No prefix in generated macro
+                Enable eRPC message logging code through the eRPC. Take look into "erpc_message_loggers.h". Can be used for base
+                printing messages, or sending data to another system for data analysis.
+
+        config ERPC_TRANSPORT_MU_USE_MCMGR
+            bool "ERPC_TRANSPORT_MU_USE_MCMGR"
+            default n
+            help
+                No prefix in generated macro
+                MU transport layer configuration. MU transport layer could leverage the Multicore Manager (MCMGR) component for Inter-Core
+                interrupts / MU interrupts management or the Inter-Core interrupts can be managed by itself (MUX_IRQHandler
+                overloading). By default, ERPC_TRANSPORT_MU_USE_MCMGR is set to ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED when mcmgr.h
+                is part of the project, otherwise the ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED option is used. Do not forget
+                to add the MCMGR library into your project when ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED option is used! See the
+                erpc_mu_transport.h for additional MU settings.
+
+        config ERPC_PRE_POST_ACTION
+            bool "ERPC_PRE_POST_ACTION"
+            default n
+            help
+                No prefix in generated macro
+                Enable eRPC pre and post callback functions shim code. Take look into "erpc_pre_post_action.h". Can be used for
+                detection of eRPC call freeze, ...
+
+        config ERPC_PRE_POST_ACTION_DEFAULT
+            bool "ERPC_PRE_POST_ACTION_DEFAULT"
+            default n
+            help
+                No prefix in generated macro
+                Enable eRPC pre and post default callback functions. Take look into "erpc_setup_extensions.h". Can be used for
+                detection of eRPC call freeze, ...
+
+    endmenu
+endif
+
+    menu "eRPC examples sources"
+    rsource "../examples/MCUXPRESSO_SDK/Kconfig"
+    endmenu
+endif

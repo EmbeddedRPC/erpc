@@ -1,0 +1,5 @@
+interface TextService
+{
+    printText(string text) -> bool
+    oneway stopServer()
+}

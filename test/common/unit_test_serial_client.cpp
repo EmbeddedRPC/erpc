@@ -17,6 +17,20 @@
 #include "myAlloc.hpp"
 #include "unit_test_wrapped.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+////////////////////////////////////////////////////////////////////////////////
+#ifndef UNIT_TEST_SERIAL_PORT
+#define UNIT_TEST_SERIAL_PORT "/dev/ttyS4"
+#endif
+
+#ifndef UNIT_TEST_SERIAL_BAUD
+#define UNIT_TEST_SERIAL_BAUD 115200
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// Code
+////////////////////////////////////////////////////////////////////////////////
 using namespace erpc;
 
 class MyMessageBufferFactory : public MessageBufferFactory
@@ -38,10 +52,12 @@ public:
     }
 };
 
-SerialTransport g_transport("/dev/ttyS4", 115200);
+SerialTransport g_transport(UNIT_TEST_SERIAL_PORT, UNIT_TEST_SERIAL_BAUD);
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 ClientManager *g_client;
+
+Crc16 g_crc16;
 
 int ::MyAlloc::allocated_ = 0;
 
@@ -59,7 +75,7 @@ int main(int argc, char **argv)
     StdoutLogger *m_logger = new StdoutLogger();
     m_logger->setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(m_logger);
-    Log::info("Starting ERPC client...\n");
+    Log::info("Starting ERPC client on port '%s' with baud %d.\n", UNIT_TEST_SERIAL_PORT, UNIT_TEST_SERIAL_BAUD);
 
     g_client = new ClientManager();
     uint8_t vtime = 0;
@@ -67,6 +83,7 @@ int main(int argc, char **argv)
     while (kErpcStatus_Success != g_transport.init(vtime, vmin))
         ;
 
+    g_transport.setCrc16(&g_crc16);
     g_client->setMessageBufferFactory(&g_msgFactory);
     g_client->setTransport(&g_transport);
     g_client->setCodecFactory(&g_basicCodecFactory);

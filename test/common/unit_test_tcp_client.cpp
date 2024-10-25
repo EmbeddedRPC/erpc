@@ -17,6 +17,21 @@
 #include "myAlloc.hpp"
 #include "unit_test_wrapped.h"
 
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+////////////////////////////////////////////////////////////////////////////////
+#ifndef UNIT_TEST_TCP_HOST
+#define UNIT_TEST_TCP_HOST "localhost"
+#endif
+
+#ifndef UNIT_TEST_TCP_PORT
+#define UNIT_TEST_TCP_PORT 12345
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// CODE
+////////////////////////////////////////////////////////////////////////////////
 using namespace erpc;
 
 class MyMessageBufferFactory : public MessageBufferFactory
@@ -39,7 +54,7 @@ public:
 };
 
 MyMessageBufferFactory g_msgFactory;
-TCPTransport g_transport("localhost", 12345, false);
+TCPTransport g_transport(UNIT_TEST_TCP_HOST, UNIT_TEST_TCP_PORT, false);
 #if USE_MESSAGE_LOGGING
 TCPTransport g_messageLogger("localhost", 54321, false);
 #endif // USE_MESSAGE_LOGGING
@@ -64,7 +79,7 @@ int main(int argc, char **argv)
     StdoutLogger *m_logger = new StdoutLogger();
     m_logger->setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(m_logger);
-    Log::info("Starting ERPC client...\n");
+    Log::info("Starting ERPC client. Connecting to '%s' on port %d.\n", UNIT_TEST_TCP_HOST, UNIT_TEST_TCP_PORT);
 
     g_client = new ClientManager();
     erpc_status_t err = g_transport.open();

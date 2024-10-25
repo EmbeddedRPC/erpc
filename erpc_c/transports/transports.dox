@@ -28,6 +28,12 @@
 */
 
 /*!
+@defgroup lpspi_slave_transport LPSPI Slave
+@ingroup transports
+@brief MCUXpressoSDK LPSPI slave driver transport.
+*/
+
+/*!
 @defgroup spidev_master_transport SPIdev Linux Master
 @ingroup transports
 @brief SPIdev Linux transport.
@@ -96,4 +102,16 @@
 @defgroup i2c_slave_transport I2C Slave
 @ingroup transports
 @brief MCUXpressoSDK I2C slave driver transport.
+*/
+
+/*!
+@defgroup lpi2c_slave_transport LPI2C Slave
+@ingroup transports
+@brief MCUXpressoSDK LPI2C slave driver transport.
+*/
+
+/*!
+@defgroup mbox_transport Zephyr MBOX
+@ingroup transports
+@brief Zephyr MBOX transport.
 */

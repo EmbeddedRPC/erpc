@@ -54,8 +54,7 @@ TransportArbitrator g_arbitrator;
 SimpleServer g_server;
 Mutex waitQuitMutex;
 
-extern const uint32_t erpc_generated_crc;
-Crc16 g_crc16(erpc_generated_crc);
+Crc16 g_crc16;
 
 int waitQuit = 0;
 

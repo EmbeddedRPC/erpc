@@ -16,6 +16,21 @@
 #include "test_unit_test_common_server.hpp"
 #include "unit_test.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+////////////////////////////////////////////////////////////////////////////////
+#ifndef UNIT_TEST_TCP_HOST
+#define UNIT_TEST_TCP_HOST "localhost"
+#endif
+
+#ifndef UNIT_TEST_TCP_PORT
+#define UNIT_TEST_TCP_PORT 12345
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// CODE
+////////////////////////////////////////////////////////////////////////////////
+
 using namespace erpc;
 using namespace erpcShim;
 
@@ -38,7 +53,7 @@ public:
     }
 };
 
-TCPTransport g_transport("localhost", 12345, true);
+TCPTransport g_transport(UNIT_TEST_TCP_HOST, UNIT_TEST_TCP_PORT, true);
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 SimpleServer g_server;
@@ -58,7 +73,7 @@ int main(int argc, const char *argv[])
     StdoutLogger *m_logger = new StdoutLogger();
     m_logger->setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(m_logger);
-    Log::info("Starting ERPC server...\n");
+    Log::info("Starting ERPC server on port %d...\n", UNIT_TEST_TCP_PORT);
 
     erpc_status_t result = g_transport.open();
     if (result)

@@ -100,7 +100,6 @@ kds
 iar
 mdk
 lpcx
-mcux
 tags
 
 format-files-to-commit.rb

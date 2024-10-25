@@ -18,6 +18,20 @@
 
 #include <stdlib.h>
 
+////////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+////////////////////////////////////////////////////////////////////////////////
+#ifndef UNIT_TEST_SERIAL_PORT
+#define UNIT_TEST_SERIAL_PORT "/dev/ttyS4"
+#endif
+
+#ifndef UNIT_TEST_SERIAL_BAUD
+#define UNIT_TEST_SERIAL_BAUD 115200
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// Code
+////////////////////////////////////////////////////////////////////////////////
 using namespace erpc;
 using namespace erpcShim;
 
@@ -40,7 +54,7 @@ public:
     }
 };
 
-SerialTransport g_transport("/dev/ttyS4", 115200);
+SerialTransport g_transport(UNIT_TEST_SERIAL_PORT, UNIT_TEST_SERIAL_BAUD);
 MyMessageBufferFactory g_msgFactory;
 BasicCodecFactory g_basicCodecFactory;
 SimpleServer g_server;
@@ -49,16 +63,13 @@ int ::MyAlloc::allocated_ = 0;
 
 Common_service *svc_common;
 
-////////////////////////////////////////////////////////////////////////////////
-// Code
-////////////////////////////////////////////////////////////////////////////////
 int main(int argc, const char *argv[])
 {
     // create logger instance
     StdoutLogger *m_logger = new StdoutLogger();
     m_logger->setFilterLevel(Logger::log_level_t::kInfo);
     Log::setLogger(m_logger);
-    Log::info("Starting ERPC server...\n");
+    Log::info("Starting ERPC server on port '%s' with baud %d.\n", UNIT_TEST_SERIAL_PORT, UNIT_TEST_SERIAL_BAUD);
 
     uint8_t vtime = 0;
     uint8_t vmin = 1;

@@ -21,7 +21,7 @@ tests_list = [
     # "test_unions"
 ]
 
-PYTHON_TESTS_PATH = r"..\python_impl_tests\scripts"
+PYTHON_TESTS_PATH = r"..\python_impl_tests"
 
 
 def to_pascal_case(text: str, separator: str = "_") -> str:

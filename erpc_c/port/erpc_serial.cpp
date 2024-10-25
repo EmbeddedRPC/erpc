@@ -316,7 +316,7 @@ int serial_open(const char *port)
     }
     else
     {
-        fd = (int)hCom;
+        fd =  *((int*)(&hCom));;
     }
 #else
     fd = open(port, O_RDWR | O_NOCTTY);

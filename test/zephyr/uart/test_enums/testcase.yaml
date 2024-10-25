@@ -5,4 +5,4 @@ tests:
       - pytest
     harness_config:
       pytest_root:
-        - "../../../python_impl_tests/scripts/test_enums/test_enums.py"
+        - "../../../python_impl_tests/test_enums/"

@@ -15,12 +15,12 @@ public class TestAnnotations extends TestingClient {
     private final AnnotateTestClient client = new AnnotateTestClient(clientManager);
 
     @Test
-    public void runTestAnnotationServiceID() {
+    public void testAnnotationServiceID() {
         assertEquals(5, IAnnotateTest.SERVICE_ID);
     }
 
     @Test
-    public void runTesttestIfMyIntAndConstExist() {
+    public void testIfMyIntAndConstExist() {
         assertEquals(1, client.testIfMyIntAndConstExist(1));
     }
 
