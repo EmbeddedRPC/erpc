@@ -137,11 +137,15 @@ class ConnectionClosed(Exception):
 
 
 class TCPTransport(FramedTransport):
-    def __init__(self, host, port, isServer):
+    def __init__(self, host, port=None, isServer=False, isUnixSocket=False):
         super(TCPTransport, self).__init__()
+        assert (port is not None and isUnixSocket is False) or (
+            port is None and isUnixSocket is True
+        ), "port and isUnixSocket are mutually exclusive arguments"
         self._host = host
         self._port = port
         self._isServer = isServer
+        self._isUnixSocket = isUnixSocket
         self._sock = None
 
         if self._isServer:
@@ -149,17 +153,25 @@ class TCPTransport(FramedTransport):
             self._serverThread.daemon = True
             self._serverThread.start()
             self._serverSockEventStart = threading.Event()
+        elif self._isUnixSocket:
+            self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            self._sock.connect(self._host)
         else:
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._sock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
             self._sock.connect((self._host, self._port))
 
     def _serve(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.setblocking(1)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
-        s.bind((self._host, self._port))
+        if self._isUnixSocket:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.setblocking(1)
+            s.bind(self._host)
+        else:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.setblocking(1)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
+            s.bind((self._host, self._port))
         s.listen(5)
 
         while True:
