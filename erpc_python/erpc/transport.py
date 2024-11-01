@@ -7,14 +7,13 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import struct
 import socket
+import struct
 import threading
-from socket import SHUT_RDWR
-
-from .crc16 import Crc16
-from .client import RequestError
 import time
+
+from .client import RequestError
+from .crc16 import Crc16
 
 try:
     import serial
@@ -170,7 +169,7 @@ class TCPTransport(FramedTransport):
     def close(self):
         if self._isServer:
             self._serverSockEventStart.clear()
-        self._sock.shutdown(SHUT_RDWR)
+        self._sock.shutdown(socket.SHUT_RDWR)
         self._sock.close()
         self._sock = None
 
