@@ -144,6 +144,7 @@ class TCPTransport(FramedTransport):
         self._port = port
         self._isServer = isServer
         self._sock = None
+        self._socket_lock = threading.Lock()
 
         if self._isServer:
             self._serverThread = threading.Thread(target=self._serve)
@@ -170,9 +171,17 @@ class TCPTransport(FramedTransport):
     def close(self):
         if self._isServer:
             self._serverSockEventStart.clear()
-        self._sock.shutdown(SHUT_RDWR)
-        self._sock.close()
-        self._sock = None
+
+        with self._socket_lock:
+            if self._sock is not None:
+                try:
+                    self._sock.shutdown(SHUT_RDWR)
+                    self._sock.close()
+                except OSError:
+                    # May be raised by the OS if the socket was closed externally,
+                    # thus invalidating the file descriptor.
+                    pass
+                self._sock = None
 
     def _base_send(self, message):
         if self._isServer:
