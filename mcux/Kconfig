@@ -50,11 +50,17 @@ choice
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_mu_transport
         tristate "eRPC MU transport layer"
 
-    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport
-        tristate "eRPC RPMsg-Lite transport layer"
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_master
+        tristate "eRPC RPMsg-Lite transport layer master"
 
-    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport
-        tristate "eRPC RPMsg-Lite RTOS transport layer"
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_remote
+        tristate "eRPC RPMsg-Lite transport layer remote"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_master
+        tristate "eRPC RPMsg-Lite RTOS transport layer master"
+
+    config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_remote
+        tristate "eRPC RPMsg-Lite RTOS transport layer remote"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_tty_rtos_transport
         tristate "eRPC RPMsg-Lite TTY RTOS transport layer"

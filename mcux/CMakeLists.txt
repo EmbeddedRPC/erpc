@@ -190,7 +190,7 @@ if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_mu_transport)
     )
 endif()
 
-if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport)
+if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_master)
     mcux_add_include(
         BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
         INCLUDES erpc_c/transports
@@ -206,11 +206,29 @@ if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport)
                 erpc_c/infra/erpc_static_queue.hpp
                 erpc_c/setup/erpc_setup_mbf_rpmsg.cpp
                 erpc_c/setup/erpc_setup_rpmsg_lite_master.cpp
+    )
+endif()
+
+if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_remote)
+    mcux_add_include(
+        BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
+        INCLUDES erpc_c/transports
+                 erpc_c/setup
+                 erpc_c/infra
+    )
+
+    mcux_add_source(
+        BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
+        SOURCES erpc_c/transports/erpc_rpmsg_lite_base.hpp
+                erpc_c/transports/erpc_rpmsg_lite_transport.hpp
+                erpc_c/transports/erpc_rpmsg_lite_transport.cpp
+                erpc_c/infra/erpc_static_queue.hpp
+                erpc_c/setup/erpc_setup_mbf_rpmsg.cpp
                 erpc_c/setup/erpc_setup_rpmsg_lite_remote.cpp
     )
 endif()
 
-if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport)
+if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_master)
     mcux_add_include(
         BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
         INCLUDES erpc_c/transports
@@ -224,6 +242,22 @@ if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transpo
                 erpc_c/transports/erpc_rpmsg_lite_rtos_transport.cpp
                 erpc_c/setup/erpc_setup_mbf_rpmsg.cpp
                 erpc_c/setup/erpc_setup_rpmsg_lite_rtos_master.cpp
+    )
+endif()
+
+if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_remote)
+    mcux_add_include(
+        BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
+        INCLUDES erpc_c/transports
+                 erpc_c/setup
+    )
+
+    mcux_add_source(
+        BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
+        SOURCES erpc_c/transports/erpc_rpmsg_lite_base.hpp
+                erpc_c/transports/erpc_rpmsg_lite_rtos_transport.hpp
+                erpc_c/transports/erpc_rpmsg_lite_rtos_transport.cpp
+                erpc_c/setup/erpc_setup_mbf_rpmsg.cpp
                 erpc_c/setup/erpc_setup_rpmsg_lite_rtos_remote.cpp
     )
 endif()
