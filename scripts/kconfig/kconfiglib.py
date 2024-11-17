@@ -7226,7 +7226,7 @@ _RELATIONS = frozenset({
 })
 
 # example config head file
-_EXAMPLE_CONFIG_HEAD = "RTE_Components.h"
+_EXAMPLE_CONFIG_HEAD = "mcux_config.h"
 
 # Removed macro prefix
 _MCUX_AUX_MACRO_PREFIXES = frozenset({
