@@ -108,8 +108,12 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 Set ERPC_ALLOCATION_POLICY_STATIC if static allocations should be used.
         config ERPC_ALLOCATION_POLICY_DYNAMIC
             bool "ERPC_ALLOCATION_POLICY_DYNAMIC"
+            help
+                type unsigned
         config ERPC_ALLOCATION_POLICY_STATIC
             bool "ERPC_ALLOCATION_POLICY_STATIC"
+            help
+                type unsigned
         endchoice
 
         config ERPC_ALLOCATION_POLICY
@@ -127,6 +131,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 Set amount of codecs objects used simultaneously in case of ERPC_ALLOCATION_POLICY is set to
                 ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one
                 thread per each then 2, ... Default value 2
+                type unsigned
 
         config ERPC_MESSAGE_LOGGERS_COUNT
             int "ERPC_MESSAGE_LOGGERS_COUNT"
@@ -135,6 +140,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Set amount of message loggers objects used simultaneously  in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC. 
                 For example if client or server is used in one thread then 1. If both are used in one thread per each then 2, ... For arbitrated client 1 is enough.
+                type unsigned   
 
         config ERPC_CLIENTS_THREADS_AMOUNT
             int "ERPC_CLIENTS_THREADS_AMOUNT"
@@ -142,6 +148,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
             help
                 No prefix in generated macro
                 Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC
+                type unsigned
 
         choice ERPC_THREADS_CONFIG
             prompt "Choice ERPC_THREADS"
@@ -149,18 +156,32 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 Select threading model
         config ERPC_THREADS_NONE
             bool "ERPC_THREADS_NONE"
+            help
+                type unsigned
         config ERPC_THREADS_PTHREADS
             bool "ERPC_THREADS_PTHREADS"
+            help
+                type unsigned
         config ERPC_THREADS_FREERTOS
             bool "ERPC_THREADS_FREERTOS"
+            help
+                type unsigned
         config ERPC_THREADS_ZEPHYR
             bool "ERPC_THREADS_ZEPHYR"
+            help
+                type unsigned
         config ERPC_THREADS_MBED
             bool "ERPC_THREADS_MBED"
+            help
+                type unsigned
         config ERPC_THREADS_WIN32
             bool "ERPC_THREADS_WIN32"
+            help
+                type unsigned
         config ERPC_THREADS_THREADX
             bool "ERPC_THREADS_THREADX"
+            help
+                type unsigned
         endchoice
 
         config ERPC_THREADS
@@ -182,6 +203,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Set the size of buffers allocated by one of MessageBufferFactory.
                 For RPMsg transport layer, ERPC_DEFAULT_BUFFER_SIZE must be 2^n - 16.
+                type unsigned
 
         config ERPC_DEFAULT_BUFFERS_COUNT
             int "ERPC_DEFAULT_BUFFERS_COUNT"
@@ -189,6 +211,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
             help
                 No prefix in generated macro
                 Set the count of buffers allocated by one of statically allocated messages
+                type unsigned
 
         config ERPC_NOEXCEPT
             bool "ERPC_NOEXCEPT"
@@ -196,6 +219,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
             help
                 No prefix in generated macro
                 Disable/enable noexcept support
+                type unsigned
 
         config ERPC_NESTED_CALLS
             bool "ERPC_NESTED_CALLS"
@@ -204,6 +228,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Disable/enable nested calls. Enable this option when callbacks or other eRPC functions are called 
                 from server implementation of another eRPC call. Nested functions need to be marked as @nested in IDL.
+                type unsigned
 
         config ERPC_NESTED_CALLS_DETECTION
             bool "ERPC_NESTED_CALLS_DETECTION"
@@ -213,6 +238,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 This serve for locating nested calls in code. Nested calls are calls where inside eRPC function
                 on server side is called another eRPC function (like callbacks). Code need be a bit changed
                 to support nested calls. See ERPC_NESTED_CALLS macro.
+                type unsigned
 
         config ERPC_MESSAGE_LOGGING
             bool "ERPC_MESSAGE_LOGGING"
@@ -221,6 +247,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Enable eRPC message logging code through the eRPC. Take look into "erpc_message_loggers.h". Can be used for base
                 printing messages, or sending data to another system for data analysis.
+                type unsigned
 
         config ERPC_TRANSPORT_MU_USE_MCMGR
             bool "ERPC_TRANSPORT_MU_USE_MCMGR"
@@ -233,6 +260,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 is part of the project, otherwise the ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED option is used. Do not forget
                 to add the MCMGR library into your project when ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED option is used! See the
                 erpc_mu_transport.h for additional MU settings.
+                type unsigned
 
         config ERPC_PRE_POST_ACTION
             bool "ERPC_PRE_POST_ACTION"
@@ -241,6 +269,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Enable eRPC pre and post callback functions shim code. Take look into "erpc_pre_post_action.h". Can be used for
                 detection of eRPC call freeze, ...
+                type unsigned
 
         config ERPC_PRE_POST_ACTION_DEFAULT
             bool "ERPC_PRE_POST_ACTION_DEFAULT"
@@ -249,6 +278,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
                 No prefix in generated macro
                 Enable eRPC pre and post default callback functions. Take look into "erpc_setup_extensions.h". Can be used for
                 detection of eRPC call freeze, ...
+                type unsigned
 
     endmenu
 endif
