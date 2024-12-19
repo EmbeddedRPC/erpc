@@ -20,6 +20,7 @@ using namespace std;
 
 #if ERPC_NESTED_CALLS_DETECTION
 extern bool nestingDetection;
+bool nestingDetection = false;
 #endif
 
 {$generateCrcVariable()}
