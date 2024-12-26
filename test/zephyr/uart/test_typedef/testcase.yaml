@@ -1,0 +1,8 @@
+tests:
+  erpc.uart.typedef:
+    harness: pytest
+    tags:
+      - pytest
+    harness_config:
+      pytest_root:
+        - "../../../python_impl_tests/scripts/test_typedef/test_typedef.py"

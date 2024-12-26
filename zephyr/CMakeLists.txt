@@ -1,5 +1,5 @@
 #
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -52,6 +52,21 @@ if (CONFIG_ERPC)
     CONFIG_ERPC_TRANSPORT_UART
     ${ERPC_DIR}/transports/erpc_uart_zephyr_transport.cpp
     ${ERPC_DIR}/setup/erpc_setup_uart_zephyr.cpp
+  )
+
+  # Optional TCP transport
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_TCP
+    ${ERPC_DIR}/transports/erpc_tcp_transport.cpp
+    ${ERPC_DIR}/setup/erpc_setup_tcp.cpp
+    ${ERPC_DIR}/port/erpc_threading_pthreads.cpp # Required for POSIX threading
+  )
+
+  # Optional MBOX transport
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_MBOX
+    ${ERPC_DIR}/transports/erpc_mbox_zephyr_transport.cpp
+    ${ERPC_DIR}/setup/erpc_setup_mbox_zephyr.cpp
   )
 
   # Optional RPMSG-LITE transport

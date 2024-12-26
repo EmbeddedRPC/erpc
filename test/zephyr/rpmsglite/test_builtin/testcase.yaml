@@ -1,0 +1,4 @@
+tests:
+  erpc.rpmsglite.builtin:
+    sysbuild: true
+    harness: gtest

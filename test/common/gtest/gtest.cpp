@@ -5390,7 +5390,7 @@ class ScopedPrematureExitFile {
 
   ~ScopedPrematureExitFile() {
     if (premature_exit_filepath_ != NULL && *premature_exit_filepath_ != '\0') {
-      remove(premature_exit_filepath_);
+      // remove(premature_exit_filepath_);
     }
   }
 
@@ -9600,7 +9600,7 @@ class CapturedStream {
   }
 
   ~CapturedStream() {
-    remove(filename_.c_str());
+    // remove(filename_.c_str());
   }
 
   std::string GetCapturedString() {

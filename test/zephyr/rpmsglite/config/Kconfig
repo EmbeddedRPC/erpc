@@ -1,0 +1,11 @@
+# Copyright 2023-2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+source "Kconfig.zephyr"
+
+config INCLUDE_REMOTE_DIR
+	bool "Include remote core header directory"
+	help
+	  Include remote build header files. Can be used if primary image
+	  needs to be aware of size or base address of secondary image
