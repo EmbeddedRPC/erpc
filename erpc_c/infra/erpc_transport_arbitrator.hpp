@@ -158,6 +158,13 @@ public:
     erpc_status_t clientReceive(client_token_t token);
 
     /*!
+     * @brief This function free client token.
+     *
+     * @param[in] token the client token to remove.
+     */
+    void removePendingClient(client_token_t token);
+
+    /*!
      * @brief Request info for a client trying to receive a response.
      */
     struct PendingClientInfo
@@ -199,13 +206,6 @@ protected:
      * @return Pending client information.
      */
     PendingClientInfo *addPendingClient(void);
-
-    /*!
-     * @brief This function removes pending client.
-     *
-     * @param[in] info Pending client info to remove.
-     */
-    void removePendingClient(PendingClientInfo *info);
 
     /*!
      * @brief This function removes pending client list.

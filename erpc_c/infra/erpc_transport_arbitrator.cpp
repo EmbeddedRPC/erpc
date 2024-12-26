@@ -193,8 +193,6 @@ erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
     // Wait on the semaphore until we're signaled.
     info->m_sem.get(Semaphore::kWaitForever);
 
-    removePendingClient(info);
-
     return kErpcStatus_Success;
 }
 
@@ -227,10 +225,15 @@ TransportArbitrator::PendingClientInfo *TransportArbitrator::addPendingClient(vo
     return info;
 }
 
-void TransportArbitrator::removePendingClient(PendingClientInfo *info)
+void TransportArbitrator::removePendingClient(client_token_t token)
 {
+    // Convert token to pointer to info struct.
+    PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);
     Mutex::Guard lock(m_clientListMutex);
     PendingClientInfo *node;
+
+    erpc_assert((token != 0) && ("invalid client token" != NULL));
+    erpc_assert((info->m_sem.getCount() == 0) && ("Semaphore should be clean" != NULL));
 
     // Clear fields.
     info->m_request = NULL;
