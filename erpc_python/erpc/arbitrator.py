@@ -1,52 +1,59 @@
 #!/usr/bin/env python
 
-# Copyright 2016 NXP
+# Copyright 2016-2025 NXP
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 import threading
+import dataclasses
+from typing import Optional, TYPE_CHECKING
 
-from .codec import MessageType
+from .codec import MessageType, Codec
 from .transport import Transport
-from .client import RequestContext
+from .client import RequestError
+
+if TYPE_CHECKING:
+    from .client import RequestContext
 
 
+@dataclasses.dataclass
 class ClientInfo:
-    event = None
-    msg = None
+    event: threading.Event
+    message: Optional[bytearray] = None
 
 
 class TransportArbitrator(Transport):
-    """ Shares a transport between a server and multiple clients.
+    """ Shares transport between a server and multiple clients.
 
     Args:
         Transport (_type_): Inherit and define transport interface methods
     """
 
-    def __init__(self, sharedTransport=None, codec=None):
+    def __init__(self, sharedTransport: Optional[Transport] = None, codec: Optional[Codec] = None):
+        super().__init__()
         self._transport = sharedTransport
         self._codec = codec
-        self._pending_clients = {}
+        self._pending_clients: dict[int, ClientInfo] = {}
         self._lock = threading.Lock()
 
     @property
-    def shared_transport(self):
+    def shared_transport(self) -> Optional[Transport]:
         return self._transport
 
     @shared_transport.setter
-    def shared_transport(self, transport):
+    def shared_transport(self, transport: Transport):
         self._transport = transport
 
     @property
-    def codec(self):
+    def codec(self) -> Optional[Codec]:
         return self._codec
 
     @codec.setter
-    def codec(self, theCodec):
+    def codec(self, theCodec: Codec):
         self._codec = theCodec
 
-    def send(self, message):
+    def send(self, message: bytes):
         assert self._transport is not None, "No shared transport was set"
         self._transport.send(message)
 
@@ -77,13 +84,13 @@ class TransportArbitrator(Transport):
                     client = self._pending_clients[info.sequence]
                 finally:
                     self._lock.release()
-                client.msg = msg
+                client.message = msg
                 client.event.set()
             except KeyError:
                 # No client was found, unexpected sequence number!
                 pass
 
-    def prepare_client_receive(self, requestContext: RequestContext):
+    def prepare_client_receive(self, requestContext: "RequestContext"):
         """ Add a client request to the client list.
 
         This call is made by the client thread prior to sending the invocation to the server. It
@@ -98,10 +105,9 @@ class TransportArbitrator(Transport):
         """
 
         # Create pending client info.
-        info = ClientInfo()
-        info.event = threading.Event()
+        info = ClientInfo(threading.Event())
 
-        # Add this client to the pending clients dict.
+        # Add this client to the pending clients' dict.
         try:
             self._lock.acquire()
             self._pending_clients[requestContext.sequence] = info
@@ -110,10 +116,10 @@ class TransportArbitrator(Transport):
 
         return requestContext.sequence
 
-    def client_receive(self, token: int):
+    def client_receive(self, token: int) -> bytearray:
         """ Receive method for the client.
 
-        Blocks until the a reply message is received with the expected sequence number that is
+        Blocks until the reply message is received with the expected sequence number that is
         associated with @a token. The client must have called prepare_client_receive() previously.
 
         Args:
@@ -133,7 +139,7 @@ class TransportArbitrator(Transport):
             # Wait for the reply to be received.
             client.event.wait()
 
-            # Remove this client from the pending clients dict.
+            # Remove this client from the pending clients' dict.
             try:
                 self._lock.acquire()
                 del self._pending_clients[token]
@@ -141,6 +147,7 @@ class TransportArbitrator(Transport):
                 self._lock.release()
 
             # Return the received message.
-            return client.msg
+            assert client.message # Message should be available at this moment
+            return client.message
         except KeyError:
-            pass
+            raise RequestError(f"Pending client with token '{token}' not found")

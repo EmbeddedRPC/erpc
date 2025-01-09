@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 
 # Copyright (c) 2016 Freescale Semiconductor, Inc.
-# Copyright 2016-2017 NXP
-# All rights reserved.
+# Copyright 2016-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-class Crc16(object):
+from typing import Union
+
+class Crc16:
     POLY = 0x1021
 
-    def __init__(self, crcStart=0xEF4A):
-        self._crcStart = crcStart
+    def __init__(self, crcStart: int=0xEF4A):
+        self._crc_start = crcStart
         self._table = [self.compute_table(i) for i in range(256)]
 
-    def compute_table(self, i):
+    def compute_table(self, i: int):
         crc = 0
         i <<= 8
-        for b in range(8):
+        for _ in range(8):
             temp = crc ^ i
             crc <<= 1
             if temp & 0x8000:
@@ -24,10 +25,10 @@ class Crc16(object):
             i <<= 1
         return crc
 
-    def computeCRC16(self, data):
+    def compute_crc16(self, data: Union[str, bytes]) -> int:
         if isinstance(data, str):
-            data = bytearray(data)
-        crc = self._crcStart
+            data = bytes(data.encode())
+        crc = self._crc_start
         for c in data:
             crc = ((crc << 8) ^ self._table[((crc >> 8) ^ c) & 0xff]) & 0xffff
         return crc
