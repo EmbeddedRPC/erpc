@@ -1,11 +1,11 @@
 #
-# Copyright 2024 NXP
+# Copyright 2024-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
 config MCUX_COMPONENT_middleware.multicore.erpc.examples.erpc_common_multicore
-    bool "eRPC examples common sources"
+    bool "examples common sources"
     default n
     depends on MCUX_COMPONENT_middleware.multicore.erpc
     help

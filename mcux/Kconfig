@@ -1,5 +1,5 @@
 #
-# Copyright 2024 NXP
+# Copyright 2024-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,83 +11,83 @@ menuconfig MCUX_COMPONENT_middleware.multicore.erpc
         This option will enable embedded Remote Procedure Call Middleware Component
 
 config MCUX_COMPONENT_middleware.multicore.erpc.client
-    bool "eRPC Client"
+    bool "Client"
     default n
     depends on MCUX_COMPONENT_middleware.multicore.erpc
     help
         This option enables eRPC Client implementation.
 
 config MCUX_COMPONENT_middleware.multicore.erpc.server
-    bool "eRPC Server"
+    bool "Server"
     default n
     depends on MCUX_COMPONENT_middleware.multicore.erpc
     help
         This option enables eRPC Server implementation.
 
 config MCUX_COMPONENT_middleware.multicore.erpc.arbitrator
-    bool "eRPC Arbitrator"
+    bool "Arbitrator"
     default n
     depends on MCUX_COMPONENT_middleware.multicore.erpc
     help
         This option enables eRPC Arbitrator implementation.
 
 if MCUX_COMPONENT_middleware.multicore.erpc
-choice
+choice MCUX_COMPONENT_middleware.multicore.erpc.port
     prompt "Select eRPC memory allocation porting layer"
     depends on MCUX_COMPONENT_middleware.multicore.erpc
 
     config MCUX_COMPONENT_middleware.multicore.erpc.port_stdlib
-        tristate "eRPC stdlib memory allocation port layer"
+        tristate "stdlib memory allocation"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.port_freertos
-        tristate "eRPC FreeRTOS memory allocation port layer"
+        tristate "FreeRTOS memory allocation"
 endchoice
 
-choice
+choice MCUX_COMPONENT_middleware.multicore.erpc.transport
     prompt "Select eRPC transport layer"
     depends on MCUX_COMPONENT_middleware.multicore.erpc.port_stdlib || MCUX_COMPONENT_middleware.multicore.erpc.port_freertos
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_mu_transport
-        tristate "eRPC MU transport layer"
+        tristate "MU"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_master
-        tristate "eRPC RPMsg-Lite transport layer master"
+        tristate "RPMsg-Lite master"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_transport_remote
-        tristate "eRPC RPMsg-Lite transport layer remote"
+        tristate "RPMsg-Lite remote"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_master
-        tristate "eRPC RPMsg-Lite RTOS transport layer master"
+        tristate "RPMsg-Lite RTOS master"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_lite_rtos_transport_remote
-        tristate "eRPC RPMsg-Lite RTOS transport layer remote"
+        tristate "RPMsg-Lite RTOS remote"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_rpmsg_tty_rtos_transport
-        tristate "eRPC RPMsg-Lite TTY RTOS transport layer"
+        tristate "RPMsg-Lite TTY RTOS"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_uart_cmsis_transport
-        tristate "eRPC UART CMSIS transport layer"
+        tristate "UART CMSIS"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_dspi_master_transport
-        tristate "eRPC DSPI master transport layer"
+        tristate "DSPI master"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_dspi_slave_transport
-        tristate "eRPC DSPI slave transport layer"
+        tristate "DSPI slave"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_spi_master_transport
-        tristate "eRPC SPI master transport layer"
+        tristate "SPI master"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_spi_slave_transport
-        tristate "eRPC SPI slave transport layer"
+        tristate "SPI slave"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_lpspi_slave_transport
-        tristate "eRPC LPSPI slave transport layer"
+        tristate "LPSPI slave"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_i2c_slave_transport
-        tristate "eRPC I2C slave transport layer"
+        tristate "I2C slave"
 
     config MCUX_COMPONENT_middleware.multicore.erpc.eRPC_lpi2c_slave_transport
-        tristate "eRPC LPI2C slave transport layer"
+        tristate "LPI2C slave"
 endchoice
 
 config MCUX_PRJSEG_middleware.multicore.erpc.generated_config
@@ -138,9 +138,9 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
             default 0
             help
                 No prefix in generated macro
-                Set amount of message loggers objects used simultaneously  in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC. 
+                Set amount of message loggers objects used simultaneously  in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC.
                 For example if client or server is used in one thread then 1. If both are used in one thread per each then 2, ... For arbitrated client 1 is enough.
-                type unsigned   
+                type unsigned
 
         config ERPC_CLIENTS_THREADS_AMOUNT
             int "ERPC_CLIENTS_THREADS_AMOUNT"
@@ -226,7 +226,7 @@ if MCUX_PRJSEG_middleware.multicore.erpc.generated_config
             default n
             help
                 No prefix in generated macro
-                Disable/enable nested calls. Enable this option when callbacks or other eRPC functions are called 
+                Disable/enable nested calls. Enable this option when callbacks or other eRPC functions are called
                 from server implementation of another eRPC call. Nested functions need to be marked as @nested in IDL.
                 type unsigned
 
