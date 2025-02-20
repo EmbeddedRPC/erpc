@@ -1,0 +1,37 @@
+var classerpcgen_1_1_data_type =
+[
+    [ "data_type_t", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983b", [
+      [ "kAliasType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983baf38fb3d4784878b53c62b4909c05e4e3", null ],
+      [ "kArrayType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983ba5b1a7cafaf7aeb23e1aa2922a4e7a137", null ],
+      [ "kBuiltinType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983ba63aafb6a6bd4638f0ff238bef09ca8d2", null ],
+      [ "kEnumType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983ba713bf6b1d54049a9af873b75d8c7c25e", null ],
+      [ "kFunctionType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983bae677e4750d5687d44d74cdc7e9d80314", null ],
+      [ "kListType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983ba082403069eef6a151945772f396e5bf7", null ],
+      [ "kStructType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983baeb09d04a478cc4b93d41aa282ce64b3b", null ],
+      [ "kUnionType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983bafa1c50dc7af4164e8b22ea9304d6a809", null ],
+      [ "kVoidType", "classerpcgen_1_1_data_type.html#aaf50f761fa731a9393688363841d983baf64c4bc89d932869b21572494b10a895", null ]
+    ] ],
+    [ "DataType", "classerpcgen_1_1_data_type.html#aa64ff0a1a01ab14b16bb43b2979eaa03", null ],
+    [ "DataType", "classerpcgen_1_1_data_type.html#a4edda1d76f5d67c76a4b11a7cb09a94b", null ],
+    [ "DataType", "classerpcgen_1_1_data_type.html#a5121533758797d58c01fb34c4b311cb7", null ],
+    [ "getDataType", "classerpcgen_1_1_data_type.html#a4364161c99bff020cd13bba134362765", null ],
+    [ "getTrueContainerDataType", "classerpcgen_1_1_data_type.html#a3f310d7f1d272a9389ad285ba920134a", null ],
+    [ "getTrueDataType", "classerpcgen_1_1_data_type.html#a5a996dbde6578d38f035695c6a567bab", null ],
+    [ "isAlias", "classerpcgen_1_1_data_type.html#a6cb107101c9cfef54b9e5a0ee90f6ccd", null ],
+    [ "isArray", "classerpcgen_1_1_data_type.html#a90ef8e267bcc704563dc0dd9e36c0f50", null ],
+    [ "isBinary", "classerpcgen_1_1_data_type.html#a5dbea05383f4595dafcae7f2c51d49f1", null ],
+    [ "isBool", "classerpcgen_1_1_data_type.html#a7dc13c14145a7b10e1db5ade81377bc4", null ],
+    [ "isBuiltin", "classerpcgen_1_1_data_type.html#ab381577fa615823bec5bade5de47f85b", null ],
+    [ "isEnum", "classerpcgen_1_1_data_type.html#afec5689b977535271c19f12f8bddd835", null ],
+    [ "isFloat", "classerpcgen_1_1_data_type.html#a17f9234ec530e81d30223fedf4da80de", null ],
+    [ "isFunction", "classerpcgen_1_1_data_type.html#afa098b8e0f0d40f6eccc17d9c75e6fd8", null ],
+    [ "isInt", "classerpcgen_1_1_data_type.html#a9785a2e108046c49ae02da5c3e8a9d1d", null ],
+    [ "isList", "classerpcgen_1_1_data_type.html#ae99443ae01307e57cec1635cab746443", null ],
+    [ "isScalar", "classerpcgen_1_1_data_type.html#ac595f0d23f9ddd0f0d2d835ec748d78a", null ],
+    [ "isString", "classerpcgen_1_1_data_type.html#a11c0ca844350b970820942f628b51798", null ],
+    [ "isStruct", "classerpcgen_1_1_data_type.html#a2bdd26aa0a235f44a4cfb2eba50c4a19", null ],
+    [ "isUnion", "classerpcgen_1_1_data_type.html#a48cf8ee1651fb4fba40e1740d464116e", null ],
+    [ "isUString", "classerpcgen_1_1_data_type.html#afb1ab0979435e35d3aa54086cac7ef22", null ],
+    [ "isVoid", "classerpcgen_1_1_data_type.html#abec5ca2f3d770956a06b85a79978e686", null ],
+    [ "m_dataType", "classerpcgen_1_1_data_type.html#a95a1f55e9f89ba5ee398794ccbe0fb6c", null ]
+];

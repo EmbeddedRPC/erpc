@@ -1,0 +1,5 @@
+<map id="StaticMessageBufferFactory" name="StaticMessageBufferFactory">
+<area shape="rect" id="node1" title="Static Message buffer factory." alt="" coords="101,95,306,121"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory." alt="" coords="5,5,209,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class." alt="" coords="233,5,365,32"/>
+</map>

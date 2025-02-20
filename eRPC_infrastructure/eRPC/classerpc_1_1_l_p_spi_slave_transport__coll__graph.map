@@ -1,0 +1,8 @@
+<map id="erpc::LPSpiSlaveTransport" name="erpc::LPSpiSlaveTransport">
+<area shape="rect" id="node1" title="Very basic transport to send/receive messages via LPSPI." alt="" coords="189,199,380,225"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers." alt="" coords="114,109,282,136"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="5,5,124,32"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_mutex.html" title="Mutex." alt="" coords="149,5,247,32"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_crc16.html" title="Class for compute crc16." alt="" coords="284,5,379,32"/>
+<area shape="rect" id="node6" href="$classerpc_1_1_semaphore.html" title="Simple semaphore class." alt="" coords="307,109,439,136"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="erpc::CodecFactory" name="erpc::CodecFactory">
+<area shape="rect" id="node1" title="Abstract interface for codec factory." alt="" coords="23,5,169,32"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_basic_codec_factory.html" title="Basic codec factory implements functions from codec factory." alt="" coords="5,80,187,107"/>
+</map>

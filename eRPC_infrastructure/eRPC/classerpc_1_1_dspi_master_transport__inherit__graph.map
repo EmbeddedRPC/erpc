@@ -1,0 +1,5 @@
+<map id="erpc::DspiMasterTransport" name="erpc::DspiMasterTransport">
+<area shape="rect" id="node1" title="Very basic transport to send/receive messages via DSPI." alt="" coords="5,155,199,181"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers." alt="" coords="18,80,186,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="43,5,161,32"/>
+</map>

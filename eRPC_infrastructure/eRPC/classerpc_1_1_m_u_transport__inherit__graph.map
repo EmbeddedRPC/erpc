@@ -1,0 +1,4 @@
+<map id="erpc::MUTransport" name="erpc::MUTransport">
+<area shape="rect" id="node1" title="Transport that uses Messaging Unit (MU) for interprocessor messaging." alt="" coords="5,80,147,107"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="17,5,135,32"/>
+</map>

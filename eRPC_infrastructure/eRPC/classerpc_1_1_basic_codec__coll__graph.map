@@ -1,0 +1,5 @@
+<map id="erpc::BasicCodec" name="erpc::BasicCodec">
+<area shape="rect" id="node1" title="Simple binary serialization format." alt="" coords="5,171,139,197"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface." alt="" coords="23,95,121,121"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_cursor.html" title="Cursor within a MessageBuffer." alt="" coords="22,5,122,32"/>
+</map>

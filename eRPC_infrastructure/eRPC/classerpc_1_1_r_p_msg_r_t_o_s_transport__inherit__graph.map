@@ -1,0 +1,5 @@
+<map id="erpc::RPMsgRTOSTransport" name="erpc::RPMsgRTOSTransport">
+<area shape="rect" id="node1" title="Transport that uses RPMsg zero copy RTOS API for interprocessor messaging." alt="" coords="40,80,239,107"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="5,5,124,32"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_r_p_msg_base.html" title="Transport that other RPMsg transports inherits." alt="" coords="148,5,283,32"/>
+</map>

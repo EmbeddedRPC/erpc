@@ -1,0 +1,7 @@
+<map id="erpc::SerialTransport" name="erpc::SerialTransport">
+<area shape="rect" id="node1" title="Serial transport layer for host PC." alt="" coords="120,185,276,212"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers." alt="" coords="114,109,282,136"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="5,5,124,32"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_mutex.html" title="Mutex." alt="" coords="149,5,247,32"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_crc16.html" title="Class for compute crc16." alt="" coords="284,5,379,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="erpc::Codec" name="erpc::Codec">
+<area shape="rect" id="node1" title="Abstract serialization encoder/decoder interface." alt="" coords="23,5,121,32"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_basic_codec.html" title="Simple binary serialization format." alt="" coords="5,80,139,107"/>
+</map>

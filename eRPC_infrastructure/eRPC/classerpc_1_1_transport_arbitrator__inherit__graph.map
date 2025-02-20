@@ -1,0 +1,4 @@
+<map id="erpc::TransportArbitrator" name="erpc::TransportArbitrator">
+<area shape="rect" id="node1" title="Interposer to share transport between client and server." alt="" coords="5,80,187,107"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="37,5,155,32"/>
+</map>

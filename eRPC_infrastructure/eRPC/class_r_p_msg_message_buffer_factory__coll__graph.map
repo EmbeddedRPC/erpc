@@ -1,0 +1,4 @@
+<map id="RPMsgMessageBufferFactory" name="RPMsgMessageBufferFactory">
+<area shape="rect" id="node1" title="RPMsg zero copy message buffer factory." alt="" coords="5,80,217,107"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory." alt="" coords="9,5,213,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Server Setup" name="Server Setup">
+<area shape="rect" id="node1" title="Server side setup and control functions." alt="" coords="137,5,243,31"/>
+<area shape="rect" id="node2" href="$group__setup.html" title="C language setup functions." alt="" coords="5,5,89,31"/>
+</map>

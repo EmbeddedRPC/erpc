@@ -1,0 +1,5 @@
+<map id="erpc::RequestContext" name="erpc::RequestContext">
+<area shape="rect" id="node1" title="Encapsulates all information about a request." alt="" coords="5,184,168,211"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_codec.html" title="Abstract serialization encoder/decoder interface." alt="" coords="37,95,136,121"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_cursor.html" title="Cursor within a MessageBuffer." alt="" coords="37,5,137,32"/>
+</map>

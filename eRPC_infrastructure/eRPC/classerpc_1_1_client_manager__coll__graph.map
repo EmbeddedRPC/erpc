@@ -1,0 +1,7 @@
+<map id="erpc::ClientManager" name="erpc::ClientManager">
+<area shape="rect" id="node1" title="Base client implementation." alt="" coords="159,171,313,197"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_client_server_common.html" title="Common class inherited by client and server class." alt="" coords="137,95,335,121"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_codec_factory.html" title="Abstract interface for codec factory." alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node4" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="177,5,295,32"/>
+<area shape="rect" id="node5" href="$classerpc_1_1_message_buffer_factory.html" title="Abstract interface for message buffer factory." alt="" coords="319,5,523,32"/>
+</map>

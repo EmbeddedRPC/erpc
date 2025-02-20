@@ -1,0 +1,5 @@
+<map id="erpc::ClientManager" name="erpc::ClientManager">
+<area shape="rect" id="node1" title="Base client implementation." alt="" coords="38,80,191,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_arbitrated_client_manager.html" title="Client that can share a transport with a server." alt="" coords="5,155,224,181"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_client_server_common.html" title="Common class inherited by client and server class." alt="" coords="16,5,213,32"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Serial port" name="Serial port">
+<area shape="rect" id="node1" href="$group__transports.html" title="Transport layer classes." alt="" coords="5,5,136,31"/>
+<area shape="rect" id="node2" title="POSIX and Win32 serial port transport." alt="" coords="184,5,273,31"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="erpc::LPI2cSlaveTransport" name="erpc::LPI2cSlaveTransport">
+<area shape="rect" id="node1" title="Very basic transport to send/receive messages via LPI2C." alt="" coords="5,155,195,181"/>
+<area shape="rect" id="node2" href="$classerpc_1_1_framed_transport.html" title="Base class for framed transport layers." alt="" coords="16,80,184,107"/>
+<area shape="rect" id="node3" href="$classerpc_1_1_transport.html" title="Abstract interface for transport layer." alt="" coords="41,5,159,32"/>
+</map>
