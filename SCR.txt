@@ -35,3 +35,44 @@ cpp_option_parser       Name: C++ option-parser
                         Location: erpcgen/src/options.cpp
                         Origin: Brad Appleton bradapp@enteract.com
                         Url: http://www.bradapp.com/ftp/src/libs/C++/Options.html
+
+kconfig_scripts         Name: A flexible Python 2/3 Kconfig implementation and library
+                        Version: NA
+                        Outgoing License: ISC
+                        License File: https://github.com/ulfalizer/Kconfiglib/blob/master/LICENSE.txt
+                        Format: source code
+                        Description: A flexible Python 2/3 Kconfig implementation and library
+                        Location: scripts/kconfig/kconfiglib.py,
+                        scripts/kconfig/guiconfig.py, scripts/kconfig/menuconfig.py
+                        Origin: Ulf Magnusson
+                        Url: https://github.com/ulfalizer/Kconfiglib
+
+hardenconfig_script     Name: Zephyr RTOS scripts
+                        Version: 3.6
+                        Outgoing License: Apache 2.0
+                        License File: https://github.com/zephyrproject-rtos/zephyr/blob/main/LICENSE
+                        Format: source code
+                        Description: Zephyr RTOS scripts
+                        Location: scripts/kconfig/hardenconfig.py
+                        Origin: Intel Corporation
+                        Url: https://github.com/zephyrproject-rtos/zephyr
+
+kconfigfunctions_script Name: Zephyr RTOS scripts
+                        Version: 3.6
+                        Outgoing License: Apache 2.0
+                        License File: https://github.com/zephyrproject-rtos/zephyr/blob/main/LICENSE
+                        Format: source code
+                        Description: Zephyr RTOS scripts
+                        Location: scripts/kconfig/kconfigfunctions.py
+                        Origin: Nordic Semiconductor ASA, Linaro
+                        Url: https://github.com/zephyrproject-rtos/zephyr
+
+lint_script             Name: Zephyr RTOS scripts
+                        Version: 3.6
+                        Outgoing License: Apache 2.0
+                        License File: https://github.com/zephyrproject-rtos/zephyr/blob/main/LICENSE
+                        Format: source code
+                        Description: Zephyr RTOS scripts
+                        Location: scripts/kconfig/lint.py
+                        Origin: Nordic Semiconductor ASA
+                        Url: https://github.com/zephyrproject-rtos/zephyr
