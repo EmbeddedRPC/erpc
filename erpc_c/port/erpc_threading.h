@@ -478,7 +478,7 @@ public:
      * @param[in] timeoutUsecs Time how long can wait for getting semaphore in [us].
      *
      * @retval true When semaphore got successfully.
-     * @retval false When mutex didn't get.
+     * @retval false When failed getting semaphore or if timeout expired.
      */
     bool get(uint32_t timeoutUsecs = kWaitForever);
 
