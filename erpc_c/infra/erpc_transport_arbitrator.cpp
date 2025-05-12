@@ -70,6 +70,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
                 {
                     if (client->m_isValid)
                     {
+                        client->m_request->getCodec()->updateStatus(kErpcStatus_Timeout);
                         client->m_sem.put();
                     }
                 }
