@@ -1,0 +1,1 @@
+{{ typedef_.name }} = {{ typedef_.type_ }}
