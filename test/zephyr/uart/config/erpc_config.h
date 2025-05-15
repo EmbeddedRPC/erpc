@@ -65,17 +65,17 @@
 //! Set ERPC_ALLOCATION_POLICY_DYNAMIC if dynamic allocations should be used.
 //! Set ERPC_ALLOCATION_POLICY_STATIC if static allocations should be used.
 //!
-//! Default value is ERPC_ALLOCATION_POLICY_DYNAMIC or in case of FreeRTOS it can be auto-detected if __has_include() is supported
-//! by compiler. Uncomment comment bellow to use static allocation policy.
-//! In case of static implementation user need consider another values to set (ERPC_CODEC_COUNT,
-//! ERPC_MESSAGE_LOGGERS_COUNT, ERPC_CLIENTS_THREADS_AMOUNT).
+//! Default value is ERPC_ALLOCATION_POLICY_DYNAMIC or in case of FreeRTOS it can be auto-detected if __has_include() is
+//! supported by compiler. Uncomment comment bellow to use static allocation policy. In case of static implementation
+//! user need consider another values to set (ERPC_CODEC_COUNT, ERPC_MESSAGE_LOGGERS_COUNT,
+//! ERPC_CLIENTS_THREADS_AMOUNT).
 #define ERPC_ALLOCATION_POLICY (ERPC_ALLOCATION_POLICY_DYNAMIC)
 
 //! @def ERPC_CODEC_COUNT
 //!
 //! @brief Set amount of codecs objects used simultaneously in case of ERPC_ALLOCATION_POLICY is set to
-//! ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one thread per
-//! each then 2, ... Default value 2.
+//! ERPC_ALLOCATION_POLICY_STATIC. For example if client or server is used in one thread then 1. If both are used in one
+//! thread per each then 2, ... Default value 2.
 #define ERPC_CODEC_COUNT (2U)
 
 //! @def ERPC_MESSAGE_LOGGERS_COUNT
@@ -89,8 +89,8 @@
 
 //! @def ERPC_CLIENTS_THREADS_AMOUNT
 //!
-//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to ERPC_ALLOCATION_POLICY_STATIC.
-//! Default value 1 (Most of current cases).
+//! @brief Set amount of client threads objects used in case of ERPC_ALLOCATION_POLICY is set to
+//! ERPC_ALLOCATION_POLICY_STATIC. Default value 1 (Most of current cases).
 #define ERPC_CLIENTS_THREADS_AMOUNT (1U)
 
 //! @def ERPC_THREADS

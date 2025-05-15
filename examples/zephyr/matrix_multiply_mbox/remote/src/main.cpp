@@ -11,7 +11,6 @@
 #include "erpc_mbox_zephyr_transport.hpp"
 #include "erpc_error_handler.h"
 
-
 #include "erpc_matrix_multiply_common.h"
 #include "c_erpc_matrix_multiply_server.h"
 
@@ -78,7 +77,6 @@ int main(void)
 
     dev = DEVICE_DT_GET(DT_NODELABEL(mbox));
     printk("REMOTE: MTU %d\n", mbox_mtu_get(dev));
-
 
     /* MBOX transport layer initialization */
     mbox_init_channel(&tx_channel, dev, TX_ID);

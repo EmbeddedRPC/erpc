@@ -17,14 +17,13 @@
 #include <iomanip>
 #include <cstdlib>
 
-
 using namespace erpcShim;
 using namespace erpc;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
-#define MATRIX_ITEM_MAX_VALUE     (50)
+#define MATRIX_ITEM_MAX_VALUE (50)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Classes
@@ -90,7 +89,7 @@ static void print_matrix(Matrix matrix_ptr)
 
 int main()
 {
-    Matrix matrix1 = {0}, matrix2 = {0}, result_matrix = {0};
+    Matrix matrix1 = { 0 }, matrix2 = { 0 }, result_matrix = { 0 };
 
     erpc_status_t status;
 
@@ -131,11 +130,9 @@ int main()
         std::cout << std::endl << "Matrix #2" << std::endl << "=========" << std::endl;
         print_matrix(matrix2);
 
- 
         /* Do eRPC call */
         std::cout << "eRPC request is sent to the server" << std::endl;
         client.erpcMatrixMultiply(matrix1, matrix2, result_matrix);
-
 
         std::cout << std::endl << "Result matrix" << std::endl << "=========" << std::endl;
         print_matrix(result_matrix);
@@ -143,11 +140,12 @@ int main()
         std::cout << "Press Enter to initiate the next matrix multiplication or 'q' to quit: ";
         std::getline(std::cin, choice);
 
-        if (choice == "q") {
+        if (choice == "q")
+        {
             break;
         }
     }
-    
+
     client.quitServer();
 
     /* Deinit objects */

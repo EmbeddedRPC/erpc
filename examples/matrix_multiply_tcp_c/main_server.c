@@ -59,7 +59,7 @@ void erpcMatrixMultiply(Matrix matrix1, Matrix matrix2, Matrix result_matrix)
 }
 
 /*!
- * @brief Stop the server 
+ * @brief Stop the server
  */
 void quitServer()
 {
@@ -96,7 +96,7 @@ int main()
             erpc_error_handler(err, 0);
         }
     }
-    
+
     /* Deinit objects */
     destroy_MatrixMultiplyService_service(service);
     erpc_server_deinit(server);

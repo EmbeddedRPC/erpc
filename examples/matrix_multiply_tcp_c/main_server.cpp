@@ -75,10 +75,7 @@ class MatrixMultiplyService : public MatrixMultiplyService_interface
         }
     }
 
-    void quitServer()
-    {
-        g_runServer = false;
-    }
+    void quitServer() { g_runServer = false; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +128,7 @@ int main()
             erpc_error_handler(status, 0);
         }
     }
-    
+
     /* Close transport */
     transport.close();
 }

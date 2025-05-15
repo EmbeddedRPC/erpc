@@ -18,8 +18,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define MATRIX_ITEM_MAX_VALUE     (50)
-
+#define MATRIX_ITEM_MAX_VALUE (50)
 
 /*******************************************************************************
  * Code
@@ -62,7 +61,7 @@ static void print_matrix(Matrix matrix_ptr)
 
 int main()
 {
-    Matrix matrix1 = {0}, matrix2 = {0}, result_matrix = {0};
+    Matrix matrix1 = { 0 }, matrix2 = { 0 }, result_matrix = { 0 };
 
     erpc_transport_t transport;
     erpc_mbf_t message_buffer_factory;
@@ -77,7 +76,7 @@ int main()
     initMatrixMultiplyService_client(client_manager);
 
     char option;
-    do 
+    do
     {
         /* Do eRPC call */
         fill_matrices(matrix1, matrix2);
@@ -99,8 +98,9 @@ int main()
         print_matrix(result_matrix);
 
         printf("Press Enter to initiate the next matrix multiplication or 'q' to quit\n");
-        option = getchar ();
-        while(option != '\n' && getchar() != '\n');
+        option = getchar();
+        while (option != '\n' && getchar() != '\n')
+            ;
     } while (option != 'q');
 
     quitServer();

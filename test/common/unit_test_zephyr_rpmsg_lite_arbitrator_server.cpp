@@ -180,7 +180,6 @@ int main(void)
     g_serverThread.setStackPointer(stack_server);
     g_clientThread.setStackPointer(stack_client);
 
-
     g_initThread.start();
     g_serverThread.start();
     g_clientThread.start();

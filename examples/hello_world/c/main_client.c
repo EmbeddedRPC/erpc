@@ -30,7 +30,8 @@ int main()
     initTextService_client(client_manager);
 
     /* Do eRPC call */
-    if (printText("Hello world!")) {
+    if (printText("Hello world!"))
+    {
         printf("Message received by server.");
     }
 

@@ -72,9 +72,8 @@ void increaseWaitQuit()
 
 void runServer(void *arg)
 {
-    struct k_poll_event events[1] = {
-        K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY, &signalServer)
-    };
+    struct k_poll_event events[1] = { K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL, K_POLL_MODE_NOTIFY_ONLY,
+                                                               &signalServer) };
     k_poll(events, 1, K_FOREVER);
 
     erpc_status_t err;

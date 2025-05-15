@@ -69,7 +69,7 @@ int main(void)
     /* TCP transport layer initialization */
     erpc_transport_t transport;
     transport = erpc_transport_tcp_init("localhost", 12345, true);
-    
+
     /* MessageBufferFactory initialization */
     erpc_mbf_t message_buffer_factory;
     message_buffer_factory = erpc_mbf_dynamic_init();
