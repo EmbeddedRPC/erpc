@@ -87,6 +87,12 @@ void ArbitratedClientManager::performClientRequest(RequestContext &request)
             request.getCodec()->updateStatus(err);
         }
 
+        if (token != 0)
+        {
+            // Also if status bad, need to free the token.
+            m_arbitrator->removePendingClient(token);
+        }
+
 #if ERPC_MESSAGE_LOGGING
         if (request.getCodec()->isStatusOk() == true)
         {
