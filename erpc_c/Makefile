@@ -91,6 +91,7 @@ HEADERS += 	$(ERPC_C_ROOT)/config/erpc_config.h \
 			$(ERPC_C_ROOT)/infra/erpc_message_buffer.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_message_loggers.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_server.hpp \
+			$(ERPC_C_ROOT)/infra/erpc_simple_server.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_static_queue.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport_arbitrator.hpp \
 			$(ERPC_C_ROOT)/infra/erpc_transport.hpp \
