@@ -57,12 +57,17 @@ public enum MessageType {
      * @return Corresponding MessageType
      */
     public static MessageType getMessageType(int value) {
-        return switch (value) {
-            case 0 -> kInvocationMessage;
-            case 1 -> kOnewayMessage;
-            case 2 -> kReplyMessage;
-            case 3 -> kNotificationMessage;
-            default -> throw new RuntimeException("Invalid MessageType " + value);
-        };
+        switch (value) {
+            case 0:
+              return kInvocationMessage;
+            case 1:
+              return kOnewayMessage;
+            case 2:
+              return kReplyMessage;
+            case 3:
+              return kNotificationMessage;
+            default:
+              throw new RuntimeException("Invalid MessageType " + value);
+        }
     }
 }
