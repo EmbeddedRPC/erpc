@@ -5,7 +5,7 @@
 #
 
 if (CONFIG_MCUX_COMPONENT_middleware.multicore.erpc)
-    mcux_component_version(1.13.0)
+    mcux_component_version(1.14.0)
     mcux_add_include(
         BASE_PATH ${CMAKE_CURRENT_LIST_DIR}/..
         INCLUDES erpc_c/infra

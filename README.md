@@ -428,4 +428,4 @@ Repository on Github contains two main branches: __main__ and __develop__. Code 
 ---
 Copyright 2014-2016 Freescale Semiconductor, Inc.
 
-Copyright 2016-2024 NXP
+Copyright 2016-2025 NXP

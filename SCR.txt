@@ -1,5 +1,5 @@
 Release Name: eRPC
-Release Version: 1.13.0
+Release Version: 1.14.0
 Package License: BSD-3-Clause
 
 the_bus_pirate          Name: The Bus Pirate

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0]
+
+### Added
+
+- Added Cmake/Kconfig support.
+- Made java code jdk11 compliant, GitHub PR #432.
+- Added imxrt1186 support into mu transport layer.
+- erpcgen: Added assert for listType before usage, GitHub PR #406.
+
+### Fixed
+
+- eRPC: Sources reformatted.
+- erpc: Fixed typo in semaphore get (mutex -> semaphore), and write it can fail in case of timeout, GitHub PR #446.
+- erpc: Free the arbitrated client token from client manager, GitHub PR #444.
+- erpc: Fixed Makefile, install the erpc_simple_server header, GitHub PR #447.
+- erpc_python: Fixed possible AttributeError and OSError on calling TCPTransport.close(), GitHub PR #438.
+- Examples and tests consolidated.
+
 ## [1.13.0]
 
 ### Added
@@ -336,7 +354,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial Release
 
 
-[unreleased]: https://github.com/EmbeddedRPC/erpc/compare/1.13.0...HEAD
+[unreleased]: https://github.com/EmbeddedRPC/erpc/compare/1.14.0...HEAD
+[1.14.0]: https://github.com/EmbeddedRPC/erpc/compare/1.13.0...1.14.0
 [1.13.0]: https://github.com/EmbeddedRPC/erpc/compare/1.12.0...1.13.0
 [1.12.0]: https://github.com/EmbeddedRPC/erpc/compare/1.11.0...1.12.0
 [1.11.0]: https://github.com/EmbeddedRPC/erpc/compare/1.10.0...1.11.0
