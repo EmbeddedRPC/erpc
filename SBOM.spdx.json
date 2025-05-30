@@ -1,0 +1,114 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-05-30T06:44:48Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.20"
+  },
+  "name": "erpc-1.14.0",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/1dfe3ec4-b29f-4e7b-afd3-36278a134a93",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-1dfe3ec4-b29f-4e7b-afd3-36278a134a93",
+      "name": "erpc",
+      "versionInfo": "1.14.0",
+      "licenseConcluded": "(BSD-3-Clause)",
+      "licenseDeclared": "(BSD-3-Clause)",
+      "downloadLocation": "https://github.com/EmbeddedRPC/erpc",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-f919933c-33b3-4b0a-950f-83c11a3d4b39",
+      "name": "BusPirate/Bus_Pirate",
+      "versionInfo": "v6.1",
+      "licenseConcluded": "CC0-1.0",
+      "licenseDeclared": "CC0-1.0",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:github/BusPirate/Bus_Pirate@v6.1",
+          "referenceType": "purl"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceLocator": "3a28d3d0-0713-4113-92c5-9a8b53e12e05",
+          "referenceType": "BlackDuck-ComponentOrigin"
+        }
+      ],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-d83f2de3-93ed-46e7-9472-401fe64df55d",
+      "name": "Kconfiglib",
+      "versionInfo": "14.1.0",
+      "licenseConcluded": "ISC",
+      "licenseDeclared": "ISC",
+      "homepage": "https://github.com/ulfalizer/Kconfiglib",
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false,
+      "supplier": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-package-9069e7c0-e11a-4d17-aa04-153e5fd93c3c",
+      "name": "zephyr",
+      "versionInfo": "v3.6.0",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "homepage": "https://zephyrproject.org/doc",
+      "downloadLocation": "https://github.com/zephyrproject-rtos/zephyr",
+      "originator": "Organization: NXP",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:a:zephyrproject:zephyr:3.6.0:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:o:zephyrproject:zephyr:3.6.0:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:a:zephyrproject_rtos:zephyr:3.6.0:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        }
+      ],
+      "filesAnalyzed": false,
+      "supplier": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-1dfe3ec4-b29f-4e7b-afd3-36278a134a93"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-1dfe3ec4-b29f-4e7b-afd3-36278a134a93",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-package-d83f2de3-93ed-46e7-9472-401fe64df55d"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-1dfe3ec4-b29f-4e7b-afd3-36278a134a93",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-package-9069e7c0-e11a-4d17-aa04-153e5fd93c3c"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-1dfe3ec4-b29f-4e7b-afd3-36278a134a93",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-package-f919933c-33b3-4b0a-950f-83c11a3d4b39"
+    }
+  ]
+}
