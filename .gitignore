@@ -102,6 +102,7 @@ mdk
 lpcx
 mcux
 tags
+shim
 
 format-files-to-commit.rb
 language\.settings\.xml
