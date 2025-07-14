@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2023 NXP
+ * Copyright 2016-2025 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -45,13 +45,13 @@ erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
         {
             err = kErpcStatus_MemoryError;
         }
-        else if ((offset + length) > m_len || (offset + length) < offset)
+        else if (offset >= m_len || length > (uint32_t)(m_len - offset))
         {
             err = kErpcStatus_BufferOverrun;
         }
         else
         {
-            (void)memcpy(data, &m_buf[offset], length);
+            (void)memcpy(data, (void *)&m_buf[offset], length);
         }
     }
 
@@ -68,13 +68,13 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
         {
             err = kErpcStatus_MemoryError;
         }
-        else if ((offset + length) > m_len || (offset + length) < offset)
+        else if (offset >= m_len || length > (uint32_t)(m_len - offset))
         {
             err = kErpcStatus_BufferOverrun;
         }
         else
         {
-            (void)memcpy(&m_buf[offset], data, length);
+            (void)memcpy((void *)&m_buf[offset], data, length);
         }
     }
 
@@ -207,7 +207,7 @@ erpc_status_t Cursor::read(void *data, uint32_t length)
         }
         else
         {
-            (void)memcpy(data, m_pos, length);
+            (void)memcpy(data, (void *)m_pos, length);
             m_pos += length;
         }
     }
@@ -234,7 +234,7 @@ erpc_status_t Cursor::write(const void *data, uint32_t length)
         }
         else
         {
-            (void)memcpy(m_pos, data, length);
+            (void)memcpy((void *)m_pos, data, length);
             m_pos += length;
             m_buffer.setUsed(m_buffer.getUsed() + length);
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2025 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -29,7 +29,8 @@ RequestContext ClientManager::createRequest(bool isOneway)
     // Create codec to read and write the request.
     Codec *codec = createBufferAndCodec();
 
-    return RequestContext(++m_sequence, codec, isOneway);
+    m_sequence = (m_sequence == 0xFFFFFFFFU) ? 0U : m_sequence + 1U;
+    return RequestContext(m_sequence, codec, isOneway);
 }
 
 void ClientManager::performRequest(RequestContext &request)

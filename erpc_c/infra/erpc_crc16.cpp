@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 NXP
+ * Copyright 2021-2025 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -46,7 +46,7 @@ uint16_t Crc16::computeCRC16(const uint8_t *data, uint32_t lengthInBytes)
         }
     }
 
-    return (uint16_t)crc;
+    return (uint16_t)(crc & 0xFFFFU);
 }
 void Crc16::setCrcStart(uint32_t crcStart)
 {

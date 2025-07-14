@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016 NXP
+ * Copyright 2016-2025 NXP
  * All rights reserved.
  *
  *
@@ -11,6 +11,7 @@
 #define _EMBEDDED_RPC__MESSAGE_BUFFER_H_
 
 #include "erpc_common.h"
+#include "erpc_config_internal.h"
 
 #include <cstddef>
 #include <stdint.h>
@@ -104,7 +105,10 @@ public:
      *
      * @return Length of free space of buffer.
      */
-    uint16_t getFree(void) const { return m_len - m_used; }
+    uint16_t getFree(void) const { 
+        erpc_assert(m_used <= m_len);
+        return m_len - m_used; 
+    }
 
     /*!
      * @brief This function sets length of used space of buffer.
@@ -244,14 +248,20 @@ public:
      *
      * @return Remaining free space in current buffer.
      */
-    uint16_t getRemaining(void) const { return m_buffer.getLength() - (uint16_t)(m_pos - m_buffer.get()); }
+    uint16_t getRemaining(void) const { 
+        erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());
+        return m_buffer.getLength() - (uint16_t)(m_pos - m_buffer.get());
+    }
 
     /*!
      * @brief Return remaining space from used of current buffer.
      *
      * @return Remaining space from used of current buffer.
      */
-    uint16_t getRemainingUsed(void) const { return m_buffer.getUsed() - (uint16_t)(m_pos - m_buffer.get()); }
+    uint16_t getRemainingUsed(void) const { 
+        erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());   
+        return m_buffer.getUsed() - (uint16_t)(m_pos - m_buffer.get()); 
+    }
 
     /*!
      * @brief Read data from current buffer.
