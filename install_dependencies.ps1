@@ -49,4 +49,18 @@ else
     Invoke-WebRequest -URI $URLMingw -OutFile $PathMingw7Zip
     & $Path7zipApp $UnzipMingw
     Remove-Item -ErrorAction Ignore $PathMingw7Zip
+
+    $URLCMake = "https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.zip"
+    $PathCMakeZip = "cmake.zip"
+    $PathCMake = "cmake_installation"
+    Remove-Item -ErrorAction Ignore $PathCMakeZip
+    Remove-Item -ErrorAction Ignore -Recurse $PathCMake
+    Invoke-WebRequest -URI $URLCMake -OutFile $PathCMakeZip
+    Expand-Archive -Path $PathCMakeZip -DestinationPath "."
+    # Rename the extracted folder to 'cmake'
+    $ExtractedFolder = Get-ChildItem -Directory -Name "cmake-*" | Select-Object -First 1
+    if ($ExtractedFolder) {
+        Rename-Item -Path $ExtractedFolder -NewName $PathCMake
+    }
+    Remove-Item -ErrorAction Ignore $PathCMakeZip
 }

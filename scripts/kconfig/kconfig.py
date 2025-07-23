@@ -249,6 +249,7 @@ def write_kconfig_filenames(kconf, kconfig_list_path):
     with open(kconfig_list_path, 'w') as out:
         for path in sorted({os.path.realpath(os.path.join(kconf.srctree, path))
                             for path in kconf.kconfig_filenames}):
+            path = path.replace('\\', '/')
             print(path, file=out)
 
 def write_header(kconf, kconfig_header_path):
@@ -260,6 +261,7 @@ def write_header(kconf, kconfig_header_path):
     with open(kconfig_header_path, 'w') as out:
         for path in sorted({os.path.realpath(os.path.join(kconf.srctree, path))
                             for path in kconf.generated_headers}):
+            path = path.replace('\\', '/')
             print(path, file=out)
 
 

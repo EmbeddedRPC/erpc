@@ -22,7 +22,7 @@ commands:
 jobs:
   build-linux-gcc:
     machine:
-      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
+      image: ubuntu-2204:2024.04.4 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - install_dependencies
@@ -32,7 +32,7 @@ jobs:
 
   build-linux-clang:
     machine:
-      image: ubuntu-2204:2022.04.2 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
+      image: ubuntu-2204:2024.04.4 #https://circleci.com/developer/machine/image/ubuntu-2204 pick LTS
     steps:
       - checkout
       - install_dependencies:
@@ -44,8 +44,8 @@ jobs:
 
   build-mac-gcc:
     macos:
-      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
-    resource_class: macos.x86.medium.gen2
+      xcode: 16.4.0 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    resource_class: macos.m1.medium.gen1
     steps:
       - checkout
       - install_dependencies
@@ -55,8 +55,8 @@ jobs:
 
   build-mac-clang:
     macos:
-      xcode: 12.5.1 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
-    resource_class: macos.x86.medium.gen2
+      xcode: 16.4.0 # https://circleci.com/docs/using-macos/#supported-xcode-versions https://en.wikipedia.org/wiki/MacOS_version_history#Releases
+    resource_class: macos.m1.medium.gen1
     steps:
       - checkout
       - install_dependencies:
@@ -73,10 +73,10 @@ jobs:
     steps:
       - checkout
       - run: powershell.exe .\install_dependencies.ps1
-      - run: .\mingw64\bin\mingw32-make all
-      - run: .\mingw64\opt\bin\python3.exe .\test\run_unit_tests.py -m"..\\..\\mingw64\\bin\\mingw32-make"
-      # - store_artifacts:
-      #     path: ./Release/MINGW64/erpcgen/erpcgen.exe
+      - run: C:\Users\circleci\project\cmake_installation\bin\cmake.exe --preset mingw64 -B ./build
+      - run: C:\Users\circleci\project\cmake_installation\bin\cmake.exe --build ./build --target erpcgen
+      - store_artifacts:
+          path: ./build/erpcgen/erpcgen.exe
 
   build-windows-VS:
     executor:
