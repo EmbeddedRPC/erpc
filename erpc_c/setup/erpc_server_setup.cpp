@@ -189,7 +189,7 @@ bool erpc_server_add_message_logger(erpc_server_t server, erpc_transport_t trans
 #endif
 
 #if ERPC_PRE_POST_ACTION
-void erpc_client_add_pre_cb_action(erpc_server_t server, pre_post_action_cb preCB)
+void erpc_server_add_pre_cb_action(erpc_server_t server, pre_post_action_cb preCB)
 {
     erpc_assert(server != NULL);
 
@@ -198,7 +198,7 @@ void erpc_client_add_pre_cb_action(erpc_server_t server, pre_post_action_cb preC
     simpleServer->addPreCB(preCB);
 }
 
-void erpc_client_add_post_cb_action(erpc_server_t server, pre_post_action_cb postCB)
+void erpc_server_add_post_cb_action(erpc_server_t server, pre_post_action_cb postCB)
 {
     erpc_assert(server != NULL);
 
