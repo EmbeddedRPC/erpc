@@ -620,6 +620,10 @@ Annotation::program_lang_t Generator::getAnnotationLang()
     {
         return Annotation::program_lang_t::kJava;
     }
+    else if (m_generatorType == generator_type_t::kRust)
+    {
+        return Annotation::program_lang_t::kRust;
+    }
 
     throw internal_error("Unsupported generator type specified for annotation.");
 }
