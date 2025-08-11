@@ -206,37 +206,79 @@ static erpc_status_t {$iface.interfaceClassName}_{$cb.name}_shim({$iface.interfa
 {
 }
 
+// Get the pre-computed compile-time hash table
+const {$iface.serviceClassName}::FunctionEntry* {$iface.serviceClassName}::getFunctionTable()
+{
+    /*
+     * Compile-time computed hash table with collision resolution
+     * Hash table size: {$iface.hashTable.size}
+     * Function count: {$iface.hashTable.functionCount}
+     * Load factor: {$iface.hashTable.loadFactor}
+     * Collisions resolved: {$iface.hashTable.collisions}
+     * Maximum probe distance: {$iface.hashTable.maxProbe}
+     * Primary hit rate: {$iface.hashTable.primaryHitRate}%
+     */
+    static const FunctionEntry s_functionTable[HASH_TABLE_SIZE] = {
+{%  for entry in iface.hashTable.entries %}
+{%   if entry.isEmpty %}
+        /* Index {$entry.index} - {$entry.comment} */
+        {0U, nullptr, nullptr},
+{%   else %}
+        /* Index {$entry.index} - {$entry.comment} */
+        {{$entry.id}U, &{$iface.serviceClassName}::{$entry.name}_shim, "{$entry.name}"},
+{%   endif %}
+{%  endfor -- entry %}
+    };
+    return s_functionTable;
+}
+
+// Find function by ID using compile-time hash table with linear probing
+{$iface.serviceClassName}::ShimFunction {$iface.serviceClassName}::findFunction(uint32_t methodId) const
+{
+    const FunctionEntry* table = getFunctionTable();
+    uint32_t hash_pos = hash_function_id(methodId);
+    uint32_t original_pos = hash_pos;
+    
+    // Linear probing search (same as your symbols implementation)
+    do {
+        if (table[hash_pos].id == methodId && table[hash_pos].func != nullptr) {
+            return table[hash_pos].func;
+        }
+        if (table[hash_pos].id == 0) {  // Empty slot
+            break;
+        }
+        // Move to next slot
+        hash_pos = (hash_pos + 1) & (HASH_TABLE_SIZE - 1);
+    } while (hash_pos != original_pos);
+    
+    return nullptr;  // Not found
+}
+
 // return service interface handler.
 {$iface.interfaceClassName}* {$iface.serviceClassName}::getHandler(void)
 {
     return m_handler;
 }
 
-// Call the correct server shim based on method unique ID.
+// Call the correct server shim based on method unique ID using O(1) compile-time hash table lookup.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory, Transport * transport)
 {
-    erpc_status_t erpcStatus;
 {%  if codecClass != "Codec" %}
     {$codecClass} *_codec = static_cast<{$codecClass} *>(codec);
-{%   endif %}
-    switch (methodId)
+{%  endif %}
+    
+    // O(1) compile-time hash table lookup for function dispatch
+    ShimFunction shimFunc = findFunction(methodId);
+    if (shimFunc != nullptr)
     {
-{%  for fn in iface.functions %}
-        case {$iface.interfaceClassName}::{$getClassFunctionIdName(fn)}:
-        {
-            erpcStatus = {$fn.name}_shim({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, transport, sequence);
-            break;
-        }
-
-{%  endfor -- fn %}
-        default:
-        {
-            erpcStatus = kErpcStatus_InvalidArgument;
-            break;
-        }
+        // Call the found shim function using function pointer
+        return (this->*shimFunc)({%if codecClass == "Codec" %}codec{% else %}_codec{% endif %}, messageFactory, transport, sequence);
     }
-
-    return erpcStatus;
+    else
+    {
+        // Method ID not found
+        return kErpcStatus_InvalidArgument;
+    }
 }
 {%  for fn in iface.functions %}
 

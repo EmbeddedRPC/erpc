@@ -32,9 +32,9 @@ class {$iface.interfaceClassName}
 {% endfor %}
 
 {%endif %}
-        static const uint8_t m_serviceId = {$iface.id};
+        static inline const uint32_t m_serviceId = {$iface.id};
 {% for fn in iface.functions %}
-        static const uint8_t {$getClassFunctionIdName(fn)} = {$fn.id};
+        static inline const uint32_t {$getClassFunctionIdName(fn)} = {$fn.id};
 {% endfor -- fn %}
 
         virtual ~{$iface.interfaceClassName}(void);
