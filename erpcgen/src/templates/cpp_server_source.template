@@ -260,7 +260,7 @@ const {$iface.serviceClassName}::FunctionEntry* {$iface.serviceClassName}::getFu
     return m_handler;
 }
 
-// Call the correct server shim based on method unique ID using O(1) compile-time hash table lookup.
+// Call the correct server shim based on method unique ID.
 erpc_status_t {$iface.serviceClassName}::handleInvocation(uint32_t methodId, uint32_t sequence, Codec * codec, MessageBufferFactory *messageFactory, Transport * transport)
 {
 {%  if codecClass != "Codec" %}
