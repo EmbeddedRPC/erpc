@@ -486,6 +486,14 @@ void erpc_transport_tcp_deinit(erpc_transport_t transport);
 
 //@}
 
+
+erpc_transport_t erpc_transport_lwip_tcp_init(const char *host, uint16_t port, bool isServer);
+
+void erpc_transport_lwip_tcp_deinit();
+
+
+
+
 //! @name CMSIS UART transport setup
 //@{
 
