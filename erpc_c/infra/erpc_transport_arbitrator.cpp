@@ -63,13 +63,14 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
         if (err != kErpcStatus_Success)
         {
             // if we timeout, we must unblock all pending client(s)
-            if (err == kErpcStatus_Timeout)
+            if (err == kErpcStatus_Timeout || err == kErpcStatus_ReceiveFailed)
             {
                 client = m_clientList;
                 for (; client; client = client->m_next)
                 {
                     if (client->m_isValid)
                     {
+                        client->m_request->getCodec()->updateStatus(err);
                         client->m_sem.put();
                     }
                 }
@@ -107,6 +108,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             {
                 // Swap the received message buffer with the client's message buffer.
                 client->m_request->getCodec()->getBufferRef().swap(message);
+                client->m_request->getCodec()->updateStatus(kErpcStatus_Success);
 
                 // Wake up the client receive thread.
                 client->m_sem.put();
@@ -183,7 +185,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
     return reinterpret_cast<client_token_t>(info);
 }
 
-erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
+void TransportArbitrator::clientReceive(client_token_t token)
 {
     erpc_assert((token != 0) && ("invalid client token" != NULL));
 
@@ -192,8 +194,6 @@ erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 
     // Wait on the semaphore until we're signaled.
     info->m_sem.get(Semaphore::kWaitForever);
-
-    return kErpcStatus_Success;
 }
 
 TransportArbitrator::PendingClientInfo *TransportArbitrator::createPendingClient(void){ ERPC_CREATE_NEW_OBJECT(
