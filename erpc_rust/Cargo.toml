@@ -1,0 +1,33 @@
+[package]
+name = "erpc_rust"
+version = "0.1.0"
+edition = "2021"
+description = "Rust implementation of eRPC (Embedded RPC) protocol"
+license = "BSD-3-Clause"
+authors = ["etherealjoy"]
+repository = "https://github.com/etherealjoy/erpc"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+bytes = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+async-trait = "0.1"
+futures = "0.3"
+byteorder = "1.4"
+tracing-subscriber = "0.3"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tracing-test = "0.2"
+tempfile = "3.0"
+
+[features]
+default = ["tcp", "serial"]
+tcp = []
+serial = ["serialport"]
+
+[dependencies.serialport]
+version = "4.0"
+optional = true

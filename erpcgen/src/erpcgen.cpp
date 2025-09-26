@@ -15,6 +15,7 @@
 #include "Logging.hpp"
 #include "PythonGenerator.hpp"
 #include "JavaGenerator.hpp"
+#include "RustGenerator.hpp"
 #include "SearchPath.hpp"
 #include "UniqueIdChecker.hpp"
 #include "options.hpp"
@@ -71,6 +72,7 @@ Available languages (use with -g option):\n\
   c    C/C++\n\
   py   Python\n\
   java Java\n\
+  rust Rust\n\
 \n\
 Available codecs (use with --c option):\n\
   basic   BasicCodec\n\
@@ -103,6 +105,7 @@ protected:
         kCLanguage,
         kPythonLanguage,
         kJavaLanguage,
+        kRustLanguage,
     }; /*!< Generated outputs format. */
 
     typedef vector<string> string_vector_t; /*!< Vector of positional arguments. */
@@ -217,6 +220,10 @@ public:
                     else if (lang == "java")
                     {
                         m_outputLanguage = languages_t::kJavaLanguage;
+                    }
+                    else if (lang == "rust")
+                    {
+                        m_outputLanguage = languages_t::kRustLanguage;
                     }
                     else
                     {
@@ -350,6 +357,11 @@ public:
                 {
                     // TODO: Check java package
                     JavaGenerator(&def, m_javaPackageName).generate();
+                    break;
+                }
+                case languages_t::kRustLanguage:
+                {
+                    RustGenerator(&def).generate();
                     break;
                 }
             }
