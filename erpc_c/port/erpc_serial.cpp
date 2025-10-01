@@ -103,11 +103,23 @@ int serial_setup(int fd, speed_t speed)
         case 9600:
             speed = B9600;
             break;
+        case 19200:
+            speed = B19200;
+            break;
         case 38400:
             speed = B38400;
             break;
         case 115200:
             speed = B115200;
+            break;
+        case 230400:
+            speed = B230400; 
+            break;
+        case 460800:
+            speed = B460800;
+            break;
+        case 921600:
+            speed = B921600;
             break;
         case 57600:
         default:
