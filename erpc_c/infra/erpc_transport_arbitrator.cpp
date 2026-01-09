@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -185,7 +185,7 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
 
 erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 {
-    erpc_assert((token != 0) && ("invalid client token" != NULL));
+    erpc_assert((token != 0U) && ("invalid client token" != NULL));
 
     // Convert token to pointer to info struct for this client receive request.
     PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);
@@ -232,7 +232,7 @@ void TransportArbitrator::removePendingClient(client_token_t token)
     Mutex::Guard lock(m_clientListMutex);
     PendingClientInfo *node;
 
-    erpc_assert((token != 0) && ("invalid client token" != NULL));
+    erpc_assert((token != 0U) && ("invalid client token" != NULL));
     erpc_assert((info->m_sem.getCount() == 0) && ("Semaphore should be clean" != NULL));
 
     // Clear fields.

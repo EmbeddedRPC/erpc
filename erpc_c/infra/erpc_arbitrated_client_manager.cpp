@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2020 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -87,7 +87,7 @@ void ArbitratedClientManager::performClientRequest(RequestContext &request)
             request.getCodec()->updateStatus(err);
         }
 
-        if (token != 0)
+        if (token != 0U)
         {
             // Also if status bad, need to free the token.
             m_arbitrator->removePendingClient(token);

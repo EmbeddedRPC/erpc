@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2025 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -136,7 +136,7 @@ MessageBuffer &Cursor::getBufferRef(void)
 uint8_t &Cursor::operator[](int index)
 {
     erpc_assert(((m_pos + index) >= m_buffer.get()) &&
-                ((uint16_t)(m_pos - m_buffer.get()) + index <= m_buffer.getLength()));
+                ((int32_t)(m_pos - m_buffer.get()) + (int32_t)index <= (int32_t)m_buffer.getLength()));
 
     return m_pos[index];
 }
@@ -144,7 +144,7 @@ uint8_t &Cursor::operator[](int index)
 const uint8_t &Cursor::operator[](int index) const
 {
     erpc_assert(((m_pos + index) >= m_buffer.get()) &&
-                ((uint16_t)(m_pos - m_buffer.get()) + index <= m_buffer.getLength()));
+                ((int32_t)(m_pos - m_buffer.get()) + (int32_t)index <= (int32_t)m_buffer.getLength()));
 
     return m_pos[index];
 }
