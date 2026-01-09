@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 NXP
+ * Copyright 2020-2026 NXP
  * Copyright 2020-2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -108,7 +108,7 @@ void erpc_reset_in_progress_state_default(void)
         (s_erpc_call_in_progress != NULL) &&
         ("If you want use default pre cb action, do not forget call erpc_init_call_progress_detection_default." !=
          NULL));
-    s_erpc_call_in_progress->get(0);
+    (void)s_erpc_call_in_progress->get(0);
     s_erpc_call_in_progress->put();
 
     erpc_assert(

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, Freescale Semiconductor, Inc.
- * Copyright 2016-2025 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -331,7 +331,7 @@ void BasicCodec::readBinary(uint32_t &length, uint8_t **value)
             *value = m_cursor.get();
 
             // Skip over data.
-            m_cursor += (uint16_t)length;
+            (void)(m_cursor += (uint16_t)length);
         }
     }
     if (!isStatusOk())

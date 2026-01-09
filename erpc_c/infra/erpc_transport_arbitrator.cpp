@@ -191,7 +191,7 @@ erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
     PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);
 
     // Wait on the semaphore until we're signaled.
-    info->m_sem.get(Semaphore::kWaitForever);
+    (void)info->m_sem.get(Semaphore::kWaitForever);
 
     return kErpcStatus_Success;
 }
