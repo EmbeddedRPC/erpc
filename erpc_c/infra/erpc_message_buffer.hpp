@@ -250,7 +250,7 @@ public:
      */
     uint16_t getRemaining(void) const { 
         erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());
-        return m_buffer.getLength() - (uint16_t)(m_pos - m_buffer.get());
+        return m_buffer.getLength() - (uint16_t)((uintptr_t)m_pos - (uintptr_t)m_buffer.get());
     }
 
     /*!
@@ -260,7 +260,7 @@ public:
      */
     uint16_t getRemainingUsed(void) const { 
         erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());   
-        return m_buffer.getUsed() - (uint16_t)(m_pos - m_buffer.get()); 
+        return m_buffer.getUsed() - (uint16_t)((uintptr_t)m_pos - (uintptr_t)m_buffer.get()); 
     }
 
     /*!

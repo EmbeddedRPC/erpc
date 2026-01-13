@@ -45,7 +45,7 @@ erpc_status_t MessageBuffer::read(uint16_t offset, void *data, uint32_t length)
         {
             err = kErpcStatus_MemoryError;
         }
-        else if (offset >= m_len || length > (uint32_t)(m_len - offset))
+        else if (offset >= m_len || length > ((uint32_t)m_len - (uint32_t)offset))
         {
             err = kErpcStatus_BufferOverrun;
         }
@@ -68,7 +68,7 @@ erpc_status_t MessageBuffer::write(uint16_t offset, const void *data, uint32_t l
         {
             err = kErpcStatus_MemoryError;
         }
-        else if (offset >= m_len || length > (uint32_t)(m_len - offset))
+        else if (offset >= m_len || length > ((uint32_t)m_len - (uint32_t)offset))
         {
             err = kErpcStatus_BufferOverrun;
         }
@@ -151,7 +151,7 @@ const uint8_t &Cursor::operator[](int index) const
 
 Cursor &Cursor::operator+=(uint16_t n)
 {
-    erpc_assert((uint32_t)(m_pos - m_buffer.get()) + n <= m_buffer.getLength());
+    erpc_assert((int32_t)(m_pos - m_buffer.get()) + (int32_t)n <= (int32_t)m_buffer.getLength());
 
     m_pos += n;
 
@@ -169,7 +169,7 @@ Cursor &Cursor::operator-=(uint16_t n)
 
 Cursor &Cursor::operator++(void)
 {
-    erpc_assert((uint16_t)(m_pos - m_buffer.get()) < m_buffer.getLength());
+    erpc_assert((int32_t)(m_pos - m_buffer.get()) < (int32_t)m_buffer.getLength());
 
     ++m_pos;
 
