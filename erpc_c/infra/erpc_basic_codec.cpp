@@ -307,7 +307,10 @@ void BasicCodec::readPtr(uintptr_t &value)
 
 void BasicCodec::readString(uint32_t &length, char **value)
 {
-    readBinary(length, reinterpret_cast<uint8_t **>(value));
+    uint8_t *tempPtr = NULL;
+    readBinary(length, &tempPtr);
+    
+    *value = reinterpret_cast<char *>(tempPtr);
 }
 
 void BasicCodec::readBinary(uint32_t &length, uint8_t **value)
