@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2021, Freescale Semiconductor, Inc.
- * Copyright 2016-2022 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -54,9 +54,12 @@ RPMsgTransport::~RPMsgTransport(void)
             }
         }
 
-        if (!skip && (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg)))
+        if (!skip)
         {
-            skip = true;
+            if (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg))
+            {
+                skip = true;
+            }
         }
 
         if (!skip)

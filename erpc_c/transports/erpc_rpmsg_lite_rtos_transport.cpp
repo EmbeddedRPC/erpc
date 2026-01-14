@@ -55,9 +55,12 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport(void)
             }
         }
 
-        if (!skip && (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg)))
+        if (!skip)
         {
-            skip = true;
+            if (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg))
+            {
+                skip = true;
+            }
         }
 
         if (!skip)
