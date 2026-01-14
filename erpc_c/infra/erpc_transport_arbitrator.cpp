@@ -66,7 +66,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             if (err == kErpcStatus_Timeout)
             {
                 client = m_clientList;
-                for (; client; client = client->m_next)
+                for (; client != NULL; client = client->m_next)
                 {
                     if (client->m_isValid)
                     {
@@ -101,7 +101,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 
         // Check if there is a client waiting for this message.
         client = m_clientList;
-        for (; client; client = client->m_next)
+        for (; client != NULL; client = client->m_next)
         {
             if (client->m_isValid && (sequence == client->m_request->getSequence()))
             {
