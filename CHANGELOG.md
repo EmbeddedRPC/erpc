@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Updated
+
+- eRPC Zephyr module port updated for Zephyr version 4.4
+
 ### Fixed
 - Python code of the eRPC infrastructure was updated to match the proper python code style, add type annotations and improve readability.
 - eRPC: Several MISRA violations addressed.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -72,8 +72,8 @@ static void print_matrix(Matrix matrix_ptr)
 
 int main(void)
 {
-    struct mbox_channel tx_channel;
-    struct mbox_channel rx_channel;
+    const struct mbox_dt_spec rx_channel = MBOX_DT_SPEC_GET(DT_PATH(mbox_consumer), rx);
+    const struct mbox_dt_spec tx_channel = MBOX_DT_SPEC_GET(DT_PATH(mbox_consumer), tx);
     const struct device *dev;
 
     erpc_transport_t transport;
@@ -82,11 +82,6 @@ int main(void)
     Matrix matrix1 = { 0 }, matrix2 = { 0 }, result_matrix = { 0 };
 
     dev = DEVICE_DT_GET(DT_NODELABEL(mbox));
-
-    /* MBOX  transport layer initialization */
-
-    mbox_init_channel(&tx_channel, dev, TX_ID);
-    mbox_init_channel(&rx_channel, dev, RX_ID);
 
     transport = erpc_transport_zephyr_mbox_init((void *)dev, (void *)&tx_channel, (void *)&rx_channel);
 
