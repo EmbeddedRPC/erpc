@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,3 +11,18 @@ config INCLUDE_REMOTE_DIR
 	help
 	  Include remote build header files. Can be used if primary image
 	  needs to be aware of size or base address of secondary image
+
+config RPMSG_LITE_LINK_ID
+	int "RPMSG-Lite Link ID"
+	default 0
+	help
+	  Define here hardcoded to `0`. As all supported boards start with the link_id 0.
+	  In case application specific change is required please refer to bellow.
+
+	  Link ID used to define the rpmsg-lite instance, see rpmsg-lite/lib/include/<platform>/rpmsg_platform.h
+
+config RPMSG_LITE_ENABLE_CACHE
+	bool "Enable cache for RPMsg Lite"
+	default n
+	help
+	  Enable cache support for RPMsg Lite communication.

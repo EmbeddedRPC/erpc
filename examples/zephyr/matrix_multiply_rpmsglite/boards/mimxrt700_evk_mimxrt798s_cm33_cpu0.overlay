@@ -1,0 +1,32 @@
+/*
+ * Copyright 2026 NXP
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+
+&dsp {
+	status = "okay";
+};
+
+/ {
+	chosen {
+		zephyr,ipc_shm = &sram_shared_mem_hifi4;
+		zephyr,ipc = &mailbox_a_hifi4;
+	};
+
+	mailbox_a_hifi4: ipm-mbox-hifi4 {
+		compatible = "zephyr,mbox-ipm";
+		mboxes = <&mbox4_a 1>, <&mbox4_a 0>;
+		mbox-names = "tx", "rx";
+	};
+
+	sram_shared_mem_hifi4: memory@20584000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x20584000 DT_SIZE_K(16)>;
+		zephyr,memory-region = "SRAM_SHARED_HIFI4";
+		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_IO)>;
+	};
+};

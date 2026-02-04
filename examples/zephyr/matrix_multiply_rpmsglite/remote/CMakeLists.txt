@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -37,3 +37,7 @@ target_sources(app PRIVATE
 target_include_directories(rpmsg_lite PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 # Same for erpc library and erpc_config.h
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+if (CONFIG_BOARD_MIMXRT685_EVK OR CONFIG_BOARD_MIMXRT700_EVK)
+    include("${ZEPHYR_BASE}/samples/boards/nxp/adsp/rtxxx/common/remote-dsp-imgs.cmake")
+endif()

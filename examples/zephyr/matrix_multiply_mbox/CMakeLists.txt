@@ -12,6 +12,8 @@ set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../remote/zephyr)
 
 if(("${BOARD}" STREQUAL "mimxrt1170_evkb") OR
    ("${BOARD}" STREQUAL "mimxrt1170_evk") OR
+   ("${BOARD}" STREQUAL "mimxrt685_evk") OR
+   ("${BOARD}" STREQUAL "mimxrt700_evk") OR
    ("${BOARD}" STREQUAL "mimxrt1160_evk"))
   message(STATUS "${BOARD} compile as Main in this sample")
 else()
@@ -45,3 +47,7 @@ target_sources(app PRIVATE
 
 # Same for erpc library and erpc_config.h
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if (CONFIG_BOARD_MIMXRT685_EVK OR CONFIG_BOARD_MIMXRT700_EVK)
+    include("${ZEPHYR_BASE}/samples/boards/nxp/adsp/rtxxx/common/dsp-load.cmake")
+endif()

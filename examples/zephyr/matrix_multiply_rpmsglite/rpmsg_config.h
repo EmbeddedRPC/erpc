@@ -2,8 +2,7 @@
  * Copyright (c) 2014, Mentor Graphics Corporation
  * Copyright (c) 2015 Xilinx, Inc.
  * Copyright (c) 2016 Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
- * All rights reserved.
+ * Copyright 2016-2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -42,6 +41,18 @@
 //! in rpmsg_config.h files for the master and the remote side, 4 buffers
 //! in total are created in the shared memory.
 #define RL_BUFFER_COUNT (2U)
+
+//! @def RL_USE_DCACHE
+//!
+//! Memory cache management of shared memory.
+//! Use in case of data cache is enabled for shared memory.
+//! enabled/disabled.
+//! The default value is 0 (disabled).
+#ifdef CONFIG_RPMSG_LITE_ENABLE_CACHE
+#define RL_USE_DCACHE (1)
+#else
+#define RL_USE_DCACHE (0)
+#endif
 
 //! @def RL_API_HAS_ZEROCOPY
 //!

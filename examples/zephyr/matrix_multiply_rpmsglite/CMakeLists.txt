@@ -1,12 +1,12 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
 cmake_minimum_required(VERSION 3.20.0)
 
-set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../remote_server/zephyr)
+set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../remote/zephyr)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(matrix_multiply_rpmsglite)
@@ -24,10 +24,10 @@ target_include_directories(app PRIVATE
     ${PROJECT_SOURCE_DIR}/src/service
 )
 
-target_sources(app PRIVATE 
+target_sources(app PRIVATE
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/erpc_error_handler.cpp
-    
+
     # Generated shim code
     ${PROJECT_SOURCE_DIR}/src/service/c_erpc_matrix_multiply_client.cpp
     ${PROJECT_SOURCE_DIR}/src/service/erpc_matrix_multiply_client.cpp
@@ -38,3 +38,7 @@ target_sources(app PRIVATE
 target_include_directories(rpmsg_lite  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Same for erpc library and erpc_config.h
 target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if (CONFIG_BOARD_MIMXRT685_EVK OR CONFIG_BOARD_MIMXRT700_EVK)
+    include("${ZEPHYR_BASE}/samples/boards/nxp/adsp/rtxxx/common/dsp-load.cmake")
+endif()

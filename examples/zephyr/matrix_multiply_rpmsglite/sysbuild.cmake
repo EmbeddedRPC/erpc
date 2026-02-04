@@ -1,12 +1,14 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+set(REMOTE_APP remote)
+
 # Add external project
 ExternalZephyrProject_Add(
-    APPLICATION remote_server
+    APPLICATION ${REMOTE_APP}
     SOURCE_DIR ${APP_DIR}/remote
     BOARD ${SB_CONFIG_RPMSG_LITE_REMOTE_BOARD}
   )
@@ -14,8 +16,8 @@ ExternalZephyrProject_Add(
 # Add dependencies so that the remote sample will be built first
 # This is required because some primary cores need information from the
 # remote core's build, such as the output image's LMA
-add_dependencies(matrix_multiply_rpmsglite remote_server)
-sysbuild_add_dependencies(CONFIGURE matrix_multiply_rpmsglite remote_server)
+add_dependencies(matrix_multiply_rpmsglite ${REMOTE_APP})
+sysbuild_add_dependencies(CONFIGURE matrix_multiply_rpmsglite ${REMOTE_APP})
 
 if(SB_CONFIG_BOOTLOADER_MCUBOOT)
   # Make sure MCUboot is flashed first

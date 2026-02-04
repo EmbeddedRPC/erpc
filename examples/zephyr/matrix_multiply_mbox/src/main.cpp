@@ -13,6 +13,10 @@
 #include "c_erpc_matrix_multiply_client.h"
 #include "erpc_matrix_multiply_common.h"
 
+#if defined(CONFIG_BOARD_MIMXRT685_EVK) || defined(CONFIG_BOARD_MIMXRT700_EVK)
+#include "dsp.h"
+#endif
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -80,6 +84,11 @@ int main(void)
     erpc_client_t client;
 
     Matrix matrix1 = { 0 }, matrix2 = { 0 }, result_matrix = { 0 };
+
+#if defined(CONFIG_BOARD_MIMXRT685_EVK) || defined(CONFIG_BOARD_MIMXRT700_EVK)
+    dsp_start();
+    k_sleep(K_MSEC(500));
+#endif
 
     dev = DEVICE_DT_GET(DT_NODELABEL(mbox));
 

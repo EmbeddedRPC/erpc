@@ -12,10 +12,14 @@
 #include "c_erpc_matrix_multiply_client.h"
 #include "erpc_error_handler.h"
 
+#if defined(CONFIG_BOARD_MIMXRT685_EVK) || defined(CONFIG_BOARD_MIMXRT700_EVK)
+#include "dsp.h"
+#endif
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define ERPC_TRANSPORT_RPMSG_LITE_LINK_ID (RL_PLATFORM_IMXRT1170_M7_M4_LINK_ID)
+#define ERPC_TRANSPORT_RPMSG_LITE_LINK_ID (CONFIG_RPMSG_LITE_LINK_ID)
 
 extern char rpmsg_lite_base[];
 
@@ -77,6 +81,11 @@ int main(void)
     /* RPMsg-Lite transport layer initialization */
     erpc_transport_t transport;
     erpc_client_t client;
+
+#if defined(CONFIG_BOARD_MIMXRT685_EVK) || defined(CONFIG_BOARD_MIMXRT700_EVK)
+    dsp_start();
+    k_sleep(K_MSEC(500));
+#endif
 
     transport = erpc_transport_rpmsg_lite_rtos_master_init(100, 101, ERPC_TRANSPORT_RPMSG_LITE_LINK_ID);
 

@@ -15,3 +15,5 @@ string
 	default "mimxrt1170_evk/mimxrt1176/cm4" if $(BOARD) = "mimxrt1170_evk"
 	default "mimxrt1160_evk/mimxrt1166/cm4" if $(BOARD) = "mimxrt1160_evk"
 	default "mimxrt1170_evkb/mimxrt1176/cm4" if $(BOARD) = "mimxrt1170_evkb"
+	default "mimxrt685_evk/mimxrt685s/hifi4" if $(BOARD) = "mimxrt685_evk"
+	default "mimxrt700_evk/mimxrt798s/hifi4" if $(BOARD) = "mimxrt700_evk"
