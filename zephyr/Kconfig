@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -13,7 +13,7 @@ config ERPC
 	help
 	  This option enables the eRPC library
 	depends on CPP
-	depends on FULL_LIBCPP_SUPPORTED
+	select FULL_LIBCPP_SUPPORTED
 
 config ZEPHYR_BUILD
 	bool

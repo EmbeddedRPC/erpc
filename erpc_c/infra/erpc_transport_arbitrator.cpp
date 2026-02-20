@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2021 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -66,7 +66,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
             if (err == kErpcStatus_Timeout)
             {
                 client = m_clientList;
-                for (; client; client = client->m_next)
+                for (; client != NULL; client = client->m_next)
                 {
                     if (client->m_isValid)
                     {
@@ -101,7 +101,7 @@ erpc_status_t TransportArbitrator::receive(MessageBuffer *message)
 
         // Check if there is a client waiting for this message.
         client = m_clientList;
-        for (; client; client = client->m_next)
+        for (; client != NULL; client = client->m_next)
         {
             if (client->m_isValid && (sequence == client->m_request->getSequence()))
             {
@@ -185,13 +185,13 @@ TransportArbitrator::client_token_t TransportArbitrator::prepareClientReceive(Re
 
 erpc_status_t TransportArbitrator::clientReceive(client_token_t token)
 {
-    erpc_assert((token != 0) && ("invalid client token" != NULL));
+    erpc_assert((token != 0U) && ("invalid client token" != NULL));
 
     // Convert token to pointer to info struct for this client receive request.
     PendingClientInfo *info = reinterpret_cast<PendingClientInfo *>(token);
 
     // Wait on the semaphore until we're signaled.
-    info->m_sem.get(Semaphore::kWaitForever);
+    (void)info->m_sem.get(Semaphore::kWaitForever);
 
     return kErpcStatus_Success;
 }
@@ -232,7 +232,7 @@ void TransportArbitrator::removePendingClient(client_token_t token)
     Mutex::Guard lock(m_clientListMutex);
     PendingClientInfo *node;
 
-    erpc_assert((token != 0) && ("invalid client token" != NULL));
+    erpc_assert((token != 0U) && ("invalid client token" != NULL));
     erpc_assert((info->m_sem.getCount() == 0) && ("Semaphore should be clean" != NULL));
 
     // Clear fields.

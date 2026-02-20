@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2023 NXP
+ * Copyright 2016-2026 NXP
  * Copyright 2021 ACRIOS Systems s.r.o.
  * All rights reserved.
  *
@@ -55,9 +55,12 @@ RPMsgRTOSTransport::~RPMsgRTOSTransport(void)
             }
         }
 
-        if (!skip && (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg)))
+        if (!skip)
         {
-            skip = true;
+            if (RL_SUCCESS != rpmsg_lite_deinit(s_rpmsg))
+            {
+                skip = true;
+            }
         }
 
         if (!skip)
@@ -244,8 +247,11 @@ erpc_status_t RPMsgRTOSTransport::receive(MessageBuffer *message)
 
     ret_val = rpmsg_queue_recv_nocopy(s_rpmsg, m_rpmsg_queue, &m_dst_addr, &buf, &length, RL_BLOCK);
     erpc_assert(buf != NULL);
-    message->set(reinterpret_cast<uint8_t *>(buf), length);
-    message->setUsed(length);
+    erpc_assert(length <= 0xFFFFU);
+    uint16_t length_u16 = static_cast<uint16_t>(length);
+
+    message->set(reinterpret_cast<uint8_t *>(buf), length_u16);
+    message->setUsed(length_u16);
 
     return (ret_val != RL_SUCCESS) ? kErpcStatus_ReceiveFailed : kErpcStatus_Success;
 }
