@@ -1,8 +1,7 @@
 #! /usr/bin/python
 
 # Copyright (c) 2016 Freescale Semiconductor, Inc.
-# Copyright 2016 NXP
-# All rights reserved.
+# Copyright 2016-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -106,12 +105,12 @@ def pytest_configure(config: pytest.Config):
     pytestConfig = config
 
 
-def pytest_collect_file(file_path: pathlib.Path, path: path.local, parent: pytest.Collector):
+def pytest_collect_file(file_path: pathlib.Path, parent: pytest.Collector):
     # @brief Generates an ErpcgenFile for valid YAML test spec files.
     #
     # Files must start with "test" and have an extension of ".yml" to be processed.
 
-    if path.ext == ".yml" and path.basename.startswith("test"):
+    if file_path.suffix == ".yml" and file_path.name.startswith("test"):
         if hasattr(ErpcgenFile, "from_parent"):
             return ErpcgenFile.from_parent(parent=parent, path=file_path)
         else:
