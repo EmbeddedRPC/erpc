@@ -124,7 +124,8 @@ python.exe ..\bin\txt_to_c.py --output .\java_interface.cpp ..\src\templates\jav
 python.exe ..\bin\txt_to_c.py --output .\java_struct.cpp ..\src\templates\java_struct.template
 python.exe ..\bin\txt_to_c.py --output .\java_server.cpp ..\src\templates\java_server.template
 python.exe ..\bin\txt_to_c.py --output .\java_client.cpp ..\src\templates\java_client.template
-python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template
+python.exe ..\bin\txt_to_c.py --output .\rust_template.cpp ..\src\templates\rust_template.template</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -178,7 +179,8 @@ python.exe ..\bin\txt_to_c.py --output .\java_interface.cpp ..\src\templates\jav
 python.exe ..\bin\txt_to_c.py --output .\java_struct.cpp ..\src\templates\java_struct.template
 python.exe ..\bin\txt_to_c.py --output .\java_server.cpp ..\src\templates\java_server.template
 python.exe ..\bin\txt_to_c.py --output .\java_client.cpp ..\src\templates\java_client.template
-python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template</Command>
+python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_const.template
+python.exe ..\bin\txt_to_c.py --output .\rust_template.cpp ..\src\templates\rust_template.template</Command>
     </PreBuildEvent>
     <Flex>
       <OutputFile>$(ProjectDir)\%(Filename).flex.cpp</OutputFile>
@@ -212,6 +214,7 @@ python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_co
     <ClInclude Include="..\src\InterfaceDefinition.hpp" />
     <ClInclude Include="..\src\ParseErrors.hpp" />
     <ClInclude Include="..\src\PythonGenerator.hpp" />
+    <ClInclude Include="..\src\RustGenerator.hpp" />
     <ClInclude Include="..\src\SymbolScanner.hpp" />
     <ClInclude Include="..\src\Token.hpp" />
     <ClInclude Include="..\src\types\AliasType.hpp" />
@@ -254,6 +257,7 @@ python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_co
     <ClCompile Include="..\src\InterfaceDefinition.cpp" />
     <ClCompile Include="..\src\ParseErrors.cpp" />
     <ClCompile Include="..\src\PythonGenerator.cpp" />
+    <ClCompile Include="..\src\RustGenerator.cpp" />
     <ClCompile Include="..\src\SymbolScanner.cpp" />
     <ClCompile Include="..\src\Token.cpp" />
     <ClCompile Include="..\src\types\Type.cpp" />
@@ -280,6 +284,7 @@ python.exe ..\bin\txt_to_c.py --output .\java_const.cpp ..\src\templates\java_co
     <ClCompile Include="java_client.cpp" />
     <ClCompile Include="java_coders.cpp" />
     <ClCompile Include="java_const.cpp" />
+    <ClCompile Include="rust_template.cpp" />
     <ClCompile Include="java_enum.cpp" />
     <ClCompile Include="java_interface.cpp" />
     <ClCompile Include="java_server.cpp" />

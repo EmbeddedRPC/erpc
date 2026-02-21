@@ -37,6 +37,7 @@ set(ERPCGEN_SOURCE
     ${ERPC_ERPCGEN}/src/CGenerator.cpp
     ${ERPC_ERPCGEN}/src/PythonGenerator.cpp
     ${ERPC_ERPCGEN}/src/JavaGenerator.cpp
+    ${ERPC_ERPCGEN}/src/RustGenerator.cpp
     ${ERPC_ERPCGEN}/src/erpcgen.cpp
     ${ERPC_ERPCGEN}/src/ErpcLexer.cpp
     ${ERPC_ERPCGEN}/src/Generator.cpp
@@ -98,6 +99,7 @@ set(ERPCGEN_TEMPLATE_NAMES
     java_const.template
     java_coders.template
     java_client.template
+    rust_template.template
 )
 
 # For each name in ERPCGEN_TEMPLATE_NAMES add custom command
