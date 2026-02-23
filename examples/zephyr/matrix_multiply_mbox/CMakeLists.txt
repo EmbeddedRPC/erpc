@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,9 +10,9 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 set(REMOTE_ZEPHYR_DIR ${CMAKE_CURRENT_BINARY_DIR}/../remote/zephyr)
 
-if(("${BOARD}" STREQUAL "mimxrt1170_evkb_cm7") OR
-   ("${BOARD}" STREQUAL "mimxrt1170_evk_cm7") OR
-   ("${BOARD}" STREQUAL "mimxrt1160_evk_cm7"))
+if(("${BOARD}" STREQUAL "mimxrt1170_evkb") OR
+   ("${BOARD}" STREQUAL "mimxrt1170_evk") OR
+   ("${BOARD}" STREQUAL "mimxrt1160_evk"))
   message(STATUS "${BOARD} compile as Main in this sample")
 else()
   message(FATAL_ERROR "${BOARD} is not supported for this sample")
@@ -33,10 +33,10 @@ target_include_directories(app PRIVATE
     ${PROJECT_SOURCE_DIR}/src/service
 )
 
-target_sources(app PRIVATE 
+target_sources(app PRIVATE
     ${PROJECT_SOURCE_DIR}/src/main.cpp
     ${PROJECT_SOURCE_DIR}/src/erpc_error_handler.cpp
-    
+
     # Generated shim code
     ${PROJECT_SOURCE_DIR}/src/service/c_erpc_matrix_multiply_client.cpp
     ${PROJECT_SOURCE_DIR}/src/service/erpc_matrix_multiply_client.cpp

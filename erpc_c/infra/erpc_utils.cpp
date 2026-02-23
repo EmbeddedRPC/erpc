@@ -1,5 +1,6 @@
 /*
  * Copyright 2023 ACRIOS Systems s.r.o.
+ * Copyright 2026 NXP
  * All rights reserved.
  *
  *
@@ -11,7 +12,7 @@
 bool erpc::findIndexOfFunction(const arrayOfFunctionPtr_t sourceArrayOfFunctionPtr, uint16_t sourceArrayLength,
                                const functionPtr_t functionPtr, uint16_t &retVal)
 {
-    uint32_t index;
+    uint16_t index;
     bool find = false;
     for (index = 0; index < sourceArrayLength; index++)
     {

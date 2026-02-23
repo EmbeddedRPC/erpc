@@ -55,6 +55,10 @@ void operator delete[](void *ptr) THROW
 
 void *erpc_malloc(size_t size)
 {
+    if (size == 0)
+    {
+        return nullptr;
+    }
     void *p = pvPortMalloc(size);
     return p;
 }

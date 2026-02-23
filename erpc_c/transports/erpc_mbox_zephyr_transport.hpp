@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2026 NXP
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -48,7 +48,7 @@ public:
      * @param[in] tx_channel Zephyr MBOX tx channel.
      * @param[in] rx_channel Zephyr MBOX rx channel.
      */
-    MBOXTransport(struct device *dev, struct mbox_channel *tx_channel, struct mbox_channel *rx_channel);
+    MBOXTransport(struct device *dev, struct mbox_dt_spec *tx_channel, struct mbox_dt_spec *rx_channel);
 
     /*!
      * @brief Destructor.
@@ -103,8 +103,8 @@ public:
 
 protected:
     struct device *m_dev; /*!< Access structure of the MBOX device */
-    struct mbox_channel *m_tx_channel;
-    struct mbox_channel *m_rx_channel;
+    struct mbox_dt_spec *m_tx_channel;
+    struct mbox_dt_spec *m_rx_channel;
 
     volatile bool m_isTransferReceiveCompleted = false;
     volatile uint32_t m_transferReceiveRequireBytes = 0;

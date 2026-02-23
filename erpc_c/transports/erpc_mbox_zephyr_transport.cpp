@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2026 NXP
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -23,7 +23,7 @@ RING_BUF_DECLARE(s_rxRingBuffer, MBOX_BUFFER_SIZE);
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
-MBOXTransport::MBOXTransport(struct device *dev, struct mbox_channel *tx_channel, struct mbox_channel *rx_channel) :
+MBOXTransport::MBOXTransport(struct device *dev, struct mbox_dt_spec *tx_channel, struct mbox_dt_spec *rx_channel) :
 m_dev(dev), m_tx_channel(tx_channel), m_rx_channel(rx_channel)
 #if !ERPC_THREADS_IS(NONE)
 ,
@@ -60,13 +60,13 @@ static void mbox_callback(const struct device *dev, uint32_t channel, void *user
 
 erpc_status_t MBOXTransport::init(void)
 {
-    if (mbox_register_callback(m_rx_channel, mbox_callback, NULL))
+    if (mbox_register_callback_dt(m_rx_channel, mbox_callback, NULL))
     {
         printk("mbox_register_callback() error\n");
         return kErpcStatus_InitFailed;
     }
 
-    if (mbox_set_enabled(m_rx_channel, 1))
+    if (mbox_set_enabled_dt(m_rx_channel, true))
     {
         printk("mbox_set_enable() error\n");
         return kErpcStatus_InitFailed;
@@ -156,14 +156,14 @@ erpc_status_t MBOXTransport::send(MessageBuffer *message)
         txMsg.data = &txMsgSize;
         txMsg.size = sizeof(uint32_t);
 
-        mbox_send(m_tx_channel, &txMsg);
+        mbox_send_dt(m_tx_channel, &txMsg);
 
         while (txCntBytes < txMsgSize)
         {
             txMsg.data = &txBuffer[txCntBytes];
             txMsg.size = sizeof(uint32_t);
 
-            int mboxStatus = mbox_send(m_tx_channel, &txMsg);
+            int mboxStatus = mbox_send_dt(m_tx_channel, &txMsg);
 
             if (mboxStatus == -EBUSY)
             {

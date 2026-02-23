@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2025 NXP
+ * Copyright 2016-2026 NXP
  * All rights reserved.
  *
  *
@@ -105,9 +105,10 @@ public:
      *
      * @return Length of free space of buffer.
      */
-    uint16_t getFree(void) const { 
+    uint16_t getFree(void) const
+    {
         erpc_assert(m_used <= m_len);
-        return m_len - m_used; 
+        return m_len - m_used;
     }
 
     /*!
@@ -248,9 +249,10 @@ public:
      *
      * @return Remaining free space in current buffer.
      */
-    uint16_t getRemaining(void) const { 
+    uint16_t getRemaining(void) const
+    {
         erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());
-        return m_buffer.getLength() - (uint16_t)(m_pos - m_buffer.get());
+        return m_buffer.getLength() - (uint16_t)((uintptr_t)m_pos - (uintptr_t)m_buffer.get());
     }
 
     /*!
@@ -258,9 +260,10 @@ public:
      *
      * @return Remaining space from used of current buffer.
      */
-    uint16_t getRemainingUsed(void) const { 
-        erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());   
-        return m_buffer.getUsed() - (uint16_t)(m_pos - m_buffer.get()); 
+    uint16_t getRemainingUsed(void) const
+    {
+        erpc_assert(m_pos >= m_buffer.get() && m_pos <= m_buffer.get() + m_buffer.getLength());
+        return m_buffer.getUsed() - (uint16_t)((uintptr_t)m_pos - (uintptr_t)m_buffer.get());
     }
 
     /*!
