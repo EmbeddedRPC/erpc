@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2014-2016, Freescale Semiconductor, Inc.
- * Copyright 2016-2024 NXP
  * Copyright 2019 ACRIOS Systems s.r.o.
- * All rights reserved.
+ * Copyright 2016-2026 NXP
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -552,6 +551,67 @@ erpc_transport_t erpc_transport_zephyr_mbox_init(void *dev, void *tx_channel, vo
  * @param[in] transport Transport which was initialized with init function.
  */
 void erpc_transport_zephyr_mbox_deinit(erpc_transport_t transport);
+
+/*!
+ * @brief Create a Zephyr IPC Service transport.
+ *
+ * Create a Zephyr IPC Service transport instance, to be used on both the server
+ * and the client side. This transport uses the Zephyr IPC Service API with
+ * RPMsg-Lite backend.
+ *
+ * @param[in] ipc_instance Pointer to the IPC service device instance.
+ * @param[in] ept_name Name of the endpoint to register.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_zephyr_ipc_init(const void *ipc_instance, const char *ept_name);
+
+/*!
+ * @brief Deinitialize Zephyr IPC Service transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_zephyr_ipc_deinit(erpc_transport_t transport);
+
+/*!
+ * @brief Create a Zephyr IPC Service transport for master/host core.
+ *
+ * This uses the Zephyr IPC Service API with device tree node ipc0.
+ * No manual shared memory management needed - IPC Service handles it!
+ *
+ * @param[in] ept_name Name of the endpoint to create.
+ * @param[in] init_delay_ms Delay in milliseconds before initializing (for remote boot).
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_zephyr_ipc_master_init(const char *ept_name, uint32_t init_delay_ms);
+
+/*!
+ * @brief Deinitialize Zephyr IPC Service master transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_zephyr_ipc_master_deinit(erpc_transport_t transport);
+
+/*!
+ * @brief Create a Zephyr IPC Service transport for remote/slave core.
+ *
+ * This uses the Zephyr IPC Service API with device tree node ipc0.
+ * No manual shared memory management needed - IPC Service handles it!
+ *
+ * @param[in] ept_name Name of the endpoint to create.
+ * @param[in] init_delay_ms Delay in milliseconds before initializing (for nameservice).
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_zephyr_ipc_remote_init(const char *ept_name, uint32_t init_delay_ms);
+
+/*!
+ * @brief Deinitialize Zephyr IPC Service remote transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_zephyr_ipc_remote_deinit(erpc_transport_t transport);
 
 //@}
 

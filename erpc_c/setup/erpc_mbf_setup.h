@@ -63,6 +63,22 @@ erpc_mbf_t erpc_mbf_rpmsg_init(erpc_transport_t transport);
 void erpc_mbf_rpmsg_deinit(erpc_mbf_t mbf);
 
 /*!
+ * @brief Create IPC Service message buffer factory and return pointer to it.
+ *
+ * @param[in] transport IPC Service transport.
+ *
+ * @return Pointer to created message buffer factory.
+ */
+erpc_mbf_t erpc_mbf_ipc_service_init(erpc_transport_t transport);
+
+/*!
+ * @brief Dispose IPC Service message buffer factory.
+ *
+ * @param[in] mbf Pointer to message buffer factory.
+ */
+void erpc_mbf_ipc_service_deinit(erpc_mbf_t mbf);
+
+/*!
  * @brief Create MessageBuffer factory which is using static allocated buffers.
  */
 erpc_mbf_t erpc_mbf_static_init(void);

@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 NXP
+# Copyright 2023-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -18,10 +18,9 @@ if (CONFIG_ERPC)
     ${ERPC_DIR}/service
     ${ERPC_DIR}/setup
     ${ERPC_DIR}/transports
-  ) 
+  )
 
   set(ERPC_SOURCES
-
     ${ERPC_DIR}/infra/erpc_basic_codec.cpp
     ${ERPC_DIR}/infra/erpc_client_manager.cpp
     ${ERPC_DIR}/infra/erpc_crc16.cpp
@@ -30,12 +29,10 @@ if (CONFIG_ERPC)
     ${ERPC_DIR}/infra/erpc_message_loggers.cpp
     ${ERPC_DIR}/infra/erpc_pre_post_action.cpp
     ${ERPC_DIR}/infra/erpc_server.cpp
-    ${ERPC_DIR}/infra/erpc_simple_server.cpp       
-    
+    ${ERPC_DIR}/infra/erpc_simple_server.cpp
     ${ERPC_DIR}/infra/erpc_utils.cpp
     ${ERPC_DIR}/port/erpc_port_zephyr.cpp
     ${ERPC_DIR}/port/erpc_threading_zephyr.cpp
-    
     ${ERPC_DIR}/setup/erpc_client_setup.cpp
     ${ERPC_DIR}/setup/erpc_server_setup.cpp
     ${ERPC_DIR}/setup/erpc_setup_mbf_dynamic.cpp
@@ -59,7 +56,7 @@ if (CONFIG_ERPC)
     CONFIG_ERPC_TRANSPORT_TCP
     ${ERPC_DIR}/transports/erpc_tcp_transport.cpp
     ${ERPC_DIR}/setup/erpc_setup_tcp.cpp
-    ${ERPC_DIR}/port/erpc_threading_pthreads.cpp # Required for POSIX threading
+    ${ERPC_DIR}/port/erpc_threading_pthreads.cpp
   )
 
   # Optional MBOX transport
@@ -69,13 +66,28 @@ if (CONFIG_ERPC)
     ${ERPC_DIR}/setup/erpc_setup_mbox_zephyr.cpp
   )
 
-  # Optional RPMSG-LITE transport
+  # Optional RPMSG-LITE transport (direct RPMsg-Lite, not IPC Service)
   zephyr_library_sources_ifdef(
     CONFIG_ERPC_TRANSPORT_RPMSG_LITE
     ${ERPC_DIR}/setup/erpc_setup_mbf_rpmsg.cpp
     ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_master.cpp
     ${ERPC_DIR}/setup/erpc_setup_rpmsg_lite_rtos_remote.cpp
     ${ERPC_DIR}/transports/erpc_rpmsg_lite_rtos_transport.cpp
+  )
+
+  # Optional Zephyr IPC Service transport (uses IPC Service API)
+  zephyr_library_sources_ifdef(
+    CONFIG_ERPC_TRANSPORT_IPC_SERVICE
+    ${ERPC_DIR}/setup/erpc_setup_mbf_ipc_service.cpp
+    ${ERPC_DIR}/setup/erpc_setup_zephyr_ipc_master.cpp
+    ${ERPC_DIR}/setup/erpc_setup_zephyr_ipc_remote.cpp
+    ${ERPC_DIR}/transports/erpc_ipc_service_zephyr_transport.cpp
+  )
+
+  # Suppress memcpy warning for MessageBuffer (benign)
+  zephyr_library_compile_options_ifdef(
+    CONFIG_ERPC_TRANSPORT_IPC_SERVICE
+    -Wno-class-memaccess
   )
 
   # Optional arbitrated client

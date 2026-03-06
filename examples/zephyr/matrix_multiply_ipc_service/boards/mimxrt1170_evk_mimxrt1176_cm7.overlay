@@ -1,0 +1,67 @@
+/*
+ * Copyright 2026 NXP
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+
+/ {
+	aliases {
+		erpc-ipc = &ipc0;  /* Select which IPC instance to use for eRPC */
+	};
+
+	chosen {
+		/* Delete ipc chosen property where old IPM mailbox driver bellow is
+		 * configured.
+		 */
+		/delete-property/ zephyr,ipc;
+		/delete-property/ zephyr,ipc_shm;
+
+		zephyr,console = &lpuart1;
+		zephyr,shell-uart = &lpuart1;
+	};
+
+	/* Define memory regions for IPC
+	 * Note that shared memory must have specific MPU attributes set.
+	 */
+	ocram2_ipc0: memory@202c0000{
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x202c0000 DT_SIZE_K(32)>;
+		zephyr,memory-region="OCRAM2_IPC0";
+		zephyr,memory-attr = <( DT_MEM_ARM(ATTR_MPU_IO))>;
+	};
+
+	soc {
+		/* Delete IPM Driver node nxp,imx-mu */
+		/delete-node/ mailbox@40c48000;
+
+		/* Attach MBOX driver to MU Unit */
+		mbox:mbox@40c48000 {
+			compatible = "nxp,mbox-imx-mu";
+			reg = <0x40c48000 0x4000>;
+			interrupts = <118 0>;
+			rx-channels = <4>;
+			#mbox-cells = <1>;
+			status = "okay";
+		};
+	};
+
+	ipc {
+		/delete-node/ ipc0;
+
+		ipc0: ipc0 {
+			compatible = "nxp,ipc-rpmsg-lite";
+			memory-region = <&ocram2_ipc0>;
+			/* With ipc-rpmsg-lite we can reuse same MBOX channel per IPC instance */
+			mboxes = <&mbox 2>, <&mbox 3>;
+			mbox-names = "tx", "rx";
+			link-id = <0>;
+			role = "host";
+			zephyr,buffer-size = <512>;
+			zephyr,buffer-count = <2>;
+			status = "okay";
+		};
+	};
+};

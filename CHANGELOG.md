@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added Zephyr IPC Service transport layer support.
 - Zephyr examples added support for RT600 and RT700.
 
 ### Updated
