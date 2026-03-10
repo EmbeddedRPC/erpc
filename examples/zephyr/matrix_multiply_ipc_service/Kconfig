@@ -11,9 +11,3 @@ config INCLUDE_REMOTE_DIR
 	help
 	  Include remote build header files. Can be used if primary image
 	  needs to be aware of size or base address of secondary image
-
-config RPMSG_LITE_ENABLE_CACHE
-	bool "Enable cache for RPMsg Lite"
-	default n
-	help
-	  Enable cache support for RPMsg Lite communication.

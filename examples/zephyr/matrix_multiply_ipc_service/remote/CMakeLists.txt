@@ -33,11 +33,6 @@ target_sources(app PRIVATE
     ${PROJECT_SOURCE_DIR}/src/service/erpc_matrix_multiply_interface.cpp
 )
 
-# Also include this directory into rpmsg_lite library because of project specific include rpsmg_config.h
-target_include_directories(rpmsg_lite PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-# Same for erpc library and erpc_config.h
-target_include_directories(erpc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
-
 if (CONFIG_BOARD_MIMXRT685_EVK OR CONFIG_BOARD_MIMXRT700_EVK)
     include("${ZEPHYR_BASE}/samples/boards/nxp/adsp/rtxxx/common/remote-dsp-imgs.cmake")
 endif()

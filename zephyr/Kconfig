@@ -7,56 +7,253 @@
 config ZEPHYR_ERPC_MODULE
 	bool
 
-config ERPC
+menuconfig ERPC
 	bool "eRPC Support"
 	depends on ZEPHYR_ERPC_MODULE
-	help
-	  This option enables the eRPC library
-	depends on CPP
+	select CPP
+	select REQUIRES_FULL_LIBC
+	select REQUIRES_FULL_LIBCPP
 	select FULL_LIBCPP_SUPPORTED
-
-config ZEPHYR_BUILD
-	bool
+	help
+	  This option enables the eRPC (Embedded RPC) library for
+	  inter-processor communication.
 
 if ERPC
 
 module = ERPC
 module-str = eRPC
 
+config ZEPHYR_BUILD
+	bool
+	default y
+
+# ============================================================================
+# Allocation Policy
+# ============================================================================
+
+choice ERPC_ALLOCATION_POLICY
+	prompt "eRPC Allocation Policy"
+	default ERPC_ALLOCATION_POLICY_DYNAMIC
+	help
+	  Choose the allocation policy for eRPC buffers and objects.
+
+config ERPC_ALLOCATION_POLICY_DYNAMIC
+	bool "Dynamic Allocation"
+	help
+	  Use dynamic allocation (malloc/new) for eRPC buffers and objects.
+
+config ERPC_ALLOCATION_POLICY_STATIC
+	bool "Static Allocation"
+	help
+	  Use static allocation for eRPC buffers and objects.
+	  When selected, you must configure ERPC_CODEC_COUNT,
+	  ERPC_MESSAGE_LOGGERS_COUNT, and ERPC_CLIENTS_THREADS_AMOUNT.
+
+endchoice
+
+menu "Static Allocation Configuration"
+	depends on ERPC_ALLOCATION_POLICY_STATIC
+
+config ERPC_CODEC_COUNT
+	int "Codec Count"
+	default 2
+	help
+	  Number of codec objects used simultaneously.
+	  For example: 1 if only client or server is used in one thread,
+	  2 if both are used in separate threads.
+
+config ERPC_MESSAGE_LOGGERS_COUNT
+	int "Message Loggers Count"
+	default 0
+	help
+	  Number of message logger objects used simultaneously.
+	  For arbitrated client, 1 is enough.
+
+config ERPC_CLIENTS_THREADS_AMOUNT
+	int "Client Threads Amount"
+	default 1
+	help
+	  Number of client thread objects.
+
+endmenu
+
+# ============================================================================
+# Threading Model (automatically set to Zephyr)
+# ============================================================================
+
+config ERPC_THREADS
+	int
+	default 0 if !MULTITHREADING
+	default 3
+	help
+	  Threading model used by eRPC.
+	  0 = No threading
+	  1 = POSIX pthreads
+	  2 = FreeRTOS
+	  3 = Zephyr (default)
+	  4 = Mbed OS
+	  5 = Win32
+	  6 = ThreadX
+
+# ============================================================================
+# Buffer Configuration
+# ============================================================================
+
+config ERPC_DEFAULT_BUFFER_SIZE
+	int "Default Buffer Size"
+	default 256
+	help
+	  Size of buffers allocated by MessageBufferFactory.
+	  For RPMsg transport layer, this must be 2^n - 16.
+	  Default is 256 bytes.
+
+config ERPC_DEFAULT_BUFFERS_COUNT
+	int "Default Buffers Count"
+	default 2
+	help
+	  Count of buffers allocated for statically allocated messages.
+	  Default is 2.
+
+# ============================================================================
+# Feature Enables
+# ============================================================================
+
+config ERPC_NOEXCEPT
+	bool "Enable noexcept Support"
+	default n
+	help
+	  Enable C++ noexcept feature for eRPC functions.
+
+config ERPC_NESTED_CALLS
+	bool "Enable Nested Calls Support"
+	default n
+	help
+	  Enable support for nested eRPC calls (callbacks or other eRPC
+	  functions called from server implementation of another eRPC call).
+	  Nested functions need to be marked as @nested in IDL.
+
+config ERPC_NESTED_CALLS_DETECTION
+	bool "Enable Nested Calls Detection"
+	default y if !ERPC_NESTED_CALLS
+	default n
+	help
+	  Enable detection of nested calls for debugging purposes.
+	  This helps locate nested calls in code that need to be marked
+	  as @nested in the IDL.
+
+config ERPC_MESSAGE_LOGGING
+	bool "Enable Message Logging"
+	default n
+	help
+	  Enable eRPC message logging for debugging and analysis.
+	  See erpc_message_loggers.h for details.
+
+config ERPC_PRE_POST_ACTION
+	bool "Enable Pre/Post Action Callbacks"
+	default n
+	help
+	  Enable pre and post callback functions for eRPC calls.
+	  Can be used for call freeze detection and other monitoring.
+	  See erpc_pre_post_action.h for details.
+
+config ERPC_PRE_POST_ACTION_DEFAULT
+	bool "Enable Default Pre/Post Action Callbacks"
+	default n
+	depends on ERPC_PRE_POST_ACTION
+	help
+	  Enable default pre and post callback functions.
+	  See erpc_setup_extensions.h for details.
+
+# ============================================================================
+# Transport Layer Selection
+# ============================================================================
+
+menu "Transport Layer"
+
 config ERPC_TRANSPORT_UART
 	bool "Enable eRPC UART transport"
-	help
-	  When enabled, eRPC will include UART transport layer.
+	depends on UART
 	select RING_BUFFER
 	select SERIAL
 	select UART_INTERRUPT_DRIVEN
+	help
+	  When enabled, eRPC will include UART transport layer.
 
 config ERPC_TRANSPORT_TCP
 	bool "Enable eRPC TCP transport"
+	depends on NETWORKING
 	help
-	  When enabled, eRPC will include TCP transport layer. This layer use Zephyr POSIX.
-
-config ERPC_TRANSPORT_RPMSG_LITE
-	bool "Enable eRPC rpsmg-lite transport"
-	help
-	  When enabled, eRPC will include rpsmg-lite transport layer.
-	depends	on RPMSGLITE
-
-config ERPC_TRANSPORT_IPC_SERVICE
-	bool "Enable IPC Service transport"
-	help
-	  When enabled, eRPC will include IPC Service transport layer.
+	  When enabled, eRPC will include TCP transport layer.
+	  This layer uses Zephyr POSIX.
 
 config ERPC_TRANSPORT_MBOX
 	bool "Enable eRPC Zephyr MBOX transport"
+	depends on MBOX
+	select RING_BUFFER
 	help
 	  When enabled, eRPC will include Zephyr MBOX transport layer.
-	select RING_BUFFER
 
+config ERPC_TRANSPORT_MU
+	bool "Enable eRPC MU transport"
+	help
+	  When enabled, eRPC will include Messaging Unit (MU) transport layer.
+
+config ERPC_TRANSPORT_RPMSG_LITE
+	bool "Enable eRPC RPMsg-Lite transport"
+	select EVENTS
+	select RPMSGLITE
+	imply RPMSGLITE_NS
+	imply RPMSGLITE_QUEUE
+	help
+	  When enabled, eRPC will include RPMsg-Lite transport layer.
+	  Uses RPMsg-Lite directly for inter-processor communication.
+
+config ERPC_TRANSPORT_IPC_SERVICE
+	bool "Enable IPC Service transport"
+	select IPC_SERVICE
+	select IPC_SERVICE_BACKEND_RPMSG_LITE
+	select MBOX
+	select EVENTS
+	select RPMSGLITE
+	imply RPMSGLITE_NS
+	imply RPMSGLITE_QUEUE
+	help
+	  When enabled, eRPC will include IPC Service transport layer.
+	  Uses Zephyr's IPC Service API with RPMsg-Lite backend.
+
+endmenu
+
+# ============================================================================
+# Transport-specific Configuration
+# ============================================================================
+
+config ERPC_TRANSPORT_MU_USE_MCMGR
+	bool "MU Transport Use MCMGR"
+	default n
+	depends on ERPC_TRANSPORT_MU
+	help
+	  When enabled, MU transport uses Multicore Manager (MCMGR) for
+	  Inter-Core interrupt management. When disabled, RPMsg-Lite manages
+	  IPC interrupts directly (MUX_IRQHandler overloading).
+
+# ============================================================================
+# Client/Server Configuration
+# ============================================================================
 
 config ERPC_ARBITRATED_CLIENT
 	bool "Enable eRPC arbitrated client"
 	help
-	  When enabled, eRPC will include arbitrated client.
+	  When enabled, eRPC will include arbitrated client manager
+	  for multiple client threads sharing a single transport.
+
+# ============================================================================
+# Debug and Development
+# ============================================================================
+
+config ERPC_DEBUG
+	bool "Enable eRPC Debug Output"
+	default n
+	help
+	  Enable debug output for eRPC library.
 
 endif # ERPC

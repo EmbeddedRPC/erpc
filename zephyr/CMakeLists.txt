@@ -15,6 +15,7 @@ if (CONFIG_ERPC)
   set(ERPC_INCLUDE_DIRS
     ${ERPC_DIR}/infra
     ${ERPC_DIR}/port
+    ${ERPC_DIR}/port/zephyr
     ${ERPC_DIR}/service
     ${ERPC_DIR}/setup
     ${ERPC_DIR}/transports
