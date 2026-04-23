@@ -1,0 +1,21 @@
+[package]
+name = "temp_alarm_rust"
+version = "0.1.0"
+edition = "2021"
+description = "Rust eRPC Temperature Alarm Example"
+license = "BSD-3-Clause"
+authors = ["eRPC Team"]
+
+[features]
+default = []
+serial = ["erpc_rust/serial"]
+
+[dependencies]
+# Local dependency on the erpc_rust crate
+erpc_rust = { path = "../../erpc_rust" }
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+clap = { version = "4.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+async-trait = "0.1"
