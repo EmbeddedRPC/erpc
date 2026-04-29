@@ -343,7 +343,7 @@ Related steps to build **erpcgen** using **Visual Studio** are described in [`er
 To install MinGW, Bison, Flex locally on Windows:
 ```bash
 ./install_dependencies.ps1
-* ```
+```
 
 #### Linux
 
