@@ -211,15 +211,15 @@ config ERPC_TRANSPORT_RPMSG_LITE
 config ERPC_TRANSPORT_IPC_SERVICE
 	bool "Enable IPC Service transport"
 	select IPC_SERVICE
-	select IPC_SERVICE_BACKEND_RPMSG_LITE
 	select MBOX
 	select EVENTS
-	select RPMSGLITE
+	imply RPMSGLITE
 	imply RPMSGLITE_NS
 	imply RPMSGLITE_QUEUE
+	imply IPC_SERVICE_BACKEND_RPMSG_LITE
 	help
 	  When enabled, eRPC will include IPC Service transport layer.
-	  Uses Zephyr's IPC Service API with RPMsg-Lite backend.
+	  Uses Zephyr's IPC Service API with RPMsg-Lite backend by default.
 
 endmenu
 
