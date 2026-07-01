@@ -15,8 +15,6 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define ERPC_ENDPOINT_NAME "erpc_ept"
-#define REMOTE_INIT_DELAY_MS (500U)
 
 /*******************************************************************************
  * Prototypes
@@ -79,7 +77,7 @@ int main(void)
 
     /* Zephyr IPC Service transport layer initialization */
     printk("Initializing Zephyr IPC Service transport...\r\n");
-    transport = erpc_transport_zephyr_ipc_remote_init(ERPC_ENDPOINT_NAME, 0);
+    transport = erpc_transport_zephyr_ipc_remote_init(CONFIG_ERPC_ENDPOINT_NAME, 0);
 
     if (transport == NULL)
     {

@@ -221,6 +221,13 @@ config ERPC_TRANSPORT_IPC_SERVICE
 	  When enabled, eRPC will include IPC Service transport layer.
 	  Uses Zephyr's IPC Service API with RPMsg-Lite backend by default.
 
+config ERPC_ENDPOINT_NAME
+	string "eRPC endpoint name"
+	default "erpc_ept"
+	help
+	  Name of the endpoint to create.
+	  Need to be the same for both local and remote sides.
+
 endmenu
 
 # ============================================================================

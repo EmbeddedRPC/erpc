@@ -19,7 +19,6 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define ERPC_ENDPOINT_NAME "erpc_ept"
 #define MASTER_INIT_DELAY_MS (500U)
 
 #define MATRIX_ITEM_MAX_VALUE (50)
@@ -91,7 +90,7 @@ int main(void)
 
     /* Zephyr IPC Service transport layer initialization */
     printk("Initializing Zephyr IPC Service transport...\r\n");
-    erpc_transport_t transport = erpc_transport_zephyr_ipc_master_init(ERPC_ENDPOINT_NAME, MASTER_INIT_DELAY_MS);
+    erpc_transport_t transport = erpc_transport_zephyr_ipc_master_init(CONFIG_ERPC_ENDPOINT_NAME, MASTER_INIT_DELAY_MS);
 
     if (transport == NULL)
     {
