@@ -263,7 +263,7 @@ To get the board list with multicore support (eRPC included) use filtering based
 eRPC examples use the 'erpc_' name prefix.
 
 Another way of getting NXP MCUXpressoSDK eRPC multicore and multiprocessor examples is using the [mcux-sdk](https://github.com/nxp-mcuxpresso/mcux-sdk) Github repo. Follow the description how to use the West tool
-to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/nxp-mcuxpresso/mcux-sdk#overview). Once done the armgcc eRPC examples can be found in
+to clone and update the mcuxsdk repo in [readme Overview section](https://github.com/nxp-mcuxpresso/legacy-mcux-sdk#overview). Once done the armgcc eRPC examples can be found in
 
 mcuxsdk/examples/<board_name>/multicore_examples or in
 
