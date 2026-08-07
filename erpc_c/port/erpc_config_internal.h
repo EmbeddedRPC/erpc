@@ -210,6 +210,9 @@
     #elif defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_MBED)
         #include "platform/mbed_assert.h"
         #define erpc_assert(condition) MBED_ASSERT(condition)
+    #elif defined(ERPC_THREADS) && (ERPC_THREADS == ERPC_THREADS_RTTHREAD)
+        #include <rtthread.h>
+        #define erpc_assert(condition) RT_ASSERT(condition)
     #else
         #ifdef __cplusplus
             #include <cassert>

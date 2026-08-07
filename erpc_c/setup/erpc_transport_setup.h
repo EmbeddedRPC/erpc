@@ -485,6 +485,32 @@ void erpc_transport_tcp_deinit(erpc_transport_t transport);
 
 //@}
 
+
+//! @name RT-Thread UART transport setup
+//@{
+
+/*!
+ * @brief Create an RT-Thread UART transport.
+ *
+ * Create an RT-Thread UART transport instance, to be used on both the server
+ * and the client side.
+ *
+ * @param[in] devName RT-Thread UART device name, for example "uart2".
+ * @param[in] baudRate UART baud rate.
+ *
+ * @return Return NULL or erpc_transport_t instance pointer.
+ */
+erpc_transport_t erpc_transport_rtthread_uart_init(const char *devName, uint32_t baudRate);
+
+/*!
+ * @brief Deinitialize RT-Thread UART transport.
+ *
+ * @param[in] transport Transport which was initialized with init function.
+ */
+void erpc_transport_rtthread_uart_deinit(erpc_transport_t transport);
+
+//@}
+
 //! @name CMSIS UART transport setup
 //@{
 
