@@ -331,6 +331,7 @@ public:
 
             // Parse and build definition model.
             InterfaceDefinition def;
+            def.parse(m_ErpcFile);
 
             // Check for duplicate function IDs
             UniqueIdChecker uniqueIdCheck;
