@@ -158,9 +158,17 @@ bool erpc_client_add_message_logger(erpc_client_t client, erpc_transport_t trans
 {
     erpc_assert(client != NULL);
 
-    ClientManager *clientManager = reinterpret_cast<ClientManager *>(client);
+    if (transport == NULL)
+    {
+        return false;
+    }
 
-    return clientManager->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    ClientManager *clientManager = reinterpret_cast<ClientManager *>(client);
+    Transport *loggerTransport = reinterpret_cast<Transport *>(transport);
+
+    loggerTransport->setCrc16(clientManager->getTransport()->getCrc16());
+
+    return clientManager->addMessageLogger(loggerTransport);
 }
 #endif
 
