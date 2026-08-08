@@ -15,6 +15,7 @@ else:
     from . import codec
     from . import client
     from . import crc16
+    from . import log
     from . import server
     from . import simple_server
     from . import transport
