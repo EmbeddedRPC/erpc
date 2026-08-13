@@ -34,6 +34,35 @@ public:
     virtual erpc_status_t handleInvocation(uint32_t methodId, uint32_t sequence, erpc::Codec * codec, erpc::MessageBufferFactory *messageFactory, erpc::Transport * transport);
 
 private:
+    /*! @brief Function pointer type for shim functions */
+    typedef erpc_status_t ({$iface.serviceClassName}::*ShimFunction)(erpc::{$codecClass} * codec, erpc::MessageBufferFactory *messageFactory, erpc::Transport * transport, uint32_t sequence);
+    
+    /*! @brief Compile-time hash table entry structure */
+    struct FunctionEntry {
+        uint32_t id;
+        ShimFunction func;
+        const char* name;  // For debugging
+    };
+    
+    /*! @brief Hash table size (power of 2, load factor ~0.65) */
+    static constexpr uint32_t HASH_TABLE_SIZE = {$iface.hashTable.size};
+    static constexpr uint32_t FUNCTION_COUNT = {$iface.hashTable.functionCount};
+    
+    /*! @brief Compile-time hash function (Knuth multiplicative method) */
+    static constexpr uint32_t hash_function_id(uint32_t id) {
+        uint32_t hash = id;
+        hash = ((hash >> 16) ^ hash) * 0x45d9f3bU;
+        hash = ((hash >> 16) ^ hash) * 0x45d9f3bU;
+        hash = (hash >> 16) ^ hash;
+        return hash & (HASH_TABLE_SIZE - 1);
+    }
+    
+    /*! @brief Get the pre-computed hash table */
+    static const FunctionEntry* getFunctionTable();
+    
+    /*! @brief Find function by ID using compile-time hash table */
+    ShimFunction findFunction(uint32_t methodId) const;
+
     {$iface.interfaceClassName} *m_handler;
 {%  for fn in iface.functions %}
     /*! @brief Server shim for {$fn.name} of {$iface.name} interface. */

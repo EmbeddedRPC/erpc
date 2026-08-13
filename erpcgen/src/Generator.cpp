@@ -471,6 +471,10 @@ data_list Generator::makeGroupInterfacesTemplateData(Group *group)
             }
         }
 
+        // Generate compile-time hash table for this interface
+        data_map hashTableInfo = generateHashTableData(iface, functions);
+        ifaceInfo["hashTable"] = hashTableInfo;
+
         interfaces.push_back(ifaceInfo);
     }
 
@@ -758,4 +762,133 @@ void Generator::getCallbacksTemplateData(Group *group, const Interface *iface, d
             callbackTypesAll.push_back(callbackType);
         }
     }
+}
+
+data_map Generator::generateHashTableData(Interface *iface, const data_list &functions)
+{
+    data_map hashTableInfo;
+    
+    // Get function count and calculate optimal hash table size
+    uint32_t functionCount = static_cast<uint32_t>(functions.size());
+    uint32_t hashTableSize = ERPC_HASH_TABLE_MIN_SIZE;
+    
+    // Find next power of 2 that gives target load factor
+    while (hashTableSize * ERPC_HASH_TABLE_TARGET_LOAD_FACTOR < functionCount && 
+           hashTableSize < ERPC_HASH_TABLE_MAX_SIZE)
+    {
+        hashTableSize *= 2;
+    }
+    
+    // Check if we hit the size limit and report performance impact
+    double loadFactor = static_cast<double>(functionCount) / hashTableSize;
+    if (hashTableSize >= ERPC_HASH_TABLE_MAX_SIZE && loadFactor > ERPC_HASH_TABLE_TARGET_LOAD_FACTOR) {
+        Log::warning("Interface '%s': Hash table size limit reached (%d functions in %d-entry table)\n"
+                   "Load factor: %.3f, Expected probes: %.1f\n"
+                   "Consider splitting interface for better performance.\n",
+                   iface->getName().c_str(), functionCount, hashTableSize,
+                   loadFactor, 0.5 * (1 + 1/(1-loadFactor)));
+    }
+    
+    Log::info("Hash table for '%s': size=%d, functions=%d, load_factor=%.3f\n",
+              iface->getName().c_str(), hashTableSize, functionCount, loadFactor);
+    
+    hashTableInfo["size"] = make_data(hashTableSize);
+    hashTableInfo["functionCount"] = make_data(functionCount);
+    hashTableInfo["loadFactor"] = make_data(static_cast<double>(functionCount) / hashTableSize);
+    
+    // Hash function implementation (Knuth multiplicative method)
+    auto hash_function_id = [hashTableSize](uint32_t id) -> uint32_t {
+        uint32_t hash = id;
+        hash = ((hash >> 16) ^ hash) * 0x45d9f3bU;
+        hash = ((hash >> 16) ^ hash) * 0x45d9f3bU;
+        hash = (hash >> 16) ^ hash;
+        return hash & (hashTableSize - 1);
+    };
+    
+    // Initialize hash table array
+    vector<data_map> hashTable(hashTableSize);
+    for (uint32_t i = 0; i < hashTableSize; i++)
+    {
+        data_map entry;
+        entry["isEmpty"] = make_data(true);
+        entry["index"] = make_data(i);
+        entry["id"] = make_data(0U);
+        entry["name"] = make_data(string(""));
+        entry["comment"] = make_data(string("Empty"));
+        entry["probeDistance"] = make_data(0);
+        hashTable[i] = entry;
+    }
+    
+    // Place functions in hash table using linear probing
+    uint32_t collisions = 0;
+    uint32_t maxProbe = 0;
+    
+    for (size_t i = 0; i < functions.size(); ++i)
+    {
+        data_ptr funcPtr = functions[i];
+        assert(dynamic_cast<DataMap *>(funcPtr.get().get()));
+        DataMap *functionData = dynamic_cast<DataMap *>(funcPtr.get().get());
+        
+        // Extract function ID and name from template data
+        uint32_t functionId = static_cast<uint32_t>(stoul(functionData->getmap()["id"]->getvalue()));
+        string functionName = functionData->getmap()["name"]->getvalue();
+        
+        // Calculate hash position
+        uint32_t hashPos = hash_function_id(functionId);
+        uint32_t probeDistance = 0;
+        
+        // Linear probing collision resolution
+        while (!hashTable[hashPos]["isEmpty"]->getvalue().empty() && 
+               hashTable[hashPos]["isEmpty"]->getvalue() != "true")
+        {
+            hashPos = (hashPos + 1) % hashTableSize;
+            probeDistance++;
+            if (probeDistance > 0 && probeDistance == 1)
+            {
+                collisions++;
+            }
+        }
+        
+        // Insert function into hash table
+        data_map entry;
+        entry["isEmpty"] = make_data(false);
+        entry["index"] = make_data(hashPos);
+        entry["id"] = make_data(functionId);
+        entry["name"] = make_data(functionName);
+        entry["probeDistance"] = make_data(probeDistance);
+        
+        if (probeDistance == 0)
+        {
+            entry["comment"] = make_data(string("Direct hash"));
+        }
+        else
+        {
+            entry["comment"] = make_data(string("Collision resolved (probe +") + to_string(probeDistance) + ")");
+        }
+        
+        hashTable[hashPos] = entry;
+        
+        if (probeDistance > maxProbe)
+        {
+            maxProbe = probeDistance;
+        }
+    }
+    
+    // Convert hash table to template data
+    data_list hashTableEntries;
+    for (const auto& entry : hashTable)
+    {
+        hashTableEntries.push_back(entry);
+    }
+    
+    // Statistics
+    hashTableInfo["entries"] = hashTableEntries;
+    hashTableInfo["collisions"] = make_data(collisions);
+    hashTableInfo["maxProbe"] = make_data(maxProbe);
+    hashTableInfo["primaryHitRate"] = make_data(static_cast<double>(functionCount - collisions) / functionCount * 100.0);
+    
+    Log::info("Generated hash table for interface %s: size=%d, functions=%d, collisions=%d, maxProbe=%d\n",
+              iface->getName().c_str(), hashTableSize, functionCount, collisions, maxProbe);
+    
+    return hashTableInfo;
 }
