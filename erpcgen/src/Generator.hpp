@@ -49,7 +49,8 @@ public:
     {
         kC,
         kPython,
-        kJava
+        kJava,
+        kRust
     }; /*!< Type of generator. */
 
     typedef std::vector<DataType *> datatype_vector_t; /*!< Vector of data types. */

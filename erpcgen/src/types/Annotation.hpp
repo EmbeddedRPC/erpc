@@ -33,7 +33,8 @@ public:
         kAll,
         kC,
         kPython,
-        kJava
+        kJava,
+        kRust
     };
 
     /*!
