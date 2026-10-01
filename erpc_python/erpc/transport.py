@@ -14,6 +14,7 @@ from typing import Optional, Any, Union
 
 from .client import RequestError
 from .crc16 import Crc16
+from .log import PacketLogRecord, get_default_packet_logger
 
 
 class TransportError(RuntimeError):
@@ -42,6 +43,16 @@ class FramedTransport(Transport):
         self._send_lock = threading.Lock()
         self._receive_lock = threading.Lock()
         self._crc16 = Crc16()
+        self._packet_logger = get_default_packet_logger()
+
+    @property
+    def packet_logger(self):
+        """Optional packet logger for framed transport TX/RX frames."""
+        return self._packet_logger
+
+    @packet_logger.setter
+    def packet_logger(self, logger):
+        self._packet_logger = logger
 
     @property
     def crc_16(self):
@@ -66,7 +77,9 @@ class FramedTransport(Transport):
 
             header = bytes(struct.pack('<HHH', crc_header, message_length, crc_body))
             assert len(header) == self.HEADER_LEN
-            self._base_send(header + message)
+            frame = header + message
+            self._log_tx_frame(frame, header, message, crc_header, message_length, crc_body)
+            self._base_send(frame)
         finally:
             self._send_lock.release()
 
@@ -84,17 +97,48 @@ class FramedTransport(Transport):
             computed_crc &= 0xFFFF  # 2bytes
 
             if computed_crc != crc_header:
+                self._log_rx_frame(header_data, header_data, bytes(), crc_header, message_length, crc_body, computed_crc,
+                                   None, False, None, "invalid header CRC")
                 raise RequestError("invalid header CRC")
 
             # Now we know the length, read the rest of the message.
             data = bytearray(self._base_receive(message_length))
-            computed_crc = self._crc16.compute_crc16(data)
-            if computed_crc != crc_body:
+            computed_body_crc = self._crc16.compute_crc16(data)
+            if computed_body_crc != crc_body:
+                self._log_rx_frame(header_data + data, header_data, data, crc_header, message_length, crc_body,
+                                   computed_crc, computed_body_crc, True, False, "invalid message CRC")
                 raise RequestError("invalid message CRC")
 
+            self._log_rx_frame(header_data + data, header_data, data, crc_header, message_length, crc_body, computed_crc,
+                               computed_body_crc, True, True, None)
             return data
         finally:
             self._receive_lock.release()
+
+    def _log_tx_frame(self, frame, header, payload, header_crc, message_length, body_crc):
+        """Log a TX framed transport packet if packet logging is enabled."""
+        if self._packet_logger is None:
+            return
+
+        try:
+            record = PacketLogRecord("TX", self, frame, header, payload, header_crc, message_length, body_crc,
+                                     header_crc, body_crc, True, True, None)
+            self._packet_logger.log_tx(record)
+        except Exception:
+            pass
+
+    def _log_rx_frame(self, frame, header, payload, header_crc, message_length, body_crc, computed_header_crc,
+                      computed_body_crc, header_crc_ok, body_crc_ok, error):
+        """Log an RX framed transport packet if packet logging is enabled."""
+        if self._packet_logger is None:
+            return
+
+        try:
+            record = PacketLogRecord("RX", self, frame, header, payload, header_crc, message_length, body_crc,
+                                     computed_header_crc, computed_body_crc, header_crc_ok, body_crc_ok, error)
+            self._packet_logger.log_rx(record)
+        except Exception:
+            pass
 
     def _base_send(self, data: Union[bytes, bytearray]) -> None:
         raise NotImplementedError()
