@@ -47,6 +47,7 @@ We welcome and encourage the community to submit patches directly to the eRPC pr
   - [Examples](#examples)
   - [References](#references)
   - [Directories](#directories)
+  - [RT-Thread integration](#rt-thread-integration)
   - [Building and installing](#building-and-installing)
     - [Requirements](#requirements)
       - [Windows](#windows)
@@ -297,9 +298,17 @@ This section provides links to interesting erpc-based projects, articles, blogs 
 
 [mk](/mk) - Contains common makefiles for building eRPC components.
 
+[rtthread](/rtthread) - Contains RT-Thread Kconfig, SCons integration, and usage notes.
+
 [test](/test) - Client/server tests. These tests verify the entire communications path from client to server and back.
 
 [utilities](/utilities) - Holds utilities which bring additional benefit to eRPC apps developers.
+
+## RT-Thread integration
+
+The eRPC C runtime provides an RT-Thread threading backend and an RT-Thread UART transport.
+RT-Thread package integration files are provided under [rtthread](/rtthread).
+See [rtthread/README.md](/rtthread/README.md) for `menuconfig` and SCons integration steps.
 
 ## Building and installing
 

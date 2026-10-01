@@ -36,6 +36,8 @@
 #include "windows.h"
 #elif ERPC_THREADS_IS(THREADX)
 #include "tx_api.h"
+#elif ERPC_THREADS_IS(RTTHREAD)
+#include <rtthread.h>
 
 #endif // ERPC_THREADS
 
@@ -164,6 +166,8 @@ public:
         return reinterpret_cast<thread_id_t>(m_thread);
 #elif ERPC_THREADS_IS(THREADX)
         return reinterpret_cast<thread_id_t>(m_thread.tx_thread_id);
+#elif ERPC_THREADS_IS(RTTHREAD)
+        return reinterpret_cast<thread_id_t>(m_thread);
 #endif
     }
 
@@ -186,6 +190,8 @@ public:
         return reinterpret_cast<thread_id_t>(GetCurrentThread());
 #elif ERPC_THREADS_IS(THREADX)
         return reinterpret_cast<thread_id_t>(tx_thread_identify());
+#elif ERPC_THREADS_IS(RTTHREAD)
+        return reinterpret_cast<thread_id_t>(rt_thread_self());
 #endif
     }
 
@@ -232,9 +238,9 @@ private:
     static pthread_key_t s_threadObjectKey; /*!< Thread key. */
     pthread_t m_thread;                     /*!< Current thread. */
 #elif ERPC_THREADS_IS(FREERTOS)
-    TaskHandle_t m_task;       /*!< Current task. */
-    Thread *m_next;            /*!< Pointer to next Thread. */
-    static Thread *s_first;    /*!< Pointer to first Thread. */
+    TaskHandle_t m_task;    /*!< Current task. */
+    Thread *m_next;         /*!< Pointer to next Thread. */
+    static Thread *s_first; /*!< Pointer to first Thread. */
 #if ERPC_ALLOCATION_POLICY == ERPC_ALLOCATION_POLICY_STATIC
     StaticTask_t m_staticTask; /*!< Hold static task data. */
 #endif
@@ -257,6 +263,8 @@ private:
     TX_THREAD m_thread;     /*!< Underlying Thread instance */
     Thread *m_next;         /*!< Pointer to next Thread. */
     static Thread *s_first; /*!< Pointer to first Thread. */
+#elif ERPC_THREADS_IS(RTTHREAD)
+    rt_thread_t m_thread; /*!< Current thread. */
 #endif
 
 #if ERPC_THREADS_IS(PTHREADS)
@@ -312,6 +320,14 @@ private:
      * @param[in] arg Thread to execute.
      */
     static void threadEntryPointStub(ULONG arg);
+#elif ERPC_THREADS_IS(RTTHREAD)
+
+    /*!
+     * @brief This function execute threadEntryPoint function.
+     *
+     * @param[in] arg Thread to execute.
+     */
+    static void threadEntryPointStub(void *arg);
 #endif
 
 private:
@@ -413,11 +429,13 @@ private:
 #elif ERPC_THREADS_IS(ZEPHYR)
     struct k_mutex m_mutex; /*!< Mutex.*/
 #elif ERPC_THREADS_IS(MBED)
-    rtos::Mutex *m_mutex;   /*!< Mutex. */
+    rtos::Mutex *m_mutex; /*!< Mutex. */
 #elif ERPC_THREADS_IS(WIN32)
     HANDLE m_mutex;
 #elif ERPC_THREADS_IS(THREADX)
     TX_MUTEX m_mutex;
+#elif ERPC_THREADS_IS(RTTHREAD)
+    struct rt_mutex m_mutex; /*!< Mutex. */
 #endif
 
 private:
@@ -499,7 +517,7 @@ private:
     SemaphoreHandle_t m_sem;         /*!< Semaphore. */
     StaticSemaphore_t m_staticQueue; /*!< Static queue. */
 #elif ERPC_THREADS_IS(ZEPHYR)
-    struct k_sem m_sem;     /*!< Semaphore. */
+    struct k_sem m_sem; /*!< Semaphore. */
 #elif ERPC_THREADS_IS(MBED)
     rtos::Semaphore *m_sem; /*!< Semaphore. */
     int m_count;            /*!< Semaphore count number. */
@@ -509,6 +527,8 @@ private:
     HANDLE m_sem;
 #elif ERPC_THREADS_IS(THREADX)
     TX_SEMAPHORE m_sem; /*!< Semaphore. */
+#elif ERPC_THREADS_IS(RTTHREAD)
+    struct rt_semaphore m_sem; /*!< Semaphore. */
 #endif
 
 private:

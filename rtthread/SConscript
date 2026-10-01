@@ -1,0 +1,180 @@
+#
+# RT-Thread SCons build script for eRPC.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+from building import *
+import os
+
+cwd = GetCurrentDir()
+REPO_ROOT = os.path.abspath(os.path.join(cwd, '..'))
+ERPC_C = os.path.join(REPO_ROOT, 'erpc_c')
+RTTHREAD_DIR = cwd
+RTTHREAD_CONFIG_DIR = os.path.join(ERPC_C, 'port', 'rtthread')
+
+
+def _is_enabled(name):
+    try:
+        return GetDepend(name)
+    except Exception:
+        return False
+
+
+def _add_existing(src, paths):
+    for path in paths:
+        full_path = os.path.join(REPO_ROOT, path)
+        if os.path.exists(full_path):
+            src.append(os.path.relpath(full_path, cwd))
+
+
+src = []
+
+_add_existing(src, [
+    'erpc_c/infra/erpc_basic_codec.cpp',
+    'erpc_c/infra/erpc_crc16.cpp',
+    'erpc_c/infra/erpc_framed_transport.cpp',
+    'erpc_c/infra/erpc_message_buffer.cpp',
+    'erpc_c/infra/erpc_pre_post_action.cpp',
+    'erpc_c/infra/erpc_utils.cpp',
+    'erpc_c/port/erpc_port_rtthread.cpp',
+    'erpc_c/port/erpc_threading_rtthread.cpp',
+])
+
+if _is_enabled('PKG_ERPC_USING_CLIENT'):
+    _add_existing(src, [
+        'erpc_c/infra/erpc_client_manager.cpp',
+        'erpc_c/setup/erpc_client_setup.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_SERVER'):
+    _add_existing(src, [
+        'erpc_c/infra/erpc_server.cpp',
+        'erpc_c/infra/erpc_simple_server.cpp',
+        'erpc_c/setup/erpc_server_setup.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_ARBITRATOR'):
+    _add_existing(src, ['erpc_c/infra/erpc_transport_arbitrator.cpp'])
+
+if _is_enabled('PKG_ERPC_USING_ARBITRATED_CLIENT'):
+    _add_existing(src, [
+        'erpc_c/infra/erpc_arbitrated_client_manager.cpp',
+        'erpc_c/setup/erpc_arbitrated_client_setup.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_MBF_DYNAMIC'):
+    _add_existing(src, ['erpc_c/setup/erpc_setup_mbf_dynamic.cpp'])
+
+if _is_enabled('PKG_ERPC_USING_MBF_STATIC'):
+    _add_existing(src, ['erpc_c/setup/erpc_setup_mbf_static.cpp'])
+
+if _is_enabled('PKG_ERPC_MESSAGE_LOGGING'):
+    _add_existing(src, ['erpc_c/infra/erpc_message_loggers.cpp'])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_INTER_THREAD_BUFFER'):
+    _add_existing(src, ['erpc_c/transports/erpc_inter_thread_buffer_transport.cpp'])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_RTTHREAD_UART'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_uart_rtthread_transport.cpp',
+        'erpc_c/setup/erpc_setup_uart_rtthread.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_UART_CMSIS'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_uart_cmsis_transport.cpp',
+        'erpc_c/setup/erpc_setup_uart_cmsis.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_USB_CDC'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_usb_cdc_transport.cpp',
+        'erpc_c/setup/erpc_setup_usb_cdc.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_SPI_MASTER'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_spi_master_transport.cpp',
+        'erpc_c/setup/erpc_setup_spi_master.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_SPI_SLAVE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_spi_slave_transport.cpp',
+        'erpc_c/setup/erpc_setup_spi_slave.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_DSPI_MASTER'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_dspi_master_transport.cpp',
+        'erpc_c/setup/erpc_setup_dspi_master.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_DSPI_SLAVE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_dspi_slave_transport.cpp',
+        'erpc_c/setup/erpc_setup_dspi_slave.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_LPSPI_SLAVE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_lpspi_slave_transport.cpp',
+        'erpc_c/setup/erpc_setup_lpspi_slave.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_I2C_SLAVE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_i2c_slave_transport.cpp',
+        'erpc_c/setup/erpc_setup_i2c_slave.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_LPI2C_SLAVE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_lpi2c_slave_transport.cpp',
+        'erpc_c/setup/erpc_setup_lpi2c_slave.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_MU'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_mu_transport.cpp',
+        'erpc_c/setup/erpc_setup_mu.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_RPMSG_LITE'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_rpmsg_lite_transport.cpp',
+        'erpc_c/setup/erpc_setup_mbf_rpmsg.cpp',
+        'erpc_c/setup/erpc_setup_rpmsg_lite_master.cpp',
+        'erpc_c/setup/erpc_setup_rpmsg_lite_remote.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_RPMSG_LITE_RTOS'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_rpmsg_lite_rtos_transport.cpp',
+        'erpc_c/setup/erpc_setup_mbf_rpmsg.cpp',
+        'erpc_c/setup/erpc_setup_rpmsg_lite_rtos_master.cpp',
+        'erpc_c/setup/erpc_setup_rpmsg_lite_rtos_remote.cpp',
+    ])
+
+if _is_enabled('PKG_ERPC_USING_TRANSPORT_RPMSG_TTY_RTOS'):
+    _add_existing(src, [
+        'erpc_c/transports/erpc_rpmsg_tty_rtos_transport.cpp',
+        'erpc_c/setup/erpc_setup_rpmsg_tty_rtos_remote.cpp',
+    ])
+
+CPPPATH = [
+    RTTHREAD_CONFIG_DIR,
+    RTTHREAD_DIR,
+    os.path.join(ERPC_C, 'infra'),
+    os.path.join(ERPC_C, 'port'),
+    os.path.join(ERPC_C, 'service'),
+    os.path.join(ERPC_C, 'setup'),
+    os.path.join(ERPC_C, 'transports'),
+]
+
+src = list(dict.fromkeys(src))
+
+group = DefineGroup('eRPC', src, depend=['PKG_USING_ERPC'], CPPPATH=CPPPATH)
+
+Return('group')

@@ -1,0 +1,447 @@
+#
+# RT-Thread package configuration for eRPC.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+menuconfig PKG_USING_ERPC
+    bool "eRPC: Embedded RPC framework"
+    default n
+    select RT_USING_CPLUSPLUS
+    select RT_USING_HEAP
+    select RT_USING_MUTEX
+    select RT_USING_SEMAPHORE
+    help
+        Enable the Embedded RPC runtime as an RT-Thread package. This package
+        builds the eRPC C/C++ runtime sources used by generated client and
+        server stubs. The host-side erpcgen tool is not built for the MCU
+        target by this package.
+
+if PKG_USING_ERPC
+
+menu "eRPC RT-Thread runtime configuration"
+
+config PKG_ERPC_HAS_THREADING_BACKEND
+    bool
+    default y
+
+config PKG_ERPC_RTTHREAD_THREAD_STACK_SIZE
+    int "Default eRPC thread stack size"
+    default 2048
+    range 512 65535
+    help
+        Default stack size in bytes for eRPC threads created without an
+        explicit stack size.
+
+config PKG_ERPC_RTTHREAD_THREAD_PRIORITY
+    int "Default eRPC thread priority"
+    default 20
+    range 0 255
+    help
+        Default RT-Thread native priority used when the eRPC thread priority is
+        0. Non-zero eRPC priorities are passed through as native RT-Thread
+        priorities.
+
+config PKG_ERPC_RTTHREAD_THREAD_TIMESLICE
+    int "Default eRPC thread timeslice"
+    default 10
+    range 1 65535
+    help
+        Default RT-Thread timeslice used for eRPC threads.
+
+endmenu
+
+menu "eRPC core components"
+
+config PKG_ERPC_USING_CLIENT
+    bool "Enable client runtime"
+    default n
+    help
+        Build the eRPC client manager and client setup helper. Enable this when
+        generated client stubs will issue RPC requests from the RT-Thread
+        target.
+
+config PKG_ERPC_USING_SERVER
+    bool "Enable server runtime"
+    default y
+    help
+        Build the eRPC server core and simple server setup helper. This is the
+        default package role for an MCU board that exposes services over a
+        transport such as UART.
+
+config PKG_ERPC_USING_TRANSPORT_ARBITRATOR
+    bool "Enable transport arbitrator runtime"
+    default n
+    depends on PKG_ERPC_USING_CLIENT
+    help
+        Build erpc_transport_arbitrator.cpp. This component multiplexes replies
+        and incoming invocations over a shared transport. It requires a valid
+        eRPC threading backend, which is fixed to RT-Thread native APIs in this package.
+
+config PKG_ERPC_USING_ARBITRATED_CLIENT
+    bool "Enable arbitrated client setup"
+    default n
+    depends on PKG_ERPC_USING_CLIENT && PKG_ERPC_USING_TRANSPORT_ARBITRATOR
+    help
+        Build the arbitrated client manager and setup helper. This is used when
+        a client shares a transport with a server and replies must be routed to
+        pending client requests.
+
+endmenu
+
+menu "eRPC message buffer factory"
+
+choice
+    prompt "Message buffer factory setup helper"
+    default PKG_ERPC_USING_MBF_DYNAMIC
+    help
+        Select exactly one setup helper for creating an eRPC message buffer
+        factory. Applications that create their own factory manually can still
+        ignore the selected setup API.
+
+config PKG_ERPC_USING_MBF_DYNAMIC
+    bool "Dynamic message buffer factory setup"
+    help
+        Build erpc_mbf_dynamic_init(). The factory allocates each message
+        buffer dynamically with ERPC_DEFAULT_BUFFER_SIZE bytes.
+
+config PKG_ERPC_USING_MBF_STATIC
+    bool "Static message buffer factory setup"
+    help
+        Build erpc_mbf_static_init(). The factory owns a fixed pool of
+        ERPC_DEFAULT_BUFFERS_COUNT buffers, each sized by
+        ERPC_DEFAULT_BUFFER_SIZE.
+
+endchoice
+
+config PKG_ERPC_DEFAULT_BUFFER_SIZE
+    int "eRPC message buffer size"
+    default 256
+    range 1 65535
+    help
+        Size in bytes for message buffers created by eRPC setup helpers. For
+        RPMsg transports this value must follow the eRPC transport requirement,
+        normally 2^n - 16.
+
+config PKG_ERPC_DEFAULT_BUFFERS_COUNT
+    int "Static message buffer count"
+    default 2
+    range 1 255
+    depends on PKG_ERPC_USING_MBF_STATIC
+    help
+        Number of buffers owned by the static message buffer factory.
+
+endmenu
+
+menu "eRPC feature macros"
+
+config PKG_ERPC_NOEXCEPT
+    bool "Enable noexcept support"
+    default n
+    help
+        Define ERPC_NOEXCEPT as ERPC_NOEXCEPT_ENABLED. The disabled state
+        defines ERPC_NOEXCEPT as ERPC_NOEXCEPT_DISABLED.
+
+config PKG_ERPC_NESTED_CALLS
+    bool "Enable nested calls"
+    default n
+    help
+        Define ERPC_NESTED_CALLS as ERPC_NESTED_CALLS_ENABLED. Nested calls
+        require a working eRPC threading backend.
+
+config PKG_ERPC_NESTED_CALLS_DETECTION
+    bool "Enable nested-call detection"
+    default y if !PKG_ERPC_NESTED_CALLS
+    default n
+    help
+        Define ERPC_NESTED_CALLS_DETECTION as
+        ERPC_NESTED_CALLS_DETECTION_ENABLED. This is mainly useful while
+        debugging unmarked nested calls.
+
+config PKG_ERPC_MESSAGE_LOGGING
+    bool "Enable message logging"
+    default n
+    help
+        Define ERPC_MESSAGE_LOGGING as ERPC_MESSAGE_LOGGING_ENABLED and compile
+        the message logger runtime source.
+
+config PKG_ERPC_PRE_POST_ACTION
+    bool "Enable pre/post action hooks"
+    default n
+    help
+        Define ERPC_PRE_POST_ACTION as ERPC_PRE_POST_ACTION_ENABLED. This
+        controls whether pre/post action callback hooks are enabled in eRPC
+        runtime code.
+
+config PKG_ERPC_PRE_POST_ACTION_DEFAULT
+    bool "Enable default pre/post callbacks"
+    default n
+    depends on PKG_ERPC_PRE_POST_ACTION
+    help
+        Define ERPC_PRE_POST_ACTION_DEFAULT as
+        ERPC_PRE_POST_ACTION_DEFAULT_ENABLED. This option affects default
+        pre/post callbacks only; it does not replace the need to enable
+        ERPC_PRE_POST_ACTION itself.
+
+endmenu
+
+menu "eRPC endianness configuration"
+
+config PKG_ERPC_ENDIANNESS_HEADER
+    string "ENDIANNESS_HEADER value"
+    default "erpc_endianness_agnostic_example.h"
+    help
+        Header name assigned to ENDIANNESS_HEADER. The selected header must be
+        reachable from the eRPC include path.
+
+choice
+    prompt "Processor endianness"
+    default PKG_ERPC_PROCESSOR_ENDIANNESS_LITTLE
+    help
+        Select the byte order of the current MCU processor for the selected
+        eRPC endianness helper.
+
+config PKG_ERPC_PROCESSOR_ENDIANNESS_LITTLE
+    bool "Processor is little endian"
+    help
+        Define ERPC_PROCESSOR_ENDIANNESS_LITTLE as 1.
+
+config PKG_ERPC_PROCESSOR_ENDIANNESS_BIG
+    bool "Processor is big endian"
+    help
+        Define ERPC_PROCESSOR_ENDIANNESS_LITTLE as 0.
+
+endchoice
+
+choice
+    prompt "Communication endianness"
+    default PKG_ERPC_COMMUNICATION_LITTLE
+    help
+        Select the byte order used on the eRPC wire format for the selected
+        endianness helper.
+
+config PKG_ERPC_COMMUNICATION_LITTLE
+    bool "Communication is little endian"
+    help
+        Define ERPC_COMMUNICATION_LITTLE as 1.
+
+config PKG_ERPC_COMMUNICATION_BIG
+    bool "Communication is big endian"
+    help
+        Define ERPC_COMMUNICATION_LITTLE as 0.
+
+endchoice
+
+choice
+    prompt "Pointer size for endianness helper"
+    default PKG_ERPC_POINTER_SIZE_32
+    help
+        Select the pointer width reported to the selected endianness helper.
+
+config PKG_ERPC_POINTER_SIZE_16
+    bool "16-bit pointer"
+    help
+        Define ERPC_POINTER_SIZE_16 as enabled and the other pointer-size macros
+        as disabled.
+
+config PKG_ERPC_POINTER_SIZE_32
+    bool "32-bit pointer"
+    help
+        Define ERPC_POINTER_SIZE_32 as enabled and the other pointer-size macros
+        as disabled.
+
+config PKG_ERPC_POINTER_SIZE_64
+    bool "64-bit pointer"
+    help
+        Define ERPC_POINTER_SIZE_64 as enabled and the other pointer-size macros
+        as disabled.
+
+endchoice
+
+endmenu
+
+menu "eRPC transport components"
+
+config PKG_ERPC_USING_TRANSPORT_INTER_THREAD_BUFFER
+    bool "Inter-thread buffer transport"
+    default n
+    depends on PKG_ERPC_USING_CLIENT && PKG_ERPC_USING_SERVER
+    help
+        Build erpc_inter_thread_buffer_transport.cpp. This transport connects a
+        local client and server inside the same process and does not depend on a
+        hardware device driver.
+
+config PKG_ERPC_USING_TRANSPORT_RTTHREAD_UART
+    bool "RT-Thread UART transport"
+    default n
+    depends on RT_USING_DEVICE && RT_USING_SERIAL
+    help
+        Build the native RT-Thread UART transport. The transport uses the
+        RT-Thread device API and supports multiple UART device instances. Each
+        active transport owns the receive callback of its UART device.
+
+config PKG_ERPC_RTTHREAD_UART_TRANSPORT_COUNT
+    int "Maximum active RT-Thread UART transports"
+    default 1
+    range 1 16
+    depends on PKG_ERPC_USING_TRANSPORT_RTTHREAD_UART
+    help
+        Maximum number of simultaneously registered RT-Thread UART transports.
+        The native UART transport uses a fixed registry and does not allocate
+        registry nodes dynamically.
+
+menuconfig PKG_ERPC_HAS_CMSIS_DRIVER_USART
+    bool "CMSIS Driver_USART transport support"
+    default n
+    help
+        Enable this when the BSP provides the CMSIS Driver_USART interface used
+        by erpc_uart_cmsis_transport.cpp.
+
+if PKG_ERPC_HAS_CMSIS_DRIVER_USART
+
+config PKG_ERPC_USING_TRANSPORT_UART_CMSIS
+    bool "CMSIS UART transport"
+    default n
+    help
+        Build erpc_uart_cmsis_transport.cpp and its setup helper. The BSP must
+        provide the CMSIS Driver_USART API.
+
+endif
+
+menuconfig PKG_ERPC_HAS_NXP_SERIAL_MANAGER
+    bool "NXP serial manager transport support"
+    default n
+    help
+        Enable this when the BSP provides fsl_component_serial_manager.h for the
+        USB CDC transport implementation.
+
+if PKG_ERPC_HAS_NXP_SERIAL_MANAGER
+
+config PKG_ERPC_USING_TRANSPORT_USB_CDC
+    bool "USB CDC transport"
+    default n
+    depends on RT_USING_USB_DEVICE
+    help
+        Build erpc_usb_cdc_transport.cpp and its setup helper. The BSP must
+        provide RT-Thread USB device support and the NXP serial manager header.
+
+endif
+
+menuconfig PKG_ERPC_HAS_MCUX_SDK
+    bool "NXP MCUX SDK transport support"
+    default n
+    help
+        Enable this when the BSP provides board.h and the NXP fsl_* driver
+        headers required by the MCUX SPI, I2C, and MU transport sources.
+
+if PKG_ERPC_HAS_MCUX_SDK
+
+config PKG_ERPC_USING_TRANSPORT_SPI_MASTER
+    bool "MCUX SPI master transport"
+    default n
+    depends on RT_USING_SPI
+    help
+        Build erpc_spi_master_transport.cpp and its setup helper. The source
+        uses board.h, fsl_spi.h, fsl_gpio.h, and fsl_port.h.
+
+config PKG_ERPC_USING_TRANSPORT_SPI_SLAVE
+    bool "MCUX SPI slave transport"
+    default n
+    depends on RT_USING_SPI
+    help
+        Build erpc_spi_slave_transport.cpp and its setup helper. The source uses
+        board.h, fsl_spi.h, and fsl_gpio.h.
+
+config PKG_ERPC_USING_TRANSPORT_DSPI_MASTER
+    bool "MCUX DSPI master transport"
+    default n
+    depends on RT_USING_SPI
+    help
+        Build erpc_dspi_master_transport.cpp and its setup helper. The source
+        uses board.h, fsl_dspi.h, fsl_gpio.h, and fsl_port.h.
+
+config PKG_ERPC_USING_TRANSPORT_DSPI_SLAVE
+    bool "MCUX DSPI slave transport"
+    default n
+    depends on RT_USING_SPI
+    help
+        Build erpc_dspi_slave_transport.cpp and its setup helper. The source
+        uses board.h, fsl_dspi.h, and fsl_gpio.h.
+
+config PKG_ERPC_USING_TRANSPORT_LPSPI_SLAVE
+    bool "MCUX LPSPI slave transport"
+    default n
+    depends on RT_USING_SPI
+    help
+        Build erpc_lpspi_slave_transport.cpp and its setup helper. The source
+        uses board.h, fsl_lpspi.h, and fsl_gpio.h.
+
+config PKG_ERPC_USING_TRANSPORT_I2C_SLAVE
+    bool "MCUX I2C slave transport"
+    default n
+    depends on RT_USING_I2C
+    help
+        Build erpc_i2c_slave_transport.cpp and its setup helper. The source uses
+        board.h, fsl_i2c.h, and fsl_gpio.h.
+
+config PKG_ERPC_USING_TRANSPORT_LPI2C_SLAVE
+    bool "MCUX LPI2C slave transport"
+    default n
+    depends on RT_USING_I2C
+    help
+        Build erpc_lpi2c_slave_transport.cpp and its setup helper. The source
+        uses board.h, fsl_lpi2c.h, and fsl_gpio.h.
+
+config PKG_ERPC_USING_TRANSPORT_MU
+    bool "MCUX MU transport"
+    default n
+    help
+        Build erpc_mu_transport.cpp and its setup helper. This transport uses
+        NXP MU hardware support from the MCUX SDK.
+
+config PKG_ERPC_TRANSPORT_MU_USE_MCMGR
+    bool "Use MCMGR for MU interrupt management"
+    default n
+    depends on PKG_ERPC_USING_TRANSPORT_MU
+    help
+        Define ERPC_TRANSPORT_MU_USE_MCMGR as
+        ERPC_TRANSPORT_MU_USE_MCMGR_ENABLED. When disabled, the macro is defined
+        as ERPC_TRANSPORT_MU_USE_MCMGR_DISABLED.
+
+endif
+
+menuconfig PKG_ERPC_HAS_RPMSG_LITE
+    bool "RPMsg-Lite transport support"
+    default n
+    help
+        Enable this when rpmsg_lite.h, rpmsg_ns.h, and the related RPMsg-Lite
+        headers are available in the BSP include path.
+
+if PKG_ERPC_HAS_RPMSG_LITE
+
+config PKG_ERPC_USING_TRANSPORT_RPMSG_LITE
+    bool "RPMsg-Lite bare-metal transport"
+    default n
+    help
+        Build the RPMsg-Lite transport, RPMsg message buffer setup helper, and
+        master/remote setup helpers.
+
+config PKG_ERPC_USING_TRANSPORT_RPMSG_LITE_RTOS
+    bool "RPMsg-Lite RTOS transport"
+    default n
+    help
+        Build the RPMsg-Lite RTOS transport, RPMsg message buffer setup helper,
+        and RTOS master/remote setup helpers.
+
+config PKG_ERPC_USING_TRANSPORT_RPMSG_TTY_RTOS
+    bool "RPMsg TTY RTOS transport"
+    default n
+    help
+        Build erpc_rpmsg_tty_rtos_transport.cpp and the RPMsg TTY remote setup
+        helper.
+
+endif
+
+endmenu
+
+endif
