@@ -199,9 +199,17 @@ bool erpc_arbitrated_client_add_message_logger(erpc_client_t client, erpc_transp
 {
     erpc_assert(client != NULL);
 
-    ArbitratedClientManager *clientManager = reinterpret_cast<ArbitratedClientManager *>(client);
+    if (transport == NULL)
+    {
+        return false;
+    }
 
-    return clientManager->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    ArbitratedClientManager *clientManager = reinterpret_cast<ArbitratedClientManager *>(client);
+    Transport *loggerTransport = reinterpret_cast<Transport *>(transport);
+
+    loggerTransport->setCrc16(clientManager->getArbitrator()->getSharedTransport()->getCrc16());
+
+    return clientManager->addMessageLogger(loggerTransport);
 }
 #endif
 

@@ -182,9 +182,17 @@ bool erpc_server_add_message_logger(erpc_server_t server, erpc_transport_t trans
 {
     erpc_assert(server != NULL);
 
-    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+    if (transport == NULL)
+    {
+        return false;
+    }
 
-    return simpleServer->addMessageLogger(reinterpret_cast<Transport *>(transport));
+    SimpleServer *simpleServer = reinterpret_cast<SimpleServer *>(server);
+    Transport *loggerTransport = reinterpret_cast<Transport *>(transport);
+
+    loggerTransport->setCrc16(simpleServer->getTransport()->getCrc16());
+
+    return simpleServer->addMessageLogger(loggerTransport);
 }
 #endif
 
