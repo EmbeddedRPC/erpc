@@ -34,6 +34,22 @@
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
+// Hash Table Configuration
+////////////////////////////////////////////////////////////////////////////////
+
+/*! @brief Maximum hash table size limit (power of 2) */
+#define ERPC_HASH_TABLE_MAX_SIZE 4096
+
+/*! @brief Target load factor for optimal performance */
+#define ERPC_HASH_TABLE_TARGET_LOAD_FACTOR 0.65
+
+/*! @brief Warning threshold for load factor */
+#define ERPC_HASH_TABLE_WARNING_LOAD_FACTOR 0.75
+
+/*! @brief Minimum hash table size */
+#define ERPC_HASH_TABLE_MIN_SIZE 8
+
+////////////////////////////////////////////////////////////////////////////////
 // Classes
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -407,6 +423,18 @@ private:
      */
     void getCallbacksTemplateData(Group *group, const Interface *iface, cpptempl::data_list &callbackTypesInt,
                                   cpptempl::data_list &callbackTypesExt, cpptempl::data_list &callbackTypesAll);
+
+    /*!
+     * @brief Generate compile-time hash table data for efficient function dispatch.
+     *
+     * This function generates hash table data similar to your symbols implementation,
+     * creating a pre-computed static array for O(1) function lookup.
+     *
+     * @param[in] iface Interface to generate hash table for
+     * @param[in] functions List of functions in the interface
+     * @return Template data for hash table generation
+     */
+    cpptempl::data_map generateHashTableData(Interface *iface, const cpptempl::data_list &functions);
 };
 
 } // namespace erpcgen
